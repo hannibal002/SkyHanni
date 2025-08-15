@@ -31,6 +31,7 @@ import dev.cbyrne.kdiscordipc.core.event.impl.ReadyEvent
 import dev.cbyrne.kdiscordipc.data.activity.Activity
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -101,9 +102,8 @@ object DiscordRPCManager {
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
         ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
-            if (isConnected()) {
-                SkyHanniMod.launchNoScopeCoroutine(::updatePresence)
-            }
+            if (isConnected()) setupPresenceJob()
+            else presenceJob?.cancel()
         }
         config.enabled.whenChanged { _, new ->
             if (!new) stop()
@@ -111,7 +111,7 @@ object DiscordRPCManager {
     }
 
     private fun setupPresenceJob() {
-        presenceJob = SkyHanniMod.launchNoScopeCoroutine {
+        presenceJob = SkyHanniMod.launchNoScopeCoroutine(timeout = Duration.INFINITE) {
             while (isConnected()) {
                 updatePresence()
                 delay(5.seconds)
@@ -165,7 +165,8 @@ object DiscordRPCManager {
 
     @HandleEvent
     fun onSecondPassed() {
-        if (!isConnected() || presenceJob?.isActive == true) return
+        if (!isConnected()) return presenceJob?.cancel() ?: Unit
+        else if (presenceJob?.isActive == true) return
         setupPresenceJob()
     }
 
@@ -192,7 +193,7 @@ object DiscordRPCManager {
         if (SkyBlockUtils.inSkyBlock) {
             // todo discord rpc doesnt connect on 1.21
             //#if TODO
-            SkyHanniMod.launchNoScopeCoroutine(::start)
+            SkyHanniMod.launchNoScopeCoroutine { start() }
             //#endif
             started = true
         }

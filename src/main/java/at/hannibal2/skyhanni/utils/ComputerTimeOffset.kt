@@ -9,12 +9,10 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.EnumUtils.next
 import at.hannibal2.skyhanni.utils.EnumUtils.previous
-import at.hannibal2.skyhanni.utils.EnumUtils.previous
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.sync.Mutex
 import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
 import java.net.SocketTimeoutException
@@ -30,7 +28,6 @@ object ComputerTimeOffset {
 
     private val devConfig get() = SkyHanniMod.feature.dev
     private val config get() = SkyHanniMod.feature.misc
-    private val timeCheckMutex = Mutex()
     private val timeoutMap: MutableMap<String, Int> = mutableMapOf()
     private val offsetFixLink by lazy {
         when {
@@ -82,7 +79,7 @@ object ComputerTimeOffset {
         }
 
         val wasOffsetBefore = (offsetDuration?.absoluteValue ?: 0.seconds) > 5.seconds
-        checkJob = SkyHanniMod.launchIOCoroutineWithMutex(timeCheckMutex) {
+        checkJob = SkyHanniMod.launchIOCoroutine {
             offsetDuration = getNtpOffset(devConfig.ntpServer)
             offsetDuration?.let {
                 tryDisplayOffset(wasOffsetBefore)

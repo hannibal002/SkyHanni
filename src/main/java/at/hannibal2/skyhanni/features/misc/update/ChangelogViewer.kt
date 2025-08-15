@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.ModVersion
+import kotlinx.coroutines.Job
 import net.minecraft.client.Minecraft
 import java.util.NavigableMap
 import java.util.TreeMap
@@ -31,6 +32,7 @@ object ChangelogViewer {
     internal lateinit var endVersion: ModVersion
 
     internal var shouldMakeNewList = false
+    private var fetchJob: Job? = null
 
     internal var shouldShowBeta = SkyHanniMod.isBetaVersion
     internal var showTechnicalDetails = false
@@ -53,10 +55,13 @@ object ChangelogViewer {
         }
         startVersion = currentVersion
         endVersion = targetVersion
-        if (!cache.containsKeys(startVersion, endVersion)) {
-            SkyHanniMod.launchIOCoroutine { getChangelog() }
-        }
+        if (!cache.containsKeys(startVersion, endVersion)) setupFetchJob()
         openChangelog()
+    }
+
+    private fun setupFetchJob() {
+        if (fetchJob?.isActive == true) return
+        fetchJob = SkyHanniMod.launchIOCoroutine { getChangelog() }
     }
 
     private fun openChangelog() {
@@ -127,13 +132,13 @@ object ChangelogViewer {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerComplex("shchangelog") {
+        event.registerComplex<CommandContext>("shchangelog") {
             description = "Shows the specified changelog. No arguments shows the latest changelog."
             category = CommandCategory.USERS_ACTIVE
             //#if TODO
             context = { CommandContext() }
             //#endif
-            specifiers = listOf<CommandArgument<CommandContext>>(
+            specifiers = listOf(
                 CommandArgument(
                     documentation = "<version> - Shows the changelog of the versions until this, " +
                         "or only that version if no since is specified.",
