@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.EnumUtils.next
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import org.apache.commons.net.ntp.NTPUDPClient
@@ -43,6 +44,7 @@ object ComputerTimeOffset {
     private var offsetDuration: Duration? = null
     private var lastSystemTime = System.currentTimeMillis()
     private var timeoutWarned = SimpleTimeMark.farPast()
+    private var checkJob: Job? = null
 
     enum class State(val duration: Duration) {
         NORMAL(1.seconds),
@@ -61,7 +63,7 @@ object ComputerTimeOffset {
 
     private fun tryCheckOffset() {
         // probably a problem when the response somehow took longer than 1s?
-        if (!timeCheckMutex.tryLock()) {
+        if (checkJob?.isActive == true) {
             state = state.next() ?: error("state is already TOTALLY_OFF")
             if (state == State.TOTALLY_OFF) ErrorManager.logErrorStateWithData(
                 "Error when checking Computer Time Offset",
@@ -70,10 +72,10 @@ object ComputerTimeOffset {
                 "Computer Time Offset calculation took longer than normal. Checking less often now.",
             )
             return
-        } else timeCheckMutex.unlock() // Immediate release, we only want to check if it's already running
+        }
 
         val wasOffsetBefore = (offsetDuration?.absoluteValue ?: 0.seconds) > 5.seconds
-        SkyHanniMod.launchIOCoroutineWithMutex(timeCheckMutex) {
+        checkJob = SkyHanniMod.launchIOCoroutineWithMutex(timeCheckMutex) {
             offsetDuration = getNtpOffset(devConfig.ntpServer)
             offsetDuration?.let {
                 tryDisplayOffset(wasOffsetBefore)

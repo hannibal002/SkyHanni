@@ -36,6 +36,7 @@ import java.util.ServiceLoader
 @SkyHanniModule
 object OrderedWaypoints {
     private val config get() = SkyHanniMod.feature.mining.orderedWaypoints
+    private val storage get() = ProfileStorageData.orderedWaypointsRoutes
 
     private var orderedWaypointsList = Waypoints<SkyhanniWaypoint>()
     private val renderWaypoints: MutableList<Int> = mutableListOf()
@@ -155,9 +156,9 @@ object OrderedWaypoints {
                 arg(
                     "name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { getRouteNames() },
                 ) { name ->
-                    callback { load(getArg(name)) }
+                    coroutineSimpleCallback { load(getArg(name)) }
                 }
-                simpleCallback { load("") }
+                coroutineSimpleCallback { load("") }
             }
             literal("unload", "clear") {
                 description = "Unloads the current ordered waypoints."
@@ -231,43 +232,28 @@ object OrderedWaypoints {
         if (loadJob?.isActive == true) {
             return ChatUtils.userError("A route is already being loaded. Please wait until it finishes.")
         }
-
-        loadJob = SkyHanniMod.launchIOCoroutine {
-            val res = if (name == "") {
-                loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
-            } else {
-                val routes = ProfileStorageData.orderedWaypointsRoutes?.routes
-                routes?.get(name) ?: run {
-                    ChatUtils.userError(
-                        "Route $name doesn't exist.\n" +
-                            "§cSaved Routes: ${routes?.keys?.toList()?.joinToString(", ")}\n" +
-                            "§cIf you would like to import a route from your clipboard, leave the route name blank.",
-                    )
-                    return@launchIOCoroutine
-                }
-            }
-
-            res?.let {
-                orderedWaypointsList = it.deepCopy()
-                orderedWaypointsList.sortedBy { waypoint -> waypoint.number }
-                currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
-                renderWaypoints.clear()
-                ChatUtils.chat("Loaded ordered waypoints!")
-            } ?: run {
-                ChatUtils.userError(
-                    "There was an error parsing waypoints. " +
-                        "Please make sure they are properly formatted and in a supported format.\n" +
-                        "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
-                )
-                return@launchIOCoroutine
-            }
-        }
-
-        loadJob!!.join()
+        loadJob = setupLoadJob(name)
+        loadJob?.join()
     }
 
-    private fun handleLoadedData() {
+    private fun setupLoadJob(name: String): Job = SkyHanniMod.launchIOCoroutine {
+        val loadedRoute = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
+        else storage?.routes?.get(name) ?: return@launchIOCoroutine ChatUtils.userError(
+            "Route $name doesn't exist.\n" +
+                "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
+                "§cIf you would like to import a route from your clipboard, leave the route name blank.",
+        )
 
+        if (loadedRoute == null) return@launchIOCoroutine ChatUtils.userError(
+            "There was an error parsing waypoints. " +
+                "Please make sure they are properly formatted and in a supported format.\n" +
+                "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
+        )
+
+        orderedWaypointsList = loadedRoute.deepCopy()
+        currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
+        renderWaypoints.clear()
+        ChatUtils.chat("Loaded ordered waypoints!")
     }
 
     private fun unload() {
