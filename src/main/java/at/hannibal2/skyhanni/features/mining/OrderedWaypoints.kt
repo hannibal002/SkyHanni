@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import kotlinx.coroutines.Job
 import java.util.Locale
 import java.util.ServiceLoader
 
@@ -40,6 +41,7 @@ object OrderedWaypoints {
     private val renderWaypoints: MutableList<Int> = mutableListOf()
     private var currentOrderedWaypointIndex = 0
     private var lastCloser = 0
+    private var loadJob: Job? = null
 
     @HandleEvent(HypixelJoinEvent::class)
     fun onHypixelJoin() {
@@ -225,8 +227,12 @@ object OrderedWaypoints {
 
     private fun getRouteNames() = ProfileStorageData.orderedWaypointsRoutes?.routes?.keys.orEmpty()
 
-    private fun load(name: String) {
-        SkyHanniMod.launchIOCoroutine {
+    private suspend fun load(name: String) {
+        if (loadJob?.isActive == true) {
+            return ChatUtils.userError("A route is already being loaded. Please wait until it finishes.")
+        }
+
+        loadJob = SkyHanniMod.launchIOCoroutine {
             val res = if (name == "") {
                 loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
             } else {
@@ -256,6 +262,12 @@ object OrderedWaypoints {
                 return@launchIOCoroutine
             }
         }
+
+        loadJob!!.join()
+    }
+
+    private fun handleLoadedData() {
+
     }
 
     private fun unload() {

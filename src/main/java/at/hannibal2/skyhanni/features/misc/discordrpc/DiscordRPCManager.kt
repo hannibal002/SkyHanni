@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -30,6 +29,8 @@ import dev.cbyrne.kdiscordipc.core.event.impl.DisconnectedEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ErrorEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ReadyEvent
 import dev.cbyrne.kdiscordipc.data.activity.Activity
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -43,6 +44,7 @@ object DiscordRPCManager {
     private var startTimestamp: SimpleTimeMark = SimpleTimeMark.farPast()
     private var started = false
     private var nextUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var presenceJob: Job? = null
 
     private var debugError = false
     private var debugStatusMessage = "nothing"
@@ -73,6 +75,7 @@ object DiscordRPCManager {
             client?.on<DisconnectedEvent> { onIPCDisconnect() }
             client?.on<ErrorEvent> { onError(data) }
             client?.connect()
+            setupPresenceJob()
             updateDebugStatus("Successfully started")
             if (!fromCommand) return
             // confirm that /shrpcstart worked
@@ -104,6 +107,15 @@ object DiscordRPCManager {
         }
         config.enabled.whenChanged { _, new ->
             if (!new) stop()
+        }
+    }
+
+    private fun setupPresenceJob() {
+        presenceJob = SkyHanniMod.launchNoScopeCoroutine {
+            while (isConnected()) {
+                updatePresence()
+                delay(5.seconds)
+            }
         }
     }
 
@@ -152,11 +164,9 @@ object DiscordRPCManager {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isConnected()) return
-        if (event.repeatSeconds(5)) {
-            SkyHanniMod.launchNoScopeCoroutine(::updatePresence)
-        }
+    fun onSecondPassed() {
+        if (!isConnected() || presenceJob?.isActive == true) return
+        setupPresenceJob()
     }
 
     private fun onIPCDisconnect() {

@@ -163,6 +163,19 @@ object SkyHanniMod {
     fun launchNoScopeCoroutine(function: suspend () -> Unit): Job = launchCoroutine { function() }
 
     /**
+     * Launch a coroutine with a lock on the provided mutex.
+     * This coroutine will catch any exceptions thrown by the provided function.
+     * @param mutex The mutex to lock during the execution of the block.
+     * @param block The suspend function to execute within the IO context.
+     */
+    fun launchCoroutineWithMutex(
+        mutex: Mutex,
+        block: suspend CoroutineScope.() -> Unit,
+    ): Job = launchCoroutine {
+        mutex.withLock { block() }
+    }
+
+    /**
      * Launches a coroutine in the SkyHanni scope.
      * This coroutine will catch any exceptions thrown by the provided function.
      * @param function The suspend function to execute in the coroutine.
