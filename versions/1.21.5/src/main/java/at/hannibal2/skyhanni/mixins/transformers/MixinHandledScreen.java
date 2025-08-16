@@ -83,7 +83,11 @@ public abstract class MixinHandledScreen {
     }
 
     @Inject(method = "mouseClicked", at = @At(value = "HEAD"), cancellable = true)
+    //#if MC < 1.21.9
     private void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+        //#else
+        //$$ private void mouseClicked(double mouseX, double mouseY, int button, boolean bl, CallbackInfoReturnable<Boolean> cir) {
+        //#endif
         if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post()) {
             cir.setReturnValue(false);
         }

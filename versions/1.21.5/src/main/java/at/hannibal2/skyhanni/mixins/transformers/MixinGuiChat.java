@@ -11,7 +11,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinGuiChat {
 
     @Inject(method = "mouseClicked", at = @At("HEAD"))
+    //#if MC < 1.21.9
     public void mouseClicked(double mouseX, double mouseY, int mouseButton, CallbackInfoReturnable<Boolean> cir) {
+        //#else
+        //$$ public void mouseClicked(double mouseX, double mouseY, int mouseButton, boolean bl,CallbackInfoReturnable<Boolean> cir) {
+        //#endif
         if (mouseButton != 1) return;
         CopyChat.handleCopyChat((int) mouseX, (int) mouseY);
     }
