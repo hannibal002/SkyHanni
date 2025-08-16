@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
+import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -366,6 +367,7 @@ object EntityOutlineRenderer {
      */
     @HandleEvent
     fun onTick() {
+        if (GlobalRender.renderDisabled) return
         if (!isEnabled()) return
 
         val renderGlobal = try {
