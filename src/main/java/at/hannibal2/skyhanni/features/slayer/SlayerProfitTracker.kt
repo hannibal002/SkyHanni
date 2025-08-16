@@ -109,7 +109,7 @@ object SlayerProfitTracker {
     @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
-        var coins = event.coins
+        val coins = event.coins
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerApi.isInCorrectArea) {
             tryAddItem(NeuInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
         }
