@@ -80,12 +80,12 @@ value class Graph(
                 val list = mutableListOf<GraphNode>()
                 val neighbourMap = mutableMapOf<GraphNode, List<Pair<Int, Double>>>()
                 while (reader.hasNext()) {
-                    if(reader.peek() != JsonToken.NAME){
+                    if (reader.peek() != JsonToken.NAME) {
                         reader.skipValue()
                         continue
                     }
                     val topLevelName = reader.nextName()
-                    val id = topLevelName.toIntOrNull() ?: run{
+                    val id = topLevelName.toIntOrNull() ?: run {
                         reader.skipValue()
                         continue
                     }
