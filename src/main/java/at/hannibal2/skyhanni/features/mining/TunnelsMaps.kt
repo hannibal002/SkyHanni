@@ -67,7 +67,7 @@ object TunnelsMaps {
 
     private val config get() = SkyHanniMod.feature.mining.tunnelMaps
 
-    private var graph: Graph = Graph(emptyList())
+    private var graph: Graph = Graph()
     private lateinit var campfire: GraphNode
 
     private var goalReached = false
@@ -399,7 +399,7 @@ object TunnelsMaps {
         if (!isEnabled()) return
         if (checkGoalReached()) return
         val prevClosest = closestNode
-        closestNode = graph.minBy { it.position.distanceSqToPlayer() }
+        closestNode = graph.getNearest()
         val closest = closestNode ?: return
         val goal = goal ?: return
         if (closest == prevClosest && goal == prevGoal) return

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
@@ -13,7 +14,7 @@ import com.google.gson.stream.JsonToken
 // TODO: This class should be disambiguated into a NodePath and a Graph class
 @JvmInline
 value class Graph(
-    @Expose val nodes: List<GraphNode>,
+    @Expose private val nodes: List<GraphNode>,
 ) : List<GraphNode> {
     override val size
         get() = nodes.size
@@ -40,6 +41,14 @@ value class Graph(
     fun getTags(tag: GraphNodeTag) = nodes.filter { it.hasTag(tag) }
     fun getTags(vararg tag: GraphNodeTag) = nodes.filter { node -> tag.all { node.hasTag(it) } }
     fun getName(name: String) = nodes.filter { it.name == name }
+    fun getNearest(location: LorenzVec): GraphNode = minBy { it.position.distanceSq(location) }
+    fun getNearest(location: LorenzVec, condition: (GraphNode) -> Boolean): GraphNode =
+        filter(condition).minBy { it.position.distanceSq(location) }
+
+    fun getNearest() = getNearest(LocationUtils.playerGraphGridLocation())
+    fun getNearest(condition: (GraphNode) -> Boolean) = getNearest(LocationUtils.playerGraphGridLocation(), condition)
+
+    constructor() : this(emptyList())
 
     companion object {
         val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(
@@ -210,7 +219,7 @@ fun DijkstraTree.findPathToDestination(end: GraphNode): Pair<Graph, Double> {
         while (true) {
             add(current)
             if (current == distances.origin) break
-            current = distances.towardsOrigin[current] ?: return Graph(emptyList()) to 0.0
+            current = distances.towardsOrigin[current] ?: return Graph() to 0.0
         }
     }
     return Graph(reversePath.reversed()) to distances.distances[end]!!

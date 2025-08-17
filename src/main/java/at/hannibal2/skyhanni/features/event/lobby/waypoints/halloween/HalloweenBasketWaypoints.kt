@@ -139,7 +139,7 @@ object HalloweenBasketWaypoints {
         if (isActive != newIsActive && newIsActive) {
             IslandGraphs.loadLobby("MAIN_LOBBY")
 
-            val nodeList = IslandGraphs.currentIslandGraph?.nodes?.filter { it.hasTag(GraphNodeTag.HALLOWEEN_BASKET) }.orEmpty()
+            val nodeList = IslandGraphs.currentIslandGraph?.getTags(GraphNodeTag.HALLOWEEN_BASKET).orEmpty()
             basketList.clear()
             nodeList.forEach { node ->
                 basketList.add(EventWaypoint(position = node.position, isFound = false))
@@ -169,9 +169,7 @@ object HalloweenBasketWaypoints {
     }
 
     private fun getClosest(nodeList: List<GraphNode>? = null): EventWaypoint? {
-        val nodes = nodeList ?: IslandGraphs.currentIslandGraph?.nodes?.filter {
-            it.hasTag(GraphNodeTag.HALLOWEEN_BASKET)
-        }.orEmpty()
+        val nodes = nodeList ?: IslandGraphs.currentIslandGraph?.getTags(GraphNodeTag.HALLOWEEN_BASKET).orEmpty()
 
         val unFoundBaskets = basketList.filter { !it.isFound }.map { it.position }
         val unFoundNodes = nodes.filter { it.position in unFoundBaskets }

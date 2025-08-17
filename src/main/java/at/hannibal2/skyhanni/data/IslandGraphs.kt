@@ -114,7 +114,7 @@ object IslandGraphs {
     fun disableNodes(reason: String, center: LorenzVec, radius: Double) {
         val graph = currentIslandGraph ?: return
         disabledNodesReason = reason
-        for (node in graph.nodes.filter { it.position.distance(center) < radius }) {
+        for (node in graph.filter { it.position.distance(center) < radius }) {
             node.enabled = false
         }
     }
@@ -122,7 +122,7 @@ object IslandGraphs {
     fun enableAllNodes() {
         disabledNodesReason = null
         val graph = currentIslandGraph ?: return
-        graph.nodes.forEach { it.enabled = true }
+        graph.forEach { it.enabled = true }
     }
 
     private var pathfindClosestNode: GraphNode? = null
@@ -338,11 +338,11 @@ object IslandGraphs {
     private fun onCurrentPath(): Boolean {
         val path = fastestPath ?: return false
         if (path.isEmpty()) return false
-        val closest = path.nodes.minBy { it.position.distanceSqToPlayer() }
+        val closest = path.getNearest()
         val distance = closest.position.distanceToPlayer()
         if (distance > 7) return false
 
-        val index = path.nodes.indexOf(closest)
+        val index = path.indexOf(closest)
         val newNodes = path.drop(index)
         val newGraph = Graph(newNodes)
         fastestPath = skipIfCloser(newGraph)
@@ -350,9 +350,9 @@ object IslandGraphs {
         return true
     }
 
-    private fun skipIfCloser(graph: Graph): Graph = if (graph.nodes.size > 1) {
+    private fun skipIfCloser(graph: Graph): Graph = if (graph.size > 1) {
         val hideNearby = if (MinecraftCompat.localPlayer.onGround) 3 else 5
-        Graph(graph.nodes.takeLastWhile { it.position.distanceToPlayer() > hideNearby })
+        Graph(graph.takeLastWhile { it.position.distanceToPlayer() > hideNearby })
     } else {
         graph
     }
@@ -379,7 +379,7 @@ object IslandGraphs {
         setFastestPath(path to (distance + nodeDistance))
     }
 
-    private fun Graph.totalLength(): Double = nodes.zipWithNext().sumOf { (a, b) -> a.position.distance(b.position) }
+    private fun Graph.totalLength(): Double = zipWithNext().sumOf { (a, b) -> a.position.distance(b.position) }
 
     private fun handlePositionChange() {
         updateFeedback()
@@ -406,7 +406,7 @@ object IslandGraphs {
     private fun setFastestPath(path: Pair<Graph, Double>, setPath: Boolean = true) {
         // TODO cleanup
         val (fastestPath, _) = path.takeIf { it.first.isNotEmpty() } ?: return
-        val nodes = fastestPath.nodes.toMutableList()
+        val nodes = fastestPath.toMutableList()
         if (MinecraftCompat.localPlayer.onGround) {
             nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
         }
@@ -573,7 +573,7 @@ object IslandGraphs {
         )
 
         val targetLocation = currentTarget ?: return
-        val lastNode = path.nodes.lastOrNull()?.position ?: return
+        val lastNode = path.lastOrNull()?.position ?: return
         event.draw3DLine(lastNode.add(0.5, 0.5, 0.5), targetLocation.add(0.5, 0.5, 0.5), color, 4, true)
     }
 
@@ -612,7 +612,7 @@ object IslandGraphs {
     fun findClosestNode(location: LorenzVec, condition: (GraphNode) -> Boolean, radius: Double = 100.0): GraphNode? {
         val graph = currentIslandGraph ?: return null
 
-        val found = graph.nodes.filter { condition(it) }.minBy { it.position.distanceSq(location) }
+        val found = graph.getNearest(location, condition)
         return found.takeIf { it.position.distance(location) < radius }
     }
 

@@ -53,7 +53,7 @@ object GraphParkour {
     }
 
     private fun graphToList(graph: Graph): List<LorenzVec>? {
-        val starts = graph.nodes.filter { it.name == "start" }
+        val starts = graph.getName("start")
         if (starts.isEmpty()) {
             ChatUtils.userError("No start node found!")
             return null
@@ -62,7 +62,7 @@ object GraphParkour {
             ChatUtils.userError("More than one start node found!")
             return null
         }
-        val ends = graph.nodes.filter { it.name == "end" }
+        val ends = graph.getName("end")
         if (ends.isEmpty()) {
             ChatUtils.userError("No end node found!")
             return null
@@ -88,7 +88,7 @@ object GraphParkour {
 
         var current = startN.first().key
 
-        while (list.size != graph.nodes.size - 1) {
+        while (list.size != graph.size - 1) {
             val neighbours = current.neighbours.filter { it.key !in list }.keys
             if (neighbours.size > 1) {
                 ChatUtils.userError("One node has more than two neighbours!")

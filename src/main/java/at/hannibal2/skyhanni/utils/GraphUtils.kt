@@ -35,7 +35,7 @@ object GraphUtils {
 
         val map = mutableMapOf<GraphNode, Double>()
         val distances = findAllShortestDistances(closestNode)
-        for (graphNode in graph.nodes) {
+        for (graphNode in graph) {
             if (!condition(graphNode)) continue
             val (path, distance) = distances.findPathToDestination(graphNode)
             paths[graphNode] = path
@@ -119,14 +119,28 @@ object GraphUtils {
         )
     }
 
+    fun findShortestDistancesOnCurrentIsland(
+        target: Collection<GraphNode>,
+    ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(), target::contains)
+
+    fun findShortestDistancesOnCurrentIsland(
+        target: Collection<LorenzVec>,
+    ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland()) { target.contains(it.position) }
+
+    fun findAllShortestDistancesOnCurrentIsland(
+        bailout: (GraphNode) -> Boolean = { false },
+    ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(), bailout)
+
     fun findAllShortestDistancesOnCurrentIsland(
         start: LorenzVec,
         bailout: (GraphNode) -> Boolean = { false },
     ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(start), bailout)
 
+    fun nearestNodeOnCurrentIsland() = nearestNodeOnCurrentIsland(LocationUtils.playerGraphGridLocation())
+
     fun nearestNodeOnCurrentIsland(location: LorenzVec): GraphNode {
         val graph = IslandGraphs.currentIslandGraph ?: error("no island found")
-        return graph.nodes.minBy { it.position.distanceSq(location) }
+        return graph.getNearest(location)
     }
 
     fun findAllShortestDistances(
