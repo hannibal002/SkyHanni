@@ -54,7 +54,7 @@ object CrownOfAvariceCounter {
     private var coinsEarned: Long = 0L
     private var sessionUptime: Duration = 0.seconds
     private var lastCoinUpdate: SimpleTimeMark? = null
-    private var isFrozen: Boolean = false
+    private var isPaused: Boolean = false
     private val isSessionActive get(): Boolean = sessionUptime < config.sessionActiveTime.seconds
     private var coinsDifference: Long? = null
 
@@ -103,7 +103,7 @@ object CrownOfAvariceCounter {
             return
         }
 
-        isFrozen = false
+        isPaused = false
         lastCoinUpdate = SimpleTimeMark.now()
         coinsEarned += coinsDifference ?: 0
         count = coins
@@ -156,7 +156,7 @@ object CrownOfAvariceCounter {
             addLine {
                 add(Renderable.clickable(text = "§c[Reset session]", onLeftClick = ::reset))
                 addHorizontalSpacer(3)
-                add(Renderable.clickable(text = "§6[Freeze session]", onLeftClick = ::freezeSession))
+                add(Renderable.clickable(text = "§6[Pause session]", onLeftClick = ::pauseSession))
             }
         }
     }
@@ -166,15 +166,15 @@ object CrownOfAvariceCounter {
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable
 
     private fun reset() {
-        isFrozen = false
+        isPaused = false
         coinsEarned = 0L
         sessionUptime = 0.seconds
         lastCoinUpdate = SimpleTimeMark.now()
         coinsDifference = 0L
     }
 
-    private fun freezeSession() {
-        isFrozen = true
+    private fun pauseSession() {
+        isPaused = true
     }
 
 
@@ -183,7 +183,7 @@ object CrownOfAvariceCounter {
         return if (timeInHours > 0) coinsEarned / timeInHours else 0.0
     }
 
-    private fun isSessionAFK() = lastCoinUpdate?.passedSince()?.let { it > MAX_AFK_TIME || isFrozen } ?: false
+    private fun isSessionAFK() = lastCoinUpdate?.passedSince()?.let { it > MAX_AFK_TIME || isPaused } ?: false
 
     private fun calculateTimeUntilMax(): String {
         val coinsPerHour = calculateCoinsPerHour()
