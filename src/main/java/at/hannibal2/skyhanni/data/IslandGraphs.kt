@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -311,6 +312,12 @@ object IslandGraphs {
         checkMoved()
     }
 
+    private fun Graph.nearestToPlayer(): GraphNode {
+        val sorted = nodes.sortedBy { it.position.distanceSq(playerPosition) }
+        return sorted.take(20).firstOrNull { it.position.canBeSeen() }
+            ?: sorted.first()
+    }
+
     private fun handleTick() {
         updatePlayerLocation()
         val prevClosest = pathfindClosestNode
@@ -327,7 +334,7 @@ object IslandGraphs {
         }
 
         val graph = currentIslandGraph ?: return
-        val newClosest = graph.minBy { it.position.distanceSq(playerPosition) }
+        val newClosest = graph.nearestToPlayer()
         if (pathfindClosestNode == newClosest) return
         val newPath = !onCurrentPath()
 
@@ -343,7 +350,7 @@ object IslandGraphs {
     private fun onCurrentPath(): Boolean {
         val path = fastestPath ?: return false
         if (path.isEmpty()) return false
-        val closest = path.nodes.minBy { it.position.distanceSq(playerPosition) }
+        val closest = path.nearestToPlayer()
         val distance = closest.position.distance(playerPosition)
         if (distance > 7) return false
 
