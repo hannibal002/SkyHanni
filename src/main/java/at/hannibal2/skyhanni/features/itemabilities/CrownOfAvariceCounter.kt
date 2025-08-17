@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -51,10 +52,10 @@ object CrownOfAvariceCounter {
 
     private var count: Long? = null
     private var coinsEarned: Long = 0L
-    private var sessionStart: SimpleTimeMark? = null
+    private var sessionStart: Duration? = null
     private var lastCoinUpdate: SimpleTimeMark? = null
     private var isFrozen: Boolean = false
-    private val isSessionActive get(): Boolean = sessionStart?.passedSince()?.let { it < config.sessionActiveTime.seconds } ?: false
+    private val isSessionActive get(): Boolean = sessionStart?.let { it < config.sessionActiveTime.seconds } ?: false
     private var coinsDifference: Long? = null
 
     init {
@@ -81,6 +82,7 @@ object CrownOfAvariceCounter {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!isWearingCrown) return
+        if (!isSessionAFK()) sessionStart = sessionStart?.plus(1.seconds)
         update()
     }
 
@@ -138,14 +140,15 @@ object CrownOfAvariceCounter {
         if (config.time) {
             val timeUntilMax = calculateTimeUntilMax()
             addString(
-                "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " + if (isSessionAFK()) "§c(PAUSED)" else "",
+                "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " +
+                    if (isSessionAFK()) "§c(PAUSED)" else "",
             )
         }
         if (config.coinDiff) {
             addString("§aLast coins gained: §6$coinsDifference")
         }
 
-        addString("§aSession Time: §6${sessionStart?.passedSince()?.format()}")
+        addString("§aSession Time: §6${sessionStart?.format()}")
 
         if (inventoryOpen) {
             addLine {
@@ -163,7 +166,7 @@ object CrownOfAvariceCounter {
     private fun reset() {
         isFrozen = false
         coinsEarned = 0L
-        sessionStart = SimpleTimeMark.now()
+        sessionStart = 0.seconds
         lastCoinUpdate = SimpleTimeMark.now()
         coinsDifference = 0L
     }
@@ -174,7 +177,7 @@ object CrownOfAvariceCounter {
 
 
     private fun calculateCoinsPerHour(): Double {
-        val timeInHours = sessionStart?.passedSince()?.inPartialHours ?: 0.0
+        val timeInHours = sessionStart?.inPartialHours ?: 0.0
         return if (timeInHours > 0) coinsEarned / timeInHours else 0.0
     }
 
