@@ -148,7 +148,9 @@ object CrownOfAvariceCounter {
             addString("§aLast coins gained: §6$coinsDifference")
         }
 
-        addString("§aSession Time: §6${sessionStart?.format()}")
+        if (config.sessionTime) {
+            addString("§aSession Time: §6${sessionStart?.format()}")
+        }
 
         if (inventoryOpen) {
             addLine {

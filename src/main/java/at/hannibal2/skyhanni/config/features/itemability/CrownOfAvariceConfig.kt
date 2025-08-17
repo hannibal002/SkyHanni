@@ -57,6 +57,11 @@ class CrownOfAvariceConfig {
     var resetOnWorldChange = false
 
     @Expose
+    @ConfigOption(name = "Session Time", desc = "Shows the elapsed time since session start.")
+    @ConfigEditorBoolean
+    var sessionTime: Boolean = false
+
+    @Expose
     @ConfigLink(owner = CrownOfAvariceConfig::class, field = "enable")
     val position: Position = Position(20, 20)
 }
