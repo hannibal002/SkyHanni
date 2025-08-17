@@ -453,6 +453,7 @@ object ItemAbilityCooldown {
         event.move(31, "itemAbilities", "inventory.itemAbilities")
     }
 
+    // TODO add item caching
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
         val itemName: String = stack.cleanName()
         val internalName = stack.getInternalName()
