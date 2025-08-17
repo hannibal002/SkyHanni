@@ -81,9 +81,9 @@ object WoodenButtonsHelper {
         if (!showButtons()) return
         val graph = IslandGraphs.currentIslandGraph ?: return
 
-        val closestNode = graph.getNearest {
-            it.hasTag(GraphNodeTag.RIFT_BUTTONS_QUEST) &&
-                buttonLocations["${it.name}:${it.position}"]?.any { !hitButtons.contains(it) } == true
+        val closestNode = graph.getNearest {node ->
+            node.hasTag(GraphNodeTag.RIFT_BUTTONS_QUEST) &&
+                buttonLocations["${node.name}:${node.position}"]?.any { !hitButtons.contains(it) } == true
         }
 
         if (closestNode != currentSpot) {
