@@ -52,10 +52,10 @@ object CrownOfAvariceCounter {
 
     private var count: Long? = null
     private var coinsEarned: Long = 0L
-    private var sessionStart: Duration? = null
+    private var sessionStart: Duration = 0.seconds
     private var lastCoinUpdate: SimpleTimeMark? = null
     private var isFrozen: Boolean = false
-    private val isSessionActive get(): Boolean = sessionStart?.let { it < config.sessionActiveTime.seconds } ?: false
+    private val isSessionActive get(): Boolean = sessionStart < config.sessionActiveTime.seconds
     private var coinsDifference: Long? = null
 
     init {
@@ -82,7 +82,7 @@ object CrownOfAvariceCounter {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!isWearingCrown) return
-        if (!isSessionAFK()) sessionStart = sessionStart?.plus(1.seconds)
+        if (!isSessionAFK()) sessionStart += 1.seconds
         update()
     }
 
@@ -149,7 +149,7 @@ object CrownOfAvariceCounter {
         }
 
         if (config.sessionTime) {
-            addString("§aSession Time: §6${sessionStart?.format()}")
+            addString("§aSession Time: §6${sessionStart.format()}")
         }
 
         if (inventoryOpen) {
@@ -179,7 +179,7 @@ object CrownOfAvariceCounter {
 
 
     private fun calculateCoinsPerHour(): Double {
-        val timeInHours = sessionStart?.inPartialHours ?: 0.0
+        val timeInHours = sessionStart.inPartialHours
         return if (timeInHours > 0) coinsEarned / timeInHours else 0.0
     }
 
