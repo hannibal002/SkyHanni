@@ -46,6 +46,7 @@ import net.minecraft.entity.passive.EntityRabbit
 import net.minecraft.entity.passive.EntitySheep
 import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
+import org.intellij.lang.annotations.Language
 
 @Suppress("RegExpRedundantEscape")
 @SkyHanniModule
@@ -53,13 +54,16 @@ object MobFilter {
 
     private val patternGroup = RepoPattern.group("mob.detection")
 
+    @Language("RegExp")
+    private val mobType = "(?<mobType>[^\\s✯]+ )?"
+
     /**
      * REGEX-TEST: Wither Husk 500M❤
      * REGEX-TEST: [Lv10] ⚓♃ Sea Guardian 4,250/5,000❤
      */
     val mobNameFilter by patternGroup.pattern(
         "filter.basic",
-        "(?:\\[Lv(?<level>\\d+)\\] )?(?<mobType>[^\\s✯]+)? ?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
+        "(?:\\[Lv(?<level>\\d+)\\] )?$mobType(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
     )
 
     /**
@@ -70,7 +74,7 @@ object MobFilter {
      */
     val slayerNameFilter by patternGroup.pattern(
         "filter.slayer",
-        "^. (?<name>.*)(?: (?<tier>[IV]+)|(?<=Atoned Horror|Conjoined Brood)) \\d+.*"
+        "^. $mobType (?<name>.*)(?: (?<tier>[IV]+)|(?<=Atoned Horror|Conjoined Brood)) \\d+.*"
     )
 
     /**
@@ -86,12 +90,12 @@ object MobFilter {
      */
     val bossMobNameFilter by patternGroup.pattern(
         "filter.boss",
-        "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$",
+        "^. (?:\\[Lv(?<level>\\d+)\\] )?$mobType(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$",
     )
     @Suppress("MaxLineLength")
     val dungeonNameFilter by patternGroup.pattern(
         "filter.dungeon",
-        "^(?<mobType>[^\\s✯]+ )?(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$",
+        "^$mobType(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$",
     )
     val summonFilter by patternGroup.pattern(
         "filter.summon",
