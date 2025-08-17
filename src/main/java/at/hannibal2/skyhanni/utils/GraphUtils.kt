@@ -119,6 +119,7 @@ object GraphUtils {
         )
     }
 
+    @JvmName("findShortestDistancesOnCurrentIslandWithTargets")
     fun findShortestDistancesOnCurrentIsland(
         target: Collection<GraphNode>,
     ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(), target::contains)
