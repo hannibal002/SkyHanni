@@ -23,8 +23,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -128,6 +126,7 @@ object IslandGraphs {
     private var pathfindClosestNode: GraphNode? = null
     var closestNode: GraphNode? = null
 
+    private var playerPosition = LorenzVec(0, 0, 0)
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
     private var label = ""
@@ -290,6 +289,7 @@ object IslandGraphs {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
+        updatePlayerLocation()
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
 
@@ -297,6 +297,10 @@ object IslandGraphs {
             update()
         }
         updateFeedback()
+    }
+
+    private fun updatePlayerLocation() {
+        playerPosition = LocationUtils.playerLocation().add(-0.5, 0.5, -0.5)
     }
 
     fun update(force: Boolean = false) {
@@ -308,10 +312,11 @@ object IslandGraphs {
     }
 
     private fun handleTick() {
+        updatePlayerLocation()
         val prevClosest = pathfindClosestNode
 
         currentTarget?.let {
-            if (it.distanceToPlayer() < 3) {
+            if (it.distance(playerPosition) < 3) {
                 NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$label§e!")
                 reset()
                 onFound()
@@ -322,7 +327,7 @@ object IslandGraphs {
         }
 
         val graph = currentIslandGraph ?: return
-        val newClosest = graph.minBy { it.position.distanceSqToPlayer() }
+        val newClosest = graph.minBy { it.position.distanceSq(playerPosition) }
         if (pathfindClosestNode == newClosest) return
         val newPath = !onCurrentPath()
 
@@ -338,8 +343,8 @@ object IslandGraphs {
     private fun onCurrentPath(): Boolean {
         val path = fastestPath ?: return false
         if (path.isEmpty()) return false
-        val closest = path.nodes.minBy { it.position.distanceSqToPlayer() }
-        val distance = closest.position.distanceToPlayer()
+        val closest = path.nodes.minBy { it.position.distanceSq(playerPosition) }
+        val distance = closest.position.distance(playerPosition)
         if (distance > 7) return false
 
         val index = path.nodes.indexOf(closest)
@@ -352,7 +357,7 @@ object IslandGraphs {
 
     private fun skipIfCloser(graph: Graph): Graph = if (graph.nodes.size > 1) {
         val hideNearby = if (MinecraftCompat.localPlayer.onGround) 3 else 5
-        Graph(graph.nodes.takeLastWhile { it.position.distanceToPlayer() > hideNearby })
+        Graph(graph.nodes.takeLastWhile { it.position.distance(playerPosition) > hideNearby })
     } else {
         graph
     }
@@ -365,7 +370,6 @@ object IslandGraphs {
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
 
-        val playerPosition = LocationUtils.playerLocation()
         val nodeDistance = first?.let { playerPosition.distance(it.position) } ?: 0.0
         if (first != null && second != null) {
             val direct = playerPosition.distance(second.position)
@@ -408,7 +412,7 @@ object IslandGraphs {
         val (fastestPath, _) = path.takeIf { it.first.isNotEmpty() } ?: return
         val nodes = fastestPath.nodes.toMutableList()
         if (MinecraftCompat.localPlayer.onGround) {
-            nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
+            nodes.add(0, GraphNode(0, playerPosition))
         }
         renderPath(setPath, nodes)
     }
@@ -528,7 +532,7 @@ object IslandGraphs {
             for ((a, b) in path.zipWithNext()) {
                 distance += a.position.distance(b.position)
             }
-            val distanceToPlayer = path.first().position.distanceToPlayer()
+            val distanceToPlayer = path.first().position.distance(playerPosition)
             distance += distanceToPlayer
             distance = distance.roundTo(1)
         }
@@ -649,7 +653,7 @@ object IslandGraphs {
         }
 
         sendReportLocation(
-            LocationUtils.playerLocation(),
+            playerPosition,
             reasonForReport = "Manual reported graph location error",
             userReason = args.joinToString(" "),
             ignoreCache = true,

@@ -74,6 +74,8 @@ object GraphEditor {
 
     private var selectedEdge: GraphingEdge? = null
     private var ghostPosition: LorenzVec? = null
+    private var playerPosition_ = LorenzVec(0, 0, 0)
+    private val playerPosition get() = ghostPosition ?: playerPosition_
 
     private var seeThroughBlocks = true
 
@@ -206,6 +208,7 @@ object GraphEditor {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
+        playerPosition_ = LocationUtils.playerLocation().add(-0.5, 0.5, -0.5)
         if (!isEnabled()) return
         input()
         if (event.isMod(5)) {
@@ -218,9 +221,8 @@ object GraphEditor {
 
     private fun updateRender() {
         val maxNodeDistance = config.maxNodeDistance * config.maxNodeDistance
-        val player = LocationUtils.playerLocation()
         for (node in nodes) {
-            node.rendering = node.position.distanceSq(player) < maxNodeDistance
+            node.rendering = distanceToPlayer(node.position) < maxNodeDistance
         }
     }
 
@@ -229,7 +231,7 @@ object GraphEditor {
 
         if (nodesToFind.isEmpty()) return
         val closest = nodesToFind.minBy { distanceToPlayer(it) }
-        if (closest.distanceToPlayer() >= 3) return
+        if (closest.distance(playerPosition) >= 3) return
         nodesAlreadyFound.add(closest)
 
         if (nodesToFind.isEmpty()) {
@@ -244,9 +246,8 @@ object GraphEditor {
     }
 
     private fun calculateNewAllNodeFind(): LorenzVec {
-        val next = GraphUtils.findAllShortestDistancesOnCurrentIsland(
-            LocationUtils.playerLocation(),
-        ).distances.keys.first { it.position in nodesToFind }.position
+        val next = GraphUtils.findAllShortestDistancesOnCurrentIsland(playerPosition)
+            .distances.keys.first { it.position in nodesToFind }.position
 
         val max = IslandGraphs.currentIslandGraph?.nodes?.size ?: -1
         val todo = nodesToFind.size
@@ -283,11 +284,12 @@ object GraphEditor {
         )
 
         val nodeName = node.name ?: return
+        val showTextAlways = seeThroughBlocks || distanceToPlayer(node.position) < 100
         this.drawDynamicText(
             node.position,
             nodeName,
             0.8,
-            seeThroughBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
+            seeThroughBlocks = showTextAlways,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = -15f,
@@ -301,7 +303,7 @@ object GraphEditor {
             node.position,
             tagText,
             0.8,
-            seeThroughBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
+            seeThroughBlocks = showTextAlways,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = 0f,
@@ -698,7 +700,7 @@ object GraphEditor {
         addEdge(activeNode, node)
     }
 
-    fun toggleGhostPosition() {
+    private fun toggleGhostPosition() {
         if (ghostPosition != null) {
             ghostPosition = null
             feedBackInTutorial("Disabled Ghost Position.")
@@ -832,10 +834,7 @@ object GraphEditor {
         ghostPosition = null
     }
 
-    fun distanceToPlayer(location: LorenzVec): Double {
-        val playerPosition = ghostPosition ?: LocationUtils.playerLocation()
-        return location.distanceSq(playerPosition)
-    }
+    fun distanceToPlayer(location: LorenzVec): Double = location.distanceSq(playerPosition)
 
     fun enable() {
         if (!config.enabled) {
