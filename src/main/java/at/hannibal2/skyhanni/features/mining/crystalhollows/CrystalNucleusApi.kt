@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.fromItemNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -39,6 +40,13 @@ object CrystalNucleusApi {
         "loot.end",
         "§3§l▬{64}",
     )
+    /**
+     * REGEX-TEST: §fEnchanted Book (Lapidary I)
+     */
+    private val bookTypePattern by RepoPattern.pattern(
+        "filter.crystalnucleus.run.enchantedbook",
+        "§fEnchanted Book \\((?<type>\\S*).*\\)"
+    )
 
     private var inLootLoop = false
     private var unCheckedBooks: Int = 0
@@ -59,6 +67,7 @@ object CrystalNucleusApi {
         "SYNTHETIC_HEART",
     ).map { it.toInternalName() }
 
+    // Fallback to the inventory based system in case of changed chat message
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
@@ -128,8 +137,18 @@ object CrystalNucleusApi {
         if (itemName.contains(" Powder")) return null
         // Books are not directly added to the loot map, but are checked for later.
         if (itemName.startsWith("§fEnchanted")) {
-            unCheckedBooks += amount
-            return null
+            val bookType = bookTypePattern.matchMatcher(itemName) {
+                group("type").lowercase()
+            }
+            return when (bookType) {
+                "lapidary" -> LAPIDARY_I_BOOK_ITEM to 1
+                "fortune" -> FORTUNE_IV_BOOK_ITEM to 1
+                // Fallback to inventory based system
+                else -> {
+                    unCheckedBooks += amount
+                    null
+                }
+            }
         }
         val item = fromItemNameOrNull(itemName) ?: return null
         return Pair(item, amount)

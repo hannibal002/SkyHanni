@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import java.awt.Desktop
 import java.io.File
 import java.io.IOException
@@ -82,7 +83,11 @@ object OSUtils {
     @JvmStatic
     @Suppress("MaxLineLength")
     fun openSoundsListInBrowser() {
-        val url = "https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments"
+        val url = if (PlatformUtils.IS_LEGACY) {
+            "https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments"
+        } else {
+            "https://misode.github.io/sounds/"
+        }
         openBrowser(url)
     }
 
