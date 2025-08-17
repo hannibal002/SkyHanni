@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraft.entity.EntityLivingBase
 
 class DamageIndicatorEntityData(
     val mob: Mob,

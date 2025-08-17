@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
-import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.ElectionApi.ignoreDerpy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
@@ -13,7 +12,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
-import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -21,7 +19,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.monster.EntityBlaze
@@ -254,30 +251,25 @@ class MobFinder {
         return null
     }
 
-    private fun tryAddRift(mob: Mob): EntityResult? {
-        if (mob.name == "Leech Supreme") {
-            return EntityResult(bossType = BossType.LEECH_SUPREME)
-        }
-
-        if (mob.name == "Bloodfiend ") {
+    private fun tryAddRift(mob: Mob): EntityResult? = when (mob.name) {
+        "Leech Supreme" -> EntityResult(bossType = BossType.LEECH_SUPREME)
+        "Bloodfiend " -> {
             val entity = mob.baseEntity
             // there is no derpy in rift
             val hp = entity.baseMaxHealth.ignoreDerpy()
             when {
-                entity.hasMaxHealth(625, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
-                entity.hasMaxHealth(1_100, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
-                entity.hasMaxHealth(1_800, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
-                entity.hasMaxHealth(2_400, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
-                entity.hasMaxHealth(3_000, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
+                entity.hasMaxHealth(625, true, hp) -> EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
+                entity.hasMaxHealth(1_100, true, hp) -> EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
+                entity.hasMaxHealth(1_800, true, hp) -> EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
+                entity.hasMaxHealth(2_400, true, hp) -> EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
+                entity.hasMaxHealth(3_000, true, hp) -> EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
+                else -> null
             }
         }
-        if (mob.name == "Bacte") {
-            return EntityResult(bossType = BossType.BACTE)
-        }
-        if (mob.name == "Sun Gecko") {
-            return EntityResult(bossType = BossType.SUN_GECKO)
-        }
-        return null
+
+        "Bacte" -> EntityResult(bossType = BossType.BACTE)
+        "Sun Gecko" -> EntityResult(bossType = BossType.SUN_GECKO)
+        else -> null
     }
 
     private fun tryAddEntityBlaze(mob: Mob) = when (mob.name) {
@@ -382,13 +374,13 @@ class MobFinder {
         else -> null
     }
 
-    private fun tryAddEntityMagmaCube(mob: Mob) = when(mob.name) {
-        "Magma Boss"-> EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
+    private fun tryAddEntityMagmaCube(mob: Mob) = when (mob.name) {
+        "Magma Boss" -> EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
         else -> null
     }
 
-    private fun tryAddEntityHorse(mob: Mob) = when(mob.name) {
-        "Headless Horseman"-> EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
+    private fun tryAddEntityHorse(mob: Mob) = when (mob.name) {
+        "Headless Horseman" -> EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
         else -> null
     }
 
@@ -404,8 +396,8 @@ class MobFinder {
     } else null
 
     private fun tryAddEntitySpider(mob: Mob): EntityResult? {
-        if(mob.name == "Tarantula Broodfather"){
-            return when(mob.levelOrTier) {
+        if (mob.name == "Tarantula Broodfather") {
+            return when (mob.levelOrTier) {
                 1 -> EntityResult(bossType = BossType.SLAYER_SPIDER_1)
                 2 -> EntityResult(bossType = BossType.SLAYER_SPIDER_2)
                 3 -> EntityResult(bossType = BossType.SLAYER_SPIDER_3)
@@ -428,8 +420,8 @@ class MobFinder {
     }
 
     private fun checkArachne(mob: Mob): EntityResult? {
-        if(mob.name != "Arachne") return null
-        return when(mob.levelOrTier) {
+        if (mob.name != "Arachne") return null
+        return when (mob.levelOrTier) {
             300 -> EntityResult(bossType = BossType.ARACHNE_SMALL)
             500 -> EntityResult(bossType = BossType.ARACHNE_SMALL)
             else -> null
@@ -437,7 +429,7 @@ class MobFinder {
     }
 
     private fun tryAddEntityWolf(mob: Mob) = if (mob.name == "Sven Packmaster ") {
-        when(mob.levelOrTier) {
+        when (mob.levelOrTier) {
             1 -> EntityResult(bossType = BossType.SLAYER_WOLF_1)
             2 -> EntityResult(bossType = BossType.SLAYER_WOLF_2)
             3 -> EntityResult(bossType = BossType.SLAYER_WOLF_3)
