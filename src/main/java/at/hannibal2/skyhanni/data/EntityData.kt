@@ -24,6 +24,7 @@ object EntityData {
     private val healthDisplayCache = TimeLimitedCache<String, String>(50.milliseconds)
     private val lastVisibilityCheck = TimeLimitedCache<Int, Boolean>(200.milliseconds)
 
+    // TODO replace with packet detection
     @HandleEvent
     fun onTick() {
         for (entity in EntityUtils.getEntities<EntityLivingBase>()) { // this completely ignores the ignored entities list?
@@ -72,6 +73,7 @@ object EntityData {
 
     @JvmStatic
     fun onRenderCheck(entity: Entity, camX: Double, camY: Double, camZ: Double): Boolean {
+        if (GlobalRender.renderDisabled) return true
         lastVisibilityCheck[entity.entityId]?.let { result ->
             return result
         }
