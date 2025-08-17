@@ -52,6 +52,11 @@ class CrownOfAvariceConfig {
     var sessionActiveTime: Int = 10
 
     @Expose
+    @ConfigOption(name = "Reset on World Change", desc = "Resets your session on world change if enabled.")
+    @ConfigEditorBoolean
+    var resetOnWorldChange = false
+
+    @Expose
     @ConfigLink(owner = CrownOfAvariceConfig::class, field = "enable")
     val position: Position = Position(20, 20)
 }

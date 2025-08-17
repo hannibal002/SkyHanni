@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -15,16 +15,21 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.billion
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCoinsOfAvarice
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -39,6 +44,7 @@ object CrownOfAvariceCounter {
     private var display: List<Renderable> = emptyList()
     private val MAX_AVARICE_COINS = 1.billion
     private val MAX_AFK_TIME = 2.minutes
+    private var inventoryOpen = false
     private val isWearingCrown by RecalculatingValue(1.seconds) {
         InventoryUtils.getHelmet()?.getInternalNameOrNull() == internalName
     }
@@ -47,15 +53,29 @@ object CrownOfAvariceCounter {
     private var coinsEarned: Long = 0L
     private var sessionStart: SimpleTimeMark? = null
     private var lastCoinUpdate: SimpleTimeMark? = null
+    private var isFrozen: Boolean = false
     private val isSessionActive get(): Boolean = sessionStart?.passedSince()?.let { it < config.sessionActiveTime.seconds } ?: false
     private var coinsDifference: Long? = null
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!isWearingCrown) return
-        config.position.renderRenderables(display, posLabel = "Crown of Avarice Counter")
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { isEnabled() && isWearingCrown },
+            onRender = { renderDisplay(config.position) }
+        )
     }
+
+    fun renderDisplay(pos: Position) {
+        val invCurrentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
+        if (inventoryOpen != invCurrentlyOpen) {
+            inventoryOpen = invCurrentlyOpen
+            update()
+        }
+
+        pos.renderRenderables(display, posLabel = "Crown of Avarice Counter")
+    }
+
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -81,7 +101,7 @@ object CrownOfAvariceCounter {
             return
         }
 
-        if (isSessionAFK()) reset()
+        isFrozen = false
         lastCoinUpdate = SimpleTimeMark.now()
         coinsEarned += coinsDifference ?: 0
         count = coins
@@ -91,7 +111,7 @@ object CrownOfAvariceCounter {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        reset()
+        if (config.resetOnWorldChange) reset()
         count = InventoryUtils.getHelmet()?.getCoinsOfAvarice()
     }
 
@@ -111,36 +131,54 @@ object CrownOfAvariceCounter {
                 "§aCoins Per Hour: §6${
                     if (isSessionActive) "Calculating..."
                     else if (config.shortFormatCPH) coinsPerHour.shortFormat() else coinsPerHour.addSeparators()
-                } " + if (isSessionAFK()) "§c(RESET)" else "",
+                } " + if (isSessionAFK()) "§c(PAUSED)" else "",
             )
 
         }
         if (config.time) {
             val timeUntilMax = calculateTimeUntilMax()
             addString(
-                "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " + if (isSessionAFK()) "§c(RESET)" else "",
+                "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " + if (isSessionAFK()) "§c(PAUSED)" else "",
             )
         }
         if (config.coinDiff) {
             addString("§aLast coins gained: §6$coinsDifference")
         }
+
+        addString("§aSession Time: §6${sessionStart?.passedSince()?.format()}")
+
+        if (inventoryOpen) {
+            addLine {
+                add(Renderable.clickable(text = "§c[Reset session]", onLeftClick = ::reset))
+                addHorizontalSpacer(3)
+                add(Renderable.clickable(text = "§6[Freeze session]", onLeftClick = ::freezeSession))
+            }
+        }
     }
+
+
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable
 
     private fun reset() {
+        isFrozen = false
         coinsEarned = 0L
         sessionStart = SimpleTimeMark.now()
         lastCoinUpdate = SimpleTimeMark.now()
         coinsDifference = 0L
     }
 
+    private fun freezeSession() {
+        isFrozen = true
+    }
+
+
     private fun calculateCoinsPerHour(): Double {
         val timeInHours = sessionStart?.passedSince()?.inPartialHours ?: 0.0
         return if (timeInHours > 0) coinsEarned / timeInHours else 0.0
     }
 
-    private fun isSessionAFK() = lastCoinUpdate?.passedSince()?.let { it > MAX_AFK_TIME } ?: false
+    private fun isSessionAFK() = lastCoinUpdate?.passedSince()?.let { it > MAX_AFK_TIME || isFrozen } ?: false
 
     private fun calculateTimeUntilMax(): String {
         val coinsPerHour = calculateCoinsPerHour()
