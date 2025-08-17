@@ -80,7 +80,15 @@ value class Graph(
                 val list = mutableListOf<GraphNode>()
                 val neighbourMap = mutableMapOf<GraphNode, List<Pair<Int, Double>>>()
                 while (reader.hasNext()) {
-                    val id = reader.nextName().toInt()
+                    if(reader.peek() != JsonToken.NAME){
+                        reader.skipValue()
+                        continue
+                    }
+                    val topLevelName = reader.nextName()
+                    val id = topLevelName.toIntOrNull() ?: run{
+                        reader.skipValue()
+                        continue
+                    }
                     reader.beginObject()
                     var position: LorenzVec? = null
                     var name: String? = null
