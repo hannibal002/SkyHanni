@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.Mob as ShMob
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
@@ -907,7 +907,7 @@ object DamageIndicatorManager {
         }
     }
 
-    private fun grabData(mob: Mob): EntityData? {
+    private fun grabData(mob: ShMob): EntityData? {
         val entity = mob.baseEntity
         if (data.contains(entity.uniqueID)) return data[entity.uniqueID]
 
