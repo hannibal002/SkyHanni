@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -38,6 +37,8 @@ import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityPlayerSP
 import java.awt.Color
@@ -124,8 +125,8 @@ object IslandGraphs {
         graph.nodes.forEach { it.enabled = true }
     }
 
-    private var pathfindClosestNode: GraphNode? = null
     var closestNode: GraphNode? = null
+        private set
 
     private var playerPosition = LorenzVec(0, 0, 0)
     private var currentTarget: LorenzVec? = null
@@ -284,7 +285,6 @@ object IslandGraphs {
 
     private fun reset() {
         stop()
-        pathfindClosestNode = null
         closestNode = null
     }
 
@@ -306,22 +306,22 @@ object IslandGraphs {
 
     fun update(force: Boolean = false) {
         if (force) {
-            pathfindClosestNode = null
+            closestNode = null
         }
         handleTick()
         checkMoved()
     }
 
+    // TODO test and decide what to keep
     private fun Graph.nearestToPlayer(): GraphNode {
-        val sorted = nodes.sortedBy { it.position.distanceSq(playerPosition) }
-        return sorted.take(20).firstOrNull { it.position.canBeSeen() }
-            ?: sorted.first()
+        return nodes.minBy { it.position.distanceSq(playerPosition) }
+//         val sorted = nodes.sortedBy { it.position.distanceSq(playerPosition) }
+//         return sorted.take(20).firstOrNull { it.position.canBeSeen() }
+//             ?: sorted.first()
     }
 
     private fun handleTick() {
         updatePlayerLocation()
-        val prevClosest = pathfindClosestNode
-
         currentTarget?.let {
             if (it.distance(playerPosition) < 3) {
                 NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$label§e!")
@@ -335,14 +335,14 @@ object IslandGraphs {
 
         val graph = currentIslandGraph ?: return
         val newClosest = graph.nearestToPlayer()
-        if (pathfindClosestNode == newClosest) return
+        if (closestNode == newClosest) return
+        // TODO remove debug
+        ChatUtils.chat("new closest: ${newClosest.position.roundTo(1)} / ${closestNode?.position?.roundTo(1)}")
         val newPath = !onCurrentPath()
 
         closestNode = newClosest
         onNewNode()
-        if (newClosest == prevClosest) return
         if (newPath) {
-            pathfindClosestNode = closestNode
             findNewPath()
         }
     }
@@ -365,13 +365,11 @@ object IslandGraphs {
     private fun skipIfCloser(graph: Graph): Graph = if (graph.nodes.size > 1) {
         val hideNearby = if (MinecraftCompat.localPlayer.onGround) 3 else 5
         Graph(graph.nodes.takeLastWhile { it.position.distance(playerPosition) > hideNearby })
-    } else {
-        graph
-    }
+    } else graph
 
     private fun findNewPath() {
         val goal = goal ?: return
-        val closest = pathfindClosestNode ?: return
+        val closest = closestNode ?: return
 
         val (path, distance) = GraphUtils.findShortestPathAsGraphWithDistance(closest, goal)
         val first = path.firstOrNull()
@@ -444,7 +442,7 @@ object IslandGraphs {
 
     private fun tryRerouting() {
         val target = currentTargetNode ?: return
-        val closest = pathfindClosestNode ?: return
+        val closest = closestNode ?: return
         val map = GraphUtils.findAllShortestDistances(closest).distances.filter { it.key.sameNameAndTags(target) }
         val newTarget = map.sorted().keys.firstOrNull() ?: return
         if (newTarget != target) {
@@ -574,6 +572,11 @@ object IslandGraphs {
 //             val diff = a.position.distance(b.position)
 //             event.drawString(a.position, "diff: ${diff.roundTo(1)}")
 //         }
+        closestNode?.let {
+            it.position
+            event.drawWaypointFilled(it.position, LorenzColor.WHITE.toColor())
+            event.drawDynamicText(it.position, "closest node", 1.5)
+        }
         event.draw3DPathWithWaypoint(
             path,
             color,
