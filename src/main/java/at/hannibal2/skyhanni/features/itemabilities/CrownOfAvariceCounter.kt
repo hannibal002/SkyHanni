@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.itemability.CrownOfAvariceConfig.CrownOfAvariceLines
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -118,16 +120,31 @@ object CrownOfAvariceCounter {
     }
 
     private fun update() {
-        display = buildList()
+        display = buildDisplay()
     }
 
-    private fun buildList(): List<Renderable> = buildList {
-        addLine {
+    private fun fmtDisplay(lines: MutableMap<CrownOfAvariceLines, Renderable>): List<Renderable> {
+        val newList = mutableListOf<Renderable>()
+        newList.addLine {
             addItemStack(internalName.getItemStack())
             addString("§6" + if (config.shortFormat) count?.shortFormat() else count?.addSeparators())
         }
+        newList.addAll(config.text.mapNotNull { lines[it] })
 
-        if (config.perHour) {
+        if (inventoryOpen) {
+            newList.addLine {
+                add(Renderable.clickable(text = "§c[Reset session]", onLeftClick = ::reset))
+                addHorizontalSpacer(3)
+                add(Renderable.clickable(text = "§6[Pause session]", onLeftClick = ::pauseSession))
+            }
+        }
+        return newList
+    }
+
+    private fun buildDisplay(): List<Renderable> {
+
+        val lines = mutableMapOf<CrownOfAvariceLines, Renderable>()
+        lines[CrownOfAvariceLines.COINSPERHOUR] = Renderable.horizontal {
             val coinsPerHour = calculateCoinsPerHour().toLong()
             addString(
                 "§aCoins Per Hour: §6${
@@ -135,32 +152,29 @@ object CrownOfAvariceCounter {
                     else if (config.shortFormatCPH) coinsPerHour.shortFormat() else coinsPerHour.addSeparators()
                 } " + if (isSessionAFK()) "§c(PAUSED)" else "",
             )
-
         }
-        if (config.time) {
+        lines[CrownOfAvariceLines.TIMEUNTILMAX] = Renderable.horizontal {
             val timeUntilMax = calculateTimeUntilMax()
             addString(
                 "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " +
                     if (isSessionAFK()) "§c(PAUSED)" else "",
             )
         }
-        if (config.coinDiff) {
+
+        lines[CrownOfAvariceLines.COINDIFFERENCE] = Renderable.horizontal {
             addString("§aLast coins gained: §6$coinsDifference")
         }
 
-        if (config.sessionTime) {
+        lines[CrownOfAvariceLines.SESSIONCOINS] = Renderable.horizontal {
+            addString("§aCoins this session: §6$coinsEarned")
+        }
+
+        lines[CrownOfAvariceLines.SESSIONTIME] = Renderable.horizontal {
             addString("§aSession Time: §6${sessionUptime.format()}")
         }
 
-        if (inventoryOpen) {
-            addLine {
-                add(Renderable.clickable(text = "§c[Reset session]", onLeftClick = ::reset))
-                addHorizontalSpacer(3)
-                add(Renderable.clickable(text = "§6[Pause session]", onLeftClick = ::pauseSession))
-            }
-        }
+        return fmtDisplay(lines)
     }
-
 
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable
@@ -191,4 +205,5 @@ object CrownOfAvariceCounter {
         val timeUntilMax = ((MAX_AVARICE_COINS - (count ?: 0)) / coinsPerHour).hours
         return timeUntilMax.format()
     }
+
 }
