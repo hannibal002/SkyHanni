@@ -166,7 +166,7 @@ object CrownOfAvariceCounter {
         }
 
         lines[CrownOfAvariceLines.SESSIONCOINS] = Renderable.horizontal {
-            addString("§aCoins this session: §6$coinsEarned")
+            addString("§aCoins this session: §6${coinsEarned.addSeparators()}")
         }
 
         lines[CrownOfAvariceLines.SESSIONTIME] = Renderable.horizontal {
