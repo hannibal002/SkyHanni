@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.config.features.itemability
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -31,25 +29,6 @@ class CrownOfAvariceConfig {
     @ConfigEditorBoolean
     var shortFormatCPH: Boolean = true
 
-    @Expose
-    @ConfigOption(name = "Crown Coins Per Hour", desc = "Show coins per hour in the Avarice Counter.")
-    @ConfigEditorBoolean
-    var perHour: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Time until Max Crown", desc = "Shows the time until you reach max coins (1B coins).")
-    @ConfigEditorBoolean
-    var time: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Last coins gained", desc = "Shows the amount of scavenger coins gained by last killed mob.")
-    @ConfigEditorBoolean
-    var coinDiff: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Coins this session", desc = "Shows the amount of coins you gained in a session.")
-    @ConfigEditorBoolean
-    var coinsSession = false
 
     @Expose
     @ConfigOption(
@@ -64,10 +43,6 @@ class CrownOfAvariceConfig {
     @ConfigEditorBoolean
     var resetOnWorldChange = false
 
-    @Expose
-    @ConfigOption(name = "Session Time", desc = "Shows the elapsed time since session start.")
-    @ConfigEditorBoolean
-    var sessionTime: Boolean = false
 
 
     @Expose
