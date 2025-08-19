@@ -143,6 +143,7 @@ class MobFinder {
             EntityResult(floor1bonzo1SpawnTime, bossType = BossType.DUNGEON_F1_BONZO_FIRST)
         }
 
+        // TODO Use other approach as the old entity does not despawn, so it does not get checked again
         floor1bonzo2 && mob.name == "Bonzo" -> {
             EntityResult(floor1bonzo2SpawnTime, bossType = BossType.DUNGEON_F1_BONZO_SECOND, finalDungeonBoss = true)
         }
