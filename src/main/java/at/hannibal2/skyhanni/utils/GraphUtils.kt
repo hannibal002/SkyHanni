@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.model.findPathToDestination
 import java.util.PriorityQueue
 import java.util.Stack
 
+@Suppress("TooManyFunctions")
 object GraphUtils {
     /**
      * Find the fastest path from [closestNode] to *any* node that matches [condition].

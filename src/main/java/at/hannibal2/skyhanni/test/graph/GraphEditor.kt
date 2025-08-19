@@ -810,7 +810,7 @@ class GraphingNode(
     override var position: LorenzVec,
     var name: String? = null,
     var tags: MutableList<GraphNodeTag> = mutableListOf(),
-): GraphUtils.GenericNode {
+) : GraphUtils.GenericNode {
 
     var rendering = true
 
