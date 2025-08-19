@@ -17,9 +17,12 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.test.graph.GraphEditor.playerPosition
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
+import at.hannibal2.skyhanni.utils.GraphUtils.getNearestToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -212,14 +215,14 @@ object GraphEditor {
             updateRender()
         }
         if (nodes.isEmpty()) return
-        closestNode = nodes.minBy { distanceToPlayer(it.position) }
+        closestNode = nodes.getNearestNode()
         handleAllNodeFind()
     }
 
     private fun updateRender() {
         val maxNodeDistance = config.maxNodeDistance * config.maxNodeDistance
         for (node in nodes) {
-            node.rendering = distanceToPlayer(node.position) < maxNodeDistance
+            node.rendering = node.distanceToPlayer() < maxNodeDistance
         }
     }
 
@@ -227,8 +230,8 @@ object GraphEditor {
         if (!active) return
 
         if (nodesToFind.isEmpty()) return
-        val closest = nodesToFind.minBy { distanceToPlayer(it) }
-        if (closest.distance(playerPosition) >= 3) return
+        val closest = nodesToFind.getNearestToPlayer()
+        if (distanceToPlayer(closest) >= 9) return
         nodesAlreadyFound.add(closest)
 
         if (nodesToFind.isEmpty()) {
@@ -280,7 +283,7 @@ object GraphEditor {
         )
 
         val nodeName = node.name ?: return
-        val showTextAlways = seeThroughBlocks || distanceToPlayer(node.position) < 100
+        val showTextAlways = seeThroughBlocks || node.distanceToPlayer() < 100
         this.drawDynamicText(
             node.position,
             nodeName,
@@ -521,7 +524,7 @@ object GraphEditor {
                     minimumDistance = distance
                     continue
                 }
-                if (minimumNode == null || distanceToPlayer(minimumNode.position) > distanceToPlayer(node.position)) {
+                if (minimumNode == null || minimumNode.distanceToPlayer() > node.distanceToPlayer()) {
                     minimumNode = node
                     minimumDistance = distance
                 }
@@ -673,7 +676,7 @@ object GraphEditor {
 
     private fun addNode() {
         val closestNode = closestNode
-        if (closestNode != null && distanceToPlayer(closestNode.position) < 9.0) {
+        if (closestNode != null && closestNode.distanceToPlayer() < 9.0) {
             if (closestNode == activeNode) {
                 feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
                 nodes.remove(closestNode)
@@ -684,12 +687,11 @@ object GraphEditor {
             }
         }
 
-        val position = playerPosition
-        if (nodes.any { it.position == position }) {
+        if (nodes.any { it.position == playerPosition }) {
             feedBackInTutorial("Can't create node, here is already another one.")
             return
         }
-        val node = GraphingNode(id++, position)
+        val node = GraphingNode(id++, playerPosition)
         nodes.add(node)
         feedBackInTutorial("Added graph node.")
         if (activeNode == null) return
@@ -830,25 +832,24 @@ object GraphEditor {
         ghostPosition = null
     }
 
-    fun distanceToPlayer(location: LorenzVec): Double {
-        return location.distanceSq(playerPosition)
-    }
-
     fun enable() {
         if (!config.enabled) {
             config.enabled = true
             ChatUtils.chat("Graph Editor is now active.")
         }
     }
+
+    private fun distanceToPlayer(location: LorenzVec) = location.distanceSq(playerPosition)
+    fun GraphUtils.GenericNode.distanceToPlayer(): Double = distanceToPlayer(position)
 }
 
 // The node object the graph editor is working with
 class GraphingNode(
     val id: Int,
-    var position: LorenzVec,
+    override var position: LorenzVec,
     var name: String? = null,
     var tags: MutableList<GraphNodeTag> = mutableListOf(),
-) {
+): GraphUtils.GenericNode {
 
     var rendering = true
 

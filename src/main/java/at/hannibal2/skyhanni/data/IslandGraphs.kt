@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -127,7 +128,7 @@ object IslandGraphs {
     var closestNode: GraphNode? = null
         private set
 
-    private var playerPosition = LorenzVec(0, 0, 0)
+    private val playerPosition get() = GraphUtils.playerGraphGridLocation()
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
     private var label = ""
@@ -287,9 +288,9 @@ object IslandGraphs {
         closestNode = null
     }
 
-    @HandleEvent
+    @HandleEvent(priority = -1) // calling before graph editor, so that we have the latest playerPosition
     fun onTick(event: SkyHanniTickEvent) {
-        updatePlayerLocation()
+        GraphUtils.updatePosition()
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
 
@@ -297,10 +298,6 @@ object IslandGraphs {
             update()
         }
         updateFeedback()
-    }
-
-    private fun updatePlayerLocation() {
-        playerPosition = GraphUtils.playerGraphGridLocation()
     }
 
     fun update(force: Boolean = false) {
@@ -311,18 +308,10 @@ object IslandGraphs {
         checkMoved()
     }
 
-    // TODO test and decide what to keep
-    private fun Graph.nearestToPlayer(): GraphNode {
-        return minBy { it.position.distanceSq(playerPosition) }
-//         val sorted = nodes.sortedBy { it.position.distanceSq(playerPosition) }
-//         return sorted.take(20).firstOrNull { it.position.canBeSeen() }
-//             ?: sorted.first()
-    }
-
     private fun handleTick() {
-        updatePlayerLocation()
+        GraphUtils.updatePosition()
         currentTarget?.let {
-            if (it.distance(playerPosition) < 3) {
+            if (it.distanceSq(playerPosition) < 9) {
                 NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$label§e!")
                 reset()
                 onFound()
@@ -333,7 +322,7 @@ object IslandGraphs {
         }
 
         val graph = currentIslandGraph ?: return
-        val newClosest = graph.nearestToPlayer()
+        val newClosest = graph.getNearestNode()
         if (closestNode == newClosest) return
         // TODO remove debug
         ChatUtils.chat("new closest: ${newClosest.position.roundTo(1)} / ${closestNode?.position?.roundTo(1)}")
@@ -346,12 +335,14 @@ object IslandGraphs {
         }
     }
 
+    private fun GraphUtils.GenericNode.distanceToPlayer(): Double = position.distance(playerPosition)
+    private fun GraphUtils.GenericNode.distanceSqToPlayer(): Double = position.distanceSq(playerPosition)
+
     private fun onCurrentPath(): Boolean {
         val path = fastestPath ?: return false
         if (path.isEmpty()) return false
         val closest = path.getNearestNode()
-        val distance = closest.position.distance(playerPosition)
-        if (distance > 7) return false
+        if (closest.distanceSqToPlayer() > 49) return false
 
         val index = path.indexOf(closest)
         val newNodes = path.drop(index)
@@ -362,8 +353,8 @@ object IslandGraphs {
     }
 
     private fun skipIfCloser(graph: Graph): Graph = if (graph.size > 1) {
-        val hideNearby = if (MinecraftCompat.localPlayer.onGround) 3 else 5
-        Graph(graph.takeLastWhile { it.position.distance(playerPosition) > hideNearby })
+        val hideNearby = if (MinecraftCompat.localPlayer.onGround) 9 else 25
+        Graph(graph.takeLastWhile { it.distanceSqToPlayer() > hideNearby })
     } else graph
 
     private fun findNewPath() {
@@ -374,9 +365,9 @@ object IslandGraphs {
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
 
-        val nodeDistance = first?.let { playerPosition.distance(it.position) } ?: 0.0
+        val nodeDistance = first?.distanceToPlayer() ?: 0.0
         if (first != null && second != null) {
-            val direct = playerPosition.distance(second.position)
+            val direct = second.distanceToPlayer()
             val firstPath = first.neighbours[second] ?: 0.0
             val around = nodeDistance + firstPath
             if (direct < around) {
@@ -536,8 +527,7 @@ object IslandGraphs {
             for ((a, b) in path.zipWithNext()) {
                 distance += a.position.distance(b.position)
             }
-            val distanceToPlayer = path.first().position.distance(playerPosition)
-            distance += distanceToPlayer
+            distance += path.first().distanceToPlayer()
             distance = distance.roundTo(1)
         }
 

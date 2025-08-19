@@ -166,5 +166,29 @@ object GraphUtils {
         return mappedNodes.zipWithNext { a, b -> findShortestDistance(a, b) }.sum()
     }
 
-    fun playerGraphGridLocation() = LocationUtils.playerEyeLocation().roundToBlock()
+    private var currentPosition: LorenzVec? = null
+
+    fun updatePosition() {
+        currentPosition = LocationUtils.playerEyeLocation().roundToBlock()
+    }
+
+    fun playerGraphGridLocation(): LorenzVec = currentPosition ?: LocationUtils.playerEyeLocation().roundToBlock()
+
+    interface GenericNode {
+        val position: LorenzVec
+    }
+
+    fun <N : GenericNode, T : List<N>> T.getNearestNode(
+        location: LorenzVec = playerGraphGridLocation(),
+        condition: (N) -> Boolean = { true },
+    ): N = asSequence()
+        .filter(condition)
+        .minBy { it.position.distanceSq(location) }
+
+    fun <T : List<LorenzVec>> T.getNearestToPlayer(
+        location: LorenzVec = playerGraphGridLocation(),
+        condition: (LorenzVec) -> Boolean = { true },
+    ): LorenzVec = asSequence()
+        .filter(condition)
+        .minBy { it.distanceSq(location) }
 }
