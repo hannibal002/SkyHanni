@@ -110,7 +110,7 @@ object GraphEditor {
 
     private val nodesAlreadyFound = mutableListOf<LorenzVec>()
     private val nodesToFind: List<LorenzVec>
-        get() = IslandGraphs.currentIslandGraph?.nodes?.map { it.position }?.filter { it !in nodesAlreadyFound }.orEmpty()
+        get() = IslandGraphs.currentIslandGraph?.map { it.position }?.filter { it !in nodesAlreadyFound }.orEmpty()
     private var currentNodeToFind: LorenzVec? = null
     private var active = false
 
@@ -246,10 +246,9 @@ object GraphEditor {
     }
 
     private fun calculateNewAllNodeFind(): LorenzVec {
-        val next = GraphUtils.findAllShortestDistancesOnCurrentIsland(playerPosition)
-            .distances.keys.first { it.position in nodesToFind }.position
+        val next = GraphUtils.findShortestDistancesOnCurrentIsland(nodesToFind).lastVisitedNode.position
 
-        val max = IslandGraphs.currentIslandGraph?.nodes?.size ?: -1
+        val max = IslandGraphs.currentIslandGraph?.size ?: -1
         val todo = nodesToFind.size
         val done = max - todo
         val percentage = (done.toDouble() / max.toDouble()) * 100
@@ -834,7 +833,10 @@ object GraphEditor {
         ghostPosition = null
     }
 
-    fun distanceToPlayer(location: LorenzVec): Double = location.distanceSq(playerPosition)
+    fun distanceToPlayer(location: LorenzVec): Double {
+        val playerPosition = ghostPosition ?: LocationUtils.playerEyeLocation().roundToBlock()
+        return location.distanceSq(playerPosition)
+    }
 
     fun enable() {
         if (!config.enabled) {
