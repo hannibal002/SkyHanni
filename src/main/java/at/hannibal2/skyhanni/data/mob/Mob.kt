@@ -80,7 +80,7 @@ class Mob(
     val hasStar: Boolean = false,
     val attribute: MobFilter.DungeonAttribute? = null,
     val levelOrTier: Int = -1,
-    val hypixelTypes : String = ""
+    val hypixelTypes: String = "",
 ) {
 
     private val uniqueId: UUID = UUID.randomUUID()
@@ -122,10 +122,12 @@ class Mob(
             else -> false
         }
     }
+
     /**
      * @property isCorrupted can change.
      */
     val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted()
+
     /**
      * @property isRunic does not change.
      */

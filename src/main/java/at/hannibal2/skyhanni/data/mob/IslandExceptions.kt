@@ -194,7 +194,7 @@ object IslandExceptions {
     ) = when {
         baseEntity is EntityOcelot &&
             armorStand?.isDefaultValue() == false &&
-            //TODO fix pattern
+            // TODO fix pattern
             armorStand.name.startsWith("§8[§7Lv155§8] §cAzrael§r") ->
             MobUtils.getArmorStand(baseEntity, 1)
                 .makeMobResult { MobFactories.basic(baseEntity, it) }
