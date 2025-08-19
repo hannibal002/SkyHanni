@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.test.graph.GraphEditor.playerPosition
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
@@ -75,8 +74,7 @@ object GraphEditor {
         }
 
     private var selectedEdge: GraphingEdge? = null
-    private var ghostPosition: LorenzVec? = null
-    private val playerPosition get() = ghostPosition ?: GraphUtils.playerGraphGridLocation()
+    private val playerPosition get() = GraphUtils.playerGraphGridLocation()
 
     private var seeThroughBlocks = true
 
@@ -120,20 +118,6 @@ object GraphEditor {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
         edges.forEach { event.drawEdge(it) }
-        drawGhostPosition(event)
-    }
-
-    private fun drawGhostPosition(event: SkyHanniRenderWorldEvent) {
-        val ghostPosition = ghostPosition ?: return
-        if (ghostPosition.distance(GraphUtils.playerGraphGridLocation()) >= config.maxNodeDistance) return
-
-        event.drawWaypointFilled(
-            ghostPosition,
-            if (activeNode == null) Color.RED else Color.GRAY,
-            seeThroughBlocks = seeThroughBlocks,
-            minimumAlpha = 0.2f,
-            inverseAlphaScale = true,
-        )
     }
 
     @HandleEvent
@@ -155,7 +139,6 @@ object GraphEditor {
             add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
             add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
             add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
-            add("§eToggle Ghost Position: §6${KeyboardManager.getKeyName(config.toggleGhostPosition)}")
             add(" ")
             if (activeNode != null) {
                 add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
@@ -170,8 +153,6 @@ object GraphEditor {
         if (!inTextMode) {
             if (activeNode != null) {
                 add("§eEdit active node: §6${KeyboardManager.getKeyName(config.editKey)}")
-            } else if (ghostPosition != null) {
-                add("Edit Ghost Position: §6${KeyboardManager.getKeyName(config.editKey)}")
             }
         }
 
@@ -459,7 +440,7 @@ object GraphEditor {
             editModeClicks()
             inEditMode = false
         }
-        if ((activeNode != null || ghostPosition != null) && config.editKey.isKeyHeld()) {
+        if ((activeNode != null) && config.editKey.isKeyHeld()) {
             inEditMode = true
             return
         }
@@ -496,9 +477,6 @@ object GraphEditor {
         }
         if (config.placeKey.isKeyClicked()) {
             addNode()
-        }
-        if (config.toggleGhostPosition.isKeyClicked()) {
-            toggleGhostPosition()
         }
         if (config.selectKey.isKeyClicked()) {
             activeNode = if (activeNode == closestNode) {
@@ -658,11 +636,7 @@ object GraphEditor {
     private fun KeyBinding.handleEditClicks(vector: LorenzVec) {
         if (this.keyCode.isKeyClicked()) {
             activeNode?.let {
-                it.position = it.position + vector
-            } ?: run {
-                ghostPosition?.let {
-                    ghostPosition = it + vector
-                }
+                it.position += vector
             }
         }
     }
@@ -696,16 +670,6 @@ object GraphEditor {
         feedBackInTutorial("Added graph node.")
         if (activeNode == null) return
         addEdge(activeNode, node)
-    }
-
-    private fun toggleGhostPosition() {
-        if (ghostPosition != null) {
-            ghostPosition = null
-            feedBackInTutorial("Disabled Ghost Position.")
-        } else {
-            ghostPosition = GraphUtils.playerGraphGridLocation()
-            feedBackInTutorial("Enabled Ghost Position.")
-        }
     }
 
     private fun getEdgeIndex(node1: GraphingNode?, node2: GraphingNode?) =
@@ -829,7 +793,6 @@ object GraphEditor {
         activeNode = null
         closestNode = null
         dissolvePossible = false
-        ghostPosition = null
     }
 
     fun enable() {
