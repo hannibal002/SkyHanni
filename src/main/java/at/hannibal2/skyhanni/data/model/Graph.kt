@@ -41,6 +41,13 @@ value class Graph(
     fun getNodesWithTags(vararg tag: GraphNodeTag): List<GraphNode> = nodes.filter { node -> tag.all { node.hasTag(it) } }
     fun getNodesWithName(name: String): List<GraphNode> = nodes.filter { it.name == name }
 
+    fun getNearestNode(
+        location: LorenzVec = GraphUtils.playerGraphGridLocation(),
+        condition: (GraphNode) -> Boolean = { true },
+    ): GraphNode = asSequence()
+        .filter(condition)
+        .minBy { it.position.distanceSq(location) }
+
     constructor() : this(emptyList())
 
     companion object {
