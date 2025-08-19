@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -301,7 +300,7 @@ object IslandGraphs {
     }
 
     private fun updatePlayerLocation() {
-        playerPosition = LocationUtils.playerLocation().add(-0.5, 0.5, -0.5)
+        playerPosition = GraphUtils.playerGraphGridLocation()
     }
 
     fun update(force: Boolean = false) {
@@ -314,7 +313,7 @@ object IslandGraphs {
 
     // TODO test and decide what to keep
     private fun Graph.nearestToPlayer(): GraphNode {
-        return nodes.minBy { it.position.distanceSq(playerPosition) }
+        return minBy { it.position.distanceSq(playerPosition) }
 //         val sorted = nodes.sortedBy { it.position.distanceSq(playerPosition) }
 //         return sorted.take(20).firstOrNull { it.position.canBeSeen() }
 //             ?: sorted.first()

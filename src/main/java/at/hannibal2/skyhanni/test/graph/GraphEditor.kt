@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -74,8 +73,7 @@ object GraphEditor {
 
     private var selectedEdge: GraphingEdge? = null
     private var ghostPosition: LorenzVec? = null
-    private var playerPosition_ = LorenzVec(0, 0, 0)
-    private val playerPosition get() = ghostPosition ?: playerPosition_
+    private val playerPosition get() = ghostPosition ?: GraphUtils.playerGraphGridLocation()
 
     private var seeThroughBlocks = true
 
@@ -124,7 +122,7 @@ object GraphEditor {
 
     private fun drawGhostPosition(event: SkyHanniRenderWorldEvent) {
         val ghostPosition = ghostPosition ?: return
-        if (ghostPosition.distanceToPlayer() >= config.maxNodeDistance) return
+        if (ghostPosition.distance(GraphUtils.playerGraphGridLocation()) >= config.maxNodeDistance) return
 
         event.drawWaypointFilled(
             ghostPosition,
@@ -208,7 +206,6 @@ object GraphEditor {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        playerPosition_ = LocationUtils.playerLocation().add(-0.5, 0.5, -0.5)
         if (!isEnabled()) return
         input()
         if (event.isMod(5)) {
@@ -687,7 +684,7 @@ object GraphEditor {
             }
         }
 
-        val position = ghostPosition ?: LocationUtils.playerEyeLocation().roundToBlock()
+        val position = playerPosition
         if (nodes.any { it.position == position }) {
             feedBackInTutorial("Can't create node, here is already another one.")
             return
@@ -704,7 +701,7 @@ object GraphEditor {
             ghostPosition = null
             feedBackInTutorial("Disabled Ghost Position.")
         } else {
-            ghostPosition = LocationUtils.playerEyeLocation().roundToBlock()
+            ghostPosition = GraphUtils.playerGraphGridLocation()
             feedBackInTutorial("Enabled Ghost Position.")
         }
     }
@@ -834,7 +831,6 @@ object GraphEditor {
     }
 
     fun distanceToPlayer(location: LorenzVec): Double {
-        val playerPosition = ghostPosition ?: LocationUtils.playerEyeLocation().roundToBlock()
         return location.distanceSq(playerPosition)
     }
 
