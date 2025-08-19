@@ -22,7 +22,10 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.GraphUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
+import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -128,7 +131,6 @@ object IslandGraphs {
     var closestNode: GraphNode? = null
         private set
 
-    private val playerPosition get() = GraphUtils.playerGraphGridLocation()
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
     private var label = ""
@@ -288,9 +290,12 @@ object IslandGraphs {
         closestNode = null
     }
 
-    @HandleEvent(priority = -1) // calling before graph editor, so that we have the latest playerPosition
+    /**
+     * calling before [at.hannibal2.skyhanni.test.graph.GraphEditor], so that we always have the latest playerPosition.
+     */
+    @HandleEvent(priority = -1) //
     fun onTick(event: SkyHanniTickEvent) {
-        GraphUtils.updatePosition()
+        GraphUtils.updatePlayerPosition()
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
 
@@ -309,9 +314,9 @@ object IslandGraphs {
     }
 
     private fun handleTick() {
-        GraphUtils.updatePosition()
+        GraphUtils.updatePlayerPosition()
         currentTarget?.let {
-            if (it.distanceSq(playerPosition) < 9) {
+            if (distanceSqToPlayer(it) < 9) {
                 NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$label§e!")
                 reset()
                 onFound()
@@ -334,9 +339,6 @@ object IslandGraphs {
             findNewPath()
         }
     }
-
-    private fun GraphUtils.GenericNode.distanceToPlayer(): Double = position.distance(playerPosition)
-    private fun GraphUtils.GenericNode.distanceSqToPlayer(): Double = position.distanceSq(playerPosition)
 
     private fun onCurrentPath(): Boolean {
         val path = fastestPath ?: return false
