@@ -56,6 +56,8 @@ object MobFilter {
 
     @Language("RegExp")
     private val mobType = "(?<mobType>[^\\s✯]+ )?"
+    @Language("RegExp")
+    private val level = "(?:\\[Lv(?<level>\\d+)\\] )?"
 
     /**
      * REGEX-TEST: Wither Husk 500M❤
@@ -63,7 +65,7 @@ object MobFilter {
      */
     val mobNameFilter by patternGroup.pattern(
         "filter.basic",
-        "(?:\\[Lv(?<level>\\d+)\\] )?$mobType(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
+        "$level$mobType(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
     )
 
     /**
@@ -90,12 +92,12 @@ object MobFilter {
      */
     val bossMobNameFilter by patternGroup.pattern(
         "filter.boss",
-        "^. (?:\\[Lv(?<level>\\d+)\\] )?$mobType(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$",
+        "^. $level$mobType(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$",
     )
     @Suppress("MaxLineLength")
     val dungeonNameFilter by patternGroup.pattern(
         "filter.dungeon",
-        "^$mobType(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$",
+        "^$level$mobType(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$",
     )
     val summonFilter by patternGroup.pattern(
         "filter.summon",
@@ -119,6 +121,7 @@ object MobFilter {
         "pattern.petcare",
         "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)",
     )
+    // TODO fix pattern
     val wokeSleepingGolemPattern by patternGroup.pattern(
         "pattern.dungeon.woke.golem",
         "(?:§c§lWoke|§5§lSleeping) Golem§r",
