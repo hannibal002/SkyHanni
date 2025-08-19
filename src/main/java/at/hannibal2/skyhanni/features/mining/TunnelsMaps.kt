@@ -399,7 +399,7 @@ object TunnelsMaps {
         if (!isEnabled()) return
         if (checkGoalReached()) return
         val prevClosest = closestNode
-        closestNode = graph.getNearest()
+        closestNode = graph.getNearestNode()
         val closest = closestNode ?: return
         val goal = goal ?: return
         if (closest == prevClosest && goal == prevGoal) return

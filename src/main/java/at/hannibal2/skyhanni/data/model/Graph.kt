@@ -38,10 +38,10 @@ value class Graph(
 
     override fun lastIndexOf(element: GraphNode) = nodes.lastIndexOf(element)
 
-    fun getTags(vararg tag: GraphNodeTag) = nodes.filter { node -> tag.all { node.hasTag(it) } }
-    fun getName(name: String) = nodes.filter { it.name == name }
+    fun getNodesWithTags(vararg tag: GraphNodeTag): List<GraphNode> = nodes.filter { node -> tag.all { node.hasTag(it) } }
+    fun getNodesWithName(name: String): List<GraphNode> = nodes.filter { it.name == name }
 
-    fun getNearest(
+    fun getNearestNode(
         location: LorenzVec = GraphUtils.playerGraphGridLocation(),
         condition: (GraphNode) -> Boolean = { true },
     ): GraphNode = asSequence()

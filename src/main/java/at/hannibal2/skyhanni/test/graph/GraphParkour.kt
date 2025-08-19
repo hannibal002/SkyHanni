@@ -53,7 +53,7 @@ object GraphParkour {
     }
 
     private fun graphToList(graph: Graph): List<LorenzVec>? {
-        val starts = graph.getName("start")
+        val starts = graph.getNodesWithName("start")
         if (starts.isEmpty()) {
             ChatUtils.userError("No start node found!")
             return null
@@ -62,7 +62,7 @@ object GraphParkour {
             ChatUtils.userError("More than one start node found!")
             return null
         }
-        val ends = graph.getName("end")
+        val ends = graph.getNodesWithName("end")
         if (ends.isEmpty()) {
             ChatUtils.userError("No end node found!")
             return null

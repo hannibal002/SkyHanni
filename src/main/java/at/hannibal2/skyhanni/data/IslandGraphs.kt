@@ -338,7 +338,7 @@ object IslandGraphs {
     private fun onCurrentPath(): Boolean {
         val path = fastestPath ?: return false
         if (path.isEmpty()) return false
-        val closest = path.getNearest()
+        val closest = path.getNearestNode()
         val distance = closest.position.distanceToPlayer()
         if (distance > 7) return false
 
@@ -612,7 +612,7 @@ object IslandGraphs {
     fun findClosestNode(location: LorenzVec, condition: (GraphNode) -> Boolean, radius: Double = 100.0): GraphNode? {
         val graph = currentIslandGraph ?: return null
 
-        val found = graph.getNearest(location, condition)
+        val found = graph.getNearestNode(location, condition)
         return found.takeIf { it.position.distance(location) < radius }
     }
 

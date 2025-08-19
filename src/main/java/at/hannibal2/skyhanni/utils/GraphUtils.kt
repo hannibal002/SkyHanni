@@ -141,7 +141,7 @@ object GraphUtils {
 
     fun nearestNodeOnCurrentIsland(location: LorenzVec): GraphNode {
         val graph = IslandGraphs.currentIslandGraph ?: error("no island found")
-        return graph.getNearest(location)
+        return graph.getNearestNode(location)
     }
 
     fun findAllShortestDistances(
