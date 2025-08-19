@@ -137,7 +137,7 @@ object GraphUtils {
         bailout: (GraphNode) -> Boolean = { false },
     ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(start), bailout)
 
-    fun nearestNodeOnCurrentIsland() = nearestNodeOnCurrentIsland(LocationUtils.playerGraphGridLocation())
+    fun nearestNodeOnCurrentIsland() = nearestNodeOnCurrentIsland(playerGraphGridLocation())
 
     fun nearestNodeOnCurrentIsland(location: LorenzVec): GraphNode {
         val graph = IslandGraphs.currentIslandGraph ?: error("no island found")
@@ -165,4 +165,6 @@ object GraphUtils {
         val mappedNodes = path.map { nearestNodeOnCurrentIsland(it) }
         return mappedNodes.zipWithNext { a, b -> findShortestDistance(a, b) }.sum()
     }
+
+    fun playerGraphGridLocation() = LocationUtils.playerEyeLocation().roundToBlock()
 }

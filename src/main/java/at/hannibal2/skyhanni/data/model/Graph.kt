@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
-import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
@@ -45,8 +45,8 @@ value class Graph(
     fun getNearest(location: LorenzVec, condition: (GraphNode) -> Boolean): GraphNode =
         filter(condition).minBy { it.position.distanceSq(location) }
 
-    fun getNearest() = getNearest(LocationUtils.playerGraphGridLocation())
-    fun getNearest(condition: (GraphNode) -> Boolean) = getNearest(LocationUtils.playerGraphGridLocation(), condition)
+    fun getNearest() = getNearest(GraphUtils.playerGraphGridLocation())
+    fun getNearest(condition: (GraphNode) -> Boolean) = getNearest(GraphUtils.playerGraphGridLocation(), condition)
 
     constructor() : this(emptyList())
 
