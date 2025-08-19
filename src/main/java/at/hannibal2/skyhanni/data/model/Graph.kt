@@ -41,12 +41,13 @@ value class Graph(
     fun getTags(tag: GraphNodeTag) = nodes.filter { it.hasTag(tag) }
     fun getTags(vararg tag: GraphNodeTag) = nodes.filter { node -> tag.all { node.hasTag(it) } }
     fun getName(name: String) = nodes.filter { it.name == name }
-    fun getNearest(location: LorenzVec): GraphNode = minBy { it.position.distanceSq(location) }
-    fun getNearest(location: LorenzVec, condition: (GraphNode) -> Boolean): GraphNode =
-        filter(condition).minBy { it.position.distanceSq(location) }
 
-    fun getNearest() = getNearest(GraphUtils.playerGraphGridLocation())
-    fun getNearest(condition: (GraphNode) -> Boolean) = getNearest(GraphUtils.playerGraphGridLocation(), condition)
+    fun getNearest(
+        location: LorenzVec = GraphUtils.playerGraphGridLocation(),
+        condition: (GraphNode) -> Boolean = { true },
+    ): GraphNode = asSequence()
+        .filter(condition)
+        .minBy { it.position.distanceSq(location) }
 
     constructor() : this(emptyList())
 
