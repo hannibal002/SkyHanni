@@ -328,8 +328,6 @@ object IslandGraphs {
         val graph = currentIslandGraph ?: return
         val newClosest = graph.getNearestNode()
         if (closestNode == newClosest) return
-        // TODO remove debug
-        ChatUtils.chat("new closest: ${newClosest.position.roundTo(1)} / ${closestNode?.position?.roundTo(1)}")
         val newPath = !onCurrentPath()
 
         closestNode = newClosest
@@ -562,11 +560,13 @@ object IslandGraphs {
 //             val diff = a.position.distance(b.position)
 //             event.drawString(a.position, "diff: ${diff.roundTo(1)}")
 //         }
-        closestNode?.let {
-            it.position
-            event.drawWaypointFilled(it.position, LorenzColor.WHITE.toColor())
-            event.drawDynamicText(it.position, "closest node", 1.5)
-        }
+
+        // maybe even more reuse for debuggin, or add a dev toggle for this
+//         closestNode?.let {
+//             it.position
+//             event.drawWaypointFilled(it.position, LorenzColor.WHITE.toColor())
+//             event.drawDynamicText(it.position, "closest node", 1.5)
+//         }
         event.draw3DPathWithWaypoint(
             path,
             color,
