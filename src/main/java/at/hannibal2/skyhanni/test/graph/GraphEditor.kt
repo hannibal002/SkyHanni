@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RaycastUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
@@ -42,6 +42,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
@@ -121,13 +123,13 @@ object GraphEditor {
         edges.forEach { event.drawEdge(it) }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled()) return
-        config.infoDisplay.renderStrings(buildDisplay(), posLabel = "Graph Info")
+        config.infoDisplay.renderRenderables(buildDisplay(), posLabel = "Graph Info")
     }
 
-    private fun buildDisplay(): List<String> = buildList {
+    private fun buildDisplay(): List<Renderable> = buildList {
         add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
         if (!inEditMode && !inTextMode) {
             add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
@@ -169,7 +171,7 @@ object GraphEditor {
             add("§eFormat: ${textBox.finalText()}")
             add("§eRaw:     ${textBox.editText(textColor = LorenzColor.YELLOW)}")
         }
-    }
+    }.map { StringRenderable.from(it) }
 
     private var dissolvePossible = false
 

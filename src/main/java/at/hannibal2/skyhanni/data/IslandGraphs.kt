@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
 import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -163,8 +162,8 @@ object IslandGraphs {
         "Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center",
     )
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    @HandleEvent(RepositoryReloadEvent::class, onlyOnSkyblock = true)
+    fun onRepoReload() {
         loadIsland(SkyBlockUtils.currentIsland)
     }
 
@@ -185,8 +184,8 @@ object IslandGraphs {
 
     private fun isGlaciteTunnelsArea(area: String?): Boolean = glaciteTunnelsPattern.matches(area)
 
-    @HandleEvent
-    fun onAreaChange(event: ScoreboardAreaChangeEvent) {
+    @HandleEvent(ScoreboardAreaChangeEvent::class)
+    fun onAreaChange() {
         if (!IslandType.DWARVEN_MINES.isCurrent()) {
             inGlaciteTunnels = null
             return
