@@ -22,7 +22,8 @@ object MobFactories {
                 armorStand = armorStand,
                 name = this.group("name"),
                 additionalEntities = extraEntityList,
-                levelOrTier = this.groupOrNull("tier")?.romanToDecimal() ?: 5
+                levelOrTier = this.groupOrNull("tier")?.romanToDecimal() ?: 5,
+                hypixelTypes = this.groupOrNull("mobtype").orEmpty()
             )
         }
 
@@ -39,7 +40,8 @@ object MobFactories {
                 armorStand = armorStand,
                 name = overriddenName ?: this.group("name"),
                 levelOrTier = group("level")?.takeIf { it.isNotEmpty() }?.toInt() ?: -1,
-                additionalEntities = extraEntityList
+                additionalEntities = extraEntityList,
+                hypixelTypes = this.groupOrNull("mobtype").orEmpty()
             )
         }
 
@@ -59,7 +61,8 @@ object MobFactories {
                 attribute = this.group("attribute")?.takeIf { it.isNotEmpty() }
                     ?.let {
                         EnumUtils.enumValueOfOrNull<MobFilter.DungeonAttribute>(it)
-                    }
+                    },
+                hypixelTypes = this.groupOrNull("mobtype").orEmpty()
             )
         }
 
@@ -78,7 +81,8 @@ object MobFactories {
                 ),
                 additionalEntities = extraEntityList,
                 levelOrTier = this.group("level")?.takeIf { it.isNotEmpty() }
-                    ?.toInt() ?: -1
+                    ?.toInt() ?: -1,
+                hypixelTypes = this.groupOrNull("mobtype").orEmpty()
             )
         }
 
