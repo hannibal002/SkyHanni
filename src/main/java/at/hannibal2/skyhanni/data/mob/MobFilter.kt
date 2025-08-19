@@ -74,7 +74,7 @@ object MobFilter {
      */
     val slayerNameFilter by patternGroup.pattern(
         "filter.slayer",
-        "^. $mobType (?<name>.*)(?: (?<tier>[IV]+)|(?<=Atoned Horror|Conjoined Brood)) \\d+.*"
+        "^$mobType. (?<name>.*)(?: (?<tier>[IV]+)|(?<=Atoned Horror|Conjoined Brood)) \\d+.*"
     )
 
     /**
