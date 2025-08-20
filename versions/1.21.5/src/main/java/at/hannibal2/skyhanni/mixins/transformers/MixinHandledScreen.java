@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.data.GlobalRender;
 import at.hannibal2.skyhanni.data.GuiData;
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.data.model.TextInput;
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent;
 import at.hannibal2.skyhanni.features.inventory.BetterContainers;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe;
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests;
 import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
@@ -36,7 +36,7 @@ public abstract class MixinHandledScreen {
 
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
     private void renderHead(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        if (!SkyHanniDebugsAndTests.INSTANCE.getGlobalRender()) return;
+        if (GlobalRender.INSTANCE.getRenderDisabled()) return;
         HandledScreen<?> gui = (HandledScreen<?>) (Object) this;
         if (new GuiContainerEvent.PreDraw(context, gui, gui.getScreenHandler(), mouseX, mouseY, deltaTicks).post()) {
             GuiData.INSTANCE.setPreDrawEventCancelled(true);

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -21,7 +22,7 @@ object MobFactories {
                 armorStand = armorStand,
                 name = this.group("name"),
                 additionalEntities = extraEntityList,
-                levelOrTier = this.group("tier").romanToDecimal()
+                levelOrTier = this.groupOrNull("tier")?.romanToDecimal() ?: 5
             )
         }
 
