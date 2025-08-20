@@ -37,6 +37,14 @@ object CorpseApi {
      */
     private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
 
+    /**
+     * REGEX-TEST:     §r§fEnchanted Book (Ice Cold I§r§f)
+     */
+    private val enchantedBookPattern by chatPatternGroup.pattern(
+        "enchantedBook",
+        " {4}§r§fEnchanted Book \\((?<item>.+)§r§f\\)"
+    )
+
     private var inLoot = false
     private val loot = mutableListOf<Pair<String, Int>>()
 
@@ -74,10 +82,12 @@ object CorpseApi {
              */
             ItemUtils.readItemAmount(group("item"))
         } ?: return
-        // Workaround: If it is an enchanted book, we assume it is a paleontologist I book
-        if (pair.first.let { it == "§fEnchanted" || it == "§fEnchanted Book" }) {
-//             pair = "Paleontologist I" to pair.second
-            pair = "§9Ice Cold I" to pair.second
+
+        if (pair.first.startsWith("§fEnchanted Book (")) {
+            val book = enchantedBookPattern.matchMatcher(message) {
+                group("item") ?: "Ice Cold I"
+            } ?: return
+            pair = book to pair.second
         }
         loot.add(pair)
     }
