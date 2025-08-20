@@ -594,7 +594,7 @@ object ItemUtils {
      * REGEX-TEST: §fEnchanted Book (Ice Cold I§r§f)
      */
     private val enchantedBookPattern by RepoPattern.pattern(
-        "enchantedBook",
+        "item.enchantedbook",
         "§fEnchanted Book \\((?<item>.+)\\)"
     )
     fun readBookType(input: String): String? {
