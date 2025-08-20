@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -34,16 +35,9 @@ object CorpseApi {
 
     /**
      * REGEX-TEST:     §r§9☠ Fine Onyx Gemstone §r§8x2
-     */
-    private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
-
-    /**
      * REGEX-TEST:     §r§fEnchanted Book (Ice Cold I§r§f)
      */
-    private val enchantedBookPattern by chatPatternGroup.pattern(
-        "enchantedBook",
-        " {4}§r§fEnchanted Book \\((?<item>.+)§r§f\\)"
-    )
+    private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
 
     private var inLoot = false
     private val loot = mutableListOf<Pair<String, Int>>()
@@ -84,9 +78,7 @@ object CorpseApi {
         } ?: return
 
         if (pair.first.startsWith("§fEnchanted Book (")) {
-            val book = enchantedBookPattern.matchMatcher(message) {
-                group("item") ?: "Ice Cold I"
-            } ?: return
+            val book = ItemUtils.readBookType(pair.first) ?: return
             pair = book to pair.second
         }
         loot.add(pair)
