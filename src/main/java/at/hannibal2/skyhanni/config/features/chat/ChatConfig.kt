@@ -214,5 +214,5 @@ class ChatConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideClickableHint: Boolean = true
+    var hideClickableHint: Boolean = false
 }
