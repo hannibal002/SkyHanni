@@ -14,8 +14,10 @@ import at.hannibal2.skyhanni.data.garden.FarmingWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.UpcomingLeaderboardPlayer
+import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -70,11 +72,11 @@ object FarmingWeightDisplay {
         weightPerSecond = -1.0
     }
 
-    @HandleEvent
+    /*@HandleEvent
     fun onWorldChange() {
         // We want to try to connect to the api again after a world switch.
         resetData()
-    }
+    }*/
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -88,7 +90,7 @@ object FarmingWeightDisplay {
         rankGoal = -1
     }
 
-    @HandleEvent
+    /*@HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
@@ -97,6 +99,19 @@ object FarmingWeightDisplay {
             update()
             //getCropWeights()
         }
+    }*/
+
+    @HandleEvent
+    fun onCollectionUpdate(event: CollectionUpdateEvent) {
+        if (!isEnabled()) return
+        update()
+    }
+
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        //check if eta is enabled
+        update()
     }
 
     @HandleEvent
@@ -174,7 +189,35 @@ object FarmingWeightDisplay {
 
     private var lastOpenWebsite = SimpleTimeMark.farPast()
 
-    private suspend fun update() {
+
+    private fun update() {
+        drawDisplay()
+    }
+
+
+    // TODO format display + draggable config list
+    // TODO monthly weight swap button
+    private fun drawDisplay() {
+        if (!isEnabled()) return
+        if (FarmingWeight.apiError) {
+            display = errorMessage
+            return
+        }
+
+        val list = mutableListOf<Renderable>()
+        list.add(
+            Renderable.clickable(
+                "§6$lbName§7: ${FarmingWeight.weight.roundTo(2)}",
+                tips = listOf("§eClick to open your Farming Profile."),
+                onLeftClick = { openWebsite(PlayerUtils.getName()) },
+            ),
+        )
+
+        display = list
+
+    }
+
+    /*private suspend fun update() {
         if (!isEnabled()) return
         if (apiError) {
             display = errorMessage
@@ -208,7 +251,7 @@ object FarmingWeightDisplay {
             }
         }
         display = list
-    }
+    }*/
 
     private fun getLeaderboardFormat(): String {
         if (!config.leaderboard) return ""
@@ -226,21 +269,9 @@ object FarmingWeightDisplay {
         }
     }
 
-    /*private fun getWeight(): String {
-        if (weightNeedsRecalculating) {
-            val values = calculateCollectionWeight().values
-            if (values.isNotEmpty()) {
-                localWeight = values.sum()
-                weightNeedsRecalculating = false
-            }
-        }
-
-        return "§e" + displayWeight.roundTo(2).addSeparators()
-    }*/
-
     private fun getRankGoal(): Int {
         val value = config.etaGoalRank
-        var goal = 10000
+        var goal = 10000 // TODO check if this is causing issues
 
         // Check that the provided string is valid
         val parsed = value.get().toIntOrNull() ?: 0

@@ -39,7 +39,7 @@ object FarmingWeight {
     private var lastPlayerWeightFetch = SimpleTimeMark.farPast()
     private var attemptingCropWeightFetch = false
     private var hasFetchedCropWeights = false
-    private var apiError = false
+    var apiError = false
     private var profileId: String = ""
     private var shouldRecalculateWeight = false
     private var ignoredCollection = mutableMapOf<CropType, Long>()
@@ -75,11 +75,19 @@ object FarmingWeight {
 
         SkyHanniMod.launchIOCoroutine {
             getCropWeights()
-            if (shouldRecalculateWeight) {
+            /*if (shouldRecalculateWeight) {
                 weight = recalculateTotalWeight()
-            }
+            }*/
         }
     }
+
+    fun getWeight(): Double {
+        if (shouldRecalculateWeight) {
+            weight = recalculateTotalWeight()
+        }
+        return weight
+    }
+
     private fun addWeight(amount: Double) {
         weight += amount
         monthlyWeight = monthlyWeight?.plus(amount)
