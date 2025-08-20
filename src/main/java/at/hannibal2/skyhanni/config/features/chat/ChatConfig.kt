@@ -213,6 +213,5 @@ class ChatConfig {
             "The message is still clickable and shows infos on hover.",
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     var hideClickableHint: Boolean = false
 }
