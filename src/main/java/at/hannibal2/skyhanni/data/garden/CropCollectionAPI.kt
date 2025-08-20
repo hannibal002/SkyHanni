@@ -11,21 +11,37 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 
 @SkyHanniModule
 object CropCollectionAPI {
+    private val storage get() = GardenApi.storage
+
+    private val cropCollectionCounter:
+        MutableMap<CropType, Long>? get() = storage?.cropCollectionCounter
+
     var lastGainedCrop: CropType?
-        get() = GardenApi.storage?.lastGainedCrop
+        get() = storage?.lastGainedCrop
         set(value) {
             value?.let {
                 GardenApi.storage?.lastGainedCrop = it
             }
         }
 
+    var lastGainedCollectionTime = SimpleTimeMark.farPast()
+
+    var needCollectionUpdate = true
+
+    fun CropType.getCollection() =
+        cropCollectionCounter?.get(this) ?: 0L
+
     fun CropType.addCollectionCounter(type: CropCollectionType, amount: Long) {
         if (amount == 0L) return
         if (type !in listOf(CropCollectionType.UNKNOWN, CropCollectionType.MOOSHROOM_COW) && amount > 1) lastGainedCrop = this
 
+        this.setCollectionCounter(amount + this.getCollection())
+
+        lastGainedCollectionTime = SimpleTimeMark.now()
         CropCollectionAddEvent(this, type, amount).post()
     }
 
@@ -37,6 +53,16 @@ object CropCollectionAPI {
             CropCollectionType.DICER,
             CropCollectionType.PEST_RNG,
         )
+
+    fun CropType.updateTotalCollection(amount: Long) {
+        ChatUtils.debug("Updating total collection: New total amount: $amount")
+        this.addCollectionCounter(CropCollectionType.UNKNOWN, amount - this.getCollection())
+    }
+
+
+    private fun CropType.setCollectionCounter(counter: Long) {
+        cropCollectionCounter?.set(this, counter)
+    }
 
     private fun addCollectionCommand(cropText: String, amount: Long, typeText: String) {
         val crop = CropType.getByNameOrNull(cropText.replace("_", " ")) ?: run {

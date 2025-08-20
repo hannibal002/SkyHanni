@@ -114,8 +114,8 @@ object EliteDevApi {
     private var weightProfileApiResponse: JsonApiResponse<JsonObject>? = null
     suspend fun fetchWeightProfile(localProfile: String): WeightProfile? = try {
         require(localProfile.isNotBlank()) { "Local profile cannot be blank" }
-
-        weightUrl = "$FARMING_WEIGHT_URL/${PlayerUtils.getUuid()}"
+        ChatUtils.debug("Fetching weight profile")
+        weightUrl = "$FARMING_WEIGHT_URL/1242bf4593a047b5bd43f466ce36fb4c?collections=true"//"$FARMING_WEIGHT_URL/${PlayerUtils.getUuid()}?collections=true"
         weightProfileApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(weightUrl, apiName = FARMING_WEIGHT_API_NAME)
         val (_, apiData) = weightProfileApiResponse?.assertSuccessWithData()
             ?: throw IllegalStateException("Response was not successful, or data was null")
@@ -124,13 +124,13 @@ object EliteDevApi {
         val selectedProfileId = weightData.selectedProfileId
         val selectedProfileEntry = weightData.profiles.firstOrNull {
             val idMatch = it.profileId == selectedProfileId
-            val nameMatch = it.profileName.lowercase() == localProfile.lowercase()
+            val nameMatch = it.profileName.lowercase() == "lime"//localProfile.lowercase()
             // Prioritize matching by ID, but also allow matching by name
             (idMatch && nameMatch) || nameMatch
         } ?: throw IllegalStateException(
             "No profile found matching the local profile: $localProfile",
         )
-
+        ChatUtils.debug("$selectedProfileEntry")
         selectedProfileEntry
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(

@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.garden.FarmingWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.UpcomingLeaderboardPlayer
@@ -94,7 +95,7 @@ object FarmingWeightDisplay {
 
         SkyHanniMod.launchIOCoroutine {
             update()
-            getCropWeights()
+            //getCropWeights()
         }
     }
 
@@ -180,14 +181,14 @@ object FarmingWeightDisplay {
             return
         }
 
-        if (weight == -1.0) loadingWeightMutex.withLock {
+        /*if (weight == -1.0) loadingWeightMutex.withLock {
             val localProfile = HypixelData.profileName
             if (display.isEmpty()) display = listOf(Renderable.text("§6$lbName§7: §eLoading.."))
             loadWeight(localProfile)
             return
-        }
+        }*/
 
-        val weight = getWeight()
+        //val weight = getWeight()
 
         if (rankGoal == -1) rankGoal = getRankGoal()
         val leaderboard = getLeaderboardFormat()
@@ -195,7 +196,7 @@ object FarmingWeightDisplay {
         val list = mutableListOf<Renderable>()
         list.add(
             Renderable.clickable(
-                "§6$lbName§7: $weight$leaderboard",
+                "§6$lbName§7: ${FarmingWeight.weight}$leaderboard",
                 tips = listOf("§eClick to open your Farming Profile."),
                 onLeftClick = { openWebsite(PlayerUtils.getName()) },
             ),
@@ -225,7 +226,7 @@ object FarmingWeightDisplay {
         }
     }
 
-    private fun getWeight(): String {
+    /*private fun getWeight(): String {
         if (weightNeedsRecalculating) {
             val values = calculateCollectionWeight().values
             if (values.isNotEmpty()) {
@@ -235,7 +236,7 @@ object FarmingWeightDisplay {
         }
 
         return "§e" + displayWeight.roundTo(2).addSeparators()
-    }
+    }*/
 
     private fun getRankGoal(): Int {
         val value = config.etaGoalRank
@@ -377,7 +378,7 @@ object FarmingWeightDisplay {
     private fun isEtaEnabled() = config.overtakeETA
     private fun isMonthlyLB() = config.eliteLBType.get() == EliteFarmingWeightConfig.EliteFarmingWeightLBType.MONTHLY
 
-    fun addCrop(crop: CropType, addedCounter: Int) {
+    /*fun addCrop(crop: CropType, addedCounter: Int) {
         // Prevent div-by-0 errors
         if (addedCounter == 0) return
 
@@ -401,7 +402,7 @@ object FarmingWeightDisplay {
         return if (values.isNotEmpty()) {
             values.sum()
         } else 0.0
-    }
+    }*/
 
     private fun loadLeaderboardIfAble() {
         if (loadingLeaderboardMutex.isLocked) return
@@ -486,18 +487,18 @@ object FarmingWeightDisplay {
         return if (newData) apiData.rank else leaderboardPosition
     }
 
-    private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine {
-        val apiData = EliteDevApi.fetchWeightProfile(localProfile) ?: run {
+    /*private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine {
+        /*val apiData = EliteDevApi.fetchWeightProfile(localProfile) ?: run {
             apiError = true
             return@launchIOCoroutine
-        }
-        profileId = apiData.profileId
-        weight = apiData.totalWeight
+        }*/
+        profileId = "aea28adee98d489eb582638d20e80e23"//apiData.profileId
+        //weight = apiData.totalWeight
         localCounter.clear()
         weightNeedsRecalculating = true
-    }
+    }*/
 
-    private fun calculateCollectionWeight(): MutableMap<CropType, Double> {
+    /*private fun calculateCollectionWeight(): MutableMap<CropType, Double> {
         val weightPerCrop = mutableMapOf<CropType, Double>()
         var totalWeight = 0.0
         for (crop in CropType.entries) {
@@ -526,7 +527,7 @@ object FarmingWeightDisplay {
 
     private fun CropType.getFactor(): Double {
         return cropWeight[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
-    }
+    }*/
 
     private fun lookUpCommand(it: Array<String>) {
         val name = if (it.size == 1) it[0] else PlayerUtils.getName()
@@ -544,7 +545,7 @@ object FarmingWeightDisplay {
         ChatUtils.chat("Opening Farming Profile of player §b$name")
     }
 
-    private val cropWeight = mutableMapOf<CropType, Double>()
+    /*private val cropWeight = mutableMapOf<CropType, Double>()
     private var attemptingCropWeightFetch = false
     private var hasFetchedCropWeights = false
 
@@ -578,7 +579,7 @@ object FarmingWeightDisplay {
         CropType.MUSHROOM to 90_944.27,
         CropType.COCOA_BEANS to 276_733.75,
         CropType.CACTUS to 178_730.65,
-    )
+    )*/
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
