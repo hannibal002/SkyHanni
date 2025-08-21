@@ -158,7 +158,7 @@ object FarmingWeightDisplay {
     private var minAmount = 0.0
     private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    private val loadingLeaderboardMutex = Mutex()
+
     private val loadingWeightMutex = Mutex()
 
     // Used to get the difference in weight to subtract for monthly lb
@@ -402,7 +402,7 @@ object FarmingWeightDisplay {
         )
     }
 
-    private fun isEnabled() = config.display && (outsideEnabled() || inGardenEnabled())
+    fun isEnabled() = config.display && (outsideEnabled() || inGardenEnabled())
     private fun outsideEnabled() = OutsideSBFeature.FARMING_WEIGHT.isSelected() && !SkyBlockUtils.inSkyBlock
     private fun inGardenEnabled() = (SkyBlockUtils.inSkyBlock && GardenApi.inGarden()) || config.showOutsideGarden
 
