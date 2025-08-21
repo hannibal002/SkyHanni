@@ -40,7 +40,7 @@ object FarmingWeight {
     private var attemptingCropWeightFetch = false
     private var hasFetchedCropWeights = false
     var apiError = false
-    private var profileId: String = ""
+    var profileId: String = ""
     private var shouldRecalculateWeight = false
     private var ignoredCollection = mutableMapOf<CropType, Long>()
     private var hasFetchedCollection = false
