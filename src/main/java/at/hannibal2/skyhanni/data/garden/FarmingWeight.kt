@@ -31,8 +31,8 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object FarmingWeight {
     private val cropWeightValues = mutableMapOf<CropType, Double>()
-    var weight: Double = 0.0
-    var weightGain: Double = 0.0
+    private var weight: Double = 0.0
+    private var weightGain: Double = 0.0
     private var bonusWeight: Double = 0.0
     private var monthlyWeight: Double? = null
     private var attemptingPlayerWeightFetch = false
@@ -94,8 +94,8 @@ object FarmingWeight {
         weightGain += amount
     }
 
-    private fun updateCollections() = SkyHanniMod.launchIOCoroutine {
-        if (lastGainedCollectionTime.passedSince() < 20.minutes && hasFetchedCollection) return@launchIOCoroutine
+    private fun updateCollections(overrideCooldown: Boolean = false) = SkyHanniMod.launchIOCoroutine {
+        if (lastGainedCollectionTime.passedSince() < 20.minutes && hasFetchedCollection && !overrideCooldown) return@launchIOCoroutine
         val apiData = EliteDevApi.fetchWeightProfile(HypixelData.profileName) ?: run {
             apiError = true
             return@launchIOCoroutine
