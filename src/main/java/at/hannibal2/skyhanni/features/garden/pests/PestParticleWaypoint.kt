@@ -50,6 +50,10 @@ object PestParticleWaypoint {
         if (!isEnabled() || !PestApi.hasVacuumInHand()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (MinecraftCompat.localPlayer.isSneaking) return
+        if (lastParticle.passedSince() < 0.2.seconds) {
+            event.cancel()
+            return
+        }
         reset()
         lastPestTrackerUse = SimpleTimeMark.now()
     }
