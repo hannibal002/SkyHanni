@@ -6,12 +6,14 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
+import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer.getModVersion
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
@@ -127,12 +129,18 @@ object ChangelogViewer {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
+        val simpleTabSuggestion: (String, CommandContext) -> Collection<String> = { arg, c ->
+            when {
+                arg.isEmpty() -> listOf(c.fallbackVersion.toString())
+                arg.isInt() -> listOf(c.fallbackVersion.toString().substringAfter('.'))
+                else -> emptyList()
+            }
+        }
+
         event.registerComplex("shchangelog") {
             description = "Shows the specified changelog. No arguments shows the latest changelog."
             category = CommandCategory.USERS_ACTIVE
-            //#if TODO
             context = { CommandContext() }
-            //#endif
             specifiers = listOf<CommandArgument<CommandContext>>(
                 CommandArgument(
                     documentation = "<version> - Shows the changelog of the versions until this, " +
@@ -143,6 +151,7 @@ object ChangelogViewer {
                         context.until = context.getModVersion(argument)
                         1
                     },
+                    tabComplete = simpleTabSuggestion
                 ),
                 CommandArgument(
                     documentation = "<version> - Shows the changelog of the versions since this. (Exclusive)",
@@ -152,6 +161,7 @@ object ChangelogViewer {
                         context.since = context.getModVersion(argument)
                         1
                     },
+                    tabComplete = simpleTabSuggestion
                 ),
                 CommandArgument(
                     documentation = "<version> - Shows the changelog of this specific versions",
@@ -162,6 +172,7 @@ object ChangelogViewer {
                         context.until = context.since
                         1
                     },
+                    tabComplete = simpleTabSuggestion
                 ),
             )
         }
@@ -187,10 +198,12 @@ object ChangelogViewer {
         var until: ModVersion? = null
         var since: ModVersion? = null
 
+        val fallbackVersion = ModVersion.fromString(SkyHanniMod.VERSION)
+
         override fun post() {
-            val since = since ?: ModVersion.fromString(SkyHanniMod.VERSION)
+            val since = since ?: fallbackVersion
             val until =
-                until ?: UpdateManager.getNextVersion()?.let { ModVersion.fromString(it) } ?: ModVersion.fromString(SkyHanniMod.VERSION)
+                until ?: UpdateManager.getNextVersion()?.let { ModVersion.fromString(it) } ?: fallbackVersion
 
             if (until < since) {
                 errorMessage = "until:'$until' is less than since:'$since', where it is expected to be greater"
