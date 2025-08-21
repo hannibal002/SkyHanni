@@ -86,8 +86,6 @@ object SkyHanniDebugsAndTests {
     @Suppress("MemberVisibilityCanBePrivate")
     var displayList = emptyList<Renderable>()
 
-    var globalRender = true
-
     var a = 1.0
     var b = 60.0
     var c = 0.0
@@ -641,18 +639,6 @@ object SkyHanniDebugsAndTests {
                     ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
                 } else {
                     ChatUtils.chat("§eYou are not in Skyblock.")
-                }
-            }
-        }
-        event.registerBrigadier("shrendertoggle") {
-            description = "Disables/enables the rendering of all skyhanni guis."
-            category = CommandCategory.USERS_BUG_FIX
-            callback {
-                globalRender = !globalRender
-                if (globalRender) {
-                    ChatUtils.chat("§aEnabled global renderer!")
-                } else {
-                    ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
                 }
             }
         }
