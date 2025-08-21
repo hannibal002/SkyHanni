@@ -28,6 +28,10 @@ import kotlin.time.Duration.Companion.seconds
 object DungeonSecretTrackerLocator {
     private val config get() = SkyHanniMod.feature.dungeon.dungeonSecretCompass
 
+    /**
+     * REGEX-TEST: §aThere's a secret §r§e11 blocks in front of you!
+     * REGEX-TEST: §aThere's a secret §r§e38 blocks in front of you and 15 blocks above you§r§a!
+     */
     private val SECRET_TRACKER_MESSAGE_REGEX by RepoPattern.pattern(
         "dungeon.secrettracker.message",
         "There's a secret (?:§.)*(?<distance>\\d+) blocks(?:.+and (?<distance2>\\d+) blocks)?"
