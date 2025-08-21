@@ -77,23 +77,25 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         simpleCallback { block(emptyArray()) }
     }
 
+    // Used in modern
     @Suppress("Unused")
     fun <O : CommandContextAwareObject, A : CommandArgument<O>> ComplexCommand<O>.complexArgs() {
 
         val suggestionProvider = SuggestionProvider<Any> { ctx, builder ->
-            val input = builder.input.substring(builder.start)
-            val tokens = input.trim().split(Regex("\\s+"))
+            val input = builder.input.substring(builder.start).trim()
+            val tokens = input.split(' ')
 
-            this.tabParse(tokens).forEach {
-                builder.suggest(it)
+            val (suggestion, baseline) = this.tabParse(tokens)
+            suggestion.forEach {
+                builder.suggest(baseline + it)
             }
             CompletableFuture.completedFuture(builder.build())
         }
 
-        val argsNode = RequiredArgumentBuilder.argument<Any, String>("_input", StringArgumentType.greedyString())
+        val argsNode = RequiredArgumentBuilder.argument<Any, String>("allArgs", StringArgumentType.greedyString())
             .suggests(suggestionProvider)
             .executes {
-                run(context(this), StringArgumentType.getString(it, "_input").split(Regex("\\s+")))
+                handleCommand(StringArgumentType.getString(it, "allArgs").split(' '), context(this))
                 0
             }
         builder.then(argsNode)

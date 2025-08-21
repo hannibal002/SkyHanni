@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
+
 //#endif
 
 //#if MC < 1.21
@@ -22,7 +23,7 @@ data class ComplexCommand<O : CommandContextAwareObject>(
     val specifiers: Collection<CommandArgument<O>>,
     val context: (ComplexCommand<O>) -> O,
     val aliases: List<String>,
-): ComplexCommandBase(){
+) : ComplexCommandBase() {
     //#if MC < 1.21
     override fun canCommandSenderUseCommand(sender: ICommandSender) = true
     override fun getCommandName() = name
@@ -36,6 +37,9 @@ data class ComplexCommand<O : CommandContextAwareObject>(
             ErrorManager.logErrorWithData(e, "Error while running command /$name")
         }
     }
+
+    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String>? =
+        tabParse(args.asList()).first
     //#endif
 
     fun handleCommand(args: List<String>, context: O = context(this)) {
@@ -57,7 +61,7 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         }
     }
 
-    private fun tabParse(args: List<String>, partial: String?): List<String> {
+    fun tabParse(args: List<String>, partial: String?): Pair<List<String>, String> {
         val context = context(this)
 
         var index = 0
@@ -80,6 +84,7 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         val validSpecifier = specifiers.filter { it.validity(context) }
 
         val rest = (args.slice(index..<args.size).joinToString(" ") + (partial?.let { " $it" }.orEmpty())).trimStart()
+        val unchanged = args.slice(0..<index).joinToString(" ", postfix = " ").takeIf { it.isNotBlank() } ?: ""
 
         if (rest.isEmpty()) {
             result.addAll(validSpecifier.mapNotNull { it.prefix.takeIf { i -> i.isNotEmpty() } })
@@ -97,10 +102,10 @@ data class ComplexCommand<O : CommandContextAwareObject>(
             )
         }
 
-        return result
+        return result to unchanged
     }
 
-    fun tabParse(args: List<String>): List<String> {
+    fun tabParse(args: List<String>): Pair<List<String>, String> {
         val rawArgs = args
         val isPartial = rawArgs.last().isNotEmpty()
         val newArgs = if (isPartial) rawArgs.dropLast(1) else rawArgs
@@ -109,11 +114,6 @@ data class ComplexCommand<O : CommandContextAwareObject>(
 
         return tabParse(newArgs, partial)
     }
-
-
-    //#if MC < 1.21
-    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String>? = tabParse(args.asList())
-    //#endif
 
     fun constructHelp(description: String): String = buildString {
         appendLine(description)
@@ -140,15 +140,4 @@ data class ComplexCommand<O : CommandContextAwareObject>(
             }
         deleteAt(lastIndex) // Removes the last /n
     }
-
-    // Brigadier Stuff
-
-    fun findMatchingSpec(tok: String, posCounter: Int, contextObj: O): CommandArgument<O>? {
-        return specifiers.firstOrNull {
-            it.validity(contextObj) &&
-                ((it.prefix.isNotEmpty() && it.prefix == tok) || (it.prefix.isEmpty() && it.defaultPosition == posCounter))
-        }
-    }
-
-    fun run(ctx: O, tokens: List<String>) = handleCommand(tokens,ctx)
 }
