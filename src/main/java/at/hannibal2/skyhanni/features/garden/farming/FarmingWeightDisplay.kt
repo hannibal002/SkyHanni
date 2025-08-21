@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.garden.FarmingWeight
+import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.UpcomingLeaderboardPlayer
@@ -207,7 +208,7 @@ object FarmingWeightDisplay {
         val list = mutableListOf<Renderable>()
         list.add(
             Renderable.clickable(
-                "§6$lbName§7: ${FarmingWeight.weight.roundTo(2)}",
+                "§6$lbName§7: §e${getWeight().roundTo(2)}",
                 tips = listOf("§eClick to open your Farming Profile."),
                 onLeftClick = { openWebsite(PlayerUtils.getName()) },
             ),
