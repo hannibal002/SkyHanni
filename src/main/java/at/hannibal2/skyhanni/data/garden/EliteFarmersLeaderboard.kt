@@ -38,6 +38,7 @@ object EliteFarmersLeaderboard {
     private val nextPlayers: MutableMap<EliteLeaderboardType, MutableList<UpcomingLeaderboardPlayer>> = mutableMapOf()
 
 
+    private var apiError = false
     private var hasWarned = false
     private var shouldRefreshLeaderboard = false
     private var rankGoal: Int? = null
@@ -138,7 +139,10 @@ object EliteFarmersLeaderboard {
             lbType = leaderboardType,
             upcomingCount = upcomingPlayers,
             atRank = atRank,
-        ) ?: return currentLeaderboardPos
+        ) ?: run {
+            apiError = true
+            return currentLeaderboardPos
+        }
 
         val diff = apiData.amount - (getWeight(leaderboardType) ?: -1.0)
 
@@ -163,6 +167,7 @@ object EliteFarmersLeaderboard {
         //return if (newData) apiData.rank else currentLeaderboardPos
         lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
         leaderboardWeight[leaderboardType] = apiData.amount
+        apiError = false
         FarmingWeightDisplay.update()
         return apiData.rank
     }
