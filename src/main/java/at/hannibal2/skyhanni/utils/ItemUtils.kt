@@ -589,6 +589,20 @@ object ItemUtils {
         return makePair(input, itemName, matcher)
     }
 
+    /**
+     * REGEX-TEST: §fEnchanted Book (Lapidary I)
+     * REGEX-TEST: §fEnchanted Book (Ice Cold I§r§f)
+     */
+    private val enchantedBookPattern by RepoPattern.pattern(
+        "item.enchantedbook",
+        "§fEnchanted Book \\((?<item>.+)\\)"
+    )
+    fun readBookType(input: String): String? {
+        return enchantedBookPattern.matchMatcher(input) {
+            group("item").removeColor()
+        }
+    }
+
     private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {
         val matcherAmount = matcher.group("amount")
         val amount = matcherAmount?.formatInt() ?: 1
