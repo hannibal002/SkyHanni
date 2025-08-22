@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.Far
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getNextPlayer
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getRankGoal
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
 import at.hannibal2.skyhanni.data.garden.FarmingWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
@@ -39,6 +40,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerti
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import scala.concurrent.duration.Duration.Infinite
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -226,8 +228,13 @@ object FarmingWeightDisplay {
     }
 
     private fun overtakeRenderable(): Renderable {
-        if (getLeaderboardPosition(currentLeaderboardType) == 1) return Renderable.text("§bNo players ahead!")
-        val (nextName, weightUntil) = getNextPlayer(currentLeaderboardType) ?: return Renderable.text("§bLoading next player...")
+        val leaderboardPos = getLeaderboardPosition(currentLeaderboardType)
+        if (leaderboardPos == 1) return Renderable.text("§bNo players ahead!")
+        var (nextName, weightUntil) = getNextPlayer(currentLeaderboardType) ?: return Renderable.text("§bLoading next player...")
+        val rankGoal = getRankGoal()
+        if (config.useEtaGoalRank.get() && rankGoal != null && rankGoal < (leaderboardPos ?: Int.MAX_VALUE)) {
+            nextName = "#${rankGoal.addSeparators()}"
+        }
         val text = "§e${weightUntil.roundTo(2).addSeparators()} §bbehind $nextName"
         return Renderable.clickable(
             text,
