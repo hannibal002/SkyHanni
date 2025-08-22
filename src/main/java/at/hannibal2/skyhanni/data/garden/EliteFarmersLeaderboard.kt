@@ -142,7 +142,7 @@ object EliteFarmersLeaderboard {
 
         val diff = apiData.amount - (getWeight(leaderboardType) ?: -1.0)
 
-        if (diff >= 0 || abs(diff) >= 10) {
+        if (diff >= 0.5 || abs(diff) >= 10) {
             when (leaderboardType) {
                 EliteLeaderboardType.ALL_TIME -> updateCollections()
                 EliteLeaderboardType.MONTHLY -> setWeight(leaderboardType, apiData.amount)
@@ -163,6 +163,7 @@ object EliteFarmersLeaderboard {
         //return if (newData) apiData.rank else currentLeaderboardPos
         lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
         leaderboardWeight[leaderboardType] = apiData.amount
+        FarmingWeightDisplay.update()
         return apiData.rank
     }
 

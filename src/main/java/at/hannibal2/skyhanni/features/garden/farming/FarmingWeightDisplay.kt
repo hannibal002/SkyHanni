@@ -231,10 +231,12 @@ object FarmingWeightDisplay {
         val leaderboardPos = getLeaderboardPosition(currentLeaderboardType)
         if (leaderboardPos == 1) return Renderable.text("§bNo players ahead!")
         var (nextName, weightUntil) = getNextPlayer(currentLeaderboardType) ?: return Renderable.text("§bLoading next player...")
+
         val rankGoal = getRankGoal()
         if (config.useEtaGoalRank.get() && rankGoal != null && rankGoal < (leaderboardPos ?: Int.MAX_VALUE)) {
-            nextName = "#${rankGoal.addSeparators()}"
+            nextName += " §7[§b#${rankGoal.addSeparators()}§7]"
         }
+
         val text = "§e${weightUntil.roundTo(2).addSeparators()} §bbehind $nextName"
         return Renderable.clickable(
             text,
