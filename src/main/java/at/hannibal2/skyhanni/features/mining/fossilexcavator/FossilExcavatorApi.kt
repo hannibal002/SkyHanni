@@ -110,9 +110,8 @@ object FossilExcavatorApi {
             ItemUtils.readItemAmount(group("item"))
         } ?: return
 
-        if (pair.first.startsWith("§fEnchanted Book (")) {
-            val book = ItemUtils.readBookType(pair.first) ?: return
-            pair = book to pair.second
+        ItemUtils.readBookType(pair.first)?.let {
+            pair = it to pair.second
         }
         loot.add(pair)
     }
