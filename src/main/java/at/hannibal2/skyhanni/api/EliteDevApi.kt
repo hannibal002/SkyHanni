@@ -164,7 +164,7 @@ object EliteDevApi {
         atRank: Int? = null,
     ): EliteLeaderboard? {
         require(profileId.isNotBlank()) { "Profile ID cannot be blank" }
-        val uuid = PlayerUtils.getUuid()
+        val uuid = "1242bf4593a047b5bd43f466ce36fb4c"//PlayerUtils.getUuid()
 
         val upcomingPlayersParam = upcomingCount?.let { "upcoming=$it" }
         val atRankParam = atRank?.let { "atRank=$it" }
@@ -181,6 +181,7 @@ object EliteDevApi {
             "url" to lbUrl,
             "apiResponse" to lbApiResponse,
         )
+        ChatUtils.debug("$lbApiResponse")
         return ConfigManager.gson.fromJson<EliteLeaderboard>(apiData)
     }
     // </editor-fold>

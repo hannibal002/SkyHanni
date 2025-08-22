@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -35,7 +36,7 @@ class EliteFarmingWeightConfig {
     @ConfigEditorBoolean
     var leaderboard: Boolean = true
 
-    @Expose
+    /*@Expose
     @ConfigOption(name = "Leaderboard Type", desc = "Select normal or monthly weight leaderboard!")
     @ConfigEditorDropdown
     val eliteLBType: Property<EliteFarmingWeightLBType> = Property.of(EliteFarmingWeightLBType.DEFAULT)
@@ -46,6 +47,25 @@ class EliteFarmingWeightConfig {
     ) {
         DEFAULT("All-Time", leaderboardName = ""),
         MONTHLY("Monthly"),
+        ;
+
+        override fun toString() = displayName
+    }*/
+
+    @Expose
+    @ConfigOption(
+        name = "Farming Weight Text",
+        desc = "Drag text to change the appearance of the overlay.\n"
+    )
+    @ConfigEditorDraggableList
+    val text: MutableList<FarmingWeightTextEntry> = mutableListOf(
+        FarmingWeightTextEntry.WEIGHT_POSITION,
+        FarmingWeightTextEntry.OVERTAKE
+    )
+
+    enum class FarmingWeightTextEntry(private val displayName: String) {
+        WEIGHT_POSITION("Farming Weight: 104,481.49 [#5]"),
+        OVERTAKE("170.21 (12h 32m 15s) behind Chissl")
         ;
 
         override fun toString() = displayName

@@ -26,8 +26,8 @@ data class WeightProfile(
     @Expose val pests: Map<String, Int>,
 )
 
-enum class EliteLeaderboardType(private val displayName: String, val suffix: String = "") {
-    NORMAL("Normal"),
+enum class EliteLeaderboardType(val displayName: String, val suffix: String = "") {
+    ALL_TIME("All-Time"),
     MONTHLY("Monthly", "-monthly"),
     ;
 

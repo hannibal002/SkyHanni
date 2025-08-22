@@ -39,9 +39,12 @@ object CropCollectionAPI {
         if (amount == 0L) return
         if (type !in listOf(CropCollectionType.UNKNOWN, CropCollectionType.MOOSHROOM_COW) && amount > 1) lastGainedCrop = this
 
+        //ChatUtils.debug("$this add event: $amount")
         this.setCollectionCounter(amount + this.getCollection())
 
-        lastGainedCollectionTime = SimpleTimeMark.now()
+        if (type != CropCollectionType.UNKNOWN) {
+            lastGainedCollectionTime = SimpleTimeMark.now()
+        }
         CropCollectionAddEvent(this, type, amount).post()
     }
 
@@ -55,7 +58,7 @@ object CropCollectionAPI {
         )
 
     fun CropType.updateTotalCollection(amount: Long) {
-        ChatUtils.debug("Updating total collection: New total amount: $amount")
+        //ChatUtils.debug("Updating $this collection: New total amount: $amount")
         this.addCollectionCounter(CropCollectionType.UNKNOWN, amount - this.getCollection())
     }
 
@@ -90,6 +93,17 @@ object CropCollectionAPI {
                         callback { addCollectionCommand(getArg(crop), getArg(amount), getArg(type)) }
                     }
                 }
+            }
+        }
+        event.registerBrigadier("shshowcropcollection") {
+            description = "Show current crop collection amounts"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback {
+                for (entry in CropType.entries) {
+                   ChatUtils.chat("$entry collection: ${entry.getCollection()}")
+                }
+
+                ChatUtils.debug("$cropCollectionCounter")
             }
         }
     }
