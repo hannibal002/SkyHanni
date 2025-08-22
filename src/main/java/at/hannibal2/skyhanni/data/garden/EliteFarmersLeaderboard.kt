@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.garden.FarmingWeight.profileId
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.setWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.updateCollections
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.UpcomingLeaderboardPlayer
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay.isEnabled
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,32 +16,51 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.EnumMap
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object EliteFarmersLeaderboard {
+    val loadingLeaderboardMutex = Mutex()
     private val config get() = GardenApi.config.eliteFarmingWeights
     private val storage get() = GardenApi.storage?.farmingWeight
-    private val lastLeaderboardPos: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardMap
+    private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardMap
     private val lastLeaderboardUpdate: MutableMap<EliteLeaderboardType, SimpleTimeMark> = mutableMapOf()
     private val leaderboardWeight: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
-    val loadingLeaderboardMutex = Mutex()
-    private val lastApiWeight: EnumMap<EliteLeaderboardType, Double> = enumMapOf()
+    private val lastApiWeight: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+    private val nextPlayers: MutableMap<EliteLeaderboardType, MutableList<UpcomingLeaderboardPlayer>> = mutableMapOf()
 
     private var wasNotLoaded = true
 
     fun getLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int? {
         if ((lastLeaderboardUpdate[leaderboardType]?.passedSince() ?: INFINITE) < 10.minutes) {
-            return lastLeaderboardPos?.get(leaderboardType)
+            return leaderboardPosMap?.get(leaderboardType)
         }
-        //ChatUtils.debug("Getting leaderboard position")
         return loadLeaderboardIfAble(leaderboardType)
+    }
+
+    fun getNextPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
+        var nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
+        val weight = getWeight(leaderboardType) ?: return null
+        var weightDiff = nextPlayer.weight - weight
+        while (weightDiff < 0) {
+            nextPlayer = updateNextPlayer(leaderboardType) ?: return null
+            weightDiff = nextPlayer.weight - weight
+        }
+        return Pair(nextPlayer.name, weightDiff)
+    }
+
+    private fun updateNextPlayer(leaderboardType: EliteLeaderboardType): UpcomingLeaderboardPlayer? {
+        val nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
+        farmingChatMessage("You passed §b${nextPlayer.name} §ein the §6$leaderboardType §eLeaderboard!")
+        nextPlayers[leaderboardType]?.removeFirstOrNull() ?: return null
+
+        val currentRank = leaderboardPosMap?.get(leaderboardType) ?: return null
+        leaderboardPosMap?.set(leaderboardType, currentRank - 1)
+        return nextPlayers[leaderboardType]?.firstOrNull()
     }
 
     private fun loadLeaderboardIfAble(leaderboardType: EliteLeaderboardType): Int? {
@@ -48,23 +68,21 @@ object EliteFarmersLeaderboard {
         if (profileId == "") updateCollections()
         SkyHanniMod.launchIOCoroutine {
             loadingLeaderboardMutex.withLock {
-                val oldPos = lastLeaderboardPos?.get(leaderboardType)
+                val oldPos = leaderboardPosMap?.get(leaderboardType)
                 val lbPos = loadLeaderboardPosition(leaderboardType)
-                //ChatUtils.debug("Lbpos: $lbPos")
-                lastLeaderboardPos?.set(leaderboardType, lbPos)
+                leaderboardPosMap?.set(leaderboardType, lbPos)
                 if (wasNotLoaded) checkOffScreenLeaderboardChanges(oldPos, leaderboardType)
                 lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
             }
         }
-        //ChatUtils.debug("lastLeaderboardPos: ${lastLeaderboardPos?.get(currentLeaderboardType)}")
-        return lastLeaderboardPos?.get(leaderboardType)
+        return leaderboardPosMap?.get(leaderboardType)
     }
 
     private fun checkOffScreenLeaderboardChanges(oldPosition: Int?, leaderboardType: EliteLeaderboardType) {
         if (!config.showLbChange) return
         if (oldPosition == null) return
         wasNotLoaded = false
-        val currentPosition = lastLeaderboardPos?.get(leaderboardType) ?: return
+        val currentPosition = leaderboardPosMap?.get(leaderboardType) ?: return
 
         val diff = currentPosition - oldPosition
         if (diff == 0) return
@@ -78,9 +96,8 @@ object EliteFarmersLeaderboard {
     }
 
     private suspend fun loadLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int {
-        //ChatUtils.debug("Loading Leaderboard position")
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
-        val currentLeaderboardPos = lastLeaderboardPos?.get(leaderboardType) ?: -1
+        val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: -1
         val upcomingPlayers = when {
             !isEnabled() -> 0
             currentLeaderboardPos > 10_000 -> 50
@@ -98,9 +115,6 @@ object EliteFarmersLeaderboard {
             else -> null
         }*/
 
-        //ChatUtils.debug("Calling api data")
-        //ChatUtils.debug("profile id: $profileId, lbType: $leaderboardType, upcoming count: $upcomingPlayers")
-
         val apiData = EliteDevApi.fetchLeaderboardPositions(
             profileId = profileId,
             lbType = leaderboardType,
@@ -117,28 +131,16 @@ object EliteFarmersLeaderboard {
             }
         }
 
-        /*val newData = apiWeight < apiData.amount
-        minAmount = apiData.minAmount
-
-        if (newData) {
-            shWeightDiff = weight - apiData.amount
-            apiWeight = apiData.amount
-        }
-
-        // Reset weight diff if not a monthly leaderboard
-        if (apiData.initialAmount == 0.0) {
-            shWeightDiff = 0.0
-        }
-
-        if (isEtaEnabled()) {
-            nextPlayers.clear()
+        // TODO config load event
+        if (config.upcomingPlayers) {
+            nextPlayers[leaderboardType] = mutableListOf()
+            val weight = getWeight(leaderboardType) ?: 0.0
             apiData.upcomingPlayers.forEach {
-                if (it.weight > displayWeight) {
-                    nextPlayers.add(it)
+                if (it.weight > weight) {
+                    nextPlayers[leaderboardType]?.add(it)
                 }
             }
-        }*/
-
+        }
         // Keep local rank if new data wasn't returned
         //return if (newData) apiData.rank else currentLeaderboardPos
         lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()

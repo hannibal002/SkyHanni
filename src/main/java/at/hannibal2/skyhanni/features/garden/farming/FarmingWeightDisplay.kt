@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.FarmingWeightTextEntry
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getNextPlayer
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
 import at.hannibal2.skyhanni.data.garden.FarmingWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
@@ -90,7 +91,7 @@ object FarmingWeightDisplay {
         apiWeight = 0.0
         shWeightDiff = 0.0
 
-        nextPlayers.clear()
+        //nextPlayers.clear()
         rankGoal = -1
     }
 
@@ -144,13 +145,8 @@ object FarmingWeightDisplay {
 
     private val config get() = GardenApi.config.eliteFarmingWeights
     private val storage get() = GardenApi.storage?.farmingWeight
-    private val lbName get() = if (currentLeaderboardType == EliteLeaderboardType.ALL_TIME) {
-        ""
-    } else {
-        currentLeaderboardType.displayName + " "
-    } + "Farming Weight"
+    private val lbName get() = currentLeaderboardType.specificDisplayName
     private val localCounter = mutableMapOf<CropType, Long>()
-
     private var display = emptyList<Renderable>()
     private var profileId = ""
     private var lastLeaderboardUpdate = SimpleTimeMark.farPast()
@@ -174,8 +170,8 @@ object FarmingWeightDisplay {
     // Calculated weight number to display
     private val displayWeight get() = localWeight + weight - shWeightDiff
 
-    private val nextPlayers = mutableListOf<UpcomingLeaderboardPlayer>()
-    private val nextPlayer get() = nextPlayers.firstOrNull()
+
+    //private val nextPlayer get() = nextPlayers.firstOrNull()
     private var currentLeaderboardType: EliteLeaderboardType
         get() = storage?.lastLeaderboardType ?: EliteLeaderboardType.ALL_TIME
         set(value) {
@@ -223,8 +219,21 @@ object FarmingWeightDisplay {
                 onLeftClick = { openWebsite(PlayerUtils.getName()) },
             )
 
+        lineMap[FarmingWeightTextEntry.OVERTAKE] = overtakeRenderable()
+
         display = formatDisplay(lineMap)
 
+    }
+
+    private fun overtakeRenderable(): Renderable {
+        if (getLeaderboardPosition(currentLeaderboardType) == 1) return Renderable.text("§bNo players ahead!")
+        val (nextName, weightUntil) = getNextPlayer(currentLeaderboardType) ?: return Renderable.text("§bLoading next player...")
+        val text = "§e${weightUntil.roundTo(2).addSeparators()} §bbehind $nextName"
+        return Renderable.clickable(
+            text,
+            tips = listOf("§eClick to open the Farming Profile of §b$nextName."),
+            onLeftClick = { openWebsite(nextName) },
+        )
     }
 
     private fun formatDisplay(lineMap: MutableMap<FarmingWeightTextEntry, Renderable>): List<Renderable> {
@@ -420,7 +429,7 @@ object FarmingWeightDisplay {
         weightNeedsRecalculating = true
         lastLeaderboardUpdate = SimpleTimeMark.farPast()
 
-        nextPlayers.clear()
+        //nextPlayers.clear()
         rankGoal = -1
 
         localCounter.clear()

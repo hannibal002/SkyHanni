@@ -26,9 +26,9 @@ data class WeightProfile(
     @Expose val pests: Map<String, Int>,
 )
 
-enum class EliteLeaderboardType(val displayName: String, val suffix: String = "") {
-    ALL_TIME("All-Time"),
-    MONTHLY("Monthly", "-monthly"),
+enum class EliteLeaderboardType(val displayName: String, val specificDisplayName: String, val suffix: String = "") {
+    ALL_TIME("All-Time", "Farming Weight"),
+    MONTHLY("Monthly", "Monthly Farming Weight", "-monthly"),
     ;
 
     override fun toString() = displayName
