@@ -7,7 +7,11 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneTotalCropsForTier
+import at.hannibal2.skyhanni.events.CollectionUpdateEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -26,6 +30,11 @@ object GardenCropMilestoneInventory {
     private var average: Double? = null
     private val config get() = GardenApi.config
 
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onMilestoneUpdate(event: CropMilestoneUpdateEvent) {
+        if (InventoryUtils.openInventoryName() != "Crop Milestones") return
+        updateAverage()
+    }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {

@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 
 @SkyHanniModule
-object CropCollectionAPI {
+object CropCollectionApi {
     var lastGainedCrop: CropType?
         get() = GardenApi.storage?.lastGainedCrop
         set(value) {
