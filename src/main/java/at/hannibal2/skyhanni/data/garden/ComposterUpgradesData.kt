@@ -19,7 +19,7 @@ object ComposterUpgradesData {
             ComposterUpgrade.regex.matchMatcher(item.displayName) {
                 val name = group("name")
                 val level = group("level")?.romanToDecimalIfNecessary() ?: 0
-                val composterUpgrade = ComposterUpgrade.getByName(name)!!
+                val composterUpgrade = ComposterUpgrade.getByName(name) ?: continue
                 ComposterApi.composterUpgrades?.put(composterUpgrade, level)
             }
         }

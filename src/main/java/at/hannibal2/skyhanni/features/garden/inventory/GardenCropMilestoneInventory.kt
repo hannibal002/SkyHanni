@@ -3,13 +3,10 @@ package at.hannibal2.skyhanni.features.garden.inventory
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getMilestoneCounter
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneTotalCropsForTier
-import at.hannibal2.skyhanni.events.CollectionUpdateEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
@@ -53,11 +50,11 @@ object GardenCropMilestoneInventory {
     fun addMaxMilestoneProgress(event: ToolTipEvent) {
         if (!config.tooltipTweak.cropMilestoneTotalProgress || InventoryUtils.openInventoryName() != "Crop Milestones") return
 
-        val crop = CropMilestonesAPI.getCropTypeByLore(event.itemStack) ?: return
+        val crop = CropMilestonesApi.getCropTypeByLore(event.itemStack) ?: return
         val tier = crop.getCurrentMilestoneTier()
         if (tier >= 20) return // Hypixel shows progress to ms46 after ms20
 
-        val maxTier = CropMilestonesAPI.getMaxTier()
+        val maxTier = CropMilestonesApi.getMaxTier()
         val maxCounter = crop.milestoneTotalCropsForTier(maxTier)
 
         val index = event.toolTipRemovedPrefix().indexOfFirst(

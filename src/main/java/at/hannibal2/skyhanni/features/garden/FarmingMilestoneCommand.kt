@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneNextTierAmount
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneProgressToNextTier
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneTotalCropsForTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneNextTierAmount
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneProgressToNextTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils

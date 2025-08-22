@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.cropMilestoneRepoData
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCropTypeByLore
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneTotalCropsForTier
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.totalPattern
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.cropMilestoneRepoData
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCropTypeByLore
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneTotalCropsForTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.totalPattern
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -159,6 +159,7 @@ object CommunityFix {
     private fun nextMax(tier: Int, crop: CropType): Long =
         crop.milestoneTotalCropsForTier(tier).let { crop.milestoneTotalCropsForTier(tier + 1).minus(it) }
 
+    @Suppress("UnsafeCallOnNullableType")
     private fun fix(crop: CropType, map: MutableMap<CropType, List<Int>>, tier: Int, amount: Int) {
         map[crop] = map[crop]!!.editCopy {
             this[tier] = amount

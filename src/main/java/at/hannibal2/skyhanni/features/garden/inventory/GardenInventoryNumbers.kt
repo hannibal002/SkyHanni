@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.garden.inventory
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getMaxTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMaxTier
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -36,7 +36,7 @@ object GardenInventoryNumbers {
         if (InventoryUtils.openInventoryName() == "Crop Milestones") {
             if (!config.cropMilestone) return
 
-            val crop = CropMilestonesAPI.getCropTypeByLore(event.stack) ?: return
+            val crop = CropMilestonesApi.getCropTypeByLore(event.stack) ?: return
             val allowOverflow = GardenApi.config.cropMilestones.overflow.inventoryStackSize
             val currentTier = crop.getCurrentMilestoneTier()
             val displayTier = if (!allowOverflow) minOf(getMaxTier(), currentTier) else currentTier
