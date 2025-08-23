@@ -42,7 +42,7 @@ value class Graph(
     fun getNodesWithName(name: String): List<GraphNode> = nodes.filter { it.name == name }
 
     fun getNearestNode(
-        location: LorenzVec = GraphUtils.playerGraphGridLocation(),
+        location: LorenzVec = GraphUtils.playerPosition,
         condition: (GraphNode) -> Boolean = { true },
     ): GraphNode = asSequence()
         .filter(condition)
