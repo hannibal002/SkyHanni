@@ -26,6 +26,7 @@ at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal.java
 at.hannibal2.skyhanni.mixins.transformers.MixinBlockLiquid.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityAgeable.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityHorse.java
+at.hannibal2.skyhanni.mixins.transformers.MixinForgeHandshake.java
 at.hannibal2.skyhanni.mixins.transformers.MixinFontRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngameForge.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGuiTextField.java
