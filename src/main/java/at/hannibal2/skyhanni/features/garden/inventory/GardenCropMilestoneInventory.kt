@@ -78,8 +78,11 @@ object GardenCropMilestoneInventory {
         val allowOverflow = config.cropMilestones.overflow.inventoryStackSize
         for (cropType in CropType.entries) {
             val tier = cropType.getCurrentMilestoneTier()
-            if (!allowOverflow && tier > 46)
+            if (!allowOverflow && tier > 46) {
+                tiers.add(46.0)
+            } else {
                 tiers.add(tier.toDouble())
+            }
         }
         average = (tiers.sum() / CropType.entries.size).roundTo(2)
     }
