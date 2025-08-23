@@ -15,12 +15,15 @@ import java.util.Map;
 @Mixin(FMLHandshakeMessage.ModList.class)
 public class MixinForgeHandshake {
 
-    @Shadow
+    @Shadow(
+        remap = false
+    )
     private Map<String, String> modTags;
 
     @Inject(
         at = @At("HEAD"),
-        method = "toBytes"
+        method = "toBytes",
+        remap = false
     )
     public void onToBytes(ByteBuf buffer, CallbackInfo ci) {
         for (ModContainer mod : Loader.instance().getActiveModList()) {
