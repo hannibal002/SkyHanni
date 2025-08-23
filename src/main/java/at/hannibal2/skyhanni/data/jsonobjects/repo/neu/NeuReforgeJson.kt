@@ -20,41 +20,57 @@ data class NeuReforgeJson(
     @Expose @SerializedName("reforgeAbility") val rawReforgeAbility: Any?,
 ) {
 
-    val nbtModifier: String by lazy {
-        rawNbtModifier ?: reforgeName
-            .lowercase()
-            .replace("[^a-z0-9\\s_-]".toRegex(), "")
-            .replace("[\\s-]".toRegex(), "_")
-    }
+    // NOTE: Lateinit fields are used here because `by lazy` causes errors
+    private lateinit var nbtModifierField: String
+    private lateinit var reforgeAbilityField: Map<LorenzRarity, String>
+    private lateinit var itemTypeField: Pair<String, List<NeuInternalName>>
 
-    val reforgeAbility: Map<LorenzRarity, String> by lazy {
-        when (rawReforgeAbility) {
-            is String -> requiredRarities.associateWith { rawReforgeAbility }
-
-            is Map<*, *> -> (rawReforgeAbility as? Map<String, String>)?.mapKeys {
-                LorenzRarity.getByNameOrError(it.key)
-            }.orEmpty()
-
-            else -> emptyMap()
-        }
-    }
-
-    val itemType: Pair<String, List<NeuInternalName>> by lazy {
-        when (rawItemTypes) {
-            is String -> rawItemTypes.replace("/", "_AND_").uppercase() to emptyList()
-
-            is Map<*, *> -> {
-                val type = "SPECIAL_ITEMS"
-                val map = rawItemTypes as? Map<String, List<String>> ?: return@lazy type to emptyList()
-                val internalNames = map["internalName"]?.toInternalNames().orEmpty()
-                val itemType = map["itemid"]?.map {
-                    NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
-                }?.flatten().orEmpty()
-                type to (internalNames + itemType)
+    val nbtModifier: String
+        get() {
+            if (!this::nbtModifierField.isInitialized) {
+                nbtModifierField = rawNbtModifier ?: reforgeName
+                    .lowercase()
+                    .replace("[^a-z0-9\\s_-]".toRegex(), "")
+                    .replace("[\\s-]".toRegex(), "_")
             }
+            return nbtModifierField
+        }
 
-            else -> error("rawItemTypes is neither String nor Map: $rawItemTypes")
+    val reforgeAbility: Map<LorenzRarity, String>
+        get() {
+            if (!this::reforgeAbilityField.isInitialized) {
+                reforgeAbilityField = when (rawReforgeAbility) {
+                    is String -> requiredRarities.associateWith { rawReforgeAbility }
+
+                    is Map<*, *> -> (rawReforgeAbility as? Map<String, String>)?.mapKeys {
+                        LorenzRarity.getByNameOrError(it.key)
+                    }.orEmpty()
+
+                    else -> emptyMap()
+                }
+            }
+            return reforgeAbilityField
+        }
+
+    val itemType: Pair<String, List<NeuInternalName>>
+        get() {
+            if (!this::itemTypeField.isInitialized) {
+                itemTypeField = when (rawItemTypes) {
+                    is String -> rawItemTypes.replace("/", "_AND_").uppercase() to emptyList()
+
+                    is Map<*, *> -> {
+                        val type = "SPECIAL_ITEMS"
+                        val map = rawItemTypes as? Map<String, List<String>> ?: return type to emptyList()
+                        val internalNames = map["internalName"]?.toInternalNames().orEmpty()
+                        val itemType = map["itemid"]?.map {
+                            NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
+                        }?.flatten().orEmpty()
+                        type to (internalNames + itemType)
+                    }
+
+                    else -> error("rawItemTypes is neither String nor Map: $rawItemTypes")
+                }
+            }
+            return itemTypeField
         }
     }
-}
-
