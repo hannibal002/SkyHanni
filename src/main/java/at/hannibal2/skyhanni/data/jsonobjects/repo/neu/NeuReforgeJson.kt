@@ -73,4 +73,4 @@ data class NeuReforgeJson(
             }
             return itemTypeField
         }
-    }
+}
