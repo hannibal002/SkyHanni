@@ -525,7 +525,7 @@ object MoongladeBeacon {
         fun RenderInventoryItemTipEvent.tryLabelIfAble() {
             if (isEnchanted && !upgradingStrength) return
             val offset = getOffsetBySlot(slot.index)?.takeIf { it != 0 } ?: return
-            stackTip = "§a$offset"
+            stackTip = if (offset > 0) "§a$offset" else "§c$offset"
         }
 
         fun getOffsetBySlot(slot: Int): Int? = when (slot) {
