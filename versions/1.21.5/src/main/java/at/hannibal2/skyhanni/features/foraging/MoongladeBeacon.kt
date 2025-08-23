@@ -254,7 +254,7 @@ object MoongladeBeacon {
         }
 
         if (!config.useMiddleClick) return
-        if (event.clickedButton != 10) return
+        if (event.clickedButton != 0) return
         event.makePickblock()
     }
 
