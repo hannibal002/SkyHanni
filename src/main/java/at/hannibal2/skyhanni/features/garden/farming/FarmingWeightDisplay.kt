@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.FarmingWeightTextEntry
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getNextPlayer
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getRankGoal
@@ -13,16 +14,12 @@ import at.hannibal2.skyhanni.data.garden.FarmingWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
-import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -40,9 +37,16 @@ import kotlin.time.Duration.Companion.seconds
 // TODO overtake ETA
 @SkyHanniModule
 object FarmingWeightDisplay {
+    private val config get() = GardenApi.config.eliteFarmingWeights
+    private val storage get() = GardenApi.storage?.farmingWeight
+    private val lbName get() = currentLeaderboardType.specificDisplayName
 
-    private fun shouldShowDisplay(): Boolean =
-        !GardenApi.hideExtraGuis() && (apiError || (config.ignoreLow || weight >= 200))
+    private var display = emptyList<Renderable>()
+    private var apiError = false
+    private var inventoryOpen = false
+    private var weight: Double? = null
+    private var leaderboardPos: Int? = null
+    private var nextPlayer: Pair<String, Double>? = null
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent) {
@@ -75,17 +79,6 @@ object FarmingWeightDisplay {
         update()
     }
 
-    private val config get() = GardenApi.config.eliteFarmingWeights
-    private val storage get() = GardenApi.storage?.farmingWeight
-    private val lbName get() = currentLeaderboardType.specificDisplayName
-    private val localCounter = mutableMapOf<CropType, Long>()
-    private var display = emptyList<Renderable>()
-    private var apiError = false
-    private var weight = -1.0
-    private var rankGoal = -1
-    private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
-    private var inventoryOpen = false
-
 
     private var currentLeaderboardType: EliteLeaderboardType
         get() = storage?.lastLeaderboardType ?: EliteLeaderboardType.ALL_TIME
@@ -110,11 +103,11 @@ object FarmingWeightDisplay {
         }
     }
 
-    private var lastOpenWebsite = SimpleTimeMark.farPast()
-
-
     // TODO fetch and cache weight, lb pos, next player, eta before drawing display
-    fun update() {
+    fun update(overrideCooldown: Boolean = false) {
+        weight = getWeight(currentLeaderboardType)
+        leaderboardPos = getLeaderboardPosition(currentLeaderboardType)
+        nextPlayer = getNextPlayer(currentLeaderboardType)
         drawDisplay()
     }
 
@@ -122,25 +115,33 @@ object FarmingWeightDisplay {
         if (!isEnabled()) return
 
         val lineMap = mutableMapOf<FarmingWeightTextEntry, Renderable>()
-        val weight = getWeight(currentLeaderboardType)?.roundTo(2)?.addSeparators() ?: "Loading..."
-        val leaderboardPos = getLeaderboardFormat()
-        lineMap[FarmingWeightTextEntry.WEIGHT_POSITION] =
-            Renderable.clickable(
-                "§6$lbName§7: §e$weight$leaderboardPos",
-                tips = listOf("§eClick to open your Farming Profile."),
-                onLeftClick = { openWebsite(PlayerUtils.getName()) },
-            )
 
+        lineMap[FarmingWeightTextEntry.WEIGHT_POSITION] = weightPosRenderable()
         lineMap[FarmingWeightTextEntry.OVERTAKE] = overtakeRenderable()
 
         display = formatDisplay(lineMap)
 
     }
 
+    private fun weightPosRenderable(): Renderable {
+        val weightText = weight?.roundTo(2)?.addSeparators() ?: "Loading..."
+        val leaderboardPos = getLeaderboardFormat()
+        return Renderable.clickable(
+                "§6$lbName§7: §e$weightText$leaderboardPos",
+                tips = listOf("§eClick to open your Farming Profile."),
+                onLeftClick = { openWebsite(PlayerUtils.getName()) },
+            )
+    }
+
+    private fun getLeaderboardFormat(): String {
+        if (!config.leaderboard) return ""
+        val format = leaderboardPos?.addSeparators() ?: return if (loadingLeaderboardMutex.isLocked) " §7[§b#?§7]" else ""
+        return " §7[§b#$format§7]"
+    }
+
     private fun overtakeRenderable(): Renderable {
-        val leaderboardPos = getLeaderboardPosition(currentLeaderboardType)
         if (leaderboardPos == 1) return Renderable.text("§bNo players ahead!")
-        var (nextName, weightUntil) = getNextPlayer(currentLeaderboardType) ?: return Renderable.text("§bLoading next player...")
+        var (nextName, weightUntil) = nextPlayer ?: return Renderable.text("§bLoading next player...")
 
         val rankGoal = getRankGoal()
         if (config.useEtaGoalRank.get() && rankGoal != null && rankGoal < (leaderboardPos ?: Int.MAX_VALUE)) {
@@ -156,14 +157,13 @@ object FarmingWeightDisplay {
     }
 
     private fun formatDisplay(lineMap: MutableMap<FarmingWeightTextEntry, Renderable>): List<Renderable> {
-        if (FarmingWeight.apiError) {
+        if (FarmingWeight.apiError || EliteFarmersLeaderboard.apiError) { // TODO only warn on specific line unless both errored
             return errorMessage
         }
+
         val newList = mutableListOf<Renderable>()
         if (inventoryOpen) newList.buildLeaderboardSwitcher() else newList.addVerticalSpacer()
-
         newList.addAll(config.text.mapNotNull { lineMap[it] })
-
         return newList
     }
 
@@ -181,33 +181,19 @@ object FarmingWeightDisplay {
         )
     }
 
-    private fun getLeaderboardFormat(): String {
-        val leaderboardPosition = getLeaderboardPosition(currentLeaderboardType)
-        if (!config.leaderboard) return ""
-        return if (leaderboardPosition != null) {
-            val format = leaderboardPosition.addSeparators()
-            " §7[§b#$format§7]"
-        } else {
-            if (loadingLeaderboardMutex.isLocked) " §7[§b#?§7]" else ""
-        }
-    }
-
     private fun resetData() {
         apiError = false
-        // We ask both api endpoints after every world switch
+        update(true)
     }
 
     fun isEnabled() = config.display && (inGardenEnabled())
     private fun inGardenEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
 
-    private fun isEtaEnabled() = config.overtakeETA
-
-    private fun lookUpCommand(it: Array<String>) {
-        val name = if (it.size == 1) it[0] else PlayerUtils.getName()
-        openWebsite(name, ignoreCooldown = true)
-    }
+    private fun shouldShowDisplay(): Boolean =
+        !GardenApi.hideExtraGuis() && (apiError || (config.ignoreLow || (getWeight(EliteLeaderboardType.ALL_TIME) ?: 0.0) >= 200.0))
 
     private var lastName = ""
+    private var lastOpenWebsite = SimpleTimeMark.farPast()
 
     private fun openWebsite(name: String, ignoreCooldown: Boolean = false) {
         if (!ignoreCooldown && lastOpenWebsite.passedSince() < 5.seconds && name == lastName) return
@@ -216,6 +202,11 @@ object FarmingWeightDisplay {
 
         OSUtils.openBrowser("https://elitebot.dev/@$name/")
         ChatUtils.chat("Opening Farming Profile of player §b$name")
+    }
+
+    private fun lookUpCommand(it: Array<String>) {
+        val name = if (it.size == 1) it[0] else PlayerUtils.getName()
+        openWebsite(name, ignoreCooldown = true)
     }
 
     @HandleEvent

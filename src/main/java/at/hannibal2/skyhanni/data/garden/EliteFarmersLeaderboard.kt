@@ -38,7 +38,7 @@ object EliteFarmersLeaderboard {
     private val nextPlayers: MutableMap<EliteLeaderboardType, MutableList<UpcomingLeaderboardPlayer>> = mutableMapOf()
 
 
-    private var apiError = false
+    var apiError = false
     private var hasWarned = false
     private var shouldRefreshLeaderboard = false
     private var rankGoal: Int? = null
