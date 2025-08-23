@@ -202,12 +202,8 @@ object FarmingWeightDisplay {
 
     fun update() {
         drawDisplay()
-        //ChatUtils.debug("Update")
     }
 
-
-    // TODO format display + draggable config list
-    // TODO monthly weight swap button
     private fun drawDisplay() {
         if (!isEnabled()) return
 
@@ -672,7 +668,8 @@ object FarmingWeightDisplay {
             callback { lookUpCommand(it) }
         }
     }
-
+// TODO configfix for overtake eta
+    
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
