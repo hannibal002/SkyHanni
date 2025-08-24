@@ -261,6 +261,11 @@ object FarmingWeightDisplay {
             category = CommandCategory.USERS_ACTIVE
             callback { lookUpCommand(it) }
         }
+        event.register("shresetfarmingweight") {
+            description = "Reset farming weight display."
+            category = CommandCategory.USERS_RESET
+            callback { resetData() }
+        }
     }
 
     @HandleEvent
