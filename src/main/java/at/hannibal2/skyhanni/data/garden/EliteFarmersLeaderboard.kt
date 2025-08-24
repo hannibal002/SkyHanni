@@ -146,6 +146,41 @@ object EliteFarmersLeaderboard {
         )
     }
 
+    private suspend fun loadLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int? {
+        if (profileId == "") return null
+        // Fetch more upcoming players when the difference between ranks is expected to be tiny
+        val currentPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
+        val upcomingPlayers = getUpcomingPlayerCount(currentPos)
+        // Tell the API to get upcoming players from our local rank (for when new data isn't fetched), or fallback to the
+        // provided eta goal rank from the config
+        val rankGoal = getRankGoal(leaderboardType)
+        val useRankGoal = config.useEtaGoalRank.get() && rankGoal != null
+        val atRank = getAtRank(currentPos, rankGoal, useRankGoal)
+
+        val apiData = EliteDevApi.fetchLeaderboardPositions(
+            profileId = profileId,
+            lbType = leaderboardType,
+            upcomingCount = upcomingPlayers,
+            atRank = atRank,
+        ) ?: run {
+            ChatUtils.debug("Api error!") // TODO run an actual error
+            apiError = true
+            return null
+        }
+
+        handleDiff(leaderboardType, apiData)
+        handleUpcomingPlayers(leaderboardType, apiData, atRank)
+
+        // Keep local rank if new data wasn't returned
+        // return if (newData) apiData.rank else currentLeaderboardPos
+        minWeight?.set(leaderboardType, apiData.minAmount)
+        lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
+        leaderboardWeight[leaderboardType] = apiData.amount
+        apiError = false
+        FarmingWeightDisplay.update()
+        return if (apiData.rank == -1) null else apiData.rank
+    }
+
     private fun getUpcomingPlayerCount(currentPos: Int) = when {
         !isEnabled() -> 0
         currentPos > 10_000 -> 50
@@ -186,40 +221,6 @@ object EliteFarmersLeaderboard {
                 }
             }
         }
-    }
-
-    private suspend fun loadLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int? {
-        // Fetch more upcoming players when the difference between ranks is expected to be tiny
-        val currentPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
-        val upcomingPlayers = getUpcomingPlayerCount(currentPos)
-        // Tell the API to get upcoming players from our local rank (for when new data isn't fetched), or fallback to the
-        // provided eta goal rank from the config
-        val rankGoal = getRankGoal(leaderboardType)
-        val useRankGoal = config.useEtaGoalRank.get() && rankGoal != null
-        val atRank = getAtRank(currentPos, rankGoal, useRankGoal)
-
-        val apiData = EliteDevApi.fetchLeaderboardPositions(
-            profileId = profileId,
-            lbType = leaderboardType,
-            upcomingCount = upcomingPlayers,
-            atRank = atRank,
-        ) ?: run {
-            ChatUtils.debug("Api error!") // TODO run an actual error
-            apiError = true
-            return null
-        }
-
-        handleDiff(leaderboardType, apiData)
-        handleUpcomingPlayers(leaderboardType, apiData, atRank)
-
-        // Keep local rank if new data wasn't returned
-        // return if (newData) apiData.rank else currentLeaderboardPos
-        minWeight?.set(leaderboardType, apiData.minAmount)
-        lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
-        leaderboardWeight[leaderboardType] = apiData.amount
-        apiError = false
-        FarmingWeightDisplay.update()
-        return if (apiData.rank == -1) null else apiData.rank
     }
 
     fun getRankGoal(leaderboardType: EliteLeaderboardType): Int? {
