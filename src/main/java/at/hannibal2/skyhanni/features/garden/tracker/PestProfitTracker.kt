@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestProfitTrackerConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.garden.CropCollectionAPI.addCollectionCounter
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent

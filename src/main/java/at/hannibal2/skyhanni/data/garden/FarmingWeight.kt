@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.garden.CropCollectionAPI.getCollection
-import at.hannibal2.skyhanni.data.garden.CropCollectionAPI.lastGainedCrop
-import at.hannibal2.skyhanni.data.garden.CropCollectionAPI.updateTotalCollection
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.updateTotalCollection
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson

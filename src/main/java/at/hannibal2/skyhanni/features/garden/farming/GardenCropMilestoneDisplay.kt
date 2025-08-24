@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.garden.CropCollectionAPI
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getMaxTier
@@ -141,7 +141,7 @@ object GardenCropMilestoneDisplay {
 
     private fun getDefaultCrop(): CropType? {
         return if (config.showWithoutTool) {
-            CropCollectionAPI.lastGainedCrop ?: getCurrentlyFarmedCrop()
+            CropCollectionApi.lastGainedCrop ?: getCurrentlyFarmedCrop()
         } else {
             getCurrentlyFarmedCrop()
         }

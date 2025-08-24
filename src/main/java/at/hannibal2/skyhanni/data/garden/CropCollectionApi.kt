@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 
 @SkyHanniModule
-object CropCollectionAPI {
+object CropCollectionApi {
     private val storage get() = GardenApi.storage
 
     private val cropCollectionCounter:
