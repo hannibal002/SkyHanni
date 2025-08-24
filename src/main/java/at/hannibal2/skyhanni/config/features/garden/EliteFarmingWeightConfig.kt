@@ -33,7 +33,7 @@ class EliteFarmingWeightConfig {
             "Only if your farming weight is high enough! Updates periodically."
     )
     @ConfigEditorBoolean
-    var leaderboard: Property<Boolean> = Property.of(true)
+    val leaderboard: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -63,7 +63,7 @@ class EliteFarmingWeightConfig {
             "Does not factor in pests or dicer drops. Garden Milestones Display must be enabled."
     )
     @ConfigEditorBoolean
-    var overtakeETA: Property<Boolean> = Property.of(false)
+    val overtakeETA: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -76,7 +76,7 @@ class EliteFarmingWeightConfig {
     @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
     @ConfigEditorBoolean
-    var overtakeETAAlways: Property<Boolean> = Property.of(true)
+    val overtakeETAAlways: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(

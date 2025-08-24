@@ -154,8 +154,8 @@ object FarmingWeight {
     }
 
     private fun specialMushroomWeight(weightPerCrop: MutableMap<CropType, Double>, totalWeight: Double): Double {
-        val cactusWeight = weightPerCrop[CropType.CACTUS]!!
-        val sugarCaneWeight = weightPerCrop[CropType.SUGAR_CANE]!!
+        val cactusWeight = weightPerCrop[CropType.CACTUS] ?: -1.0
+        val sugarCaneWeight = weightPerCrop[CropType.SUGAR_CANE] ?: -1.0
         val doubleBreakRatio = (cactusWeight + sugarCaneWeight) / totalWeight
         val normalRatio = (totalWeight - cactusWeight - sugarCaneWeight) / totalWeight
 

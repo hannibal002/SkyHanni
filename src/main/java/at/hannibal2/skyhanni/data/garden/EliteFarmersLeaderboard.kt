@@ -38,7 +38,7 @@ object EliteFarmersLeaderboard {
     private val leaderboardWeight: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
     private val lastPlayer: MutableMap<EliteLeaderboardType, UpcomingLeaderboardPlayer?> = mutableMapOf()
     private val nextPlayers: MutableMap<EliteLeaderboardType, MutableList<UpcomingLeaderboardPlayer>> = mutableMapOf()
-    private var shouldRefreshLeaderboard: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
+    private val shouldRefreshLeaderboard: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
 
     var apiError = false
     private var hasWarned = false
