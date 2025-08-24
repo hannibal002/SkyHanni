@@ -43,7 +43,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButt
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
 
-// TODO default weight goal if not on lb
 @SkyHanniModule
 object FarmingWeightDisplay {
     private val config get() = GardenApi.config.eliteFarmingWeights
@@ -198,7 +197,7 @@ object FarmingWeightDisplay {
     }
 
     private fun formatDisplay(lineMap: MutableMap<FarmingWeightTextEntry, Renderable>): List<Renderable> {
-        if (FarmingWeight.apiError || EliteFarmersLeaderboard.apiError) { // TODO only warn on specific line unless both errored
+        if (FarmingWeight.apiError || EliteFarmersLeaderboard.apiError) {
             return errorMessage
         }
 

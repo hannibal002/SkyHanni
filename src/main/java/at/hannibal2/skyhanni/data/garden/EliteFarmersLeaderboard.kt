@@ -26,7 +26,6 @@ import kotlin.math.abs
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 
-// TODO support for players not on lb
 @SkyHanniModule
 object EliteFarmersLeaderboard {
     val loadingLeaderboardMutex = Mutex()
@@ -39,8 +38,6 @@ object EliteFarmersLeaderboard {
     private val lastPlayer: MutableMap<EliteLeaderboardType, UpcomingLeaderboardPlayer?> = mutableMapOf()
     private val nextPlayers: MutableMap<EliteLeaderboardType, MutableList<UpcomingLeaderboardPlayer>> = mutableMapOf()
     private var shouldRefreshLeaderboard: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
-
-
 
     var apiError = false
     private var hasWarned = false

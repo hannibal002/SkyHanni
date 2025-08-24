@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object FarmingWeight {
@@ -46,36 +47,10 @@ object FarmingWeight {
     private var ignoredCollection = mutableMapOf<CropType, Long>()
     private var hasFetchedCollection = false
 
-    /*@HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        updateCollections()
-    }*/
-
-    fun reset() {
-        cropWeightValues.clear()
-        weightMap.clear()
-        weightGain = 0.0
-        bonusWeight = 0.0
-        lastPlayerWeightFetch = SimpleTimeMark.farPast()
-        attemptingCropWeightFetch = false
-        hasFetchedCropWeights = false
-        apiError = false
-        profileId = ""
-        shouldRecalculateWeight = false
-        ignoredCollection = mutableMapOf()
-        hasFetchedCollection = false
-    }
-
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
-        // TODO enable this cooldown before making pr
-        //if (lastPlayerWeightFetch.passedSince() <= 5.minutes) return
+        if (lastPlayerWeightFetch.passedSince() <= 5.minutes) return
         updateCollections()
-    }
-
-    @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-
     }
 
     @HandleEvent
@@ -92,7 +67,6 @@ object FarmingWeight {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        //if (!isEnabled()) return
         if (!event.isMod(5)) return
 
         SkyHanniMod.launchIOCoroutine {
@@ -101,7 +75,6 @@ object FarmingWeight {
     }
 
     fun setWeight(leaderboardType: EliteLeaderboardType, value: Double) {
-        //ChatUtils.debug("Setting weight: $leaderboardType, $value")
         weightMap[leaderboardType] = value
         weightGain = 0.0
         FarmingWeightDisplay.update()
@@ -192,6 +165,21 @@ object FarmingWeight {
         val mushroomFactor = CropType.MUSHROOM.getFactor()
         val mushroomCollection = CropType.MUSHROOM.getCollection()
         return doubleBreakRatio * (mushroomCollection / (2 * mushroomFactor)) + normalRatio * (mushroomCollection / mushroomFactor)
+    }
+
+    fun reset() {
+        cropWeightValues.clear()
+        weightMap.clear()
+        weightGain = 0.0
+        bonusWeight = 0.0
+        lastPlayerWeightFetch = SimpleTimeMark.farPast()
+        attemptingCropWeightFetch = false
+        hasFetchedCropWeights = false
+        apiError = false
+        profileId = ""
+        shouldRecalculateWeight = false
+        ignoredCollection = mutableMapOf()
+        hasFetchedCollection = false
     }
 
     fun CropType.getFactor(): Double {
