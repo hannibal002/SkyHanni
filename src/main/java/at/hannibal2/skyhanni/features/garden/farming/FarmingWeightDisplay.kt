@@ -274,7 +274,7 @@ object FarmingWeightDisplay {
             update()
         }
     }
-    // TODO configfix for overtake eta
+
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
