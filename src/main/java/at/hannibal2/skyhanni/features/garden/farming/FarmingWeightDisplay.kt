@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.FarmingWeightTextEntry
+import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.HeldItem
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getMinWeight
@@ -286,6 +288,18 @@ object FarmingWeightDisplay {
         event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
         event.move(14, "garden.eliteFarmingWeight.offScreenDropMessage", "garden.eliteFarmingWeights.showLbChange")
         event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
+
+        val displayList: List<FarmingWeightTextEntry> = buildList {
+            add(FarmingWeightTextEntry.WEIGHT_POSITION)
+            event.transform(103, "garden.eliteFarmingWeights.overtakeETA") { entry ->
+                if (entry.asBoolean) add(FarmingWeightTextEntry.OVERTAKE)
+                entry
+            }
+        }
+
+        event.add(103, "garden.eliteFarmingWeights.text") {
+            ConfigManager.gson.toJsonTree(displayList)
+        }
 
         val base = "#garden.farmingWeight"
         event.move(101, "$base.lastFarmingWeightLeaderboard", "$base.lastLeaderboard")
