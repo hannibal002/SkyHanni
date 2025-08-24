@@ -43,7 +43,6 @@ object FarmingWeight {
     var profileId: String = ""
     private var shouldRecalculateWeight = false
     private var ignoredCollection = mutableMapOf<CropType, Long>()
-    private var hasFetchedCollection = false
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
@@ -131,8 +130,8 @@ object FarmingWeight {
             bonusWeight = apiData.bonusWeight.sumAllValues()
 
             weightGain = 0.0
-            hasFetchedCollection = true
             shouldRecalculateWeight = true
+            lastPlayerWeightFetch = SimpleTimeMark.now()
             apiError = false
         }
     }
@@ -177,7 +176,6 @@ object FarmingWeight {
         profileId = ""
         shouldRecalculateWeight = false
         ignoredCollection = mutableMapOf()
-        hasFetchedCollection = false
     }
 
     fun CropType.getFactor(): Double {
