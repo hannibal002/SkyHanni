@@ -1,25 +1,33 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.FarmingWeightTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getMinWeight
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getNextPlayer
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getRankGoal
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
 import at.hannibal2.skyhanni.data.garden.FarmingWeight
+import at.hannibal2.skyhanni.data.garden.FarmingWeight.getFactor
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -28,13 +36,14 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
 
-// TODO overtake ETA
+// TODO default weight goal if not on lb
 @SkyHanniModule
 object FarmingWeightDisplay {
     private val config get() = GardenApi.config.eliteFarmingWeights
@@ -47,6 +56,7 @@ object FarmingWeightDisplay {
     private var weight: Double? = null
     private var leaderboardPos: Int? = null
     private var nextPlayer: Pair<String, Double>? = null
+    private var lastFarmedCrop: CropType? = null
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent) {
@@ -103,10 +113,9 @@ object FarmingWeightDisplay {
         }
     }
 
-    // TODO fetch and cache weight, lb pos, next player, eta before drawing display
     fun update(overrideCooldown: Boolean = false) {
-        weight = getWeight(currentLeaderboardType)
-        leaderboardPos = getLeaderboardPosition(currentLeaderboardType)
+        weight = getWeight(currentLeaderboardType, overrideCooldown)
+        leaderboardPos = getLeaderboardPosition(currentLeaderboardType, overrideCooldown)
         nextPlayer = getNextPlayer(currentLeaderboardType)
         drawDisplay()
     }
@@ -134,26 +143,58 @@ object FarmingWeightDisplay {
     }
 
     private fun getLeaderboardFormat(): String {
-        if (!config.leaderboard) return ""
+        if (!config.leaderboard.get()) return ""
         val format = leaderboardPos?.addSeparators() ?: return if (loadingLeaderboardMutex.isLocked) " §7[§b#?§7]" else ""
         return " §7[§b#$format§7]"
     }
 
     private fun overtakeRenderable(): Renderable {
-        if (leaderboardPos == 1) return Renderable.text("§bNo players ahead!")
-        var (nextName, weightUntil) = nextPlayer ?: return Renderable.text("§bLoading next player...")
+        var (nextName, weightUntil) = nextPlayer ?: run {
+            return if ((weight ?: 0.0) < (getMinWeight(currentLeaderboardType) ?: 0.0)) {
+                val nextName = "1,000 weight"
+                val weightUntil = 1000.0 - (weight ?: 0.0)
+                val overtakeEta = overtakeEta(weightUntil)
+                val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeEta §bbehind $nextName"
+                Renderable.text(text)
+            } else {
+                Renderable.text("§bLoading next player...")
+            }
+        }
 
-        val rankGoal = getRankGoal()
-        if (config.useEtaGoalRank.get() && rankGoal != null && rankGoal < (leaderboardPos ?: Int.MAX_VALUE)) {
+        val rankGoal = getRankGoal(currentLeaderboardType)
+        if (config.useEtaGoalRank.get() && rankGoal != null) {
             nextName += " §7[§b#${rankGoal.addSeparators()}§7]"
         }
 
-        val text = "§e${weightUntil.roundTo(2).addSeparators()} §bbehind $nextName"
+        if ((weight ?: 0.0) < (getMinWeight(currentLeaderboardType) ?: 0.0)) {
+            nextName = "1,000 Weight"
+            weightUntil = 1000.0 - (weight ?: 0.0)
+        }
+
+        val behindOrAhead = if (leaderboardPos == 1) "ahead of" else "behind"
+        val overtakeETA = if (leaderboardPos == 1) "" else overtakeEta(weightUntil)
+        val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeETA §b$behindOrAhead $nextName"
         return Renderable.clickable(
             text,
             tips = listOf("§eClick to open the Farming Profile of §b$nextName."),
             onLeftClick = { openWebsite(nextName) },
         )
+    }
+
+    // TODO support crop/dicer drops
+    private fun overtakeEta(weightUntil: Double): String {
+        if (!config.overtakeETA.get() || !config.overtakeETAAlways.get() && !GardenApi.isCurrentlyFarming()) return ""
+        lastFarmedCrop = GardenApi.getCurrentlyFarmedCrop() ?: if (config.overtakeETAAlways.get()) lastFarmedCrop else null
+        val crop = lastFarmedCrop ?: return ""
+        val cropsPerSecond = crop.getSpeed() ?: return ""
+        val mooshroomCowCropsPerSecond = if (GardenApi.mushroomCowPet) {
+            (CurrentPetApi.currentPet?.level ?: 0) / 100 * (crop.getLatestBlocksPerSecond() ?: 0.0)
+        } else {
+            0.0
+        }
+        val weightPerSecond = cropsPerSecond / crop.getFactor() + mooshroomCowCropsPerSecond / CropType.MUSHROOM.getFactor()
+        val timeUntil = (weightUntil / weightPerSecond).seconds
+        return " §7(§b${timeUntil.format()}§7)"
     }
 
     private fun formatDisplay(lineMap: MutableMap<FarmingWeightTextEntry, Renderable>): List<Renderable> {
@@ -163,7 +204,7 @@ object FarmingWeightDisplay {
 
         val newList = mutableListOf<Renderable>()
         if (inventoryOpen) newList.buildLeaderboardSwitcher() else newList.addVerticalSpacer()
-        newList.addAll(config.text.mapNotNull { lineMap[it] })
+        newList.addAll(config.text.get().mapNotNull { lineMap[it] })
         return newList
     }
 
@@ -183,6 +224,11 @@ object FarmingWeightDisplay {
 
     private fun resetData() {
         apiError = false
+        nextPlayer = null
+        weight = null
+        leaderboardPos = null
+        EliteFarmersLeaderboard.reset()
+        FarmingWeight.reset()
         update(true)
     }
 
@@ -215,6 +261,17 @@ object FarmingWeightDisplay {
             description = "Look up the farming profile from yourself or another player on elitebot.dev"
             category = CommandCategory.USERS_ACTIVE
             callback { lookUpCommand(it) }
+        }
+    }
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        onToggle(
+            config.overtakeETA,
+            config.overtakeETAAlways,
+            config.text
+        ) {
+            update()
         }
     }
 // TODO configfix for overtake eta

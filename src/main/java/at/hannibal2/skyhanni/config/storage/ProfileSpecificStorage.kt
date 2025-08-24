@@ -601,7 +601,10 @@ class ProfileSpecificStorage(
             var lastLeaderboardMap: MutableMap<EliteLeaderboardType, Int> = enumMapOf()
 
             @Expose
-            var lastLeaderboardType: EliteLeaderboardType = EliteLeaderboardType.`ALL_TIME`
+            var minWeight: MutableMap<EliteLeaderboardType, Double> = enumMapOf()
+
+            @Expose
+            var lastLeaderboardType: EliteLeaderboardType = EliteLeaderboardType.ALL_TIME
         }
 
         @Expose

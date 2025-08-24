@@ -26,10 +26,13 @@ import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.json.fromJson
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.math.abs
 
 @SkyHanniModule
 object FarmingWeight {
+    val collectionMutex = Mutex()
     private val cropWeightValues = mutableMapOf<CropType, Double>()
     private val weightMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
     private var weightGain: Double = 0.0
@@ -47,6 +50,21 @@ object FarmingWeight {
     fun onProfileJoin(event: ProfileJoinEvent) {
         updateCollections()
     }*/
+
+    fun reset() {
+        cropWeightValues.clear()
+        weightMap.clear()
+        weightGain = 0.0
+        bonusWeight = 0.0
+        lastPlayerWeightFetch = SimpleTimeMark.farPast()
+        attemptingCropWeightFetch = false
+        hasFetchedCropWeights = false
+        apiError = false
+        profileId = ""
+        shouldRecalculateWeight = false
+        ignoredCollection = mutableMapOf()
+        hasFetchedCollection = false
+    }
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
@@ -89,8 +107,8 @@ object FarmingWeight {
         FarmingWeightDisplay.update()
     }
 
-    fun getWeight(leaderboardType: EliteLeaderboardType): Double? {
-        if (weightMap[leaderboardType] == null) {
+    fun getWeight(leaderboardType: EliteLeaderboardType, override: Boolean = false): Double? {
+        if (weightMap[leaderboardType] == null || override) {
             when (leaderboardType) {
                 EliteLeaderboardType.ALL_TIME -> updateCollections()
                 EliteLeaderboardType.MONTHLY -> getLeaderboardPosition(leaderboardType)
@@ -111,38 +129,41 @@ object FarmingWeight {
         weightGain += amount
     }
 
-
     fun updateCollections() = SkyHanniMod.launchIOCoroutine {
         if (HypixelData.profileName == "") return@launchIOCoroutine
-        val apiData = EliteDevApi.fetchWeightProfile(HypixelData.profileName) ?: run {
-            if (weightMap.isEmpty()) {
-                apiError = true
-            }
-            ChatUtils.debug("Failed to fetch weight data, using fallback")
-            return@launchIOCoroutine
-        }
-        profileId = apiData.profileId
-        // we track this, so we only want elite values if they're higher or significantly different from what we have tracked
-        apiData.crops.forEach {
-            (name, value) -> run {
-                val crop = CropType.getByNameOrNull(name) ?: return@run
-                val storedAmount = crop.getCollection()
-                val diff = value - storedAmount
-                val weightDiff = abs(diff / crop.getFactor())
-                if (diff > 0 || weightDiff >= 10) { // 10 weight diff is at least half an hour of farming
-                    crop.updateTotalCollection(value)
+        if (collectionMutex.isLocked) return@launchIOCoroutine
+        collectionMutex.withLock {
+            val apiData = EliteDevApi.fetchWeightProfile(HypixelData.profileName) ?: run {
+                if (weightMap.isEmpty()) {
+                    apiError = true
                 }
+                return@launchIOCoroutine
             }
+            profileId = apiData.profileId
+            // we track this, so we only want elite values if they're higher or significantly different from what we have tracked
+            apiData.crops.forEach { (name, value) ->
+                run {
+                    val crop = CropType.getByNameOrNull(name) ?: return@run
+                    val storedAmount = crop.getCollection()
+                    val diff = value - storedAmount
+                    val weightDiff = abs(diff / crop.getFactor())
+                    if (diff > 0 || weightDiff >= 10) { // 10 weight diff is at least half an hour of farming
+                        crop.updateTotalCollection(value)
+                    }
+                }
 
+            }
+            // we don't track these
+            apiData.uncountedCrops.forEach { (name, value) ->
+                CropType.getByNameOrNull(name)?.let { ignoredCollection[it] = value.toLong() }
+            }
+            bonusWeight = apiData.bonusWeight.sumAllValues()
+
+            weightGain = 0.0
+            hasFetchedCollection = true
+            shouldRecalculateWeight = true
+            apiError = false
         }
-        // we don't track these
-        apiData.uncountedCrops.forEach { (name, value) -> CropType.getByNameOrNull(name)?.let { ignoredCollection[it] = value.toLong() } }
-        bonusWeight = apiData.bonusWeight.sumAllValues()
-
-        weightGain = 0.0
-        hasFetchedCollection = true
-        shouldRecalculateWeight = true
-        apiError = false
     }
 
     private fun recalculateTotalWeight(): Double {
@@ -173,7 +194,7 @@ object FarmingWeight {
         return doubleBreakRatio * (mushroomCollection / (2 * mushroomFactor)) + normalRatio * (mushroomCollection / mushroomFactor)
     }
 
-    private fun CropType.getFactor(): Double {
+    fun CropType.getFactor(): Double {
         val value = cropWeightValues[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
         if (value != 0.0) return value else error("Crop $this weight factor is 0!")
     }

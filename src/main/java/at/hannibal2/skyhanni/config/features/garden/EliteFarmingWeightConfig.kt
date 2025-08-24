@@ -34,7 +34,7 @@ class EliteFarmingWeightConfig {
             "Only if your farming weight is high enough! Updates periodically."
     )
     @ConfigEditorBoolean
-    var leaderboard: Boolean = true
+    var leaderboard: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -42,9 +42,9 @@ class EliteFarmingWeightConfig {
         desc = "Drag text to change the appearance of the overlay.\n"
     )
     @ConfigEditorDraggableList
-    val text: MutableList<FarmingWeightTextEntry> = mutableListOf(
+    val text: Property<MutableList<FarmingWeightTextEntry>> = Property.of(mutableListOf(
         FarmingWeightTextEntry.WEIGHT_POSITION,
-        FarmingWeightTextEntry.OVERTAKE
+        FarmingWeightTextEntry.OVERTAKE)
     )
 
     enum class FarmingWeightTextEntry(private val displayName: String) {
@@ -57,20 +57,12 @@ class EliteFarmingWeightConfig {
 
     @Expose
     @ConfigOption(
-        name = "Upcoming Players",
-        desc = "Show the amount of weight you are away from the next player."
-    )
-    @ConfigEditorBoolean
-    var upcomingPlayers: Boolean = false
-
-    @Expose
-    @ConfigOption(
         name = "Overtake ETA",
         desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
-            "Will show an ETA to placement weight required if you're not on the leaderboard yet."
+            "Does not factor in pests or dicer drops. Garden Milestones Display must be enabled."
     )
     @ConfigEditorBoolean
-    var overtakeETA: Boolean = false
+    var overtakeETA: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -83,7 +75,7 @@ class EliteFarmingWeightConfig {
     @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
     @ConfigEditorBoolean
-    var overtakeETAAlways: Boolean = true
+    var overtakeETAAlways: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(

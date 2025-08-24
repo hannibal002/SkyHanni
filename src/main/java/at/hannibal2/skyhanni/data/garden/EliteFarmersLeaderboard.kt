@@ -26,58 +26,91 @@ import kotlin.math.abs
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 
+// TODO support for players not on lb
 @SkyHanniModule
 object EliteFarmersLeaderboard {
     val loadingLeaderboardMutex = Mutex()
     private val config get() = GardenApi.config.eliteFarmingWeights
     private val storage get() = GardenApi.storage?.farmingWeight
     private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardMap
+    private val minWeight: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minWeight
     private val lastLeaderboardUpdate: MutableMap<EliteLeaderboardType, SimpleTimeMark> = mutableMapOf()
     private val leaderboardWeight: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
-    private val lastApiWeight: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+    private val lastPlayer: MutableMap<EliteLeaderboardType, UpcomingLeaderboardPlayer?> = mutableMapOf()
     private val nextPlayers: MutableMap<EliteLeaderboardType, MutableList<UpcomingLeaderboardPlayer>> = mutableMapOf()
+    private var shouldRefreshLeaderboard: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
+
 
 
     var apiError = false
     private var hasWarned = false
-    private var shouldRefreshLeaderboard = false
     private var rankGoal: Int? = null
     private var wasNotLoaded = true
 
+    fun reset() {
+        leaderboardPosMap?.clear()
+        lastLeaderboardUpdate.clear()
+        leaderboardWeight.clear()
+        lastLeaderboardUpdate.clear()
+        lastPlayer.clear()
+        nextPlayers.clear()
+        apiError = false
+        hasWarned = false
+        rankGoal = null
+    }
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.useEtaGoalRank, config.etaGoalRank) {
-            shouldRefreshLeaderboard = true
+            shouldRefreshLeaderboard.clear()
+            nextPlayers.clear()
+            lastPlayer.clear()
             FarmingWeightDisplay.update()
         }
     }
 
-    fun getLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int? {
-        if ((lastLeaderboardUpdate[leaderboardType]?.passedSince() ?: INFINITE) < 10.minutes && !shouldRefreshLeaderboard) {
+    fun getMinWeight(leaderboardType: EliteLeaderboardType): Double? {
+        return minWeight?.get(leaderboardType)
+    }
+
+    fun getLeaderboardPosition(leaderboardType: EliteLeaderboardType, override: Boolean = false): Int? {
+        var refreshLeaderboard = shouldRefreshLeaderboard[leaderboardType] ?: true
+        if (override) refreshLeaderboard = true
+        if ((lastLeaderboardUpdate[leaderboardType]?.passedSince() ?: INFINITE) < 10.minutes && !refreshLeaderboard) {
             return leaderboardPosMap?.get(leaderboardType)
         }
-        shouldRefreshLeaderboard = false
+        shouldRefreshLeaderboard[leaderboardType] = false
         return loadLeaderboardIfAble(leaderboardType)
     }
 
+    // Gets last passed player if first
     fun getNextPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
-        var nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
         val weight = getWeight(leaderboardType) ?: return null
+        var nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: lastPlayer[leaderboardType] ?: return null
         var weightDiff = nextPlayer.weight - weight
         while (weightDiff < 0) {
-            nextPlayer = updateNextPlayer(leaderboardType) ?: return null
+            nextPlayer = updateNextPlayer(leaderboardType) ?: break
             weightDiff = nextPlayer.weight - weight
         }
-        return Pair(nextPlayer.name, weightDiff)
+
+        if (leaderboardPosMap?.get(leaderboardType) == 1) {
+            val lastPlayer = lastPlayer[leaderboardType]
+            if (lastPlayer != null && lastPlayer.weight <= weight) {
+                return Pair(lastPlayer.name, weight - lastPlayer.weight)
+            }
+        }
+
+        return if (weightDiff < 0) null else Pair(nextPlayer.name, weightDiff)
     }
 
     private fun updateNextPlayer(leaderboardType: EliteLeaderboardType): UpcomingLeaderboardPlayer? {
         val nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
+        lastPlayer[leaderboardType] = nextPlayer
         farmingChatMessage("You passed §b${nextPlayer.name} §ein the §6$leaderboardType §eLeaderboard!")
         nextPlayers[leaderboardType]?.removeFirstOrNull() ?: return null
 
         val currentRank = leaderboardPosMap?.get(leaderboardType) ?: return null
-        leaderboardPosMap?.set(leaderboardType, currentRank - 1)
+        val rankGoal = getRankGoal(leaderboardType) //getRankGoal returns null if we're at or in front of it
+        leaderboardPosMap?.set(leaderboardType, rankGoal ?: (currentRank - 1)) // player we passed should be at rank goal if not null
         return nextPlayers[leaderboardType]?.firstOrNull()
     }
 
@@ -88,8 +121,10 @@ object EliteFarmersLeaderboard {
             loadingLeaderboardMutex.withLock {
                 val oldPos = leaderboardPosMap?.get(leaderboardType)
                 val lbPos = loadLeaderboardPosition(leaderboardType)
-                leaderboardPosMap?.set(leaderboardType, lbPos)
-                if (wasNotLoaded) checkOffScreenLeaderboardChanges(oldPos, leaderboardType)
+                if (lbPos != null) {
+                    leaderboardPosMap?.set(leaderboardType, lbPos)
+                    if (wasNotLoaded) checkOffScreenLeaderboardChanges(oldPos, leaderboardType)
+                }
                 lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
             }
         }
@@ -113,9 +148,9 @@ object EliteFarmersLeaderboard {
         )
     }
 
-    private suspend fun loadLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int {
+    private suspend fun loadLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int? {
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
-        val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: -1
+        val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
         val upcomingPlayers = when {
             !isEnabled() -> 0
             currentLeaderboardPos > 10_000 -> 50
@@ -125,12 +160,12 @@ object EliteFarmersLeaderboard {
         }
         // Tell the API to get upcoming players from our local rank (for when new data isn't fetched), or fallback to the
         // provided eta goal rank from the config
-        val rankGoal = getRankGoal()
+        val rankGoal = getRankGoal(leaderboardType)
         val useRankGoal = config.useEtaGoalRank.get() && rankGoal != null
         val atRank = when {
-            useRankGoal && currentLeaderboardPos != -1 -> minOf(rankGoal!! + 1, currentLeaderboardPos)
-            useRankGoal -> rankGoal!! + 1
-            currentLeaderboardPos != -1 -> currentLeaderboardPos
+            currentLeaderboardPos == 1 -> 3
+            useRankGoal -> minOf((rankGoal ?: 0) + 1, currentLeaderboardPos)
+            currentLeaderboardPos != Int.MAX_VALUE -> currentLeaderboardPos
             else -> null
         }
 
@@ -140,46 +175,50 @@ object EliteFarmersLeaderboard {
             upcomingCount = upcomingPlayers,
             atRank = atRank,
         ) ?: run {
+            ChatUtils.debug("Api error!") // TODO run an actual error
             apiError = true
-            return currentLeaderboardPos
+            return null
         }
 
-        val diff = apiData.amount - (getWeight(leaderboardType) ?: -1.0)
+        val diff = apiData.amount - (getWeight(leaderboardType) ?: 0.0)
 
-        if (diff >= 0.5 || abs(diff) >= 10) {
+        if ((diff >= 0.5 || abs(diff) >= 10) && apiData.rank != -1) {
             when (leaderboardType) {
                 EliteLeaderboardType.ALL_TIME -> updateCollections()
                 EliteLeaderboardType.MONTHLY -> setWeight(leaderboardType, apiData.amount)
             }
         }
 
-        // TODO config load event
-        if (config.upcomingPlayers) {
+        if (apiData.rank == 1 && atRank == 3) {
+            lastPlayer[leaderboardType] = apiData.upcomingPlayers.firstOrNull()
+        } else {
             nextPlayers[leaderboardType] = mutableListOf()
-            val weight = getWeight(leaderboardType) ?: 0.0
             apiData.upcomingPlayers.forEach {
-                if (it.weight > weight) {
+                if (it.weight > (getWeight(leaderboardType) ?: apiData.amount)) {
                     nextPlayers[leaderboardType]?.add(it)
                 }
             }
         }
         // Keep local rank if new data wasn't returned
         //return if (newData) apiData.rank else currentLeaderboardPos
+        minWeight?.set(leaderboardType, apiData.minAmount)
         lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
         leaderboardWeight[leaderboardType] = apiData.amount
         apiError = false
         FarmingWeightDisplay.update()
-        return apiData.rank
+        return if (apiData.rank == -1) null else apiData.rank
     }
 
-    fun getRankGoal(): Int? {
+    fun getRankGoal(leaderboardType: EliteLeaderboardType): Int? {
         if (!config.useEtaGoalRank.get()) return null
         val value = config.etaGoalRank
+        val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
 
         // Check that the provided string is valid
         val goal = value.get().toIntOrNull() ?: 0
-        if (goal < 1) {
-            if (!hasWarned) {
+
+        if (goal < 1 || goal >= currentLeaderboardPos) {
+            if (goal < 1 && !hasWarned) {
                 ChatUtils.chatAndOpenConfig(
                     "Invalid Farming Weight Overtake Goal! Click here to edit the Overtake Goal config value " +
                         "to a positive number less than your current leaderboard position to use this feature!",
@@ -192,7 +231,7 @@ object EliteFarmersLeaderboard {
         }
 
         if (rankGoal != goal) {
-            shouldRefreshLeaderboard = true
+            shouldRefreshLeaderboard[leaderboardType] = true
             rankGoal = goal
         }
         return rankGoal
