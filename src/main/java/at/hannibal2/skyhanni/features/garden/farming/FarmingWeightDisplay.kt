@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.FarmingWeightTextEntry
-import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.HeldItem
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getMinWeight

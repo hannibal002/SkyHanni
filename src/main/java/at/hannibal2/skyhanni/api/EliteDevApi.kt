@@ -114,8 +114,8 @@ object EliteDevApi {
     private var weightProfileApiResponse: JsonApiResponse<JsonObject>? = null
     suspend fun fetchWeightProfile(localProfile: String): WeightProfile? = try {
         require(localProfile.isNotBlank()) { "Local profile cannot be blank" }
-        ChatUtils.debug("Fetching weight profile")
         weightUrl = "$FARMING_WEIGHT_URL/${PlayerUtils.getUuid()}?collections=true"
+        ChatUtils.debug("Fetching weight profile from $weightUrl")
         weightProfileApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(weightUrl, apiName = FARMING_WEIGHT_API_NAME)
         val (_, apiData) = weightProfileApiResponse?.assertSuccessWithData()
             ?: throw IllegalStateException("Response was not successful, or data was null")
@@ -130,7 +130,6 @@ object EliteDevApi {
         } ?: throw IllegalStateException(
             "No profile found matching the local profile: $localProfile",
         )
-        ChatUtils.debug("$selectedProfileEntry")
         selectedProfileEntry
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
@@ -174,6 +173,7 @@ object EliteDevApi {
         }
         val lbSuffix = lbType.suffix
         val lbUrl = "$WEIGHT_LEADERBOARD_URL$lbSuffix/$uuid/$profileId$paramString"
+        ChatUtils.debug("Fetching leaderboard information from $lbUrl")
 
         val lbApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(lbUrl, apiName = WEIGHT_LEADERBOARD_API_NAME)
         val (_, apiData) = lbApiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
@@ -181,7 +181,6 @@ object EliteDevApi {
             "url" to lbUrl,
             "apiResponse" to lbApiResponse,
         )
-        ChatUtils.debug("$lbApiResponse")
         return ConfigManager.gson.fromJson<EliteLeaderboard>(apiData)
     }
     // </editor-fold>
