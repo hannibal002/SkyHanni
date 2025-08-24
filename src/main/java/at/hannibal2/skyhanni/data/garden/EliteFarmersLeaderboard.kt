@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.profileId
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.setWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.updateCollections
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.UpcomingLeaderboardPlayer
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -106,7 +107,7 @@ object EliteFarmersLeaderboard {
         nextPlayers[leaderboardType]?.removeFirstOrNull() ?: return null
 
         val currentRank = leaderboardPosMap?.get(leaderboardType) ?: return null
-        val rankGoal = getRankGoal(leaderboardType) //getRankGoal returns null if we're at or in front of it
+        val rankGoal = getRankGoal(leaderboardType) // getRankGoal returns null if we're at or in front of it
         leaderboardPosMap?.set(leaderboardType, rankGoal ?: (currentRank - 1)) // player we passed should be at rank goal if not null
         return nextPlayers[leaderboardType]?.firstOrNull()
     }
@@ -145,26 +146,57 @@ object EliteFarmersLeaderboard {
         )
     }
 
+    private fun getUpcomingPlayerCount(currentPos: Int) = when {
+        !isEnabled() -> 0
+        currentPos > 10_000 -> 50
+        currentPos > 5_000 -> 30
+        currentPos > 1_000 -> 20
+        else -> 10
+    }
+
+    private fun getAtRank(currentPos: Int, rankGoal: Int?, useRankGoal: Boolean): Int? = when {
+        currentPos == 1 -> 3
+        useRankGoal -> minOf((rankGoal ?: 0) + 1, currentPos)
+        currentPos != Int.MAX_VALUE -> currentPos
+        else -> null
+    }
+
+    private fun handleDiff(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard) {
+        val diff = apiData.amount - (getWeight(leaderboardType) ?: 0.0)
+        if ((diff >= 0.5 || abs(diff) >= 10) && apiData.rank != -1) {
+            when (leaderboardType) {
+                EliteLeaderboardType.ALL_TIME -> updateCollections()
+                EliteLeaderboardType.MONTHLY -> setWeight(leaderboardType, apiData.amount)
+            }
+        }
+    }
+
+    private fun handleUpcomingPlayers(
+        leaderboardType: EliteLeaderboardType,
+        apiData: EliteLeaderboard,
+        atRank: Int?
+    ) {
+        if (apiData.rank == 1 && atRank == 3) {
+            lastPlayer[leaderboardType] = apiData.upcomingPlayers.firstOrNull()
+        } else {
+            nextPlayers[leaderboardType] = mutableListOf()
+            apiData.upcomingPlayers.forEach {
+                if (it.weight > (getWeight(leaderboardType) ?: apiData.amount)) {
+                    nextPlayers[leaderboardType]?.add(it)
+                }
+            }
+        }
+    }
+
     private suspend fun loadLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int? {
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
-        val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
-        val upcomingPlayers = when {
-            !isEnabled() -> 0
-            currentLeaderboardPos > 10_000 -> 50
-            currentLeaderboardPos > 5_000 -> 30
-            currentLeaderboardPos > 1_000 -> 20
-            else -> 10
-        }
+        val currentPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
+        val upcomingPlayers = getUpcomingPlayerCount(currentPos)
         // Tell the API to get upcoming players from our local rank (for when new data isn't fetched), or fallback to the
         // provided eta goal rank from the config
         val rankGoal = getRankGoal(leaderboardType)
         val useRankGoal = config.useEtaGoalRank.get() && rankGoal != null
-        val atRank = when {
-            currentLeaderboardPos == 1 -> 3
-            useRankGoal -> minOf((rankGoal ?: 0) + 1, currentLeaderboardPos)
-            currentLeaderboardPos != Int.MAX_VALUE -> currentLeaderboardPos
-            else -> null
-        }
+        val atRank = getAtRank(currentPos, rankGoal, useRankGoal)
 
         val apiData = EliteDevApi.fetchLeaderboardPositions(
             profileId = profileId,
@@ -177,27 +209,11 @@ object EliteFarmersLeaderboard {
             return null
         }
 
-        val diff = apiData.amount - (getWeight(leaderboardType) ?: 0.0)
+        handleDiff(leaderboardType, apiData)
+        handleUpcomingPlayers(leaderboardType, apiData, atRank)
 
-        if ((diff >= 0.5 || abs(diff) >= 10) && apiData.rank != -1) {
-            when (leaderboardType) {
-                EliteLeaderboardType.ALL_TIME -> updateCollections()
-                EliteLeaderboardType.MONTHLY -> setWeight(leaderboardType, apiData.amount)
-            }
-        }
-
-        if (apiData.rank == 1 && atRank == 3) {
-            lastPlayer[leaderboardType] = apiData.upcomingPlayers.firstOrNull()
-        } else {
-            nextPlayers[leaderboardType] = mutableListOf()
-            apiData.upcomingPlayers.forEach {
-                if (it.weight > (getWeight(leaderboardType) ?: apiData.amount)) {
-                    nextPlayers[leaderboardType]?.add(it)
-                }
-            }
-        }
         // Keep local rank if new data wasn't returned
-        //return if (newData) apiData.rank else currentLeaderboardPos
+        // return if (newData) apiData.rank else currentLeaderboardPos
         minWeight?.set(leaderboardType, apiData.minAmount)
         lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
         leaderboardWeight[leaderboardType] = apiData.amount

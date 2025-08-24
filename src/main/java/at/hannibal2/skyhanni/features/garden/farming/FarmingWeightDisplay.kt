@@ -84,7 +84,6 @@ object FarmingWeightDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        //check if eta is enabled
         update()
     }
 
@@ -135,10 +134,10 @@ object FarmingWeightDisplay {
         val weightText = weight?.roundTo(2)?.addSeparators() ?: "Loading..."
         val leaderboardPos = getLeaderboardFormat()
         return Renderable.clickable(
-                "§6$lbName§7: §e$weightText$leaderboardPos",
-                tips = listOf("§eClick to open your Farming Profile."),
-                onLeftClick = { openWebsite(PlayerUtils.getName()) },
-            )
+            "§6$lbName§7: §e$weightText$leaderboardPos",
+            tips = listOf("§eClick to open your Farming Profile."),
+            onLeftClick = { openWebsite(PlayerUtils.getName()) },
+        )
     }
 
     private fun getLeaderboardFormat(): String {
@@ -273,8 +272,7 @@ object FarmingWeightDisplay {
             update()
         }
     }
-// TODO configfix for overtake eta
-    
+    // TODO configfix for overtake eta
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")

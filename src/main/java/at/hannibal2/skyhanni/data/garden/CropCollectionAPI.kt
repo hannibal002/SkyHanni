@@ -39,7 +39,6 @@ object CropCollectionAPI {
         if (amount == 0L) return
         if (type !in listOf(CropCollectionType.UNKNOWN, CropCollectionType.MOOSHROOM_COW) && amount > 1) lastGainedCrop = this
 
-        //ChatUtils.debug("$this add event: $amount")
         this.setCollectionCounter(amount + this.getCollection())
 
         if (type != CropCollectionType.UNKNOWN) {
@@ -58,7 +57,6 @@ object CropCollectionAPI {
         )
 
     fun CropType.updateTotalCollection(amount: Long) {
-        //ChatUtils.debug("Updating $this collection: New total amount: $amount")
         this.addCollectionCounter(CropCollectionType.UNKNOWN, amount - this.getCollection())
     }
 
@@ -100,9 +98,8 @@ object CropCollectionAPI {
             category = CommandCategory.DEVELOPER_DEBUG
             callback {
                 for (entry in CropType.entries) {
-                   ChatUtils.chat("$entry collection: ${entry.getCollection()}")
+                    ChatUtils.chat("$entry collection: ${entry.getCollection()}")
                 }
-
                 ChatUtils.debug("$cropCollectionCounter")
             }
         }

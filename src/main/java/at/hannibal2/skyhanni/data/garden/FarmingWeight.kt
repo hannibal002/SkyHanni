@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.data.garden.CropCollectionAPI.updateTotalCollection
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -19,7 +18,6 @@ import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
@@ -95,7 +93,7 @@ object FarmingWeight {
 
     private fun addWeight(amount: Double, type: EliteLeaderboardType? = null) {
         if (type == null) {
-            weightMap.forEach{ (type, value) -> weightMap[type] = value + amount }
+            weightMap.forEach { (type, value) -> weightMap[type] = value + amount }
         } else {
             weightMap[type] = amount + (weightMap[type] ?: 0.0)
         }
