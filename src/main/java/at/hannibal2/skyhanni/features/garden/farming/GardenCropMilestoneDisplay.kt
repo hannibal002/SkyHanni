@@ -6,16 +6,16 @@ import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestone
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getMaxTier
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getMaxedMilestoneAmount
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.getMilestoneCounter
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.inaccurateMilestone
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.isMaxMilestone
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneNextTierAmount
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.milestoneProgressToNextTier
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesAPI.percentToNextMilestone
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMaxTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMaxedMilestoneAmount
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.inaccurateMilestone
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.isMaxMilestone
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneNextTierAmount
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneProgressToNextTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.percentToNextMilestone
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CustomGoals.getCustomGoal
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -303,7 +303,7 @@ object GardenCropMilestoneDisplay {
     private fun formatDisplay(lineMap: MutableMap<MilestoneTextEntry, Renderable>): List<Renderable> {
         val newList = mutableListOf<Renderable>()
         if (inventoryOpen) newList.buildCropSwitcher() else newList.addVerticalSpacer()
-        if (CropMilestonesAPI.missingMilestoneRepoData) {
+        if (CropMilestonesApi.missingMilestoneRepoData) {
             newList.add(Renderable.text("§cMissing Milestone Repo Data!"))
             val inaccurateList = listOf(
                 MilestoneTextEntry.MILESTONE_TIER,

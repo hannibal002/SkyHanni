@@ -42,6 +42,7 @@ object JacobContestStatsSummary {
 
         when (event.phase) {
             FarmingContestPhase.START -> {
+                blocksBroken.clear()
                 ChatUtils.chat("Started tracking your Jacob Contest Blocks Per Second!")
                 startTime = SimpleTimeMark.now()
             }

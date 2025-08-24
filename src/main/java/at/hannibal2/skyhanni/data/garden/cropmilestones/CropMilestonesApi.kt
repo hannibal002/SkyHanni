@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
-object CropMilestonesAPI {
+object CropMilestonesApi {
     private val patternGroup = RepoPattern.group("data.garden.milestone")
 
     /**
