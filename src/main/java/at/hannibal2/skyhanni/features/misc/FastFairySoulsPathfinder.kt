@@ -109,14 +109,14 @@ object FastFairySoulsPathfinder {
 
         private fun getNearestSoul(): LorenzVec? {
             val playerLocation = LocationUtils.playerLocation()
-            val nearest = allSouls.minBy { it.distanceSq(playerLocation) }
-            if (nearest.distanceToPlayer() < 10) return nearest
+            val nearest = allSouls.minBy { it.position.distanceSq(playerLocation) }
+            if (nearest.position.distanceToPlayer() < 10) return nearest.position
 
             val inAir = PlayerUtils.inAir()
             if (inAir) {
                 val abovePlayer = LocationUtils.playerLocation().up(10)
-                val aboveNearest = allSouls.minBy { it.distanceSq(abovePlayer) }
-                if (aboveNearest.distanceToPlayer() < 10) return aboveNearest
+                val aboveNearest = allSouls.minBy { it.position.distanceSq(abovePlayer) }
+                if (aboveNearest.position.distanceToPlayer() < 10) return aboveNearest.position
             }
 
             ErrorManager.logErrorStateWithData(
@@ -124,14 +124,14 @@ object FastFairySoulsPathfinder {
                 "user clicked a fairy soul while far away from known fairy souls",
                 "nearest loc" to nearest,
                 "player loc" to LocationUtils.playerLocation(),
-                "distance" to nearest.distanceToPlayer().roundTo(1),
+                "distance" to nearest.position.distanceToPlayer().roundTo(1),
                 "inAir" to inAir,
             )
             return null
         }
 
         private fun found(nearest: LorenzVec) {
-            route.remove(nearest)
+            route?.remove(nearest)
             fairySoulsData.add(nearest)
         }
 
