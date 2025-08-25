@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardP
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getMinWeight
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getNextPlayer
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getRankGoal
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
 import at.hannibal2.skyhanni.data.garden.FarmingWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.getFactor
@@ -132,7 +133,12 @@ object FarmingWeightDisplay {
     }
 
     private fun weightPosRenderable(): Renderable {
-        val weightText = weight?.roundTo(2)?.addSeparators() ?: "Loading..."
+        val weightText = weight?.roundTo(2)?.addSeparators() ?: if (isUnranked(currentLeaderboardType)) {
+            "Not ranked!"
+        } else {
+            "Loading..."
+        }
+
         val leaderboardPos = getLeaderboardFormat()
         return Renderable.clickable(
             "§6$lbName§7: §e$weightText$leaderboardPos",
@@ -148,13 +154,16 @@ object FarmingWeightDisplay {
     }
 
     private fun overtakeRenderable(): Renderable {
-        var (nextName, weightUntil) = nextPlayer ?: run {
+        // I was planning on showing the player behind you if you're first, but elite api does not support that without some shenanigans
+        // This should be changed in the future so leaving it in the code for now
+        if (leaderboardPos == 1) return Renderable.text("§bNo players ahead!")
+        var (nextName, weightUntil) = nextPlayer ?: run { // Month weight min amount uses all-time weight
             return if ((weight ?: 0.0) < (getMinWeight(currentLeaderboardType) ?: 0.0)) {
-                val nextName = "1,000 weight"
-                val weightUntil = 1000.0 - (weight ?: 0.0)
+                val minWeight = "${getMinWeight(currentLeaderboardType)} weight"
+                val weightUntil = 1000.0 - (getWeight(EliteLeaderboardType.ALL_TIME) ?: 0.0)
                 val overtakeEta = overtakeEta(weightUntil)
-                val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeEta §bbehind $nextName"
-                Renderable.text(text)
+                val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeEta §bbehind $minWeight"
+                Renderable.text(text) // TODO make this hover text that explains what min rank is
             } else {
                 Renderable.text("§bLoading next player...")
             }
@@ -221,7 +230,7 @@ object FarmingWeightDisplay {
         )
     }
 
-    private fun resetData() {
+    fun resetData() {
         apiError = false
         nextPlayer = null
         weight = null

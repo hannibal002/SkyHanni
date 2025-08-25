@@ -26,7 +26,10 @@ import kotlinx.coroutines.sync.withLock
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
+
+// TODO fix loading weight profiles + #1 player
 @SkyHanniModule
 object EliteFarmersLeaderboard {
     val loadingLeaderboardMutex = Mutex()
@@ -39,11 +42,14 @@ object EliteFarmersLeaderboard {
     private val lastPlayer: MutableMap<EliteLeaderboardType, UpcomingLeaderboardPlayer?> = mutableMapOf()
     private val nextPlayers: MutableMap<EliteLeaderboardType, MutableList<UpcomingLeaderboardPlayer>> = mutableMapOf()
     private val shouldRefreshLeaderboard: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
+    private val unranked: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
 
     var apiError = false
     private var hasWarned = false
     private var rankGoal: Int? = null
     private var wasNotLoaded = true
+    private var fetchAttempts = 0
+    private var lastFetchAttempt = SimpleTimeMark.farPast()
 
     fun reset() {
         leaderboardPosMap?.clear()
@@ -52,9 +58,14 @@ object EliteFarmersLeaderboard {
         lastLeaderboardUpdate.clear()
         lastPlayer.clear()
         nextPlayers.clear()
+        shouldRefreshLeaderboard.clear()
+        unranked.clear()
+        hasWarned = false
         apiError = false
         hasWarned = false
         rankGoal = null
+        fetchAttempts = 0
+        lastFetchAttempt = SimpleTimeMark.farPast()
     }
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -66,18 +77,40 @@ object EliteFarmersLeaderboard {
         }
     }
 
+    fun isUnranked(leaderboardType: EliteLeaderboardType): Boolean {
+        if (leaderboardType == EliteLeaderboardType.ALL_TIME) return false // We support other methods to calculate all-time farming weight
+        return unranked[leaderboardType] ?: false
+    }
+
     fun getMinWeight(leaderboardType: EliteLeaderboardType): Double? {
         return minWeight?.get(leaderboardType)
     }
 
     fun getLeaderboardPosition(leaderboardType: EliteLeaderboardType, override: Boolean = false): Int? {
-        var refreshLeaderboard = shouldRefreshLeaderboard[leaderboardType] ?: true
-        if (override) refreshLeaderboard = true
-        if ((lastLeaderboardUpdate[leaderboardType]?.passedSince() ?: INFINITE) < 10.minutes && !refreshLeaderboard) {
-            return leaderboardPosMap?.get(leaderboardType)
+        val lastUpdate = lastLeaderboardUpdate[leaderboardType]?.passedSince() ?: INFINITE
+        val refresh = override || (shouldRefreshLeaderboard[leaderboardType] ?: true)
+
+        if (!refresh && lastUpdate < 10.minutes) {
+            val pos = leaderboardPosMap?.get(leaderboardType)
+            if (pos != null && pos <= 0) {
+                leaderboardPosMap?.remove(leaderboardType)
+            } else {
+                return pos
+            }
         }
-        shouldRefreshLeaderboard[leaderboardType] = false
-        return loadLeaderboardIfAble(leaderboardType)
+
+        if (lastFetchAttempt.passedSince() <= 5.seconds) return null
+        lastFetchAttempt = SimpleTimeMark.now()
+        fetchAttempts++
+
+        val pos = loadLeaderboardIfAble(leaderboardType)
+        if (pos != null || fetchAttempts > 3) {
+            lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
+            shouldRefreshLeaderboard[leaderboardType] = false
+            fetchAttempts = 0
+        }
+
+        return pos
     }
 
     // Gets last passed player if first
@@ -122,8 +155,8 @@ object EliteFarmersLeaderboard {
                 if (lbPos != null) {
                     leaderboardPosMap?.set(leaderboardType, lbPos)
                     if (wasNotLoaded) checkOffScreenLeaderboardChanges(oldPos, leaderboardType)
+                    lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
                 }
-                lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
             }
         }
         return leaderboardPosMap?.get(leaderboardType)
@@ -168,6 +201,8 @@ object EliteFarmersLeaderboard {
             return null
         }
 
+        ChatUtils.debug("$apiData")
+
         handleDiff(leaderboardType, apiData)
         handleUpcomingPlayers(leaderboardType, apiData, atRank)
 
@@ -175,10 +210,16 @@ object EliteFarmersLeaderboard {
         // return if (newData) apiData.rank else currentLeaderboardPos
         minWeight?.set(leaderboardType, apiData.minAmount)
         lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
+        // workaround for rank 1 players until last passed player is added to elite api
+        shouldRefreshLeaderboard[leaderboardType] = apiData.rank == 1 && apiData.rank != currentPos
         leaderboardWeight[leaderboardType] = apiData.amount
         apiError = false
         FarmingWeightDisplay.update()
-        return if (apiData.rank == -1) null else apiData.rank
+        if (apiData.rank <= 0) {
+            unranked[leaderboardType] = true
+            return null
+        }
+        return apiData.rank
     }
 
     private fun getUpcomingPlayerCount(currentPos: Int) = when {

@@ -28,25 +28,31 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FarmingWeight {
-    val collectionMutex = Mutex()
+    var apiError = false
+    var profileId: String = ""
+
+    private val collectionMutex = Mutex()
     private val cropWeightValues = mutableMapOf<CropType, Double>()
     private val weightMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+    private val ignoredCollection: MutableMap<CropType, Long> = mutableMapOf()
+
     private var weightGain: Double = 0.0
     private var bonusWeight: Double = 0.0
     private var lastPlayerWeightFetch = SimpleTimeMark.farPast()
+    private var lastFetchAttempt = SimpleTimeMark.farPast()
+    private var fetchAttempts = 0
     private var attemptingCropWeightFetch = false
     private var hasFetchedCropWeights = false
-    var apiError = false
-    var profileId: String = ""
     private var shouldRecalculateWeight = false
-    private var ignoredCollection = mutableMapOf<CropType, Long>()
+
+
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
-        if (lastPlayerWeightFetch.passedSince() <= 5.minutes) return
         updateCollections()
     }
 
@@ -99,9 +105,20 @@ object FarmingWeight {
         weightGain += amount
     }
 
-    fun updateCollections() = SkyHanniMod.launchIOCoroutine {
-        if (HypixelData.profileName == "") return@launchIOCoroutine
-        if (collectionMutex.isLocked) return@launchIOCoroutine
+    fun updateCollections() {
+        if (lastFetchAttempt.passedSince() <= 5.seconds || lastPlayerWeightFetch.passedSince() <= 5.minutes) return
+        if (HypixelData.profileName == "") return
+        if (collectionMutex.isLocked) return
+        lastFetchAttempt = SimpleTimeMark.now()
+        fetchAttempts++
+        if (fetchAttempts >= 3) {
+            lastPlayerWeightFetch = SimpleTimeMark.now()
+            fetchAttempts = 0
+        }
+        fetchCollections()
+    }
+
+    private fun fetchCollections() = SkyHanniMod.launchIOCoroutine {
         collectionMutex.withLock {
             val apiData = EliteDevApi.fetchWeightProfile(HypixelData.profileName) ?: run {
                 if (weightMap.isEmpty()) {
@@ -167,15 +184,17 @@ object FarmingWeight {
     fun reset() {
         cropWeightValues.clear()
         weightMap.clear()
+        ignoredCollection.clear()
         weightGain = 0.0
         bonusWeight = 0.0
         lastPlayerWeightFetch = SimpleTimeMark.farPast()
+        lastFetchAttempt = SimpleTimeMark.farPast()
+        fetchAttempts = 0
         attemptingCropWeightFetch = false
         hasFetchedCropWeights = false
         apiError = false
         profileId = ""
         shouldRecalculateWeight = false
-        ignoredCollection = mutableMapOf()
     }
 
     fun CropType.getFactor(): Double {
