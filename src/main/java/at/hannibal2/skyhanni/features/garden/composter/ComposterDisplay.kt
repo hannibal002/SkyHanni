@@ -80,7 +80,7 @@ object ComposterDisplay {
         display = Renderable.vertical {
             +text("§bComposter")
             DataType.TIME_LEFT.labeledWithData(tabListData)?.unaryPlus()
-            horizontal {
+            +horizontal {
                 DataType.ORGANIC_MATTER.labeledWithData(tabListData)?.unaryPlus()
                 addHorizontalSpacer()
                 DataType.FUEL.labeledWithData(tabListData)?.unaryPlus()
