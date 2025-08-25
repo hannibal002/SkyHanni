@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -24,7 +25,10 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.Collections
+import kotlin.collections.buildList
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object KingTalismanHelper {
@@ -125,11 +129,11 @@ object KingTalismanHelper {
                 val current = king == currentKing
 
                 val missingTimeFormat = if (current) {
-                    val changedTime = timeUntil - 1000 * 60 * 20 * (kingCircles.size - 1)
+                    val changedTime = timeUntil.inWholeMilliseconds - 1000 * 60 * 20 * (kingCircles.size - 1)
                     val time = changedTime.milliseconds.format(maxUnits = 2)
                     "§7(§b$time remaining§7)"
                 } else {
-                    val time = timeUntil.milliseconds.format(maxUnits = 2)
+                    val time = timeUntil.format(maxUnits = 2)
                     "§7(§bin $time§7)"
                 }
 
@@ -150,30 +154,28 @@ object KingTalismanHelper {
         val storage = storage ?: error("profileSpecific is null")
         val kingsTalkedTo = storage.kingsTalkedTo
         val (nextKing, until) = getKingTimes().filter { it.key !in kingsTalkedTo }.sorted().firstNotNullOf { it }
-        val time = until.milliseconds.format(maxUnits = 2)
+        val time = until.format(maxUnits = 2)
 
         return "§cNext missing king: §7$nextKing §7(§bin $time§7)"
     }
 
-    private fun getKingTimes(): MutableMap<String, Long> {
+    private fun getKingTimes(): Map<String, Duration> {
+        // TODO: Needs more data - Currently believe king index to be only year based and resets at start of year
         val sbTime = SkyBlockTime.now()
-        val absDay = (sbTime.year - 1) * 372 + (sbTime.month - 1) * 31 + (sbTime.day - 1)
-        val kingIndex = (absDay + 4) % kingCircles.size
-        val circleStart = absDay - kingIndex
-        val oneSBDay = 1000 * 60 * 20
+        val yearDay = (sbTime.month - 1) * 31 + sbTime.day
+        val kingIndex = (yearDay + 5) % kingCircles.size
+        val absDay = (sbTime.year - 1) * 372 + (sbTime.month - 1) * 31 + sbTime.day
+        val startTime = SkyBlockTime.fromAbsoluteDay(absDay - kingIndex)
+        val oneSBDay = 20.minutes
         val oneCircleTime = oneSBDay * kingCircles.size
-        val kingTime = mutableMapOf<String, Long>()
-        for ((index, king) in kingCircles.withIndex()) {
-            val startTime = SkyBlockTime.fromAbsoluteDay(index + circleStart)
 
-            var timeNext = startTime.toMillis()
-            while (timeNext < SimpleTimeMark.now().toMillis()) {
+        return kingCircles.mapIndexed{ index, king ->
+            var timeNext = (startTime + oneSBDay * index).toTimeMark().timeUntil()
+            while (timeNext.isNegative()){
                 timeNext += oneCircleTime
             }
-            val timeUntil = timeNext - SimpleTimeMark.now().toMillis()
-            kingTime[king] = timeUntil
-        }
-        return kingTime
+            king to timeNext
+        }.toMap()
     }
 
     private fun getCurrentKing() = getKingTimes().sortedDesc().firstNotNullOf { it.key }
@@ -198,6 +200,24 @@ object KingTalismanHelper {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shprintking"){
+            description = "Prints out king related debug stuff"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback {
+                for ((king, time) in getKingTimes()) {
+                    ChatUtils.chat(king + ": " + time.inWholeSeconds.toString())
+                }
+                val sbTime = SkyBlockTime.now()
+                val yearDay = (sbTime.month - 1) * 31 + sbTime.day
+                val kingIndex = (yearDay + 5) % kingCircles.size
+                val absDay = (sbTime.year - 1) * 372 + (sbTime.month - 1) * 31 + sbTime.day
+                val startTime = SkyBlockTime.fromAbsoluteDay(absDay - kingIndex)
+                ChatUtils.chat("SB Time: ${sbTime.year} - ${sbTime.month} - ${sbTime.day}")
+                ChatUtils.chat("Absolute day: $absDay")
+                ChatUtils.chat("King index: $kingIndex")
+                ChatUtils.chat("Start time: ${startTime.toMillis()/1000}")
+            }
+        }
         event.register("shresetkinghelper") {
             description = "Resets the King Talisman Helper"
             category = CommandCategory.USERS_RESET
