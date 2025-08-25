@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 
@@ -35,7 +36,7 @@ open class CircularRenderable protected constructor(
     }
 
     companion object {
-        fun Renderable.Companion.circular(
+        fun RenderableContext.circular(
             backgroundColor: ChromaColour,
             radius: Int,
             smoothness: Float = 1f,

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing.Axis
@@ -157,7 +157,7 @@ class AnimatedItemStackRenderable private constructor(
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) = super<TimeDependentRenderable>.render(mouseOffsetX, mouseOffsetY)
 
     companion object {
-        fun Renderable.Companion.animatedItemStack(
+        fun RenderableContext.animatedItemStack(
             frames: Collection<ItemStackAnimationFrame>,
             rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
             bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),

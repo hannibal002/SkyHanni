@@ -13,10 +13,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -77,13 +77,13 @@ object JyrreTimer {
         duration -= 1.seconds
 
         return Renderable.horizontal {
-            addItemStack(displayIcon)
-            addString("§aJyrre Boost: ")
+            +item(displayIcon)
+            +text("§aJyrre Boost: ")
 
             if (duration <= 0.seconds && config.showInactive) {
-                addString("§cInactive!")
+                +text("§cInactive!")
             } else {
-                addString("§b${duration.format()}")
+                +text("§b${duration.format()}")
             }
         }
     }

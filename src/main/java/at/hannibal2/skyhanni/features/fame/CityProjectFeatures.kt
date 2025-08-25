@@ -36,11 +36,11 @@ import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -162,13 +162,13 @@ object CityProjectFeatures {
     }
 
     private fun buildDisplay(materials: MutableMap<NeuInternalName, Int>) = Renderable.vertical {
-        addString("§7City Project Materials")
+        +text("§7City Project Materials")
 
         if (materials.isEmpty()) {
-            addString("§cNo Materials to contribute.")
+            +text("§cNo Materials to contribute.")
         } else {
             for ((internalName, amount) in materials) {
-                add(materialRow(internalName, amount))
+                +materialRow(internalName, amount)
             }
         }
 
@@ -180,10 +180,10 @@ object CityProjectFeatures {
         val price = internalName.getPrice() * amount
 
         return Renderable.horizontal {
-            addString(" §7- ")
-            addItemStack(stack)
-            add(materialLink(name, amount))
-            addString(" §7(§6${price.shortFormat()}§7)")
+            +text(" §7- ")
+            +item(stack)
+            +materialLink(name, amount)
+            +text(" §7(§6${price.shortFormat()}§7)")
         }
     }
 

@@ -14,11 +14,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -100,24 +100,24 @@ object GardenBestCropTime {
         if (!config.next.bestHideTitle.get()) {
             val title = if (gardenExp) "§2Garden Experience" else "§bSkyBlock Level"
             if (config.next.bestCompact.get()) {
-                addString("§eBest Crop Time")
+                +text("§eBest Crop Time")
             } else {
-                addString("§eBest Crop Time §7($title§7)")
+                +text("§eBest Crop Time §7($title§7)")
             }
         }
 
         if (!config.progress) {
-            addString("§cCrop Milestone Progress Display is disabled!")
+            +text("§cCrop Milestone Progress Display is disabled!")
             return@vertical
         }
 
         if (sorted.isEmpty()) {
-            addString("§cFarm crops to add them to this list!")
+            +text("§cFarm crops to add them to this list!")
             return@vertical
         }
 
         sorted.keys.withIndex().forEach { (index, crop) ->
-            createCropEntry(crop, index + 1, useOverflow, gardenExp, currentCrop)?.let(::add)
+            createCropEntry(crop, index + 1, useOverflow, gardenExp, currentCrop)?.unaryPlus()
         }
     }
 
@@ -131,9 +131,9 @@ object GardenBestCropTime {
 
         return Renderable.horizontal {
             if (!config.next.bestCompact.get()) {
-                addString("§7$index# ")
+                +text("§7$index# ")
             }
-            addItemStack(crop.icon)
+            +item(crop.icon)
 
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
@@ -142,11 +142,11 @@ object GardenBestCropTime {
 
             val cropName = if (!config.next.bestCompact.get()) crop.cropName + " " else ""
             val tier = if (!config.next.bestCompact.get()) "$currentTier➜$nextTier§r " else ""
-            addString("$color$contestFormat$cropName$tier§b$duration")
+            +text("$color$contestFormat$cropName$tier§b$duration")
 
             if (gardenExp && !config.next.bestCompact.get()) {
                 val gardenExpForTier = getGardenExpForTier(nextTier)
-                addString(" §7(§2$gardenExpForTier §7Exp)")
+                +text(" §7(§2$gardenExpForTier §7Exp)")
             }
         }
     }

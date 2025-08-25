@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.primitives.CircularRenderable
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import kotlin.time.Duration
@@ -63,7 +63,7 @@ class RadialGradientCircularRenderable private constructor(
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) = super<TimeDependentRenderable>.render(mouseOffsetX, mouseOffsetY)
 
     companion object {
-        fun Renderable.Companion.radialGradientCircular(
+        fun RenderableContext.radialGradientCircular(
             radius: Int,
             startColor: ChromaColour,
             endColor: ChromaColour,

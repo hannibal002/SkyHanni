@@ -22,12 +22,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
 
@@ -337,24 +337,24 @@ object ExperimentsAddonsHelper {
             onlyOnIsland = IslandType.PRIVATE_ISLAND,
             onRender = {
                 val renderable = Renderable.vertical {
-                    addString("Current Addon Phase: $currentAddonPhase")
+                    +text("Current Addon Phase: $currentAddonPhase")
                     if (ExperimentationTableApi.inChronomatron) {
-                        addString("Current Round: $currentChronomatronRound")
-                        addString("Current Sequence Index: $chronomatronSequenceIndex")
-                        add(Renderable.emptyText())
-                        addString("Hypixel Data:")
-                        addString(formatColorSet(hypixelChronomatronData))
-                        add(Renderable.emptyText())
-                        addString("User Progress:")
-                        addString(formatColorSet(userChronomatronProgress))
-                        add(Renderable.emptyText())
-                        addString("Last Sound: $lastChronomatronSound")
+                        +text("Current Round: $currentChronomatronRound")
+                        +text("Current Sequence Index: $chronomatronSequenceIndex")
+                        +emptyText()
+                        +text("Hypixel Data:")
+                        +text(formatColorSet(hypixelChronomatronData))
+                        +emptyText()
+                        +text("User Progress:")
+                        +text(formatColorSet(userChronomatronProgress))
+                        +emptyText()
+                        +text("Last Sound: $lastChronomatronSound")
                     } else if (ExperimentationTableApi.inUltrasequencer) {
-                        addString("Current Round: $currentUltraSequencerRound")
-                        add(Renderable.emptyText())
-                        addString("Hypixel Data: $hypixelUltrasequencerData")
-                        addString("User Progress: $userUltrasequencerProgress")
-                        addString("Dye Map: $ultrasequencerDyeMap")
+                        +text("Current Round: $currentUltraSequencerRound")
+                        +emptyText()
+                        +text("Hypixel Data: $hypixelUltrasequencerData")
+                        +text("User Progress: $userUltrasequencerProgress")
+                        +text("Dye Map: $ultrasequencerDyeMap")
                     } else return@vertical
                 }
                 debugConfig.addonsDebugPosition.renderRenderable(renderable, posLabel = "Addons Debug")

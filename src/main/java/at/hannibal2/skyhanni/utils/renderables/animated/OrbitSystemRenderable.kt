@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import kotlin.math.cos
 import kotlin.math.sin
@@ -82,7 +83,7 @@ class OrbitSystemRenderable private constructor(
     }
 
     companion object {
-        fun Renderable.Companion.orbitalSystem(
+        fun RenderableContext.orbitalSystem(
             mainBody: Renderable,
             /**
              * Spacing between the main body and sub bodies.

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -52,7 +53,7 @@ class WrappedStringRenderable private constructor(
     }
 
     companion object {
-        fun Renderable.Companion.wrappedText(
+        fun RenderableContext.wrappedText(
             text: String,
             setWidth: Int,
             scale: Double = 1.0,

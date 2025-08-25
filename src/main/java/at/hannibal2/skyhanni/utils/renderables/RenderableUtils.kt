@@ -25,6 +25,7 @@ import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.reflect.KMutableProperty0
+
 //#if MC > 1.21
 //$$ import net.minecraft.text.Text
 //#endif
@@ -258,6 +259,7 @@ internal object RenderableUtils {
         )
     }
 
+    @Deprecated("Use RenderableContainerContext instead of Lists")
     inline fun MutableList<Renderable>.addRenderableButton(
         label: String,
         enabled: String,
@@ -268,6 +270,19 @@ internal object RenderableUtils {
         scrollValue: ScrollValue = ScrollValue(),
     ) {
         add(createBooleanButton(label, enabled, disabled, config, onChange, enableUniverseScroll, scrollValue).renderable)
+    }
+
+    // TODO
+    inline fun RenderableContainerContext<*>.addRenderableButton(
+        label: String,
+        enabled: String,
+        disabled: String,
+        config: KMutableProperty0<Boolean>,
+        crossinline onChange: () -> Unit,
+        enableUniverseScroll: Boolean = true,
+        scrollValue: ScrollValue = ScrollValue(),
+    ) {
+        +createBooleanButton(label, enabled, disabled, config, onChange, enableUniverseScroll, scrollValue).renderable
     }
 
     private inline fun createBooleanButton(
@@ -296,6 +311,7 @@ internal object RenderableUtils {
         return element
     }
 
+    @Deprecated("Use RenderableContainerContext instead of Lists")
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addRenderableButton(
         label: String,
         current: T?,
@@ -318,6 +334,28 @@ internal object RenderableUtils {
         )
     }
 
+    // TODO
+    inline fun <reified T : Enum<T>> RenderableContainerContext<*>.addRenderableButton(
+        label: String,
+        current: T?,
+        crossinline getName: (T) -> String = { it.toString() },
+        crossinline onChange: (T) -> Unit,
+        universe: List<T> = enumValues<T>().toList(),
+        enableUniverseScroll: Boolean = true,
+        scrollValue: ScrollValue = ScrollValue(),
+    ) {
+        +createButtonNew(
+            label,
+            current,
+            getName = { getName(it ?: error("it is null in non-nullable getName()")) },
+            onChange = { onChange(it ?: error("it is null in non-nullable onChange()")) },
+            universe,
+            enableUniverseScroll,
+            scrollValue,
+        ).renderable
+    }
+
+    @Deprecated("Use RenderableContainerContext instead of Lists")
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addRenderableNullableButton(
         label: String,
         current: T?,
@@ -327,6 +365,18 @@ internal object RenderableUtils {
         enableUniverseScroll: Boolean = true,
     ) {
         add(createButtonNew(label, current, getName, onChange, universe, enableUniverseScroll).renderable)
+    }
+
+    // TODO
+    inline fun <reified T : Enum<T>> RenderableContainerContext<*>.addRenderableNullableButton(
+        label: String,
+        current: T?,
+        crossinline getName: (T?) -> String = { it?.toString().orEmpty() },
+        crossinline onChange: (T?) -> Unit,
+        universe: List<T?> = enumValues<T>().toList(),
+        enableUniverseScroll: Boolean = true,
+    ) {
+        +createButtonNew(label, current, getName, onChange, universe, enableUniverseScroll).renderable
     }
 
     fun <T> List<T?>.circle(current: T?): T? {
@@ -388,13 +438,13 @@ internal object RenderableUtils {
         )
 
         return Renderable.horizontal {
-            addString("§7$label §a[")
+            +text("§7$label §a[")
             val displayFormat = hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {})
             when (enableUniverseScroll) {
                 true -> clickableAndScrollable(displayFormat, onAnyClick = clickMap, bypassChecks = false, scrollValue = scrollValue)
                 false -> clickable(displayFormat, onAnyClick = clickMap, bypassChecks = false)
-            }.let { add(it) }
-            addString("§a]")
+            }.unaryPlus()
+            +text("§a]")
         }.toSearchable()
     }
 
@@ -443,10 +493,12 @@ internal object RenderableUtils {
     }
 }
 
+@Deprecated("Use RenderableContainerContext instead of Lists")
 fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() -> Unit) {
     add(Renderable.horizontal(buildList { builderAction() }))
 }
 
+@Deprecated("Use RenderableContainerContext instead of Lists")
 fun MutableList<Renderable>.addLine(tips: List<String>, builderAction: MutableList<Renderable>.() -> Unit) {
     add(hoverTips(Renderable.horizontal(buildList { builderAction() }, 0), tips = tips))
 }

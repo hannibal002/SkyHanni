@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.filterListMap
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 
@@ -70,7 +71,9 @@ class SearchableTable private constructor(
     }
 
     companion object {
-        fun Renderable.Companion.searchableTable(
+
+        // TODO
+        fun RenderableContext.searchableTable(
             content: Map<List<Renderable>, String>,
             textInput: TextInput,
             key: Int,

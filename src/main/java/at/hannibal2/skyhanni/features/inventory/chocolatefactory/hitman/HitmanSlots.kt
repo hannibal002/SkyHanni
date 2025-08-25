@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -74,14 +74,12 @@ object HitmanSlots {
     }
 
     private fun getSlotPriceRenderable(): Renderable = Renderable.vertical {
-        addString("§eHitman Slot Progress")
+        +text("§eHitman Slot Progress")
 
         if (slotPricesPaid.isNotEmpty()) {
-            add(
-                Renderable.hoverTips(
-                    "§aPurchased Slots§7: §a${slotPricesPaid.size}",
-                    listOf("§7Total Paid: §6${slotPricesPaid.sum().addSeparators()} Coins"),
-                ),
+            +Renderable.hoverTips(
+                "§aPurchased Slots§7: §a${slotPricesPaid.size}",
+                listOf("§7Total Paid: §6${slotPricesPaid.sum().addSeparators()} Coins"),
             )
         }
 
@@ -94,12 +92,9 @@ object HitmanSlots {
                 add("§8... and ${slotPricesLeft.size - 5} more")
             }
         }
-
-        add(
-            Renderable.hoverTips(
-                "§cRemaining Slots§7: §c${slotPricesLeft.size}",
-                remainingSlotsText,
-            ),
+        +Renderable.hoverTips(
+            "§cRemaining Slots§7: §c${slotPricesLeft.size}",
+            remainingSlotsText,
         )
     }
 

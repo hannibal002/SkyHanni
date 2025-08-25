@@ -7,6 +7,9 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.decorators.RenderableDecoratorOnlyRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import net.minecraft.init.Blocks
@@ -44,7 +47,7 @@ object DragNDrop {
         DrawContextUtils.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
     }
 
-    fun Renderable.Companion.draggable(
+    fun RenderableContext.draggable(
         display: Renderable,
         item: () -> DragItem<*>,
         bypassChecks: Boolean = false,
@@ -56,7 +59,7 @@ object DragNDrop {
         condition = condition,
     )
 
-    fun Renderable.Companion.droppable(
+    fun RenderableContext.droppable(
         display: Renderable,
         drop: Droppable,
         bypassChecks: Boolean = false,

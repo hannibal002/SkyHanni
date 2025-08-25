@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -40,9 +41,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getCountdownFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
 import at.hannibal2.skyhanni.utils.renderables.container.ContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -235,7 +234,7 @@ object HoppityLiveDisplay {
     }
 
     private fun buildTitle(statYear: Int) = Renderable.vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {
-        addString(
+        +text(
             CFApi.partyModeReplace(
                 when (statYear) {
                     Int.MAX_VALUE -> "§dHoppity's Hunt All-Time Stats"
@@ -246,8 +245,9 @@ object HoppityLiveDisplay {
         )
         if (statYear == Int.MAX_VALUE) {
             val numberEvents = storage?.hoppityEventStats?.keys?.count { it <= currentSbYear } ?: 0
-            addCenteredString(
+            +text(
                 CFApi.partyModeReplace("§7Compiled from §f$numberEvents §7events"),
+                horizontalAlign = HorizontalAlignment.CENTER
             )
             return@vertical
         }
@@ -276,7 +276,7 @@ object HoppityLiveDisplay {
             else -> if (timeMarkAbs) "Starts" else "Starts in"
         }
 
-        addCenteredString(
+        +text(
             CFApi.partyModeReplace(
                 when {
                     isCurrentEvent -> "§7$grammarFormat §f$timeMarkFormat"
@@ -284,6 +284,7 @@ object HoppityLiveDisplay {
                     else -> "§7$grammarFormat §f$timeMarkFormat"
                 },
             ),
+            horizontalAlign = HorizontalAlignment.CENTER,
         )
     }
 

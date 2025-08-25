@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.filterListMap
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.ScrollInput
@@ -131,7 +132,8 @@ class SearchableScrollTable private constructor(
         private val scrollUpTip = Renderable.text("§7§oMore items above (scroll)")
         private val scrollDownTip = Renderable.text("§7§oMore items below (scroll)")
 
-        fun Renderable.Companion.searchableScrollTable(
+        // TODO
+        fun RenderableContext.searchableScrollTable(
             content: Map<List<Renderable>, String?>,
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),

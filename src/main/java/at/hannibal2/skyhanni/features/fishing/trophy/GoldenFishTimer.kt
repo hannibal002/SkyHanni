@@ -39,15 +39,13 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -204,9 +202,9 @@ object GoldenFishTimer {
 
     private fun buildCompactDisplay(): Renderable {
         return Renderable.horizontal {
-            addItemStack(goldenFishSkullItem)
+            +item(goldenFishSkullItem)
             addHorizontalSpacer()
-            addString(
+            +text(
                 if (isGoldenFishActive()) {
                     "§aSpawned! ${formattedTimeUntilDespawn()}"
                 } else if (timePossibleSpawn.isFarFuture() || timePossibleSpawn.isInFuture()) {
@@ -219,53 +217,45 @@ object GoldenFishTimer {
     }
 
     private fun buildDisplay(icon: Boolean): Renderable = Renderable.horizontal {
-        if (icon) {
-            // TODO use MutableList<Renderable>.addItemStack once it allows for align
-            add(
-                Renderable.item(
-                    goldenFishSkullItem,
-                    2.5,
-                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                ),
-            )
-        }
-        val text = buildList {
-            add("§6§lGolden Fish Timer")
+        if (icon) +item(
+            goldenFishSkullItem,
+            2.5,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+        )
+
+        +vertical(
+            spacing = 1,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+        ) {
+            +text("§6§lGolden Fish Timer")
             if (!isGoldenFishActive()) {
                 if (lastGoldenFishTime.isFarPast()) {
-                    add("§7Last Golden Fish: §cNone this session")
+                    +text("§7Last Golden Fish: §cNone this session")
                 } else {
-                    add("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().formatTime()}")
+                    +text("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().formatTime()}")
                 }
                 if (lastRodThrowTime.isFarPast()) {
-                    add("§7Last Rod Throw: §cNone yet")
+                    +text("§7Last Rod Throw: §cNone yet")
                 } else {
-                    add(
+                    +text(
                         "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().formatTime()} " +
                             "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().formatTime()})",
                     )
                 }
-                if (timePossibleSpawn.isFarFuture()) add("§7Can spawn in: §cUnknown")
+                if (timePossibleSpawn.isFarFuture()) +text("§7Can spawn in: §cUnknown")
                 else if (timePossibleSpawn.isInFuture()) {
-                    add(formattedTimeUntilSpawn())
+                    +text(formattedTimeUntilSpawn())
                 } else {
-                    add(formattedTimeSinceAvailable())
-                    add("§7Chance: ${formattedChance()}")
+                    +text(formattedTimeSinceAvailable())
+                    +text("§7Chance: ${formattedChance()}")
                 }
             } else {
-                add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
-                add(formattedTimeUntilDespawn())
+                +text("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
+                +text(formattedTimeUntilDespawn())
             }
         }
-        add(
-            Renderable.vertical(
-                text.map(StringRenderable::from),
-                spacing = 1,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-            ),
-        )
-    }
 
+    }
 
     private fun formattedTimeUntilDespawn(): String =
         "§7Despawns in: §b${(goldenFishDespawnTimer + 1.seconds).timeUntil().formatTime()}"

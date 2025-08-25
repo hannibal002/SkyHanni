@@ -87,7 +87,7 @@ interface Renderable {
      */
     fun render(mouseOffsetX: Int, mouseOffsetY: Int)
 
-    companion object {
+    companion object : RenderableContext {
 
         val logger = LorenzLogger("debug/renderable")
         var currentRenderPassMousePosition: Pair<Int, Int>? = null

@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable2dContainerContext
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 
@@ -38,18 +40,35 @@ class TableRenderable private constructor(
     }
 
     companion object {
+
         /**
+         * @property xSpacing Space between rows
+         * @property ySpacing Space between columns
+         */
+        fun RenderableContext.table(
+            xSpacing: Int = 1,
+            ySpacing: Int = 0,
+            useEmptySpace: Boolean = false,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+            entries: Renderable2dContainerContext.() -> Unit,
+        ) = TableRenderable(Renderable2dContainerContext.result(entries), xSpacing, ySpacing, useEmptySpace, horizontalAlign, verticalAlign)
+
+        /**
+         * Consider using the [Renderable2dContainerContext] version when possible
          * @property content Collection of rows of Renderables
          * @property xSpacing Space between rows
          * @property ySpacing Space between columns
          */
-        fun Renderable.Companion.table(
+        fun RenderableContext.table(
             content: List<List<Renderable>>,
             xSpacing: Int = 1,
             ySpacing: Int = 0,
             useEmptySpace: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = TableRenderable(content, xSpacing, ySpacing, useEmptySpace, horizontalAlign, verticalAlign)
+        ): TableRenderable {
+            return TableRenderable(content, xSpacing, ySpacing, useEmptySpace, horizontalAlign, verticalAlign)
+        }
     }
 }

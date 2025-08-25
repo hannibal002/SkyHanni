@@ -35,13 +35,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.moveEntryToTop
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
@@ -122,20 +120,20 @@ object CropMoneyDisplay {
 
         if (!ready) {
             return Renderable.vertical {
-                addString(title)
-                addString("§eLoading...")
+                +text(title)
+                +text("§eLoading...")
             }
         }
 
         if (GardenApi.getCurrentlyFarmedCrop() == null && !config.alwaysOn) return null
 
         return Renderable.vertical {
-            if (!config.hideTitle) addString(fullTitle(title))
+            if (!config.hideTitle) +text(fullTitle(title))
 
             if (!GardenApi.config.cropMilestones.progress) {
-                addString("§cCrop Milestone Progress Display is disabled!")
+                +text("§cCrop Milestone Progress Display is disabled!")
             } else {
-                add(buildDisplayBody())
+                +buildDisplayBody()
             }
         }
     }
@@ -202,7 +200,7 @@ object CropMoneyDisplay {
         val cropList = createDescendingCropList(moneyPerHour)
         return Renderable.vertical {
             for ((index, pair) in cropList.withIndex()) {
-                addNotNull(buildCropMoneyLine(index + 1, pair.first, pair.second, extraMoneyPerHour.total))
+                buildCropMoneyLine(index + 1, pair.first, pair.second, extraMoneyPerHour.total)?.unaryPlus()
             }
         }
     }
@@ -240,24 +238,24 @@ object CropMoneyDisplay {
 
         return Renderable.horizontal {
             if (!config.compact) {
-                addString("§7$number# ")
+                +text("§7$number# ")
             }
 
             if (isSeeds(internalName)) {
-                addItemStack(BOX_OF_SEEDS)
+                +item(BOX_OF_SEEDS)
             } else {
-                addItemStack(internalName)
+                +item(internalName)
             }
 
             if (cropNames[internalName] == CropType.WHEAT && config.mergeSeeds) {
-                addItemStack(BOX_OF_SEEDS)
+                +item(BOX_OF_SEEDS)
             }
 
             if (!config.compact) {
                 val itemName = internalName.itemNameWithoutColor
                 val currentColor = if (isCurrent) "§e" else "§7"
                 val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-                addString("$currentColor$contestFormat$itemName§7: ")
+                +text("$currentColor$contestFormat$itemName§7: ")
             }
 
             val coinsColor = if (config.compact && GardenApi.getCurrentlyFarmedCrop() == crop) "§e" else "§6"
@@ -270,7 +268,7 @@ object CropMoneyDisplay {
                 }
                 "$coinsColor$formattedPrice"
             }
-            addString(coins)
+            +text(coins)
         }
     }
 

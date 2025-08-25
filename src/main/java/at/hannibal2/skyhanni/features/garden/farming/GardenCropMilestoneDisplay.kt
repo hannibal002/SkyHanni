@@ -33,10 +33,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -157,11 +157,11 @@ object GardenCropMilestoneDisplay {
         nextTier = if (useCustomGoal) customTargetLevel else nextTier
 
         lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontal {
-            addItemStack(crop.icon)
+            +item(crop.icon)
             if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
-                addString("§7" + crop.cropName + " §eMAXED")
+                +text("§7" + crop.cropName + " §eMAXED")
             } else {
-                addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
+                +text("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
             }
         }
 
@@ -310,8 +310,8 @@ object GardenCropMilestoneDisplay {
 
         lineMap[MushroomTextEntry.TITLE] = Renderable.text("§6Mooshroom Cow Perk")
         lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.horizontal {
-            addItemStack(mushroom.icon)
-            addString("§7Mushroom Milestone $nextTier")
+            +item(mushroom.icon)
+            +text("§7Mushroom Milestone $nextTier")
         }
 
         lineMap[MushroomTextEntry.NUMBER_OUT_OF_TOTAL] = Renderable.text("§e$haveFormat§8/§e$needFormat")

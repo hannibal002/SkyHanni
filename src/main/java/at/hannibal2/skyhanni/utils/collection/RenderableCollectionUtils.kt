@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableContainerContext
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -18,6 +19,7 @@ import java.util.Collections
 // TODO move the type specific into the companion objects, the rest goes back into the RenderableUtils
 object RenderableCollectionUtils {
 
+    @Deprecated("Use RenderableContainerContext instead of Lists")
     fun MutableList<Renderable>.addString(
         text: String,
         scale: Double = 1.0,
@@ -27,6 +29,7 @@ object RenderableCollectionUtils {
         add(Renderable.text(text, scale, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
     }
 
+    @Deprecated("Use RenderableContainerContext instead of Lists")
     fun MutableList<Renderable>.addString(
         text: String,
         tips: List<String>,
@@ -45,10 +48,12 @@ object RenderableCollectionUtils {
         add(Renderable.text(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign).toSearchable(searchText))
     }
 
+    @Deprecated("Use RenderableContainerContext instead of Lists")
     fun MutableList<List<Renderable>>.addSingleString(text: String) {
         add(Collections.singletonList(Renderable.text(text)))
     }
 
+    @Deprecated("Use RenderableContainerContext instead of Lists")
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
         highlight: Boolean = false,
@@ -61,6 +66,7 @@ object RenderableCollectionUtils {
         add(Renderable.item(itemStack, scale = scale))
     }
 
+    @Deprecated("Use RenderableContainerContext instead of Lists")
     fun MutableList<Renderable>.addItemStack(internalName: NeuInternalName) {
         addItemStack(internalName.getItemStack())
     }
@@ -81,11 +87,7 @@ object RenderableCollectionUtils {
         return emptySpace / (yLength - 1)
     }
 
-    fun MutableList<Renderable>.addHorizontalSpacer(width: Int = 3) {
-        add(Renderable.placeholder(width, 0))
-    }
+    fun RenderableContainerContext<*>.addHorizontalSpacer(width: Int = 3) = +placeholder(width, 0)
 
-    fun MutableList<Renderable>.addVerticalSpacer(height: Int = 10) {
-        add(Renderable.placeholder(0, height))
-    }
+    fun RenderableContainerContext<*>.addVerticalSpacer(height: Int = 10) = +placeholder(0, height)
 }

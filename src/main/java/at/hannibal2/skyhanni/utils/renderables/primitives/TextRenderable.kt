@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.Text
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.client.Minecraft
 import java.awt.Color
@@ -11,7 +12,7 @@ import java.awt.Color
 // Extension Functions are not inside there Companion Object as it would be ambiguous on import.
 // Therefore, they are in the top level and the constructors are just internal not private as they should be.
 
-fun Renderable.Companion.text(
+fun RenderableContext.text(
     text: String,
     scale: Double = 1.0,
     color: Color = Color.WHITE,
@@ -19,13 +20,15 @@ fun Renderable.Companion.text(
     verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) = StringRenderable(text, scale, color, horizontalAlign, verticalAlign)
 
-fun Renderable.Companion.text(
+fun RenderableContext.text(
     text: Text,
     scale: Double = 1.0,
     color: Color = Color.WHITE,
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) = TextRenderable(text, scale, color, horizontalAlign, verticalAlign)
+
+fun String.toRenderable() = StringRenderable(this)
 
 class StringRenderable internal constructor(
     val text: String,
@@ -41,10 +44,6 @@ class StringRenderable internal constructor(
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         RenderableUtils.renderString(text, scale, color, inverseScale)
-    }
-
-    companion object {
-        fun from(text: String) = StringRenderable(text)
     }
 }
 

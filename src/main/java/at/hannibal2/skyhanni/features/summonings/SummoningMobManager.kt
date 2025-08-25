@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.toRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import kotlin.time.Duration.Companion.seconds
@@ -130,7 +130,7 @@ object SummoningMobManager {
                 val color = NumberUtil.percentageColor(health.toLong(), maxHealth.toLong()).getChatColor()
                 add("#${index + 1} §a${mob.name} $color${health.shortFormat()}§2/${maxHealth.shortFormat()}§c❤")
             }
-        }.map(StringRenderable::from)
+        }.map(String::toRenderable)
 
         val renderable = Renderable.vertical(list)
         config.summoningMobDisplayPos.renderRenderable(renderable, posLabel = "Summoning Mob Display")

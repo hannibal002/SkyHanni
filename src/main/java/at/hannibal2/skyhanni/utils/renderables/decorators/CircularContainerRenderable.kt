@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables.decorators
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.primitives.CircularRenderable
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -35,7 +36,7 @@ class CircularContainerRenderable(
     }
 
     companion object {
-        fun Renderable.Companion.circularContainer(
+        fun RenderableContext.circularContainer(
             root: Renderable,
             backgroundColor: ChromaColour,
             smoothness: Float = 1f,

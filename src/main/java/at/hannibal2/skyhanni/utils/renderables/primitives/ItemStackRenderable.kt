@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import net.minecraft.item.ItemStack
 
 open class ItemStackRenderable protected constructor(
@@ -41,7 +42,7 @@ open class ItemStackRenderable protected constructor(
     )
 
     companion object {
-        fun Renderable.Companion.item(
+        fun RenderableContext.item(
             stackGetter: () -> ItemStack,
             scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,
@@ -59,7 +60,7 @@ open class ItemStackRenderable protected constructor(
             verticalAlign = verticalAlign,
         )
 
-        fun Renderable.Companion.item(
+        fun RenderableContext.item(
             stack: ItemStack,
             scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,
@@ -77,7 +78,7 @@ open class ItemStackRenderable protected constructor(
             verticalAlign = verticalAlign,
         )
 
-        fun Renderable.Companion.item(
+        fun RenderableContext.item(
             provider: NeuItemStackProvider,
             scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,
@@ -95,7 +96,7 @@ open class ItemStackRenderable protected constructor(
             verticalAlign = verticalAlign,
         )
 
-        fun Renderable.Companion.item(
+        fun RenderableContext.item(
             item: NeuInternalName,
             scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,

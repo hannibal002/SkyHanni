@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils.renderables.container
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable1dContainerContext
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 
 open class VerticalContainerRenderable protected constructor(
@@ -27,21 +29,26 @@ open class VerticalContainerRenderable protected constructor(
     }
 
     companion object {
-        fun Renderable.Companion.vertical(
+
+        fun RenderableContext.vertical(
+            spacing: Int = 0,
+            horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+            verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
+            entries: Renderable1dContainerContext.() -> Unit,
+        ) = VerticalContainerRenderable(Renderable1dContainerContext.result(entries), spacing, horizontalAlign, verticalAlign)
+
+        /**
+         * Consider using the [Renderable1dContainerContext] version when possible
+         */
+        fun RenderableContext.vertical(
             renderables: Collection<Renderable>,
             spacing: Int = 0,
             horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
             verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
         ) = VerticalContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign)
 
-        fun Renderable.Companion.vertical(
-            spacing: Int = 0,
-            horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
-            verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
-            builderAction: MutableList<Renderable>.() -> Unit,
-        ) = VerticalContainerRenderable(buildList { builderAction() }, spacing, horizontalAlign, verticalAlign)
-
-        fun Renderable.Companion.vertical(
+        @Deprecated("Use Renderable1dContainerContext version")
+        fun RenderableContext.vertical(
             vararg renderables: Renderable,
             spacing: Int = 0,
             horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.time.Duration
@@ -107,7 +108,7 @@ class DVDLogoRenderable private constructor(
         /**
          * Docs see: [DVDLogoRenderable]
          */
-        fun Renderable.Companion.dvdLogo(
+        fun RenderableContext.dvdLogo(
             renderable: Renderable,
             movementSpeed: Float = 4f,
             initialTrajectory: LogoTrajectory = LogoTrajectory.entries.random(),

@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
+import at.hannibal2.skyhanni.utils.renderables.Renderable2dContainerContext
+import at.hannibal2.skyhanni.utils.renderables.RenderableContext
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.ScrollInput
@@ -91,7 +93,37 @@ class ScrollTable private constructor(
     }
 
     companion object {
-        fun Renderable.Companion.scrollTable(
+
+        fun RenderableContext.scrollTable(
+            height: Int,
+            scrollValue: ScrollValue = ScrollValue(),
+            velocity: Double = 2.0,
+            button: Int? = null,
+            xSpacing: Int = 1,
+            ySpacing: Int = 0,
+            header: List<Renderable> = emptyList(),
+            bypassChecks: Boolean = false,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+            entries: Renderable2dContainerContext.() -> Unit,
+        ) = ScrollTable(
+            content = Renderable2dContainerContext.result(entries),
+            height = height,
+            scrollValue = scrollValue,
+            velocity = velocity,
+            button = button,
+            xSpacing = xSpacing,
+            ySpacing = ySpacing,
+            header = header,
+            bypassChecks = bypassChecks,
+            horizontalAlign = horizontalAlign,
+            verticalAlign = verticalAlign,
+        )
+
+        /**
+         * Consider using the [Renderable2dContainerContext] version when possible
+         */
+        fun RenderableContext.scrollTable(
             content: List<List<Renderable>>,
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),

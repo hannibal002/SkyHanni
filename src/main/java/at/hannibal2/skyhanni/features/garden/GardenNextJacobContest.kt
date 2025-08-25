@@ -40,11 +40,11 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.skyhanni.utils.renderables.Renderable1dContainerContext
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -191,11 +191,11 @@ object GardenNextJacobContest {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.JACOB_CONTEST)) return
         simpleDisplay = Renderable.vertical {
-            event.lines.forEach { addString(it) }
-            if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
+            event.lines.forEach { +text(it) }
+            if (isCloseToNewYear()) +text(CLOSE_TO_NEW_YEAR_TEXT)
             else {
-                addString("§cOpen calendar for")
-                addString("§cmore exact data!")
+                +text("§cOpen calendar for")
+                +text("§cmore exact data!")
             }
         }
         event.tryUpdateBoostedCrop()
@@ -359,41 +359,42 @@ object GardenNextJacobContest {
 
     private fun drawDisplay() = Renderable.horizontal {
         val nextContest = nextContest
-        if (calendarDetector.isInside()) return@horizontal drawCalendarDisplay()
-        else if (knownContests.isEmpty()) return@horizontal drawNoContestsDisplay()
+        if (calendarDetector.isInside()) return@horizontal +drawCalendarDisplay()
+        else if (knownContests.isEmpty()) return@horizontal +drawNoContestsDisplay()
         else if (nextContest != null) return@horizontal drawNextContest(nextContest)
 
         // We only reach here if there are no contests available
-        if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
-        else addString("§cOpen calendar to read Jacob contest times!")
+        if (isCloseToNewYear()) +text(CLOSE_TO_NEW_YEAR_TEXT)
+        else +text("§cOpen calendar to read Jacob contest times!")
         resetContestData()
     }
 
-    private fun MutableList<Renderable>.drawCalendarDisplay() {
+    private fun drawCalendarDisplay(): Renderable {
         val percentage = knownContests.size.toDouble() / MAX_CONTESTS_PER_YEAR
         val formatted = percentage.formatPercentage()
-        addString("§eDetected $formatted of farming contests this year")
+        return Renderable.text("§eDetected $formatted of farming contests this year")
     }
 
-    private fun MutableList<Renderable>.drawNoContestsDisplay() =
-        if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
-        else addString("§cOpen calendar to read Jacob contest times!")
+    private fun drawNoContestsDisplay(): Renderable =
+        if (isCloseToNewYear()) Renderable.text(CLOSE_TO_NEW_YEAR_TEXT)
+        else Renderable.text("§cOpen calendar to read Jacob contest times!")
 
-    private fun MutableList<Renderable>.drawNextContest(contest: EliteFarmingContest) {
+    private fun Renderable1dContainerContext.drawNextContest(contest: EliteFarmingContest) {
         val activeContest = contest.startTime.isInPast() && contest.endTime.isInFuture()
         val untilEnd = contest.endTime.timeUntil()
         val duration = when {
             untilEnd > (SkyBlockTime.SKYBLOCK_DAY_MILLIS * 4).milliseconds -> {
-                return addString(CLOSE_TO_NEW_YEAR_TEXT)
+                +text(CLOSE_TO_NEW_YEAR_TEXT)
+                return
             }
 
             activeContest -> {
-                addString("§aActive: ")
+                +text("§aActive: ")
                 untilEnd
             }
 
             else -> {
-                addString("§eNext: ")
+                +text("§eNext: ")
                 contest.warnAbout()
                 contest.startTime.timeUntil()
             }
@@ -406,11 +407,11 @@ object GardenNextJacobContest {
             }
             val stack = Renderable.item(cropStack, 1.0)
             if (config.additionalBoostedHighlight && isBoosted) {
-                add(stack.renderBounds(config.additionalBoostedHighlightColor.toColor()))
-            } else add(stack)
+                +stack.renderBounds(config.additionalBoostedHighlightColor.toColor())
+            } else +stack
         }
 
-        addString("§7(§b${duration.format()}§7)")
+        +text("§7(§b${duration.format()}§7)")
     }
 
     private fun EliteFarmingContest.warnAbout() {

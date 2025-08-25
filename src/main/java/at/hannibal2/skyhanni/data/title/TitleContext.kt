@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -133,16 +132,14 @@ open class TitleContext(
     fun tryRenderInventoryTitle() {
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
-        val stringRenderable = with(Renderable) {
-            vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {
-                addString(
-                    getTitleText(),
-                    1.5,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                )
-                getSubtitleText()?.let {
-                    addString(it, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
-                }
+        val stringRenderable = Renderable.vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {
+            +text(
+                getTitleText(),
+                1.5,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            )
+            getSubtitleText()?.let {
+                +text(it, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
             }
         }
 
