@@ -62,9 +62,10 @@ object ClientEvents {
                 prepareExecutor: Executor,
                 applyExecutor: Executor,
             ): CompletableFuture<Void> {
-                ResourcePackReloadEvent(manager).post()
 
-                return CompletableFuture.allOf()
+                return CompletableFuture.runAsync({
+                    ResourcePackReloadEvent(manager).post()
+                }, applyExecutor).thenCompose(synchronizer::whenPrepared)
             }
 
         })

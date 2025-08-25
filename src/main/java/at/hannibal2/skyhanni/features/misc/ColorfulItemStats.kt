@@ -28,6 +28,8 @@ object ColorfulItemStats {
         "§7(?<stat>[a-zA-Z ]+): (?<oldColor>§[0-9a-f])(?<bonus>[-+]?[\\d.,%s]+)(?:\\s|$)",
     )
 
+    private var resourcePackOverrides = emptyMap<String, String>()
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltipEvent(event: ItemHoverEvent) {
         if (!config.enabled) return
@@ -38,9 +40,11 @@ object ColorfulItemStats {
                 val stat = group("stat")
                 val oldColor = group("oldColor")
 
-                val skyblockStat = SkyblockStat.getValueOrNull(
-                    stat.uppercase().replace(" ", "_")
-                ) ?: return@replace this.group()
+                val statId = stat.uppercase().replace(" ", "_")
+
+                val skyblockStatIcon = resourcePackOverrides[statId] ?: SkyblockStat.getValueOrNull(
+                    statId
+                )?.icon ?: return@replace this.group()
 
                 val bonusGroup = group("bonus")
                 val bonus = when {
@@ -51,10 +55,10 @@ object ColorfulItemStats {
 
                 buildString {
                     append("§7$stat: ")
-                    append(skyblockStat.icon.take(2))
+                    append(skyblockStatIcon.take(2))
                     append(bonus)
                     if (config.statIcons) {
-                        append(skyblockStat.icon.drop(2))
+                        append(skyblockStatIcon.drop(2))
                     }
                     append(oldColor)
                     append(" ")
@@ -65,7 +69,10 @@ object ColorfulItemStats {
 
     @HandleEvent
     fun onResourcePackLoad(event: ResourcePackReloadEvent) {
-        val packOverridesStream = event.resourceManager.getResource(createResourceLocation("skyhanni", "icon_overrides.json")).inputStream
-        println(packOverridesStream)
+        val packOverrides = event.getJsonResource<Map<String, String>>(
+            createResourceLocation("skyhanni", "icon_overrides.json")
+        )
+
+        resourcePackOverrides = packOverrides ?: emptyMap()
     }
 }
