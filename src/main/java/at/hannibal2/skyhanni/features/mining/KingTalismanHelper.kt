@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -37,17 +36,6 @@ object KingTalismanHelper {
     private val storage get() = ProfileStorageData.profileSpecific?.mining
 
     private val patternGroup = RepoPattern.group("mining.kingtalisman")
-
-    /**
-     * REGEX-TEST: §6§lKing Brammor
-     * REGEX-TEST: §6§lKing Emkam
-     * REGEX-TEST: §6§lKing Kevin
-     * REGEX-TEST: §6§lKing Redros
-     */
-//     private val kingPattern by patternGroup.pattern(
-//         "king",
-//         "§6§lKing (?<name>.*)",
-//     )
 
     /**
      * REGEX-TEST: §7You have received a §r§fKing Talisman§r§7!
@@ -169,9 +157,9 @@ object KingTalismanHelper {
         val oneSBDay = 20.minutes
         val oneCircleTime = oneSBDay * kingCircles.size
 
-        return kingCircles.mapIndexed{ index, king ->
+        return kingCircles.mapIndexed { index, king ->
             var timeNext = (startTime + oneSBDay * index).toTimeMark().timeUntil()
-            while (timeNext.isNegative()){
+            while (timeNext.isNegative()) {
                 timeNext += oneCircleTime
             }
             king to timeNext
@@ -200,7 +188,7 @@ object KingTalismanHelper {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shprintking"){
+        event.register("shprintking") {
             description = "Prints out king related debug stuff"
             category = CommandCategory.DEVELOPER_DEBUG
             callback {
@@ -215,7 +203,7 @@ object KingTalismanHelper {
                 ChatUtils.chat("SB Time: ${sbTime.year} - ${sbTime.month} - ${sbTime.day}")
                 ChatUtils.chat("Absolute day: $absDay")
                 ChatUtils.chat("King index: $kingIndex")
-                ChatUtils.chat("Start time: ${startTime.toMillis()/1000}")
+                ChatUtils.chat("Start time: ${startTime.toMillis() / 1000}")
             }
         }
         event.register("shresetkinghelper") {
