@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.replace
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -52,12 +54,18 @@ object ColorfulItemStats {
                     append(skyblockStat.icon.take(2))
                     append(bonus)
                     if (config.statIcons) {
-                        skyblockStat.icon.lastOrNull()?.let { append(it) }
+                        append(skyblockStat.icon.drop(2))
                     }
                     append(oldColor)
                     append(" ")
                 }
             }
         }
+    }
+
+    @HandleEvent
+    fun onResourcePackLoad(event: ResourcePackReloadEvent) {
+        val packOverridesStream = event.resourceManager.getResource(createResourceLocation("skyhanni", "icon_overrides.json")).inputStream
+        println(packOverridesStream)
     }
 }
