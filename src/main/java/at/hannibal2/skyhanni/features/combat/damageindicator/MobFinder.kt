@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
-import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.ElectionApi.ignoreDerpy
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -12,8 +12,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
-import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -21,8 +19,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLiving
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.monster.EntityBlaze
@@ -35,7 +31,6 @@ import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityPigZombie
 import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraft.entity.monster.EntitySkeleton
-import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityBat
@@ -84,79 +79,80 @@ class MobFinder {
     private var floor6Sadan = false
     private var floor6SadanSpawnTime = SimpleTimeMark.farPast()
 
-    internal fun tryAdd(entity: EntityLivingBase) = when {
-        DungeonApi.inDungeon() -> tryAddDungeon(entity)
-        RiftApi.inRift() -> tryAddRift(entity)
-        GardenApi.inGarden() -> tryAddGarden(entity)
+    internal fun tryAdd(mob: Mob) = when {
+        DungeonApi.inDungeon() -> tryAddDungeon(mob)
+        RiftApi.inRift() -> tryAddRift(mob)
+        GardenApi.inGarden() -> tryAddGarden(mob)
         else -> {
-            if (entity is EntityLiving && entity.hasNameTagWith(2, "Dummy §a10M§c❤")) {
+            if (mob.name == "Dummy") {
                 EntityResult(bossType = BossType.DUMMY)
             } else {
-                when (entity) {
+                when (val entity = mob.baseEntity) {
                     /*
                      * Note that the order does matter here.
                      * For example, if you put EntityZombie before EntityPigZombie,
                      * EntityPigZombie will never be reached because EntityPigZombie extends EntityZombie.
                      * Please take this into consideration if you are to modify this.
                      */
-                    is EntityOtherPlayerMP -> tryAddEntityOtherPlayerMP(entity)
-                    is EntityIronGolem -> tryAddEntityIronGolem(entity)
-                    is EntityPigZombie -> tryAddEntityPigZombie(entity)
-                    is EntityMagmaCube -> tryAddEntityMagmaCube(entity)
-                    is EntityEnderman -> tryAddEntityEnderman(entity)
-                    is EntitySkeleton -> tryAddEntitySkeleton(entity)
-                    is EntityGuardian -> tryAddEntityGuardian(entity)
-                    is EntityZombie -> tryAddEntityZombie(entity)
-                    is EntityWither -> tryAddEntityWither(entity)
-                    is EntityDragon -> tryAddEntityDragon(entity)
-                    is EntitySpider -> tryAddEntitySpider(entity)
-                    is EntityHorse -> tryAddEntityHorse(entity)
-                    is EntityBlaze -> tryAddEntityBlaze(entity)
-                    is EntityWolf -> tryAddEntityWolf(entity)
+                    is EntityOtherPlayerMP -> tryAddEntityOtherPlayerMP(mob)
+                    is EntityIronGolem -> tryAddEntityIronGolem(mob)
+                    is EntityPigZombie -> tryAddEntityPigZombie(mob)
+                    is EntityMagmaCube -> tryAddEntityMagmaCube(mob)
+                    is EntityEnderman -> tryAddEntityEnderman(mob)
+                    is EntitySkeleton -> tryAddEntitySkeleton(mob)
+                    is EntityGuardian -> tryAddEntityGuardian(mob)
+                    is EntityZombie -> tryAddEntityZombie(mob)
+                    is EntityWither -> tryAddEntityWither(mob)
+                    is EntityDragon -> tryAddEntityDragon(mob)
+                    is EntitySpider -> tryAddEntitySpider(mob)
+                    is EntityHorse -> tryAddEntityHorse(mob)
+                    is EntityBlaze -> tryAddEntityBlaze(mob)
+                    is EntityWolf -> tryAddEntityWolf(mob)
                     else -> null
                 }
             }
         }
     }
 
-    private fun tryAddGarden(entity: EntityLivingBase): EntityResult? {
+    private fun tryAddGarden(mob: Mob): EntityResult? {
+        val entity = mob.baseEntity
         if (entity is EntitySilverfish || entity is EntityBat) {
-            return tryAddGardenPest(entity)
+            return tryAddGardenPest(mob)
         }
 
         return null
     }
 
-    private fun tryAddGardenPest(entity: EntityLivingBase): EntityResult? {
-        if (!GardenApi.inGarden()) return null
-
-        return PestType.filterableEntries.firstOrNull { entity.hasNameTagWith(3, it.displayName) }
+    private fun tryAddGardenPest(mob: Mob): EntityResult? {
+        return PestType.filterableEntries.firstOrNull { mob.name == it.displayName }
             ?.let { EntityResult(bossType = it.damageIndicatorBoss) }
     }
 
-    private fun tryAddDungeon(entity: EntityLivingBase) = when {
-        DungeonApi.isOneOf("F1", "M1") -> tryAddDungeonF1(entity)
-        DungeonApi.isOneOf("F2", "M2") -> tryAddDungeonF2(entity)
-        DungeonApi.isOneOf("F3", "M3") -> tryAddDungeonF3(entity)
-        DungeonApi.isOneOf("F4", "M4") -> tryAddDungeonF4(entity)
-        DungeonApi.isOneOf("F5", "M5") -> tryAddDungeonF5(entity)
-        DungeonApi.isOneOf("F6", "M6") -> tryAddDungeonF6(entity)
+    private fun tryAddDungeon(mob: Mob) = when {
+        DungeonApi.isOneOf("F1", "M1") -> tryAddDungeonF1(mob)
+        DungeonApi.isOneOf("F2", "M2") -> tryAddDungeonF2(mob)
+        DungeonApi.isOneOf("F3", "M3") -> tryAddDungeonF3(mob)
+        DungeonApi.isOneOf("F4", "M4") -> tryAddDungeonF4(mob)
+        DungeonApi.isOneOf("F5", "M5") -> tryAddDungeonF5(mob)
+        DungeonApi.isOneOf("F6", "M6") -> tryAddDungeonF6(mob)
         else -> null
     }
 
-    private fun tryAddDungeonF1(entity: EntityLivingBase) = when {
-        floor1bonzo1 && entity is EntityOtherPlayerMP && entity.name == "Bonzo " -> {
+    private fun tryAddDungeonF1(mob: Mob) = when {
+        floor1bonzo1 && mob.name == "Bonzo" -> {
             EntityResult(floor1bonzo1SpawnTime, bossType = BossType.DUNGEON_F1_BONZO_FIRST)
         }
 
-        floor1bonzo2 && entity is EntityOtherPlayerMP && entity.name == "Bonzo " -> {
+        // TODO Use other approach as the old entity does not despawn, so it does not get checked again
+        floor1bonzo2 && mob.name == "Bonzo" -> {
             EntityResult(floor1bonzo2SpawnTime, bossType = BossType.DUNGEON_F1_BONZO_SECOND, finalDungeonBoss = true)
         }
 
         else -> null
     }
 
-    private fun tryAddDungeonF2(entity: EntityLivingBase): EntityResult? {
+    private fun tryAddDungeonF2(mob: Mob): EntityResult? {
+        val entity = mob.baseEntity
         if (entity.name == "Summon " && entity is EntityOtherPlayerMP) {
             if (floor2summons1 && !floor2summonsDiedOnce.contains(entity)) {
                 if (entity.health.toInt() != 0) {
@@ -182,7 +178,8 @@ class MobFinder {
         return null
     }
 
-    private fun tryAddDungeonF3(entity: EntityLivingBase): EntityResult? {
+    private fun tryAddDungeonF3(mob: Mob): EntityResult? {
+        val entity = mob.baseEntity
         if (entity is EntityGuardian && floor3GuardianShield) {
             if (guardians.size == 4) {
                 calcGuardiansTotalHealth()
@@ -194,14 +191,14 @@ class MobFinder {
             }
         }
 
-        if (floor3Professor && entity is EntityOtherPlayerMP && entity.name == "The Professor") {
+        if (floor3Professor && mob.name == "The Professor") {
             return EntityResult(
                 floor3ProfessorSpawnTime,
                 floor3ProfessorSpawnTime.passedSince() > 1.seconds,
                 bossType = BossType.DUNGEON_F3_PROFESSOR_1,
             )
         }
-        if (floor3ProfessorGuardianPrepare && entity is EntityOtherPlayerMP && entity.name == "The Professor") {
+        if (floor3ProfessorGuardianPrepare && mob.name == "The Professor") {
             return EntityResult(
                 floor3ProfessorGuardianPrepareSpawnTime,
                 true,
@@ -215,8 +212,8 @@ class MobFinder {
         return null
     }
 
-    private fun tryAddDungeonF4(entity: EntityLivingBase): EntityResult? {
-        if (entity is EntityGhast) {
+    private fun tryAddDungeonF4(mob: Mob): EntityResult? {
+        if (mob.baseEntity is EntityGhast) {
             return EntityResult(
                 bossType = BossType.DUNGEON_F4_THORN,
                 ignoreBlocks = true,
@@ -226,8 +223,8 @@ class MobFinder {
         return null
     }
 
-    private fun tryAddDungeonF5(entity: EntityLivingBase): EntityResult? {
-        if (entity is EntityOtherPlayerMP && entity == DungeonLividFinder.livid) {
+    private fun tryAddDungeonF5(mob: Mob): EntityResult? {
+        if (mob.baseEntity == DungeonLividFinder.livid) {
             return EntityResult(
                 bossType = BossType.DUNGEON_F5,
                 ignoreBlocks = true,
@@ -237,7 +234,8 @@ class MobFinder {
         return null
     }
 
-    private fun tryAddDungeonF6(entity: EntityLivingBase): EntityResult? {
+    private fun tryAddDungeonF6(mob: Mob): EntityResult? {
+        val entity = mob.baseEntity
         if (entity !is EntityGiantZombie || entity.isInvisible) return null
         if (floor6Giants && entity.posY > 68) {
             val (extraDelay, bossType) = checkExtraF6GiantsDelay(entity)
@@ -254,50 +252,38 @@ class MobFinder {
         return null
     }
 
-    private fun tryAddRift(entity: EntityLivingBase): EntityResult? {
-        if (entity is EntityOtherPlayerMP) {
-            if (entity.name == "Leech Supreme") {
-                return EntityResult(bossType = BossType.LEECH_SUPREME)
-            }
-
-            if (entity.name == "Bloodfiend ") {
-                // there is no derpy in rift
-                val hp = entity.baseMaxHealth.ignoreDerpy()
-                when {
-                    entity.hasMaxHealth(625, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
-                    entity.hasMaxHealth(1_100, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
-                    entity.hasMaxHealth(1_800, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
-                    entity.hasMaxHealth(2_400, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
-                    entity.hasMaxHealth(3_000, true, hp) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
-                }
+    private fun tryAddRift(mob: Mob): EntityResult? = when (mob.name) {
+        "Leech Supreme" -> EntityResult(bossType = BossType.LEECH_SUPREME)
+        "Bloodfiend " -> {
+            val entity = mob.baseEntity
+            // there is no derpy in rift
+            val hp = entity.baseMaxHealth.ignoreDerpy()
+            when {
+                entity.hasMaxHealth(625, true, hp) -> EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
+                entity.hasMaxHealth(1_100, true, hp) -> EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
+                entity.hasMaxHealth(1_800, true, hp) -> EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
+                entity.hasMaxHealth(2_400, true, hp) -> EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
+                entity.hasMaxHealth(3_000, true, hp) -> EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
+                else -> null
             }
         }
-        if (entity is EntitySlime && entity.baseMaxHealth == 1_000) {
-            return EntityResult(bossType = BossType.BACTE)
-        }
-        if (entity is EntityOtherPlayerMP && entity.baseMaxHealth == 250 && entity.name == "Sun Gecko") {
-            return EntityResult(bossType = BossType.SUN_GECKO)
 
-        }
-        return null
+        "Bacte" -> EntityResult(bossType = BossType.BACTE)
+        "Sun Gecko" -> EntityResult(bossType = BossType.SUN_GECKO)
+        else -> null
     }
 
-    private fun tryAddEntityBlaze(entity: EntityLivingBase) = when {
-        entity.name != "Dinnerbone" &&
-            entity.hasNameTagWith(2, "§e﴾ §8[§7Lv200§8] §l§8§lAshfang§r ") &&
-            entity.hasMaxHealth(
-                50_000_000,
-                true,
-            ) -> {
+    private fun tryAddEntityBlaze(mob: Mob) = when (mob.name) {
+        "Ashfang" -> {
             EntityResult(bossType = BossType.NETHER_ASHFANG)
         }
 
-        entity.hasNameTagWith(2, "§c☠ §bInferno Demonlord ") -> {
-            when {
-                entity.hasBossHealth(2_500_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_1)
-                entity.hasBossHealth(10_000_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_2)
-                entity.hasBossHealth(45_000_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_3)
-                entity.hasBossHealth(150_000_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_4)
+        "Inferno Demonlord" -> {
+            when (mob.levelOrTier) {
+                1 -> EntityResult(bossType = BossType.SLAYER_BLAZE_1)
+                2 -> EntityResult(bossType = BossType.SLAYER_BLAZE_2)
+                3 -> EntityResult(bossType = BossType.SLAYER_BLAZE_3)
+                4 -> EntityResult(bossType = BossType.SLAYER_BLAZE_4)
                 else -> null
             }
         }
@@ -305,8 +291,9 @@ class MobFinder {
         else -> null
     }
 
-    private fun tryAddEntitySkeleton(entity: EntityLivingBase) = when {
-        entity.hasNameTagWith(2, "§c☠ §3ⓆⓊⒶⓏⒾⒾ ") -> {
+    private fun tryAddEntitySkeleton(mob: Mob) = when (mob.name) {
+        "ⓆⓊⒶⓏⒾⒾ " -> {
+            val entity = mob.baseEntity
             when {
                 entity.hasBossHealth(10_000_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_4)
                 entity.hasBossHealth(5_000_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_3)
@@ -316,108 +303,90 @@ class MobFinder {
             }
         }
 
-        entity.hasNameTagWith(5, "§e﴾ §8[§7Lv200§8] §l§8§lBladesoul§r ") -> {
+        "Bladesoul" -> {
             EntityResult(bossType = BossType.NETHER_BLADESOUL)
         }
 
         else -> null
     }
 
-    private fun tryAddEntityOtherPlayerMP(entity: EntityLivingBase) = when {
-        entity.name == "Mage Outlaw" -> EntityResult(bossType = BossType.NETHER_MAGE_OUTLAW)
-        entity.name == "DukeBarb " &&
-            entity.getLorenzVec()
-                .distanceToPlayer() < 30 -> EntityResult(bossType = BossType.NETHER_BARBARIAN_DUKE)
-
-        entity.name == "Minos Inquisitor" -> EntityResult(bossType = BossType.MINOS_INQUISITOR)
-        entity.name == "Minos Champion" -> EntityResult(bossType = BossType.MINOS_CHAMPION)
-        entity.name == "Minotaur " -> EntityResult(bossType = BossType.MINOTAUR)
-        entity.name == "Ragnarok" -> EntityResult(bossType = BossType.RAGNAROK)
+    private fun tryAddEntityOtherPlayerMP(mob: Mob) = when (mob.name) {
+        "Mage Outlaw" -> EntityResult(bossType = BossType.NETHER_MAGE_OUTLAW)
+        "DukeBarb" -> EntityResult(bossType = BossType.NETHER_BARBARIAN_DUKE)
+        "Minos Inquisitor" -> EntityResult(bossType = BossType.MINOS_INQUISITOR)
+        "Minos Champion" -> EntityResult(bossType = BossType.MINOS_CHAMPION)
+        "Minotaur " -> EntityResult(bossType = BossType.MINOTAUR)
+        "Ragnarok" -> EntityResult(bossType = BossType.RAGNAROK)
 
         else -> null
     }
 
-    private fun tryAddEntityWither(entity: EntityLivingBase) = when {
-        entity.hasNameTagWith(4, "§8[§7Lv100§8] §c§5Vanquisher§r ") -> {
-            EntityResult(bossType = BossType.NETHER_VANQUISHER)
-        }
-
+    private fun tryAddEntityWither(mob: Mob) = when (mob.name) {
+        "Vanquisher" -> EntityResult(bossType = BossType.NETHER_VANQUISHER)
         else -> null
     }
 
-    private fun tryAddEntityEnderman(entity: EntityLivingBase): EntityResult? {
-        if (!entity.hasNameTagWith(3, "§c☠ §bVoidgloom Seraph ")) return null
-
-        return when {
-            entity.hasMaxHealth(300_000, true) -> EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
-            entity.hasMaxHealth(12_000_000, true) -> EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
-            entity.hasMaxHealth(50_000_000, true) -> EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
-            entity.hasMaxHealth(210_000_000, true) -> EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
+    private fun tryAddEntityEnderman(mob: Mob): EntityResult? {
+        if (mob.name != "Voidgloom Seraph") return null
+        return when (mob.levelOrTier) {
+            1 -> EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
+            2 -> EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
+            3 -> EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
+            4 -> EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
             else -> null
         }
     }
 
     // TODO testing and use sidebar data
     @Suppress("UnusedParameter")
-    private fun tryAddEntityDragon(entity: EntityLivingBase) = when {
+    private fun tryAddEntityDragon(mob: Mob) = when {
         IslandType.THE_END.isCurrent() -> EntityResult(bossType = BossType.END_ENDER_DRAGON)
         IslandType.WINTER.isCurrent() -> EntityResult(bossType = BossType.WINTER_REINDRAKE)
 
         else -> null
     }
 
-    private fun tryAddEntityIronGolem(entity: EntityLivingBase) = when {
-        entity.hasNameTagWith(3, "§e﴾ §8[§7Lv100§8] §lEndstone Protector§r ") -> {
-            EntityResult(bossType = BossType.END_ENDSTONE_PROTECTOR)
-        }
-
-        entity.hasMaxHealth(1_500_000) -> {
+    private fun tryAddEntityIronGolem(mob: Mob) = when {
+        mob.name == "Endstone Protector" -> EntityResult(bossType = BossType.END_ENDSTONE_PROTECTOR)
+        // TODO use Gaia Construct Name
+        mob.baseEntity.hasMaxHealth(1_500_000) -> {
             EntityResult(bossType = BossType.GAIA_CONSTRUCT)
         }
-
-        entity.hasMaxHealth(100_000_000) -> {
+        // TODO use Lord Jawbus Name
+        mob.baseEntity.hasMaxHealth(100_000_000) -> {
             EntityResult(bossType = BossType.LORD_JAWBUS)
         }
 
         else -> null
     }
 
-    private fun tryAddEntityZombie(entity: EntityLivingBase) = when {
-        entity.hasNameTagWith(2, "§c☠ §bRevenant Horror") -> {
-            when {
-                entity.hasMaxHealth(500, true) -> EntityResult(bossType = BossType.SLAYER_ZOMBIE_1)
-                entity.hasMaxHealth(20_000, true) -> EntityResult(bossType = BossType.SLAYER_ZOMBIE_2)
-                entity.hasMaxHealth(400_000, true) -> EntityResult(bossType = BossType.SLAYER_ZOMBIE_3)
-                entity.hasMaxHealth(1_500_000, true) -> EntityResult(bossType = BossType.SLAYER_ZOMBIE_4)
-
-                else -> null
-            }
+    private fun tryAddEntityZombie(mob: Mob) = when (mob.name) {
+        "Revenant Horror" -> when (mob.levelOrTier) {
+            1 -> EntityResult(bossType = BossType.SLAYER_ZOMBIE_1)
+            2 -> EntityResult(bossType = BossType.SLAYER_ZOMBIE_2)
+            3 -> EntityResult(bossType = BossType.SLAYER_ZOMBIE_3)
+            4 -> EntityResult(bossType = BossType.SLAYER_ZOMBIE_4)
+            5 -> EntityResult(bossType = BossType.SLAYER_ZOMBIE_5)
+            else -> null
         }
 
-        entity.hasNameTagWith(2, "§c☠ §fAtoned Horror ") && entity.hasMaxHealth(10_000_000, true) -> {
-            EntityResult(bossType = BossType.SLAYER_ZOMBIE_5)
-        }
+        "Atoned Horror" -> EntityResult(bossType = BossType.SLAYER_ZOMBIE_5)
 
         else -> null
     }
 
-    private fun tryAddEntityMagmaCube(entity: EntityLivingBase) = when {
-        entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ") && entity.hasMaxHealth(200_000_000, true) -> {
-            EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
-        }
-
+    private fun tryAddEntityMagmaCube(mob: Mob) = when (mob.name) {
+        "Magma Boss" -> EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
         else -> null
     }
 
-    private fun tryAddEntityHorse(entity: EntityLivingBase) = when {
-        entity.hasNameTagWith(15, "§8[§7Lv100§8] §c§6Headless Horseman§r ") && entity.hasMaxHealth(3_000_000, true) -> {
-            EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
-        }
-
+    private fun tryAddEntityHorse(mob: Mob) = when (mob.name) {
+        "Headless Horseman" -> EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
         else -> null
     }
 
-    private fun tryAddEntityPigZombie(entity: EntityLivingBase) = if (entity.hasNameTagWith(2, "§c☠ §6ⓉⓎⓅⒽⓄⒺⓊⓈ ")) {
+    private fun tryAddEntityPigZombie(mob: Mob) = if (mob.name == "ⓉⓎⓅⒽⓄⒺⓊⓈ") {
+        val entity = mob.baseEntity
         when {
             entity.hasBossHealth(10_000_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_4)
             entity.hasBossHealth(5_000_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_3)
@@ -427,58 +396,50 @@ class MobFinder {
         }
     } else null
 
-    private fun tryAddEntitySpider(entity: EntityLivingBase): EntityResult? {
-        when {
-            entity.hasMaxHealth(740, true) -> EntityResult(bossType = BossType.SLAYER_SPIDER_1)
-            entity.hasMaxHealth(30_000, true) -> EntityResult(bossType = BossType.SLAYER_SPIDER_2)
-            entity.hasMaxHealth(900_000, true) -> EntityResult(bossType = BossType.SLAYER_SPIDER_3)
-            entity.hasMaxHealth(2_400_000, true) -> EntityResult(bossType = BossType.SLAYER_SPIDER_4)
-            entity.hasMaxHealth(10_000_000, true) -> EntityResult(bossType = BossType.SLAYER_SPIDER_5_1)
-            else -> null
-        }?.let {
-            if (entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
-                return it
+    private fun tryAddEntitySpider(mob: Mob): EntityResult? {
+        if (mob.name == "Tarantula Broodfather") {
+            return when (mob.levelOrTier) {
+                1 -> EntityResult(bossType = BossType.SLAYER_SPIDER_1)
+                2 -> EntityResult(bossType = BossType.SLAYER_SPIDER_2)
+                3 -> EntityResult(bossType = BossType.SLAYER_SPIDER_3)
+                4 -> EntityResult(bossType = BossType.SLAYER_SPIDER_4)
+                5 -> EntityResult(bossType = BossType.SLAYER_SPIDER_5_1)
+                else -> null
             }
         }
-        if (entity.hasMaxHealth(20_000_000, true) && entity.hasNameTagWith(1, "§5☠ §4Conjoined Brood ")) {
+
+        if (mob.name == "Conjoined Brood") {
             return EntityResult(bossType = BossType.SLAYER_SPIDER_5_2)
         }
         if (IslandType.SPIDER_DEN.isCurrent()) {
-            if (entity.hasMaxHealth(6000) && entity.hasNameTagWith(1, "[§7Lv12§8] §4Broodmother")) {
+            if (mob.name == "Broodmother") {
                 return EntityResult(bossType = BossType.BROODMOTHER)
             }
-            checkArachne(entity as EntitySpider)?.let { return it }
+            checkArachne(mob)?.let { return it }
         }
         return null
     }
 
-    private fun checkArachne(entity: EntitySpider): EntityResult? {
-        if (entity.hasNameTagWith(1, "[§7Lv300§8] §cArachne") || entity.hasNameTagWith(1, "[§7Lv300§8] §lArachne")) {
-            val maxHealth = entity.baseMaxHealth
-            // Ignore the minis
-            if (maxHealth == 12 || maxHealth.derpy() == 4000) return null
-            return EntityResult(bossType = BossType.ARACHNE_SMALL)
+    private fun checkArachne(mob: Mob): EntityResult? {
+        if (mob.name != "Arachne") return null
+        return when (mob.levelOrTier) {
+            300 -> EntityResult(bossType = BossType.ARACHNE_SMALL)
+            500 -> EntityResult(bossType = BossType.ARACHNE_SMALL)
+            else -> null
         }
-        if (entity.hasNameTagWith(1, "[§7Lv500§8] §cArachne") || entity.hasNameTagWith(1, "[§7Lv500§8] §lArachne")) {
-            val maxHealth = entity.baseMaxHealth
-            if (maxHealth == 12 || maxHealth.derpy() == 20_000) return null
-            return EntityResult(bossType = BossType.ARACHNE_BIG)
-        }
-
-        return null
     }
 
-    private fun tryAddEntityWolf(entity: EntityLivingBase) = if (entity.hasNameTagWith(1, "§c☠ §fSven Packmaster ")) {
-        when {
-            entity.hasMaxHealth(2_000, true) -> EntityResult(bossType = BossType.SLAYER_WOLF_1)
-            entity.hasMaxHealth(40_000, true) -> EntityResult(bossType = BossType.SLAYER_WOLF_2)
-            entity.hasMaxHealth(750_000, true) -> EntityResult(bossType = BossType.SLAYER_WOLF_3)
-            entity.hasMaxHealth(2_000_000, true) -> EntityResult(bossType = BossType.SLAYER_WOLF_4)
+    private fun tryAddEntityWolf(mob: Mob) = if (mob.name == "Sven Packmaster ") {
+        when (mob.levelOrTier) {
+            1 -> EntityResult(bossType = BossType.SLAYER_WOLF_1)
+            2 -> EntityResult(bossType = BossType.SLAYER_WOLF_2)
+            3 -> EntityResult(bossType = BossType.SLAYER_WOLF_3)
+            4 -> EntityResult(bossType = BossType.SLAYER_WOLF_4)
             else -> null
         }
     } else null
 
-    private fun tryAddEntityGuardian(entity: EntityLivingBase) = if (entity.hasMaxHealth(35_000_000)) {
+    private fun tryAddEntityGuardian(mob: Mob) = if (mob.baseEntity.hasMaxHealth(35_000_000)) {
         EntityResult(bossType = BossType.THUNDER)
     } else null
 
