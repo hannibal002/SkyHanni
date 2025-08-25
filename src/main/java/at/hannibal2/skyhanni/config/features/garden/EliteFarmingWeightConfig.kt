@@ -49,8 +49,8 @@ class EliteFarmingWeightConfig {
     )
 
     enum class FarmingWeightTextEntry(private val displayName: String) {
-        WEIGHT_POSITION("Farming Weight: 104,481.49 [#5]"),
-        OVERTAKE("170.21 (12h 32m 15s) behind Chissl")
+        WEIGHT_POSITION("§6Farming Weight: §e104,481.49 §7[§b#5§7]"),
+        OVERTAKE("§e170.21 §7(§b12h 32m 15s§7) §7behind §bChissl")
         ;
 
         override fun toString() = displayName

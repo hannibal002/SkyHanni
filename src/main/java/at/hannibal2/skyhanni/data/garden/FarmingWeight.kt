@@ -83,7 +83,7 @@ object FarmingWeight {
         FarmingWeightDisplay.update()
     }
 
-    fun getWeight(leaderboardType: EliteLeaderboardType, override: Boolean = false): Double? {
+    fun getWeight(leaderboardType: EliteLeaderboardType, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
         if (weightMap[leaderboardType] == null || override) {
             when (leaderboardType) {
                 EliteLeaderboardType.ALL_TIME -> updateCollections()
@@ -93,7 +93,13 @@ object FarmingWeight {
         if (shouldRecalculateWeight) {
             weightMap[EliteLeaderboardType.ALL_TIME] = recalculateTotalWeight()
         }
-        return weightMap[leaderboardType]
+        val weight = weightMap[leaderboardType]
+        if (cropWeightOnly) {
+            if (weight != null) {
+                return weight - bonusWeight
+            }
+        }
+        return weight
     }
 
     private fun addWeight(amount: Double, type: EliteLeaderboardType? = null) {

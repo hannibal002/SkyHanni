@@ -155,39 +155,63 @@ object FarmingWeightDisplay {
 
     private fun overtakeRenderable(): Renderable {
         // I was planning on showing the player behind you if you're first, but elite api does not support that without some shenanigans
-        // This should be changed in the future so leaving it in the code for now
+        // This should be changed in the future so leaving it in for now
         if (leaderboardPos == 1) return Renderable.text("§bNo players ahead!")
-        var (nextName, weightUntil) = nextPlayer ?: run { // Month weight min amount uses all-time weight
-            return if ((weight ?: 0.0) < (getMinWeight(currentLeaderboardType) ?: 0.0)) {
-                val minWeight = "${getMinWeight(currentLeaderboardType)} weight"
-                val weightUntil = 1000.0 - (getWeight(EliteLeaderboardType.ALL_TIME) ?: 0.0)
-                val overtakeEta = overtakeEta(weightUntil)
-                val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeEta §bbehind $minWeight"
-                Renderable.text(text) // TODO make this hover text that explains what min rank is
-            } else {
-                Renderable.text("§bLoading next player...")
-            }
-        }
+
+        var (nextName, weightUntil) = nextPlayer ?: return nullNextPlayerRenderable()
 
         val rankGoal = getRankGoal(currentLeaderboardType)
         if (config.useEtaGoalRank.get() && rankGoal != null) {
             nextName += " §7[§b#${rankGoal.addSeparators()}§7]"
         }
 
-        if ((weight ?: 0.0) < (getMinWeight(currentLeaderboardType) ?: 0.0)) {
-            nextName = "1,000 Weight"
-            weightUntil = 1000.0 - (weight ?: 0.0)
-        }
-
         val behindOrAhead = if (leaderboardPos == 1) "ahead of" else "behind"
         val overtakeETA = if (leaderboardPos == 1) "" else overtakeEta(weightUntil)
-        val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeETA §b$behindOrAhead $nextName"
+        val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeETA §7$behindOrAhead §b$nextName"
         return Renderable.clickable(
             text,
             tips = listOf("§eClick to open the Farming Profile of §b$nextName."),
             onLeftClick = { openWebsite(nextName) },
         )
     }
+
+    private fun nullNextPlayerRenderable(): Renderable {
+        return if ((weight ?: 0.0) < (getMinWeight(currentLeaderboardType) ?: 0.0)) {
+            val minWeight = getMinWeight(currentLeaderboardType) ?: 1000.00
+            // Min weight to get on lb is 1k all-time weight for all-time lb (including bonus weight), and 1k all-time crop weight
+            // for monthly lb because kaeso personally hates me and wants to make this more annoying than it should be
+            val isMonthly = currentLeaderboardType == EliteLeaderboardType.MONTHLY
+            val currentWeight = getWeight(
+                EliteLeaderboardType.ALL_TIME,
+                cropWeightOnly = isMonthly
+            )
+            val weightUntil = minWeight - (currentWeight ?: 0.0)
+            val overtakeEta = overtakeEta(weightUntil)
+            val minWeightText = "${if (isMonthly) "Crop" else "Farming"} Weight"
+            val untilRankedTextColor = if (overtakeEta == "") "§7" else "§e"
+            val untilRankedText = if (isMonthly) "until eligible!" else "until ranked!"
+            val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeEta $untilRankedTextColor$untilRankedText"
+            val tips = mutableListOf(
+                "§bThis leaderboard requires $minWeight ",
+                "§b$minWeightText before getting ranked!",
+            )
+            if (isMonthly) {
+                tips.addAll(
+                    listOf(
+                        "",
+                        "§7Excludes bonus weight!"
+                    )
+                )
+            }
+            Renderable.hoverTips(
+                content = text,
+                tips = tips,
+            )
+        } else {
+            Renderable.text("§bLoading next player...")
+        }
+    }
+
 
     // TODO support crop/dicer drops
     private fun overtakeEta(weightUntil: Double): String {
@@ -220,7 +244,7 @@ object FarmingWeightDisplay {
 
     private fun MutableList<Renderable>.buildLeaderboardSwitcher() {
         this.addRenderableButton(
-            label = "Leaderboard Type",
+            label = "Leaderboard Type:",
             current = getLeaderboardType(),
             onChange = { new ->
                 currentLeaderboardType = new
