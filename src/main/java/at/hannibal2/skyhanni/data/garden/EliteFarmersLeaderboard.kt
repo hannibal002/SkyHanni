@@ -181,8 +181,7 @@ object EliteFarmersLeaderboard {
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
         val currentPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
         val upcomingPlayers = getUpcomingPlayerCount(currentPos)
-        // Tell the API to get upcoming players from our local rank (for when new data isn't fetched), or fallback to the
-        // provided eta goal rank from the config
+        // Fetch upcoming players from current lb pos if api hasn't updated, or from rank goal
         val rankGoal = getRankGoal(leaderboardType)
         val useRankGoal = config.useEtaGoalRank.get() && rankGoal != null
         val atRank = getAtRank(currentPos, rankGoal, useRankGoal)
