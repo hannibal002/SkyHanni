@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.compat.ReiCompat;
 import at.hannibal2.skyhanni.events.minecraft.CharEvent;
-import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
-import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
+import at.hannibal2.skyhanni.events.minecraft.KeyReleaseEvent;
+import at.hannibal2.skyhanni.events.minecraft.KeyHeldEvent;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import org.lwjgl.glfw.GLFW;
@@ -41,13 +41,13 @@ public class MixinKeyboard {
         // there is also an onChar method we could mixin to and use for typing fields and replace TextInput.isActive() with that somehow
         // the extension functions such as isActive() and isKeyHeld() still work from keyboard manager
         // this only replaces the posting of events
-        if (action == 0) new KeyUpEvent(key).post();
+        if (action == 0) new KeyReleaseEvent(key).post();
         if (action == 1) {
-            new KeyDownEvent(key).post();
-            // on 1.21 it takes like 1 full second before the key press event will get posted so im doing it here
             new KeyPressEvent(key).post();
+            // on 1.21 it takes like 1 full second before the key press event will get posted so im doing it here
+            new KeyHeldEvent(key).post();
         }
-        if (action == 2) new KeyPressEvent(key).post();
+        if (action == 2) new KeyHeldEvent(key).post();
     }
 
     @Inject(method = "onChar", at = @At("HEAD"))

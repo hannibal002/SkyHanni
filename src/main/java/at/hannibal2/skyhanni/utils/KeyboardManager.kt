@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
+
 //#if MC < 1.21
 //#else
 //$$ import net.minecraft.client.util.InputUtil

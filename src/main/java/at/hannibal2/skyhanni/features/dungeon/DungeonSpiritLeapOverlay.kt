@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapColorConfig
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
@@ -87,7 +87,7 @@ object DungeonSpiritLeapOverlay {
     }
 
     @HandleEvent
-    fun onKeyPress(event: KeyDownEvent) {
+    fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled() || !config.spiritLeapKeybindConfig.enableKeybind) return
         val index = getKeybindIndex(event.keyCode)
         if (index !in 0..<playerList.count()) return
