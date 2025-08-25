@@ -202,7 +202,7 @@ object FastFairySoulsPathfinder {
             islandData = createEmptyData("island graph is empty")
             return
         }
-        val allSouls = getTargetNodes(graph.nodes)
+        val allSouls = getTargetNodes(graph)
 
         if (allSouls.isEmpty()) {
             islandData = createEmptyData("There are no fairy souls in the graph network of ${SkyBlockUtils.currentIsland}")

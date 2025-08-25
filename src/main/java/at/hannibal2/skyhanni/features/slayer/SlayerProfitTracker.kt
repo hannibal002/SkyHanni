@@ -111,6 +111,10 @@ object SlayerProfitTracker {
         if (!isEnabled()) return
         val coins = event.coins
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerApi.isInCorrectArea) {
+            if (coins >= 100000) {
+                ChatUtils.debug("Mob kill coin gain too high! Ignoring!")
+                return
+            }
             tryAddItem(NeuInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
         }
         // TODO spawn costs in repo
