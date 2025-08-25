@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
+import at.hannibal2.skyhanni.events.minecraft.KeyHeldEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
 import at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook;
 import at.hannibal2.skyhanni.utils.DelayedRun;
@@ -42,10 +42,10 @@ public class MixinMouse {
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
         if (action == 1) {
             MouseCompat.INSTANCE.setLastEventButton(button);
-            new KeyDownEvent(button).post();
             new KeyPressEvent(button).post();
+            new KeyHeldEvent(button).post();
         } else {
-            new KeyPressEvent(button).post();
+            new KeyHeldEvent(button).post();
             DelayedRun.INSTANCE.runNextTick(() -> {
                 MouseCompat.INSTANCE.setLastEventButton(-1);
                 return null;
