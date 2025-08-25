@@ -201,9 +201,7 @@ object EliteFarmersLeaderboard {
             return null
         }
 
-        ChatUtils.debug("$apiData")
-
-        handleDiff(leaderboardType, apiData)
+        val updateLbPos = handleDiff(leaderboardType, apiData)
         handleUpcomingPlayers(leaderboardType, apiData, atRank)
 
         // Keep local rank if new data wasn't returned
@@ -219,7 +217,7 @@ object EliteFarmersLeaderboard {
             unranked[leaderboardType] = true
             return null
         }
-        return apiData.rank
+        return if (currentPos != Int.MAX_VALUE && updateLbPos) currentPos else apiData.rank
     }
 
     private fun getUpcomingPlayerCount(currentPos: Int) = when {
@@ -237,14 +235,16 @@ object EliteFarmersLeaderboard {
         else -> null
     }
 
-    private fun handleDiff(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard) {
+    private fun handleDiff(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard): Boolean {
         val diff = apiData.amount - (getWeight(leaderboardType) ?: 0.0)
         if ((diff >= 0.5 || abs(diff) >= 10) && apiData.rank != -1) {
             when (leaderboardType) {
                 EliteLeaderboardType.ALL_TIME -> updateCollections()
                 EliteLeaderboardType.MONTHLY -> setWeight(leaderboardType, apiData.amount)
             }
+            return true
         }
+        return false
     }
 
     private fun handleUpcomingPlayers(
