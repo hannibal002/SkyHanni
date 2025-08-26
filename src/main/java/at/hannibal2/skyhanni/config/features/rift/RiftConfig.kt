@@ -59,7 +59,7 @@ class RiftConfig {
     @ConfigOption(
         name = "Temporal Pillar Dodge",
         desc = "Avoid pathfinding solutions through or near the big enderman " +
-            "that throws you back to the end credits screen and steals so much time."
+            "that throws you back to the end credits screen and steals so much time.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
