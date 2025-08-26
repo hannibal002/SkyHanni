@@ -73,6 +73,6 @@ object ColorfulItemStats {
             createResourceLocation("skyhanni", "icon_overrides.json")
         )
 
-        resourcePackOverrides = packOverrides ?: emptyMap()
+        resourcePackOverrides = packOverrides.orEmpty()
     }
 }

@@ -24,9 +24,9 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 object ClientEvents {
 
     init {
-        val resourceManager = Minecraft.getMinecraft().resourceManager
-        if (resourceManager is IReloadableResourceManager) {
-            resourceManager.registerReloadListener { resourceManager ->
+        val minecraftResourceManager = Minecraft.getMinecraft().resourceManager
+        if (minecraftResourceManager is IReloadableResourceManager) {
+            minecraftResourceManager.registerReloadListener { resourceManager ->
                 ResourcePackReloadEvent(resourceManager).post()
             }
         }
