@@ -9,11 +9,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class DamageIndicatorConfig {
+
+    // TODO rename to showNameAndHealth
     @Expose
     @ConfigOption(name = "Damage Indicator Enabled", desc = "Show name and health of selected mobs big.")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to showNameAndHealth
     var enabled: Boolean = false
 
     @Expose

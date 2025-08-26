@@ -12,7 +12,8 @@ class EnderSlayerConfig {
     @FeatureToggle
     var laserPhaseTimer: Boolean = false
 
-    @Expose // TODO test what this does exactly
+    // TODO test what this does exactly
+    @Expose
     @ConfigOption(name = "Health During Laser", desc = "Show the health of Voidgloom Seraph 4 in Damage Indicator during the laser phase .")
     @ConfigEditorBoolean
     var showHealthDuringLaser: Boolean = false
