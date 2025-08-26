@@ -1,16 +1,14 @@
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getAmount
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.leaderboardMinAmount
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getNextPlayer
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.leaderboardMinAmount
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
-import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
-import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay.overtakeEta
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -101,24 +99,22 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
         )
     }
 
+    // TODO abstract this out
     private fun nullNextPlayerRenderable(leaderboardType: EliteLeaderboardType): Renderable {
         return if ((amount ?: 0.0) < (leaderboardMinAmount(leaderboardType) ?: 0.0)) {
-            val minWeight = leaderboardMinAmount(leaderboardType) ?: 1000.00
+            val minAmount = leaderboardMinAmount(leaderboardType) ?: 0.0
             // Min weight to get on lb is 1k all-time weight for all-time lb (including bonus weight), and 1k all-time crop weight
             // for monthly lb because kaeso personally hates me and wants to make this more annoying than it should be
-            val isMonthly = currentLeaderboardType == EliteLeaderboardType.MONTHLY
-            val currentWeight = getWeight(
-                EliteLeaderboardType.ALL_TIME,
-                cropWeightOnly = isMonthly
-            )
-            val weightUntil = minWeight - (currentWeight ?: 0.0)
-            val overtakeEta = overtakeEta(weightUntil)
-            val minWeightText = "${if (isMonthly) "Crop" else "Farming"} Weight"
+            val isMonthly = currentMode == EliteLeaderboardMode.MONTHLY
+            val currentAmount = getAmount(leaderboardType)
+            val weightUntil = minAmount - (currentAmount ?: 0.0)
+            val overtakeEta = ""//overtakeEta(weightUntil)
+            val minWeightText = "$leaderboardType"
             val untilRankedTextColor = if (overtakeEta == "") "§7" else "§e"
             val untilRankedText = if (isMonthly) "until eligible!" else "until ranked!"
             val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeEta $untilRankedTextColor$untilRankedText"
             val tips = mutableListOf(
-                "§bThis leaderboard requires $minWeight ",
+                "§bThis leaderboard requires $minAmount ",
                 "§b$minWeightText before getting ranked!",
             )
             if (isMonthly) {
