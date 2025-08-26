@@ -972,7 +972,7 @@ object DamageIndicatorManager {
                 entityData.damageCounter.currentDamage += dmg
             }
         } else {
-            if (config.hideVanillaNametag && showNameAndHealth) {
+            if (showNameAndHealth && config.hideVanillaNametag) {
                 val name = entity.name
                 if (name.contains("Plasmaflux")) return
                 if (name.contains("Overflux")) return

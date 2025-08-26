@@ -13,6 +13,7 @@ class DamageIndicatorConfig {
     @ConfigOption(name = "Damage Indicator Enabled", desc = "Show name and health of selected mobs big.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to showNameAndHealth
     var enabled: Boolean = false
 
     @Expose
@@ -85,8 +86,7 @@ class DamageIndicatorConfig {
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hide damage splashes near selected mobs.")
     @ConfigEditorBoolean
-    @FeatureToggle
-    var hideDamageSplash: Boolean = false
+    var hideDamageSplash: Boolean = false // remain dependent on dmg indicator
 
     @Expose
     @ConfigOption(name = "Damage Over Time", desc = "Show damage and health over time below the damage indicator.")
