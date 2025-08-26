@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.data.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
+import at.hannibal2.skyhanni.data.garden.FarmingWeight.getFactor
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.profileId
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.setWeight
@@ -10,8 +12,11 @@ import at.hannibal2.skyhanni.data.garden.FarmingWeight.updateCollections
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.UpcomingLeaderboardPlayer
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
+import at.hannibal2.skyhanni.features.garden.CropCollectionType
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay.isEnabled
@@ -38,14 +43,15 @@ object EliteFarmersLeaderboard {
     private val storage get() = GardenApi.storage?.farmingWeight
     private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardMap
     private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
-    private val minWeight: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minWeight
+    private val minAmount: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minWeight
     private val lastLeaderboardUpdate: MutableMap<EliteLeaderboardType, SimpleTimeMark> = mutableMapOf()
     private val shouldRefreshLeaderboard: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
-    private val lastPlayer: MutableMap<EliteLeaderboardType, UpcomingLeaderboardPlayer?> = mutableMapOf()
-    private val nextPlayers: MutableMap<EliteLeaderboardType, MutableList<UpcomingLeaderboardPlayer>> = mutableMapOf()
+    private val lastPlayer: MutableMap<EliteLeaderboardType, EliteLeaderboardPlayer?> = mutableMapOf()
+    private val nextPlayers: MutableMap<EliteLeaderboardType, MutableList<EliteLeaderboardPlayer>> = mutableMapOf()
     private val lastApiData: MutableMap<EliteLeaderboardType, EliteLeaderboard> = mutableMapOf()
     private val isUnranked: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
 
+    // TODO move these to each display class
     var apiError = false
     private var hasWarned = false
     private var rankGoal: Int? = null
@@ -77,13 +83,24 @@ object EliteFarmersLeaderboard {
         }
     }
 
+    @HandleEvent
+    fun onCropCollectionAdd(event: CropCollectionAddEvent) {
+        if (event.cropCollectionType == CropCollectionType.UNKNOWN) return
+        val leaderboardType = EliteLeaderboardType.Crop(event.crop, EliteLeaderboardMode.MONTHLY)
+        val currentAmount = leaderboardAmountMap.getOrPut(leaderboardType) {
+            event.amount.toDouble()
+            return
+        }
+        leaderboardAmountMap[leaderboardType] = currentAmount + event.amount.toDouble()
+    }
+
     fun isUnranked(leaderboardType: EliteLeaderboardType): Boolean {
         if (leaderboardType.mode == EliteLeaderboardMode.ALL_TIME) return false // We support other methods to calculate all-time farming weight
         return isUnranked[leaderboardType] ?: false
     }
 
-    fun getMinWeight(leaderboardType: EliteLeaderboardType): Double? {
-        return minWeight?.get(leaderboardType)
+    fun leaderboardMinAmount(leaderboardType: EliteLeaderboardType): Double? {
+        return minAmount?.get(leaderboardType)
     }
 
     fun getLeaderboardPosition(leaderboardType: EliteLeaderboardType, override: Boolean = false): Int? {
@@ -99,7 +116,7 @@ object EliteFarmersLeaderboard {
             }
         }
 
-        // We want to prevent spamming the api
+        // We want to prevent spamming the api, especially when swapping leaderboard displays
         if (lastFetchAttempt.passedSince() <= 5.seconds) return null
         lastFetchAttempt = SimpleTimeMark.now()
         fetchAttempts++
@@ -115,32 +132,40 @@ object EliteFarmersLeaderboard {
     }
 
     fun getNextPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
-        val weight = getAmount(leaderboardType) ?: return null
+        val amount = getAmount(leaderboardType) ?: return null
         var nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: lastPlayer[leaderboardType] ?: return null
-        var weightDiff = nextPlayer.weight - weight
-        while (weightDiff < 0) {
+        var amountDiff = nextPlayer.amount - amount
+        while (amountDiff < 0) {
             nextPlayer = updateNextPlayer(leaderboardType) ?: break
-            weightDiff = nextPlayer.weight - weight
+            amountDiff = nextPlayer.amount - amount
         }
         // This currently doesn't work
         if (leaderboardPosMap?.get(leaderboardType) == 1) {
             val lastPlayer = lastPlayer[leaderboardType]
-            if (lastPlayer != null && lastPlayer.weight <= weight) {
-                return Pair(lastPlayer.name, weight - lastPlayer.weight)
+            if (lastPlayer != null && lastPlayer.amount <= amount) {
+                return Pair(lastPlayer.name, amount - lastPlayer.amount)
             }
         }
 
-        return if (weightDiff < 0) null else Pair(nextPlayer.name, weightDiff)
+        return if (amountDiff < 0) null else Pair(nextPlayer.name, amountDiff)
     }
 
     fun getAmount(leaderboardType: EliteLeaderboardType): Double? {
         return when (leaderboardType) {
             is EliteLeaderboardType.Weight -> getWeight(leaderboardType.mode)
+            is EliteLeaderboardType.Crop -> getCropCollection(leaderboardType.crop, leaderboardType.mode)
             else -> leaderboardAmountMap[leaderboardType]
         }
     }
 
-    private fun updateNextPlayer(leaderboardType: EliteLeaderboardType): UpcomingLeaderboardPlayer? {
+    private fun getCropCollection(crop: CropType, leaderboardMode: EliteLeaderboardMode): Double? {
+        return when (leaderboardMode) {
+            EliteLeaderboardMode.ALL_TIME -> crop.getCollection().toDouble()
+            EliteLeaderboardMode.MONTHLY -> leaderboardAmountMap[EliteLeaderboardType.Crop(crop, EliteLeaderboardMode.MONTHLY)]
+        }
+    }
+
+    private fun updateNextPlayer(leaderboardType: EliteLeaderboardType): EliteLeaderboardPlayer? {
         val nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
         lastPlayer[leaderboardType] = nextPlayer
         farmingChatMessage("You passed §b${nextPlayer.name} §ein the §6$leaderboardType §eLeaderboard!")
@@ -201,26 +226,23 @@ object EliteFarmersLeaderboard {
             lbType = leaderboardType,
             upcomingCount = upcomingPlayers,
             atRank = atRank,
-        ) ?: run {
-            ChatUtils.debug("Api error!") // TODO run an actual error
-            apiError = true
-            return null
-        }
+        )
 
         val shouldUpdateData = shouldUpdateData(leaderboardType, apiData)
         // don't update anything besides upcoming players if data hasn't changed since last request
         if (shouldUpdateData) handleDiff(leaderboardType, apiData)
-        handleUpcomingPlayers(leaderboardType, apiData, atRank)
+        handleUpcomingPlayers(leaderboardType, apiData)
 
-        minWeight?.set(leaderboardType, apiData.minAmount)
+        minAmount?.set(leaderboardType, apiData.minAmount)
         lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
-        shouldRefreshLeaderboard[leaderboardType] = false
+        shouldRefreshLeaderboard[leaderboardType] = false // Don't want to fetch again if api call was successful
         apiError = false
-        FarmingWeightDisplay.update()
-        if (apiData.rank <= 0) {
+        FarmingWeightDisplay.update() // Update display because we updated next players
+        if (apiData.rank <= 0) { // api returns -1 for unranked players
             isUnranked[leaderboardType] = true
             return null
         }
+        // api caches data, so prefer our lb pos if api pos hasn't changed since last request
         return if (shouldUpdateData && currentPos != Int.MAX_VALUE) currentPos else apiData.rank
     }
 
@@ -239,6 +261,7 @@ object EliteFarmersLeaderboard {
         else -> null
     }
 
+    // only update data if api data has changed since last request
     private fun shouldUpdateData(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard): Boolean {
         val oldApiData = lastApiData[leaderboardType] ?: return true
         val leaderboardDiff = oldApiData.rank != apiData.rank
@@ -247,36 +270,63 @@ object EliteFarmersLeaderboard {
     }
 
     private fun handleDiff(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard) {
+        if (apiData.rank == -1) return // no lb rank means amount is invalid
         val diff = apiData.amount - (getAmount(leaderboardType) ?: 0.0)
-        if ((diff >= 0.5 || abs(diff) >= 10) && apiData.rank != -1) {
-            when (leaderboardType) {
-                is EliteLeaderboardType.Weight -> handleWeightDiff(leaderboardType, apiData)
-                else -> leaderboardAmountMap[leaderboardType] = apiData.amount
-            }
+        when (leaderboardType) {
+            is EliteLeaderboardType.Weight -> handleWeightDiff(leaderboardType, apiData, diff)
+            is EliteLeaderboardType.Crop -> handleCollectionDiff(leaderboardType, apiData, diff)
+            is EliteLeaderboardType.Pest -> handlePestDiff(leaderboardType, apiData, diff)
         }
     }
 
     private fun handleWeightDiff(
         leaderboardType: EliteLeaderboardType,
-        apiData: EliteLeaderboard
-    ) = when(leaderboardType.mode) {
-        EliteLeaderboardMode.ALL_TIME -> updateCollections()
-        EliteLeaderboardMode.MONTHLY -> setWeight(leaderboardType.mode, apiData.amount)
+        apiData: EliteLeaderboard,
+        diff: Double
+    ) {
+        if (diff >= 0.5 || abs(diff) >= 10) {
+            when (leaderboardType.mode) {
+                EliteLeaderboardMode.ALL_TIME -> updateCollections() // we handle all-time weight in the farmingweight class
+                EliteLeaderboardMode.MONTHLY -> setWeight(leaderboardType.mode, apiData.amount)
+            }
+        }
+    }
+
+    private fun handleCollectionDiff(
+        leaderboardType: EliteLeaderboardType,
+        apiData: EliteLeaderboard,
+        diff: Double
+    ) {
+        val crop = leaderboardType.getCrop() ?: return
+        val diffWeight = diff / crop.getFactor()
+        if (diffWeight >= 0.5 || abs(diffWeight) >= 10) {
+            when (leaderboardType.mode) {
+                EliteLeaderboardMode.ALL_TIME -> updateCollections() // we handle all-time collections in the farming weight class
+                EliteLeaderboardMode.MONTHLY ->
+                    leaderboardAmountMap[leaderboardType] = apiData.amount
+            }
+        }
+    }
+
+    private fun handlePestDiff(
+        leaderboardType: EliteLeaderboardType,
+        apiData: EliteLeaderboard,
+        diff: Double
+    ) {
+        if (diff >= 1 || abs(diff) >= 30) {
+            leaderboardAmountMap[leaderboardType] = apiData.amount
+        }
     }
 
     private fun handleUpcomingPlayers(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
-        atRank: Int?
     ) {
-        if (apiData.rank == 1 && atRank == 3) {
-            lastPlayer[leaderboardType] = apiData.upcomingPlayers.firstOrNull()
-        } else {
-            nextPlayers[leaderboardType] = mutableListOf()
-            apiData.upcomingPlayers.forEach {
-                if (it.weight > (getAmount(leaderboardType) ?: apiData.amount)) {
-                    nextPlayers[leaderboardType]?.add(it)
-                }
+        lastPlayer[leaderboardType] = apiData.previous.firstOrNull()
+        nextPlayers[leaderboardType] = mutableListOf()
+        apiData.upcomingPlayers.forEach {
+            if (it.amount > (getAmount(leaderboardType) ?: apiData.amount)) {
+                nextPlayers[leaderboardType]?.add(it)
             }
         }
     }

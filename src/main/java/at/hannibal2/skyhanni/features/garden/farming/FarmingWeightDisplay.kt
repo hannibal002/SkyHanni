@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.FarmingWeightTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getMinWeight
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.leaderboardMinAmount
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getNextPlayer
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getRankGoal
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
@@ -177,8 +177,8 @@ object FarmingWeightDisplay {
     }
 
     private fun nullNextPlayerRenderable(): Renderable {
-        return if ((weight ?: 0.0) < (getMinWeight(currentLeaderboardType) ?: 0.0)) {
-            val minWeight = getMinWeight(currentLeaderboardType) ?: 1000.00
+        return if ((weight ?: 0.0) < (leaderboardMinAmount(currentLeaderboardType) ?: 0.0)) {
+            val minWeight = leaderboardMinAmount(currentLeaderboardType) ?: 1000.00
             // Min weight to get on lb is 1k all-time weight for all-time lb (including bonus weight), and 1k all-time crop weight
             // for monthly lb because kaeso personally hates me and wants to make this more annoying than it should be
             val isMonthly = currentLeaderboardType == EliteLeaderboardType.MONTHLY

@@ -48,25 +48,46 @@ sealed class EliteLeaderboardType {
 
     val lbName: String
         get() = when (this) {
-            is Weight -> "farmingweight${mode.suffix}"
-            is Crop   -> "${crop.eliteLbName}${mode.suffix}"
+            is Weight -> "${weight.apiName}${mode.lbSuffix}"
+            is Crop   -> "${crop.eliteLbName}${mode.lbSuffix}"
             is Pest   -> {
-                pest?.eliteLbName ?: // Only all pests (null pests) have a monthly leaderboard
-                "pests${mode.suffix}"
+                pest?.eliteLbName ?: // Only "all pests" (when pests is null) have a monthly leaderboard
+                "pests${mode.lbSuffix}"
             }
         }
+
+    override fun toString(): String {
+        return when (this) {
+            is Weight -> "${weight}${mode.displaySuffix}"
+            is Crop   -> "${crop.name} Weight${mode.displaySuffix}"
+            is Pest   -> {
+                "${pest?.name ?: "Pest"} Kills${mode.displaySuffix}"
+            }
+        }
+    }
+
+    fun getCrop(): CropType? = when (this) {
+        is Crop -> crop
+        else -> null
+    }
 }
 
-enum class EliteLeaderboardMode(val displayName: String, val suffix: String = "") {
+enum class EliteLeaderboardMode(
+    val displayName: String,
+    val lbSuffix: String = "",
+    val displaySuffix: String = "") {
     ALL_TIME("All-Time", ),
-    MONTHLY("Monthly", "-monthly"),
+    MONTHLY("Monthly", "-monthly", "Monthly"),
     ;
 
     override fun toString() = displayName
 }
 
-enum class FarmingWeight(val apiName: String) {
-    FARMING_WEIGHT("farmingweight"),
+enum class FarmingWeight(val displayName: String, val apiName: String) {
+    FARMING_WEIGHT("Farming Weight","farmingweight"),
+    ;
+
+    override fun toString(): String = displayName
 }
 
 
@@ -76,14 +97,15 @@ data class EliteLeaderboard(
     @Expose val minAmount: Double,
     @Expose val initialAmount: Double,
     @Expose val upcomingRank: Int,
-    @Expose val upcomingPlayers: List<UpcomingLeaderboardPlayer>,
+    @Expose val upcomingPlayers: List<EliteLeaderboardPlayer>,
+    @Expose val previous: List<EliteLeaderboardPlayer>
 )
 
-data class UpcomingLeaderboardPlayer(
+data class EliteLeaderboardPlayer(
     @Expose @SerializedName("ign") val name: String,
     @Expose val profile: String,
     @Expose val uuid: UUID,
-    @Expose @SerializedName("amount") val weight: Double,
+    @Expose val amount: Double,
     @Expose val mode: String? = null,
     @Expose val meta: JsonObject? = null,
 )

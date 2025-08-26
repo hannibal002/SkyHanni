@@ -198,7 +198,8 @@ object EliteDevApi {
 
         val upcomingPlayersParam = upcomingCount?.let { "upcoming=$it" }
         val atRankParam = atRank?.let { "atRank=$it" }
-        val params = listOfNotNull(upcomingPlayersParam, atRankParam)
+        val previousPlayersParam = "previous=1"
+        val params = listOfNotNull(upcomingPlayersParam, atRankParam, previousPlayersParam)
         val paramString = if (params.isEmpty()) "" else {
             "?" + params.joinToString("&")
         }
