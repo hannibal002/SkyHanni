@@ -317,6 +317,8 @@ object DamageIndicatorManager {
         BossType.SLAYER_BLAZE_QUAZII_3,
         BossType.SLAYER_BLAZE_QUAZII_4,
 
+        BossType.SLAYER_SPIDER_5_1,
+
             // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
         -> true
 
@@ -374,9 +376,10 @@ object DamageIndicatorManager {
     fun onSkyHanniTick(event: SkyHanniTickEvent) {
         data.values.forEach(::update)
         // TODO config to define between 100ms and 5 sec
-        data.removeIf {
-            val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4.seconds else 100.milliseconds
-            (SimpleTimeMark.now() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
+        data.removeIf { (_, value) ->
+            val noDeathDisplay = noDeathDisplay(value.bossType)
+            val waitForRemoval = if (value.dead && !noDeathDisplay) 4.seconds else 100.milliseconds
+            (SimpleTimeMark.now() > value.timeLastTick + waitForRemoval) || (value.dead && noDeathDisplay)
         }
     }
 
