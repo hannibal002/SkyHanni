@@ -1,0 +1,24 @@
+package at.hannibal2.skyhanni.features.garden.farming
+
+import EliteLeaderboardDisplay
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCurrentlyFarmedCrop
+
+class CropDisplay(
+    storage: Pair<CropType?, EliteLeaderboardMode>?,
+) : EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
+    storage,
+    { crop, mode -> EliteLeaderboardType.Crop(crop, mode) } // explicit factory
+) {
+    override fun render() {
+        val type = leaderboardType ?: return
+        println("Showing crop leaderboard for ${type.enumValue} in ${type.mode}")
+        println("Leaderboard key = ${type.lbName}")
+    }
+}

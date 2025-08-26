@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderbo
 import at.hannibal2.skyhanni.data.garden.FarmingWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.getFactor
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -91,7 +92,7 @@ object FarmingWeightDisplay {
 
 
     private var currentLeaderboardType: EliteLeaderboardType
-        get() = storage?.lastLeaderboardType ?: EliteLeaderboardType.ALL_TIME
+        get() = storage?.weightDisplayType ?: EliteLeaderboardMode.ALL_TIME
         set(value) {
             value.let {
                 GardenApi.storage?.farmingWeight?.lastLeaderboardType = it

@@ -31,9 +31,20 @@ data class WeightProfile(
 sealed class EliteLeaderboardType {
     abstract val mode: EliteLeaderboardMode
 
-    data class Weight(override val mode: EliteLeaderboardMode) : EliteLeaderboardType()
-    data class Crop(val crop: CropType, override val mode: EliteLeaderboardMode) : EliteLeaderboardType()
-    data class Pest(val pest: PestType?, override val mode: EliteLeaderboardMode) : EliteLeaderboardType()
+    interface WithEnum<E : Enum<E>> {
+        val enumValue: E?
+    }
+
+    data class Weight(val weight: FarmingWeight, override val mode: EliteLeaderboardMode) : EliteLeaderboardType(),WithEnum<FarmingWeight> {
+        override val enumValue: FarmingWeight = weight
+    }
+    data class Crop(val crop: CropType, override val mode: EliteLeaderboardMode) : EliteLeaderboardType(), WithEnum<CropType> {
+        override val enumValue: CropType = crop
+    }
+    data class Pest(val pest: PestType?, override val mode: EliteLeaderboardMode) : EliteLeaderboardType(), WithEnum<PestType> {
+        override val enumValue: PestType? = pest
+    }
+
 
     val lbName: String
         get() = when (this) {

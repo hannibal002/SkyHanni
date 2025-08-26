@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -33,6 +34,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.DicerRngDropTracker
@@ -70,6 +72,7 @@ import net.minecraft.item.ItemStack
 import java.time.LocalDate
 import java.util.EnumMap
 import java.util.UUID
+import kotlin.reflect.KClass
 import kotlin.time.Duration
 
 // put everything under its respective feature, the order of the features is the same as in the folder structure
@@ -602,10 +605,18 @@ class ProfileSpecificStorage(
             var lastLeaderboardMap: MutableMap<EliteLeaderboardType, Int> = mutableMapOf()
 
             @Expose
-            var minWeight: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+            var cropDisplayType: Pair<CropType?, EliteLeaderboardMode> = Pair(null, EliteLeaderboardMode.ALL_TIME)
 
             @Expose
-            var lastLeaderboardType: MutableMap<EliteLeaderboardType, EliteLeaderboardType> = mutableMapOf()
+            var pestDisplayType: Pair<PestType?, EliteLeaderboardMode> = Pair(null, EliteLeaderboardMode.ALL_TIME)
+
+            // TODO config fix this
+            @Expose
+            var weightDisplayType: Pair<FarmingWeight, EliteLeaderboardMode> = Pair(FarmingWeight.FARMING_WEIGHT, EliteLeaderboardMode.ALL_TIME)
+
+            @Expose
+            var minWeight: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+
         }
 
         @Expose
