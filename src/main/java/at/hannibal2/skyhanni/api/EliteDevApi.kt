@@ -115,8 +115,8 @@ object EliteDevApi {
         FARMING_WEIGHT_API_NAME,
     )
 
-    private const val WEIGHT_LEADERBOARD_API_NAME = "Elitebot Farming Weight Leaderboard"
-    private const val WEIGHT_LEADERBOARD_URL = "$ELITEBOT_API_URL/leaderboard/farmingweight"
+    private const val LEADERBOARD_URL = "$ELITEBOT_API_URL/leaderboard/"
+    private const val LEADERBOARD_API_NAME = "Elitebot Leaderboard"
 
     private const val RESOURCE_API_NAME = "Elitebot Resources"
     private const val RESOURCE_API_URL = "$ELITEBOT_API_URL/resources"
@@ -192,7 +192,7 @@ object EliteDevApi {
         lbType: EliteLeaderboardType,
         upcomingCount: Int? = null,
         atRank: Int? = null,
-    ): EliteLeaderboard? {
+    ): EliteLeaderboard {
         require(profileId.isNotBlank()) { "Profile ID cannot be blank" }
         val uuid = if (spoofProfile) PlayerUuid else PlayerUtils.getUuid()
 
@@ -202,11 +202,11 @@ object EliteDevApi {
         val paramString = if (params.isEmpty()) "" else {
             "?" + params.joinToString("&")
         }
-        val lbSuffix = lbType.suffix
-        val lbUrl = "$WEIGHT_LEADERBOARD_URL$lbSuffix/$uuid/$profileId$paramString"
+        val lbSuffix = lbType.lbName
+        val lbUrl = "$LEADERBOARD_URL$lbSuffix/$uuid/$profileId$paramString"
         ChatUtils.debug("Fetching leaderboard information from $lbUrl")
 
-        val lbApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(lbUrl, apiName = WEIGHT_LEADERBOARD_API_NAME)
+        val lbApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(lbUrl, apiName = LEADERBOARD_API_NAME)
         val (_, apiData) = lbApiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
             "Error getting weight leaderboard position",
             "url" to lbUrl,

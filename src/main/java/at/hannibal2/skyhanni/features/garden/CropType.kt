@@ -17,7 +17,7 @@ enum class CropType(
     val farmingItem: FarmingItemType,
     val replenish: Boolean = false,
     val enchantName: String = cropName.lowercase(),
-    val eliteApiName: String = simpleName
+    val eliteLbName: String = simpleName
 ) {
 
     WHEAT(
@@ -35,7 +35,7 @@ enum class CropType(
     NETHER_WART(
         "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
         { ItemStack(Items.nether_wart) }, "wart", FarmingItemType.NETHER_WART, replenish = true,
-        enchantName = "warts", eliteApiName = "netherwart"
+        enchantName = "warts", eliteLbName = "netherwart"
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
@@ -52,7 +52,7 @@ enum class CropType(
     ),
     SUGAR_CANE(
         "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
-        { ItemStack(Items.reeds) }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane", eliteApiName = "sugarcane"
+        { ItemStack(Items.reeds) }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane", eliteLbName = "sugarcane"
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,

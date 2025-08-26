@@ -35,12 +35,12 @@ sealed class EliteLeaderboardType {
     data class Crop(val crop: CropType, override val mode: EliteLeaderboardMode) : EliteLeaderboardType()
     data class Pest(val pest: PestType?, override val mode: EliteLeaderboardMode) : EliteLeaderboardType()
 
-    val apiName: String
+    val lbName: String
         get() = when (this) {
             is Weight -> "farmingweight${mode.suffix}"
-            is Crop   -> "${crop.eliteApiName}${mode.suffix}"
+            is Crop   -> "${crop.eliteLbName}${mode.suffix}"
             is Pest   -> {
-                pest?.eliteApiName ?: // Only all pests (null pests) have a monthly leaderboard
+                pest?.eliteLbName ?: // Only all pests (null pests) have a monthly leaderboard
                 "pests${mode.suffix}"
             }
         }
