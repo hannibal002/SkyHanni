@@ -16,7 +16,7 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
 @SkyHanniModule
-object KeyStateManager {
+object ForgeKeyStateManager {
     // inventory check is not needed, as forge only send events when not in a gui
     private fun shouldTrigger(): Boolean = !NeuItems.neuHasFocus()
 
