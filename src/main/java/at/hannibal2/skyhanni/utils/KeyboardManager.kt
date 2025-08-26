@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyHeldEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
@@ -108,8 +110,8 @@ object KeyboardManager {
 
     /**
      * Can only be used once per click, since the function locks itself until the key is no longer held.
-     * Do not use in KeyPressEvent, since it won't be unlocked again, use KeyPressEvent instead.
-     * */
+     * Do not use in [KeyHeldEvent], since it won't be unlocked again, use [KeyPressEvent] instead.
+     */
     fun Int.isKeyClicked(): Boolean = if (this.isKeyHeld()) {
         if (lockedKeys[this] != true) {
             lockedKeys[this] = true
