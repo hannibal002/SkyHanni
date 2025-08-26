@@ -12,12 +12,12 @@ import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardP
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -81,14 +81,14 @@ object FarmingWeight {
     fun setWeight(leaderboardMode: EliteLeaderboardMode, value: Double) {
         weightMap[leaderboardMode] = value
         weightGain = 0.0
-        FarmingWeightDisplay.update()
+        // TODO: Update event post
     }
 
     fun getWeight(leaderboardMode: EliteLeaderboardMode, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
         if (weightMap[leaderboardMode] == null || override) {
             when (leaderboardMode) {
                 EliteLeaderboardMode.ALL_TIME -> updateCollections()
-                EliteLeaderboardMode.MONTHLY -> getLeaderboardPosition(EliteLeaderboardType.Weight(leaderboardMode))
+                EliteLeaderboardMode.MONTHLY -> getLeaderboardPosition(EliteLeaderboardType.Weight(FarmingWeight.FARMING_WEIGHT, leaderboardMode))
             }
         }
         if (shouldRecalculateWeight) {

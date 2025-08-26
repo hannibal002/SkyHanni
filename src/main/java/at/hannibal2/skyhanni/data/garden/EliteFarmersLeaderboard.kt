@@ -18,8 +18,6 @@ import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
-import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay.isEnabled
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -79,7 +77,7 @@ object EliteFarmersLeaderboard {
             shouldRefreshLeaderboard.clear()
             nextPlayers.clear()
             lastPlayer.clear()
-            FarmingWeightDisplay.update()
+            // TODO push an update event
         }
     }
 
@@ -237,7 +235,7 @@ object EliteFarmersLeaderboard {
         lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
         shouldRefreshLeaderboard[leaderboardType] = false // Don't want to fetch again if api call was successful
         apiError = false
-        FarmingWeightDisplay.update() // Update display because we updated next players
+        // TODO update event here too // Update display because we updated next players
         if (apiData.rank <= 0) { // api returns -1 for unranked players
             isUnranked[leaderboardType] = true
             return null
@@ -247,7 +245,6 @@ object EliteFarmersLeaderboard {
     }
 
     private fun getUpcomingPlayerCount(currentPos: Int) = when {
-        !isEnabled() -> 0
         currentPos > 10_000 -> 50
         currentPos > 5_000 -> 30
         currentPos > 1_000 -> 20

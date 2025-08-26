@@ -45,7 +45,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
-
+/*
 @SkyHanniModule
 object FarmingWeightDisplay {
     private val config get() = GardenApi.config.eliteFarmingWeights
@@ -342,4 +342,4 @@ object FarmingWeightDisplay {
         val base = "#garden.farmingWeight"
         event.move(101, "$base.lastFarmingWeightLeaderboard", "$base.lastLeaderboard")
     }
-}
+}*/

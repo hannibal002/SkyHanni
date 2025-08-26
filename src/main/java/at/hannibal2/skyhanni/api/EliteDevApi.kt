@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.WeightProfile
-import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -73,7 +72,7 @@ object EliteDevApi {
     private fun spoofProfile(uuid: String, profile: String) {
         if (uuid.length <= 20) {
             spoofProfile = false
-            FarmingWeightDisplay.resetData()
+            // TODO push reset event
             ChatUtils.userError("Invalid uuid!")
             return
         }
@@ -81,7 +80,7 @@ object EliteDevApi {
         spoofProfile = true
         PlayerUuid = uuid
         PlayerProfile = profile
-        FarmingWeightDisplay.resetData()
+        // TODO push reset event
     }
 
     private suspend fun fetchResourceCommand(resourceType: EliteResourceType) = runCatching {
