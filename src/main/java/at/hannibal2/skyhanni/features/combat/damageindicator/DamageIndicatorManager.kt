@@ -374,6 +374,7 @@ object DamageIndicatorManager {
 
     @HandleEvent
     fun onSkyHanniTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
         data.values.forEach(::update)
         // TODO config to define between 100ms and 5 sec
         // TODO fix bug that the time is always 100 ms, even when the config is enabled?
