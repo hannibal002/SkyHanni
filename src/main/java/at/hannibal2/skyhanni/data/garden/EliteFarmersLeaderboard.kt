@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.garden.FarmingWeight.setWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeight.updateCollections
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.UpcomingLeaderboardPlayer
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -76,7 +77,7 @@ object EliteFarmersLeaderboard {
     }
 
     fun isUnranked(leaderboardType: EliteLeaderboardType): Boolean {
-        if (leaderboardType == EliteLeaderboardType.ALL_TIME) return false // We support other methods to calculate all-time farming weight
+        if (leaderboardType.mode == EliteLeaderboardMode.ALL_TIME) return false // We support other methods to calculate all-time farming weight
         return isUnranked[leaderboardType] ?: false
     }
 
@@ -239,9 +240,9 @@ object EliteFarmersLeaderboard {
     private fun handleDiff(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard) {
         val diff = apiData.amount - (getWeight(leaderboardType) ?: 0.0)
         if ((diff >= 0.5 || abs(diff) >= 10) && apiData.rank != -1) {
-            when (leaderboardType) {
-                EliteLeaderboardType.ALL_TIME -> updateCollections()
-                EliteLeaderboardType.MONTHLY -> setWeight(leaderboardType, apiData.amount)
+            when (leaderboardType.mode) {
+                EliteLeaderboardMode.ALL_TIME -> updateCollections()
+                EliteLeaderboardMode.MONTHLY -> setWeight(leaderboardType, apiData.amount)
             }
         }
     }

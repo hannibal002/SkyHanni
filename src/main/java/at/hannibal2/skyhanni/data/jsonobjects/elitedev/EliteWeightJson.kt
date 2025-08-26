@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.data.jsonobjects.elitedev
 
+import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -26,13 +28,26 @@ data class WeightProfile(
     @Expose val pests: Map<String, Int>,
 )
 
-enum class EliteLeaderboardType(val displayName: String, val specificDisplayName: String, val suffix: String = "") {
-    ALL_TIME("All-Time", "Farming Weight"),
-    MONTHLY("Monthly", "Monthly Farming Weight", "-monthly"),
+sealed class EliteLeaderboardType {
+    abstract val mode: EliteLeaderboardMode
+
+    data class Weight(override val mode: EliteLeaderboardMode) : EliteLeaderboardType()
+    data class Crop(val crop: CropType, override val mode: EliteLeaderboardMode) : EliteLeaderboardType()
+    data class Pest(val pest: PestType, override val mode: EliteLeaderboardMode) : EliteLeaderboardType()
+}
+
+enum class EliteLeaderboardMode(val displayName: String, val suffix: String = "") {
+    ALL_TIME("All-Time", ),
+    MONTHLY("Monthly", "-monthly"),
     ;
 
     override fun toString() = displayName
 }
+
+enum class FarmingWeight(val apiName: String) {
+    FARMING_WEIGHT("farmingweight"),
+}
+
 
 data class EliteLeaderboard(
     @Expose val rank: Int,

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -598,13 +599,13 @@ class ProfileSpecificStorage(
 
         class FarmingWeightConfig {
             @Expose
-            var lastLeaderboardMap: MutableMap<EliteLeaderboardType, Int> = enumMapOf()
+            var lastLeaderboardMap: MutableMap<EliteLeaderboardType, Int> = mutableMapOf()
 
             @Expose
-            var minWeight: MutableMap<EliteLeaderboardType, Double> = enumMapOf()
+            var minWeight: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
 
             @Expose
-            var lastLeaderboardType: EliteLeaderboardType = EliteLeaderboardType.ALL_TIME
+            var lastLeaderboardType: MutableMap<EliteLeaderboardType, EliteLeaderboardType> = mutableMapOf()
         }
 
         @Expose

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.updateTotalCollection
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
@@ -37,7 +38,7 @@ object FarmingWeight {
 
     private val collectionMutex = Mutex()
     private val cropWeightValues = mutableMapOf<CropType, Double>()
-    private val weightMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+    private val weightMap: MutableMap<EliteLeaderboardMode, Double> = mutableMapOf()
     private val ignoredCollection: MutableMap<CropType, Long> = mutableMapOf()
 
     private var weightGain: Double = 0.0
@@ -77,23 +78,23 @@ object FarmingWeight {
         }
     }
 
-    fun setWeight(leaderboardType: EliteLeaderboardType, value: Double) {
-        weightMap[leaderboardType] = value
+    fun setWeight(leaderboardMode: EliteLeaderboardMode, value: Double) {
+        weightMap[leaderboardMode] = value
         weightGain = 0.0
         FarmingWeightDisplay.update()
     }
 
-    fun getWeight(leaderboardType: EliteLeaderboardType, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
-        if (weightMap[leaderboardType] == null || override) {
-            when (leaderboardType) {
-                EliteLeaderboardType.ALL_TIME -> updateCollections()
-                EliteLeaderboardType.MONTHLY -> getLeaderboardPosition(leaderboardType)
+    fun getWeight(leaderboardMode: EliteLeaderboardMode, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
+        if (weightMap[leaderboardMode] == null || override) {
+            when (leaderboardMode) {
+                EliteLeaderboardMode.ALL_TIME -> updateCollections()
+                EliteLeaderboardMode.MONTHLY -> getLeaderboardPosition(EliteLeaderboardType.Weight(leaderboardMode))
             }
         }
         if (shouldRecalculateWeight) {
-            weightMap[EliteLeaderboardType.ALL_TIME] = recalculateTotalWeight()
+            weightMap[EliteLeaderboardMode.ALL_TIME] = recalculateTotalWeight()
         }
-        val weight = weightMap[leaderboardType]
+        val weight = weightMap[leaderboardMode]
         if (cropWeightOnly) {
             if (weight != null) {
                 return weight - bonusWeight
@@ -102,7 +103,7 @@ object FarmingWeight {
         return weight
     }
 
-    private fun addWeight(amount: Double, type: EliteLeaderboardType? = null) {
+    private fun addWeight(amount: Double, type: EliteLeaderboardMode? = null) {
         if (type == null) {
             weightMap.forEach { (type, value) -> weightMap[type] = value + amount }
         } else {
