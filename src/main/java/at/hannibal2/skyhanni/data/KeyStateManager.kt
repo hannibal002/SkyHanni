@@ -57,7 +57,7 @@ object KeyStateManager {
 
         var button = Mouse.getEventButton()
         if (button == -1) return // No button pressed
-        button = button - 100
+        button -= 100
         val buttonState = Mouse.getEventButtonState()
 
         if (buttonState) {
