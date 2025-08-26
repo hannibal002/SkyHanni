@@ -376,6 +376,7 @@ object DamageIndicatorManager {
     fun onSkyHanniTick(event: SkyHanniTickEvent) {
         data.values.forEach(::update)
         // TODO config to define between 100ms and 5 sec
+        // TODO fix bug that the time is always 100 ms, even when the config is enabled?
         data.removeIf { (_, value) ->
             val noDeathDisplay = noDeathDisplay(value.bossType)
             val waitForRemoval = if (value.dead && !noDeathDisplay) 4.seconds else 100.milliseconds
