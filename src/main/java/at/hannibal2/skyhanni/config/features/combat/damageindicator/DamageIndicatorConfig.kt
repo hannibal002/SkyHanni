@@ -10,15 +10,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class DamageIndicatorConfig {
     @Expose
-    @ConfigOption(name = "Damage Indicator Enabled", desc = "Show the boss' remaining health.")
+    @ConfigOption(name = "Damage Indicator Enabled", desc = "Show name and health of selected mobs big.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Healing Chat Message", desc = "Send a chat message when a boss heals themself.")
-    @ConfigEditorBoolean
-    var healingMessage: Boolean = false
 
     @Expose
     @ConfigOption(name = "Boss Name", desc = "Change how boss names are displayed.")
@@ -88,28 +83,31 @@ class DamageIndicatorConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide damage splashes near the damage indicator.")
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hide damage splashes near selected mobs.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var hideDamageSplash: Boolean = false
 
     @Expose
     @ConfigOption(name = "Damage Over Time", desc = "Show damage and health over time below the damage indicator.")
     @ConfigEditorBoolean
-    var showDamageOverTime: Boolean = false
+    var showDamageOverTime: Boolean = false // remain dependent on dmg indicator
 
     @Expose
     @ConfigOption(name = "Hide Nametag", desc = "Hide the vanilla nametag of bosses with damage indicator enabled.")
     @ConfigEditorBoolean
-    var hideVanillaNametag: Boolean = false
+    var hideVanillaNametag: Boolean = false // remain dependent on dmg indicator
 
     @Expose
     @ConfigOption(name = "Shuriken Indicator", desc = "Indicate if an Extremely Real Shuriken has been used.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var shurikenIndicator: Boolean = true
 
     @Expose
     @ConfigOption(name = "Twilight Indicator", desc = "Indicate if Twilight Arrow Poison has been used.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var twilightIndicator: Boolean = true
 
     @Expose
@@ -128,11 +126,13 @@ class DamageIndicatorConfig {
             "§eRequires Damage Indicator to be active.",
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var timeToKillSlayer: Boolean = true
 
     @Expose
     @ConfigOption(name = "Show Bacte Phase", desc = "Show the current phase of Bacte in the Rift.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var showBactePhase: Boolean = true
 
     @Expose
