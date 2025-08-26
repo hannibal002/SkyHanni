@@ -15,6 +15,7 @@ enum class PestType(
     val internalName: NeuInternalName,
     val crop: CropType?,
     val pluralName: String? = "${displayName}s",
+    val eliteApiName: String = displayName.lowercase(),
 ) {
     BEETLE(
         "Beetle",
@@ -48,6 +49,7 @@ enum class PestType(
         "PEST_FIELD_MOUSE_MONSTER".toInternalName(),
         crop = null,
         pluralName = "Field Mice",
+        eliteApiName = "mouse"
     ),
     FLY(
         "Fly",
