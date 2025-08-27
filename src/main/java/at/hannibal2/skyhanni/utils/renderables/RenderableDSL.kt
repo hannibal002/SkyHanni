@@ -12,6 +12,9 @@ interface RenderableContext
 interface RenderableContainerContext<T> : RenderableContext {
     val result: T
     operator fun Renderable.unaryPlus()
+    // The suppression is needed since there is a bug/is not implemented feature in the compiler, as it does not work on everything but here it should work.
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("unaryPlusRenderableNullable")
     operator fun Renderable?.unaryPlus() = this?.unaryPlus() ?: Unit
 }
 
