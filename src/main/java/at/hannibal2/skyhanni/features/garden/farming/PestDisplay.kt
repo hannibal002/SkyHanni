@@ -1,39 +1,45 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import EliteLeaderboardDisplay
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.CropCollectionDisplayConfig.CropCollectionTextEntry
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.FarmingWeightDisplayConfig.FarmingWeightTextEntry
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.PestKillsDisplayConfig.PestKillsTextEntry
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.PestKillsDisplayConfig
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 
-class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
-    GardenApi.storage?.farmingWeight?.cropDisplayType,
-    { crop, mode -> EliteLeaderboardType.Crop(crop, mode) },
-    name = "Crop Leaderboard Display"
+class PestDisplay: EliteLeaderboardDisplay<PestType, EliteLeaderboardType.Pest>(
+    GardenApi.storage?.farmingWeight?.pestDisplayType,
+    { pest, mode -> EliteLeaderboardType.Pest(pest, mode) },
+    name = "Pest Leaderboard Display"
 ) {
-    val config get() = configBase.cropCollectionDisplay
+    val config get() = configBase.pestKillsDisplay
 
-    override fun getDefaultEnum(): CropType? {
-        return CropType.MELON // TODO set actual default
+    override fun getDefaultEnum(): PestType? {
+        return null
     }
+
+    override val currentLeaderboardType: EliteLeaderboardType?
+        get() = EliteLeaderboardType.Pest(currentEnum, currentMode)
 
     override fun drawDisplay(leaderboardType: EliteLeaderboardType) {
         if (!isEnabled()) return
 
-        val lineMap = mutableMapOf<CropCollectionTextEntry, Renderable>()
+        val lineMap = mutableMapOf<PestKillsTextEntry, Renderable>()
         val isFirst = leaderboardPos == 1
 
-        lineMap[CropCollectionTextEntry.WEIGHT_POSITION] = weightPosRenderable(leaderboardType)
-        lineMap[CropCollectionTextEntry.OVERTAKE] = overtakeRenderable(leaderboardType, isFirst)
-        if (!isFirst && config.text.get().contains(CropCollectionTextEntry.OVERTAKE)) {
-            lineMap[CropCollectionTextEntry.LAST_PLAYER] = overtakeRenderable(leaderboardType, true)
+        lineMap[PestKillsTextEntry.WEIGHT_POSITION] = weightPosRenderable(leaderboardType)
+        lineMap[PestKillsTextEntry.OVERTAKE] = overtakeRenderable(leaderboardType, isFirst)
+        if (!isFirst && config.text.get().contains(PestKillsTextEntry.OVERTAKE)) {
+            lineMap[PestKillsTextEntry.LAST_PLAYER] = overtakeRenderable(leaderboardType, true)
         }
 
         display = formatDisplay(lineMap)
@@ -49,28 +55,33 @@ class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
 
     override fun showLeaderboard(): Boolean = config.leaderboard.get()
 
-    private fun formatDisplay(lineMap: MutableMap<CropCollectionTextEntry, Renderable>): List<Renderable> {
+    private fun formatDisplay(lineMap: MutableMap<PestKillsTextEntry, Renderable>): List<Renderable> {
         if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) {
             return errorMessage
         }
 
         val newList = mutableListOf<Renderable>()
-        if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
+        if (inventoryOpen && currentEnum == null) newList.buildModeSwitcher() else newList.addVerticalSpacer()
         newList.addAll(config.text.get().mapNotNull { lineMap[it] })
         if (inventoryOpen) newList.buildTypeSwitcher() else newList.addVerticalSpacer()
         return newList
     }
 
+    private fun changeEnum(pestType: PestType?) {
+        if (pestType != null) currentMode = EliteLeaderboardMode.ALL_TIME // Specific pest lbs don't support monthly
+        currentEnum = pestType
+        update()
+    }
+
     override fun MutableList<Renderable>.buildTypeSwitcher() {
         this.addRenderableNullableButton(
-            label = "Crop Type",
+            label = "Pest Type",
             current = currentEnum,
-            nullLabel = "Default",
+            nullLabel = "All",
             onChange = { new ->
-                currentEnum = new
-                update()
+                changeEnum(new)
             },
-            universe = CropType.entries,
+            universe = PestType.entries,
             enableUniverseScroll = false // would infinitely scroll while hovered
         )
     }

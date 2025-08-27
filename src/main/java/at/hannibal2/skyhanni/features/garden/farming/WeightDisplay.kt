@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import EliteLeaderboardDisplay
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.CropCollectionDisplayConfig.CropCollectionTextEntry
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.FarmingWeightDisplayConfig.FarmingWeightTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -13,27 +13,27 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerti
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 
-class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
-    GardenApi.storage?.farmingWeight?.cropDisplayType,
-    { crop, mode -> EliteLeaderboardType.Crop(crop, mode) },
-    name = "Crop Leaderboard Display"
+class WeightDisplay: EliteLeaderboardDisplay<FarmingWeight, EliteLeaderboardType.Weight>(
+    GardenApi.storage?.farmingWeight?.weightDisplayType,
+    { weight, mode -> EliteLeaderboardType.Weight(weight, mode) },
+    name = "Farming Weight Display"
 ) {
-    val config get() = configBase.cropCollectionDisplay
+    val config get() = configBase.farmingWeightDisplay
 
-    override fun getDefaultEnum(): CropType? {
-        return CropType.MELON // TODO set actual default
+    override fun getDefaultEnum(): FarmingWeight {
+        return FarmingWeight.FARMING_WEIGHT // TODO set actual default
     }
 
     override fun drawDisplay(leaderboardType: EliteLeaderboardType) {
         if (!isEnabled()) return
 
-        val lineMap = mutableMapOf<CropCollectionTextEntry, Renderable>()
         val isFirst = leaderboardPos == 1
+        val lineMap = mutableMapOf<FarmingWeightTextEntry, Renderable>()
 
-        lineMap[CropCollectionTextEntry.WEIGHT_POSITION] = weightPosRenderable(leaderboardType)
-        lineMap[CropCollectionTextEntry.OVERTAKE] = overtakeRenderable(leaderboardType, isFirst)
-        if (!isFirst && config.text.get().contains(CropCollectionTextEntry.OVERTAKE)) {
-            lineMap[CropCollectionTextEntry.LAST_PLAYER] = overtakeRenderable(leaderboardType, true)
+        lineMap[FarmingWeightTextEntry.WEIGHT_POSITION] = weightPosRenderable(leaderboardType)
+        lineMap[FarmingWeightTextEntry.OVERTAKE] = overtakeRenderable(leaderboardType, isFirst)
+        if (!isFirst && config.text.get().contains(FarmingWeightTextEntry.OVERTAKE)) {
+            lineMap[FarmingWeightTextEntry.LAST_PLAYER] = overtakeRenderable(leaderboardType, true)
         }
 
         display = formatDisplay(lineMap)
@@ -49,7 +49,8 @@ class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
 
     override fun showLeaderboard(): Boolean = config.leaderboard.get()
 
-    private fun formatDisplay(lineMap: MutableMap<CropCollectionTextEntry, Renderable>): List<Renderable> {
+    // TODO consider abstracting this to remove duplication
+    private fun formatDisplay(lineMap: MutableMap<FarmingWeightTextEntry, Renderable>): List<Renderable> {
         if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) {
             return errorMessage
         }
@@ -57,23 +58,10 @@ class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
         val newList = mutableListOf<Renderable>()
         if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
         newList.addAll(config.text.get().mapNotNull { lineMap[it] })
-        if (inventoryOpen) newList.buildTypeSwitcher() else newList.addVerticalSpacer()
         return newList
     }
 
-    override fun MutableList<Renderable>.buildTypeSwitcher() {
-        this.addRenderableNullableButton(
-            label = "Crop Type",
-            current = currentEnum,
-            nullLabel = "Default",
-            onChange = { new ->
-                currentEnum = new
-                update()
-            },
-            universe = CropType.entries,
-            enableUniverseScroll = false // would infinitely scroll while hovered
-        )
-    }
+    override fun MutableList<Renderable>.buildTypeSwitcher() {} // No switcher needed for this display
 
     override fun reset() {
         TODO("Not yet implemented")

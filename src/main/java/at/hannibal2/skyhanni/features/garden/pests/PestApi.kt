@@ -252,7 +252,7 @@ object PestApi {
             if (pest == PestType.FIELD_MOUSE && item != DUNG_ITEM) return
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
-            PestKillEvent.post()
+            PestKillEvent(pest).post()
         }
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()

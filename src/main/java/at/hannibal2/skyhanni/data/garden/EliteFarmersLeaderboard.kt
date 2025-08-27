@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.crop
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -91,6 +92,17 @@ object EliteFarmersLeaderboard {
             return
         }
         leaderboardAmountMap[leaderboardType] = currentAmount + event.amount.toDouble()
+    }
+
+    @HandleEvent
+    fun onPestKill(event: PestKillEvent) {
+        addPestKill(EliteLeaderboardType.Pest(event.pest, EliteLeaderboardMode.ALL_TIME))
+        addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.MONTHLY))
+        addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.ALL_TIME))
+    }
+
+    private fun addPestKill(leaderboardType: EliteLeaderboardType, amount: Double = 1.0) {
+        leaderboardAmountMap[leaderboardType] = leaderboardAmountMap.getOrDefault(leaderboardType, 0.0) + amount
     }
 
     fun isUnranked(leaderboardType: EliteLeaderboardType): Boolean {

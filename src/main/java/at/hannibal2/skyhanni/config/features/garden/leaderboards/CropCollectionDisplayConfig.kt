@@ -20,7 +20,7 @@ class CropCollectionDisplayConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var display: Boolean = true // TODO config fix this on milestones display
+    var display: Boolean = true // TODO config fix this based on milestones display
 
     @Expose
     @ConfigLink(owner = CropCollectionDisplayConfig::class, field = "display")
@@ -41,7 +41,8 @@ class CropCollectionDisplayConfig {
 
     enum class CropCollectionTextEntry(private val displayName: String) {
         WEIGHT_POSITION("§6Farming Weight: §e104,481.49 §7[§b#5§7]"),
-        OVERTAKE("§e170.21 §7(§b12h 32m 15s§7) §7behind §bChissl")
+        OVERTAKE("§e170.21 §7(§b12h 32m 15s§7) §7behind §bChissl"),
+        LAST_PLAYER("§e170.21 §7 §7ahead of §bChissl")
         ;
 
         override fun toString() = displayName

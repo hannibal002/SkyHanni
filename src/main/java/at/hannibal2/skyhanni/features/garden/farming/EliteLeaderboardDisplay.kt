@@ -68,7 +68,7 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
         }
     }
 
-    val currentLeaderboardType: EliteLeaderboardType?
+    open val currentLeaderboardType: EliteLeaderboardType?
         get() = (currentEnum ?: getDefaultEnum())?.let { createType(it, currentMode) }
 
     fun update(overrideCooldown: Boolean = false) {
@@ -96,9 +96,8 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
         )
     }
 
-    fun overtakeRenderable(leaderboardType: EliteLeaderboardType): Renderable {
-
-        val next: Pair<String, Double>? = if (leaderboardPos == 1) getLastPlayer(leaderboardType) else getNextPlayer(leaderboardType)
+    fun overtakeRenderable(leaderboardType: EliteLeaderboardType, getLastPlayer: Boolean = false): Renderable {
+        val next: Pair<String, Double>? = if (getLastPlayer) getLastPlayer(leaderboardType) else getNextPlayer(leaderboardType)
 
         var (nextName, weightUntil) = next ?: return nullNextPlayerRenderable(leaderboardType)
 
@@ -107,8 +106,8 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
             nextName += " §7[§b#${rankGoal.addSeparators()}§7]"
         }
 
-        val behindOrAhead = if (leaderboardPos == 1) "ahead of" else "behind"
-        val overtakeETA = if (leaderboardPos == 1) "" else overtakeEta(weightUntil)
+        val behindOrAhead = if (getLastPlayer) "ahead of" else "behind"
+        val overtakeETA = if (getLastPlayer) "" else overtakeEta(weightUntil)
         val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeETA §7$behindOrAhead §b$nextName"
         return Renderable.clickable(
             text,
