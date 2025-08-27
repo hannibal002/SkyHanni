@@ -186,7 +186,7 @@ object FarmingWeightDisplay {
     }
 
     private fun formatDisplay(lineMap: MutableMap<FarmingWeightTextEntry, Renderable>): List<Renderable> {
-        if (FarmingWeight.apiError || EliteFarmersLeaderboard.apiError) {
+        if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) {
             return errorMessage
         }
 
@@ -216,7 +216,7 @@ object FarmingWeightDisplay {
         weight = null
         leaderboardPos = null
         EliteFarmersLeaderboard.reset()
-        FarmingWeight.reset()
+        FarmingWeightData.reset()
         update(true)
     }
 

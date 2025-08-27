@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -55,6 +56,12 @@ object FarmingWeightData {
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         updateCollections()
+    }
+
+    // We need profile id for leaderboard api
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (profileId == "") updateCollections()
     }
 
     @HandleEvent
