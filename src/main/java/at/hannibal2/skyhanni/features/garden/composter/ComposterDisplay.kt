@@ -79,13 +79,13 @@ object ComposterDisplay {
         if (!config.displayEnabled) return
         display = Renderable.vertical {
             +text("§bComposter")
-            DataType.TIME_LEFT.labeledWithData(tabListData)?.unaryPlus()
+            +DataType.TIME_LEFT.labeledWithData(tabListData)
             +horizontal {
-                DataType.ORGANIC_MATTER.labeledWithData(tabListData)?.unaryPlus()
+                +DataType.ORGANIC_MATTER.labeledWithData(tabListData)
                 addHorizontalSpacer()
-                DataType.FUEL.labeledWithData(tabListData)?.unaryPlus()
+                +DataType.FUEL.labeledWithData(tabListData)
             }
-            DataType.STORED_COMPOST.labeledWithData(tabListData)?.unaryPlus()
+            +DataType.STORED_COMPOST.labeledWithData(tabListData)
             +composterEmptyTime(composterEmptyTime)
         }
     }

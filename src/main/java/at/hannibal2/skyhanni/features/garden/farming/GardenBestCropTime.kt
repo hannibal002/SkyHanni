@@ -117,7 +117,7 @@ object GardenBestCropTime {
         }
 
         sorted.keys.withIndex().forEach { (index, crop) ->
-            createCropEntry(crop, index + 1, useOverflow, gardenExp, currentCrop)?.unaryPlus()
+            +createCropEntry(crop, index + 1, useOverflow, gardenExp, currentCrop)
         }
     }
 

@@ -12,6 +12,7 @@ interface RenderableContext
 interface RenderableContainerContext<T> : RenderableContext {
     val result: T
     operator fun Renderable.unaryPlus()
+    operator fun Renderable?.unaryPlus() = this?.unaryPlus() ?: Unit
 }
 
 // 1d implementation (only needs to be defined once and all containers can use it)

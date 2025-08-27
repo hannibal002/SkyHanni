@@ -227,7 +227,7 @@ object ComposterOverlay {
         return Renderable.vertical {
             +preview(extraComposterUpgrade)
             addVerticalSpacer()
-            profitDisplay()?.unaryPlus()
+            +profitDisplay()
             +text("§eOrganic Matter §7empty in §b$organicMatterFormat").tips(
                 listOf(
                     "§7The full §eOrganic Matter §7storage would",

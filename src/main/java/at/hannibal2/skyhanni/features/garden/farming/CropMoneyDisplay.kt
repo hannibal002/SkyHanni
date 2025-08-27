@@ -200,7 +200,7 @@ object CropMoneyDisplay {
         val cropList = createDescendingCropList(moneyPerHour)
         return Renderable.vertical {
             for ((index, pair) in cropList.withIndex()) {
-                buildCropMoneyLine(index + 1, pair.first, pair.second, extraMoneyPerHour.total)?.unaryPlus()
+                +buildCropMoneyLine(index + 1, pair.first, pair.second, extraMoneyPerHour.total)
             }
         }
     }
