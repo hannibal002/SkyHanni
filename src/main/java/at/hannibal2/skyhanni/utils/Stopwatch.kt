@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.utils
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-class Stopwatch(startDuration: Duration = 0.seconds) {
-    private var duration = startDuration
-    private var paused: Boolean = true
-    private var startTime = SimpleTimeMark.farPast()
+class Stopwatch(
+    private var duration: Duration = 0.seconds,
+    private var paused: Boolean = true) {
+    private var startTime = if (paused) SimpleTimeMark.farPast() else SimpleTimeMark.now()
 
     fun start() {
         if (!paused) return
@@ -30,9 +30,9 @@ class Stopwatch(startDuration: Duration = 0.seconds) {
 
     fun isPaused(): Boolean = paused
 
-    fun reset() {
+    fun reset(pause: Boolean = true) {
         duration = 0.seconds
-        paused = true
+        paused = pause
         startTime = SimpleTimeMark.farPast()
     }
 }
