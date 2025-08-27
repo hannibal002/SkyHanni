@@ -5,7 +5,8 @@ import kotlin.time.Duration.Companion.seconds
 
 class Stopwatch(
     private var duration: Duration = 0.seconds,
-    private var paused: Boolean = true) {
+    private var paused: Boolean = true
+) {
     private var startTime = if (paused) SimpleTimeMark.farPast() else SimpleTimeMark.now()
 
     fun start() {
