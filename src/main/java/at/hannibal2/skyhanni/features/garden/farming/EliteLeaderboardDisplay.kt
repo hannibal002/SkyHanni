@@ -99,7 +99,7 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
     fun overtakeRenderable(leaderboardType: EliteLeaderboardType, getLastPlayer: Boolean = false): Renderable {
         val next: Pair<String, Double>? = if (getLastPlayer) getLastPlayer(leaderboardType) else getNextPlayer(leaderboardType)
 
-        var (nextName, weightUntil) = next ?: return nullNextPlayerRenderable(leaderboardType)
+        var (nextName, amountUntil) = next ?: return nullNextPlayerRenderable(leaderboardType)
 
         val rankGoal = getRankGoal(leaderboardType)
         if (useEtaGoalRank() && rankGoal != null) {
@@ -107,8 +107,8 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
         }
 
         val behindOrAhead = if (getLastPlayer) "ahead of" else "behind"
-        val overtakeETA = if (getLastPlayer) "" else overtakeEta(weightUntil)
-        val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeETA §7$behindOrAhead §b$nextName"
+        val overtakeETA = if (getLastPlayer) "" else overtakeEta(amountUntil)
+        val text = "§e${amountUntil.roundTo(2).addSeparators()}$overtakeETA §7$behindOrAhead §b$nextName"
         return Renderable.clickable(
             text,
             tips = listOf("§eClick to open the Farming Profile of §b$nextName."),
@@ -116,7 +116,7 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
         )
     }
 
-    abstract fun overtakeEta(weightUntil: Double): String
+    abstract fun overtakeEta(amountUntil: Double): String
 
     abstract fun useEtaGoalRank(): Boolean
 

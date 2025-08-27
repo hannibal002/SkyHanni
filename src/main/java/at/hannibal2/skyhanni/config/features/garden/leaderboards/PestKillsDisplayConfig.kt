@@ -59,13 +59,23 @@ class PestKillsDisplayConfig {
 
     @Expose
     @ConfigOption(
-        name = "Overtake ETA",
-        desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
-            "Does not factor in pests or dicer drops. Garden Milestones Display must be enabled."
+        name = "Use ETA Goal",
+        desc = "Use the ETA Goal number instead of the next upcoming rank. Useful when your rank is in the " +
+            "ten thousands and you don't want to see small ETAs."
     )
     @ConfigEditorBoolean
-    val overtakeETA: Property<Boolean> = Property.of(false)
+    val useEtaGoalRank: Property<Boolean> = Property.of(true)
 
+    // TODO eta for each pest
+    @Expose
+    @ConfigOption(
+        name = "ETA Goal",
+        desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")"
+    )
+    @ConfigEditorText
+    val etaGoalRank: Property<String> = Property.of("10000")
+
+    // TODO figure out what to do with this
     @Expose
     @ConfigOption(
         name = "Show LB Change",
@@ -75,34 +85,7 @@ class PestKillsDisplayConfig {
     var showLbChange: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
-    @ConfigEditorBoolean
-    val overtakeETAAlways: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(
-        name = "Use ETA Goal",
-        desc = "Use the ETA Goal number instead of the next upcoming rank. Useful when your rank is in the " +
-            "ten thousands and you don't want to see small ETAs."
-    )
-    @ConfigEditorBoolean
-    val useEtaGoalRank: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(
-        name = "ETA Goal",
-        desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")"
-    )
-    @ConfigEditorText
-    val etaGoalRank: Property<String> = Property.of("10000")
-
-    @Expose
-    @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")
-    @ConfigEditorBoolean
-    var ignoreLow: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Show Outside Garden", desc = "Show the farming weight outside of the garden.")
+    @ConfigOption(name = "Show Outside Garden", desc = "Show your pest kills outside of the garden.")
     @ConfigEditorBoolean
     var showOutsideGarden: Boolean = false
 }

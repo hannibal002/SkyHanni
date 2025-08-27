@@ -3,15 +3,20 @@ package at.hannibal2.skyhanni.features.garden.farming
 import EliteLeaderboardDisplay
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.CropCollectionDisplayConfig.CropCollectionTextEntry
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.FarmingWeightDisplayConfig.FarmingWeightTextEntry
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCurrentlyFarmedCrop
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
+import kotlin.time.Duration.Companion.seconds
 
 class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
     GardenApi.storage?.farmingWeight?.cropDisplayType,
@@ -21,7 +26,11 @@ class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
     val config get() = configBase.cropCollectionDisplay
 
     override fun getDefaultEnum(): CropType? {
-        return CropType.MELON // TODO set actual default
+        return if (!config.hideWhenNotFarming) {
+            CropCollectionApi.lastGainedCrop ?: getCurrentlyFarmedCrop()
+        } else {
+            getCurrentlyFarmedCrop()
+        }
     }
 
     override fun drawDisplay(leaderboardType: EliteLeaderboardType) {
@@ -39,8 +48,13 @@ class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
         display = formatDisplay(lineMap)
     }
 
-    override fun overtakeEta(weightUntil: Double): String {
-        return ""
+    override fun overtakeEta(amountUntil: Double): String {
+        if (!config.overtakeETA.get() || !config.overtakeETAAlways.get() && !GardenApi.isCurrentlyFarming()) return ""
+
+        val crop = currentEnum ?: getDefaultEnum() ?: return ""
+        val cropsPerSecond = crop.getSpeed() ?: return ""
+        val timeUntil = (amountUntil / cropsPerSecond).seconds
+        return " §7(§b${timeUntil.format()}§7)"
     }
 
     override fun useEtaGoalRank(): Boolean {
@@ -83,9 +97,7 @@ class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
 
     private fun inGardenEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
 
-    override fun shouldShowDisplay(): Boolean {
-        return true
-    }
+    override fun shouldShowDisplay(): Boolean = !GardenApi.hideExtraGuis()
 
 
 }

@@ -1,17 +1,24 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import EliteLeaderboardDisplay
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.FarmingWeightDisplayConfig.FarmingWeightTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getFactor
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
+import kotlin.time.Duration.Companion.seconds
 
 class WeightDisplay: EliteLeaderboardDisplay<FarmingWeight, EliteLeaderboardType.Weight>(
     GardenApi.storage?.farmingWeight?.weightDisplayType,
@@ -19,6 +26,7 @@ class WeightDisplay: EliteLeaderboardDisplay<FarmingWeight, EliteLeaderboardType
     name = "Farming Weight Display"
 ) {
     val config get() = configBase.farmingWeightDisplay
+    var lastFarmedCrop: CropType? = null
 
     override fun getDefaultEnum(): FarmingWeight {
         return FarmingWeight.FARMING_WEIGHT // TODO set actual default
@@ -39,8 +47,19 @@ class WeightDisplay: EliteLeaderboardDisplay<FarmingWeight, EliteLeaderboardType
         display = formatDisplay(lineMap)
     }
 
-    override fun overtakeEta(weightUntil: Double): String {
-        return ""
+    override fun overtakeEta(amountUntil: Double): String {
+        if (!config.overtakeETA.get() || !config.overtakeETAAlways.get() && !GardenApi.isCurrentlyFarming()) return ""
+        lastFarmedCrop = GardenApi.getCurrentlyFarmedCrop() ?: if (config.overtakeETAAlways.get()) lastFarmedCrop else null
+        val crop = lastFarmedCrop ?: return ""
+        val cropsPerSecond = crop.getSpeed() ?: return ""
+        val mooshroomCowCropsPerSecond = if (GardenApi.mushroomCowPet) {
+            (CurrentPetApi.currentPet?.level ?: 0) / 100 * (crop.getLatestBlocksPerSecond() ?: 0.0)
+        } else {
+            0.0
+        }
+        val weightPerSecond = cropsPerSecond / crop.getFactor() + mooshroomCowCropsPerSecond / CropType.MUSHROOM.getFactor()
+        val timeUntil = (amountUntil / weightPerSecond).seconds
+        return " §7(§b${timeUntil.format()}§7)"
     }
 
     override fun useEtaGoalRank(): Boolean {
@@ -71,9 +90,8 @@ class WeightDisplay: EliteLeaderboardDisplay<FarmingWeight, EliteLeaderboardType
 
     private fun inGardenEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
 
-    override fun shouldShowDisplay(): Boolean {
-        return true
-    }
+    override fun shouldShowDisplay(): Boolean =
+        !GardenApi.hideExtraGuis() && (apiError || (config.ignoreLow || (getWeight(EliteLeaderboardMode.ALL_TIME) ?: 0.0) >= 200.0))
 
 
 }

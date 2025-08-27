@@ -22,9 +22,15 @@ class CropCollectionDisplayConfig {
     @FeatureToggle
     var display: Boolean = true // TODO config fix this based on milestones display
 
+    // TODO goal rank for each crop
     @Expose
     @ConfigLink(owner = CropCollectionDisplayConfig::class, field = "display")
     val pos: Position = Position(180, 10)
+
+    @Expose
+    @ConfigOption(name = "Hide When Not Farming", desc = "Hides the display unless actively farming.")
+    @ConfigEditorBoolean
+    val hideWhenNotFarming: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -39,6 +45,7 @@ class CropCollectionDisplayConfig {
         )
     )
 
+    // TODO fix when no longer updating display
     enum class CropCollectionTextEntry(private val displayName: String) {
         WEIGHT_POSITION("§6Farming Weight: §e104,481.49 §7[§b#5§7]"),
         OVERTAKE("§e170.21 §7(§b12h 32m 15s§7) §7behind §bChissl"),
@@ -67,14 +74,6 @@ class CropCollectionDisplayConfig {
     val overtakeETA: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigOption(
-        name = "Show LB Change",
-        desc = "Show the change of your position in the farming weight leaderboard while you were offline."
-    )
-    @ConfigEditorBoolean
-    var showLbChange: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
     @ConfigEditorBoolean
     val overtakeETAAlways: Property<Boolean> = Property.of(true)
@@ -90,14 +89,14 @@ class CropCollectionDisplayConfig {
 
     @Expose
     @ConfigOption(
-        name = "ETA Goal",
+        name = "All-Time ETA Goal",
         desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")"
     )
     @ConfigEditorText
     val etaGoalRank: Property<String> = Property.of("10000")
 
     @Expose
-    @ConfigOption(name = "Show Outside Garden", desc = "Show the farming weight outside of the garden.")
+    @ConfigOption(name = "Show Outside Garden", desc = "Show your crop collection outside of the garden.")
     @ConfigEditorBoolean
     var showOutsideGarden: Boolean = false
 }

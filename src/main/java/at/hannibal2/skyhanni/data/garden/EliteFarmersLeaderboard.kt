@@ -42,7 +42,7 @@ object EliteFarmersLeaderboard {
     private val weightConfig get() = GardenApi.config.eliteFarmersLeaderboards.farmingWeightDisplay
     private val storage get() = GardenApi.storage?.farmingWeight
     private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardPosMap
-    private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+    private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf() // TODO save to storage
     private val minAmount: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minAmountMap
     private val lastLeaderboardUpdate: MutableMap<EliteLeaderboardType, SimpleTimeMark> = mutableMapOf()
     private val shouldRefreshLeaderboard: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
@@ -73,6 +73,7 @@ object EliteFarmersLeaderboard {
         fetchAttempts = 0
         lastFetchAttempt = SimpleTimeMark.farPast()
     }
+    // TODO only reset the relevant leaderboards
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(weightConfig.useEtaGoalRank, weightConfig.etaGoalRank) {
@@ -344,7 +345,7 @@ object EliteFarmersLeaderboard {
 
     fun getRankGoal(leaderboardType: EliteLeaderboardType): Int? {
         if (!weightConfig.useEtaGoalRank.get()) return null
-        val value = weightConfig.etaGoalRank
+        val value = weightConfig.etaGoalRank // TODO actually fetch the correct goal
         val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
 
         // Check that the provided string is valid

@@ -1,14 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import EliteLeaderboardDisplay
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.FarmingWeightDisplayConfig.FarmingWeightTextEntry
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.PestKillsDisplayConfig.PestKillsTextEntry
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.PestKillsDisplayConfig
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
-import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -45,7 +42,8 @@ class PestDisplay: EliteLeaderboardDisplay<PestType, EliteLeaderboardType.Pest>(
         display = formatDisplay(lineMap)
     }
 
-    override fun overtakeEta(weightUntil: Double): String {
+    // We don't track pest kills over a time period so we can't support this right now
+    override fun overtakeEta(amountUntil: Double): String {
         return ""
     }
 
@@ -94,9 +92,7 @@ class PestDisplay: EliteLeaderboardDisplay<PestType, EliteLeaderboardType.Pest>(
 
     private fun inGardenEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
 
-    override fun shouldShowDisplay(): Boolean {
-        return true
-    }
+    override fun shouldShowDisplay(): Boolean = !GardenApi.hideExtraGuis()
 
 
 }
