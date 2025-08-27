@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.garden.CropCollectionApi.updateTotalCollection
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -31,7 +32,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object FarmingWeight {
+object FarmingWeightData {
     var apiError = false
     var profileId: String = ""
 
@@ -54,6 +55,12 @@ object FarmingWeight {
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         updateCollections()
+    }
+
+    // We need profile id for leaderboard api
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (profileId == "") updateCollections()
     }
 
     @HandleEvent

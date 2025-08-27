@@ -14,9 +14,9 @@ import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getNextPlayer
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getRankGoal
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
-import at.hannibal2.skyhanni.data.garden.FarmingWeight
-import at.hannibal2.skyhanni.data.garden.FarmingWeight.getFactor
-import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getFactor
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -230,7 +230,7 @@ object FarmingWeightDisplay {
     }
 
     private fun formatDisplay(lineMap: MutableMap<FarmingWeightTextEntry, Renderable>): List<Renderable> {
-        if (FarmingWeight.apiError || EliteFarmersLeaderboard.apiError) {
+        if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) {
             return errorMessage
         }
 
@@ -260,7 +260,7 @@ object FarmingWeightDisplay {
         weight = null
         leaderboardPos = null
         EliteFarmersLeaderboard.reset()
-        FarmingWeight.reset()
+        FarmingWeightData.reset()
         update(true)
     }
 

@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.data.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
-import at.hannibal2.skyhanni.data.garden.FarmingWeight.profileId
-import at.hannibal2.skyhanni.data.garden.FarmingWeight.setWeight
-import at.hannibal2.skyhanni.data.garden.FarmingWeight.updateCollections
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.profileId
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.setWeight
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.updateCollections
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.UpcomingLeaderboardPlayer
