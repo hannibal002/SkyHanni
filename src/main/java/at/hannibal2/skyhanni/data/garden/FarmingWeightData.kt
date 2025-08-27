@@ -32,7 +32,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object FarmingWeight {
+object FarmingWeightData {
     var apiError = false
     var profileId: String = ""
 
