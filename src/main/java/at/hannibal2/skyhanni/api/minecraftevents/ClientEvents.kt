@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
@@ -8,6 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.player.ClickAction
 import at.hannibal2.skyhanni.events.player.PlayerInteractionEvent
+import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -23,12 +25,16 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 @SkyHanniModule
 object ClientEvents {
 
-    init {
+    @HandleEvent
+    fun onInitialize(event: PreInitFinishedEvent) {
         val minecraftResourceManager = Minecraft.getMinecraft().resourceManager
+
         if (minecraftResourceManager is IReloadableResourceManager) {
             minecraftResourceManager.registerReloadListener { resourceManager ->
                 ResourcePackReloadEvent(resourceManager).post()
             }
+
+            ResourcePackReloadEvent(minecraftResourceManager).post()
         }
     }
 
