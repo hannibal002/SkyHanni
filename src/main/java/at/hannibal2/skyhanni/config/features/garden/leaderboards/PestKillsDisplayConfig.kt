@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.garden
+package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class EliteFarmingWeightConfig {
+class PestKillsDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Display",
@@ -23,8 +23,29 @@ class EliteFarmingWeightConfig {
     var display: Boolean = true
 
     @Expose
-    @ConfigLink(owner = EliteFarmingWeightConfig::class, field = "display")
+    @ConfigLink(owner = PestKillsDisplayConfig::class, field = "display")
     val pos: Position = Position(180, 10)
+
+    @Expose
+    @ConfigOption(
+        name = "Farming Weight Text",
+        desc = "Drag text to change the appearance of the overlay.\n"
+    )
+    @ConfigEditorDraggableList
+    val text: Property<MutableList<PestKillsTextEntry>> = Property.of(
+        mutableListOf(
+            PestKillsTextEntry.WEIGHT_POSITION,
+            PestKillsTextEntry.OVERTAKE
+        )
+    )
+
+    enum class PestKillsTextEntry(private val displayName: String) {
+        WEIGHT_POSITION("§6Farming Weight: §e104,481.49 §7[§b#5§7]"),
+        OVERTAKE("§e170.21 §7(§b12h 32m 15s§7) §7behind §bChissl")
+        ;
+
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(
@@ -34,27 +55,6 @@ class EliteFarmingWeightConfig {
     )
     @ConfigEditorBoolean
     val leaderboard: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(
-        name = "Farming Weight Text",
-        desc = "Drag text to change the appearance of the overlay.\n"
-    )
-    @ConfigEditorDraggableList
-    val text: Property<MutableList<FarmingWeightTextEntry>> = Property.of(
-        mutableListOf(
-            FarmingWeightTextEntry.WEIGHT_POSITION,
-            FarmingWeightTextEntry.OVERTAKE
-        )
-    )
-
-    enum class FarmingWeightTextEntry(private val displayName: String) {
-        WEIGHT_POSITION("§6Farming Weight: §e104,481.49 §7[§b#5§7]"),
-        OVERTAKE("§e170.21 §7(§b12h 32m 15s§7) §7behind §bChissl")
-        ;
-
-        override fun toString() = displayName
-    }
 
     @Expose
     @ConfigOption(

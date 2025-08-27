@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.crop
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
@@ -37,11 +38,11 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object EliteFarmersLeaderboard {
     val loadingLeaderboardMutex = Mutex()
-    private val config get() = GardenApi.config.eliteFarmingWeights
+    private val weightConfig get() = GardenApi.config.eliteFarmersLeaderboards.farmingWeightDisplay
     private val storage get() = GardenApi.storage?.farmingWeight
-    private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardMap
+    private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardPosMap
     private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
-    private val minAmount: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minWeight
+    private val minAmount: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minAmountMap
     private val lastLeaderboardUpdate: MutableMap<EliteLeaderboardType, SimpleTimeMark> = mutableMapOf()
     private val shouldRefreshLeaderboard: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
     private val lastPlayer: MutableMap<EliteLeaderboardType, EliteLeaderboardPlayer?> = mutableMapOf()
@@ -73,7 +74,7 @@ object EliteFarmersLeaderboard {
     }
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.useEtaGoalRank, config.etaGoalRank) {
+        ConditionalUtils.onToggle(weightConfig.useEtaGoalRank, weightConfig.etaGoalRank) {
             shouldRefreshLeaderboard.clear()
             nextPlayers.clear()
             lastPlayer.clear()
@@ -102,6 +103,7 @@ object EliteFarmersLeaderboard {
     }
 
     fun getLeaderboardPosition(leaderboardType: EliteLeaderboardType, override: Boolean = false): Int? {
+        if (profileId == "") return null // api call requires profile id
         val lastUpdate = lastLeaderboardUpdate[leaderboardType]?.passedSince() ?: INFINITE
         val refresh = override || (shouldRefreshLeaderboard[leaderboardType] ?: true)
 
@@ -131,21 +133,21 @@ object EliteFarmersLeaderboard {
 
     fun getNextPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
         val amount = getAmount(leaderboardType) ?: return null
-        var nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: lastPlayer[leaderboardType] ?: return null
-        var amountDiff = nextPlayer.amount - amount
-        while (amountDiff < 0) {
+        var nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
+        var amountBehind = nextPlayer.amount - amount
+        while (amountBehind < 0) {
             nextPlayer = updateNextPlayer(leaderboardType) ?: break
-            amountDiff = nextPlayer.amount - amount
-        }
-        // This currently doesn't work
-        if (leaderboardPosMap?.get(leaderboardType) == 1) {
-            val lastPlayer = lastPlayer[leaderboardType]
-            if (lastPlayer != null && lastPlayer.amount <= amount) {
-                return Pair(lastPlayer.name, amount - lastPlayer.amount)
-            }
+            amountBehind = nextPlayer.amount - amount
         }
 
-        return if (amountDiff < 0) null else Pair(nextPlayer.name, amountDiff)
+        return if (amountBehind < 0) null else Pair(nextPlayer.name, amountBehind)
+    }
+
+    fun getLastPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
+        val amount = getAmount(leaderboardType) ?: return null
+        val lastPlayer = lastPlayer[leaderboardType] ?: return null
+        val amountAhead = amount - lastPlayer.amount
+        return if (amountAhead < 0) null else Pair(lastPlayer.name, amountAhead)
     }
 
     fun getAmount(leaderboardType: EliteLeaderboardType): Double? {
@@ -193,7 +195,7 @@ object EliteFarmersLeaderboard {
     }
 
     private fun checkOffScreenLeaderboardChanges(oldPosition: Int?, leaderboardType: EliteLeaderboardType) {
-        if (!config.showLbChange) return
+        if (!weightConfig.showLbChange) return
         if (oldPosition == null) return
         wasNotLoaded = false
         val currentPosition = leaderboardPosMap?.get(leaderboardType) ?: return
@@ -216,7 +218,7 @@ object EliteFarmersLeaderboard {
         val upcomingPlayers = getUpcomingPlayerCount(currentPos)
         // Fetch upcoming players from current lb pos if api hasn't updated, or from rank goal
         val rankGoal = getRankGoal(leaderboardType)
-        val useRankGoal = config.useEtaGoalRank.get() && rankGoal != null
+        val useRankGoal = weightConfig.useEtaGoalRank.get() && rankGoal != null
         val atRank = getAtRank(currentPos, rankGoal, useRankGoal)
 
         val apiData = EliteDevApi.fetchLeaderboardPositions(
@@ -294,7 +296,7 @@ object EliteFarmersLeaderboard {
         apiData: EliteLeaderboard,
         diff: Double
     ) {
-        val crop = leaderboardType.getCrop() ?: return
+        val crop = leaderboardType.crop ?: return
         val diffWeight = diff / crop.getFactor()
         if (diffWeight >= 0.5 || abs(diffWeight) >= 10) {
             when (leaderboardType.mode) {
@@ -329,8 +331,8 @@ object EliteFarmersLeaderboard {
     }
 
     fun getRankGoal(leaderboardType: EliteLeaderboardType): Int? {
-        if (!config.useEtaGoalRank.get()) return null
-        val value = config.etaGoalRank
+        if (!weightConfig.useEtaGoalRank.get()) return null
+        val value = weightConfig.etaGoalRank
         val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
 
         // Check that the provided string is valid
@@ -341,7 +343,7 @@ object EliteFarmersLeaderboard {
                 ChatUtils.chatAndOpenConfig(
                     "Invalid Farming Weight Overtake Goal! Click here to edit the Overtake Goal config value " +
                         "to a positive number less than your current leaderboard position to use this feature!",
-                    config::etaGoalRank,
+                    weightConfig::etaGoalRank,
                 )
                 hasWarned = true
             }

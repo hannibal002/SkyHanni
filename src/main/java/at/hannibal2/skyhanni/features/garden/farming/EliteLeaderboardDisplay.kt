@@ -1,7 +1,9 @@
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getAmount
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLastPlayer
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getNextPlayer
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getRankGoal
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.leaderboardMinAmount
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
@@ -26,14 +28,14 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
     private val createType: (E, EliteLeaderboardMode) -> EliteLeaderboardType,
     private val name: String
 ) {
-    private val config get() = GardenApi.config.eliteFarmingWeights
+    protected val configBase get() = GardenApi.config.eliteFarmersLeaderboards
 
-    private var display = emptyList<Renderable>()
-    private var apiError = false
-    private var inventoryOpen = false
-    private var amount: Double? = null
-    private var leaderboardPos: Int? = null
-    private var nextPlayer: Pair<String, Double>? = null
+    protected var display = emptyList<Renderable>()
+    protected var apiError = false
+    var inventoryOpen = false
+    protected var amount: Double? = null
+    protected var leaderboardPos: Int? = null
+    protected var nextPlayer: Pair<String, Double>? = null
     protected open var currentMode: EliteLeaderboardMode
         get() = storage?.second ?: EliteLeaderboardMode.ALL_TIME
         set(value) {
@@ -42,16 +44,16 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
         }
 
     protected open var currentEnum: E?
-        get() = storage?.first ?: getDefaultEnum()
+        get() = storage?.first
         set(value) {
             val mode = storage?.second ?: EliteLeaderboardMode.ALL_TIME
             storage = Pair(value, mode)
         }
 
-    abstract fun getDefaultEnum(): E
+    abstract fun getDefaultEnum(): E?
 
 
-    private val errorMessage by lazy {
+    protected val errorMessage by lazy {
         listOf(
             "§cFarming Weight error: Cannot load",
             "§cdata from Elite Farmers!",
@@ -67,23 +69,19 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
     }
 
     val currentLeaderboardType: EliteLeaderboardType?
-        get() = storage?.let { (storageEnum, mode) ->
-            storageEnum?.let { createType(it, mode) }
-        }
+        get() = (currentEnum ?: getDefaultEnum())?.let { createType(it, currentMode) }
 
     fun update(overrideCooldown: Boolean = false) {
         val type = currentLeaderboardType ?: return
-        amount = getAmount(type)
         leaderboardPos = getLeaderboardPosition(type, overrideCooldown)
+        amount = getAmount(type)
         nextPlayer = getNextPlayer(type)
         drawDisplay(type)
     }
 
     abstract fun drawDisplay(leaderboardType: EliteLeaderboardType)
 
-    abstract fun formatDisplay(): Renderable
-
-    private fun weightPosRenderable(leaderboardType: EliteLeaderboardType): Renderable {
+    protected fun weightPosRenderable(leaderboardType: EliteLeaderboardType): Renderable {
         val amountText = amount?.roundTo(2)?.addSeparators() ?: if (isUnranked(leaderboardType)) {
             "Not ranked!"
         } else {
@@ -97,6 +95,31 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
             onLeftClick = { openWebsite(PlayerUtils.getName()) },
         )
     }
+
+    fun overtakeRenderable(leaderboardType: EliteLeaderboardType): Renderable {
+
+        val next: Pair<String, Double>? = if (leaderboardPos == 1) getLastPlayer(leaderboardType) else getNextPlayer(leaderboardType)
+
+        var (nextName, weightUntil) = next ?: return nullNextPlayerRenderable(leaderboardType)
+
+        val rankGoal = getRankGoal(leaderboardType)
+        if (useEtaGoalRank() && rankGoal != null) {
+            nextName += " §7[§b#${rankGoal.addSeparators()}§7]"
+        }
+
+        val behindOrAhead = if (leaderboardPos == 1) "ahead of" else "behind"
+        val overtakeETA = if (leaderboardPos == 1) "" else overtakeEta(weightUntil)
+        val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeETA §7$behindOrAhead §b$nextName"
+        return Renderable.clickable(
+            text,
+            tips = listOf("§eClick to open the Farming Profile of §b$nextName."),
+            onLeftClick = { openWebsite(nextName) },
+        )
+    }
+
+    abstract fun overtakeEta(weightUntil: Double): String
+
+    abstract fun useEtaGoalRank(): Boolean
 
     // TODO abstract this out
     private fun nullNextPlayerRenderable(leaderboardType: EliteLeaderboardType): Renderable {
@@ -133,21 +156,29 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
         }
     }
 
+    abstract fun showLeaderboard(): Boolean
+
     private fun getLeaderboardFormat(): String {
-        if (!config.leaderboard.get()) return ""
+        if (!showLeaderboard()) return ""
         val format = leaderboardPos?.addSeparators() ?: return if (loadingLeaderboardMutex.isLocked) " §7[§b#?§7]" else ""
         return " §7[§b#$format§7]"
     }
 
-    abstract fun resetData()
+    private fun resetData() {
+        leaderboardPos = null
+        amount = null
+        nextPlayer = null
+    }
+
+    abstract fun reset()
 
     abstract fun isEnabled(): Boolean
 
     abstract fun shouldShowDisplay(): Boolean
 
-    abstract fun MutableList<Renderable>.buildLeaderboardSwitcher()
+    abstract fun MutableList<Renderable>.buildTypeSwitcher()
 
-    private fun MutableList<Renderable>.buildModeSwitcher() {
+    fun MutableList<Renderable>.buildModeSwitcher() {
         this.addRenderableButton(
             label = "Leaderboard Type:",
             current = currentMode,

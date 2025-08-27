@@ -72,7 +72,6 @@ import net.minecraft.item.ItemStack
 import java.time.LocalDate
 import java.util.EnumMap
 import java.util.UUID
-import kotlin.reflect.KClass
 import kotlin.time.Duration
 
 // put everything under its respective feature, the order of the features is the same as in the folder structure
@@ -601,8 +600,9 @@ class ProfileSpecificStorage(
         var farmingWeight: FarmingWeightConfig = FarmingWeightConfig()
 
         class FarmingWeightConfig {
+            // TODO config fix this
             @Expose
-            var lastLeaderboardMap: MutableMap<EliteLeaderboardType, Int> = mutableMapOf()
+            var lastLeaderboardPosMap: MutableMap<EliteLeaderboardType, Int> = mutableMapOf()
 
             @Expose
             var cropDisplayType: Pair<CropType?, EliteLeaderboardMode> = Pair(null, EliteLeaderboardMode.ALL_TIME)
@@ -613,9 +613,9 @@ class ProfileSpecificStorage(
             // TODO config fix this
             @Expose
             var weightDisplayType: Pair<FarmingWeight, EliteLeaderboardMode> = Pair(FarmingWeight.FARMING_WEIGHT, EliteLeaderboardMode.ALL_TIME)
-
+            // TODO config fix this
             @Expose
-            var minWeight: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+            var minAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
 
         }
 

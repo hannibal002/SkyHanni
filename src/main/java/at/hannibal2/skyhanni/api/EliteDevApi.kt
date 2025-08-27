@@ -43,9 +43,9 @@ object EliteDevApi {
         override fun toString() = displayName
     }
 
-    private var spoofProfile = false
-    private var PlayerUuid = ""
-    private var PlayerProfile = ""
+    private var spoofProfile = true
+    private var PlayerUuid = "1242bf4593a047b5bd43f466ce36fb4c"
+    private var PlayerProfile = "lime"
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

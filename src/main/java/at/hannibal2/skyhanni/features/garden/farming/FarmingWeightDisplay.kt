@@ -1,50 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.FarmingWeightTextEntry
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.leaderboardMinAmount
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getNextPlayer
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getRankGoal
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
-import at.hannibal2.skyhanni.data.garden.FarmingWeight
-import at.hannibal2.skyhanni.data.garden.FarmingWeight.getFactor
-import at.hannibal2.skyhanni.data.garden.FarmingWeight.getWeight
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
-import at.hannibal2.skyhanni.events.CollectionUpdateEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import kotlin.time.Duration.Companion.seconds
 /*
 @SkyHanniModule
 object FarmingWeightDisplay {

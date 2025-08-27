@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardTypeAdapter
 import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
@@ -35,6 +37,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(IslandType::class.java, SkyHanniTypeAdapters.ISLAND_TYPE.nullSafe())
         .registerTypeAdapter(ModVersion::class.java, SkyHanniTypeAdapters.MOD_VERSION.nullSafe())
         .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
+        .registerTypeAdapter(EliteLeaderboardType::class.java, EliteLeaderboardTypeAdapter().nullSafe())
         .registerTypeAdapter(
             SkyHanniTracker.DefaultDisplayMode::class.java,
             SkyHanniTypeAdapters.TRACKER_DISPLAY_MODE.nullSafe(),
