@@ -4,10 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
-import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.replace
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -28,8 +26,6 @@ object ColorfulItemStats {
         "§7(?<stat>[a-zA-Z ]+): (?<oldColor>§[0-9a-f])(?<bonus>[-+]?[\\d.,%s]+)(?:\\s|$)",
     )
 
-    private var resourcePackOverrides = emptyMap<String, String>()
-
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltipEvent(event: ItemHoverEvent) {
         if (!config.enabled) return
@@ -42,9 +38,9 @@ object ColorfulItemStats {
 
                 val statId = stat.uppercase().replace(" ", "_")
 
-                val skyblockStatIcon = resourcePackOverrides[statId] ?: SkyblockStat.getValueOrNull(
+                val skyblockStatIcon = SkyblockStat.getIconOrNull(
                     statId
-                )?.icon ?: return@replace this.group()
+                ) ?: return@replace this.group()
 
                 val bonusGroup = group("bonus")
                 val bonus = when {
@@ -65,14 +61,5 @@ object ColorfulItemStats {
                 }
             }
         }
-    }
-
-    @HandleEvent
-    fun onResourcePackLoad(event: ResourcePackReloadEvent) {
-        val packOverrides = event.getJsonResource<Map<String, String>>(
-            createResourceLocation("skyhanni", "icon_overrides.json")
-        )
-
-        resourcePackOverrides = packOverrides.orEmpty()
     }
 }
