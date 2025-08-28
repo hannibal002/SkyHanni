@@ -22,7 +22,6 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import net.minecraft.item.ItemStack
-import net.minecraftforge.event.entity.player.PlayerUseItemEvent.Stop
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
