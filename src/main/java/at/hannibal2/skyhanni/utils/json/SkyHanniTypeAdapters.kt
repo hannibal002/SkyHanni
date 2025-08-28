@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -21,6 +22,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import net.minecraft.item.ItemStack
+import net.minecraftforge.event.entity.player.PlayerUseItemEvent.Stop
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
@@ -74,6 +76,11 @@ object SkyHanniTypeAdapters {
         }
     }
 
+    val STOPWATCH: TypeAdapter<Stopwatch> = SimpleStringTypeAdapter(
+        { this.getDuration().inWholeMilliseconds.toString() },
+        { this.toIntOrNull()?.milliseconds?.let { Stopwatch(it) } ?: error("Could not parse Stopwatch duration from '$this'") },
+    )
+
     val CROP_TYPE: TypeAdapter<CropType> = SimpleStringTypeAdapter(
         { name },
         { CropType.getByName(this) },
@@ -104,6 +111,8 @@ object SkyHanniTypeAdapters {
             return LocalDate.parse(reader.nextString())
         }
     }
+
+
 
     inline fun <reified T> GsonBuilder.registerTypeAdapter(
         crossinline write: (JsonWriter, T) -> Unit,
