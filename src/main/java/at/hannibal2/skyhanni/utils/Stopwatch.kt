@@ -15,13 +15,32 @@ class Stopwatch(
         startTime = SimpleTimeMark.now()
     }
 
-    fun pause() {
+    fun pause(revertLap: Boolean = false) {
         if (paused) return
         paused = true
-        if (startTime != SimpleTimeMark.farPast()) {
+        if (startTime != SimpleTimeMark.farPast() && !revertLap) {
             duration += startTime.passedSince()
         }
         startTime = SimpleTimeMark.farPast()
+    }
+
+    // hard set
+    fun set(setDuration: Duration) {
+        duration = setDuration
+        if (!paused) startTime = SimpleTimeMark.now()
+    }
+
+    // intended to be used for afk detection, call this whenever the player is detected to not be afk
+    fun lap() {
+        if (paused) return
+        duration += startTime.passedSince()
+        startTime = SimpleTimeMark.now()
+    }
+
+    // detection to pause tracker for afk timeout, don't need this if already paused
+    fun getLapTime(): Duration? {
+        if (paused) return null
+        return startTime.passedSince()
     }
 
     fun getDuration(): Duration {
@@ -34,6 +53,6 @@ class Stopwatch(
     fun reset(pause: Boolean = true) {
         duration = 0.seconds
         paused = pause
-        startTime = SimpleTimeMark.farPast()
+        startTime = if (pause) SimpleTimeMark.farPast() else SimpleTimeMark.now()
     }
 }
