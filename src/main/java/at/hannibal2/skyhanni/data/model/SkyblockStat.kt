@@ -170,8 +170,9 @@ enum class SkyblockStat(
             ProfileStorageData.profileSpecific?.stats?.set(this, value)
         }
 
+    @Suppress("UNNECESSARY_SAFE_CALL")
     val icon: String
-        get() = resourcePackOverrides[name] ?: hypixelIcon
+        get() = resourcePackOverrides?.get(name) ?: hypixelIcon
 
     var lastSource: StatSourceType = StatSourceType.UNKNOWN
 
@@ -179,7 +180,8 @@ enum class SkyblockStat(
 
     private val capitalizedName = name.lowercase().allLettersFirstUppercase()
 
-    val iconWithName = "$icon $capitalizedName"
+    val iconWithName
+        get() = "$icon $capitalizedName"
 
     private val keyName = name.lowercase().replace('_', '.')
 
