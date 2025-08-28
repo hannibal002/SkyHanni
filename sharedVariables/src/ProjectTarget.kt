@@ -66,10 +66,10 @@ enum class ProjectTarget(
     MODERN_12109(
         "1.21.9",
         MinecraftVersion.MC12109,
-        yarn("25w34b+build.1"),
+        yarn("25w35a+build.7"),
         MappingStyle.YARN,
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.17.2",
-        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.132.1+1.21.9",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.132.3+1.21.9",
         modMenuVersion = "15.0.0-beta.3",
         isModern = true,
 //         modrinthInfo = ModrinthInfo.FABRIC_1_21_9,
