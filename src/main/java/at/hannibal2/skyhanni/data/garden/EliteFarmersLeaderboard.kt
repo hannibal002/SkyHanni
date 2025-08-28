@@ -322,7 +322,6 @@ object EliteFarmersLeaderboard {
         lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
         shouldRefreshLeaderboard[leaderboardType] = false // Don't want to fetch again if api call was successful
         apiError = false
-        // TODO update event here too // Update display because we updated next players
         if (apiData.rank <= 0) { // api returns -1 for unranked players
             isUnranked[leaderboardType] = true
             return null
