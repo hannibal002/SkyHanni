@@ -178,7 +178,7 @@ class DebugConfig {
 
     // TODO rename to rayTracedOreBlock
     @Expose
-    @ConfigOption(name = "OreBlock Name", desc = "Show the OreBlock you are currently looking at.")
+    @ConfigOption(name = "OreBlock Name", desc = "Show the OreBlock you are currently looking at while F3 is open.")
     @ConfigEditorBoolean
     var raytracedOreblock: Boolean = true
 
