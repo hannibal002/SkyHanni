@@ -8,9 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.reflect.KProperty0
 
-class CropRankGoalsConfig(
-    private val mode: EliteLeaderboardMode
-) {
+class CropRankGoalsConfig {
     @Expose
     @ConfigOption(name = "Wheat", desc = "")
     @ConfigEditorText
@@ -61,16 +59,16 @@ class CropRankGoalsConfig(
     @ConfigEditorText
     val mushroom: Property<String> = Property.of("10000")
 
-    val goalMap: Map<CropType, KProperty0<Property<String>>> = mapOf(
-        CropType.WHEAT to this::wheat,
-        CropType.CARROT to this::carrot,
-        CropType.POTATO to this::potato,
-        CropType.NETHER_WART to this::wart,
-        CropType.PUMPKIN to this::pumpkin,
-        CropType.MELON to this::melon,
-        CropType.COCOA_BEANS to this::cocoa,
-        CropType.SUGAR_CANE to this::cane,
-        CropType.CACTUS to this::cactus,
-        CropType.MUSHROOM to this::mushroom
-    )
+    fun getGoal(type: CropType): KProperty0<Property<String>> = when (type) {
+        CropType.WHEAT -> this::wheat
+        CropType.CARROT -> this::carrot
+        CropType.POTATO -> this::potato
+        CropType.NETHER_WART -> this::wart
+        CropType.PUMPKIN -> this::pumpkin
+        CropType.MELON -> this::melon
+        CropType.COCOA_BEANS -> this::cocoa
+        CropType.SUGAR_CANE -> this::cane
+        CropType.CACTUS -> this::cactus
+        CropType.MUSHROOM -> this::mushroom
+    }
 }

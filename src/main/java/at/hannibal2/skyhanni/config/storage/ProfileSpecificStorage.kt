@@ -605,6 +605,9 @@ class ProfileSpecificStorage(
             var lastLeaderboardPosMap: MutableMap<EliteLeaderboardType, Int> = mutableMapOf()
 
             @Expose
+            var leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+
+            @Expose
             var cropDisplayType: Pair<CropType?, EliteLeaderboardMode> = Pair(null, EliteLeaderboardMode.ALL_TIME)
 
             @Expose

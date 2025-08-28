@@ -131,7 +131,7 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
     private fun nullNextPlayerRenderable(leaderboardType: EliteLeaderboardType): Renderable {
         return if (isUnranked(leaderboardType)) {
             val minAmount = leaderboardMinAmount(leaderboardType) ?: 0.0
-            // the amount eligible to enter most leaderboards is the all-time amount for that lb, except for the monthly weight lb
+            // the amount eligible to enter every other leaderboard is the all-time amount for that lb, except for the monthly weight lb
             // which doesn't include bonus weight because kaeso personally hates me and wants to make this more annoying than it should be
             val isMonthly = currentMode == EliteLeaderboardMode.MONTHLY
             val isWeightMonthly = currentMode == EliteLeaderboardMode.MONTHLY && leaderboardType is EliteLeaderboardType.Weight

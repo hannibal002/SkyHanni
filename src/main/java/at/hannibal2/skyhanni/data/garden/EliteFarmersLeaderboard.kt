@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.data.garden.FarmingWeightData.profileId
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.setWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.updateCollections
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.crop
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -39,7 +40,6 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 
-// TODO fix loading weight profiles + #1 player
 @SkyHanniModule
 object EliteFarmersLeaderboard {
     private val weightConfig get() = GardenApi.config.eliteFarmersLeaderboards.farmingWeightDisplay
@@ -49,7 +49,7 @@ object EliteFarmersLeaderboard {
     val loadingLeaderboardMutex = Mutex()
     private val storage get() = GardenApi.storage?.farmingWeight
     private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardPosMap
-    private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf() // TODO save to storage
+    private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double>? get() = storage?.leaderboardAmountMap
     private val minAmount: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minAmountMap
     private val lastLeaderboardUpdate: MutableMap<EliteLeaderboardType, SimpleTimeMark> = mutableMapOf()
     private val shouldRefreshLeaderboard: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
@@ -74,43 +74,62 @@ object EliteFarmersLeaderboard {
     private val cropConfigs = listOf(
         cropConfig.useRankGoal,
         cropConfig.rankGoalCrops,
-        cropConfig.cropRankGoalsConfig,
-        cropConfig.monthlyCropRankGoalsConfig
     )
 
     private val pestConfigs = listOf(
         pestConfig.useRankGoal,
         pestConfig.rankGoalPests,
-        pestConfig.pestRankGoalsConfig,
-        pestConfig.monthlyPestRankGoalsConfig
     )
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         weightConfigs.forEach { it.afterChange {
-            leaderboardPosMap?.clearCategory(EliteLeaderboardType.Weight::class)
-            shouldRefreshLeaderboard.clearCategory(EliteLeaderboardType.Weight::class)
-            nextPlayers.clearCategory(EliteLeaderboardType.Weight::class)
-            lastPlayer.clearCategory(EliteLeaderboardType.Weight::class)
+            clearCategories(EliteLeaderboardType.Weight::class)
         } }
 
         cropConfigs.forEach { it.afterChange {
-            leaderboardPosMap?.clearCategory(EliteLeaderboardType.Crop::class)
-            shouldRefreshLeaderboard.clearCategory(EliteLeaderboardType.Crop::class)
-            nextPlayers.clearCategory(EliteLeaderboardType.Crop::class)
-            lastPlayer.clearCategory(EliteLeaderboardType.Crop::class)
+            clearCategories(EliteLeaderboardType.Crop::class)
         } }
 
         pestConfigs.forEach { it.afterChange {
-            leaderboardPosMap?.clearCategory(EliteLeaderboardType.Pest::class)
-            shouldRefreshLeaderboard.clearCategory(EliteLeaderboardType.Pest::class)
-            nextPlayers.clearCategory(EliteLeaderboardType.Pest::class)
-            lastPlayer.clearCategory(EliteLeaderboardType.Pest::class)
+            clearCategories(EliteLeaderboardType.Pest::class)
         } }
+
+        for (crop in CropType.entries) {
+            for (mode in EliteLeaderboardMode.entries) {
+                val leaderboardType = EliteLeaderboardType.Crop(crop, mode)
+                ConditionalUtils.onToggle(getRankFromConfig(leaderboardType) ?: continue) {
+                    clearEntries(leaderboardType)
+                }
+            }
+        }
+
+        for (pest in (PestType.entries + null)) {
+            for (mode in EliteLeaderboardMode.entries) {
+                val leaderboardType = EliteLeaderboardType.Pest(pest, mode)
+                ConditionalUtils.onToggle(getRankFromConfig(leaderboardType) ?: continue) {
+                    clearEntries(leaderboardType)
+                }
+            }
+        }
+    }
+
+    private fun clearEntries(leaderboardType: EliteLeaderboardType) {
+        leaderboardPosMap?.remove(leaderboardType)
+        shouldRefreshLeaderboard.remove(leaderboardType)
+        nextPlayers.remove(leaderboardType)
+        lastPlayer.remove(leaderboardType)
+    }
+
+    private fun clearCategories(category: KClass<out EliteLeaderboardType>) {
+        leaderboardPosMap?.clearCategory(category)
+        shouldRefreshLeaderboard.clearCategory(category)
+        nextPlayers.clearCategory(category)
+        lastPlayer.clearCategory(category)
     }
 
     private fun <T> MutableMap<EliteLeaderboardType, T>.clearCategory(category: KClass<out EliteLeaderboardType>) {
-        val keysToRemove = keys.filter { it::class == category }
+        val keysToRemove = keys.filter { category.isInstance(it) }
         keysToRemove.forEach { remove(it) }
     }
 
@@ -118,11 +137,8 @@ object EliteFarmersLeaderboard {
     fun onCropCollectionAdd(event: CropCollectionAddEvent) {
         if (event.cropCollectionType == CropCollectionType.UNKNOWN) return
         val leaderboardType = EliteLeaderboardType.Crop(event.crop, EliteLeaderboardMode.MONTHLY)
-        val currentAmount = leaderboardAmountMap.getOrPut(leaderboardType) {
-            event.amount.toDouble()
-            return
-        }
-        leaderboardAmountMap[leaderboardType] = currentAmount + event.amount.toDouble()
+        val currentAmount = leaderboardAmountMap?.get(leaderboardType) ?: event.amount.toDouble()
+        leaderboardAmountMap?.set(leaderboardType, currentAmount + event.amount.toDouble())
     }
 
     @HandleEvent
@@ -133,7 +149,7 @@ object EliteFarmersLeaderboard {
     }
 
     private fun addPestKill(leaderboardType: EliteLeaderboardType, amount: Double = 1.0) {
-        leaderboardAmountMap[leaderboardType] = leaderboardAmountMap.getOrDefault(leaderboardType, 0.0) + amount
+        leaderboardAmountMap?.set(leaderboardType, (leaderboardAmountMap?.get(leaderboardType) ?: 0.0) + amount)
     }
 
     fun isUnranked(leaderboardType: EliteLeaderboardType): Boolean {
@@ -197,7 +213,7 @@ object EliteFarmersLeaderboard {
         return when (leaderboardType) {
             is EliteLeaderboardType.Weight -> getWeight(leaderboardType.mode)
             is EliteLeaderboardType.Crop -> getCropCollection(leaderboardType.crop, leaderboardType.mode)
-            else -> leaderboardAmountMap[leaderboardType]
+            else -> leaderboardAmountMap?.get(leaderboardType)
         }
     }
 
@@ -218,7 +234,7 @@ object EliteFarmersLeaderboard {
     private fun getCropCollection(crop: CropType, leaderboardMode: EliteLeaderboardMode): Double? {
         return when (leaderboardMode) {
             EliteLeaderboardMode.ALL_TIME -> crop.getCollection().toDouble()
-            EliteLeaderboardMode.MONTHLY -> leaderboardAmountMap[EliteLeaderboardType.Crop(crop, EliteLeaderboardMode.MONTHLY)]
+            EliteLeaderboardMode.MONTHLY -> leaderboardAmountMap?.get(EliteLeaderboardType.Crop(crop, EliteLeaderboardMode.MONTHLY))
         }
     }
 
@@ -371,7 +387,7 @@ object EliteFarmersLeaderboard {
             when (leaderboardType.mode) {
                 EliteLeaderboardMode.ALL_TIME -> updateCollections() // we handle all-time collections in the farming weight class
                 EliteLeaderboardMode.MONTHLY ->
-                    leaderboardAmountMap[leaderboardType] = apiData.amount
+                    leaderboardAmountMap?.set(leaderboardType, apiData.amount)
             }
         }
     }
@@ -382,7 +398,7 @@ object EliteFarmersLeaderboard {
         diff: Double
     ) {
         if (diff >= 1 || abs(diff) >= 30) {
-            leaderboardAmountMap[leaderboardType] = apiData.amount
+            leaderboardAmountMap?.set(leaderboardType, apiData.amount)
         }
     }
 
@@ -400,20 +416,19 @@ object EliteFarmersLeaderboard {
     }
 
     fun getRankGoal(leaderboardType: EliteLeaderboardType): Int? {
-        //if (!weightConfig.useEtaGoalRank.get()) return null
-        val value = getRankFromConfig(leaderboardType)
+        val property = getRankFromConfig(leaderboardType) ?: return null
+
         val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
 
-        // Check that the provided string is valid
-        val goal = value?.get()?.toIntOrNull() ?: return null
+        val goal = property.get().toIntOrNull() ?: return null
 
         if (goal < 1 || goal >= currentLeaderboardPos) {
             if (goal < 1 && !hasWarned) {
-                getLeaderboardRankConfig(leaderboardType)?.let {
+                getLeaderboardRankConfig(leaderboardType).let { prop ->
                     ChatUtils.chatAndOpenConfig(
                         "Invalid $leaderboardType Rank Goal! Click here to edit the Rank Goal config value " +
-                                "to a positive number less than your current leaderboard position to use this feature!",
-                        it,
+                            "to a positive number less than your current leaderboard position to use this feature!",
+                        prop,
                     )
                 }
                 hasWarned = true
@@ -426,6 +441,7 @@ object EliteFarmersLeaderboard {
             shouldRefreshLeaderboard[leaderboardType] = true
             rankGoal[leaderboardType] = goal
         }
+
         return rankGoal[leaderboardType]
     }
 
@@ -437,7 +453,6 @@ object EliteFarmersLeaderboard {
         shouldRefreshLeaderboard.clear()
         rankGoal.clear()
         isUnranked.clear()
-        hasWarned = false
         apiError = false
         hasWarned = false
         fetchAttempts = 0

@@ -99,8 +99,7 @@ class CropCollectionDisplayConfig {
         desc = ""
     )
     @Accordion
-    val cropRankGoalsConfig: Property<CropRankGoalsConfig> =
-        Property.of(CropRankGoalsConfig(EliteLeaderboardMode.ALL_TIME))
+    val cropRankGoalsConfig: CropRankGoalsConfig = CropRankGoalsConfig()
 
     @Expose
     @ConfigOption(
@@ -108,8 +107,7 @@ class CropCollectionDisplayConfig {
         desc = ""
     )
     @Accordion
-    val monthlyCropRankGoalsConfig: Property<CropRankGoalsConfig> =
-        Property.of(CropRankGoalsConfig(EliteLeaderboardMode.MONTHLY))
+    val monthlyCropRankGoalsConfig: CropRankGoalsConfig = CropRankGoalsConfig()
 
     @Expose
     @ConfigOption(

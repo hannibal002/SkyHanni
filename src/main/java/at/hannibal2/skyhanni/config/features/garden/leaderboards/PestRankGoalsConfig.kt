@@ -8,9 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.reflect.KProperty0
 
-class PestRankGoalsConfig(
-    private val mode: EliteLeaderboardMode
-) {
+class PestRankGoalsConfig {
     @Expose
     @ConfigOption(name = "All pests", desc = "")
     @ConfigEditorText
@@ -71,18 +69,18 @@ class PestRankGoalsConfig(
     @ConfigEditorText
     val slug: Property<String> = Property.of("10000")
 
-    val goalMap: Map<PestType?, KProperty0<Property<String>>> = mapOf(
-        PestType.FLY to this::fly,
-        PestType.CRICKET to this::cricket,
-        PestType.LOCUST to this::locust,
-        PestType.BEETLE to this::beetle,
-        PestType.RAT to this::rat,
-        PestType.EARTHWORM to this::earthworm,
-        PestType.MOTH to this::moth,
-        PestType.MOSQUITO to this::mosquito,
-        PestType.MITE to this::mite,
-        PestType.SLUG to this::slug,
-        PestType.FIELD_MOUSE to this::fieldMouse,
-        null to this::allPests
-    )
+    fun getGoal(type: PestType?): KProperty0<Property<String>> = when (type) {
+        PestType.FLY    -> this::fly
+        PestType.CRICKET    -> this::cricket
+        PestType.LOCUST -> this::locust
+        PestType.BEETLE -> this::beetle
+        PestType.RAT    -> this::rat
+        PestType.EARTHWORM  -> this::earthworm
+        PestType.MOTH   -> this::moth
+        PestType.MOSQUITO   -> this::mosquito
+        PestType.MITE   -> this::mite
+        PestType.SLUG   -> this::slug
+        PestType.FIELD_MOUSE    -> this::fieldMouse
+        else -> this::allPests
+    }
 }

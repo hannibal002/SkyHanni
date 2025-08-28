@@ -79,7 +79,7 @@ class PestDisplay: EliteLeaderboardDisplay<PestType, EliteLeaderboardType.Pest>(
             onChange = { new ->
                 changeEnum(new)
             },
-            universe = PestType.entries,
+            universe = PestType.filterableEntries,
             enableUniverseScroll = false // would infinitely scroll while hovered
         )
     }
