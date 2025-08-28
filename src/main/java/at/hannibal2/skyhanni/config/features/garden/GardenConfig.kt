@@ -32,7 +32,7 @@ class GardenConfig {
     val visitors: VisitorConfig = VisitorConfig()
 
     @Expose
-    @Category(name = "EliteBot Leaderboards", desc = "")
+    @Category(name = "Elite Leaderboards", desc = "")
     val eliteFarmersLeaderboards: EliteFarmersLeaderboardsConfig = EliteFarmersLeaderboardsConfig()
 
     @Expose

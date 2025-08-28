@@ -48,7 +48,7 @@ class PestDisplay: EliteLeaderboardDisplay<PestType, EliteLeaderboardType.Pest>(
     }
 
     override fun useEtaGoalRank(): Boolean {
-        return config.useEtaGoalRank.get()
+        return config.useRankGoal.get()
     }
 
     override fun showLeaderboard(): Boolean = config.leaderboard.get()
@@ -82,10 +82,6 @@ class PestDisplay: EliteLeaderboardDisplay<PestType, EliteLeaderboardType.Pest>(
             universe = PestType.entries,
             enableUniverseScroll = false // would infinitely scroll while hovered
         )
-    }
-
-    override fun reset() {
-        TODO("Not yet implemented")
     }
 
     override fun isEnabled(): Boolean = config.display && (inGardenEnabled())

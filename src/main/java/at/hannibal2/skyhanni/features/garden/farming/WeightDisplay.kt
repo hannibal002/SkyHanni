@@ -63,16 +63,13 @@ class WeightDisplay: EliteLeaderboardDisplay<FarmingWeight, EliteLeaderboardType
     }
 
     override fun useEtaGoalRank(): Boolean {
-        return config.useEtaGoalRank.get()
+        return config.useRankGoal.get()
     }
 
     override fun showLeaderboard(): Boolean = config.leaderboard.get()
 
-    // TODO consider abstracting this to remove duplication
     private fun formatDisplay(lineMap: MutableMap<FarmingWeightTextEntry, Renderable>): List<Renderable> {
-        if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) {
-            return errorMessage
-        }
+        if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) return errorMessage
 
         val newList = mutableListOf<Renderable>()
         if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
@@ -81,10 +78,6 @@ class WeightDisplay: EliteLeaderboardDisplay<FarmingWeight, EliteLeaderboardType
     }
 
     override fun MutableList<Renderable>.buildTypeSwitcher() {} // No switcher needed for this display
-
-    override fun reset() {
-        TODO("Not yet implemented")
-    }
 
     override fun isEnabled(): Boolean = config.display && (inGardenEnabled())
 

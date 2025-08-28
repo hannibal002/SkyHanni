@@ -2,12 +2,10 @@ package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.*
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestKillsDisplayConfig {
@@ -59,27 +57,53 @@ class PestKillsDisplayConfig {
 
     @Expose
     @ConfigOption(
-        name = "Use ETA Goal",
-        desc = "Use the ETA Goal number instead of the next upcoming rank. Useful when your rank is in the " +
-            "ten thousands and you don't want to see small ETAs."
+        name = "Use Rank Goal",
+        desc = "Use the Rank Goal number instead of the next upcoming rank. Useful when your rank is in the " +
+                "ten thousands and you don't want to see small ETAs."
     )
     @ConfigEditorBoolean
-    val useEtaGoalRank: Property<Boolean> = Property.of(true)
+    val useRankGoal: Property<Boolean> = Property.of(true)
 
-    // TODO eta for each pest
     @Expose
     @ConfigOption(
-        name = "ETA Goal",
-        desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")"
+        name = "Rank Goal",
+        desc = "What crops to set a custom rank goal for. Applies to all leaderboard modes."
     )
-    @ConfigEditorText
-    val etaGoalRank: Property<String> = Property.of("10000")
+    @ConfigEditorDraggableList
+    val rankGoalPests: Property<MutableList<PestTypeWithAll>> = Property.of(mutableListOf())
 
-    // TODO figure out what to do with this
+    sealed class PestTypeWithAll {
+        object AllPests : PestTypeWithAll()
+        data class Specific(val type: PestType) : PestTypeWithAll()
+
+        override fun toString(): String = when (this) {
+            AllPests -> "All Pests"
+            is Specific -> type.displayName
+        }
+    }
+
+    @Expose
+    @ConfigOption(
+        name = "All-Time Crop Rank Goals",
+        desc = ""
+    )
+    @Accordion
+    val pestRankGoalsConfig: Property<PestRankGoalsConfig> =
+        Property.of(PestRankGoalsConfig(EliteLeaderboardMode.ALL_TIME))
+
+    @Expose
+    @ConfigOption(
+        name = "Monthly Crop Rank Goals",
+        desc = ""
+    )
+    @Accordion
+    val monthlyPestRankGoalsConfig: Property<PestRankGoalsConfig> =
+        Property.of(PestRankGoalsConfig(EliteLeaderboardMode.MONTHLY))
+
     @Expose
     @ConfigOption(
         name = "Show LB Change",
-        desc = "Show the change of your position in the farming weight leaderboard while you were offline."
+        desc = "Show the change of your position on your current pest leaderboard while you were offline."
     )
     @ConfigEditorBoolean
     var showLbChange: Boolean = false

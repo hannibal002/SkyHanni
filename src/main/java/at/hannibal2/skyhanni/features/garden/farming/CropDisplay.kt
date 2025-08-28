@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import EliteLeaderboardDisplay
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.CropCollectionDisplayConfig.CropCollectionTextEntry
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.FarmingWeightDisplayConfig.FarmingWeightTextEntry
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
@@ -58,15 +57,13 @@ class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
     }
 
     override fun useEtaGoalRank(): Boolean {
-        return config.useEtaGoalRank.get()
+        return config.useRankGoal.get()
     }
 
     override fun showLeaderboard(): Boolean = config.leaderboard.get()
 
     private fun formatDisplay(lineMap: MutableMap<CropCollectionTextEntry, Renderable>): List<Renderable> {
-        if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) {
-            return errorMessage
-        }
+        if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) return errorMessage
 
         val newList = mutableListOf<Renderable>()
         if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
@@ -87,10 +84,6 @@ class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
             universe = CropType.entries,
             enableUniverseScroll = false // would infinitely scroll while hovered
         )
-    }
-
-    override fun reset() {
-        TODO("Not yet implemented")
     }
 
     override fun isEnabled(): Boolean = config.display && (inGardenEnabled())

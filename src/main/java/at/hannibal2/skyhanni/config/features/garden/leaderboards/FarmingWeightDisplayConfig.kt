@@ -86,7 +86,7 @@ class FarmingWeightDisplayConfig {
             "ten thousands and you don't want to see small ETAs."
     )
     @ConfigEditorBoolean
-    val useEtaGoalRank: Property<Boolean> = Property.of(true)
+    val useRankGoal: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -94,15 +94,15 @@ class FarmingWeightDisplayConfig {
         desc = "Set a rank goal for the All-Time Farming Weight Leaderboard."
     )
     @ConfigEditorText
-    val etaGoalRank: Property<String> = Property.of("10000")
+    val weightRankGoal: Property<String> = Property.of("10000")
 
     @Expose
     @ConfigOption(
-        name = "Monthly ETA Goal",
+        name = "Monthly Rank Goal",
         desc = "Set a rank goal for the Monthly Farming Weight Leaderboard."
     )
     @ConfigEditorText
-    val etaGoalRankMonthly: Property<String> = Property.of("10000")
+    val monthlyWeightRankGoal: Property<String> = Property.of("10000")
 
 
     @Expose

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getRankGoal
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.leaderboardMinAmount
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -20,6 +21,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
 
@@ -99,11 +102,15 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
     fun overtakeRenderable(leaderboardType: EliteLeaderboardType, getLastPlayer: Boolean = false): Renderable {
         val next: Pair<String, Double>? = if (getLastPlayer) getLastPlayer(leaderboardType) else getNextPlayer(leaderboardType)
 
-        var (nextName, amountUntil) = next ?: return nullNextPlayerRenderable(leaderboardType)
+
 
         val rankGoal = getRankGoal(leaderboardType)
-        if (useEtaGoalRank() && rankGoal != null) {
-            nextName += " §7[§b#${rankGoal.addSeparators()}§7]"
+        val useRankGoal = useEtaGoalRank() && rankGoal != null
+        if (useRankGoal && getLastPlayer) return Renderable.empty()
+
+        var (nextName, amountUntil) = next ?: return nullNextPlayerRenderable(leaderboardType)
+        if (useRankGoal) {
+            nextName += " §7[§b#${rankGoal?.addSeparators()}§7]"
         }
 
         val behindOrAhead = if (getLastPlayer) "ahead of" else "behind"
@@ -122,36 +129,41 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
 
     // TODO abstract this out
     private fun nullNextPlayerRenderable(leaderboardType: EliteLeaderboardType): Renderable {
-        return if ((amount ?: 0.0) < (leaderboardMinAmount(leaderboardType) ?: 0.0)) {
+        return if (isUnranked(leaderboardType)) {
             val minAmount = leaderboardMinAmount(leaderboardType) ?: 0.0
-            // Min weight to get on lb is 1k all-time weight for all-time lb (including bonus weight), and 1k all-time crop weight
-            // for monthly lb because kaeso personally hates me and wants to make this more annoying than it should be
+            // the amount eligible to enter most leaderboards is the all-time amount for that lb, except for the monthly weight lb
+            // which doesn't include bonus weight because kaeso personally hates me and wants to make this more annoying than it should be
             val isMonthly = currentMode == EliteLeaderboardMode.MONTHLY
-            val currentAmount = getAmount(leaderboardType)
+            val isWeightMonthly = currentMode == EliteLeaderboardMode.MONTHLY && leaderboardType is EliteLeaderboardType.Weight
+
+            val currentAmount = if (isWeightMonthly) {
+                getWeight(EliteLeaderboardMode.MONTHLY, cropWeightOnly = true)
+            } else {
+                getAmount(leaderboardType, EliteLeaderboardMode.ALL_TIME)
+            }
+
             val weightUntil = minAmount - (currentAmount ?: 0.0)
-            val overtakeEta = ""//overtakeEta(weightUntil)
-            val minWeightText = "$leaderboardType"
+            val overtakeEta = overtakeEta(weightUntil)
             val untilRankedTextColor = if (overtakeEta == "") "§7" else "§e"
             val untilRankedText = if (isMonthly) "until eligible!" else "until ranked!"
+
             val text = "§e${weightUntil.roundTo(2).addSeparators()}$overtakeEta $untilRankedTextColor$untilRankedText"
-            val tips = mutableListOf(
-                "§bThis leaderboard requires $minAmount ",
-                "§b$minWeightText before getting ranked!",
-            )
-            if (isMonthly) {
-                tips.addAll(
-                    listOf(
-                        "",
-                        "§7Excludes bonus weight!"
-                    )
-                )
+
+            val tips = buildList {
+                add("§bThis leaderboard requires $minAmount ")
+                add("§b$leaderboardType before ${if (isMonthly) "being eligible" else "getting ranked"}!")
+                if (isWeightMonthly) {
+                    add("")
+                    add("§7Excludes bonus weight!")
+                }
             }
+
             Renderable.hoverTips(
                 content = text,
                 tips = tips,
             )
         } else {
-            Renderable.text("§bLoading next player...")
+            Renderable.text("§bLoading player...")
         }
     }
 
@@ -169,7 +181,12 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
         nextPlayer = null
     }
 
-    abstract fun reset()
+    fun reset() {
+        amount = null
+        leaderboardPos = null
+        nextPlayer = null
+        apiError = false
+    }
 
     abstract fun isEnabled(): Boolean
 
