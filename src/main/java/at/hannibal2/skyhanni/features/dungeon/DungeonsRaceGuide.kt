@@ -5,8 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DungeonHubRacesJson
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -39,7 +37,7 @@ object DungeonsRaceGuide {
     private var inRace: Boolean = false
     private var currentRace: String? = null
 
-    @HandleEvent(IslandChangeEvent::class)
+    @HandleEvent
     fun onIslandChange() {
         reset()
     }
@@ -60,7 +58,7 @@ object DungeonsRaceGuide {
         updateConfig()
     }
 
-    @HandleEvent(ConfigLoadEvent::class)
+    @HandleEvent
     fun onConfigLoad() {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
