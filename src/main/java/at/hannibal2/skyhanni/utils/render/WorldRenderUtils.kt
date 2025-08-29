@@ -771,6 +771,7 @@ object WorldRenderUtils {
         smallestDistanceVew: Double = 5.0,
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
+        blockCenter: Boolean = true,
         maxDistance: Int? = null,
     ) {
         val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
@@ -803,10 +804,10 @@ object WorldRenderUtils {
         var scale = distRender / 12
         scale *= scaleMultiplier
 
-        val resultX = renderOffsetX + (x + 0.5 - renderOffsetX) / (distToPlayer / distRender)
+        val resultX = renderOffsetX + (x + (if (blockCenter) 0.5 else 0.0) - renderOffsetX) / (distToPlayer / distRender)
         val resultY = if (ignoreY) y * distToPlayer / distRender else renderOffsetY + eyeHeight +
             (y + 20 * distToPlayer / 300 - (renderOffsetY + eyeHeight)) / (distToPlayer / distRender)
-        val resultZ = renderOffsetZ + (z + 0.5 - renderOffsetZ) / (distToPlayer / distRender)
+        val resultZ = renderOffsetZ + (z + (if (blockCenter) 0.5 else 0.0) - renderOffsetZ) / (distToPlayer / distRender)
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
