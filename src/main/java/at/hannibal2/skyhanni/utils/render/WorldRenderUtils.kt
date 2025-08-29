@@ -821,6 +821,7 @@ object WorldRenderUtils {
         location: LorenzVec,
         lines: List<Pair<String, Double>>,
         yOff: Float = 0f,
+        anchoredLineIndex: Int = 0,
         hideTooCloseAt: Double = 4.5,
         smallestDistanceVew: Double = 5.0,
         seeThroughBlocks: Boolean = true,
@@ -828,21 +829,22 @@ object WorldRenderUtils {
         blockCenter: Boolean = true,
         maxDistance: Int? = null,
     ) {
+        if (lines.isEmpty()) return
+
         val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
         val player = MinecraftCompat.localPlayerOrNull ?: return
 
-        val x = location.x
-        val y = location.y
-        val z = location.z
+        val x = location.x + (if (blockCenter) 0.5 else 0.0)
+        val y = location.y + (if (blockCenter) 0.5 else 0.0)
+        val z = location.z + (if (blockCenter) 0.5 else 0.0)
 
-        val renderOffsetX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-        val renderOffsetY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
-        val renderOffsetZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
-        val eyeHeight = player.getEyeHeight()
+        val viewX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
+        val viewY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks + player.getEyeHeight()
+        val viewZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
 
-        val dX = (x - renderOffsetX) * (x - renderOffsetX)
-        val dY = (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight))
-        val dZ = (z - renderOffsetZ) * (z - renderOffsetZ)
+        val dX = (x - viewX) * (x - viewX)
+        val dY = (y - viewY) * (y - viewY)
+        val dZ = (z - viewZ) * (z - viewZ)
         val distToPlayerSq = dX + dY + dZ
         var distToPlayer = sqrt(distToPlayerSq)
         // TODO this is optional maybe?
@@ -853,24 +855,26 @@ object WorldRenderUtils {
             if (seeThroughBlocks && distToPlayer > it) return
         }
 
-        val distRender = distToPlayer.coerceAtMost(50.0)
+//         val distRender = distToPlayer.coerceAtMost(50.0)
+        val distRender = 50
 
-        val processedLines = mutableListOf<Triple<String, Double, Double>>()
-
-        val scale = distRender / 12
-
-        lines.forEach { (text, scaleMultiplier) ->
-            processedLines.add(Triple("§f$text", scaleMultiplier, scale * scaleMultiplier))
+        val processedLines = lines.map { (text, scaleMultiplier) ->
+            "§f$text" to scaleMultiplier
         }
 
-        val resultX = renderOffsetX + (x + (if (blockCenter) 0.5 else 0.0) - renderOffsetX) / (distToPlayer / distRender)
-        val resultY = if (ignoreY) y * distToPlayer / distRender else renderOffsetY + eyeHeight +
-            (y + 20 * distToPlayer / 300 - (renderOffsetY + eyeHeight)) / (distToPlayer / distRender)
-        val resultZ = renderOffsetZ + (z + (if (blockCenter) 0.5 else 0.0) - renderOffsetZ) / (distToPlayer / distRender)
+        val resultX = viewX + (x - viewX) / (distToPlayer / distRender)
+        val resultY = if (ignoreY) {
+            y * (distToPlayer / distRender)
+        } else {
+            viewY + (y - viewY) / (distToPlayer / distRender)
+        }
+        val resultZ = viewZ + (z - viewZ) / (distToPlayer / distRender)
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
-        renderMultiLineText(renderLocation, processedLines, !seeThroughBlocks, true, yOff)
+        renderMultiLineText(
+            renderLocation, processedLines, !seeThroughBlocks, true, yOff, anchoredLineIndex, baseScaleIn = distRender / 12.0,
+        )
     }
 
     private fun SkyHanniRenderWorldEvent.renderText(
@@ -921,11 +925,18 @@ object WorldRenderUtils {
 
     private fun SkyHanniRenderWorldEvent.renderMultiLineText(
         location: LorenzVec,
-        lines: List<Triple<String, Double, Double>>,
+        lines: List<Pair<String, Double>>,
         seeThroughBlocks: Boolean,
         shadow: Boolean,
         yOff: Float,
+        anchoredLineIndex: Int = 0,
+        ySpacing: Float = 4.0F,
+        baseScaleIn: Double = 1.0,
     ) {
+        if (lines.isEmpty()) return
+
+        val baseScale = baseScaleIn / 25
+
         if (!seeThroughBlocks) {
             GL11.glDisable(GL11.GL_DEPTH_TEST)
             GL11.glDepthMask(false)
@@ -935,8 +946,14 @@ object WorldRenderUtils {
         val fontRenderer = minecraft.fontRendererObj
         val renderManager = minecraft.renderManager
 
-        var y = 0
-        lines.forEach { (text, originalScale, scale) ->
+        var y = yOff.toDouble() + ySpacing
+
+        for (i in 0..anchoredLineIndex) {
+            y -= ySpacing
+            y -= (fontRenderer.FONT_HEIGHT * lines[i].second)
+        }
+
+        lines.forEach { (text, scale) ->
             GlStateManager.pushMatrix()
             GlStateManager.enableBlend()
             GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
@@ -950,16 +967,18 @@ object WorldRenderUtils {
             GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
             GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
 
-            GlStateManager.scale(-scale / 25, -scale / 25, scale / 25)
+            GlStateManager.scale(-(scale * baseScale), -(scale * baseScale), scale * baseScale)
+
+            y += fontRenderer.FONT_HEIGHT * scale / 2
             val stringWidth = fontRenderer.getStringWidth(text)
             fontRenderer.drawString(
                 text,
                 (-stringWidth / 2).toFloat(),
-                yOff + y,
+                (y / scale).toFloat(),
                 0,
                 shadow,
             )
-            y += (fontRenderer.FONT_HEIGHT * originalScale).toInt()
+            y += fontRenderer.FONT_HEIGHT * scale / 2 + ySpacing
 
             GlStateManager.color(1f, 1f, 1f)
             GlStateManager.disableBlend()
