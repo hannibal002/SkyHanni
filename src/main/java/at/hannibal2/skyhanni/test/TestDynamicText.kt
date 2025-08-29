@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.DynamicTextLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawMultiLineDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import java.awt.Color
 
 @SkyHanniModule
@@ -40,13 +40,13 @@ object TestDynamicText {
 
     private class MultiLineDynamicText(
         val location: LorenzVec,
-        val lines: List<Pair<String, Double>>,
+        val lines: List<DynamicTextLine>,
     ) : DynamicText {
         override fun draw(event: SkyHanniRenderWorldEvent) {
             event.drawMultiLineDynamicText(
                 location,
                 lines,
-                anchoredLineIndex = 3,
+                anchoredLineIndex = 0,
                 blockCenter = true,
             )
             event.drawSphereInWorld(
@@ -73,12 +73,12 @@ object TestDynamicText {
             MultiLineDynamicText(
                 GetCoordinates.inFront(),
                 listOf(
-                    Pair("topline x1.5", 1.5),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("topline x1.5", 1.5),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
+                    DynamicTextLine("topline x1.5", 1.5),
+                    DynamicTextLine("second line x1.0", 1.0),
+                    DynamicTextLine("second line x1.0", 1.0),
+                    DynamicTextLine("topline x1.5", 1.5),
+                    DynamicTextLine("second line x1.0", 1.0),
+                    DynamicTextLine("second line x1.0", 1.0),
                 ),
             ),
         )
@@ -99,22 +99,10 @@ object TestDynamicText {
         texts.add(
             MultiLineDynamicText(
                 GetCoordinates.inFront(),
-                listOf(
-                    Pair("topline x1.5", 1.5),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                    Pair("second line x1.0", 1.0),
-                ),
+                buildList {
+                    add(DynamicTextLine("topline x1.5", 1.5))
+                    for (i in 0..10) add(DynamicTextLine("second line x1.0", 1.0))
+                }.toList(),
             ),
         )
     }
