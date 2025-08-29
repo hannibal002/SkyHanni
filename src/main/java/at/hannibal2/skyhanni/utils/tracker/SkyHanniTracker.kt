@@ -48,7 +48,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private val trackUptime: Boolean = true,
     private val drawDisplay: (Data) -> List<Searchable>,
 ) {
-
+    //private val trackUptime: Boolean = true
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
@@ -64,25 +64,19 @@ open class SkyHanniTracker<Data : TrackerData>(
 
         private val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
-        private val unpausedTrackers: MutableList<SkyHanniTracker<*>> = mutableListOf()
+        private val unpausedTrackers: MutableSet<SkyHanniTracker<*>> = mutableSetOf()
 
         @HandleEvent
         fun onTick(event: SkyHanniTickEvent) {
             if (!event.isMod(10)) return
-            val toRemove = mutableListOf<SkyHanniTracker<*>>()
             ChatUtils.debug("Unpaused trackers: $unpausedTrackers")
 
-            unpausedTrackers.forEach { tracker ->
+            unpausedTrackers.toList().forEach { tracker ->
                 ChatUtils.debug("$tracker")
                 if (tracker.trackUptime) {
-                    if (tracker.checkAfk()) {
-                        toRemove.add(tracker)
-                    } else {
-                        tracker.update()
-                    }
+                    tracker.checkAfk()
                 }
             }
-            unpausedTrackers.removeAll(toRemove)
         }
 
         fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
@@ -167,8 +161,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    private fun showSessionUptime(): Boolean =
-        config.showUptime && (if (config.onlyShowSession) displayMode != DisplayMode.TOTAL else false)
+    private fun showSessionUptime(): Boolean = config.showUptime && (!config.onlyShowSession || displayMode != DisplayMode.TOTAL)
 
     private fun checkAfk(): Boolean {
         if (getSessionUptime()?.isPaused() == true) {
@@ -189,9 +182,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.sessionUptime.start(true) }
-        if (this !in unpausedTrackers) {
-            unpausedTrackers.add(this)
-        }
+        unpausedTrackers.add(this)
         update()
     }
 
@@ -199,6 +190,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.sessionUptime.pause(true) }
+        unpausedTrackers.remove(this)
         update()
     }
 
