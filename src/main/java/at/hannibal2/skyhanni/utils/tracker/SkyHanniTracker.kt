@@ -70,6 +70,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         fun onTick(event: SkyHanniTickEvent) {
             if (!event.isMod(10)) return
             val toRemove = mutableListOf<SkyHanniTracker<*>>()
+            ChatUtils.debug("Unpaused trackers: $unpausedTrackers")
 
             unpausedTrackers.forEach { tracker ->
                 ChatUtils.debug("$tracker")
