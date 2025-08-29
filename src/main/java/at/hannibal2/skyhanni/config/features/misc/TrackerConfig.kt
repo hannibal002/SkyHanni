@@ -96,7 +96,7 @@ class TrackerConfig {
     @Expose
     @ConfigOption(name = "Show Uptime", desc = "Show how long the tracker has been active")
     @ConfigEditorBoolean
-    var showUptime: Boolean = false
+    var showUptime: Boolean = true
 
     @Expose
     @ConfigOption(name = "AFK timeout", desc = "Pause the tracker if it is not modified for this amount of seconds")
