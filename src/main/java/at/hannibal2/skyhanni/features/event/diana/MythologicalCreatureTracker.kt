@@ -70,7 +70,7 @@ object MythologicalCreatureTracker {
 
     class Data : TrackerData() {
 
-        override fun reset() {
+        override fun resetData() {
             count.clear()
             creaturesSinceLastInquisitor = 0
         }

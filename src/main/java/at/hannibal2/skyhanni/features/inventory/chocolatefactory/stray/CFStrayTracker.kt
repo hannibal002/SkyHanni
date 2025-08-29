@@ -143,7 +143,7 @@ object CFStrayTracker {
     }
 
     class Data : TrackerData() {
-        override fun reset() {
+        override fun resetData() {
             straysCaught.clear()
             straysExtraChocMs.clear()
             goldenTypesCaught.clear()

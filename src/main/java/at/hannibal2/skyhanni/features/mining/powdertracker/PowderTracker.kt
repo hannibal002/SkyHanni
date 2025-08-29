@@ -141,7 +141,7 @@ object PowderTracker {
 
     class Data : TrackerData() {
 
-        override fun reset() {
+        override fun resetData() {
             rewards.clear()
             totalChestPicked = 0
             totalHardStoneCompacted = 0

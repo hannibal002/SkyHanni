@@ -70,7 +70,7 @@ object EnderNodeTracker {
 
     class Data : TrackerData() {
 
-        override fun reset() {
+        override fun resetData() {
             totalNodesMined = 0
             totalEndermiteNests = 0
             lootCount.clear()

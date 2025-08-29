@@ -33,7 +33,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
         }
     }
 
-    override fun reset() {
+    override fun resetData() {
         bucketedItems.clear()
         selectedBucket = null
         resetItems()

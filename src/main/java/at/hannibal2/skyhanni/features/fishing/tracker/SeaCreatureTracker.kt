@@ -40,7 +40,7 @@ object SeaCreatureTracker {
 
     class Data : TrackerData() {
 
-        override fun reset() {
+        override fun resetData() {
             amount.clear()
         }
 

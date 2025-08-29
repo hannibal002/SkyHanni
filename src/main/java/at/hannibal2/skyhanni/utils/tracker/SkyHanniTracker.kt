@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
@@ -9,7 +10,9 @@ import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -19,6 +22,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.Stopwatch
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
@@ -26,10 +31,14 @@ import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
+import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 open class SkyHanniTracker<Data : TrackerData>(
@@ -47,12 +56,24 @@ open class SkyHanniTracker<Data : TrackerData>(
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
+    private var afkTimeout: Duration = 5.seconds
+    private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
     val textInput = SearchTextInput()
 
+    @SkyHanniModule
     companion object {
 
         private val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
+        private val unpausedTrackers: CopyOnWriteArrayList<SkyHanniTracker<*>> = CopyOnWriteArrayList()
+
+        @HandleEvent
+        fun onTick(event: SkyHanniTickEvent) {
+            if (!event.isMod(5)) return
+            unpausedTrackers.forEach { tracker ->
+                tracker.checkAfk()
+            }
+        }
 
         fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
     }
@@ -71,6 +92,8 @@ open class SkyHanniTracker<Data : TrackerData>(
     fun modify(modifyFunction: (Data) -> Unit) {
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify(modifyFunction)
+        startSessionUptime()
+        lastUpdate = SimpleTimeMark.now()
         update()
     }
 
@@ -125,11 +148,60 @@ open class SkyHanniTracker<Data : TrackerData>(
     private fun buildFinalDisplay(searchBox: Renderable) = buildList {
         add(searchBox)
         if (isEmpty()) return@buildList
+        add(buildSessionUptime())
         if (inventoryOpen) {
             buildDisplayModeView()
             if (getDisplayMode() == DisplayMode.SESSION) {
                 add(buildSessionResetButton())
             }
+        }
+    }
+
+    private fun checkAfk() {
+        if (getSessionUptime()?.isPaused() == true) {
+            unpausedTrackers.remove(this)
+            return
+        }
+        val sharedTracker = getSharedTracker() ?: return
+        val afkTime = sharedTracker.get(DisplayMode.TOTAL).sessionUptime.getLapTime()
+        if (afkTime == null || afkTime > afkTimeout) {
+            pauseSessionUptime()
+            return
+        }
+        update()
+    }
+
+    private fun getSessionUptime(): Stopwatch? = displayMode?.let { getSharedTracker()?.get(it)?.sessionUptime }
+
+    private fun startSessionUptime() {
+        val sharedTracker = getSharedTracker() ?: return
+        sharedTracker.modify { it.sessionUptime.start(true) }
+        unpausedTrackers.add(this)
+        update()
+    }
+
+    private fun pauseSessionUptime() {
+        val sharedTracker = getSharedTracker() ?: return
+        sharedTracker.modify { it.sessionUptime.pause(true) }
+        unpausedTrackers.remove(this)
+        update()
+    }
+
+    private fun buildSessionUptime(): Renderable {
+        val sessionUptime = getSessionUptime()?.getDuration() ?: return Renderable.empty()
+        val isTotalDisplay = displayMode == DisplayMode.TOTAL
+        val pausedText = if (getSessionUptime()?.isPaused() == true) " §c(Paused!)" else ""
+        // Uptime added after trackers already had data
+        return if (isTotalDisplay) {
+            Renderable.hoverTips(
+                Renderable.text("§eTotal Uptime: §b${sessionUptime.format()}$pausedText"),
+                tips = listOf(
+                    "§eⓘ §7Uptime tracked only from",
+                    "§7SkyHanni version 6.0.0 onwards",
+                )
+            )
+        } else {
+            Renderable.text("§eSession Uptime: §b${sessionUptime.format()}$pausedText")
         }
     }
 

@@ -40,7 +40,7 @@ object DicerRngDropTracker {
 
     class Data : TrackerData() {
 
-        override fun reset() {
+        override fun resetData() {
             drops.clear()
         }
 

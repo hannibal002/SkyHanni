@@ -49,7 +49,7 @@ object FrozenTreasureTracker {
 
     class Data : TrackerData() {
 
-        override fun reset() {
+        override fun resetData() {
             treasureCount.clear()
             treasuresMined = 0
             compactProcs = 0

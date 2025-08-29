@@ -9,8 +9,11 @@ class Stopwatch(
 ) {
     private var startTime = if (paused) SimpleTimeMark.farPast() else SimpleTimeMark.now()
 
-    fun start() {
-        if (!paused) return
+    fun start(lapIfStarted: Boolean = false) {
+        if (!paused) {
+            if (lapIfStarted) lap()
+            return
+        }
         paused = false
         startTime = SimpleTimeMark.now()
     }

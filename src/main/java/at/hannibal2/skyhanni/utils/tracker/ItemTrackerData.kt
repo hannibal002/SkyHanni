@@ -17,7 +17,7 @@ abstract class ItemTrackerData : TrackerData() {
 
     open fun getCustomPricePer(internalName: NeuInternalName) = SkyHanniTracker.getPricePer(internalName)
 
-    override fun reset() {
+    override fun resetData() {
         items.clear()
         resetItems()
     }

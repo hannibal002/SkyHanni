@@ -1,6 +1,16 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-abstract class TrackerData {
+import at.hannibal2.skyhanni.utils.Stopwatch
+import com.google.gson.annotations.Expose
 
-    abstract fun reset()
+abstract class TrackerData {
+    @Expose
+    var sessionUptime = Stopwatch()
+
+    fun reset() {
+        sessionUptime = Stopwatch()
+        resetData()
+    }
+
+    abstract fun resetData()
 }
