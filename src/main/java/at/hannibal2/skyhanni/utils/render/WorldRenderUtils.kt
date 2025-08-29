@@ -814,6 +814,65 @@ object WorldRenderUtils {
         renderText(renderLocation, "§f$text", scale, !seeThroughBlocks, true, yOff)
     }
 
+    /**
+     *  the location is at the first (and top) line, it also turns around that point
+     */
+    fun SkyHanniRenderWorldEvent.drawMultiLineDynamicText(
+        location: LorenzVec,
+        lines: List<Pair<String, Double>>,
+        yOff: Float = 0f,
+        hideTooCloseAt: Double = 4.5,
+        smallestDistanceVew: Double = 5.0,
+        seeThroughBlocks: Boolean = true,
+        ignoreY: Boolean = false,
+        blockCenter: Boolean = true,
+        maxDistance: Int? = null,
+    ) {
+        val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
+        val player = MinecraftCompat.localPlayerOrNull ?: return
+
+        val x = location.x
+        val y = location.y
+        val z = location.z
+
+        val renderOffsetX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
+        val renderOffsetY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
+        val renderOffsetZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
+        val eyeHeight = player.getEyeHeight()
+
+        val dX = (x - renderOffsetX) * (x - renderOffsetX)
+        val dY = (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight))
+        val dZ = (z - renderOffsetZ) * (z - renderOffsetZ)
+        val distToPlayerSq = dX + dY + dZ
+        var distToPlayer = sqrt(distToPlayerSq)
+        // TODO this is optional maybe?
+        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
+
+        if (distToPlayer < hideTooCloseAt) return
+        maxDistance?.let {
+            if (seeThroughBlocks && distToPlayer > it) return
+        }
+
+        val distRender = distToPlayer.coerceAtMost(50.0)
+
+        val processedLines = mutableListOf<Triple<String, Double, Double>>()
+
+        val scale = distRender / 12
+
+        lines.forEach { (text, scaleMultiplier) ->
+            processedLines.add(Triple("§f$text", scaleMultiplier, scale * scaleMultiplier))
+        }
+
+        val resultX = renderOffsetX + (x + (if (blockCenter) 0.5 else 0.0) - renderOffsetX) / (distToPlayer / distRender)
+        val resultY = if (ignoreY) y * distToPlayer / distRender else renderOffsetY + eyeHeight +
+            (y + 20 * distToPlayer / 300 - (renderOffsetY + eyeHeight)) / (distToPlayer / distRender)
+        val resultZ = renderOffsetZ + (z + (if (blockCenter) 0.5 else 0.0) - renderOffsetZ) / (distToPlayer / distRender)
+
+        val renderLocation = LorenzVec(resultX, resultY, resultZ)
+
+        renderMultiLineText(renderLocation, processedLines, !seeThroughBlocks, true, yOff)
+    }
+
     private fun SkyHanniRenderWorldEvent.renderText(
         location: LorenzVec,
         text: String,
@@ -854,6 +913,58 @@ object WorldRenderUtils {
         GlStateManager.color(1f, 1f, 1f)
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
+        if (!seeThroughBlocks) {
+            GL11.glEnable(GL11.GL_DEPTH_TEST)
+            GL11.glDepthMask(true)
+        }
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderMultiLineText(
+        location: LorenzVec,
+        lines: List<Triple<String, Double, Double>>,
+        seeThroughBlocks: Boolean,
+        shadow: Boolean,
+        yOff: Float,
+    ) {
+        if (!seeThroughBlocks) {
+            GL11.glDisable(GL11.GL_DEPTH_TEST)
+            GL11.glDepthMask(false)
+        }
+
+        val minecraft = Minecraft.getMinecraft()
+        val fontRenderer = minecraft.fontRendererObj
+        val renderManager = minecraft.renderManager
+
+        var y = 0
+        lines.forEach { (text, originalScale, scale) ->
+            GlStateManager.pushMatrix()
+            GlStateManager.enableBlend()
+            GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+
+            GlStateManager.translate(
+                location.x - renderManager.viewerPosX,
+                location.y - renderManager.viewerPosY,
+                location.z - renderManager.viewerPosZ,
+            )
+            GlStateManager.color(1f, 1f, 1f, 0.5f)
+            GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
+            GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
+
+            GlStateManager.scale(-scale / 25, -scale / 25, scale / 25)
+            val stringWidth = fontRenderer.getStringWidth(text)
+            fontRenderer.drawString(
+                text,
+                (-stringWidth / 2).toFloat(),
+                yOff + y,
+                0,
+                shadow,
+            )
+            y += (fontRenderer.FONT_HEIGHT * originalScale).toInt()
+
+            GlStateManager.color(1f, 1f, 1f)
+            GlStateManager.disableBlend()
+            GlStateManager.popMatrix()
+        }
         if (!seeThroughBlocks) {
             GL11.glEnable(GL11.GL_DEPTH_TEST)
             GL11.glDepthMask(true)
