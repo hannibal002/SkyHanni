@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import kotlin.time.Duration.Companion.seconds
 
-class CropDisplay: EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.Crop>(
+class CropDisplay : EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.Crop>(
     GardenApi.storage?.farmingWeight?.cropDisplayType,
     { crop, mode -> EliteLeaderboardType.Crop(crop, mode) },
     name = "Crop Leaderboard Display"
@@ -40,7 +40,7 @@ class CropDisplay: EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.Cr
 
         lineMap[CropCollectionTextEntry.WEIGHT_POSITION] = weightPosRenderable(leaderboardType)
         lineMap[CropCollectionTextEntry.OVERTAKE] = overtakeRenderable(leaderboardType, isFirst)
-        if (!isFirst && !isUnranked(leaderboardType)  && config.text.get().contains(CropCollectionTextEntry.OVERTAKE)) {
+        if (!isFirst && !isUnranked(leaderboardType) && config.text.get().contains(CropCollectionTextEntry.OVERTAKE)) {
             lineMap[CropCollectionTextEntry.LAST_PLAYER] = overtakeRenderable(leaderboardType, true)
         }
 
@@ -72,7 +72,7 @@ class CropDisplay: EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.Cr
         return newList
     }
 
-    override fun MutableList<Renderable>.buildTypeSwitcher() {
+    private fun MutableList<Renderable>.buildTypeSwitcher() {
         this.addRenderableNullableButton(
             label = "Crop Type",
             current = currentEnum,

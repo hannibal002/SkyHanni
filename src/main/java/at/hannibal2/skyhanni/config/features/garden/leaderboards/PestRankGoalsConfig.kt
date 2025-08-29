@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
@@ -70,17 +69,17 @@ class PestRankGoalsConfig {
     val slug: Property<String> = Property.of("10000")
 
     fun getGoal(type: PestType?): KProperty0<Property<String>> = when (type) {
-        PestType.FLY    -> this::fly
-        PestType.CRICKET    -> this::cricket
+        PestType.FLY -> this::fly
+        PestType.CRICKET -> this::cricket
         PestType.LOCUST -> this::locust
         PestType.BEETLE -> this::beetle
-        PestType.RAT    -> this::rat
-        PestType.EARTHWORM  -> this::earthworm
-        PestType.MOTH   -> this::moth
-        PestType.MOSQUITO   -> this::mosquito
-        PestType.MITE   -> this::mite
-        PestType.SLUG   -> this::slug
-        PestType.FIELD_MOUSE    -> this::fieldMouse
+        PestType.RAT -> this::rat
+        PestType.EARTHWORM -> this::earthworm
+        PestType.MOTH -> this::moth
+        PestType.MOSQUITO -> this::mosquito
+        PestType.MITE -> this::mite
+        PestType.SLUG -> this::slug
+        PestType.FIELD_MOUSE -> this::fieldMouse
         else -> this::allPests
     }
 }

@@ -6,14 +6,13 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType.Weig
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import com.google.gson.JsonObject
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
 import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
 import java.util.UUID
 
 data class ElitePlayerWeightJson(
@@ -66,10 +65,8 @@ data class PestWeightData(
     @Expose @SerializedName("values") val pestWeights: Map<String, Map<Int, Double>>,
 )
 
-// TODO deserialize
 sealed class EliteLeaderboardType {
     abstract val mode: EliteLeaderboardMode
-    //abstract val type: String
 
     interface WithEnum<E : Enum<E>> {
         val enumValue: E?
@@ -104,10 +101,8 @@ sealed class EliteLeaderboardType {
         get() = when (this) {
             is Weight -> "${weight.apiName}${mode.lbSuffix}"
             is Crop -> "${crop.eliteLbName}${mode.lbSuffix}"
-            is Pest -> {
-                pest?.eliteLbName ?: // Only "all pests" (when pests is null) have a monthly leaderboard
-                "pests${mode.lbSuffix}"
-            }
+            // Only "all pests" (when pests is null) have a monthly leaderboard
+            is Pest -> pest?.eliteLbName ?: "pests${mode.lbSuffix}"
         }
 }
 
@@ -120,8 +115,9 @@ val EliteLeaderboardType.crop: CropType?
 enum class EliteLeaderboardMode(
     val displayName: String,
     val lbSuffix: String = "",
-    val displaySuffix: String = "") {
-    ALL_TIME("All-Time", ),
+    val displaySuffix: String = ""
+) {
+    ALL_TIME("All-Time"),
     MONTHLY("Monthly", "-monthly", " Monthly"),
     ;
 
@@ -129,7 +125,7 @@ enum class EliteLeaderboardMode(
 }
 
 enum class FarmingWeight(val displayName: String, val apiName: String) {
-    FARMING_WEIGHT("Farming Weight","farmingweight"),
+    FARMING_WEIGHT("Farming Weight", "farmingweight"),
     ;
 
     override fun toString(): String = displayName

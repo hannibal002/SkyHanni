@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearEntries
 import at.hannibal2.skyhanni.data.garden.EliteFarmersRankGoals.getRankFromConfig
@@ -85,17 +84,23 @@ object EliteLeaderboardDisplayManager {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        weightConfigs.forEach { it.afterChange {
-            clearCategories(EliteLeaderboardType.Weight::class)
-        } }
+        weightConfigs.forEach {
+            it.afterChange {
+                clearCategories(EliteLeaderboardType.Weight::class)
+            }
+        }
 
-        cropConfigs.forEach { it.afterChange {
-            clearCategories(EliteLeaderboardType.Crop::class)
-        } }
+        cropConfigs.forEach {
+            it.afterChange {
+                clearCategories(EliteLeaderboardType.Crop::class)
+            }
+        }
 
-        pestConfigs.forEach { it.afterChange {
-            clearCategories(EliteLeaderboardType.Pest::class)
-        } }
+        pestConfigs.forEach {
+            it.afterChange {
+                clearCategories(EliteLeaderboardType.Pest::class)
+            }
+        }
 
         for (crop in CropType.entries) {
             for (mode in EliteLeaderboardMode.entries) {

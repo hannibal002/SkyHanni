@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText

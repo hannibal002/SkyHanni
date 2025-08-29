@@ -95,7 +95,8 @@ object FarmingWeightData {
         if (weightMap[leaderboardMode] == null || override) {
             when (leaderboardMode) {
                 EliteLeaderboardMode.ALL_TIME -> updateCollections()
-                EliteLeaderboardMode.MONTHLY -> getLeaderboardPosition(EliteLeaderboardType.Weight(FarmingWeight.FARMING_WEIGHT, leaderboardMode))
+                EliteLeaderboardMode.MONTHLY ->
+                    getLeaderboardPosition(EliteLeaderboardType.Weight(FarmingWeight.FARMING_WEIGHT, leaderboardMode))
             }
         }
         if (shouldRecalculateWeight) {

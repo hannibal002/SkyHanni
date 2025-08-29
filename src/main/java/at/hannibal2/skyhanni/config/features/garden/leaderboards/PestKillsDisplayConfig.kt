@@ -2,10 +2,13 @@ package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.*
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestKillsDisplayConfig {
@@ -59,7 +62,7 @@ class PestKillsDisplayConfig {
     @ConfigOption(
         name = "Use Rank Goal",
         desc = "Use the Rank Goal number instead of the next upcoming rank. Useful when your rank is in the " +
-                "ten thousands and you don't want to see small ETAs."
+            "ten thousands and you don't want to see small ETAs."
     )
     @ConfigEditorBoolean
     val useRankGoal: Property<Boolean> = Property.of(true)
@@ -90,7 +93,7 @@ class PestKillsDisplayConfig {
 
         companion object {
             fun fromPestType(type: PestType?): PestTypeWithAll =
-                entries.firstOrNull{ it.pestType == type  } ?: ALL
+                entries.firstOrNull { it.pestType == type } ?: ALL
 
             fun toPestType(value: PestTypeWithAll): PestType? =
                 value.pestType

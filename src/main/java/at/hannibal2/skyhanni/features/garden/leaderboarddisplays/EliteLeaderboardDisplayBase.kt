@@ -94,7 +94,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
 
         val leaderboardPos = getLeaderboardFormat()
         return Renderable.clickable(
-            "§6${leaderboardType}§7: §e$amountText$leaderboardPos",
+            "§6$leaderboardType§7: §e$amountText$leaderboardPos",
             tips = listOf("§eClick to open your Farming Profile."),
             onLeftClick = { openWebsite(PlayerUtils.getName()) },
         )
@@ -191,8 +191,6 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     abstract fun isEnabled(): Boolean
 
     abstract fun shouldShowDisplay(): Boolean
-
-    abstract fun MutableList<Renderable>.buildTypeSwitcher()
 
     fun MutableList<Renderable>.buildModeSwitcher() {
         this.addRenderableButton(

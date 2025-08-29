@@ -40,10 +40,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object EliteFarmersLeaderboard {
-    private val weightConfig get() = GardenApi.config.eliteFarmersLeaderboards.farmingWeightDisplay
-    private val cropConfig get() = GardenApi.config.eliteFarmersLeaderboards.cropCollectionDisplay
-    private val pestConfig get() = GardenApi.config.eliteFarmersLeaderboards.pestKillsDisplay
-
     val loadingLeaderboardMutex = Mutex()
     private val storage get() = GardenApi.storage?.farmingWeight
     private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardPosMap
@@ -102,7 +98,6 @@ object EliteFarmersLeaderboard {
     }
 
     fun isUnranked(leaderboardType: EliteLeaderboardType): Boolean {
-        //if (leaderboardType.mode == EliteLeaderboardMode.ALL_TIME) return false // We support other methods to calculate all-time farming weight
         return isUnranked[leaderboardType] ?: false
     }
 

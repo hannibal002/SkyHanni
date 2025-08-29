@@ -615,7 +615,8 @@ class ProfileSpecificStorage(
 
             // TODO config fix this
             @Expose
-            var weightDisplayType: Pair<FarmingWeight, EliteLeaderboardMode> = Pair(FarmingWeight.FARMING_WEIGHT, EliteLeaderboardMode.ALL_TIME)
+            var weightDisplayType: Pair<FarmingWeight, EliteLeaderboardMode> =
+                Pair(FarmingWeight.FARMING_WEIGHT, EliteLeaderboardMode.ALL_TIME)
             // TODO config fix this
             @Expose
             var minAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()

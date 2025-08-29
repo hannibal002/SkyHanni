@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerti
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 
-class PestDisplay: EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.Pest>(
+class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.Pest>(
     GardenApi.storage?.farmingWeight?.pestDisplayType,
     { pest, mode -> EliteLeaderboardType.Pest(pest, mode) },
     name = "Pest Leaderboard Display"
@@ -71,7 +71,7 @@ class PestDisplay: EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.Pe
         update()
     }
 
-    override fun MutableList<Renderable>.buildTypeSwitcher() {
+    private fun MutableList<Renderable>.buildTypeSwitcher() {
         this.addRenderableNullableButton(
             label = "Pest Type",
             current = currentEnum,

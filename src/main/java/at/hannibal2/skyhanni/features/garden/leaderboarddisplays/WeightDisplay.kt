@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerti
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.time.Duration.Companion.seconds
 
-class WeightDisplay: EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboardType.Weight>(
+class WeightDisplay : EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboardType.Weight>(
     GardenApi.storage?.farmingWeight?.weightDisplayType,
     { weight, mode -> EliteLeaderboardType.Weight(weight, mode) },
     name = "Farming Weight Display"
@@ -76,8 +76,6 @@ class WeightDisplay: EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboard
         newList.addAll(config.text.get().mapNotNull { lineMap[it] })
         return newList
     }
-
-    override fun MutableList<Renderable>.buildTypeSwitcher() {} // No switcher needed for this display
 
     override fun isEnabled(): Boolean = config.display && (inGardenEnabled())
 
