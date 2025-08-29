@@ -12,5 +12,5 @@ abstract class TrackerData {
         resetData()
     }
 
-    abstract fun resetData()
+    protected abstract fun resetData()
 }

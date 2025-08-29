@@ -93,13 +93,15 @@ class TrackerConfig {
     @ConfigEditorBoolean
     var hideOutsideInventory: Boolean = false
 
-    /*@Expose
+    @Expose
     @ConfigOption(name = "Show Uptime", desc = "Show how long the tracker has been active")
     @ConfigEditorBoolean
-    var showUptime: Boolean = false*/
+    var showUptime: Boolean = false
 
-    /*@Expose
-    @ConfigOption(name = "")*/
+    @Expose
+    @ConfigOption(name = "AFK timeout", desc = "Pause the tracker if it is not modified for this amount of seconds")
+    @ConfigEditorSlider(minValue = 15f, maxValue = 900f, minStep = 15f)
+    var afkTimeout: Int = 300
 
     @Expose
     @ConfigOption(name = "Tracker Search", desc = "Add a search bar to tracker GUIs.")

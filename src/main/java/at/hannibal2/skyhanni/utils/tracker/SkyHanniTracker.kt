@@ -56,7 +56,6 @@ open class SkyHanniTracker<Data : TrackerData>(
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
-    private var afkTimeout: Duration = 5.seconds
     private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
     val textInput = SearchTextInput()
 
@@ -148,7 +147,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private fun buildFinalDisplay(searchBox: Renderable) = buildList {
         add(searchBox)
         if (isEmpty()) return@buildList
-        add(buildSessionUptime())
+        if (config.showUptime) add(buildSessionUptime())
         if (inventoryOpen) {
             buildDisplayModeView()
             if (getDisplayMode() == DisplayMode.SESSION) {
@@ -163,8 +162,8 @@ open class SkyHanniTracker<Data : TrackerData>(
             return
         }
         val sharedTracker = getSharedTracker() ?: return
-        val afkTime = sharedTracker.get(DisplayMode.TOTAL).sessionUptime.getLapTime()
-        if (afkTime == null || afkTime > afkTimeout) {
+        val afkTime = sharedTracker.get(DisplayMode.TOTAL).sessionUptime.getLapTime() // Afk time should be the same for all valid displays
+        if (afkTime == null || afkTime > config.afkTimeout.seconds) {
             pauseSessionUptime()
             return
         }
