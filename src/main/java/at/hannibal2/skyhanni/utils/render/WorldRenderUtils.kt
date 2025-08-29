@@ -776,7 +776,7 @@ object WorldRenderUtils {
         text: String,
         scaleMultiplier: Double,
         yOff: Float = 0f,
-        hideTooCloseAt: Double = 4.5,
+        hideTooCloseAt: Double = 0.0,
         smallestDistanceVew: Double = 5.0,
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
