@@ -147,7 +147,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private fun buildFinalDisplay(searchBox: Renderable) = buildList {
         add(searchBox)
         if (isEmpty()) return@buildList
-        if (config.showUptime) add(buildSessionUptime())
+        if (showSessionUptime()) add(buildSessionUptime())
         if (inventoryOpen) {
             buildDisplayModeView()
             if (getDisplayMode() == DisplayMode.SESSION) {
@@ -156,7 +156,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    private fun showSessionUptime(): Boolean = config.showUptime && (if (config.onlyShowSession) displayMode != DisplayMode.TOTAL else true)
+    private fun showSessionUptime(): Boolean =
+        config.showUptime && (!config.onlyShowSession || displayMode != DisplayMode.TOTAL)
 
     private fun checkAfk() {
         if (getSessionUptime()?.isPaused() == true) {
