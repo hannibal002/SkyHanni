@@ -18,8 +18,10 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.DynamicTextLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawMultiLineDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -130,17 +132,17 @@ object PestParticleWaypoint {
             return
         }
         val waypoint = guessPosition ?: return
-        val distance = waypoint.distance(event.exactPlayerEyeLocation())
+        val lines = mutableListOf(DynamicTextLine("§aPest Guess", 1.3, LorenzColor.GREEN))
         val color: ChromaColour
         if (isGuessPlotMiddle && config.differentiatePlotMiddle) {
             color = LorenzColor.YELLOW.toChromaColor()
-            event.drawDynamicText(waypoint, " §r§e(plot middle)", 1.0, (-0.1 - distance / (12 * 1.7)).toFloat())
+            lines.add(DynamicTextLine("(plot middle)", 1.0, LorenzColor.YELLOW))
         } else {
             color = LorenzColor.RED.toChromaColor()
         }
 
         event.drawWaypointFilled(waypoint, color.toColor(), beacon = true)
-        event.drawDynamicText(waypoint, "§aPest Guess", 1.3)
+        event.drawMultiLineDynamicText(waypoint, lines)
         if (config.drawLine) {
             event.drawLineToEye(
                 waypoint.add(0.5, 0.5, 0.5),
