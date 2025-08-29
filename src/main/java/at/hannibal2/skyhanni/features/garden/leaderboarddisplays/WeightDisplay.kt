@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
-import EliteLeaderboardDisplay
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.FarmingWeightDisplayConfig.FarmingWeightTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getFactor
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerti
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.time.Duration.Companion.seconds
 
-class WeightDisplay: EliteLeaderboardDisplay<FarmingWeight, EliteLeaderboardType.Weight>(
+class WeightDisplay: EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboardType.Weight>(
     GardenApi.storage?.farmingWeight?.weightDisplayType,
     { weight, mode -> EliteLeaderboardType.Weight(weight, mode) },
     name = "Farming Weight Display"
@@ -40,7 +40,7 @@ class WeightDisplay: EliteLeaderboardDisplay<FarmingWeight, EliteLeaderboardType
 
         lineMap[FarmingWeightTextEntry.WEIGHT_POSITION] = weightPosRenderable(leaderboardType)
         lineMap[FarmingWeightTextEntry.OVERTAKE] = overtakeRenderable(leaderboardType, isFirst)
-        if (!isFirst && config.text.get().contains(FarmingWeightTextEntry.OVERTAKE)) {
+        if (!isFirst && !isUnranked(leaderboardType) && config.text.get().contains(FarmingWeightTextEntry.OVERTAKE)) {
             lineMap[FarmingWeightTextEntry.LAST_PLAYER] = overtakeRenderable(leaderboardType, true)
         }
 

@@ -7,6 +7,9 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.updateCollections
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteAuctionsResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteBazaarResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteContestsRequest
@@ -18,6 +21,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.WeightProfile
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.EliteLeaderboardDisplayManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -43,9 +47,9 @@ object EliteDevApi {
         override fun toString() = displayName
     }
 
-    private var spoofProfile = true
-    private var PlayerUuid = "1242bf4593a047b5bd43f466ce36fb4c"
-    private var PlayerProfile = "lime"
+    private var spoofProfile = false
+    private var PlayerUuid = ""
+    private var PlayerProfile = ""
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -72,7 +76,11 @@ object EliteDevApi {
     private fun spoofProfile(uuid: String, profile: String) {
         if (uuid.length <= 20) {
             spoofProfile = false
-            // TODO push reset event
+            updateCollections()
+            FarmingWeightData.reset()
+            EliteFarmersLeaderboard.reset()
+            EliteLeaderboardDisplayManager.resetDisplays()
+            EliteLeaderboardDisplayManager.updateDisplays()
             ChatUtils.userError("Invalid uuid!")
             return
         }
@@ -80,7 +88,11 @@ object EliteDevApi {
         spoofProfile = true
         PlayerUuid = uuid
         PlayerProfile = profile
-        // TODO push reset event
+        updateCollections()
+        FarmingWeightData.reset()
+        EliteFarmersLeaderboard.reset()
+        EliteLeaderboardDisplayManager.resetDisplays()
+        EliteLeaderboardDisplayManager.updateDisplays()
     }
 
     private suspend fun fetchResourceCommand(resourceType: EliteResourceType) = runCatching {

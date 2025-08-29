@@ -1,3 +1,5 @@
+package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
+
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getAmount
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLastPlayer
@@ -22,11 +24,10 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
-import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
 
-abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.WithEnum<E>>(
+abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType.WithEnum<E>>(
     private var storage: Pair<E?, EliteLeaderboardMode>?,
     private val createType: (E, EliteLeaderboardMode) -> EliteLeaderboardType,
     private val name: String
@@ -38,7 +39,7 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
     var inventoryOpen = false
     protected var amount: Double? = null
     protected var leaderboardPos: Int? = null
-    protected var nextPlayer: Pair<String, Double>? = null
+    private var nextPlayer: Pair<String, Double>? = null
     protected open var currentMode: EliteLeaderboardMode
         get() = storage?.second ?: EliteLeaderboardMode.ALL_TIME
         set(value) {
@@ -127,7 +128,6 @@ abstract class EliteLeaderboardDisplay<E : Enum<E>, T : EliteLeaderboardType.Wit
 
     abstract fun useEtaGoalRank(): Boolean
 
-    // TODO abstract this out
     private fun nullNextPlayerRenderable(leaderboardType: EliteLeaderboardType): Renderable {
         return if (isUnranked(leaderboardType)) {
             val minAmount = leaderboardMinAmount(leaderboardType) ?: 0.0

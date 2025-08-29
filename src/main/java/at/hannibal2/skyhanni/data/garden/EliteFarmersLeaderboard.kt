@@ -22,6 +22,9 @@ import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.EliteLeaderboardDisplayManager
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.EliteLeaderboardDisplayManager.getLeaderboardChangeConfig
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.EliteLeaderboardDisplayManager.getRankGoalConfig
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -65,63 +68,14 @@ object EliteFarmersLeaderboard {
     private var fetchAttempts = 0
     private var lastFetchAttempt = SimpleTimeMark.farPast()
 
-    private val weightConfigs = listOf(
-        weightConfig.useRankGoal,
-        weightConfig.monthlyWeightRankGoal,
-        weightConfig.weightRankGoal
-    )
-
-    private val cropConfigs = listOf(
-        cropConfig.useRankGoal,
-        cropConfig.rankGoalCrops,
-    )
-
-    private val pestConfigs = listOf(
-        pestConfig.useRankGoal,
-        pestConfig.rankGoalPests,
-    )
-
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        weightConfigs.forEach { it.afterChange {
-            clearCategories(EliteLeaderboardType.Weight::class)
-        } }
-
-        cropConfigs.forEach { it.afterChange {
-            clearCategories(EliteLeaderboardType.Crop::class)
-        } }
-
-        pestConfigs.forEach { it.afterChange {
-            clearCategories(EliteLeaderboardType.Pest::class)
-        } }
-
-        for (crop in CropType.entries) {
-            for (mode in EliteLeaderboardMode.entries) {
-                val leaderboardType = EliteLeaderboardType.Crop(crop, mode)
-                ConditionalUtils.onToggle(getRankFromConfig(leaderboardType) ?: continue) {
-                    clearEntries(leaderboardType)
-                }
-            }
-        }
-
-        for (pest in (PestType.entries + null)) {
-            for (mode in EliteLeaderboardMode.entries) {
-                val leaderboardType = EliteLeaderboardType.Pest(pest, mode)
-                ConditionalUtils.onToggle(getRankFromConfig(leaderboardType) ?: continue) {
-                    clearEntries(leaderboardType)
-                }
-            }
-        }
-    }
-
-    private fun clearEntries(leaderboardType: EliteLeaderboardType) {
+    fun clearEntries(leaderboardType: EliteLeaderboardType) {
         leaderboardPosMap?.remove(leaderboardType)
         shouldRefreshLeaderboard.remove(leaderboardType)
         nextPlayers.remove(leaderboardType)
         lastPlayer.remove(leaderboardType)
     }
 
-    private fun clearCategories(category: KClass<out EliteLeaderboardType>) {
+    fun clearCategories(category: KClass<out EliteLeaderboardType>) {
         leaderboardPosMap?.clearCategory(category)
         shouldRefreshLeaderboard.clearCategory(category)
         nextPlayers.clearCategory(category)
@@ -153,7 +107,7 @@ object EliteFarmersLeaderboard {
     }
 
     fun isUnranked(leaderboardType: EliteLeaderboardType): Boolean {
-        if (leaderboardType.mode == EliteLeaderboardMode.ALL_TIME) return false // We support other methods to calculate all-time farming weight
+        //if (leaderboardType.mode == EliteLeaderboardMode.ALL_TIME) return false // We support other methods to calculate all-time farming weight
         return isUnranked[leaderboardType] ?: false
     }
 
@@ -290,11 +244,6 @@ object EliteFarmersLeaderboard {
         )
     }
 
-    private fun getLeaderboardChangeConfig(leaderboardType: EliteLeaderboardType) = when (leaderboardType) {
-        is EliteLeaderboardType.Pest -> pestConfig.showLbChange
-        is EliteLeaderboardType.Weight -> weightConfig.showLbChange
-        is EliteLeaderboardType.Crop -> cropConfig.showLbChange
-    }
 
     private suspend fun loadLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int? {
         if (profileId == "") return null
@@ -303,7 +252,7 @@ object EliteFarmersLeaderboard {
         val upcomingPlayers = getUpcomingPlayerCount(currentPos)
         // Fetch upcoming players from current lb pos if api hasn't updated, or from rank goal
         val rankGoal = getRankGoal(leaderboardType)
-        val useRankGoal = weightConfig.useRankGoal.get() && rankGoal != null
+        val useRankGoal = getRankGoalConfig(leaderboardType).get() && rankGoal != null
         val atRank = getAtRank(currentPos, rankGoal, useRankGoal)
 
         val apiData = EliteDevApi.fetchLeaderboardPositions(
@@ -405,7 +354,7 @@ object EliteFarmersLeaderboard {
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
     ) {
-        lastPlayer[leaderboardType] = apiData.previous.firstOrNull()
+        lastPlayer[leaderboardType] = apiData.previous?.firstOrNull()
         nextPlayers[leaderboardType] = mutableListOf()
         apiData.upcomingPlayers.forEach {
             if (it.amount > (getAmount(leaderboardType) ?: apiData.amount)) {
@@ -446,6 +395,7 @@ object EliteFarmersLeaderboard {
 
     fun reset() {
         leaderboardPosMap?.clear()
+        leaderboardAmountMap?.clear()
         lastLeaderboardUpdate.clear()
         lastPlayer.clear()
         nextPlayers.clear()

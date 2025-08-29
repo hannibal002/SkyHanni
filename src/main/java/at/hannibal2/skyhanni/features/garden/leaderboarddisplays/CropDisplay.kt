@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
-import EliteLeaderboardDisplay
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.CropCollectionDisplayConfig.CropCollectionTextEntry
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import kotlin.time.Duration.Companion.seconds
 
-class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
+class CropDisplay: EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.Crop>(
     GardenApi.storage?.farmingWeight?.cropDisplayType,
     { crop, mode -> EliteLeaderboardType.Crop(crop, mode) },
     name = "Crop Leaderboard Display"
@@ -40,7 +40,7 @@ class CropDisplay: EliteLeaderboardDisplay<CropType, EliteLeaderboardType.Crop>(
 
         lineMap[CropCollectionTextEntry.WEIGHT_POSITION] = weightPosRenderable(leaderboardType)
         lineMap[CropCollectionTextEntry.OVERTAKE] = overtakeRenderable(leaderboardType, isFirst)
-        if (!isFirst && config.text.get().contains(CropCollectionTextEntry.OVERTAKE)) {
+        if (!isFirst && !isUnranked(leaderboardType)  && config.text.get().contains(CropCollectionTextEntry.OVERTAKE)) {
             lineMap[CropCollectionTextEntry.LAST_PLAYER] = overtakeRenderable(leaderboardType, true)
         }
 

@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
-import EliteLeaderboardDisplay
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.PestKillsDisplayConfig.PestKillsTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerti
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 
-class PestDisplay: EliteLeaderboardDisplay<PestType, EliteLeaderboardType.Pest>(
+class PestDisplay: EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.Pest>(
     GardenApi.storage?.farmingWeight?.pestDisplayType,
     { pest, mode -> EliteLeaderboardType.Pest(pest, mode) },
     name = "Pest Leaderboard Display"
@@ -35,7 +35,7 @@ class PestDisplay: EliteLeaderboardDisplay<PestType, EliteLeaderboardType.Pest>(
 
         lineMap[PestKillsTextEntry.WEIGHT_POSITION] = weightPosRenderable(leaderboardType)
         lineMap[PestKillsTextEntry.OVERTAKE] = overtakeRenderable(leaderboardType, isFirst)
-        if (!isFirst && config.text.get().contains(PestKillsTextEntry.OVERTAKE)) {
+        if (!isFirst && !isUnranked(leaderboardType) && config.text.get().contains(PestKillsTextEntry.OVERTAKE)) {
             lineMap[PestKillsTextEntry.LAST_PLAYER] = overtakeRenderable(leaderboardType, true)
         }
 
