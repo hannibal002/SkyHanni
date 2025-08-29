@@ -63,16 +63,10 @@ object DungeonSecretTrackerLocator {
         val distToLast = bezierFitter.getLastPoint()?.distance(currLoc) ?: return
 
         if (distToLast == 0.0 || distToLast > 1.0) return
-        println("particle 6")
 
         bezierFitter.addPoint(currLoc)
 
-        val curve = bezierFitter.fit()
-        val knownDistance = secretDistance
-
-        if (curve != null && knownDistance != null) {
-            secretLocation = curve.at(knownDistance * 2.0)
-        }
+        repredictPoint()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
@@ -97,7 +91,16 @@ object DungeonSecretTrackerLocator {
             val distance1 = group("distance").toInt()
             val distance2 = groupOrNull("distance2")?.toInt() ?: 0
             secretDistance = sqrt((distance1 * distance1 + distance2 * distance2).toDouble()).toInt()
-            println("distance is $secretDistance")
+            repredictPoint()
+        }
+    }
+
+    private fun repredictPoint() {
+        val curve = bezierFitter.fit()
+        val knownDistance = secretDistance
+
+        if (curve != null && knownDistance != null) {
+            secretLocation = curve.at(knownDistance * 2.0)
         }
     }
 
