@@ -763,6 +763,14 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
+    class DynamicTextLine(
+        text: String,
+        val scale: Double,
+        color: LorenzColor = LorenzColor.WHITE,
+    ) {
+        val text: String = "${color.getChatColor()}$text"
+    }
+
     fun SkyHanniRenderWorldEvent.drawDynamicText(
         location: LorenzVec,
         text: String,
@@ -820,7 +828,7 @@ object WorldRenderUtils {
      */
     fun SkyHanniRenderWorldEvent.drawMultiLineDynamicText(
         location: LorenzVec,
-        lines: List<Pair<String, Double>>,
+        lines: List<DynamicTextLine>,
         yOff: Float = 0f,
         anchoredLineIndex: Int = 0,
         hideTooCloseAt: Double = 0.0,
@@ -861,8 +869,7 @@ object WorldRenderUtils {
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
         renderMultiLineText(
-            renderLocation, lines.map { (text, scale) -> "§f$text" to scale },
-            !seeThroughBlocks, true, yOff, anchoredLineIndex, baseScaleIn = distRender / 12.0,
+            renderLocation, lines, !seeThroughBlocks, true, yOff, anchoredLineIndex, baseScaleIn = distRender / 12.0,
         )
     }
 
@@ -914,7 +921,7 @@ object WorldRenderUtils {
 
     private fun SkyHanniRenderWorldEvent.renderMultiLineText(
         location: LorenzVec,
-        lines: List<Pair<String, Double>>,
+        lines: List<DynamicTextLine>,
         seeThroughBlocks: Boolean,
         shadow: Boolean,
         yOff: Float,
@@ -939,10 +946,10 @@ object WorldRenderUtils {
 
         for (i in 0..anchoredLineIndex) {
             y -= ySpacing
-            y -= (fontRenderer.FONT_HEIGHT * lines[i].second)
+            y -= (fontRenderer.FONT_HEIGHT * lines[i].scale)
         }
 
-        lines.forEach { (text, scale) ->
+        lines.forEach { line ->
             GlStateManager.pushMatrix()
             GlStateManager.enableBlend()
             GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
@@ -956,18 +963,18 @@ object WorldRenderUtils {
             GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
             GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
 
-            GlStateManager.scale(-(scale * baseScale), -(scale * baseScale), scale * baseScale)
+            GlStateManager.scale(-(line.scale * baseScale), -(line.scale * baseScale), line.scale * baseScale)
 
-            y += fontRenderer.FONT_HEIGHT * scale / 2
-            val stringWidth = fontRenderer.getStringWidth(text)
+            y += fontRenderer.FONT_HEIGHT * line.scale / 2
+            val stringWidth = fontRenderer.getStringWidth(line.text)
             fontRenderer.drawString(
-                text,
+                line.text,
                 (-stringWidth / 2).toFloat(),
-                (y / scale).toFloat(),
+                (y / line.scale).toFloat(),
                 0,
                 shadow,
             )
-            y += fontRenderer.FONT_HEIGHT * scale / 2 + ySpacing
+            y += fontRenderer.FONT_HEIGHT * line.scale / 2 + ySpacing
 
             GlStateManager.color(1f, 1f, 1f)
             GlStateManager.disableBlend()
