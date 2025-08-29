@@ -94,12 +94,23 @@ class TrackerConfig {
     var hideOutsideInventory: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Show Uptime", desc = "Show how long the tracker has been active")
+    @ConfigOption(name = "Show Uptime", desc = "Show how long the tracker has been active.")
     @ConfigEditorBoolean
     var showUptime: Boolean = true
 
     @Expose
-    @ConfigOption(name = "AFK timeout", desc = "Pause the tracker if it is not modified for this amount of seconds")
+    @ConfigOption(
+        name = "Only show session uptime",
+        desc = "Only show uptime when the tracker is on session mode."
+    )
+    @ConfigEditorBoolean
+    var onlyShowSession: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "AFK timeout",
+        desc = "Pause the tracker if it is not modified for this amount of seconds."
+    )
     @ConfigEditorSlider(minValue = 15f, maxValue = 900f, minStep = 15f)
     var afkTimeout: Int = 300
 

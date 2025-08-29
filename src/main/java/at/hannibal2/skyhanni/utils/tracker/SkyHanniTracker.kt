@@ -38,9 +38,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("TooManyFunctions")
 open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
@@ -155,6 +155,8 @@ open class SkyHanniTracker<Data : TrackerData>(
             }
         }
     }
+
+    private fun showSessionUptime(): Boolean = config.showUptime && (if (config.onlyShowSession) displayMode != DisplayMode.TOTAL else true)
 
     private fun checkAfk() {
         if (getSessionUptime()?.isPaused() == true) {
