@@ -48,7 +48,6 @@ open class SkyHanniTracker<Data : TrackerData>(
     private val trackUptime: Boolean = true,
     private val drawDisplay: (Data) -> List<Searchable>,
 ) {
-    //private val trackUptime: Boolean = true
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
@@ -69,10 +68,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         @HandleEvent
         fun onTick(event: SkyHanniTickEvent) {
             if (!event.isMod(10)) return
-            ChatUtils.debug("Unpaused trackers: $unpausedTrackers")
 
             unpausedTrackers.toList().forEach { tracker ->
-                ChatUtils.debug("$tracker")
                 if (tracker.trackUptime) {
                     tracker.checkAfk()
                 }
