@@ -64,12 +64,13 @@ open class SkyHanniTracker<Data : TrackerData>(
 
         private val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
-        private val unpausedTrackers: CopyOnWriteArrayList<SkyHanniTracker<*>> = CopyOnWriteArrayList()
+        private val unpausedTrackers: MutableList<SkyHanniTracker<*>> = mutableListOf()
 
         @HandleEvent
         fun onTick(event: SkyHanniTickEvent) {
             if (!event.isMod(5)) return
             unpausedTrackers.forEach { tracker ->
+                ChatUtils.debug("$tracker")
                 tracker.checkAfk()
             }
         }
