@@ -26,6 +26,7 @@ import net.minecraft.util.MathHelper
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.cos
+import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
@@ -822,7 +823,7 @@ object WorldRenderUtils {
         lines: List<Pair<String, Double>>,
         yOff: Float = 0f,
         anchoredLineIndex: Int = 0,
-        hideTooCloseAt: Double = 4.5,
+        hideTooCloseAt: Double = 0.0,
         smallestDistanceVew: Double = 5.0,
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
@@ -842,38 +843,26 @@ object WorldRenderUtils {
         val viewY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks + player.getEyeHeight()
         val viewZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
 
-        val dX = (x - viewX) * (x - viewX)
-        val dY = (y - viewY) * (y - viewY)
-        val dZ = (z - viewZ) * (z - viewZ)
-        val distToPlayerSq = dX + dY + dZ
+        val dX = (x - viewX)
+        val dY = (y - viewY)
+        val dZ = (z - viewZ)
+        val distToPlayerSq = dX.pow(2) + dY.pow(2) + dZ.pow(2)
         var distToPlayer = sqrt(distToPlayerSq)
-        // TODO this is optional maybe?
-        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
 
         if (distToPlayer < hideTooCloseAt) return
-        maxDistance?.let {
-            if (seeThroughBlocks && distToPlayer > it) return
-        }
+        if (maxDistance != null && seeThroughBlocks && distToPlayer > maxDistance) return
 
-//         val distRender = distToPlayer.coerceAtMost(50.0)
-        val distRender = 50
+        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
+        val distRender = distToPlayer.coerceAtMost(50.0)
 
-        val processedLines = lines.map { (text, scaleMultiplier) ->
-            "§f$text" to scaleMultiplier
-        }
-
-        val resultX = viewX + (x - viewX) / (distToPlayer / distRender)
-        val resultY = if (ignoreY) {
-            y * (distToPlayer / distRender)
-        } else {
-            viewY + (y - viewY) / (distToPlayer / distRender)
-        }
-        val resultZ = viewZ + (z - viewZ) / (distToPlayer / distRender)
-
+        val resultX = viewX + dX / (distToPlayer / distRender)
+        val resultY = if (ignoreY) y * (distToPlayer / distRender) else viewY + dY / (distToPlayer / distRender)
+        val resultZ = viewZ + dZ / (distToPlayer / distRender)
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
         renderMultiLineText(
-            renderLocation, processedLines, !seeThroughBlocks, true, yOff, anchoredLineIndex, baseScaleIn = distRender / 12.0,
+            renderLocation, lines.map { (text, scale) -> "§f$text" to scale },
+            !seeThroughBlocks, true, yOff, anchoredLineIndex, baseScaleIn = distRender / 12.0,
         )
     }
 
