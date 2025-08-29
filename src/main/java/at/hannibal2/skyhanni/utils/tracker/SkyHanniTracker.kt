@@ -189,7 +189,9 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.sessionUptime.start(true) }
-        unpausedTrackers.add(this)
+        if (this !in unpausedTrackers) {
+            unpausedTrackers.add(this)
+        }
         update()
     }
 
