@@ -266,7 +266,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
 
             if (totalAmount > 0 && duration > 0.seconds && actionPluralized != "") {
                 val amountPerHour = profit / duration.inPartialHours
-                add("§7$actionPluralized per hour: $profitPrefix${amountPerHour.shortFormat()}")
+                add("§7$actionPluralized per hour: §e${amountPerHour.shortFormat()}")
             }
         }
 
