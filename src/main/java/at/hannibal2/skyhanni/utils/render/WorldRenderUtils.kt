@@ -789,7 +789,7 @@ object WorldRenderUtils {
         drawMultiLineDynamicText(
             location,
             listOf(DynamicTextLine(text, scaleMultiplier)),
-            0,
+            0.0,
             yOff,
             hideTooCloseAt,
             smallestDistanceVew,
@@ -803,7 +803,7 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.drawMultiLineDynamicText(
         location: LorenzVec,
         lines: List<DynamicTextLine>,
-        anchoredLineIndex: Int = 0,
+        anchoredLineIndex: Double = 0.5,
         yOff: Float = 0f,
         hideTooCloseAt: Double = 0.0,
         smallestDistanceVew: Double = 5.0,
@@ -855,11 +855,14 @@ object WorldRenderUtils {
         seeThroughBlocks: Boolean,
         shadow: Boolean,
         yOff: Float,
-        anchoredLineIndex: Int = 0,
+        anchoredLineIndex: Double = 0.5,
         ySpacing: Float = 4.0F,
         baseScaleIn: Double = 1.0,
     ) {
         if (lines.isEmpty()) return
+        if (anchoredLineIndex >= lines.size) {
+            error("anchoredLineIndex exceeds size of lines")
+        }
 
         val baseScale = baseScaleIn / 25
 
@@ -872,12 +875,14 @@ object WorldRenderUtils {
         val fontRenderer = minecraft.fontRendererObj
         val renderManager = minecraft.renderManager
 
-        var y = yOff.toDouble() + ySpacing
+        var y = yOff.toDouble()
 
-        for (i in 0..anchoredLineIndex) {
-            y -= ySpacing
-            y -= (fontRenderer.FONT_HEIGHT * lines[i].scale)
+        val fullLinesMove = anchoredLineIndex.toInt()
+        val partialLineMove = anchoredLineIndex - fullLinesMove
+        for (i in 0..<fullLinesMove) {
+            y -= fontRenderer.FONT_HEIGHT * lines[i].scale + ySpacing
         }
+        y -= (fontRenderer.FONT_HEIGHT * lines[fullLinesMove].scale + ySpacing) * partialLineMove
 
         lines.forEach { line ->
             GlStateManager.pushMatrix()
@@ -896,7 +901,7 @@ object WorldRenderUtils {
             val scale = line.scale * baseScale
             GlStateManager.scale(-scale, -scale, scale)
 
-            y += fontRenderer.FONT_HEIGHT * line.scale / 2 + ySpacing / 2
+            y += (fontRenderer.FONT_HEIGHT * line.scale + ySpacing) / 2
             val stringWidth = fontRenderer.getStringWidth(line.text)
             fontRenderer.drawString(
                 line.text,
@@ -906,7 +911,7 @@ object WorldRenderUtils {
                 0,
                 shadow,
             )
-            y += fontRenderer.FONT_HEIGHT * line.scale / 2 + ySpacing / 2
+            y += (fontRenderer.FONT_HEIGHT * line.scale + ySpacing) / 2
 
             GlStateManager.color(1f, 1f, 1f)
             GlStateManager.disableBlend()

@@ -7,11 +7,18 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.LineDrawer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.DynamicTextLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawMultiLineDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import net.minecraft.client.Minecraft
+import net.minecraft.util.Vec3
 import java.awt.Color
+import kotlin.math.cos
+import kotlin.math.sin
 
 @SkyHanniModule
 object TestDynamicText {
@@ -39,21 +46,42 @@ object TestDynamicText {
     }
 
     private class MultiLineDynamicText(
-        val location: LorenzVec,
+        locationRaw: LorenzVec,
         val lines: List<DynamicTextLine>,
     ) : DynamicText {
+        val location = locationRaw.roundLocation() + LorenzVec(0.5, 0.5, 0.5)
+
+        private fun makeTWithAngle(p: LorenzVec, angleDegrees: Float, length: Double): Pair<LorenzVec, LorenzVec> {
+            val rad = Math.toRadians(angleDegrees.toDouble()).toFloat()
+
+            val dir = LorenzVec(cos(rad), 0f, sin(rad))
+
+            val c = p + dir * (length / 2.0)
+            val d = p - dir * (length / 2.0)
+            return c to d
+        }
+
+
         override fun draw(event: SkyHanniRenderWorldEvent) {
             event.drawMultiLineDynamicText(
                 location,
                 lines,
-                anchoredLineIndex = 0,
-                blockCenter = true,
+                blockCenter = false,
             )
             event.drawSphereInWorld(
                 Color.RED,
-                location + LorenzVec(0.5, 0.5, 0.5),
-                0.02F,
+                location,
+                0.05F,
             )
+
+            LineDrawer.draw3D(event, 3, false) {
+                drawPath(
+                    makeTWithAngle(location, Minecraft.getMinecraft().renderManager.playerViewY,3.0).toList(),
+                    Color.RED,
+                    1.0,
+                )
+            }
+
 //             event.drawWaypointFilled(
 //                 location,
 //                 Color.YELLOW,
@@ -75,6 +103,9 @@ object TestDynamicText {
                 listOf(
                     DynamicTextLine("topline x1.5", 1.5),
                     DynamicTextLine("second line x1.0", 1.0),
+                    DynamicTextLine("linep x5.0", 5.0),
+                    DynamicTextLine("second line x1.0", 1.0),
+                    DynamicTextLine("linep x5.0", 5.0),
                     DynamicTextLine("second line x1.0", 1.0),
                     DynamicTextLine("topline x1.5", 1.5),
                     DynamicTextLine("second line x1.0", 1.0),
@@ -101,7 +132,9 @@ object TestDynamicText {
                 GetCoordinates.inFront(),
                 buildList {
                     add(DynamicTextLine("topline x1.5", 1.5))
-                    for (i in 0..10) add(DynamicTextLine("second line x1.0", 1.0))
+                    repeat(10) {
+                        add(DynamicTextLine("second line x1.0", 1.0))
+                    }
                 }.toList(),
             ),
         )
@@ -163,7 +196,7 @@ object TestDynamicText {
 
     object GetCoordinates {
         fun inFront(): LorenzVec {
-            val location = LocationUtils.playerLocation() + LorenzVec(5, 0, 0)
+            val location = LocationUtils.playerLocation() + LorenzVec(5, 2, 0)
             println("returned $location")
             return location
         }
