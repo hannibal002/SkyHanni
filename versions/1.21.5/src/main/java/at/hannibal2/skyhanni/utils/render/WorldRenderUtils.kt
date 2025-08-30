@@ -514,52 +514,137 @@ object WorldRenderUtils {
         }
     }
 
+    class DynamicTextLine(
+        text: String,
+        val scale: Double,
+        val color: LorenzColor = LorenzColor.WHITE,
+    ) {
+        val text: String = "${color.getChatColor()}$text"
+    }
+
     fun SkyHanniRenderWorldEvent.drawDynamicText(
         location: LorenzVec,
         text: String,
         scaleMultiplier: Double,
         yOff: Float = 0f,
-        hideTooCloseAt: Double = 4.5,
+        hideTooCloseAt: Double = 0.0,
         smallestDistanceVew: Double = 5.0,
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
+        blockCenter: Boolean = true,
         maxDistance: Int? = null,
     ) {
-        val (viewerX, viewerY, viewerZ) = getViewerPos()
+        drawMultiLineDynamicText(
+            location,
+            listOf(DynamicTextLine(text, scaleMultiplier)),
+            yOff,
+            0,
+            hideTooCloseAt,
+            smallestDistanceVew,
+            seeThroughBlocks,
+            ignoreY,
+            blockCenter,
+            maxDistance,
+        )
+    }
 
-        val x = location.x
-        val y = location.y
-        val z = location.z
+    fun SkyHanniRenderWorldEvent.drawMultiLineDynamicText(
+        location: LorenzVec,
+        lines: List<DynamicTextLine>,
+        yOff: Float = 0f,
+        anchoredLineIndex: Int = 0,
+        hideTooCloseAt: Double = 0.0,
+        smallestDistanceVew: Double = 5.0,
+        seeThroughBlocks: Boolean = true,
+        ignoreY: Boolean = false,
+        blockCenter: Boolean = true,
+        maxDistance: Int? = null,
+    ) {
+        if (lines.isEmpty()) return
 
         val player = MinecraftCompat.localPlayerOrNull ?: return
-        val eyeHeight = player.getEyeHeight(player.pose)
 
-        val dX = (x - viewerX) * (x - viewerX)
-        val dY = (y - (viewerY + eyeHeight)) * (y - (viewerY + eyeHeight))
-        val dZ = (z - viewerZ) * (z - viewerZ)
-        val distToPlayerSq = dX + dY + dZ
+        val x = location.x + (if (blockCenter) 0.5 else 0.0)
+        val y = location.y + (if (blockCenter) 0.5 else 0.0)
+        val z = location.z + (if (blockCenter) 0.5 else 0.0)
+
+        val viewerPos = getViewerPos()
+        val viewerX = viewerPos.x
+        val viewerY = viewerPos.y + player.getEyeHeight(player.pose)
+        val viewerZ = viewerPos.z
+
+        val dX = (x - viewerX)
+        val dY = (y - viewerY)
+        val dZ = (z - viewerZ)
+        val distToPlayerSq = dX.pow(2) + dY.pow(2) + dZ.pow(2)
         var distToPlayer = sqrt(distToPlayerSq)
-        // TODO this is optional maybe?
-        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
 
         if (distToPlayer < hideTooCloseAt) return
-        maxDistance?.let {
-            if (!seeThroughBlocks && distToPlayer > it) return
-        }
+        if (maxDistance != null && seeThroughBlocks && distToPlayer > maxDistance) return
 
+        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
         val distRender = distToPlayer.coerceAtMost(50.0)
 
-        var scale = distRender / 12
-        scale *= scaleMultiplier
-
-        val resultX = viewerX + (x + 0.5 - viewerX) / (distToPlayer / distRender)
-        val resultY = if (ignoreY) y * distToPlayer / distRender else viewerY + eyeHeight +
-            (y + 20 * distToPlayer / 300 - (viewerY + eyeHeight)) / (distToPlayer / distRender)
-        val resultZ = viewerZ + (z + 0.5 - viewerZ) / (distToPlayer / distRender)
-
+        val resultX = viewerX + dX / (distToPlayer / distRender)
+        val resultY = if (ignoreY) y * (distToPlayer / distRender) else viewerY + dY / (distToPlayer / distRender)
+        val resultZ = viewerZ + dZ / (distToPlayer / distRender)
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
-        drawString(renderLocation, "§f$text", seeThroughBlocks, null, scale, true, yOff, 0)
+        renderMultiLineText(
+            renderLocation, lines, !seeThroughBlocks, true, yOff, anchoredLineIndex, baseScaleIn = distRender / 12.0,
+        )
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderMultiLineText(
+        location: LorenzVec,
+        lines: List<DynamicTextLine>,
+        seeThroughBlocks: Boolean,
+        shadow: Boolean,
+        yOff: Float,
+        anchoredLineIndex: Int = 0,
+        ySpacing: Float = 4.0F,
+        baseScaleIn: Double = 1.0,
+    ) {
+        if (lines.isEmpty()) return
+
+        val baseScale = baseScaleIn / 25
+
+        val matrix = Matrix4f()
+        val cameraPos = camera.pos
+        val fontRenderer = MinecraftClient.getInstance().textRenderer
+
+        matrix.translate(
+            (location.x - cameraPos.getX()).toFloat(),
+            (location.y - cameraPos.getY()).toFloat(),
+            (location.z - cameraPos.getZ()).toFloat(),
+        ).rotate(camera.rotation)
+
+        var y = yOff.toDouble() + ySpacing
+
+        for (i in 0..anchoredLineIndex) {
+            y -= ySpacing
+            y -= (fontRenderer.fontHeight * lines[i].scale)
+        }
+
+        lines.forEach { line: DynamicTextLine ->
+            matrix.scale(-(line.scale * baseScale).toFloat(), -(line.scale * baseScale).toFloat(), (line.scale * baseScale).toFloat())
+
+            y += fontRenderer.fontHeight * line.scale / 2
+            val stringWidth = fontRenderer.getWidth(line.text)
+            fontRenderer.draw(
+                line.text,
+                (-stringWidth / 2).toFloat(),
+                (y / line.scale).toFloat(),
+                line.color.toColor().rgb,
+                shadow,
+                matrix,
+                vertexConsumers,
+                if (seeThroughBlocks) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL,
+                LorenzColor.BLACK.toColor().addAlpha(63).rgb,
+                LightmapTextureManager.MAX_LIGHT_COORDINATE,
+            )
+            y += fontRenderer.fontHeight * line.scale / 2 + ySpacing
+        }
     }
 
     // TODO add chroma color support

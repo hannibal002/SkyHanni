@@ -765,7 +765,7 @@ object WorldRenderUtils {
     class DynamicTextLine(
         text: String,
         val scale: Double,
-        color: LorenzColor = LorenzColor.WHITE,
+        val color: LorenzColor = LorenzColor.WHITE,
     ) {
         val text: String = "${color.getChatColor()}$text"
     }
