@@ -26,6 +26,7 @@ import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 object SkyHanniTypeAdapters {
     val NEU_ITEMSTACK: TypeAdapter<ItemStack> = SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData)
@@ -76,8 +77,8 @@ object SkyHanniTypeAdapters {
     }
 
     val STOPWATCH: TypeAdapter<Stopwatch> = SimpleStringTypeAdapter(
-        { this.getDuration().inWholeMilliseconds.toString() },
-        { this.toIntOrNull()?.milliseconds?.let { Stopwatch(it) } ?: error("Could not parse Stopwatch duration from '$this'") },
+        { this.getDuration().inWholeSeconds.toString() },
+        { this.toIntOrNull()?.seconds?.let { Stopwatch(it) } ?: error("Could not parse Stopwatch duration from '$this'") },
     )
 
     val CROP_TYPE: TypeAdapter<CropType> = SimpleStringTypeAdapter(
