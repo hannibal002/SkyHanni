@@ -896,16 +896,17 @@ object WorldRenderUtils {
             val scale = line.scale * baseScale
             GlStateManager.scale(-scale, -scale, scale)
 
-            y += fontRenderer.FONT_HEIGHT * line.scale / 2
+            y += fontRenderer.FONT_HEIGHT * line.scale / 2 + ySpacing / 2
             val stringWidth = fontRenderer.getStringWidth(line.text)
             fontRenderer.drawString(
                 line.text,
                 (-stringWidth / 2).toFloat(),
-                (y / line.scale).toFloat(),
+                // don't ask me why we need to subtract half the font_height, but it works like this (as else it overlapped)
+                (y / line.scale - fontRenderer.FONT_HEIGHT / 2).toFloat(),
                 0,
                 shadow,
             )
-            y += fontRenderer.FONT_HEIGHT * line.scale / 2 + ySpacing
+            y += fontRenderer.FONT_HEIGHT * line.scale / 2 + ySpacing / 2
 
             GlStateManager.color(1f, 1f, 1f)
             GlStateManager.disableBlend()
