@@ -613,15 +613,8 @@ object WorldRenderUtils {
 
         val baseScale = baseScaleIn / 25
 
-        val matrix = Matrix4f()
         val cameraPos = camera.pos
         val fontRenderer = MinecraftClient.getInstance().textRenderer
-
-        matrix.translate(
-            (location.x - cameraPos.getX()).toFloat(),
-            (location.y - cameraPos.getY()).toFloat(),
-            (location.z - cameraPos.getZ()).toFloat(),
-        ).rotate(camera.rotation)
 
         var y = yOff.toDouble() + ySpacing
 
@@ -631,9 +624,20 @@ object WorldRenderUtils {
         }
 
         lines.forEach { line: DynamicTextLine ->
-            matrix.scale(-(line.scale * baseScale).toFloat(), -(line.scale * baseScale).toFloat(), (line.scale * baseScale).toFloat())
+            val matrix = Matrix4f()
+
+            matrix.translate(
+                (location.x - cameraPos.getX()).toFloat(),
+                (location.y - cameraPos.getY()).toFloat(),
+                (location.z - cameraPos.getZ()).toFloat(),
+            ).rotate(camera.rotation).scale(
+                (line.scale * baseScale).toFloat(),
+                -(line.scale * baseScale).toFloat(),
+                (line.scale * baseScale).toFloat(),
+            )
 
             y += fontRenderer.fontHeight * line.scale / 2
+
             val stringWidth = fontRenderer.getWidth(line.text)
             fontRenderer.draw(
                 line.text,
