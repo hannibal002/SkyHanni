@@ -136,7 +136,7 @@ object WorldRenderUtils {
         val x = location.x - viewerX
         val y = location.y - viewerY
         val z = location.z - viewerZ
-        val distSq = x * x + y * y + z * z
+        val distSq = x.pow(2) + y.pow(2) + z.pow(2)
         val realAlpha = if (alpha == -1f) {
             (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
         } else alpha
@@ -176,7 +176,7 @@ object WorldRenderUtils {
         val x = location.x - viewerX
         val y = location.y - viewerY
         val z = location.z - viewerZ
-        val distSq = x * x + y * y + z * z
+        val distSq = x.pow(2) + y.pow(2) + z.pow(2)
 
         if (seeThroughBlocks) {
             GlStateManager.disableDepth()
@@ -324,9 +324,9 @@ object WorldRenderUtils {
         GlStateManager.pushMatrix()
         val renderManager = Minecraft.getMinecraft().renderManager
         var x = location.x - renderManager.viewerPosX
-        var y = location.y - renderManager.viewerPosY - viewer.eyeHeight
+        var y = location.y - (renderManager.viewerPosY + viewer.eyeHeight)
         var z = location.z - renderManager.viewerPosZ
-        val distSq = x * x + y * y + z * z
+        val distSq = x.pow(2) + y.pow(2) + z.pow(2)
         val dist = sqrt(distSq)
         if (distSq > 144) {
             x *= 12 / dist
