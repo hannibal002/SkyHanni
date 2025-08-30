@@ -29,6 +29,7 @@ import net.minecraft.util.math.Box
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.cos
+import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
@@ -75,7 +76,7 @@ object WorldRenderUtils {
         val x = location.x - viewerX
         val y = location.y - viewerY
         val z = location.z - viewerZ
-        val distSq = x * x + y * y + z * z
+        val distSq = x.pow(2) + y.pow(2) + z.pow(2)
 
         val realAlpha = if (alpha == -1f) {
             (0.1f + 0.005f * distSq.toFloat()).coerceIn(0.2f..1f)
@@ -108,7 +109,7 @@ object WorldRenderUtils {
         val x = location.x - viewerX
         val y = location.y - viewerY
         val z = location.z - viewerZ
-        val distSq = x * x + y * y + z * z
+        val distSq = x.pow(2) + y.pow(2) + z.pow(2)
 
         drawFilledBoundingBox(
             Box(
@@ -217,7 +218,7 @@ object WorldRenderUtils {
 
         val matrix = Matrix4f()
         val cameraPos = camera.pos
-        val fr = MinecraftClient.getInstance().textRenderer
+        val fontRenderer = MinecraftClient.getInstance().textRenderer
         val adjustedScale = (scale * 0.05).toFloat()
 
         matrix.translate(
@@ -226,9 +227,9 @@ object WorldRenderUtils {
             (location.z - cameraPos.getZ()).toFloat(),
         ).rotate(camera.rotation).scale(adjustedScale, -adjustedScale, adjustedScale)
 
-        val x = -fr.getWidth(text) / 2f
+        val x = -fontRenderer.getWidth(text) / 2f
 
-        fr.draw(
+        fontRenderer.draw(
             text,
             x,
             0f,
