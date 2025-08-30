@@ -34,7 +34,9 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
-import at.hannibal2.skyhanni.features.garden.pests.PestType
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.DicerRngDropTracker
@@ -608,15 +610,15 @@ class ProfileSpecificStorage(
             var leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
 
             @Expose
-            var cropDisplayType: Pair<CropType?, EliteLeaderboardMode> = Pair(null, EliteLeaderboardMode.ALL_TIME)
+            var cropDisplayType: CropLeaderboardStorage = CropLeaderboardStorage(null, EliteLeaderboardMode.ALL_TIME)
 
             @Expose
-            var pestDisplayType: Pair<PestType?, EliteLeaderboardMode> = Pair(null, EliteLeaderboardMode.ALL_TIME)
+            var pestDisplayType: PestLeaderboardStorage = PestLeaderboardStorage(null, EliteLeaderboardMode.ALL_TIME)
 
             // TODO config fix this
             @Expose
-            var weightDisplayType: Pair<FarmingWeight, EliteLeaderboardMode> =
-                Pair(FarmingWeight.FARMING_WEIGHT, EliteLeaderboardMode.ALL_TIME)
+            var weightDisplayType: WeightLeaderboardStorage =
+                WeightLeaderboardStorage(FarmingWeight.FARMING_WEIGHT, EliteLeaderboardMode.ALL_TIME)
             // TODO config fix this
             @Expose
             var minAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.garden.CropCollectionApi
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -15,14 +16,23 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
+import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.seconds
 
 class CropDisplay : EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.Crop>(
-    GardenApi.storage?.farmingWeight?.cropDisplayType,
     { crop, mode -> EliteLeaderboardType.Crop(crop, mode) },
     name = "Crop Leaderboard Display"
 ) {
     val config get() = configBase.cropCollectionDisplay
+    private val cropStorage get() = GardenApi.storage?.farmingWeight?.cropDisplayType
+
+    override var currentMode: EliteLeaderboardMode
+        get() = cropStorage?.mode ?: EliteLeaderboardMode.ALL_TIME
+        set(value) { cropStorage?.mode = value }
+
+    override var currentEnum: CropType?
+        get() = cropStorage?.enum
+        set(value) { cropStorage?.enum = value }
 
     override fun getDefaultEnum(): CropType? {
         return if (!config.hideWhenNotFarming) {
@@ -91,6 +101,9 @@ class CropDisplay : EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.C
     private fun inGardenEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
 
     override fun shouldShowDisplay(): Boolean = !GardenApi.hideExtraGuis()
-
-
 }
+
+data class CropLeaderboardStorage(
+    @Expose var enum: CropType?,
+    @Expose var mode: EliteLeaderboardMode
+)

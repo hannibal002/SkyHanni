@@ -18,15 +18,25 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.seconds
 
 class WeightDisplay : EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboardType.Weight>(
-    GardenApi.storage?.farmingWeight?.weightDisplayType,
     { weight, mode -> EliteLeaderboardType.Weight(weight, mode) },
     name = "Farming Weight Display"
 ) {
     val config get() = configBase.farmingWeightDisplay
     var lastFarmedCrop: CropType? = null
+
+    private val weightStorage get() = GardenApi.storage?.farmingWeight?.weightDisplayType
+
+    override var currentMode: EliteLeaderboardMode
+        get() = weightStorage?.mode ?: EliteLeaderboardMode.ALL_TIME
+        set(value) { weightStorage?.mode = value }
+
+    override var currentEnum: FarmingWeight?
+        get() = weightStorage?.enum ?: FarmingWeight.FARMING_WEIGHT
+        set(value) { weightStorage?.enum = value }
 
     override fun getDefaultEnum(): FarmingWeight {
         return FarmingWeight.FARMING_WEIGHT // TODO set actual default
@@ -83,6 +93,9 @@ class WeightDisplay : EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboar
 
     override fun shouldShowDisplay(): Boolean =
         !GardenApi.hideExtraGuis() && (apiError || (config.ignoreLow || (getWeight(EliteLeaderboardMode.ALL_TIME) ?: 0.0) >= 200.0))
-
-
 }
+
+data class WeightLeaderboardStorage(
+    @Expose var enum: FarmingWeight?,
+    @Expose var mode: EliteLeaderboardMode
+)

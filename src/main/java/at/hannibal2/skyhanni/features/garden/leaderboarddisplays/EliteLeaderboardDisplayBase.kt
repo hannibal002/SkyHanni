@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
 
 abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType.WithEnum<E>>(
-    private var storage: Pair<E?, EliteLeaderboardMode>?,
     private val createType: (E, EliteLeaderboardMode) -> EliteLeaderboardType,
     private val name: String
 ) {
@@ -40,19 +39,9 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     protected var amount: Double? = null
     protected var leaderboardPos: Int? = null
     private var nextPlayer: Pair<String, Double>? = null
-    protected open var currentMode: EliteLeaderboardMode
-        get() = storage?.second ?: EliteLeaderboardMode.ALL_TIME
-        set(value) {
-            val enumValue = storage?.first
-            storage = Pair(enumValue, value)
-        }
 
-    protected open var currentEnum: E?
-        get() = storage?.first
-        set(value) {
-            val mode = storage?.second ?: EliteLeaderboardMode.ALL_TIME
-            storage = Pair(value, mode)
-        }
+    protected abstract var currentMode: EliteLeaderboardMode
+    protected abstract var currentEnum: E?
 
     abstract fun getDefaultEnum(): E?
 

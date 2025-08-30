@@ -12,13 +12,22 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
+import com.google.gson.annotations.Expose
 
 class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.Pest>(
-    GardenApi.storage?.farmingWeight?.pestDisplayType,
     { pest, mode -> EliteLeaderboardType.Pest(pest, mode) },
     name = "Pest Leaderboard Display"
 ) {
     val config get() = configBase.pestKillsDisplay
+    private val pestStorage get() = GardenApi.storage?.farmingWeight?.pestDisplayType
+
+    override var currentMode: EliteLeaderboardMode
+        get() = pestStorage?.mode ?: EliteLeaderboardMode.ALL_TIME
+        set(value) { pestStorage?.mode = value }
+
+    override var currentEnum: PestType?
+        get() = pestStorage?.enum
+        set(value) { pestStorage?.enum = value }
 
     override fun getDefaultEnum(): PestType? {
         return null
@@ -89,6 +98,9 @@ class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.P
     private fun inGardenEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
 
     override fun shouldShowDisplay(): Boolean = !GardenApi.hideExtraGuis()
-
-
 }
+
+data class PestLeaderboardStorage(
+    @Expose var enum: PestType?,
+    @Expose var mode: EliteLeaderboardMode
+)
