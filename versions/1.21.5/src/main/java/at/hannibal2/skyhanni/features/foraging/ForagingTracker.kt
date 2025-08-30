@@ -109,8 +109,8 @@ object ForagingTracker {
         ).toSearchable("trees felled")
         add(totalRenderable)
 
-
-        add(tracker.addTotalProfit(profit, treesContributedTo, "gift"))
+        val duration = bucketData.sessionUptime.getDuration()
+        addAll(tracker.addTotalProfit(profit, treesContributedTo, "gift", duration, "Gifts"))
         tracker.addPriceFromButton(this)
     }
 
