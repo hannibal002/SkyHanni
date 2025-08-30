@@ -624,16 +624,17 @@ object WorldRenderUtils {
         }
 
         lines.forEach { line: DynamicTextLine ->
-            val matrix = Matrix4f()
+            val scale = (line.scale * baseScale).toFloat()
 
+            val matrix = Matrix4f()
             matrix.translate(
                 (location.x - cameraPos.getX()).toFloat(),
                 (location.y - cameraPos.getY()).toFloat(),
                 (location.z - cameraPos.getZ()).toFloat(),
-            ).rotate(camera.rotation).scale(
-                (line.scale * baseScale).toFloat(),
-                -(line.scale * baseScale).toFloat(),
-                (line.scale * baseScale).toFloat(),
+            ).rotate(
+                camera.rotation,
+            ).scale(
+                scale, -scale, scale,
             )
 
             y += fontRenderer.fontHeight * line.scale / 2
