@@ -320,7 +320,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
             onLeftClick = {
                 val line = "$name: ${text.removeColor()}"
                 val tipStats = tips[0]
-                val fullTipsLine = "$line\n $tipStats"
+                val fullTipsLine = "$line\n ${tipStats.removeColor()}"
                 copyOnClick(line, fullTipsLine, "profit per hour")
             }
         )
