@@ -262,7 +262,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    private fun getDisplayMode() = displayMode ?: run {
+    internal fun getDisplayMode() = displayMode ?: run {
         val newValue = config.defaultDisplayMode.get().mode ?: storedTrackers[name] ?: DisplayMode.TOTAL
         displayMode = newValue
         newValue
@@ -341,10 +341,10 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    enum class DisplayMode(private val displayName: String) {
+    enum class DisplayMode(private val displayName: String, val shortenedName: String = displayName) {
         TOTAL("Total"),
-        SESSION("This Session"),
-        MAYOR("This Mayor"),
+        SESSION("This Session", "Session"),
+        MAYOR("This Mayor", "Mayor"),
         ;
 
         override fun toString(): String = displayName
