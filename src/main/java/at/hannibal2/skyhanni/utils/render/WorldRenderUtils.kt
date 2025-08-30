@@ -789,8 +789,8 @@ object WorldRenderUtils {
         drawMultiLineDynamicText(
             location,
             listOf(DynamicTextLine(text, scaleMultiplier)),
-            yOff,
             0,
+            yOff,
             hideTooCloseAt,
             smallestDistanceVew,
             seeThroughBlocks,
@@ -803,8 +803,8 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.drawMultiLineDynamicText(
         location: LorenzVec,
         lines: List<DynamicTextLine>,
-        yOff: Float = 0f,
         anchoredLineIndex: Int = 0,
+        yOff: Float = 0f,
         hideTooCloseAt: Double = 0.0,
         smallestDistanceVew: Double = 5.0,
         seeThroughBlocks: Boolean = true,
@@ -817,9 +817,11 @@ object WorldRenderUtils {
         val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
         val player = MinecraftCompat.localPlayerOrNull ?: return
 
-        val x = location.x + (if (blockCenter) 0.5 else 0.0)
-        val y = location.y + (if (blockCenter) 0.5 else 0.0)
-        val z = location.z + (if (blockCenter) 0.5 else 0.0)
+        val locationRounded = if (blockCenter) location.roundLocation() else location
+
+        val x = locationRounded.x + (if (blockCenter) 0.5 else 0.0)
+        val y = locationRounded.y + (if (blockCenter) 0.5 else 0.0)
+        val z = locationRounded.z + (if (blockCenter) 0.5 else 0.0)
 
         val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
         val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks + player.getEyeHeight()
