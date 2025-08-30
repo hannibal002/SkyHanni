@@ -243,7 +243,13 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
         }
     }
 
-    fun addTotalProfit(profit: Double, totalAmount: Long, action: String, duration: Duration): List<Searchable> {
+    fun addTotalProfit(
+        profit: Double,
+        totalAmount: Long,
+        action: String,
+        duration: Duration,
+        actionPluralized: String = ""
+    ): List<Searchable> {
         val profitFormat = profit.toLong().addSeparators()
         val profitPrefix = if (profit < 0) "§c" else "§6"
 
@@ -256,6 +262,11 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
             if (duration > 0.seconds) {
                 val profitPerHour = profit / duration.inPartialHours
                 add("§7Profit per hour: $profitPrefix${profitPerHour.shortFormat()}")
+            }
+
+            if (totalAmount > 0 && duration > 0.seconds && actionPluralized != "") {
+                val amountPerHour = profit / duration.inPartialHours
+                add("§7$actionPluralized per hour: $profitPrefix${amountPerHour.shortFormat()}")
             }
         }
 

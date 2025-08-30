@@ -233,7 +233,7 @@ object ExperimentsProfitTracker {
             ).toSearchable(),
         )
         val duration = data.sessionUptime.getDuration()
-        addAll(tracker.addTotalProfit(profit, data.experimentsDone, "experiment", duration))
+        addAll(tracker.addTotalProfit(profit, data.experimentsDone, "experiment", duration, "Experiments"))
 
         val enchantingXpGained = data.xpGained
         add(

@@ -102,7 +102,7 @@ object DraconicSacrificeTracker {
         )
 
         val duration = data.sessionUptime.getDuration()
-        addAll(tracker.addTotalProfit(profit, data.itemsSacrificed, "sacrifice", duration))
+        addAll(tracker.addTotalProfit(profit, data.itemsSacrificed, "sacrifice", duration, "Sacrifices"))
 
         tracker.addPriceFromButton(this)
     }

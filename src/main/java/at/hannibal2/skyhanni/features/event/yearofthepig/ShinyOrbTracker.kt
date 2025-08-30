@@ -123,6 +123,6 @@ object ShinyOrbTracker {
         addSkillXpInfo(data.skillXpGained)
 
         val duration = data.sessionUptime.getDuration()
-        addAll(tracker.addTotalProfit(profit, data.orbsCompleted, "orb used", duration))
+        addAll(tracker.addTotalProfit(profit, data.orbsCompleted, "orb used", duration, "Orbs used"))
     }
 }

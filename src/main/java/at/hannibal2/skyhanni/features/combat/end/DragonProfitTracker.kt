@@ -101,7 +101,7 @@ object DragonProfitTracker {
         val dragonString = "${colorCode.getChatColor()}$displayName §r§bkills: $killAmount"
         addSearchString(dragonString)
 
-        addAll(tracker.addTotalProfit(profit, bucketData.getTotalDragonCount(), "Dragon", duration))
+        addAll(tracker.addTotalProfit(profit, bucketData.getTotalDragonCount(), "Dragon", duration, "Dragons"))
 
         tracker.addPriceFromButton(this)
     }

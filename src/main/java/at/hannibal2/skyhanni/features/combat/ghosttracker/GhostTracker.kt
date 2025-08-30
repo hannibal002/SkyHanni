@@ -179,7 +179,7 @@ object GhostTracker {
         }
 
         val duration = data.sessionUptime.getDuration()
-        addAll(tracker.addTotalProfit(profit, data.kills, "kill", duration))
+        addAll(tracker.addTotalProfit(profit, data.kills, "kill", duration, "Kills"))
     }
 
     @HandleEvent

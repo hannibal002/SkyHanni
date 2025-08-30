@@ -139,7 +139,7 @@ object CorpseTracker {
         }
 
         val duration = bucketData.sessionUptime.getDuration()
-        addAll(tracker.addTotalProfit(profit, bucketData.getCorpseCount(), "loot", duration))
+        addAll(tracker.addTotalProfit(profit, bucketData.getCorpseCount(), "corpse", duration, "Corpses"))
 
         tracker.addPriceFromButton(this)
     }

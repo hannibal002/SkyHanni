@@ -97,7 +97,7 @@ object ExcavatorProfitTracker {
         }
 
         val duration = data.sessionUptime.getDuration()
-        addAll(tracker.addTotalProfit(profit, data.timesExcavated, "excavation", duration))
+        addAll(tracker.addTotalProfit(profit, data.timesExcavated, "excavation", duration, "Excavations"))
 
         tracker.addPriceFromButton(this)
     }

@@ -172,7 +172,7 @@ object CrystalNucleusTracker {
             )
 
             val duration = data.sessionUptime.getDuration()
-            addAll(tracker.addTotalProfit(profit, data.runsCompleted, "run", duration))
+            addAll(tracker.addTotalProfit(profit, data.runsCompleted, "run", duration, "Runs"))
         } else {
             addSearchString("§7Do a run to start tracking!")
         }
