@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -26,8 +27,9 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.DynamicTextLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawMultiLineDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -165,10 +167,14 @@ object FlareDisplay {
         if (config.displayType != FlareConfig.DisplayType.GUI) {
             for (flare in flares) {
                 val location = flare.location.add(-0.5, 0.0, -0.5)
-                val name = flare.type.displayName
-                val time = "§b${getRemainingTime(flare).format()}"
-                event.drawDynamicText(location, name, 1.5, seeThroughBlocks = false)
-                event.drawDynamicText(location, time, 1.5, yOff = 10f, seeThroughBlocks = false)
+                event.drawMultiLineDynamicText(
+                    location,
+                    listOf(
+                        DynamicTextLine(flare.type.displayName, 1.5),
+                        DynamicTextLine(getRemainingTime(flare).format(), 1.5, LorenzColor.AQUA),
+                    ),
+                    seeThroughBlocks = false,
+                )
             }
         }
 
