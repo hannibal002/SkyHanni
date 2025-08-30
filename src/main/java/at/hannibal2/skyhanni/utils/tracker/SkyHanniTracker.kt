@@ -160,17 +160,17 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     private fun showSessionUptime(): Boolean = config.showUptime && (!config.onlyShowSession || displayMode != DisplayMode.TOTAL)
 
-    private fun checkAfk(): Boolean {
+    private fun checkAfk() {
         if (getSessionUptime()?.isPaused() == true) {
-            return true
+            return
         }
-        val sharedTracker = getSharedTracker() ?: return true
+        val sharedTracker = getSharedTracker() ?: return
         val afkTime = sharedTracker.get(DisplayMode.TOTAL).sessionUptime.getLapTime() // Afk time should be the same for all valid displays
         if (afkTime == null || afkTime > config.afkTimeout.seconds) {
             pauseSessionUptime()
-            return true
+            return
         }
-        return false
+        update()
     }
 
     private fun getSessionUptime(): Stopwatch? = displayMode?.let { getSharedTracker()?.get(it)?.sessionUptime }
