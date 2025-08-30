@@ -85,6 +85,8 @@ object DragonProfitTracker {
         addSearchString("§b§lDragon Profit Tracker")
         tracker.addBucketSelector(this, bucketData, "Dragon Type")
 
+        val duration = bucketData.sessionUptime.getDuration()
+
         var profit = tracker.drawItems(bucketData, { true }, this)
 
         val eyePrice = SkyHanniTracker.getPricePer(SUMMONING_EYE)
@@ -99,7 +101,7 @@ object DragonProfitTracker {
         val dragonString = "${colorCode.getChatColor()}$displayName §r§bkills: $killAmount"
         addSearchString(dragonString)
 
-        add(tracker.addTotalProfit(profit, bucketData.getTotalDragonCount(), "Dragon"))
+        addAll(tracker.addTotalProfit(profit, bucketData.getTotalDragonCount(), "Dragon", duration))
 
         tracker.addPriceFromButton(this)
     }

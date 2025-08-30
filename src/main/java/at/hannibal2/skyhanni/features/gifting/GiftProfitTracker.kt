@@ -369,7 +369,8 @@ object GiftProfitTracker {
             )
         }
 
-        add(tracker.addTotalProfit(profit, totalRewards, "gift"))
+        val duration = data.sessionUptime.getDuration()
+        addAll(tracker.addTotalProfit(profit, totalRewards, "gift", duration))
         tracker.addPriceFromButton(this)
     }
 

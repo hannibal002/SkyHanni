@@ -177,7 +177,9 @@ object GhostTracker {
         config.ghostTrackerText.forEach { line ->
             addSearchString(line.line(data))
         }
-        add(tracker.addTotalProfit(profit, data.kills, "kill"))
+
+        val duration = data.sessionUptime.getDuration()
+        addAll(tracker.addTotalProfit(profit, data.kills, "kill", duration))
     }
 
     @HandleEvent
