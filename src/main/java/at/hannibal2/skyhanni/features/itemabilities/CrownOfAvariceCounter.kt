@@ -112,7 +112,7 @@ object CrownOfAvariceCounter {
     }
 
     private fun update() {
-        if (sessionUptime.getLapTime()?.let{ it > config.afkTimeout.seconds } != false) {
+        if (sessionUptime.getLapTime()?.let { it > config.afkTimeout.seconds } != false) {
             sessionUptime.pause(true)
         }
         display = buildDisplay()
