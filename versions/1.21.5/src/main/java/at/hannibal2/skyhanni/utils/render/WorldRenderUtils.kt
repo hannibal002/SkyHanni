@@ -520,6 +520,10 @@ object WorldRenderUtils {
         val color: LorenzColor = LorenzColor.WHITE,
     ) {
         val text: String = "${color.getChatColor()}$text"
+
+        override fun toString(): String {
+            return "DynamicTextLine($text, scale: $scale)"
+        }
     }
 
     fun SkyHanniRenderWorldEvent.drawDynamicText(
