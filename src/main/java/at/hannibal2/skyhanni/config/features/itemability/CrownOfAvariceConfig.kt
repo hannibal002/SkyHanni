@@ -29,6 +29,13 @@ class CrownOfAvariceConfig {
     @ConfigEditorBoolean
     var shortFormatCPH: Boolean = true
 
+    @Expose
+    @ConfigOption(
+        name = "Afk Pause Time",
+        desc = "Pauses the timer if no coins are added after this amount of time in seconds."
+    )
+    @ConfigEditorSlider(minValue = 5F, maxValue = 180F, minStep = 5F)
+    var afkTimeout: Int = 120
 
     @Expose
     @ConfigOption(
@@ -42,8 +49,6 @@ class CrownOfAvariceConfig {
     @ConfigOption(name = "Reset on World Change", desc = "Resets your session on world change if enabled.")
     @ConfigEditorBoolean
     var resetOnWorldChange = false
-
-
 
     @Expose
     @ConfigOption(name = "Tracker Text", desc = "Drag the text to change the appearance of the overlay.")

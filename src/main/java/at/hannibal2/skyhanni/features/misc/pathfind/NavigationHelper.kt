@@ -113,9 +113,8 @@ object NavigationHelper {
         val graph = IslandGraphs.currentIslandGraph ?: return emptyMap()
         val closestNode = IslandGraphs.closestNode ?: return emptyMap()
 
-        val nodes = graph.nodes
         val distances = mutableMapOf<GraphNode, Double>()
-        for (node in nodes) {
+        for (node in graph) {
             val name = node.name ?: continue
             val remainingTags = node.tags.filter { it in allowedTags }
             if (remainingTags.isEmpty()) continue

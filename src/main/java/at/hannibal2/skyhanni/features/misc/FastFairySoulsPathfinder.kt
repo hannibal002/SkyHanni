@@ -240,7 +240,7 @@ object FastFairySoulsPathfinder {
             return
         }
         val foundSouls = foundSoulsOnCurrentIsland()
-        val allSouls = getTargetNodes(graph.nodes)
+        val allSouls = getTargetNodes(graph)
         val missingSouls = allSouls.filter { it.position !in foundSouls }
 
         if (missingSouls.isEmpty()) {
