@@ -262,7 +262,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    internal fun getDisplayMode() = displayMode ?: run {
+    protected fun getDisplayMode() = displayMode ?: run {
         val newValue = config.defaultDisplayMode.get().mode ?: storedTrackers[name] ?: DisplayMode.TOTAL
         displayMode = newValue
         newValue
