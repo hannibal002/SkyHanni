@@ -96,7 +96,7 @@ class TrackerConfig {
     @Expose
     @ConfigOption(name = "Show Uptime", desc = "Show how long the tracker has been active.")
     @ConfigEditorBoolean
-    var showUptime: Boolean = true
+    var showUptime: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -104,7 +104,7 @@ class TrackerConfig {
         desc = "Only show uptime when the tracker is on session mode."
     )
     @ConfigEditorBoolean
-    var onlyShowSession: Boolean = true
+    var onlyShowSession: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(

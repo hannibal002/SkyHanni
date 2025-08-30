@@ -158,7 +158,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    private fun showSessionUptime(): Boolean = config.showUptime && (!config.onlyShowSession || displayMode != DisplayMode.TOTAL)
+    private fun showSessionUptime(): Boolean =
+        config.showUptime.get() && (!config.onlyShowSession.get() || displayMode != DisplayMode.TOTAL)
 
     private fun checkAfk() {
         if (getSessionUptime()?.isPaused() == true) {

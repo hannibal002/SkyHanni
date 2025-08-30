@@ -27,6 +27,8 @@ object TrackerManager {
                 textOrder,
                 showTable,
                 itemsShown,
+                showUptime,
+                onlyShowSession
             ) {
                 hasChanged = true
             }
