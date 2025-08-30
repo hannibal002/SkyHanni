@@ -42,9 +42,11 @@ import at.hannibal2.skyhanni.utils.compat.addLeaves
 import at.hannibal2.skyhanni.utils.compat.addLeaves2
 import at.hannibal2.skyhanni.utils.compat.addRedFlower
 import at.hannibal2.skyhanni.utils.compat.addTallGrass
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.DynamicTextLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawMultiLineDynamicText
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
@@ -341,24 +343,27 @@ object GriffinBurrowHelper {
                 val location = inquis.location
                 // TODO add chroma color support via config
                 event.drawColor(location, LorenzColor.LIGHT_PURPLE.toChromaColor())
+
+                val lines = mutableListOf<DynamicTextLine>()
                 val distance = location.distance(playerLocation)
                 if (distance > 10) {
                     // TODO use round(1)
                     val formattedDistance = distance.toInt().addSeparators()
-                    event.drawDynamicText(location.up(), "§d§lInquisitor §e${formattedDistance}m", 1.7)
+                    lines.add(DynamicTextLine("§d§lInquisitor §e${formattedDistance}m", 1.7))
                 } else {
-                    event.drawDynamicText(location.up(), "§d§lInquisitor", 1.7)
+                    lines.add(DynamicTextLine("§d§lInquisitor", 1.7))
                 }
                 if (distance < 5) {
                     InquisitorWaypointShare.maybeRemove(inquis)
                 }
-                event.drawDynamicText(location.up(), "§eFrom §b${inquis.displayName}", 1.6, yOff = 9f)
+                lines.add(DynamicTextLine("§eFrom §b${inquis.displayName}", 1.6))
 
                 if (config.inquisitorSharing.showDespawnTime) {
                     val spawnTime = inquis.spawnTime
                     val format = (75.seconds - spawnTime.passedSince()).format()
-                    event.drawDynamicText(location.up(), "§eDespawns in §b$format", 1.6, yOff = 18f)
+                    lines.add(DynamicTextLine("§eDespawns in §b$format", 1.6))
                 }
+                event.drawMultiLineDynamicText(location.up(), lines)
             }
         }
 
@@ -402,12 +407,20 @@ object GriffinBurrowHelper {
                 val distance = guessLocation.distance(playerLocation)
                 // TODO add chroma color support via config
                 event.drawColor(guessLocation, LorenzColor.WHITE.toChromaColor(), distance > 10)
-                val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"
-                event.drawDynamicText(guessLocation.up(), "${color}Guess", 1.5)
+
+                val lines = mutableListOf<DynamicTextLine>()
+                lines.add(
+                    DynamicTextLine(
+                        "Guess",
+                        1.5,
+                        color = if (currentWarp != null && targetLocation == guessLocation) LorenzColor.AQUA else LorenzColor.WHITE,
+                    ),
+                )
                 if (distance > 5) {
                     val formattedDistance = distance.toInt().addSeparators()
-                    event.drawDynamicText(guessLocation.up(), "§e${formattedDistance}m", 1.7, yOff = 10f)
+                    lines.add(DynamicTextLine("§e${formattedDistance}m", 1.7))
                 }
+                event.drawMultiLineDynamicText(guessLocation.up(), lines)
             }
         }
     }
