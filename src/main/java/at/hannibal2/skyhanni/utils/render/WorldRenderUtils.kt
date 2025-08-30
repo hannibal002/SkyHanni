@@ -350,7 +350,6 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
 
-
         if (seeThroughBlocks) {
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
@@ -818,13 +817,13 @@ object WorldRenderUtils {
         val y = location.y + (if (blockCenter) 0.5 else 0.0)
         val z = location.z + (if (blockCenter) 0.5 else 0.0)
 
-        val viewX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-        val viewY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks + player.getEyeHeight()
-        val viewZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
+        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
+        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks + player.getEyeHeight()
+        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
 
-        val dX = (x - viewX)
-        val dY = (y - viewY)
-        val dZ = (z - viewZ)
+        val dX = (x - viewerX)
+        val dY = (y - viewerY)
+        val dZ = (z - viewerZ)
         val distToPlayerSq = dX.pow(2) + dY.pow(2) + dZ.pow(2)
         var distToPlayer = sqrt(distToPlayerSq)
 
@@ -834,9 +833,9 @@ object WorldRenderUtils {
         distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
         val distRender = distToPlayer.coerceAtMost(50.0)
 
-        val resultX = viewX + dX / (distToPlayer / distRender)
-        val resultY = if (ignoreY) y * (distToPlayer / distRender) else viewY + dY / (distToPlayer / distRender)
-        val resultZ = viewZ + dZ / (distToPlayer / distRender)
+        val resultX = viewerX + dX / (distToPlayer / distRender)
+        val resultY = if (ignoreY) y * (distToPlayer / distRender) else viewerY + dY / (distToPlayer / distRender)
+        val resultZ = viewerZ + dZ / (distToPlayer / distRender)
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
         renderMultiLineText(
