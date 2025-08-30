@@ -893,7 +893,8 @@ object WorldRenderUtils {
             GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
             GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
 
-            GlStateManager.scale(-(line.scale * baseScale), -(line.scale * baseScale), line.scale * baseScale)
+            val scale = line.scale * baseScale
+            GlStateManager.scale(-scale, -scale, scale)
 
             y += fontRenderer.FONT_HEIGHT * line.scale / 2
             val stringWidth = fontRenderer.getStringWidth(line.text)
