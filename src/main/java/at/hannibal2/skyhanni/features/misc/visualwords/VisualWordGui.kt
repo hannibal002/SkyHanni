@@ -598,13 +598,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
     }
 
     private fun drawUnmodifiedString(str: String, x: Float, y: Float) {
-        //#if MC > 1.21
-        //$$ ModifyVisualWords.changeWords = false
-        //#endif
+        ModifyVisualWords.changeWords = false
         GuiRenderUtils.drawString(str, x, y)
-        //#if MC > 1.21
-        //$$ ModifyVisualWords.changeWords = true
-        //#endif
+        ModifyVisualWords.changeWords = true
     }
 
     private fun drawUnmodifiedString(str: String, x: Int, y: Int) {
@@ -612,13 +608,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
     }
 
     private fun drawUnmodifiedStringCentered(str: String?, x: Int, y: Int) {
-        //#if MC > 1.21
-        //$$ ModifyVisualWords.changeWords = false
-        //#endif
+        ModifyVisualWords.changeWords = false
         GuiRenderUtils.drawStringCentered(str ?: "null", x, y)
-        //#if MC > 1.21
-        //$$ ModifyVisualWords.changeWords = true
-        //#endif
+        ModifyVisualWords.changeWords = true
     }
 
     private fun drawUnmodifiedStringCentered(str: String?, x: Float, y: Float) {
