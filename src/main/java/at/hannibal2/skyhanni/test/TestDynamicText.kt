@@ -13,6 +13,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawMultiLineDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
 import net.minecraft.client.Minecraft
+import org.joml.Quaternionf
+import org.joml.Vector3f
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
@@ -58,6 +60,21 @@ object TestDynamicText {
             return c to d
         }
 
+        private fun makeTWithQuaternion(p: LorenzVec, rotation: Quaternionf, length: Float): Pair<LorenzVec, LorenzVec> {
+            // Get the rotated X-axis (right direction)
+            val right = Vector3f(1f, 0f, 0f).rotate(rotation)
+
+            // Project into XZ plane (ignore Y)
+            right.y = 0f
+            right.normalize()
+
+            // Build the endpoints
+            val half = right.mul(length / 2f, Vector3f())
+            val c = p + LorenzVec(half.x, half.y, half.z)
+            val d = p - LorenzVec(half.x, half.y, half.z)
+
+            return c to d
+        }
 
         override fun draw(event: SkyHanniRenderWorldEvent) {
             event.drawMultiLineDynamicText(
@@ -72,16 +89,17 @@ object TestDynamicText {
             )
 
             //#if MC < 1.21
+            val coords = makeTWithAngle(location, Minecraft.getMinecraft().renderManager.playerViewY, 3.0).toList()
+            //#else
+            //$$val coords = makeTWithQuaternion(location, event.camera.rotation, 3.0f).toList()
+            //#endif
             LineDrawer.draw3D(event, 3, false) {
                 drawPath(
-                    makeTWithAngle(location, Minecraft.getMinecraft().renderManager.playerViewY, 3.0).toList(),
+                    coords,
                     Color.RED,
                     1.0,
                 )
             }
-            //#else
-            //#endif
-
 //             event.drawWaypointFilled(
 //                 location,
 //                 Color.YELLOW,
