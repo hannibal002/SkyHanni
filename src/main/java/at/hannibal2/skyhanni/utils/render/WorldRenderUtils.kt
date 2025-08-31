@@ -789,7 +789,7 @@ object WorldRenderUtils {
         drawMultiLineDynamicText(
             location,
             listOf(DynamicTextLine(text, scaleMultiplier)),
-            0.0,
+            0.5,
             yOff,
             hideTooCloseAt,
             smallestDistanceVew,
@@ -814,18 +814,13 @@ object WorldRenderUtils {
     ) {
         if (lines.isEmpty()) return
 
-        val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
-        val player = MinecraftCompat.localPlayerOrNull ?: return
-
         val locationRounded = if (blockCenter) location.roundLocation() else location
 
         val x = locationRounded.x + (if (blockCenter) 0.5 else 0.0)
         val y = locationRounded.y + (if (blockCenter) 0.5 else 0.0)
         val z = locationRounded.z + (if (blockCenter) 0.5 else 0.0)
 
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks + player.getEyeHeight()
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
+        val (viewerX, viewerY, viewerZ) = exactPlayerEyeLocation()
 
         val dX = (x - viewerX)
         val dY = (y - viewerY)
@@ -874,17 +869,18 @@ object WorldRenderUtils {
         val minecraft = Minecraft.getMinecraft()
         val fontRenderer = minecraft.fontRendererObj
         val renderManager = minecraft.renderManager
+        val fontHeight = fontRenderer.FONT_HEIGHT
 
         var y = yOff.toDouble()
 
         val fullLinesMove = anchoredLineIndex.toInt()
         val partialLineMove = anchoredLineIndex - fullLinesMove
         for (i in 0..<fullLinesMove) {
-            y -= fontRenderer.FONT_HEIGHT * lines[i].scale + ySpacing
+            y -= fontHeight * lines[i].scale + ySpacing
         }
-        y -= (fontRenderer.FONT_HEIGHT * lines[fullLinesMove].scale + ySpacing) * partialLineMove
+        y -= (fontHeight * lines[fullLinesMove].scale + ySpacing) * partialLineMove
 
-        lines.forEach { line ->
+        lines.forEach { line: DynamicTextLine ->
             GlStateManager.pushMatrix()
             GlStateManager.enableBlend()
             GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
@@ -901,17 +897,17 @@ object WorldRenderUtils {
             val scale = line.scale * baseScale
             GlStateManager.scale(-scale, -scale, scale)
 
-            y += (fontRenderer.FONT_HEIGHT * line.scale + ySpacing) / 2
+            y += (fontHeight * line.scale + ySpacing) / 2
             val stringWidth = fontRenderer.getStringWidth(line.text)
             fontRenderer.drawString(
                 line.text,
                 (-stringWidth / 2).toFloat(),
                 // don't ask me why we need to subtract half the font_height, but it works like this (as else it overlapped)
-                (y / line.scale - fontRenderer.FONT_HEIGHT / 2).toFloat(),
+                (y / line.scale - fontHeight / 2).toFloat(),
                 0,
                 shadow,
             )
-            y += (fontRenderer.FONT_HEIGHT * line.scale + ySpacing) / 2
+            y += (fontHeight * line.scale + ySpacing) / 2
 
             GlStateManager.color(1f, 1f, 1f)
             GlStateManager.disableBlend()
