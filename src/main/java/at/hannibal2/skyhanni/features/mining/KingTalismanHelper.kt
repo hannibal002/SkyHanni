@@ -148,10 +148,8 @@ object KingTalismanHelper {
     }
 
     private fun getKingTimes(): Map<String, Duration> {
-        // TODO: Needs more data - Currently believe king index to be only year based and resets at start of year
         val sbTime = SkyBlockTime.now()
-        val yearDay = (sbTime.month - 1) * 31 + sbTime.day
-        val kingIndex = (yearDay + 5) % kingCircles.size
+        val kingIndex = (sbTime.day + 5) % kingCircles.size
         val absDay = (sbTime.year - 1) * 372 + (sbTime.month - 1) * 31 + sbTime.day
         val startTime = SkyBlockTime.fromAbsoluteDay(absDay - kingIndex)
         val oneSBDay = 20.minutes
@@ -188,24 +186,6 @@ object KingTalismanHelper {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shprintking") {
-            description = "Prints out king related debug stuff"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback {
-                for ((king, time) in getKingTimes()) {
-                    ChatUtils.chat(king + ": " + time.inWholeSeconds.toString())
-                }
-                val sbTime = SkyBlockTime.now()
-                val yearDay = (sbTime.month - 1) * 31 + sbTime.day
-                val kingIndex = (yearDay + 5) % kingCircles.size
-                val absDay = (sbTime.year - 1) * 372 + (sbTime.month - 1) * 31 + sbTime.day
-                val startTime = SkyBlockTime.fromAbsoluteDay(absDay - kingIndex)
-                ChatUtils.chat("SB Time: ${sbTime.year} - ${sbTime.month} - ${sbTime.day}")
-                ChatUtils.chat("Absolute day: $absDay")
-                ChatUtils.chat("King index: $kingIndex")
-                ChatUtils.chat("Start time: ${startTime.toMillis() / 1000}")
-            }
-        }
         event.register("shresetkinghelper") {
             description = "Resets the King Talisman Helper"
             category = CommandCategory.USERS_RESET
