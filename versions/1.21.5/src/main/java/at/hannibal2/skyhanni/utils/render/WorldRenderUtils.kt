@@ -541,7 +541,7 @@ object WorldRenderUtils {
         drawMultiLineDynamicText(
             location,
             listOf(DynamicTextLine(text, scaleMultiplier)),
-            0,
+            0.5,
             yOff,
             hideTooCloseAt,
             smallestDistanceVew,
@@ -555,7 +555,7 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.drawMultiLineDynamicText(
         location: LorenzVec,
         lines: List<DynamicTextLine>,
-        anchoredLineIndex: Int = 0,
+        anchoredLineIndex: Double = 0.5,
         yOff: Float = 0f,
         hideTooCloseAt: Double = 0.0,
         smallestDistanceVew: Double = 5.0,
@@ -566,18 +566,13 @@ object WorldRenderUtils {
     ) {
         if (lines.isEmpty()) return
 
-        val player = MinecraftCompat.localPlayerOrNull ?: return
-
         val locationRounded = if (blockCenter) location.roundLocation() else location
 
         val x = locationRounded.x + (if (blockCenter) 0.5 else 0.0)
         val y = locationRounded.y + (if (blockCenter) 0.5 else 0.0)
         val z = locationRounded.z + (if (blockCenter) 0.5 else 0.0)
 
-        val viewerPos = getViewerPos()
-        val viewerX = viewerPos.x
-        val viewerY = viewerPos.y + player.getEyeHeight(player.pose)
-        val viewerZ = viewerPos.z
+        val (viewerX, viewerY, viewerZ) = exactPlayerEyeLocation()
 
         val dX = (x - viewerX)
         val dY = (y - viewerY)
@@ -607,45 +602,50 @@ object WorldRenderUtils {
         seeThroughBlocks: Boolean,
         shadow: Boolean,
         yOff: Float,
-        anchoredLineIndex: Int = 0,
+        anchoredLineIndex: Double = 0.5,
         ySpacing: Float = 4.0F,
         baseScaleIn: Double = 1.0,
     ) {
         if (lines.isEmpty()) return
+        if (anchoredLineIndex >= lines.size) {
+            error("anchoredLineIndex exceeds size of lines")
+        }
 
         val baseScale = baseScaleIn / 25
 
         val cameraPos = camera.pos
         val fontRenderer = MinecraftClient.getInstance().textRenderer
+        val fontHeight = fontRenderer.fontHeight
 
-        var y = yOff.toDouble() + ySpacing
+        var y = yOff.toDouble()
 
-        for (i in 0..anchoredLineIndex) {
-            y -= ySpacing
-            y -= (fontRenderer.fontHeight * lines[i].scale)
+        val fullLinesMove = anchoredLineIndex.toInt()
+        val partialLineMove = anchoredLineIndex - fullLinesMove
+        for (i in 0..<fullLinesMove) {
+            y -= fontHeight * lines[i].scale + ySpacing
         }
+        y -= (fontHeight * lines[fullLinesMove].scale + ySpacing) * partialLineMove
 
         lines.forEach { line: DynamicTextLine ->
-            val scale = (line.scale * baseScale).toFloat()
 
             val matrix = Matrix4f()
             matrix.translate(
                 (location.x - cameraPos.getX()).toFloat(),
                 (location.y - cameraPos.getY()).toFloat(),
                 (location.z - cameraPos.getZ()).toFloat(),
-            ).rotate(
-                camera.rotation,
-            ).scale(
-                scale, -scale, scale,
             )
+            matrix.rotate(camera.rotation)
 
-            y += fontRenderer.fontHeight * line.scale / 2
+            val scale = (line.scale * baseScale).toFloat()
+            matrix.scale(scale, -scale, scale)
 
+            y += (fontHeight * line.scale + ySpacing) / 2
             val stringWidth = fontRenderer.getWidth(line.text)
             fontRenderer.draw(
                 line.text,
                 (-stringWidth / 2).toFloat(),
-                (y / line.scale).toFloat(),
+                // don't ask me why we need to subtract half the font_height, but it works like this (as else it overlapped)
+                (y / line.scale - fontHeight / 2).toFloat(),
                 line.color.toColor().rgb,
                 shadow,
                 matrix,
@@ -654,7 +654,7 @@ object WorldRenderUtils {
                 LorenzColor.BLACK.toColor().addAlpha(63).rgb,
                 LightmapTextureManager.MAX_LIGHT_COORDINATE,
             )
-            y += fontRenderer.fontHeight * line.scale / 2 + ySpacing
+            y += (fontHeight * line.scale + ySpacing) / 2
         }
     }
 
