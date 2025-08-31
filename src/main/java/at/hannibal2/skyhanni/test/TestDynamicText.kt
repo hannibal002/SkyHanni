@@ -71,13 +71,16 @@ object TestDynamicText {
                 0.05F,
             )
 
+            //#if MC < 1.21
             LineDrawer.draw3D(event, 3, false) {
                 drawPath(
-                    makeTWithAngle(location, Minecraft.getMinecraft().renderManager.playerViewY,3.0).toList(),
+                    makeTWithAngle(location, Minecraft.getMinecraft().renderManager.playerViewY, 3.0).toList(),
                     Color.RED,
                     1.0,
                 )
             }
+            //#else
+            //#endif
 
 //             event.drawWaypointFilled(
 //                 location,
