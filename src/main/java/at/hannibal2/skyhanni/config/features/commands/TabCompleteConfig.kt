@@ -60,4 +60,10 @@ class TabCompleteConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var viewrecipeItems: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Call", desc = "Tab-complete §e/call§7 with all contact names.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var call: Boolean = true
 }
