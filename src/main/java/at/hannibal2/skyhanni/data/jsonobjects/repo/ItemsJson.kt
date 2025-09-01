@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -24,11 +23,15 @@ data class ItemValueCalculationDataJson(
     @Expose @SerializedName("always_active_enchants") val alwaysActiveEnchants: Map<String, AlwaysActiveEnchantJson>,
     @Expose @SerializedName("only_tier_one_prices") val onlyTierOnePrices: List<String>,
     @Expose @SerializedName("only_tier_five_prices") val onlyTierFivePrices: List<String>,
+    @Expose @SerializedName("endcap_enchants") val endcapEnchants: Map<String, EndCapData>? = mapOf(),
 )
 
 data class AlwaysActiveEnchantJson(
     @Expose val level: Int,
-    @Expose val items: List<String>,
-) {
-    val internalNames get() = items.map { it.toInternalName() }
-}
+    @Expose val internalNames: List<NeuInternalName>,
+)
+
+data class EndCapData(
+    @Expose @SerializedName("required_level") val requiredLevel: Int,
+    @Expose @SerializedName("endcap_item") val endcapItem: NeuInternalName,
+)
