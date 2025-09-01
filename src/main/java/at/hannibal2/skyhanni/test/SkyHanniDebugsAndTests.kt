@@ -520,7 +520,6 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
-        event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
         event.move(103, "dev.debug.raytracedOreblock", "dev.debug.rayTracedOreBlock")
     }
 
