@@ -689,7 +689,7 @@ object EstimatedItemValueCalculator {
                     items[endcapData.endcapItem] = 1
                 }
             }
-            
+
             val enchantmentName = "$rawName;$level".toInternalName()
 
             if (enchantmentName.isBazaarItem()) {
