@@ -202,8 +202,8 @@ object PestProfitTracker {
             val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
-            //as of sept 2025, mushroom rng drop grants the wrong amount of milestone progress, but not collection
-            //we'll add the difference directly to milestone progress
+            // as of sept 2025, mushroom rng drop grants the wrong amount of milestone progress, but not collection
+            // we'll add the difference directly to milestone progress
             if (cropType == CropType.MUSHROOM) {
                 val missingAmount = primitiveStack.amount.toLong() * amount.toLong() * 4
                 cropType.addMilestoneCounter(missingAmount)
