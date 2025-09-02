@@ -361,12 +361,10 @@ object EliteFarmersLeaderboard {
         lastPlayer[leaderboardType] = apiData.previous?.firstOrNull()
         nextPlayers[leaderboardType] = mutableListOf()
         apiData.upcomingPlayers.forEach {
-            if (it.amount > (getAmount(leaderboardType) ?: apiData.amount)) {
-                nextPlayers[leaderboardType]?.add(it)
-            }
-        }
-        if ((nextPlayers[leaderboardType]?.size ?: 0) == 0 && apiData.upcomingPlayers.isNotEmpty()) {
-            shouldRefreshLeaderboard[leaderboardType] = true
+            nextPlayers[leaderboardType]?.add(it)
+            /*if (it.amount > (getAmount(leaderboardType) ?: apiData.amount)) {
+
+            }*/
         }
     }
 
