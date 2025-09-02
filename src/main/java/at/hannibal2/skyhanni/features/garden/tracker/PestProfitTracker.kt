@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestProfitTrackerConfi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.addMilestoneCounter
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -201,6 +202,12 @@ object PestProfitTracker {
             val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
+            //as of sept 2025, mushroom rng drop grants the wrong amount of milestone progress, but not collection
+            //we'll add the difference directly to milestone progress
+            if (cropType == CropType.MUSHROOM) {
+                val missingAmount = primitiveStack.amount.toLong() * amount.toLong() * 4
+                cropType.addMilestoneCounter(missingAmount)
+            }
             cropType.addCollectionCounter(CropCollectionType.PEST_RNG, primitiveStack.amount.toLong() * amount.toLong())
             // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
