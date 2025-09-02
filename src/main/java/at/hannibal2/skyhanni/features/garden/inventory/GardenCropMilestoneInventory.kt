@@ -29,13 +29,14 @@ object GardenCropMilestoneInventory {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onMilestoneUpdate(event: CropMilestoneUpdateEvent) {
+        // This should only render in the crop milestones menu, so no point updating it outside of that
         if (InventoryUtils.openInventoryName() != "Crop Milestones") return
         updateAverage()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (InventoryUtils.openInventoryName() != "Crop Milestones") return
+        if (InventoryUtils.openInventoryName() != "Crop Milestones" || !config.number.averageCropMilestone) return
         if (average == null) updateAverage()
 
         if (event.slot.slotNumber == 38) {

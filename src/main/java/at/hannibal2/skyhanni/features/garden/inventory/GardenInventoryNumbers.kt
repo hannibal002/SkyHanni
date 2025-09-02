@@ -32,7 +32,6 @@ object GardenInventoryNumbers {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderItemTip(event: RenderItemTipEvent) {
-
         if (InventoryUtils.openInventoryName() == "Crop Milestones") {
             if (!config.cropMilestone) return
 
