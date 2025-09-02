@@ -40,7 +40,7 @@ object WrongDataFix {
         for ((_, stack) in event.inventoryItems) {
             val crop = getCropTypeByLore(stack) ?: continue
             totalPattern.firstMatcher(stack.getLore()) {
-                val oldAmount = crop.getMilestoneCounter()
+                val oldAmount = crop.getMilestoneCounter() ?: continue
                 val amount = group("name").formatLong()
                 val change = amount - oldAmount
                 forceUpdateMilestone(crop, change)
@@ -79,7 +79,7 @@ object WrongDataFix {
     private val loadedCrops = mutableListOf<CropType>()
 
     private fun changedValue(crop: CropType, tabListValue: Long, source: String, minDiff: Int) {
-        val calculated = crop.getMilestoneCounter()
+        val calculated = crop.getMilestoneCounter() ?: return
         val diff = tabListValue - calculated
 
         if (diff >= minDiff) {

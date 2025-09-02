@@ -29,13 +29,14 @@ object GardenCropMilestoneInventory {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onMilestoneUpdate(event: CropMilestoneUpdateEvent) {
+        // This should only render in the crop milestones menu, so no point updating it outside of that
         if (InventoryUtils.openInventoryName() != "Crop Milestones") return
         updateAverage()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (InventoryUtils.openInventoryName() != "Crop Milestones") return
+        if (InventoryUtils.openInventoryName() != "Crop Milestones" || !config.number.averageCropMilestone) return
         if (average == null) updateAverage()
 
         if (event.slot.slotNumber == 38) {
@@ -51,7 +52,7 @@ object GardenCropMilestoneInventory {
         if (!config.tooltipTweak.cropMilestoneTotalProgress || InventoryUtils.openInventoryName() != "Crop Milestones") return
 
         val crop = CropMilestonesApi.getCropTypeByLore(event.itemStack) ?: return
-        val tier = crop.getCurrentMilestoneTier()
+        val tier = crop.getCurrentMilestoneTier() ?: return
         if (tier >= 20) return // Hypixel shows progress to ms46 after ms20
 
         val maxTier = CropMilestonesApi.getMaxTier()
@@ -61,7 +62,7 @@ object GardenCropMilestoneInventory {
             "§7Rewards:",
         ) ?: return
 
-        val counter = crop.getMilestoneCounter().toDouble()
+        val counter = crop.getMilestoneCounter()?.toDouble() ?: return
         val percentage = counter / maxCounter
         val percentageFormat = percentage.formatPercentage()
 
@@ -77,7 +78,7 @@ object GardenCropMilestoneInventory {
         val tiers = mutableListOf<Double>()
         val allowOverflow = config.cropMilestones.overflow.inventoryStackSize
         for (cropType in CropType.entries) {
-            val tier = cropType.getCurrentMilestoneTier()
+            val tier = cropType.getCurrentMilestoneTier() ?: continue
             if (!allowOverflow && tier > 46) {
                 tiers.add(46.0)
             } else {

@@ -54,7 +54,7 @@ object CropMilestonesApi {
     @Suppress("MaxLineLength")
     val tabListPattern by patternGroup.pattern(
         "tablist",
-        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) (?<tier>\\d+): §r§a(?<percentage>.*)%",
+        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon Slice|Cactus|Cocoa Beans|Mushroom|Nether Wart) (?<tier>\\d+): §r§a(?<percentage>.*)%",
     )
 
     /**
@@ -90,7 +90,7 @@ object CropMilestonesApi {
     private var maxTier: Int? = null
     private val cropMilestoneCounter: MutableMap<CropType, Long>? get() = storage?.cropMilestoneCounter
     private val cropMilestoneTierCache: MutableMap<CropType, Int> = mutableMapOf()
-    private val amountToNextMilestoneTierCache: MutableMap<CropType, Long> = mutableMapOf()
+    private val amountToNextTierCache: MutableMap<CropType, Long> = mutableMapOf()
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         cropPattern.firstMatcher(itemStack.getLore()) {
@@ -100,22 +100,24 @@ object CropMilestonesApi {
         return null
     }
 
-    fun CropType.getMilestoneCounter() = cropMilestoneCounter?.get(this) ?: 0
+    fun CropType.getMilestoneCounter() = cropMilestoneCounter?.get(this)
 
     fun CropType.isMaxMilestone(): Boolean {
+        val counter = getMilestoneCounter() ?: return false
         val maxValue = this.getMaxedMilestoneAmount()
-        return getMilestoneCounter() >= maxValue
+        return counter >= maxValue
     }
 
-    fun CropType.getCurrentMilestoneTier(): Int {
+    fun CropType.getCurrentMilestoneTier(): Int? {
         val tier = cropMilestoneTierCache.getOrPut(this) {
-            this.milestoneTierFromCropCount(this.getMilestoneCounter())
+            val counter = this.getMilestoneCounter() ?: return null
+            this.milestoneTierFromCropCount(counter)
         }
         return tier
     }
 
-    fun CropType.setProgress(amount: Long) {
-        amountToNextMilestoneTierCache[this] = amount
+    private fun CropType.setProgress(amount: Long) {
+        amountToNextTierCache[this] = amount
     }
 
     fun getMaxTier(): Int {
@@ -136,21 +138,22 @@ object CropMilestonesApi {
         return msVal
     }
 
-    fun CropType.milestoneProgressToNextTier(): Long {
-        return amountToNextMilestoneTierCache.getOrPut(this) {
-            this.milestoneCalculateTierProgress()
+    fun CropType.milestoneProgressToNextTier(): Long? {
+        return amountToNextTierCache.getOrPut(this) {
+            this.milestoneCalculateTierProgress() ?: return null
         }
     }
 
-    fun CropType.percentToNextMilestone(): Double {
-        val progressAmount = this.milestoneProgressToNextTier()
-        val limit = this.milestoneNextTierAmount()
+    fun CropType.percentToNextMilestone(): Double? {
+        val progressAmount = this.milestoneProgressToNextTier() ?: return null
+        val limit = this.milestoneNextTierAmount() ?: return null
         val percent = (progressAmount.toDouble() / limit)
         return percent
     }
 
-    fun CropType.milestoneNextTierAmount(): Long {
-        return this.milestoneTierAmount((this.getCurrentMilestoneTier()) + 1)
+    fun CropType.milestoneNextTierAmount(): Long? {
+        val tier = this.getCurrentMilestoneTier() ?: return null
+        return this.milestoneTierAmount(tier + 1)
     }
 
     fun CropType.milestoneTierAmount(tier: Int): Long { // get the amount of crops for only that tier, eg ms. 46 is 3m
@@ -197,8 +200,9 @@ object CropMilestonesApi {
 
     internal fun CropType.addMilestoneCounter(counter: Long) {
         if (counter == 0L) return
-        amountToNextMilestoneTierCache[this] = amountToNextMilestoneTierCache[this]?.plus(counter) ?: counter
-        this.setMilestoneCounter(this.getMilestoneCounter() + counter)
+        amountToNextTierCache[this] = amountToNextTierCache[this]?.plus(counter) ?: counter
+        val milestoneCounter = this.getMilestoneCounter() ?: 0
+        this.setMilestoneCounter(milestoneCounter + counter)
         this.milestoneCheckProgress()
         CropMilestoneUpdateEvent.post()
     }
@@ -213,13 +217,13 @@ object CropMilestonesApi {
     }
 
     private fun CropType.milestoneCheckProgress() {
-        val tierProgress = this.milestoneProgressToNextTier()
-        val tierCutoff = this.milestoneNextTierAmount()
+        val tierProgress = this.milestoneProgressToNextTier() ?: return
+        val tierCutoff = this.milestoneNextTierAmount() ?: return
         val maxTier = getMaxTier()
 
         if (tierProgress >= tierCutoff) {
-            val oldLevel = this.getCurrentMilestoneTier()
-            val newLevel = this.milestoneCalculateCurrentTier()
+            val oldLevel = this.getCurrentMilestoneTier() ?: return
+            val newLevel = this.milestoneCalculateCurrentTier() ?: return
 
             if (config.overflow.chat) {
                 if (newLevel > (maxTier)) {
@@ -228,14 +232,15 @@ object CropMilestonesApi {
             }
 
             this.setMilestoneTier(newLevel)
-            this.milestoneCalculateTierProgress().let { this.setProgress(it) }
+            this.milestoneCalculateTierProgress()?.let { this.setProgress(it) }
             return
         }
 
         if (tierProgress < 0) {
-            val level = this.milestoneTierFromCropCount(this.getMilestoneCounter())
+            val counter = this.getMilestoneCounter() ?: return
+            val level = this.milestoneTierFromCropCount(counter)
             this.setMilestoneTier(level)
-            this.milestoneCalculateTierProgress().let { this.setProgress(it) }
+            this.milestoneCalculateTierProgress()?.let { this.setProgress(it) }
         }
     }
 
@@ -250,8 +255,9 @@ object CropMilestonesApi {
         }
     }
 
-    private fun CropType.milestoneCalculateCurrentTier(): Int {
-        return this.milestoneTierFromCropCount(this.getMilestoneCounter())
+    private fun CropType.milestoneCalculateCurrentTier(): Int? {
+        val counter = this.getMilestoneCounter() ?: return null
+        return this.milestoneTierFromCropCount(counter)
     }
 
     private fun CropType.milestoneTierFromCropCount(count: Long): Int {
@@ -282,9 +288,9 @@ object CropMilestonesApi {
         return tier
     }
 
-    private fun CropType.milestoneCalculateTierProgress(): Long {
-        val progress = getMilestoneCounter()
-        val startTier = this.getCurrentMilestoneTier()
+    private fun CropType.milestoneCalculateTierProgress(): Long? {
+        val progress = getMilestoneCounter() ?: return null
+        val startTier = this.getCurrentMilestoneTier() ?: return null
         val startCrops = this.milestoneTotalCropsForTier(startTier)
         val tierProgress = (progress - startCrops)
 
@@ -339,7 +345,7 @@ object CropMilestonesApi {
 
     internal fun clearMilestoneCache() {
         cropMilestoneTierCache.clear()
-        amountToNextMilestoneTierCache.clear()
+        amountToNextTierCache.clear()
         maxTier = null
         GardenCropMilestoneDisplay.update()
     }
@@ -380,7 +386,7 @@ object CropMilestonesApi {
                 for (crop in cropMilestoneTierCache) {
                     chat("Crop: ${crop.key}, Tier: ${crop.value}")
                 }
-                for (crop in amountToNextMilestoneTierCache) {
+                for (crop in amountToNextTierCache) {
                     chat("Crop: ${crop.key}, Progress: ${crop.value}")
                 }
             }

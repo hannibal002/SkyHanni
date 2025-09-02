@@ -203,7 +203,7 @@ object FortuneUpgrades {
                 ),
             )
         }
-        val cropMilestone = crop.getCurrentMilestoneTier()
+        val cropMilestone = crop.getCurrentMilestoneTier() ?: 0
         if (dedicationLvl != 4 && cropMilestone > 0) {
             val dedicationMultiplier = listOf(0.5, 0.75, 1.0, 2.0)[dedicationLvl]
             val dedicationIncrease =

@@ -333,7 +333,7 @@ object FarmingFortuneDisplay {
         if (cropType == null) return 0.0
         val dedicationLevel = tool?.getHypixelEnchantments()?.get("dedication") ?: 0
         val dedicationMultiplier = listOf(0.0, 0.5, 0.75, 1.0, 2.0)[dedicationLevel]
-        val cropMilestone = cropType.getCurrentMilestoneTier().toDouble()
+        val cropMilestone = cropType.getCurrentMilestoneTier()?.toDouble() ?: 0.0
         return dedicationMultiplier * cropMilestone
     }
 
