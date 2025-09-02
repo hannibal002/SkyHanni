@@ -142,8 +142,11 @@ object EliteFarmersLeaderboard {
             nextPlayer = updateNextPlayer(leaderboardType) ?: break
             amountBehind = nextPlayer.amount - amount
         }
-
-        return if (amountBehind < 0) null else Pair(nextPlayer.name, amountBehind)
+        if (amountBehind < 0) {
+            getLeaderboardPosition(leaderboardType, true)
+            return null
+        }
+        return Pair(nextPlayer.name, amountBehind)
     }
 
     fun getLastPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
