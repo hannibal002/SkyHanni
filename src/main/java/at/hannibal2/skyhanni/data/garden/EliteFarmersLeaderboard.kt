@@ -266,7 +266,7 @@ object EliteFarmersLeaderboard {
             return null
         }
         // api caches data, so prefer our lb pos if api pos hasn't changed since last request
-        return if (shouldUpdateData && currentPos != Int.MAX_VALUE) currentPos else apiData.rank
+        return if (!shouldUpdateData && currentPos != Int.MAX_VALUE) currentPos else apiData.rank
     }
 
     private fun getUpcomingPlayerCount(currentPos: Int) = when {
