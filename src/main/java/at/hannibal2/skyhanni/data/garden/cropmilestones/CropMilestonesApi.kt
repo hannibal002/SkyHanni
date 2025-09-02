@@ -90,7 +90,7 @@ object CropMilestonesApi {
     private var maxTier: Int? = null
     private val cropMilestoneCounter: MutableMap<CropType, Long>? get() = storage?.cropMilestoneCounter
     private val cropMilestoneTierCache: MutableMap<CropType, Int> = mutableMapOf()
-    private val amountToNextMilestoneTierCache: MutableMap<CropType, Long> = mutableMapOf()
+    private val amountToNextTierCache: MutableMap<CropType, Long> = mutableMapOf()
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         cropPattern.firstMatcher(itemStack.getLore()) {
@@ -117,7 +117,7 @@ object CropMilestonesApi {
     }
 
     private fun CropType.setProgress(amount: Long) {
-        amountToNextMilestoneTierCache[this] = amount
+        amountToNextTierCache[this] = amount
     }
 
     fun getMaxTier(): Int {
@@ -139,7 +139,7 @@ object CropMilestonesApi {
     }
 
     fun CropType.milestoneProgressToNextTier(): Long? {
-        return amountToNextMilestoneTierCache.getOrPut(this) {
+        return amountToNextTierCache.getOrPut(this) {
             this.milestoneCalculateTierProgress() ?: return null
         }
     }
@@ -200,7 +200,7 @@ object CropMilestonesApi {
 
     internal fun CropType.addMilestoneCounter(counter: Long) {
         if (counter == 0L) return
-        amountToNextMilestoneTierCache[this] = amountToNextMilestoneTierCache[this]?.plus(counter) ?: counter
+        amountToNextTierCache[this] = amountToNextTierCache[this]?.plus(counter) ?: counter
         val milestoneCounter = this.getMilestoneCounter() ?: 0
         this.setMilestoneCounter(milestoneCounter + counter)
         this.milestoneCheckProgress()
@@ -345,7 +345,7 @@ object CropMilestonesApi {
 
     internal fun clearMilestoneCache() {
         cropMilestoneTierCache.clear()
-        amountToNextMilestoneTierCache.clear()
+        amountToNextTierCache.clear()
         maxTier = null
         GardenCropMilestoneDisplay.update()
     }
@@ -386,7 +386,7 @@ object CropMilestonesApi {
                 for (crop in cropMilestoneTierCache) {
                     chat("Crop: ${crop.key}, Tier: ${crop.value}")
                 }
-                for (crop in amountToNextMilestoneTierCache) {
+                for (crop in amountToNextTierCache) {
                     chat("Crop: ${crop.key}, Progress: ${crop.value}")
                 }
             }
