@@ -261,6 +261,7 @@ object EliteFarmersLeaderboard {
         handleUpcomingPlayers(leaderboardType, apiData)
 
         minAmount?.set(leaderboardType, apiData.minAmount)
+        lastApiData[leaderboardType] = apiData
         lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
         shouldRefreshLeaderboard[leaderboardType] = false // Don't want to fetch again if api call was successful
         apiError = false
