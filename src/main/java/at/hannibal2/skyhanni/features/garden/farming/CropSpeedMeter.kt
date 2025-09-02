@@ -83,7 +83,7 @@ object CropSpeedMeter {
         if (!isEnabled()) return
         val counters = mutableMapOf<CropType, Long>()
         for (cropType in CropType.entries) {
-            counters[cropType] = cropType.getMilestoneCounter()
+            counters[cropType] = cropType.getMilestoneCounter() ?: continue
         }
         if (startCrops.isEmpty()) {
             startCrops = counters
@@ -91,7 +91,7 @@ object CropSpeedMeter {
             snapshot = emptyList()
         } else {
             currentCrop?.let {
-                val crops = it.getMilestoneCounter() - (startCrops[it] ?: 0L)
+                val crops = (it.getMilestoneCounter() ?: 0) - (startCrops[it] ?: 0L)
                 val blocks = currentBlocks
                 val cropsPerBlocks = (crops.toDouble() / blocks.toDouble()).roundTo(3)
 

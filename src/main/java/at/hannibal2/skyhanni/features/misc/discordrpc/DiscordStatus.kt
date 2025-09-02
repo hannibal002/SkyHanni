@@ -63,7 +63,7 @@ private fun getCropMilestoneDisplay(): String {
     val allowOverflow = GardenApi.config.cropMilestones.overflow.discordRPC
     val tier = crop?.getCurrentMilestoneTier()
     val progress = tier?.let {
-        crop.percentToNextMilestone().formatPercentage()
+        crop.percentToNextMilestone()?.formatPercentage()
     } ?: 100 // percentage to next milestone
 
     if (tier == null || cropCounter == null) return AutoStatus.CROP_MILESTONES.placeholderText
