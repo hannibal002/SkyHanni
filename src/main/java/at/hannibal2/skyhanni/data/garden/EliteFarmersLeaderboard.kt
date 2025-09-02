@@ -273,21 +273,21 @@ object EliteFarmersLeaderboard {
     }
 
     private fun getUpcomingPlayerCount(currentPos: Int, leaderboardType: EliteLeaderboardType): Int {
-       if (leaderboardType.mode == EliteLeaderboardMode.ALL_TIME) {
-           return when {
-               currentPos > 10_000 -> 50
-               currentPos > 5_000 -> 30
-               currentPos > 1_000 -> 20
-               else -> 10
-       }
-    } else if (leaderboardType.mode == EliteLeaderboardMode.MONTHLY) {
-           return when {
-               currentPos > 1000 -> 50
-               currentPos > 500 -> 30
-               currentPos > 100 -> 20
-               else -> 10
-           }
-       }
+        if (leaderboardType.mode == EliteLeaderboardMode.ALL_TIME) {
+            return when {
+                currentPos > 10_000 -> 50
+                currentPos > 5_000 -> 30
+                currentPos > 1_000 -> 20
+                else -> 10
+            }
+        } else if (leaderboardType.mode == EliteLeaderboardMode.MONTHLY) {
+            return when {
+                currentPos > 1000 -> 50
+                currentPos > 500 -> 30
+                currentPos > 100 -> 20
+                else -> 10
+            }
+        }
         return 10
     }
 
@@ -301,9 +301,8 @@ object EliteFarmersLeaderboard {
     // only update data if api data has changed since last request
     private fun shouldUpdateData(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard): Boolean {
         val oldApiData = lastApiData[leaderboardType] ?: return true
-        val leaderboardDiff = oldApiData.rank != apiData.rank
         val amountDiff = oldApiData.amount != apiData.amount
-        return leaderboardDiff || amountDiff
+        return amountDiff
     }
 
     private fun handleDiff(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard) {
@@ -321,7 +320,7 @@ object EliteFarmersLeaderboard {
         apiData: EliteLeaderboard,
         diff: Double
     ) {
-        if (diff >= 0.5 || abs(diff) >= 10) {
+        if (diff >= 0.5 || abs(diff) >= 30) {
             when (leaderboardType.mode) {
                 EliteLeaderboardMode.ALL_TIME -> updateCollections() // we handle all-time weight in the farmingweight class
                 EliteLeaderboardMode.MONTHLY -> setWeight(leaderboardType.mode, apiData.amount)
@@ -336,7 +335,7 @@ object EliteFarmersLeaderboard {
     ) {
         val crop = leaderboardType.crop ?: return
         val diffWeight = diff / crop.getFactor()
-        if (diffWeight >= 0.5 || abs(diffWeight) >= 10) {
+        if (diffWeight >= 0.5 || abs(diffWeight) >= 30) {
             when (leaderboardType.mode) {
                 EliteLeaderboardMode.ALL_TIME -> updateCollections() // we handle all-time collections in the farming weight class
                 EliteLeaderboardMode.MONTHLY ->
@@ -350,7 +349,7 @@ object EliteFarmersLeaderboard {
         apiData: EliteLeaderboard,
         diff: Double
     ) {
-        if (diff >= 1 || abs(diff) >= 30) {
+        if (diff >= 1 || abs(diff) >= 150) {
             leaderboardAmountMap?.set(leaderboardType, apiData.amount)
         }
     }
