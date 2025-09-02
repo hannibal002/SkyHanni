@@ -64,11 +64,11 @@ object GardenBestCropTime {
             }
             val speed = crop.getSpeed() ?: continue
 
-            val currentTier = crop.getCurrentMilestoneTier()
+            val currentTier = crop.getCurrentMilestoneTier() ?: return
 
             val cropsForCurrentTier = crop.milestoneTotalCropsForTier(currentTier)
 
-            val have = crop.milestoneProgressToNextTier()
+            val have = crop.milestoneProgressToNextTier() ?: return
             val need =
                 if (config.showMaxTier.get()) {
                     cropsForCurrentTier
@@ -93,7 +93,7 @@ object GardenBestCropTime {
             val helpMap = mutableMapOf<CropType, Long>()
             for ((crop, time) in timeTillNextCrop) {
                 if (crop.isMaxMilestone()) continue
-                val gardenExpForTier = getGardenExpForTier((crop.getCurrentMilestoneTier()) + 1)
+                val gardenExpForTier = getGardenExpForTier((crop.getCurrentMilestoneTier() ?: continue) + 1)
                 val fakeTime = time / gardenExpForTier
                 helpMap[crop] = fakeTime.inWholeMilliseconds
             }
@@ -134,6 +134,7 @@ object GardenBestCropTime {
 
     private fun createCropEntry(crop: CropType, index: Int, gardenExp: Boolean, currentCrop: CropType?): Renderable? {
         if (crop.isMaxMilestone()) return null
+        val currentTier = crop.getCurrentMilestoneTier() ?: return null
         val millis = timeTillNextCrop[crop] ?: return null
         val biggestUnit = config.highestTimeFormat.get().timeUnit
         val duration = millis.format(biggestUnit, maxUnits = 2)
@@ -148,7 +149,6 @@ object GardenBestCropTime {
 
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-            val currentTier = crop.getCurrentMilestoneTier()
             val nextTier = if (config.showMaxTier.get()) 46 else currentTier + 1
 
             val cropName = if (!config.next.bestCompact.get()) crop.cropName + " " else ""

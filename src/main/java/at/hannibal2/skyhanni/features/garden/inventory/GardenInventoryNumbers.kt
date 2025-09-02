@@ -38,7 +38,7 @@ object GardenInventoryNumbers {
 
             val crop = CropMilestonesApi.getCropTypeByLore(event.stack) ?: return
             val allowOverflow = GardenApi.config.cropMilestones.overflow.inventoryStackSize
-            val currentTier = crop.getCurrentMilestoneTier()
+            val currentTier = crop.getCurrentMilestoneTier() ?: return
             val displayTier = if (!allowOverflow) minOf(getMaxTier(), currentTier) else currentTier
             event.stackTip = "" + displayTier
         }

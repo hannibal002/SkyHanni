@@ -46,6 +46,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerti
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -157,8 +158,14 @@ object GardenCropMilestoneDisplay {
             currentTier,
             nextTier,
             useCustomGoal
-        ) = getMilestoneInfo(crop)
-        val (have, need) = getHaveNeed(crop, counter, useCustomGoal, useMaxTier)
+        ) = getMilestoneInfo(crop) ?: run {
+            inaccurateMilestone = true
+            return formatDisplay(lineMap)
+        }
+        val (have, need) = getHaveNeed(crop, counter, useCustomGoal, useMaxTier) ?: run {
+            inaccurateMilestone = true
+            return formatDisplay(lineMap)
+        }
 
         lineMap[MilestoneTextEntry.TITLE] = Renderable.text("§6Crop Milestones")
         lineMap[MilestoneTextEntry.MILESTONE_TIER] = tiersRenderable(crop, currentTier, nextTier, overflowDisplay)
@@ -210,11 +217,11 @@ object GardenCropMilestoneDisplay {
         return formatDisplay(lineMap)
     }
 
-    private fun getMilestoneInfo(crop: CropType): MilestoneInfo {
-        val counter = crop.getMilestoneCounter()
+    private fun getMilestoneInfo(crop: CropType): MilestoneInfo? {
+        val counter = crop.getMilestoneCounter() ?: return null
         val customGoal = crop.getCustomGoal()?.tier ?: 0
         val overflowDisplay = overflowConfig.cropMilestoneDisplay.get()
-        val currentTier = crop.getCurrentMilestoneTier()
+        val currentTier = crop.getCurrentMilestoneTier() ?: return null
         val maxTier = getMaxTier()
         val useMaxTier = if (currentTier >= maxTier) false else config.showMaxTier.get()
 
@@ -248,7 +255,7 @@ object GardenCropMilestoneDisplay {
     }
 
     private fun percentRenderable(crop: CropType, overflowDisplay: Boolean): Renderable {
-        val percentageFormat = crop.percentToNextMilestone().formatPercentage()
+        val percentageFormat = crop.percentToNextMilestone()?.formatPercentage() ?: return Renderable.empty()
         return if (crop.isMaxMilestone() && !overflowDisplay) {
             Renderable.text("§7Percentage: §e100%")
         } else {
@@ -267,12 +274,12 @@ object GardenCropMilestoneDisplay {
         }
     }
 
-    private fun getHaveNeed(crop: CropType, counter: Long, useCustomGoal: Boolean, showMaxTier: Boolean): Pair<Long, Long> {
-        val have = if (useCustomGoal || showMaxTier) counter else crop.milestoneProgressToNextTier()
+    private fun getHaveNeed(crop: CropType, counter: Long, useCustomGoal: Boolean, showMaxTier: Boolean): Pair<Long, Long>? {
+        val have = if (useCustomGoal || showMaxTier) counter else crop.milestoneProgressToNextTier() ?: return null
         val need = when {
             useCustomGoal -> crop.getCustomGoal()?.cropAmount ?: 0
             showMaxTier -> crop.getMaxedMilestoneAmount()
-            else -> crop.milestoneNextTierAmount()
+            else -> crop.milestoneNextTierAmount() ?: return null
         }
         return Pair(have, need)
     }
@@ -353,8 +360,14 @@ object GardenCropMilestoneDisplay {
             currentTier,
             nextTier,
             useCustomGoal
-        ) = getMilestoneInfo(mushroom)
-        val (have, need) = getHaveNeed(mushroom, counter, useCustomGoal, useMaxTier)
+        ) = getMilestoneInfo(mushroom) ?: run {
+            mushroomCowPerkDisplay = listOf(Renderable.text("§cOpen §e/cropmilestones §cto update!"))
+            return
+        }
+        val (have, need) = getHaveNeed(mushroom, counter, useCustomGoal, useMaxTier) ?: run {
+            mushroomCowPerkDisplay = listOf(Renderable.text("§cOpen §e/cropmilestones §cto update!"))
+            return
+        }
 
         lineMap[MushroomTextEntry.TITLE] = Renderable.text("§6Mooshroom Cow Perk")
         lineMap[MushroomTextEntry.MUSHROOM_TIER] = tiersRenderable(mushroom, currentTier, nextTier, overflowDisplay)

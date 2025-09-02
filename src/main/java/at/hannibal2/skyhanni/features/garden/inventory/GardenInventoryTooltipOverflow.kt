@@ -38,8 +38,8 @@ object GardenInventoryTooltipOverflow {
         val split = stack.cleanName().split(" ")
         val crop = getCrop(split)
 
-        val currentTier = crop.getCurrentMilestoneTier()
-        val (have, need) = getHaveNeed(crop)
+        val currentTier = crop.getCurrentMilestoneTier() ?: return
+        val (have, need) = getHaveNeed(crop) ?: return
         val (level, nextLevel) = getLevels(split, currentTier)
 
         var next = false
@@ -76,9 +76,9 @@ object GardenInventoryTooltipOverflow {
 
     private fun getHaveNeed(
         crop: CropType,
-    ): Pair<Long, Long> {
-        val have = crop.milestoneProgressToNextTier()
-        val need = crop.milestoneNextTierAmount()
+    ): Pair<Long, Long>? {
+        val have = crop.milestoneProgressToNextTier() ?: return null
+        val need = crop.milestoneNextTierAmount() ?: return null
         return Pair(have, need)
     }
 

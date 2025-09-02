@@ -20,8 +20,17 @@ object FarmingMilestoneCommand {
 
     private fun onCommand(crop: CropType, current: Int?, target: Int?, needsTime: Boolean) {
         if (current == null) {
-            val output = (crop.milestoneNextTierAmount() - crop.milestoneProgressToNextTier()).formatOutput(needsTime, crop)
-            ChatUtils.chat("§7$output needed to reach the next milestone")
+            val nextTierAmount = crop.milestoneNextTierAmount()
+            val progressToNextTier = crop.milestoneProgressToNextTier()
+            if (nextTierAmount != null && progressToNextTier != null) {
+                val output = (nextTierAmount - progressToNextTier).formatOutput(needsTime, crop)
+                ChatUtils.chat("§7$output needed to reach the next milestone")
+            } else {
+                ChatUtils.userError(
+                    "No crop milestone data detected! Please do /cropmilestones and rerun the command," +
+                        "or specify your tier targets!"
+                )
+            }
             return
         }
 

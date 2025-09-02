@@ -51,7 +51,7 @@ object GardenCropMilestoneInventory {
         if (!config.tooltipTweak.cropMilestoneTotalProgress || InventoryUtils.openInventoryName() != "Crop Milestones") return
 
         val crop = CropMilestonesApi.getCropTypeByLore(event.itemStack) ?: return
-        val tier = crop.getCurrentMilestoneTier()
+        val tier = crop.getCurrentMilestoneTier() ?: return
         if (tier >= 20) return // Hypixel shows progress to ms46 after ms20
 
         val maxTier = CropMilestonesApi.getMaxTier()
@@ -61,7 +61,7 @@ object GardenCropMilestoneInventory {
             "§7Rewards:",
         ) ?: return
 
-        val counter = crop.getMilestoneCounter().toDouble()
+        val counter = crop.getMilestoneCounter()?.toDouble() ?: return
         val percentage = counter / maxCounter
         val percentageFormat = percentage.formatPercentage()
 
@@ -77,7 +77,7 @@ object GardenCropMilestoneInventory {
         val tiers = mutableListOf<Double>()
         val allowOverflow = config.cropMilestones.overflow.inventoryStackSize
         for (cropType in CropType.entries) {
-            val tier = cropType.getCurrentMilestoneTier()
+            val tier = cropType.getCurrentMilestoneTier() ?: continue
             if (!allowOverflow && tier > 46) {
                 tiers.add(46.0)
             } else {
