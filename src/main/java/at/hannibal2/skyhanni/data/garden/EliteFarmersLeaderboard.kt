@@ -143,7 +143,7 @@ object EliteFarmersLeaderboard {
             amountBehind = nextPlayer.amount - amount
         }
         if (amountBehind < 0) {
-            getLeaderboardPosition(leaderboardType, true)
+            shouldRefreshLeaderboard[leaderboardType] = true
             return null
         }
         return Pair(nextPlayer.name, amountBehind)
@@ -242,7 +242,7 @@ object EliteFarmersLeaderboard {
         if (profileId == "") return null
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
         val currentPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
-        val upcomingPlayers = getUpcomingPlayerCount(currentPos)
+        val upcomingPlayers = getUpcomingPlayerCount(currentPos, leaderboardType)
         // Fetch upcoming players from current lb pos if api hasn't updated, or from rank goal
         val rankGoal = getRankGoal(leaderboardType)
         val useRankGoal = getRankGoalConfig(leaderboardType).get() && rankGoal != null
@@ -272,11 +272,23 @@ object EliteFarmersLeaderboard {
         return if (!shouldUpdateData && currentPos != Int.MAX_VALUE) currentPos else apiData.rank
     }
 
-    private fun getUpcomingPlayerCount(currentPos: Int) = when {
-        currentPos > 10_000 -> 50
-        currentPos > 5_000 -> 30
-        currentPos > 1_000 -> 20
-        else -> 10
+    private fun getUpcomingPlayerCount(currentPos: Int, leaderboardType: EliteLeaderboardType): Int {
+       if (leaderboardType.mode == EliteLeaderboardMode.ALL_TIME) {
+           return when {
+               currentPos > 10_000 -> 50
+               currentPos > 5_000 -> 30
+               currentPos > 1_000 -> 20
+               else -> 10
+       }
+    } else if (leaderboardType.mode == EliteLeaderboardMode.MONTHLY) {
+           return when {
+               currentPos > 1000 -> 50
+               currentPos > 500 -> 30
+               currentPos > 100 -> 20
+               else -> 10
+           }
+       }
+        return 10
     }
 
     private fun getAtRank(currentPos: Int, rankGoal: Int?, useRankGoal: Boolean): Int? = when {
@@ -353,6 +365,9 @@ object EliteFarmersLeaderboard {
             if (it.amount > (getAmount(leaderboardType) ?: apiData.amount)) {
                 nextPlayers[leaderboardType]?.add(it)
             }
+        }
+        if ((nextPlayers[leaderboardType]?.size ?: 0) == 0 && apiData.upcomingPlayers.isNotEmpty()) {
+            shouldRefreshLeaderboard[leaderboardType] = true
         }
     }
 
