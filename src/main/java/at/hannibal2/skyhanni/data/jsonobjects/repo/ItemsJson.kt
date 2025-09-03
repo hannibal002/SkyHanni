@@ -28,7 +28,7 @@ data class ItemValueCalculationDataJson(
 
 data class AlwaysActiveEnchantJson(
     @Expose val level: Int,
-    @Expose val internalNames: List<NeuInternalName>,
+    @Expose @SerializedName("items") val internalNames: List<NeuInternalName>,
 )
 
 data class EndCapData(
