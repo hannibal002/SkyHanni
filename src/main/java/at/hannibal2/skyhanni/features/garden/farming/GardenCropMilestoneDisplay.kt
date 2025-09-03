@@ -159,11 +159,9 @@ object GardenCropMilestoneDisplay {
             nextTier,
             useCustomGoal
         ) = getMilestoneInfo(crop) ?: run {
-            inaccurateMilestone = true
             return formatDisplay(lineMap)
         }
         val (have, need) = getHaveNeed(crop, counter, useCustomGoal, useMaxTier) ?: run {
-            inaccurateMilestone = true
             return formatDisplay(lineMap)
         }
 
