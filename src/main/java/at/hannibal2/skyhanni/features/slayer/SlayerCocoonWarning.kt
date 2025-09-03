@@ -11,6 +11,9 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object SlayerCocoonWarning {
+    /**
+     * REGEX-TEST:   §r§c§lYOU COCOONED YOUR SLAYER BOSS
+     */
     private val slayerCocoonPattern by RepoPattern.pattern(
         "slayer.cocooned",
         "\\s+§r§c§lYOU COCOONED YOUR SLAYER BOSS",
