@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object SlayerCocoonWarning {
     private val slayerCocoonPattern by RepoPattern.pattern(
         "slayer.cocooned",
-        "§r§c§lYOU COCOONED YOUR SLAYER BOSS",
+        "\\s+§r§c§lYOU COCOONED YOUR SLAYER BOSS",
     )
 
     private val config get() = SlayerApi.config
@@ -21,8 +21,8 @@ object SlayerCocoonWarning {
     @HandleEvent
     fun onChatMessage(event: SkyHanniChatEvent) {
         if (slayerCocoonPattern.matches(event.message)) {
-            if (config.slayerCocoonTitle) TitleManager.sendTitle("Slayer Boss Cocooned!")
-            if (config.slayerCocoonDing) SoundUtils.repeatSound(100, 30, SoundUtils.plingSound)
+            if (config.slayerCocoonTitle) TitleManager.sendTitle("§lSlayer Boss Cocooned!")
+            if (config.slayerCocoonDing) SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
         }
     }
 }
