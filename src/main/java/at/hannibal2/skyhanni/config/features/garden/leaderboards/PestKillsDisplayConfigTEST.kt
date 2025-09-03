@@ -11,22 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class PestKillsDisplayConfig {
-    @Expose
-    @ConfigOption(
-        name = "Display",
-        desc = "Display your farming weight on screen.\n" +
-            "The calculation and API is provided by The Elite SkyBlock farmers.\n" +
-            "See §eelitebot.dev/info §7for more info."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var display: Boolean = true
-
-    @Expose
-    @ConfigLink(owner = PestKillsDisplayConfig::class, field = "display")
-    val pos: Position = Position(180, 10)
-
+class PestKillsDisplayConfigTEST: GenericDisplayConfig() {
     @Expose
     @ConfigOption(
         name = "Farming Weight Text",
@@ -48,24 +33,6 @@ class PestKillsDisplayConfig {
 
         override fun toString() = displayName
     }
-
-    @Expose
-    @ConfigOption(
-        name = "Leaderboard Ranking",
-        desc = "Show your position in the farming weight leaderboard. " +
-            "Only if your farming weight is high enough! Updates periodically."
-    )
-    @ConfigEditorBoolean
-    val leaderboard: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(
-        name = "Use Rank Goal",
-        desc = "Use the Rank Goal number instead of the next upcoming rank. Useful when your rank is in the " +
-            "ten thousands and you don't want to see small ETAs."
-    )
-    @ConfigEditorBoolean
-    val useRankGoal: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -117,25 +84,4 @@ class PestKillsDisplayConfig {
     )
     @Accordion
     val monthlyPestRankGoalsConfig: PestRankGoalsConfig = PestRankGoalsConfig()
-
-    @Expose
-    @ConfigOption(
-        name = "Overtake Player Message",
-        desc = "Send a message when you overtake a player."
-    )
-    @ConfigEditorBoolean
-    var overtakePlayerMessage: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Offline leaderboard change",
-        desc = "Send a message with the change of your position in the farming weight leaderboard while you were offline."
-    )
-    @ConfigEditorBoolean
-    var offlineChangeMessage: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Show Outside Garden", desc = "Show your pest kills outside of the garden.")
-    @ConfigEditorBoolean
-    var showOutsideGarden: Boolean = false
 }

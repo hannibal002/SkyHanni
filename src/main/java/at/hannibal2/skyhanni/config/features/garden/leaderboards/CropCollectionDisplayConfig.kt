@@ -114,11 +114,19 @@ class CropCollectionDisplayConfig {
 
     @Expose
     @ConfigOption(
-        name = "Show LB Change",
-        desc = "Show the change of your position on your current pest leaderboard while you were offline."
+        name = "Overtake Player Message",
+        desc = "Send a message when you overtake a player."
     )
     @ConfigEditorBoolean
-    var showLbChange: Boolean = false
+    var overtakePlayerMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Offline leaderboard change",
+        desc = "Send a message with the change of your position in the farming weight leaderboard while you were offline."
+    )
+    @ConfigEditorBoolean
+    var offlineChangeMessage: Boolean = false
 
 
     @Expose

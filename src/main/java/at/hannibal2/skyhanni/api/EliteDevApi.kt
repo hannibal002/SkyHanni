@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
-import at.hannibal2.skyhanni.data.garden.FarmingWeightData
-import at.hannibal2.skyhanni.data.garden.FarmingWeightData.updateCollections
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData
+import at.hannibal2.skyhanni.data.garden.elitefarmers.FarmingWeightData
+import at.hannibal2.skyhanni.data.garden.elitefarmers.FarmingWeightData.updateCollections
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteAuctionsResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteBazaarResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteContestsRequest
@@ -78,7 +78,7 @@ object EliteDevApi {
             spoofProfile = false
             updateCollections()
             FarmingWeightData.reset()
-            EliteFarmersLeaderboard.reset()
+            LeaderboardData.reset()
             EliteLeaderboardDisplayManager.resetDisplays()
             EliteLeaderboardDisplayManager.updateDisplays()
             ChatUtils.userError("Invalid uuid!")
@@ -90,7 +90,7 @@ object EliteDevApi {
         PlayerProfile = profile
         updateCollections()
         FarmingWeightData.reset()
-        EliteFarmersLeaderboard.reset()
+        LeaderboardData.reset()
         EliteLeaderboardDisplayManager.resetDisplays()
         EliteLeaderboardDisplayManager.updateDisplays()
     }

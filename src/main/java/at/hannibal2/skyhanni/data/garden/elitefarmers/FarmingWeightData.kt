@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.data.garden
+package at.hannibal2.skyhanni.data.garden.elitefarmers
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
-import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.updateTotalCollection
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData.getLeaderboardPosition
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
@@ -67,7 +67,7 @@ object FarmingWeightData {
     @HandleEvent
     fun onCollectionUpdate(event: CropCollectionAddEvent) {
         if (event.cropCollectionType == CropCollectionType.MOOSHROOM_COW) {
-            if (lastGainedCrop?.isAnyOf(CropType.CACTUS, CropType.SUGAR_CANE) == true) {
+            if (CropCollectionApi.lastGainedCrop?.isAnyOf(CropType.CACTUS, CropType.SUGAR_CANE) == true) {
                 addWeight(event.amount / (event.crop.getFactor() * 2))
                 return
             }

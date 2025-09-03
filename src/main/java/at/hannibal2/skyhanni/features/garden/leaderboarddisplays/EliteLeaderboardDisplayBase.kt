@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getAmount
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLastPlayer
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getNextPlayer
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getRankGoal
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.leaderboardMinAmount
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
-import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData.getAmount
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData.getLastPlayer
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData.getLeaderboardPosition
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData.getNextPlayer
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData.getRankGoal
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData.isUnranked
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData.leaderboardMinAmount
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData.loadingLeaderboardMutex
+import at.hannibal2.skyhanni.data.garden.elitefarmers.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -81,7 +81,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
             "Loading..."
         }
 
-        val leaderboardPos = getLeaderboardFormat()
+        val leaderboardPos = getLeaderboardFormat(leaderboardType)
         return Renderable.clickable(
             "§6$leaderboardType§7: §e$amountText$leaderboardPos",
             tips = listOf("§eClick to open your Farming Profile."),
@@ -158,9 +158,10 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
 
     abstract fun showLeaderboard(): Boolean
 
-    private fun getLeaderboardFormat(): String {
+    private fun getLeaderboardFormat(leaderboardType: EliteLeaderboardType): String {
         if (!showLeaderboard()) return ""
-        val format = leaderboardPos?.addSeparators() ?: return if (loadingLeaderboardMutex.isLocked) " §7[§b#?§7]" else ""
+        val format = leaderboardPos?.addSeparators()
+            ?: return if (loadingLeaderboardMutex[leaderboardType::class]?.isLocked == true) " §7[§b#?§7]" else ""
         return " §7[§b#$format§7]"
     }
 

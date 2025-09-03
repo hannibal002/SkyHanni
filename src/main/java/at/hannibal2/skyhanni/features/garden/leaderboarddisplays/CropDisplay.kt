@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.CropCollectionDisplayConfig.CropCollectionTextEntry
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.CropCollectionDisplayConfigTEST.CropCollectionTextEntry
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
-import at.hannibal2.skyhanni.data.garden.FarmingWeightData
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData
+import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData.isUnranked
+import at.hannibal2.skyhanni.data.garden.elitefarmers.FarmingWeightData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -73,7 +73,7 @@ class CropDisplay : EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.C
     override fun showLeaderboard(): Boolean = config.leaderboard.get()
 
     private fun formatDisplay(lineMap: MutableMap<CropCollectionTextEntry, Renderable>): List<Renderable> {
-        if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) return errorMessage
+        if (FarmingWeightData.apiError || LeaderboardData.apiError) return errorMessage
 
         val newList = mutableListOf<Renderable>()
         if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
