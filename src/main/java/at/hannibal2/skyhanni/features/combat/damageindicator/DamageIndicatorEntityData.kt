@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraft.entity.EntityLivingBase
 
 class DamageIndicatorEntityData(
-    val entity: EntityLivingBase,
+    val mob: Mob,
     var ignoreBlocks: Boolean,
     var delayedStart: SimpleTimeMark?,
     val finalDungeonBoss: Boolean,
@@ -27,6 +27,7 @@ class DamageIndicatorEntityData(
 
     var serverTicksAlive: Long = 0L,
 ) {
+    val entity get() = mob.baseEntity
 
     val timeToKill by lazy { "§e" + foundTime.passedSince().format(TimeUnit.SECOND, showMilliSeconds = true) }
 }

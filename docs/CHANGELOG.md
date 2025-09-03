@@ -104,6 +104,8 @@
 #### Hunting
 
 + Added customizable keybinds to easily repeat and confirm fusions. - Luna (https://github.com/hannibal002/SkyHanni/pull/4440)
++ Added Prevent Huntrap Misclick. - Roboo (https://github.com/hannibal002/SkyHanni/pull/4533)
+    + Empty traps in the Hunting Toolkit are now unclickable.
 
 #### Slayer
 
@@ -173,6 +175,8 @@
     + Added prompt to disable Rainbow Max Enchants in one of the two mods.
 + Improved mod performance when reading item stack data. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4527)
 + Slightly improved the mod performance when switching islands or opening private island chests. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4539)
++ Added Slayer and Commissions options to Tab Widget Display. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4573)
++ Updated Visual Words for 1.21.8 compatibility. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4608)
 
 #### Foraging
 
@@ -203,10 +207,13 @@
 + Added filter for Swoop's message. - Roboo (https://github.com/hannibal002/SkyHanni/pull/4388)
 + Made copy chat work on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4408)
 + Added support for Hypixel’s new Magic Find format. - Luna (https://github.com/hannibal002/SkyHanni/pull/4542)
++ Added option to hide Clickable Chat Hints. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4609)
+    + Hides the 'Click to x' chat line in SkyHanni messages. The message remains clickable and shows info on hover.
 
 #### Mining
 
 + Added option to only show powder chest features when great explorer 20. - nopo (https://github.com/hannibal002/SkyHanni/pull/4481)
++ Added detection of Nucleus Run Enchanted Books from chat messages. - formicacidgd (https://github.com/hannibal002/SkyHanni/pull/4565)
 
 ### Fixes
 
@@ -216,6 +223,12 @@
 + Fixed wrong color for Tara T5 Name in Damage Indicator. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4518)
 + Fixed missing decimals in Slayer Time to Kill chat message. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4523)
 + Fixed Slayer Kill Timer showing for other players’ bosses. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4523)
++ Fixed Enderman Beacon highlight not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/4571)
++ Fixed slayer feature hide mob names. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4568)
++ Fixed Tier 5 Slayer compatibility for related features. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4554)
++ Fixed errors with Atoned Horror (Revenant) and Conjoined Brood (Tarantula) Slayer bosses. - Luna (https://github.com/hannibal002/SkyHanni/pull/4588)
++ Prevented incorrect mob-kill coin gains from being added to the Slayer Profit Tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4606)
++ Prevented incorrect Slayer spawn costs from being added to the Profit Tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4597)
 
 #### Rift
 
@@ -272,6 +285,8 @@
 + Fixed small inconsistencies in scrollable Table GUIs. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4424)
     + Eg: Trackers.
 + Fixed typo 'Contol' → 'Control' in Moonglade Beacon Solver. - Luna (https://github.com/hannibal002/SkyHanni/pull/4537)
++ Fixed Toggle Sneak unsneaking when hovering over a SkyHanni Tracker. - nopo (https://github.com/hannibal002/SkyHanni/pull/4613)
++ Fixed Vanilla Nametag Colors. - Pugzy (https://github.com/hannibal002/SkyHanni/pull/4586)
 
 #### Chat
 
@@ -283,6 +298,7 @@
 + Fixed tab complete on some commands not working on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4453)
 + Fixed warp tab complete removing tab complete for some Hypixel commands on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4504)
 + Fixed Slayer books showing both Hypixel and SkyHanni messages. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4521)
++ Fixed Pet Drop Rarity on messages without Magic Find or Farming Fortune. - Luna (https://github.com/hannibal002/SkyHanni/pull/4566)
 
 #### Inventory
 
@@ -308,17 +324,35 @@
 + Fixed inventory names not showing on 1.21.7 when Improved SB Menus was off. - nopo (https://github.com/hannibal002/SkyHanni/pull/4450)
 + Fixed SkyHanni not recognizing belt-exclusive reforges, preventing NEU repo load errors. - Luna (https://github.com/hannibal002/SkyHanni/pull/4515)
 + Fixed rare Cake Tracker error. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4548)
++ Fixed Attribute Shard features with Bogged (Sea Archer) shard. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4563)
++ Fixed double negative signs in Item Pickup Log. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4564)
++ Fixed Item Pickup Log not counting correctly. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4564)
++ Fixed sack display for rough gemstones in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4555)
++ Fixed Item Pickup Log showing incorrect amounts. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4594)
 
 #### Fishing
 
 + Fixed grinch sea creature detection on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4394)
 + Fixed duplicate chat messages in Trophy Fishing features. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4494)
++ Fixed small performance issue in Chum Bucket Hider. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4559)
++ Fixed Colorful Item Tooltips using the wrong color for Trophy Fish Chance. - Luna (https://github.com/hannibal002/SkyHanni/pull/4587)
 
 #### Farming
 
 + Fixed Jacob Contests Saying they went for 55 years. - nopo (https://github.com/hannibal002/SkyHanni/pull/4383)
 + Added warty and half eaten mushrooms to /ff. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4480)
 + Fixed Farming Fortune Guide suggesting Blooming instead of Squeaky reforge. - Luna (https://github.com/hannibal002/SkyHanni/pull/4525)
++ Fixed Pest Spawn Timer. - nopo (https://github.com/hannibal002/SkyHanni/pull/4562)
++ Fixed incorrect stats summary for Jacob's Contests. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4582)
+
+#### Foraging
+
++ Fixed Compact Tree Gifts not working after Hypixel update. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4561)
++ Fixed pitch calculation in Moonglade Beacon Solver. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4482)
+
+#### Mining
+
++ Fixed Enchanted Books detection for Corpses and Fossil Excavator. - Siv (https://github.com/hannibal002/SkyHanni/pull/4610)
 
 ### Technical Details
 
@@ -467,6 +501,16 @@
 + Fixed internal display of pets at Level 0 when they have 0 XP. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4550)
 + Minor fixes to `EnchantParser.kt`. - ninjaguardian & hannibal002 (https://github.com/hannibal002/SkyHanni/pull/4277)
 + Moved table Renderables out of `Renderable.kt`. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4424)
++ Fixed `EntityOutlineRenderer` ignoring `/shrendertoggle`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4557)
++ Fixed Renderable Test Command. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4551)
++ Improved performance of Damage Indicator slightly. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4557)
++ Moved Global Render from SkyHanniDebugsAndTests to GlobalRender, accessed via SkyHanniMod. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4557)
++ Moved item resolution query logic to the repo. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4563)
++ The preprocessing task is now incremental. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4558)
++ Bumped Loom to 1.10.34. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4581)
++ Cleaned up Graph usage. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4601)
++ Renamed `SlayerType.getByClazzName()` to `SlayerType.getByClassName()`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4588)
++ Updated Graph Deserialization. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4600)
 
 ## Version 4.0.0
 

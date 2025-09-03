@@ -56,7 +56,11 @@ object EndermanSlayerFeatures {
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
-        if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && entity.canBeSeen(15.0)) {
+        if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && entity.canBeSeen(
+                viewDistance = 15.0,
+                ignoreFrustum = true
+            )
+        ) {
             endermenWithBeacons.add(entity)
             logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
         }
@@ -64,7 +68,7 @@ object EndermanSlayerFeatures {
         if (entity is EntityArmorStand) {
             if (showBeacon()) {
                 val stack = entity.getStandHelmet() ?: return
-                if (stack.displayName == "Beacon" && entity.canBeSeen(15.0)) {
+                if (stack.displayName == "Beacon" && entity.canBeSeen(viewDistance = 15.0, ignoreFrustum = true)) {
                     flyingBeacons.add(entity)
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
@@ -137,7 +141,7 @@ object EndermanSlayerFeatures {
 
     private fun drawFlyingBeacon(event: SkyHanniRenderWorldEvent) {
         for (beacon in flyingBeacons) {
-            if (!beacon.canBeSeen()) continue
+            if (!beacon.canBeSeen(ignoreFrustum = true)) continue
             if (beaconConfig.highlightBeacon) {
                 val beaconLocation = event.exactLocation(beacon)
                 event.drawDynamicText(beaconLocation.add(y = 1), "§4Beacon", 1.8)
