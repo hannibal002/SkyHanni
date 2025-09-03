@@ -34,7 +34,7 @@ class HypixelItemApi {
             for (price in prices) {
                 newMap[price.key] = price.value
             }
-            npcPrices
+            npcPrices = newMap
         }
     }
 
