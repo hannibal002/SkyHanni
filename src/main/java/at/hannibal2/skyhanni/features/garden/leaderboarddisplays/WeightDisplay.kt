@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.FarmingWeightDisplayConfig.FarmingWeightTextEntry
-import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData
-import at.hannibal2.skyhanni.data.garden.elitefarmers.LeaderboardData.isUnranked
-import at.hannibal2.skyhanni.data.garden.elitefarmers.FarmingWeightData
-import at.hannibal2.skyhanni.data.garden.elitefarmers.FarmingWeightData.getFactor
-import at.hannibal2.skyhanni.data.garden.elitefarmers.FarmingWeightData.getWeight
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getFactor
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
@@ -79,7 +79,7 @@ class WeightDisplay : EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboar
     override fun showLeaderboard(): Boolean = config.leaderboard.get()
 
     private fun formatDisplay(lineMap: MutableMap<FarmingWeightTextEntry, Renderable>): List<Renderable> {
-        if (FarmingWeightData.apiError || LeaderboardData.apiError) return errorMessage
+        if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) return errorMessage
 
         val newList = mutableListOf<Renderable>()
         if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()

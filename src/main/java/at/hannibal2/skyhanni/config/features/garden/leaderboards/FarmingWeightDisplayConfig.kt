@@ -67,6 +67,14 @@ class FarmingWeightDisplayConfig {
     val overtakeETA: Property<Boolean> = Property.of(false)
 
     @Expose
+    @ConfigOption(
+        name = "Show LB Change",
+        desc = "Show the change of your position in the farming weight leaderboard while you were offline."
+    )
+    @ConfigEditorBoolean
+    var showLbChange: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
     @ConfigEditorBoolean
     val overtakeETAAlways: Property<Boolean> = Property.of(true)
@@ -96,21 +104,6 @@ class FarmingWeightDisplayConfig {
     @ConfigEditorText
     val monthlyWeightRankGoal: Property<String> = Property.of("10000")
 
-    @Expose
-    @ConfigOption(
-        name = "Overtake Player Message",
-        desc = "Send a message when you overtake a player."
-    )
-    @ConfigEditorBoolean
-    var overtakePlayerMessage: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Offline leaderboard change",
-        desc = "Send a message with the change of your position in the farming weight leaderboard while you were offline."
-    )
-    @ConfigEditorBoolean
-    var offlineChangeMessage: Boolean = false
 
     @Expose
     @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")
