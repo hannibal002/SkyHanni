@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.other.SkyblockItemsDataJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuGeorgeJson
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -13,11 +17,25 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 
 class HypixelItemApi {
 
+    @SkyHanniModule
     companion object {
 
         private var npcPrices = mapOf<NeuInternalName, Double>()
+        private var georgePrices = mapOf<NeuInternalName, Double>()
 
         fun getNpcPrice(internalName: NeuInternalName) = npcPrices[internalName]
+
+        @HandleEvent
+        fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+            val constant = event.getConstant<NeuGeorgeJson>("george")
+            val prices = constant.prices ?: return
+            georgePrices = prices
+            val newMap = npcPrices.toMutableMap()
+            for (price in prices) {
+                newMap[price.key] = price.value
+            }
+            npcPrices = newMap
+        }
     }
 
     private val hypixelItemStatic = ApiStaticGetPath(
@@ -45,7 +63,7 @@ class HypixelItemApi {
 
     fun start() {
         SkyHanniMod.launchIOCoroutine {
-            npcPrices = loadNpcPrices()
+            npcPrices = loadNpcPrices() + georgePrices
         }
 
         // TODO use SecondPassedEvent

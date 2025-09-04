@@ -683,6 +683,13 @@ object EstimatedItemValueCalculator {
             }
             if (rawName in EstimatedItemValue.stackingEnchants.keys) level = 1
 
+            data.endcapEnchants?.get(rawName)?.let { endcapData ->
+                if (rawLevel > endcapData.requiredLevel) {
+                    level = endcapData.requiredLevel
+                    items[endcapData.endcapItem] = 1
+                }
+            }
+
             val enchantmentName = "$rawName;$level".toInternalName()
 
             if (enchantmentName.isBazaarItem()) {
