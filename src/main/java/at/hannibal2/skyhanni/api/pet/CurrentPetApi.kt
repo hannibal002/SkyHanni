@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.pets.PetChangedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -82,6 +83,8 @@ object CurrentPetApi {
             )?.takeIf {
                 it.uuid != null
             } ?: return
+
+            PetChangedEvent(resolvedPet).post()
 
             ProfileStorageData.profileSpecific?.currentPetUuid = resolvedPet.uuid
         }
