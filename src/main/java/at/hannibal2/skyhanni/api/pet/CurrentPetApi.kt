@@ -70,6 +70,8 @@ object CurrentPetApi {
         if (petData.uuid == null) {
             ErrorManager.skyHanniError("Tried to assert a non-UUID having pet!")
         }
+
+        PetChangedEvent(petData).post()
         ProfileStorageData.profileSpecific?.currentPetUuid = petData.uuid
     }
 
