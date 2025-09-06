@@ -30,7 +30,9 @@ object MinecraftInputHook {
                     ClickType.RIGHT_CLICK,
                     position,
                     InventoryUtils.getItemInHand(),
-                ).post() || clickCancelled
+                ).also {
+                    if (clickCancelled) it.cancel()
+                }.post()
             }
 
             MovingObjectPosition.MovingObjectType.ENTITY -> {
@@ -43,7 +45,9 @@ object MinecraftInputHook {
                     //$$ (blockHitResult as EntityHitResult).getEntity(),
                     //#endif
                     InventoryUtils.getItemInHand(),
-                ).post() || clickCancelled
+                ).also {
+                    if (clickCancelled) it.cancel()
+                }.post()
             }
         }
 
@@ -67,7 +71,9 @@ object MinecraftInputHook {
                     ClickType.LEFT_CLICK,
                     position,
                     InventoryUtils.getItemInHand(),
-                ).post() || clickCancelled
+                ).also {
+                    if (clickCancelled) it.cancel()
+                }.post()
             }
 
             MovingObjectPosition.MovingObjectType.ENTITY -> {
@@ -80,7 +86,9 @@ object MinecraftInputHook {
                     //$$ (blockHitResult as EntityHitResult).getEntity(),
                     //#endif
                     InventoryUtils.getItemInHand(),
-                ).post() || clickCancelled
+                ).also {
+                    if (clickCancelled) it.cancel()
+                }.post()
             }
         }
 
