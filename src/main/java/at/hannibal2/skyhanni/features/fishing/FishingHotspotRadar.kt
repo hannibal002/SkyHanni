@@ -136,10 +136,10 @@ object FishingHotspotRadar {
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         if (item.getInternalNameOrNull() != HOTSPOT_RADAR) return
-        if (lastParticle.passedSince() < 0.2.seconds) {
-            event.cancel()
-            return
-        }
+//         if (lastParticle.passedSince() < 0.2.seconds) {
+//             event.cancel()
+//             return
+//         }
         bezierFitter.reset()
         lastAbilityUse = SimpleTimeMark.now()
     }

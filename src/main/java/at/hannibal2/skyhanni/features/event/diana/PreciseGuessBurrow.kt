@@ -68,10 +68,10 @@ object PreciseGuessBurrow {
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
-        if (lastLavaParticle.passedSince() < 0.2.seconds) {
-            event.cancel()
-            return
-        }
+//         if (lastLavaParticle.passedSince() < 0.2.seconds) {
+//             event.cancel()
+//             return
+//         }
         bezierFitter.reset()
         lastDianaSpade = SimpleTimeMark.now()
         newBurrow = true
