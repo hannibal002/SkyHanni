@@ -26,7 +26,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.12
 //$$ import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
 //#endif
@@ -50,10 +49,6 @@ object PestParticleWaypoint {
         if (!isEnabled() || !PestApi.hasVacuumInHand()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (MinecraftCompat.localPlayer.isSneaking) return
-        if (lastParticle.passedSince() < 0.2.seconds) {
-            event.cancel()
-            return
-        }
         reset()
         lastPestTrackerUse = SimpleTimeMark.now()
     }
