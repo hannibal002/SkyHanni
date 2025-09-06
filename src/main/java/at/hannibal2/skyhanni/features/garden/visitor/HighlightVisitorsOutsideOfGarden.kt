@@ -23,7 +23,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.network.play.client.C02PacketUseEntity.Action
 
 @SkyHanniModule
 object HighlightVisitorsOutsideOfGarden {
@@ -90,12 +89,10 @@ object HighlightVisitorsOutsideOfGarden {
         if (MinecraftCompat.localPlayer.isSneaking) return
         val entity = event.clickedEntity
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
-            if (event.action != Action.INTERACT_AT) {
-                ChatUtils.chatAndOpenConfig(
-                    "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
-                    VisitorApi.config::blockInteracting,
-                )
-            }
+            ChatUtils.chatAndOpenConfig(
+                "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
+                VisitorApi.config::blockInteracting,
+            )
             event.cancel()
         }
     }
