@@ -153,6 +153,8 @@
 + Added option to show total coin value of items in the Item Pickup Log. - pretzoot (https://github.com/hannibal002/SkyHanni/pull/4457)
 + Added a way to reset tracked hunting box shards for the attribute shard overlay. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4477)
 + Made estimated item value calculate the value of enchantments that have used an endcap item. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4635)
++ Added the wet book price to estimated item value. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4642)
++ Added color options for sold, expired, and underbid Auction items. - brooke-gill (https://github.com/hannibal002/SkyHanni/pull/4646)
 
 #### Farming
 
@@ -295,6 +297,8 @@
 + Fixed Vanilla Nametag Colors. - Pugzy (https://github.com/hannibal002/SkyHanni/pull/4586)
 + Fixed 1.8 visual words being replaced in the visual word editing menu. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4630)
 + Fixed a typo in the block strength guide. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4627)
++ Fixed bucketed item trackers displaying invalid items. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4647)
++ Fixed estimated item value error on items with replenish or scavenger 5. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4643)
 
 #### Chat
 
@@ -338,6 +342,8 @@
 + Fixed sack display for rough gemstones in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4555)
 + Fixed Item Pickup Log showing incorrect amounts. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4594)
 + Fixed some chocolate factory options not respecting the global toggle. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4628)
++ Fixed brewing stand overlay labelling air on modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4644)
++ Fixed hunting box value being capped at integer limit. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4645)
 
 #### Fishing
 
@@ -358,6 +364,7 @@
 + Fixed Garden Visitor detection not working with Rainbow Rune. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4624)
 + Fixed multiple menus and features throwing an error when encountering melons. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4639)
 + Prevented use of vacuums when a previous vacuum line is still being traced out. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4612)
++ Fixed issue in pest particle waypoints. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4649)
 
 #### Foraging
 
