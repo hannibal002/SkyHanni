@@ -36,6 +36,8 @@
 
 + Added Prevent command early execution. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3377)
 + Added /shping to show your ping in chat. - nopo (https://github.com/hannibal002/SkyHanni/pull/4478)
++ Added tab complete for /call. - nopo (https://github.com/hannibal002/SkyHanni/pull/4632)
++ Added tab complete to the /show command. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4605)
 
 #### Rift
 
@@ -150,6 +152,9 @@
 + Added option to only show Attribute Shard data for shards visible in your current inventory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4456)
 + Added option to show total coin value of items in the Item Pickup Log. - pretzoot (https://github.com/hannibal002/SkyHanni/pull/4457)
 + Added a way to reset tracked hunting box shards for the attribute shard overlay. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4477)
++ Made estimated item value calculate the value of enchantments that have used an endcap item. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4635)
++ Added the wet book price to estimated item value. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4642)
++ Added color options for sold, expired, and underbid Auction items. - brooke-gill (https://github.com/hannibal002/SkyHanni/pull/4646)
 
 #### Farming
 
@@ -177,6 +182,8 @@
 + Slightly improved the mod performance when switching islands or opening private island chests. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4539)
 + Added Slayer and Commissions options to Tab Widget Display. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4573)
 + Updated Visual Words for 1.21.8 compatibility. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4608)
++ Improved wording of some config options. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4628)
++ Trackers now show george price for pets when the tracker is set to npc. - nopo (https://github.com/hannibal002/SkyHanni/pull/4633)
 
 #### Foraging
 
@@ -229,6 +236,7 @@
 + Fixed errors with Atoned Horror (Revenant) and Conjoined Brood (Tarantula) Slayer bosses. - Luna (https://github.com/hannibal002/SkyHanni/pull/4588)
 + Prevented incorrect mob-kill coin gains from being added to the Slayer Profit Tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4606)
 + Prevented incorrect Slayer spawn costs from being added to the Profit Tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4597)
++ Fixed Blaze T4 spawn costs being ignored in Slayer Profit Tracker. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4625)
 
 #### Rift
 
@@ -287,6 +295,10 @@
 + Fixed typo 'Contol' → 'Control' in Moonglade Beacon Solver. - Luna (https://github.com/hannibal002/SkyHanni/pull/4537)
 + Fixed Toggle Sneak unsneaking when hovering over a SkyHanni Tracker. - nopo (https://github.com/hannibal002/SkyHanni/pull/4613)
 + Fixed Vanilla Nametag Colors. - Pugzy (https://github.com/hannibal002/SkyHanni/pull/4586)
++ Fixed 1.8 visual words being replaced in the visual word editing menu. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4630)
++ Fixed a typo in the block strength guide. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4627)
++ Fixed bucketed item trackers displaying invalid items. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4647)
++ Fixed estimated item value error on items with replenish or scavenger 5. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4643)
 
 #### Chat
 
@@ -329,6 +341,9 @@
 + Fixed Item Pickup Log not counting correctly. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4564)
 + Fixed sack display for rough gemstones in 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4555)
 + Fixed Item Pickup Log showing incorrect amounts. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4594)
++ Fixed some chocolate factory options not respecting the global toggle. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4628)
++ Fixed brewing stand overlay labelling air on modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4644)
++ Fixed hunting box value being capped at integer limit. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4645)
 
 #### Fishing
 
@@ -344,6 +359,12 @@
 + Fixed Farming Fortune Guide suggesting Blooming instead of Squeaky reforge. - Luna (https://github.com/hannibal002/SkyHanni/pull/4525)
 + Fixed Pest Spawn Timer. - nopo (https://github.com/hannibal002/SkyHanni/pull/4562)
 + Fixed incorrect stats summary for Jacob's Contests. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4582)
++ Fixed dicer drops not being added to tracker/hidden. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4639)
++ Fixed fortune display not detecting melon fortune from tablist. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4639)
++ Fixed Garden Visitor detection not working with Rainbow Rune. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4624)
++ Fixed multiple menus and features throwing an error when encountering melons. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4639)
++ Prevented use of vacuums when a previous vacuum line is still being traced out. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4612)
++ Fixed issue in pest particle waypoints. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4649)
 
 #### Foraging
 
@@ -511,6 +532,9 @@
 + Cleaned up Graph usage. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4601)
 + Renamed `SlayerType.getByClazzName()` to `SlayerType.getByClassName()`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4588)
 + Updated Graph Deserialization. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4600)
++ Added NPC names to the dictionary. - Motte (https://github.com/hannibal002/SkyHanni/pull/4616)
++ Changed part of the foundation of the Damage Indicator to utilize the Mob Detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4604)
++ Stop including Kotlin on modern. - meowora, j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4602)
 
 ## Version 4.0.0
 
