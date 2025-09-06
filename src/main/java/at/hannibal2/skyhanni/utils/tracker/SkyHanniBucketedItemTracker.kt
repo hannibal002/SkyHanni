@@ -57,10 +57,10 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             it.addItem(bucket, internalName, amount, command)
         }
         getSharedTracker()?.let {
-            val totalProp = it.get(DisplayMode.TOTAL).selectedBucketItems.getOrPut(internalName) {
+            val totalProp = it.get(DisplayMode.TOTAL).getBucketedItems(bucket).getOrPut(internalName) {
                 ItemTrackerData.TrackedItem()
             }
-            val sessionProp = it.get(DisplayMode.SESSION).selectedBucketItems.getOrPut(internalName) {
+            val sessionProp = it.get(DisplayMode.SESSION).getBucketedItems(bucket).getOrPut(internalName) {
                 ItemTrackerData.TrackedItem()
             }
             sessionProp.hidden = totalProp.hidden
