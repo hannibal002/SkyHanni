@@ -118,7 +118,7 @@ enum class SkyblockStat(
     CARROT_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Carrot Fortune $VALUE_PATTERN"),
     POTATO_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Potato Fortune $VALUE_PATTERN"),
     PUMPKIN_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Pumpkin Fortune $VALUE_PATTERN"),
-    MELON_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Melon Fortune $VALUE_PATTERN"),
+    MELON_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Melon Slice Fortune $VALUE_PATTERN"),
     MUSHROOM_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Mushroom Fortune $VALUE_PATTERN"),
     CACTUS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cactus Fortune $VALUE_PATTERN"),
     NETHER_WART_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Nether Wart Fortune $VALUE_PATTERN"),
