@@ -429,7 +429,7 @@ class MobFinder {
         }
     }
 
-    private fun tryAddEntityWolf(mob: Mob) = if (mob.name == "Sven Packmaster ") {
+    private fun tryAddEntityWolf(mob: Mob) = if (mob.name == "Sven Packmaster") {
         when (mob.levelOrTier) {
             1 -> EntityResult(bossType = BossType.SLAYER_WOLF_1)
             2 -> EntityResult(bossType = BossType.SLAYER_WOLF_2)

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -22,11 +23,11 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.12
 //$$ import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
 //#endif
@@ -50,10 +51,6 @@ object PestParticleWaypoint {
         if (!isEnabled() || !PestApi.hasVacuumInHand()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (MinecraftCompat.localPlayer.isSneaking) return
-        if (lastParticle.passedSince() < 0.2.seconds) {
-            event.cancel()
-            return
-        }
         reset()
         lastPestTrackerUse = SimpleTimeMark.now()
     }
@@ -164,6 +161,13 @@ object PestParticleWaypoint {
     @HandleEvent(PestUpdateEvent::class)
     fun onPestUpdate() {
         if (PestApi.scoreboardPests == 0) reset()
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(104, "garden.pests.pestWaypoint.enabled") {
+            JsonPrimitive(true)
+        }
     }
 
     private fun isEnabled() = config.enabled
