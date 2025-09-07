@@ -60,6 +60,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSilexCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getTransmissionTunerCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getWetBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfWar
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasBookOfStats
@@ -110,6 +111,7 @@ object EstimatedItemValueCalculator {
         ::addStars, // crimson, dungeon
         ::addMasterStars,
         ::addHotPotatoBooks,
+        ::addWetBook,
         ::addFarmingForDummies,
         ::addSilex,
         ::addTransmissionTuners,
@@ -148,6 +150,7 @@ object EstimatedItemValueCalculator {
     private val ART_OF_WAR = "THE_ART_OF_WAR".toInternalName()
     private val BOOK_OF_STATS = "BOOK_OF_STATS".toInternalName()
     private val ART_OF_PEACE = "THE_ART_OF_PEACE".toInternalName()
+    private val WET_BOOK = "WET_BOOK".toInternalName()
     private val POLARVOID_BOOK = "POLARVOID_BOOK".toInternalName()
     private val POCKET_SACK_IN_A_SACK = "POCKET_SACK_IN_A_SACK".toInternalName()
     private val BOOKWORM_BOOK = "BOOKWORM_BOOK".toInternalName()
@@ -362,6 +365,14 @@ object EstimatedItemValueCalculator {
         }
 
         return totalPrice
+    }
+
+    private fun addWetBook(stack: ItemStack, list: MutableList<String>): Double {
+        val count = stack.getWetBookCount() ?: return 0.0
+
+        val price = WET_BOOK.getPrice() * count
+        list.add(formatProgress("Wet Book", count, max = 5, price))
+        return price
     }
 
     private fun addFarmingForDummies(stack: ItemStack, list: MutableList<String>): Double {
