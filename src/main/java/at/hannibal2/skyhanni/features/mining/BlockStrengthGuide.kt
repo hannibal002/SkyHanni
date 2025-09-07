@@ -222,7 +222,7 @@ object BlockStrengthGuide {
                     add(Renderable.placeholder(0, 5))
 
                     addString("§3Block Strength: §f${ore.strength.addSeparators()}")
-                    addExtraInfo("This defines the \"thoughness\" of a block.")
+                    addExtraInfo("This defines the \"toughness\" of a block.")
                     addExtraInfo("A higher number means it takes longer")
                     addExtraInfo("to break $blockName.")
 

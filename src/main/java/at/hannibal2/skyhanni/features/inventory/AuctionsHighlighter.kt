@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -52,11 +51,11 @@ object AuctionsHighlighter {
         for ((slot, stack) in chest.getUpperItems()) {
             val lore = stack.getLore()
             if (lore.any { it == "§7Status: §aSold!" }) {
-                slot.highlight(LorenzColor.GREEN)
+                slot.highlight(config.soldColor)
                 continue
             }
             if (lore.any { it == "§7Status: §cExpired!" }) {
-                slot.highlight(LorenzColor.RED)
+                slot.highlight(config.expiredColor)
                 continue
             }
             if (config.highlightAuctionsUnderbid) {
@@ -64,7 +63,7 @@ object AuctionsHighlighter {
                     val coins = group("coins").formatLong()
                     EstimatedItemValueCalculator.getTotalPrice(stack)?.let { totalPrice ->
                         if (coins > totalPrice) {
-                            slot.highlight(LorenzColor.GOLD)
+                            slot.highlight(config.underbidColor)
                         }
                     }
                 }
