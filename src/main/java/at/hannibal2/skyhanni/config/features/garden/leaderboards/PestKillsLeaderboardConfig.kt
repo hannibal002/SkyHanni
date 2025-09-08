@@ -2,15 +2,15 @@ package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteLeaderboardGenericConfig
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.MultipleTypeRankGoalConfig
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.types.PestTypeRankGoalsConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.MultipleTypeRankGoalConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.PestTypeRankGoalsConfig
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class PestKillsLeaderboardConfig: EliteLeaderboardGenericConfig<
+class PestKillsLeaderboardConfig : EliteLeaderboardGenericConfig<
     PestRankGoalConfig,
     EliteDisplayGenericConfig
     >(
@@ -18,7 +18,7 @@ class PestKillsLeaderboardConfig: EliteLeaderboardGenericConfig<
     { EliteDisplayGenericConfig() },
 )
 
-class PestRankGoalConfig: MultipleTypeRankGoalConfig<PestTypeWithAll, PestTypeRankGoalsConfig>(
+class PestRankGoalConfig : MultipleTypeRankGoalConfig<PestTypeWithAll, PestTypeRankGoalsConfig>(
     { PestTypeRankGoalsConfig() }
 ) {
     @Expose

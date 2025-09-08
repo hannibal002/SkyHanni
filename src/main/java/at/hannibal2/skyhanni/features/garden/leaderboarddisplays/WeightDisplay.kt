@@ -52,7 +52,7 @@ class WeightDisplay : EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboar
         return " §7(§b${timeUntil.format()}§7)"
     }
 
-    override fun MutableList<Renderable>.buildTypeSwitcher() {}
+    override fun MutableList<Renderable>.buildTypeSwitcher() = Unit
 
     override fun shouldShowDisplay(): Boolean =
         !GardenApi.hideExtraGuis() && (apiError || (config.display.ignoreLow || (getWeight(EliteLeaderboardMode.ALL_TIME) ?: 0.0) >= 200.0))

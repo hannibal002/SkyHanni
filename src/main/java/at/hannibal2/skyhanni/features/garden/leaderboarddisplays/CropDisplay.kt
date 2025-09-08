@@ -60,7 +60,8 @@ class CropDisplay : EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.C
         )
     }
 
-    override fun shouldShowDisplay(): Boolean = !GardenApi.hideExtraGuis() && (GardenApi.isCurrentlyFarming() || !config.display.hideWhenNotFarming)
+    override fun shouldShowDisplay(): Boolean =
+        !GardenApi.hideExtraGuis() && (GardenApi.isCurrentlyFarming() || !config.display.hideWhenNotFarming)
 }
 
 data class CropLeaderboardStorage(

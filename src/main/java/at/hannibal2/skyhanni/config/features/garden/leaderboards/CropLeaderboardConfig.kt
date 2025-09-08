@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteLeaderboardGenericConfig
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.MultipleTypeRankGoalConfig
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.types.CropTypeRankGoalsConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.MultipleTypeRankGoalConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.CropTypeRankGoalsConfig
 import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -11,15 +11,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class CropCollectionLeaderboardConfig: EliteLeaderboardGenericConfig<
+class CropCollectionLeaderboardConfig : EliteLeaderboardGenericConfig<
     CropRankGoalConfig,
     CropCollectionDisplayConfig
     >(
     { CropRankGoalConfig() },
-    {CropCollectionDisplayConfig()}
-    )
+    { CropCollectionDisplayConfig() }
+)
 
-class CropCollectionDisplayConfig: EliteDisplayGenericConfig() {
+class CropCollectionDisplayConfig : EliteDisplayGenericConfig() {
     @Expose
     @ConfigOption(
         name = "Overtake ETA",
@@ -40,7 +40,7 @@ class CropCollectionDisplayConfig: EliteDisplayGenericConfig() {
     val hideWhenNotFarming: Boolean = true
 }
 
-class CropRankGoalConfig: MultipleTypeRankGoalConfig<CropType, CropTypeRankGoalsConfig>(
+class CropRankGoalConfig : MultipleTypeRankGoalConfig<CropType, CropTypeRankGoalsConfig>(
     { CropTypeRankGoalsConfig() }
 ) {
     @Expose

@@ -2,21 +2,21 @@ package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteLeaderboardGenericConfig
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.SingleTypeRankGoalConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.SingleTypeRankGoalConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class WeightLeaderboardConfig: EliteLeaderboardGenericConfig<
+class WeightLeaderboardConfig : EliteLeaderboardGenericConfig<
     SingleTypeRankGoalConfig,
     WeightDisplayConfig,
     >(
-    {SingleTypeRankGoalConfig()},
-    {WeightDisplayConfig()},
-    )
+    { SingleTypeRankGoalConfig() },
+    { WeightDisplayConfig() },
+)
 
-class WeightDisplayConfig: EliteDisplayGenericConfig() {
+class WeightDisplayConfig : EliteDisplayGenericConfig() {
     @Expose
     @ConfigOption(
         name = "Overtake ETA",

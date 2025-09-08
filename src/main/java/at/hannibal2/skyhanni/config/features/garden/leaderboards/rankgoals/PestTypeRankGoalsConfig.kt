@@ -1,13 +1,14 @@
-package at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.types
+package at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals
 
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.PestTypeWithAll
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.TypeRankGoalGenericConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.reflect.KProperty0
 
-class PestTypeRankGoalsConfig: TypeRankGoalGenericConfig<PestTypeWithAll>() {
+class PestTypeRankGoalsConfig : TypeRankGoalGenericConfig<PestTypeWithAll>() {
     @Expose
     @ConfigOption(name = "All pests", desc = "")
     @ConfigEditorText

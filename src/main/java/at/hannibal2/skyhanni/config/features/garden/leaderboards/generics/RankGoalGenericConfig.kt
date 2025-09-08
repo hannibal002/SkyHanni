@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals
+package at.hannibal2.skyhanni.config.features.garden.leaderboards.generics
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

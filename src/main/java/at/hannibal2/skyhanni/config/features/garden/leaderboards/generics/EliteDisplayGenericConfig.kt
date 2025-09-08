@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-open class EliteDisplayGenericConfig{
+open class EliteDisplayGenericConfig {
     @Expose
     @ConfigOption(
         name = "Display",
@@ -31,10 +31,12 @@ open class EliteDisplayGenericConfig{
         desc = "Drag text to change the appearance of the overlay.\n"
     )
     @ConfigEditorDraggableList
-    val text: Property<MutableList<TextEntry>> = Property.of(mutableListOf(
-        TextEntry.WEIGHT_POSITION,
-        TextEntry.OVERTAKE
-    ))
+    val text: Property<MutableList<LeaderboardTextEntry>> = Property.of(
+        mutableListOf(
+            LeaderboardTextEntry.WEIGHT_POSITION,
+            LeaderboardTextEntry.OVERTAKE
+        )
+    )
 
     @Expose
     @ConfigOption(
@@ -51,7 +53,7 @@ open class EliteDisplayGenericConfig{
     var showOutsideGarden: Boolean = false
 
 
-    enum class TextEntry(private val displayName: String) {
+    enum class LeaderboardTextEntry(private val displayName: String) {
         WEIGHT_POSITION("§6Leaderboard: §eAmount §7[§b#Rank§7]"),
         OVERTAKE("§eAmount §7(§bTime§7) §7behind §bPlayer"),
         LAST_PLAYER("§eAmount §7ahead of §bPlayer")

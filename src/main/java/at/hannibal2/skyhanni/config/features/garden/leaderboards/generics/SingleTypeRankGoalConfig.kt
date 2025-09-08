@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals
+package at.hannibal2.skyhanni.config.features.garden.leaderboards.generics
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class SingleTypeRankGoalConfig: RankGoalGenericConfig() {
+class SingleTypeRankGoalConfig : RankGoalGenericConfig() {
     @Expose
     @ConfigOption(
         name = "All-Time Rank Goal",

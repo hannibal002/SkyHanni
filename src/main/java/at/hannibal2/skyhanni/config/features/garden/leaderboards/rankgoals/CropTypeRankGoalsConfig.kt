@@ -1,5 +1,6 @@
-package at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.types
+package at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals
 
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.TypeRankGoalGenericConfig
 import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
@@ -7,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.reflect.KProperty0
 
-class CropTypeRankGoalsConfig: TypeRankGoalGenericConfig<CropType>() {
+class CropTypeRankGoalsConfig : TypeRankGoalGenericConfig<CropType>() {
     @Expose
     @ConfigOption(name = "Wheat", desc = "")
     @ConfigEditorText

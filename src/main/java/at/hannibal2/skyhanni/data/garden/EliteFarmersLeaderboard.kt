@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.data.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardRankConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankFromConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
-import at.hannibal2.skyhanni.data.garden.EliteFarmersRankGoals.getLeaderboardRankConfig
-import at.hannibal2.skyhanni.data.garden.EliteFarmersRankGoals.getRankFromConfig
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getFactor
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.profileId
@@ -276,6 +278,7 @@ object EliteFarmersLeaderboard {
     }
 
     private fun getUpcomingPlayerCount(currentPos: Int, leaderboardType: EliteLeaderboardType): Int {
+        if (LeaderboardTextEntry.OVERTAKE !in getLeaderboardConfig(leaderboardType).display.text.get()) return 0
         if (leaderboardType.mode == EliteLeaderboardMode.ALL_TIME) {
             return when {
                 currentPos > 10_000 -> 50
@@ -365,9 +368,6 @@ object EliteFarmersLeaderboard {
         nextPlayers[leaderboardType] = mutableListOf()
         apiData.upcomingPlayers.forEach {
             if (apiData.rank != 1) nextPlayers[leaderboardType]?.add(it)
-            /*if (it.amount > (getAmount(leaderboardType) ?: apiData.amount)) {
-
-            }*/
         }
     }
 

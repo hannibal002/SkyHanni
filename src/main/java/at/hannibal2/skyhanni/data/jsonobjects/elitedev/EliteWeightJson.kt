@@ -106,11 +106,11 @@ sealed class EliteLeaderboardType {
         }
 
     val type
-    get() = when (this) {
-        is Weight -> this.weight
-        is Crop -> this.crop
-        is Pest -> this.pest
-    }
+        get() = when (this) {
+            is Weight -> this.weight
+            is Crop -> this.crop
+            is Pest -> this.pest
+        }
 }
 
 val EliteLeaderboardType.pest: PestType?

@@ -1,7 +1,6 @@
-package at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals
+package at.hannibal2.skyhanni.config.features.garden.leaderboards.generics
 
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.PestTypeWithAll.Companion.fromPestType
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.types.TypeRankGoalGenericConfig
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import com.google.gson.annotations.Expose
@@ -10,10 +9,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.reflect.KProperty0
 
-abstract class MultipleTypeRankGoalConfig<E: Enum<E>, Config: TypeRankGoalGenericConfig<E>>(
+abstract class MultipleTypeRankGoalConfig<E : Enum<E>, Config : TypeRankGoalGenericConfig<E>>(
     createConfig: () -> Config
-): RankGoalGenericConfig() {
+) : RankGoalGenericConfig() {
     // moulconfig requires concrete types
+    @Suppress("StorageNeedsExpose")
     abstract val rankGoalTypes: Property<MutableList<E>>
 
     @Expose
