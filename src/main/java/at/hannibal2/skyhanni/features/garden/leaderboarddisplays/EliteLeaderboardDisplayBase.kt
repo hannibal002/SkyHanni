@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.TextEntry
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getAmount
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLastPlayer
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
@@ -9,6 +11,8 @@ import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getRankGoal
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.isUnranked
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.leaderboardMinAmount
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
+import at.hannibal2.skyhanni.data.garden.EliteFarmersRankGoals.getConfigFromClass
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
@@ -21,13 +25,17 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.seconds
 
 abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType.WithEnum<E>>(
+    private val typeClass: KClass<T>,
     private val createType: (E, EliteLeaderboardMode) -> EliteLeaderboardType,
     private val name: String
 ) {
@@ -43,6 +51,8 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     protected abstract var currentMode: EliteLeaderboardMode
     protected abstract var currentEnum: E?
 
+    @Suppress("Unchecked_cast")
+    private val config get() = (typeClass as? KClass<out EliteLeaderboardType>)?.let { getConfigFromClass(it) }
     abstract fun getDefaultEnum(): E?
 
 
@@ -65,6 +75,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         get() = (currentEnum ?: getDefaultEnum())?.let { createType(it, currentMode) }
 
     fun update(overrideCooldown: Boolean = false) {
+        if (!isEnabled()) return
         val type = currentLeaderboardType ?: return
         leaderboardPos = getLeaderboardPosition(type, overrideCooldown)
         amount = getAmount(type)
@@ -72,7 +83,32 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         drawDisplay(type)
     }
 
-    abstract fun drawDisplay(leaderboardType: EliteLeaderboardType)
+    fun drawDisplay(leaderboardType: EliteLeaderboardType) {
+        if (!isEnabled()) return
+
+        val lineMap = mutableMapOf<TextEntry, Renderable>()
+        val isFirst = leaderboardPos == 1
+
+        lineMap[TextEntry.WEIGHT_POSITION] = weightPosRenderable(leaderboardType)
+        lineMap[TextEntry.OVERTAKE] = overtakeRenderable(leaderboardType, isFirst)
+        if (!isFirst && !isUnranked(leaderboardType) && config?.display?.text?.get()?.contains(TextEntry.OVERTAKE) == true) {
+            lineMap[TextEntry.LAST_PLAYER] = overtakeRenderable(leaderboardType, true)
+        }
+
+        display = formatDisplay(lineMap)
+    }
+
+    private fun formatDisplay(lineMap: MutableMap<TextEntry, Renderable>): List<Renderable> {
+        if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) return errorMessage
+
+        val newList = mutableListOf<Renderable>()
+        if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
+        config?.display?.text?.get()?.let { it -> newList.addAll(it.mapNotNull { lineMap[it] }) }
+        if (inventoryOpen) newList.buildTypeSwitcher() else newList.addVerticalSpacer()
+        return newList
+    }
+
+    abstract fun MutableList<Renderable>.buildTypeSwitcher()
 
     protected fun weightPosRenderable(leaderboardType: EliteLeaderboardType): Renderable {
         val amountText = amount?.roundTo(2)?.addSeparators() ?: if (isUnranked(leaderboardType)) {
@@ -115,7 +151,9 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
 
     abstract fun overtakeEta(amountUntil: Double): String
 
-    abstract fun useEtaGoalRank(): Boolean
+    private fun useEtaGoalRank(): Boolean {
+        return config?.rankGoals?.useRankGoal?.get() ?: false
+    }
 
     private fun nullNextPlayerRenderable(leaderboardType: EliteLeaderboardType): Renderable {
         return if (isUnranked(leaderboardType)) {
@@ -156,7 +194,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         }
     }
 
-    abstract fun showLeaderboard(): Boolean
+    private fun showLeaderboard(): Boolean = config?.display?.leaderboard?.get() ?: false
 
     private fun getLeaderboardFormat(): String {
         if (!showLeaderboard()) return ""
@@ -177,7 +215,10 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         apiError = false
     }
 
-    abstract fun isEnabled(): Boolean
+    fun isEnabled(): Boolean = (config?.display?.display ?: false) && (inGardenEnabled())
+
+    private fun inGardenEnabled() =
+        SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || (config?.display?.showOutsideGarden ?: false))
 
     abstract fun shouldShowDisplay(): Boolean
 

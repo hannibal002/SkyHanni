@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.garden.leaderboards
+package at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.types
 
 import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.annotations.Expose
@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.reflect.KProperty0
 
-class CropRankGoalsConfig {
+class CropTypeRankGoalsConfig: TypeRankGoalGenericConfig<CropType>() {
     @Expose
     @ConfigOption(name = "Wheat", desc = "")
     @ConfigEditorText
@@ -58,7 +58,7 @@ class CropRankGoalsConfig {
     @ConfigEditorText
     val mushroom: Property<String> = Property.of("10000")
 
-    fun getGoal(type: CropType): KProperty0<Property<String>> = when (type) {
+    override fun getConfig(type: CropType): KProperty0<Property<String>> = when (type) {
         CropType.WHEAT -> this::wheat
         CropType.CARROT -> this::carrot
         CropType.POTATO -> this::potato

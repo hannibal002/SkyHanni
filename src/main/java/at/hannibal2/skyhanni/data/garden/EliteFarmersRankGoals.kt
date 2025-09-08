@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.data.garden
 
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.PestKillsDisplayConfig.PestTypeWithAll
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteLeaderboardGenericConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.MultipleTypeRankGoalConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.RankGoalGenericConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.SingleTypeRankGoalConfig
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import io.github.notenoughupdates.moulconfig.observer.Property
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty0
 
 object EliteFarmersRankGoals {
@@ -12,36 +16,39 @@ object EliteFarmersRankGoals {
     private val cropConfig get() = GardenApi.config.eliteFarmersLeaderboards.cropCollectionDisplay
     private val pestConfig get() = GardenApi.config.eliteFarmersLeaderboards.pestKillsDisplay
 
-    fun getRankFromConfig(leaderboardType: EliteLeaderboardType): Property<String>? {
-        return when (leaderboardType) {
-            is EliteLeaderboardType.Weight -> if (weightConfig.useRankGoal.get()) {
-                getLeaderboardRankConfig(leaderboardType).get()
-            } else null
-            is EliteLeaderboardType.Crop -> if (cropConfig.useRankGoal.get() && leaderboardType.crop in cropConfig.rankGoalCrops.get()) {
-                getLeaderboardRankConfig(leaderboardType).get()
-            } else null
-            is EliteLeaderboardType.Pest -> {
-                if (pestConfig.useRankGoal.get() && PestTypeWithAll.fromPestType(leaderboardType.pest) in pestConfig.rankGoalPests.get()) {
-                    getLeaderboardRankConfig(leaderboardType).get()
-                } else null
-            }
-        }
+    fun getConfig(leaderboardType: EliteLeaderboardType): EliteLeaderboardGenericConfig<*, *> = when (leaderboardType) {
+        is EliteLeaderboardType.Weight -> weightConfig
+        is EliteLeaderboardType.Crop -> cropConfig
+        is EliteLeaderboardType.Pest -> pestConfig
     }
 
-    fun getLeaderboardRankConfig(type: EliteLeaderboardType): KProperty0<Property<String>> = when (type) {
-        is EliteLeaderboardType.Weight -> when (type.mode) {
-            EliteLeaderboardMode.ALL_TIME -> weightConfig::weightRankGoal
-            EliteLeaderboardMode.MONTHLY -> weightConfig::monthlyWeightRankGoal
-        }
+    fun getConfigFromClass(leaderboardType: KClass<out EliteLeaderboardType>): EliteLeaderboardGenericConfig<*, *>? = when (leaderboardType) {
+        EliteLeaderboardType.Weight::class -> weightConfig
+        EliteLeaderboardType.Crop::class -> cropConfig
+        EliteLeaderboardType.Pest::class -> pestConfig
+        else -> null
+    }
 
-        is EliteLeaderboardType.Crop -> when (type.mode) {
-            EliteLeaderboardMode.ALL_TIME -> cropConfig.cropRankGoalsConfig.getGoal(type.crop)
-            EliteLeaderboardMode.MONTHLY -> cropConfig.monthlyCropRankGoalsConfig.getGoal(type.crop)
-        }
+    fun getRankFromConfig(leaderboardType: EliteLeaderboardType): Property<String>? =
+        getLeaderboardRankConfig(leaderboardType)?.get()
 
-        is EliteLeaderboardType.Pest -> when (type.mode) {
-            EliteLeaderboardMode.ALL_TIME -> pestConfig.pestRankGoalsConfig.getGoal(type.pest)
-            EliteLeaderboardMode.MONTHLY -> pestConfig.monthlyPestRankGoalsConfig.getGoal(type.pest)
+    fun getLeaderboardRankConfig(leaderboardType: EliteLeaderboardType): KProperty0<Property<String>>? =
+        when (val config = getRankConfig(leaderboardType)) {
+        is SingleTypeRankGoalConfig -> when (leaderboardType.mode) {
+            EliteLeaderboardMode.ALL_TIME -> config::rankGoal
+            EliteLeaderboardMode.MONTHLY -> config::monthlyRankGoal
         }
+        is MultipleTypeRankGoalConfig<*, *> -> config.getGoal(leaderboardType)
+        else -> null
+    }
+
+
+    fun getRankConfig(leaderboardType: EliteLeaderboardType): RankGoalGenericConfig = getConfig(leaderboardType).rankGoals
+
+    fun getRankConfig(leaderboardType: KClass<out EliteLeaderboardType>?): RankGoalGenericConfig? = when (leaderboardType) {
+        EliteLeaderboardType.Weight::class -> weightConfig.rankGoals
+        EliteLeaderboardType.Crop::class -> cropConfig.rankGoals
+        EliteLeaderboardType.Pest::class -> pestConfig.rankGoals
+        else -> null
     }
 }

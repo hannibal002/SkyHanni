@@ -60,6 +60,7 @@ object EliteFarmersLeaderboard {
     private var lastFetchAttempt = SimpleTimeMark.farPast()
 
     fun clearEntries(leaderboardType: EliteLeaderboardType) {
+        nextPlayers.remove(leaderboardType)
         leaderboardPosMap?.remove(leaderboardType)
         shouldRefreshLeaderboard.remove(leaderboardType)
         nextPlayers.remove(leaderboardType)
@@ -67,6 +68,7 @@ object EliteFarmersLeaderboard {
     }
 
     fun clearCategories(category: KClass<out EliteLeaderboardType>) {
+        nextPlayers.clearCategory(category)
         leaderboardPosMap?.clearCategory(category)
         shouldRefreshLeaderboard.clearCategory(category)
         nextPlayers.clearCategory(category)
@@ -370,15 +372,13 @@ object EliteFarmersLeaderboard {
     }
 
     fun getRankGoal(leaderboardType: EliteLeaderboardType): Int? {
-        val property = getRankFromConfig(leaderboardType) ?: return null
+        val goal = getRankFromConfig(leaderboardType)?.get()?.toIntOrNull() ?: return null
 
         val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
 
-        val goal = property.get().toIntOrNull() ?: return null
-
         if (goal < 1 || goal >= currentLeaderboardPos) {
             if (goal < 1 && !hasWarned) {
-                getLeaderboardRankConfig(leaderboardType).let { prop ->
+                getLeaderboardRankConfig(leaderboardType)?.let { prop ->
                     ChatUtils.chatAndOpenConfig(
                         "Invalid $leaderboardType Rank Goal! Click here to edit the Rank Goal config value " +
                             "to a positive number less than your current leaderboard position to use this feature!",

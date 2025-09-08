@@ -104,6 +104,13 @@ sealed class EliteLeaderboardType {
             // Only "all pests" (when pests is null) have a monthly leaderboard
             is Pest -> pest?.eliteLbName ?: "pests${mode.lbSuffix}"
         }
+
+    val type
+    get() = when (this) {
+        is Weight -> this.weight
+        is Crop -> this.crop
+        is Pest -> this.pest
+    }
 }
 
 val EliteLeaderboardType.pest: PestType?

@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.config.features.garden.leaderboards
+package at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.types
 
-import at.hannibal2.skyhanni.features.garden.pests.PestType
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.PestTypeWithAll
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.reflect.KProperty0
 
-class PestRankGoalsConfig {
+class PestTypeRankGoalsConfig: TypeRankGoalGenericConfig<PestTypeWithAll>() {
     @Expose
     @ConfigOption(name = "All pests", desc = "")
     @ConfigEditorText
@@ -68,18 +68,18 @@ class PestRankGoalsConfig {
     @ConfigEditorText
     val slug: Property<String> = Property.of("10000")
 
-    fun getGoal(type: PestType?): KProperty0<Property<String>> = when (type) {
-        PestType.FLY -> this::fly
-        PestType.CRICKET -> this::cricket
-        PestType.LOCUST -> this::locust
-        PestType.BEETLE -> this::beetle
-        PestType.RAT -> this::rat
-        PestType.EARTHWORM -> this::earthworm
-        PestType.MOTH -> this::moth
-        PestType.MOSQUITO -> this::mosquito
-        PestType.MITE -> this::mite
-        PestType.SLUG -> this::slug
-        PestType.FIELD_MOUSE -> this::fieldMouse
+    override fun getConfig(type: PestTypeWithAll): KProperty0<Property<String>> = when (type) {
+        PestTypeWithAll.FLY -> this::fly
+        PestTypeWithAll.CRICKET -> this::cricket
+        PestTypeWithAll.LOCUST -> this::locust
+        PestTypeWithAll.BEETLE -> this::beetle
+        PestTypeWithAll.RAT -> this::rat
+        PestTypeWithAll.EARTHWORM -> this::earthworm
+        PestTypeWithAll.MOTH -> this::moth
+        PestTypeWithAll.MOSQUITO -> this::mosquito
+        PestTypeWithAll.MITE -> this::mite
+        PestTypeWithAll.SLUG -> this::slug
+        PestTypeWithAll.FIELD_MOUSE -> this::fieldMouse
         else -> this::allPests
     }
 }

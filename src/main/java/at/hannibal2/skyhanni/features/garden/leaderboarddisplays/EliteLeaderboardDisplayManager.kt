@@ -36,9 +36,9 @@ object EliteLeaderboardDisplayManager {
 
     @HandleEvent
     fun onRender(event: GuiRenderEvent) {
-        cropDisplay.renderDisplay(cropConfig.pos)
-        pestDisplay.renderDisplay(pestConfig.pos)
-        weightDisplay.renderDisplay(weightConfig.pos)
+        cropDisplay.renderDisplay(cropConfig.display.pos)
+        pestDisplay.renderDisplay(pestConfig.display.pos)
+        weightDisplay.renderDisplay(weightConfig.display.pos)
     }
 
     fun updateDisplays() {
@@ -61,25 +61,25 @@ object EliteLeaderboardDisplayManager {
     }
 
     fun getRankGoalConfig(leaderboardType: EliteLeaderboardType) = when (leaderboardType) {
-        is EliteLeaderboardType.Pest -> pestConfig.useRankGoal
-        is EliteLeaderboardType.Weight -> weightConfig.useRankGoal
-        is EliteLeaderboardType.Crop -> cropConfig.useRankGoal
+        is EliteLeaderboardType.Pest -> pestConfig.rankGoals.useRankGoal
+        is EliteLeaderboardType.Weight -> weightConfig.rankGoals.useRankGoal
+        is EliteLeaderboardType.Crop -> cropConfig.rankGoals.useRankGoal
     }
 
     private val weightConfigs = listOf(
-        weightConfig.useRankGoal,
-        weightConfig.monthlyWeightRankGoal,
-        weightConfig.weightRankGoal
+        weightConfig.rankGoals.useRankGoal,
+        weightConfig.rankGoals.monthlyRankGoal,
+        weightConfig.rankGoals.rankGoal
     )
 
     private val cropConfigs = listOf(
-        cropConfig.useRankGoal,
-        cropConfig.rankGoalCrops,
+        cropConfig.rankGoals.useRankGoal,
+        cropConfig.rankGoals.rankGoalTypes,
     )
 
     private val pestConfigs = listOf(
-        pestConfig.useRankGoal,
-        pestConfig.rankGoalPests,
+        pestConfig.rankGoals.useRankGoal,
+        pestConfig.rankGoals.rankGoalTypes,
     )
 
     @HandleEvent
