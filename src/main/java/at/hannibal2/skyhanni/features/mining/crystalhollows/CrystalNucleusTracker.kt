@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.BAL_SHARD_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.EPIC_BAL_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JUNGLE_KEY_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.LEGENDARY_BAL_ITEM
@@ -93,6 +95,15 @@ object CrystalNucleusTracker {
             }
             tracker.modify {
                 it.addItem(item, amount = 1, false)
+            }
+        }
+
+        AttributeShardsData.caughtShardsPattern.matchMatcher(event.message) {
+            if (group("shardName") != "Bal") return@matchMatcher
+
+            val amount = group("amount")?.toInt() ?: 1
+            tracker.modify {
+                it.addItem(BAL_SHARD_ITEM, 1, false)
             }
         }
     }
