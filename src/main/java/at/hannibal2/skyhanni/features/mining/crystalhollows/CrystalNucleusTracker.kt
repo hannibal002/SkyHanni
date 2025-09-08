@@ -94,7 +94,7 @@ object CrystalNucleusTracker {
                 else -> return@matchMatcher
             }
             tracker.modify {
-                it.addItem(item, amount = 1, false)
+                it.addItem(item, 1, false)
             }
         }
 
@@ -103,7 +103,7 @@ object CrystalNucleusTracker {
 
             val amount = group("amount")?.toInt() ?: 1
             tracker.modify {
-                it.addItem(BAL_SHARD_ITEM, 1, false)
+                it.addItem(BAL_SHARD_ITEM, amount, false)
             }
         }
     }
