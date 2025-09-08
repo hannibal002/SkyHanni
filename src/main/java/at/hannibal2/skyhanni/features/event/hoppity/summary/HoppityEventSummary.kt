@@ -408,8 +408,7 @@ object HoppityEventSummary {
 
             put(HoppityStat.RABBIT_THE_FISH_FINDS) { statList, stats, _ ->
                 val rabbitTheFishFinds = stats.rabbitTheFishFinds.takeIf { it > 0 } ?: return@put
-                val timesFormat = StringUtils.pluralize(rabbitTheFishFinds, "time")
-                statList.addStr("§7You found §cRabbit the Fish §7in Meal Eggs §b$rabbitTheFishFinds §7$timesFormat.")
+                statList.addStr("§7You found §b$rabbitTheFishFinds §cRabbit the Fish §7in Meal Eggs.")
             }
 
             put(HoppityStat.LEADERBOARD_CHANGE) { statList, stats, _ ->
