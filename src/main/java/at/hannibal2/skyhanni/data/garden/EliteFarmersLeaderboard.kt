@@ -61,6 +61,7 @@ object EliteFarmersLeaderboard {
     private var lastFetchAttempt = SimpleTimeMark.farPast()
 
     fun clearEntries(leaderboardType: EliteLeaderboardType) {
+        rankGoal.remove(leaderboardType)
         nextPlayers.remove(leaderboardType)
         leaderboardPosMap?.remove(leaderboardType)
         shouldRefreshLeaderboard.remove(leaderboardType)
@@ -69,6 +70,7 @@ object EliteFarmersLeaderboard {
     }
 
     fun clearCategories(category: KClass<out EliteLeaderboardType>) {
+        rankGoal.clearCategory(category)
         nextPlayers.clearCategory(category)
         leaderboardPosMap?.clearCategory(category)
         shouldRefreshLeaderboard.clearCategory(category)

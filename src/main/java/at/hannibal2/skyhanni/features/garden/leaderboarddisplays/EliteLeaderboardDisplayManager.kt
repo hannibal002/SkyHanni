@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 
@@ -79,6 +80,7 @@ object EliteLeaderboardDisplayManager {
 
         cropConfigs.forEach {
             it.afterChange {
+                ChatUtils.debug("Change: $it")
                 clearCategories(EliteLeaderboardType.Crop::class)
             }
         }
