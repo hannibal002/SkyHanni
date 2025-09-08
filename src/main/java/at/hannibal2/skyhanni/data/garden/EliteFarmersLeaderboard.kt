@@ -5,7 +5,8 @@ import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardRankConfig
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankFromConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankGoalIfValid
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getFactor
@@ -23,8 +24,6 @@ import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.EliteLeaderboardDisplayManager.getLeaderboardChangeConfig
-import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.EliteLeaderboardDisplayManager.getRankGoalConfig
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -226,7 +225,7 @@ object EliteFarmersLeaderboard {
     }
 
     private fun checkOffScreenLeaderboardChanges(oldPosition: Int?, leaderboardType: EliteLeaderboardType) {
-        if (!getLeaderboardChangeConfig(leaderboardType)) return
+        if (!getLeaderboardConfig(leaderboardType).showLbChange) return
         if (oldPosition == null) return
         val currentPosition = leaderboardPosMap?.get(leaderboardType) ?: return
 
@@ -249,7 +248,7 @@ object EliteFarmersLeaderboard {
         val upcomingPlayers = getUpcomingPlayerCount(currentPos, leaderboardType)
         // Fetch upcoming players from current lb pos if api hasn't updated, or from rank goal
         val rankGoal = getRankGoal(leaderboardType)
-        val useRankGoal = getRankGoalConfig(leaderboardType).get() && rankGoal != null
+        val useRankGoal = getRankConfig(leaderboardType).useRankGoal.get() && rankGoal != null
         val atRank = getAtRank(currentPos, rankGoal, useRankGoal)
 
         val apiData = EliteDevApi.fetchLeaderboardPositions(
@@ -372,7 +371,7 @@ object EliteFarmersLeaderboard {
     }
 
     fun getRankGoal(leaderboardType: EliteLeaderboardType): Int? {
-        val goal = getRankFromConfig(leaderboardType)?.get()?.toIntOrNull() ?: return null
+        val goal = getRankGoalIfValid(leaderboardType)?.get()?.toIntOrNull() ?: return null
 
         val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
 

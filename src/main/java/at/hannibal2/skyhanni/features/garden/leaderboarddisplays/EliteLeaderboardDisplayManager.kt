@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankFromConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardRankConfig
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearEntries
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
@@ -53,19 +53,6 @@ object EliteLeaderboardDisplayManager {
         weightDisplay.reset()
     }
 
-
-    fun getLeaderboardChangeConfig(leaderboardType: EliteLeaderboardType) = when (leaderboardType) {
-        is EliteLeaderboardType.Pest -> pestConfig.showLbChange
-        is EliteLeaderboardType.Weight -> weightConfig.showLbChange
-        is EliteLeaderboardType.Crop -> cropConfig.showLbChange
-    }
-
-    fun getRankGoalConfig(leaderboardType: EliteLeaderboardType) = when (leaderboardType) {
-        is EliteLeaderboardType.Pest -> pestConfig.rankGoals.useRankGoal
-        is EliteLeaderboardType.Weight -> weightConfig.rankGoals.useRankGoal
-        is EliteLeaderboardType.Crop -> cropConfig.rankGoals.useRankGoal
-    }
-
     private val weightConfigs = listOf(
         weightConfig.rankGoals.useRankGoal,
         weightConfig.rankGoals.monthlyRankGoal,
@@ -105,7 +92,7 @@ object EliteLeaderboardDisplayManager {
         for (crop in CropType.entries) {
             for (mode in EliteLeaderboardMode.entries) {
                 val leaderboardType = EliteLeaderboardType.Crop(crop, mode)
-                ConditionalUtils.onToggle(getRankFromConfig(leaderboardType) ?: continue) {
+                ConditionalUtils.onToggle(getLeaderboardRankConfig(leaderboardType)?.get() ?: continue) {
                     clearEntries(leaderboardType)
                 }
             }
@@ -114,7 +101,7 @@ object EliteLeaderboardDisplayManager {
         for (pest in (PestType.entries + null)) {
             for (mode in EliteLeaderboardMode.entries) {
                 val leaderboardType = EliteLeaderboardType.Pest(pest, mode)
-                ConditionalUtils.onToggle(getRankFromConfig(leaderboardType) ?: continue) {
+                ConditionalUtils.onToggle(getLeaderboardRankConfig(leaderboardType)?.get() ?: continue) {
                     clearEntries(leaderboardType)
                 }
             }

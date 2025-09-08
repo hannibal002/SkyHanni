@@ -129,8 +129,6 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     fun overtakeRenderable(leaderboardType: EliteLeaderboardType, getLastPlayer: Boolean = false): Renderable {
         val next: Pair<String, Double>? = if (getLastPlayer) getLastPlayer(leaderboardType) else getNextPlayer(leaderboardType)
 
-
-
         val rankGoal = getRankGoal(leaderboardType)
         val useRankGoal = useEtaGoalRank() && rankGoal != null
         if (useRankGoal && getLastPlayer) return Renderable.empty()

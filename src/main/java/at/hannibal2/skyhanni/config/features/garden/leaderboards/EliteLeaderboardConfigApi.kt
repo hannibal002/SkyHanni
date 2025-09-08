@@ -31,8 +31,12 @@ object EliteLeaderboardConfigApi {
             else -> null
         }
 
-    fun getRankFromConfig(leaderboardType: EliteLeaderboardType): Property<String>? =
-        getLeaderboardRankConfig(leaderboardType)?.get()
+    fun getRankGoalIfValid(leaderboardType: EliteLeaderboardType): Property<String>? {
+        val config = getRankConfig(leaderboardType)
+        if (!config.useRankGoal.get()) return null
+        if (config is MultipleTypeRankGoalConfig<*, *> && leaderboardType.type !in config.rankGoalTypes.get()) return null
+        return getLeaderboardRankConfig(leaderboardType)?.get()
+    }
 
     fun getLeaderboardRankConfig(leaderboardType: EliteLeaderboardType): KProperty0<Property<String>>? =
         when (val config = getRankConfig(leaderboardType)) {
