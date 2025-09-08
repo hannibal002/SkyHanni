@@ -41,7 +41,11 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object EliteFarmersLeaderboard {
-    val loadingLeaderboardMutex = Mutex()
+    val loadingLeaderboardMutex = mutableMapOf<KClass<out EliteLeaderboardType>, Mutex>(
+        EliteLeaderboardType.Crop::class to Mutex(),
+        EliteLeaderboardType.Weight::class to Mutex(),
+        EliteLeaderboardType.Pest::class to Mutex()
+    )
     private val storage get() = GardenApi.storage?.farmingWeight
     private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardPosMap
     private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double>? get() = storage?.leaderboardAmountMap
@@ -203,13 +207,13 @@ object EliteFarmersLeaderboard {
     }
 
     private fun loadLeaderboardIfAble(leaderboardType: EliteLeaderboardType): Int? {
-        if (loadingLeaderboardMutex.isLocked) return null
+        if (loadingLeaderboardMutex[leaderboardType::class]?.isLocked == true) return null
         if (profileId == "") updateCollections()
 
         val category = leaderboardType::class
 
         SkyHanniMod.launchIOCoroutine {
-            loadingLeaderboardMutex.withLock {
+            loadingLeaderboardMutex[leaderboardType::class]?.withLock {
                 val oldPos = leaderboardPosMap?.get(leaderboardType)
                 val lbPos = loadLeaderboardPosition(leaderboardType)
                 lbPos?.let {

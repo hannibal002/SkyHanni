@@ -118,7 +118,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
             "Loading..."
         }
 
-        val leaderboardPos = getLeaderboardFormat()
+        val leaderboardPos = getLeaderboardFormat(leaderboardType)
         return Renderable.clickable(
             "§6$leaderboardType§7: §e$amountText$leaderboardPos",
             tips = listOf("§eClick to open your Farming Profile."),
@@ -126,7 +126,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         )
     }
 
-    fun overtakeRenderable(leaderboardType: EliteLeaderboardType, getLastPlayer: Boolean = false): Renderable {
+    private fun overtakeRenderable(leaderboardType: EliteLeaderboardType, getLastPlayer: Boolean = false): Renderable {
         val next: Pair<String, Double>? = if (getLastPlayer) getLastPlayer(leaderboardType) else getNextPlayer(leaderboardType)
 
         val rankGoal = getRankGoal(leaderboardType)
@@ -195,9 +195,11 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
 
     private fun showLeaderboard(): Boolean = config?.display?.leaderboard?.get() ?: false
 
-    private fun getLeaderboardFormat(): String {
+    private fun getLeaderboardFormat(leaderboardType: EliteLeaderboardType): String {
         if (!showLeaderboard()) return ""
-        val format = leaderboardPos?.addSeparators() ?: return if (loadingLeaderboardMutex.isLocked) " §7[§b#?§7]" else ""
+        val format = leaderboardPos?.addSeparators() ?: run {
+            return if (loadingLeaderboardMutex[leaderboardType::class]?.isLocked == true) " §7[§b#?§7]" else ""
+        }
         return " §7[§b#$format§7]"
     }
 

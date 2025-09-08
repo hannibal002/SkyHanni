@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getConfigFromClass
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardRankConfig
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearEntries
@@ -54,24 +55,24 @@ object EliteLeaderboardDisplayManager {
         weightDisplay.reset()
     }
 
-    private val weightConfigs = listOf(
-        weightConfig.rankGoals.useRankGoal,
-        weightConfig.rankGoals.monthlyRankGoal,
-        weightConfig.rankGoals.rankGoal
-    )
-
-    private val cropConfigs = listOf(
-        cropConfig.rankGoals.useRankGoal,
-        cropConfig.rankGoals.rankGoalTypes,
-    )
-
-    private val pestConfigs = listOf(
-        pestConfig.rankGoals.useRankGoal,
-        pestConfig.rankGoals.rankGoalTypes,
-    )
-
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
+        val weightConfigs = listOf(
+            weightConfig.rankGoals.useRankGoal,
+            weightConfig.rankGoals.monthlyRankGoal,
+            weightConfig.rankGoals.rankGoal
+        )
+
+        val cropConfigs = listOf(
+            cropConfig.rankGoals.useRankGoal,
+            cropConfig.rankGoals.rankGoalTypes,
+        )
+
+        val pestConfigs = listOf(
+            pestConfig.rankGoals.useRankGoal,
+            pestConfig.rankGoals.rankGoalTypes,
+        )
+
         weightConfigs.forEach {
             it.afterChange {
                 clearCategories(EliteLeaderboardType.Weight::class)
@@ -80,7 +81,6 @@ object EliteLeaderboardDisplayManager {
 
         cropConfigs.forEach {
             it.afterChange {
-                ChatUtils.debug("Change: $it")
                 clearCategories(EliteLeaderboardType.Crop::class)
             }
         }
