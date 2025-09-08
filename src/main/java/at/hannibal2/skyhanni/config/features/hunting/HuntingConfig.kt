@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
@@ -28,6 +29,11 @@ class HuntingConfig {
     @OnlyLegacy
     @ConfigEditorInfoText
     var notice: String = ""
+
+    @Expose
+    @ConfigOption(name = "Hunting Profit Tracker", desc = "")
+    @Accordion
+    val huntingProfitTracker: HuntingProfitTrackerConfig = HuntingProfitTrackerConfig()
 
     @Expose
     @OnlyModern
