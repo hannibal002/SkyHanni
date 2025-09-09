@@ -136,7 +136,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
                         Renderable.text("§aNo changes found", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
                     } else if (!ChangelogViewer.shouldShowBeta) {
                         Renderable.text(
-                            "§aOnly Betas where added, turn on \"Include Betas\"",
+                            "§aNo Full Releases in specified interval, modify the search or turn on \"Include Betas\"",
                             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                         )
                     } else {
