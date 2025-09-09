@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.summonings
+package at.hannibal2.skyhanni.features.summonings import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -15,15 +15,15 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import net.minecraft.entity.EntityLiving
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.mob.MobEntity
+import net.minecraft.entity.decoration.ArmorStandEntity
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object SummoningSoulsName {
 
     private val SUMMONING_SOUL_TEXTURE by lazy { SkullTextureHolder.getTexture("SUMMONING_SOUL") }
-    private val souls = mutableMapOf<EntityArmorStand, String>()
+    private val souls = mutableMapOf<ArmorStandEntity, String>()
     private val mobsLastLocation = TimeLimitedCache<Int, LorenzVec>(6.minutes)
     private val mobsName = TimeLimitedCache<Int, String>(6.minutes)
 
@@ -36,7 +36,7 @@ object SummoningSoulsName {
     }
 
     private fun check() {
-        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
+        for (entity in EntityUtils.getEntities<ArmorStandEntity>()) {
             if (entity in souls) continue
 
             if (!entity.wearingSkullTexture(SUMMONING_SOUL_TEXTURE)) continue
@@ -53,16 +53,16 @@ object SummoningSoulsName {
             }
         }
 
-        for (entity in EntityUtils.getEntities<EntityLiving>()) {
-            val id = entity.entityId
+        for (entity in EntityUtils.getEntities<MobEntity>()) {
+            val id = entity.id
             val consumer = entity.getNameTagWith(2, "§c❤")
-            if (consumer != null && !consumer.name.contains("§e0")) {
+            if (consumer != null && !consumer.name.formattedTextCompatLessResets().contains("§e0")) {
                 mobsLastLocation[id] = entity.getLorenzVec()
-                mobsName[id] = consumer.name
+                mobsName[id] = consumer.name.formattedTextCompatLessResets()
             }
         }
 
-        val entityList = EntityUtils.getEntities<EntityArmorStand>()
+        val entityList = EntityUtils.getEntities<ArmorStandEntity>()
         souls.keys.removeIf { it !in entityList }
         // TODO fix overhead!
 //        mobs.keys.removeIf { it !in world.loadedEntityList }

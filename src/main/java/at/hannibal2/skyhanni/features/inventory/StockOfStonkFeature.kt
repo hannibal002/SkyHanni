@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -75,7 +75,7 @@ object StockOfStonkFeature {
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-        if (!itemPattern.matches(event.itemStack.displayName)) return
+        if (!itemPattern.matches(event.itemStack.name.formattedTextCompatLeadingWhiteLessResets())) return
         var stonksReward = 0
         var index = 0
         var bestValueIndex = 0

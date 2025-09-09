@@ -12,14 +12,14 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import net.minecraft.entity.Entity
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.math.Box
 
 @SkyHanniModule
 object TubulatorParkour {
 
     private val config get() = RiftApi.config.area.mirrorverse.tubulatorConfig
     private var parkourHelper: ParkourHelper? = null
-    private val puzzleRoom = AxisAlignedBB(-298.0, 0.0, -112.0, -309.0, 63.0, -101.0)
+    private val puzzleRoom = Box(-298.0, 0.0, -112.0, -309.0, 63.0, -101.0)
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {

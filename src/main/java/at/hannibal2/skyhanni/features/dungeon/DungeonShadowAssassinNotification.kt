@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SoundUtils
 //#if MC < 1.16
-import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket
-import net.minecraft.network.play.server.S44PacketWorldBorder
+//$$ import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket
+//$$ import net.minecraft.network.play.server.S44PacketWorldBorder
 //#else
-//$$ import net.minecraft.network.packet.s2c.play.WorldBorderInitializeS2CPacket
+import net.minecraft.network.packet.s2c.play.WorldBorderInitializeS2CPacket
 //#endif
 
 @SkyHanniModule
@@ -25,11 +25,11 @@ object DungeonShadowAssassinNotification {
         if (DungeonApi.dungeonFloor?.contains("3") == true && DungeonApi.inBossRoom) return
 
         //#if MC < 1.16
-        val packet = event.packet as? AccessorWorldBorderPacket ?: return
-        val action = packet.action
-        if (action != S44PacketWorldBorder.Action.INITIALIZE) return
+        //$$ val packet = event.packet as? AccessorWorldBorderPacket ?: return
+        //$$ val action = packet.action
+        //$$ if (action != S44PacketWorldBorder.Action.INITIALIZE) return
         //#else
-        //$$ val packet = event.packet as? WorldBorderInitializeS2CPacket ?: return
+        val packet = event.packet as? WorldBorderInitializeS2CPacket ?: return
         //#endif
         val warningTime = packet.warningTime
 

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.skyhanni.mixins.hooks import at.hannibal2.skyhanni.utils.compat.container
 
 import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.data.GuiData
@@ -8,30 +8,30 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import net.minecraft.client.gui.DrawContext
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NEUApi
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.inventory.Container
-import net.minecraft.inventory.Slot
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import net.minecraft.screen.ScreenHandler
+import net.minecraft.screen.slot.Slot
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 
 class GuiContainerHook(guiAny: Any) {
 
-    private val gui: GuiContainer = guiAny as GuiContainer
-    private val container: Container
+    private val gui: SkyHanniGuiContainer = guiAny as SkyHanniGuiContainer
+    private val container: ScreenHandler
         get() =
             //#if MC < 1.16
-            gui.inventorySlots
+            //$$ gui.inventorySlots
     //#else
-    //$$ gui.menu
+    gui.screenHandler
     //#endif
 
     //#if MC < 1.21
-    fun closeWindowPressed(ci: CallbackInfo) {
+    //$$ fun closeWindowPressed(ci: CallbackInfo) {
         //#else
-        //$$ fun closeWindowPressed(ci: org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Boolean>) {
+        fun closeWindowPressed(ci: org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Boolean>) {
         //#endif
         if (CloseWindowEvent(gui, container).post()) ci.cancel()
     }
@@ -87,7 +87,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
-        val item = container.inventory?.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
+        val item = container.stacks?.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
         if (SlotClickEvent(gui, container, item, slot, slotId, clickedButton, ClickType.getTypeById(clickType)).post()
         ) ci.cancel()
     }

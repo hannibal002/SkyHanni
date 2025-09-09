@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.Slot;
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer;
+import net.minecraft.screen.slot.Slot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(GuiContainer.class)
+@Mixin(SkyHanniGuiContainer.class)
 public interface AccessorGuiContainer {
 
     @Accessor("guiLeft")

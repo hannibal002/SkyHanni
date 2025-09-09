@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.everywhere
+package at.hannibal2.skyhanni.features.rift.everywhere import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -31,9 +31,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.inventory.ContainerChest
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.inventory.SimpleInventory
+import net.minecraft.screen.GenericContainerScreenHandler
 
 @SkyHanniModule
 object EnigmaSoulWaypoints {
@@ -97,7 +97,7 @@ object EnigmaSoulWaypoints {
         if (!isEnabled()) return
 
         if (inventoryUnfound.isEmpty()) return
-        if (event.inventory is ContainerLocalMenu && inInventory && event.slot == 31) {
+        if (event.inventory is SimpleInventory && inInventory && event.slot == 31) {
             event.replace(item)
         }
     }
@@ -111,7 +111,7 @@ object EnigmaSoulWaypoints {
         for (stack in event.inventoryItems.values) {
             stack.getLore().lastOrNull()?.let {
                 if (notCompletedPattern.matches(it.removeColor())) {
-                    enigmaTitlePattern.matchMatcher(stack.displayName.removeColor()) {
+                    enigmaTitlePattern.matchMatcher(stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
                         inventoryUnfound.add(group("name"))
                     }
                 }
@@ -148,7 +148,7 @@ object EnigmaSoulWaypoints {
 
         if (event.slot?.stack == null) return
 
-        val name = enigmaTitlePattern.matchMatcher(event.slot.stack.displayName.removeColor()) {
+        val name = enigmaTitlePattern.matchMatcher(event.slot.stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
             group("name")
         } ?: return
         event.makePickblock()
@@ -184,21 +184,21 @@ object EnigmaSoulWaypoints {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
 
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is GenericContainerScreen) return
+        val chest = event.container as GenericContainerScreenHandler
 
         val area = getSelectedArea() ?: return
         val tracked = trackedSouls[area] ?: return
 
         for ((slot, stack) in chest.getAllItems()) {
-            enigmaTitlePattern.matchMatcher(stack.displayName.removeColor()) {
+            enigmaTitlePattern.matchMatcher(stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
                 if (group("name") in tracked) {
                     slot.highlight(LorenzColor.DARK_PURPLE)
                 }
             }
         }
         if (!adding) {
-            chest.inventorySlots[31].highlight(LorenzColor.DARK_PURPLE)
+            chest.slots[31].highlight(LorenzColor.DARK_PURPLE)
         }
     }
 

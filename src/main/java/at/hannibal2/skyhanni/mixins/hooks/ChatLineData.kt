@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import net.minecraft.util.IChatComponent
+import net.minecraft.text.Text
 
 interface ChatLineData {
     @Suppress("VariableNaming", "PropertyName")
-    var skyHanni_fullComponent: IChatComponent
+    var skyHanni_fullComponent: Text
 }

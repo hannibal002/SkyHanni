@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import net.minecraft.entity.Entity
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.item.EntityItemFrame
+import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.entity.decoration.ItemFrameEntity
 import java.awt.Color
 
 class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity>?) : SkyHanniEvent() {
@@ -98,7 +98,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
         entitiesToChooseFrom = HashSet(entities.size)
         // Only consider entities that aren't invisible armorstands to increase FPS significantly
         for (entity in entities) {
-            if (!(entity is EntityArmorStand && entity.isInvisible) && entity !is EntityItemFrame) {
+            if (!(entity is ArmorStandEntity && entity.isInvisible) && entity !is ItemFrameEntity) {
                 entitiesToChooseFrom!!.add(entity)
             }
         }

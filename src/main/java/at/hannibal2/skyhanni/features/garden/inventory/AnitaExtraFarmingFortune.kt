@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.inventory
+package at.hannibal2.skyhanni.features.garden.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -40,7 +40,7 @@ object AnitaExtraFarmingFortune {
 
         if (InventoryUtils.openInventoryName() != "Anita") return
 
-        if (!event.itemStack.displayName.contains("Extra Farming Fortune")) return
+        if (!event.itemStack.name.formattedTextCompatLeadingWhiteLessResets().contains("Extra Farming Fortune")) return
 
         val anitaUpgrade = GardenApi.storage?.fortune?.anitaUpgrade ?: return
 

@@ -25,11 +25,11 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.network.play.server.S0EPacketSpawnObject
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
+import net.minecraft.particle.ParticleTypes
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.12
-//$$ import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
+import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
 //#endif
 
 @SkyHanniModule
@@ -88,10 +88,10 @@ object PestParticleWaypoint {
     }
 
     private fun ReceiveParticleEvent.isEnchantmentTable(): Boolean =
-        type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 10 && speed == -2f && offset.isZero()
+        type == ParticleTypes.ENCHANT && count == 10 && speed == -2f && offset.isZero()
 
     private fun ReceiveParticleEvent.isVillagerAngry(): Boolean =
-        type == EnumParticleTypes.VILLAGER_ANGRY && count == 1 && speed == 0f && offset.isZero()
+        type == ParticleTypes.ANGRY_VILLAGER && count == 1 && speed == 0f && offset.isZero()
 
     @HandleEvent
     fun onWorldChange() = reset()
@@ -106,15 +106,15 @@ object PestParticleWaypoint {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onFireWorkSpawn(event: PacketReceivedEvent) {
         //#if MC < 1.12
-        val packet = event.packet as? S0EPacketSpawnObject ?: return
+        //$$ val packet = event.packet as? S0EPacketSpawnObject ?: return
         //#else
-        //$$ val packet = event.packet as? ParticleS2CPacket ?: return
+        val packet = event.packet as? ParticleS2CPacket ?: return
         //#endif
         if (!config.hideParticles) return
         //#if MC < 1.12
-        if (packet.type == FIREWORK_ID) event.cancel()
+        //$$ if (packet.type == FIREWORK_ID) event.cancel()
         //#else
-        //$$ if (packet.parameters == ParticleTypes.FIREWORK) event.cancel()
+        if (packet.parameters == ParticleTypes.FIREWORK) event.cancel()
         //#endif
     }
 

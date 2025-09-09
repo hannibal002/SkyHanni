@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
@@ -30,7 +30,7 @@ import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
-import net.minecraft.init.Blocks
+import net.minecraft.block.Blocks
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import java.util.NavigableMap
@@ -69,7 +69,7 @@ object NeuItems {
 
     private val fallbackItem by lazy {
         ItemUtils.createItemStack(
-            ItemStack(Blocks.barrier).item,
+            ItemStack(Blocks.BARRIER).item,
             "§cMissing Repo Item",
             "§cYour NEU repo seems to be out of date",
         )
@@ -104,7 +104,7 @@ object NeuItems {
                 ChatUtils.debug("skipped `$this`from readAllNeuItems")
                 return@forEach
             }
-            val cleanName = stack.displayName?.lowercase()?.removePrefix(neuPetLevelRegex)?.takeIf {
+            val cleanName = stack.name.formattedTextCompatLeadingWhiteLessResets()?.lowercase()?.removePrefix(neuPetLevelRegex)?.takeIf {
                 it.isNotEmpty()
             } ?: return@forEach
 
@@ -279,13 +279,13 @@ object NeuItems {
 
     fun neuHasFocus(): Boolean {
         //#if MC < 1.16
-        if (!PlatformUtils.isNeuLoaded()) return false
-        if (AuctionSearchOverlay.shouldReplace()) return true
-        if (BazaarSearchOverlay.shouldReplace()) return true
-        // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
-        // https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/overlays/RecipeSearchOverlay.java
-        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
-        if (NEUOverlay.searchBarHasFocus) return true
+        //$$ if (!PlatformUtils.isNeuLoaded()) return false
+        //$$ if (AuctionSearchOverlay.shouldReplace()) return true
+        //$$ if (BazaarSearchOverlay.shouldReplace()) return true
+        //$$ // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
+        //$$ // https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/overlays/RecipeSearchOverlay.java
+        //$$ if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
+        //$$ if (NEUOverlay.searchBarHasFocus) return true
         //#endif
         return false
     }

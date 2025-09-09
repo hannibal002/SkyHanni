@@ -18,7 +18,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 //#if MC >= 1.21
-//$$ import net.minecraft.client.MinecraftClient
+import net.minecraft.client.MinecraftClient
 //#endif
 
 @SkyHanniModule
@@ -30,46 +30,46 @@ object CurrentPing {
         get() = previousPings.takeIf { it.isNotEmpty() }?.average()?.milliseconds ?: Duration.ZERO
 
     //#if MC < 1.21
-    val previousPings = mutableListOf<Long>()
-
-    private var lastPingTime = SimpleTimeMark.farPast()
-    private var waitingForPacket = false
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onPongPacket(packet: ClientboundPingPacket) {
-        if (!isEnabled()) return
-        waitingForPacket = false
-
-        if (previousPings.size > 5) {
-            previousPings.subList(0, previousPings.size - 5).clear()
-        }
-        previousPings.add(lastPingTime.passedSince().inWholeMilliseconds)
-    }
-
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-        if (!event.repeatSeconds(10)) return
-        if (lastPingTime.passedSince() > 20.seconds) waitingForPacket = false
-        requestPing()
-    }
-
-    private fun requestPing() {
-        if (waitingForPacket || !SkyBlockUtils.onHypixel) return
-        lastPingTime = SimpleTimeMark.now()
-        waitingForPacket = true
-        HypixelEventApi.sendPacket(ServerboundPingPacket())
-    }
-
-    //#else
-    //$$ val previousPings: List<Long>
-    //$$     get() = buildList {
-    //$$         MinecraftClient.getInstance().debugHud.pingLog.let {
-    //$$             for (i in 0..<it.getLength()) {
-    //$$                 add(it.get(i))
-    //$$             }
-    //$$         }
+    //$$ val previousPings = mutableListOf<Long>()
+    //$$
+    //$$ private var lastPingTime = SimpleTimeMark.farPast()
+    //$$ private var waitingForPacket = false
+    //$$
+    //$$ @Suppress("UNUSED_PARAMETER")
+    //$$ fun onPongPacket(packet: ClientboundPingPacket) {
+    //$$     if (!isEnabled()) return
+    //$$     waitingForPacket = false
+    //$$
+    //$$     if (previousPings.size > 5) {
+    //$$         previousPings.subList(0, previousPings.size - 5).clear()
     //$$     }
+    //$$     previousPings.add(lastPingTime.passedSince().inWholeMilliseconds)
+    //$$ }
+    //$$
+    //$$ @HandleEvent
+    //$$ fun onSecondPassed(event: SecondPassedEvent) {
+    //$$     if (!isEnabled()) return
+    //$$     if (!event.repeatSeconds(10)) return
+    //$$     if (lastPingTime.passedSince() > 20.seconds) waitingForPacket = false
+    //$$     requestPing()
+    //$$ }
+    //$$
+    //$$ private fun requestPing() {
+    //$$     if (waitingForPacket || !SkyBlockUtils.onHypixel) return
+    //$$     lastPingTime = SimpleTimeMark.now()
+    //$$     waitingForPacket = true
+    //$$     HypixelEventApi.sendPacket(ServerboundPingPacket())
+    //$$ }
+    //$$
+    //#else
+    val previousPings: List<Long>
+        get() = buildList {
+            MinecraftClient.getInstance().debugHud.pingLog.let {
+                for (i in 0..<it.getLength()) {
+                    add(it.get(i))
+                }
+            }
+        }
     //#endif
 
     fun getFormattedPing(): String =

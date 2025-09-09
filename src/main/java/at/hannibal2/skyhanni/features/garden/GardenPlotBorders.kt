@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -24,11 +24,11 @@ object GardenPlotBorders {
         if (!isEnabled()) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
-        if (event.keyCode == Keyboard.KEY_G && Keyboard.KEY_F3.isKeyHeld()) {
+        if (event.keyCode == GLFW.GLFW_KEY_G && GLFW.GLFW_KEY_F3.isKeyHeld()) {
             timeLastSaved = SimpleTimeMark.now()
             showBorders = !showBorders
         }
-        if (event.keyCode == Keyboard.KEY_F3 && Keyboard.KEY_G.isKeyHeld()) {
+        if (event.keyCode == GLFW.GLFW_KEY_F3 && GLFW.GLFW_KEY_G.isKeyHeld()) {
             timeLastSaved = SimpleTimeMark.now()
             showBorders = !showBorders
         }

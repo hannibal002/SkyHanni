@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.inventory.plots
+package at.hannibal2.skyhanni.features.garden.inventory.plots import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -21,7 +21,7 @@ object GardenNextPlotPrice {
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return
 
-        if (!event.itemStack.displayName.startsWith("§ePlot")) return
+        if (!event.itemStack.name.formattedTextCompatLeadingWhiteLessResets().startsWith("§ePlot")) return
 
         var next = false
         val list = event.toolTip

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.IChatComponent
+import net.minecraft.text.Text
 import java.util.UUID
 
 @SkyHanniModule
@@ -139,7 +139,7 @@ object FriendApi {
         if (!event.message.contains("Friends")) return
 
         for (sibling in event.chatComponent.siblings) {
-            val chatStyle = sibling.chatStyle ?: continue
+            val chatStyle = sibling.style ?: continue
             val value = sibling.command ?: continue
             if (!value.startsWith("/viewprofile")) continue
 
@@ -160,7 +160,7 @@ object FriendApi {
                     }
                 }
             }
-            val bestFriend = sibling.unformattedText.split(" ").firstOrNull()?.contains("§l") ?: false
+            val bestFriend = sibling.unformattedTextCompat().split(" ").firstOrNull()?.contains("§l") ?: false
             val name = readName(sibling)
             if (uuid != null && name != null) {
                 getFriends()[uuid] = Friend().also {
@@ -173,10 +173,10 @@ object FriendApi {
         saveConfig()
     }
 
-    private fun readName(chatComponent: IChatComponent): String? {
+    private fun readName(chatComponent: Text): String? {
         val hoverEventSiblings = chatComponent.hover?.siblings ?: return null
         for (component in hoverEventSiblings) {
-            val rawName = component.unformattedText
+            val rawName = component.unformattedTextCompat()
             rawNamePattern.matchMatcher(rawName) {
                 return group("name").cleanPlayerName()
             }

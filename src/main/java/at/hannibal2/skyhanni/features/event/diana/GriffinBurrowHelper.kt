@@ -46,9 +46,9 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.init.Blocks
-import org.lwjgl.input.Keyboard
+import net.minecraft.client.network.ClientPlayerEntity
+import net.minecraft.block.Blocks
+import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -57,9 +57,9 @@ object GriffinBurrowHelper {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val allowedBlocksAboveGround = buildList {
-        add(Blocks.air)
-        add(Blocks.yellow_flower)
-        add(Blocks.spruce_fence)
+        add(Blocks.AIR)
+        add(Blocks.DANDELION)
+        add(Blocks.SPRUCE_FENCE)
         addLeaves()
         addLeaves2()
         addTallGrass()
@@ -232,7 +232,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<ClientPlayerEntity>) {
         if (!isEnabled()) return
         if (event.distance > 10 && event.isLocalPlayer) {
             update()
@@ -294,7 +294,7 @@ object GriffinBurrowHelper {
 
     private fun findGround(point: LorenzVec): LorenzVec? {
         fun isValidGround(y: Double): Boolean {
-            val isGround = point.copy(y = y).getBlockAt() == Blocks.grass
+            val isGround = point.copy(y = y).getBlockAt() == Blocks.GRASS_BLOCK
             val isValidBlockAbove = point.copy(y = y + 1).getBlockAt() in allowedBlocksAboveGround
             return isGround && isValidBlockAbove
         }
@@ -313,7 +313,7 @@ object GriffinBurrowHelper {
     private fun findBlockBelowAir(point: LorenzVec): LorenzVec {
         val start = 65.0
         var gY = start
-        while (point.copy(y = gY).getBlockAt() != Blocks.air) {
+        while (point.copy(y = gY).getBlockAt() != Blocks.AIR) {
             gY++
             if (gY > 140) {
                 // no blocks at this spot, assuming outside of island
@@ -430,7 +430,7 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
 
         val location = event.position
-        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
+        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.GRASS_BLOCK) return
         removePreciseGuess(location)
 
         if (particleBurrows.containsKey(location)) {
@@ -448,7 +448,7 @@ object GriffinBurrowHelper {
         val warp = BurrowWarpHelper.currentWarp ?: return
 
         val text = "§bWarp to " + warp.displayName
-        val keybindSuffix = if (config.keyBindWarp != Keyboard.KEY_NONE) {
+        val keybindSuffix = if (config.keyBindWarp != GLFW.GLFW_KEY_UNKNOWN) {
             val keyName = KeyboardManager.getKeyName(config.keyBindWarp)
             " §7(§ePress $keyName§7)"
         } else ""

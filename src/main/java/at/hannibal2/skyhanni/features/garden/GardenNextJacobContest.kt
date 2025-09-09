@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.skyhanni.features.garden import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.EliteDevApi
@@ -52,7 +52,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.sync.Mutex
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
@@ -255,7 +255,7 @@ object GardenNextJacobContest {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) return@mapNotNull null
 
-            val day = dayPattern.matchMatcher(item.displayName) {
+            val day = dayPattern.matchMatcher(item.name.formattedTextCompatLeadingWhiteLessResets()) {
                 group("day").toInt()
             } ?: return@mapNotNull null
 
@@ -431,7 +431,7 @@ object GardenNextJacobContest {
         val cropTextNoColor = crops.joinToString(", ") {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
-        if (config.warnPopup && !Minecraft.getMinecraft().inGameHasFocus) {
+        if (config.warnPopup && !MinecraftClient.getInstance().isWindowFocused) {
             SkyHanniMod.launchIOCoroutine {
                 DialogUtils.openPopupWindow(
                     title = "SkyHanni Jacob Contest Notification",

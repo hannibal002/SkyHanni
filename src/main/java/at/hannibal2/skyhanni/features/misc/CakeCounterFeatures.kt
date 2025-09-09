@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
@@ -96,10 +96,10 @@ object CakeCounterFeatures {
     private var lastSoulFoundBySelf = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<EntityArmorStand>) {
+    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<ArmorStandEntity>) {
         val entity = event.entity
-        val name = entity.name
-        val entityId = entity.entityId
+        val name = entity.name.formattedTextCompatLessResets()
+        val entityId = entity.id
 
         if (cakesEatenEntityId == null) {
             cakesEatenPattern.matchMatcher(name) {
@@ -134,13 +134,13 @@ object CakeCounterFeatures {
         }
     }
 
-    private fun checkForSoulsStand(cakesStand: EntityArmorStand) {
+    private fun checkForSoulsStand(cakesStand: ArmorStandEntity) {
         if (soulsFoundEntityId != null) return // in case it was found during DelayedRun time
 
-        val nearbyArmorStands = EntityUtils.getEntitiesNearby<EntityArmorStand>(cakesStand.position.toLorenzVec(), 1.0)
+        val nearbyArmorStands = EntityUtils.getEntitiesNearby<ArmorStandEntity>(cakesStand.blockPos.toLorenzVec(), 1.0)
         soulsStandExists = nearbyArmorStands.any { armorStand ->
-            soulsFoundPattern.matchMatcher(armorStand.name) {
-                soulsFoundEntityId = armorStand.entityId
+            soulsFoundPattern.matchMatcher(armorStand.name.formattedTextCompatLessResets()) {
+                soulsFoundEntityId = armorStand.id
                 ChatUtils.debug("Found \"Souls Found\" entity (from \"Cakes Eaten\" location)")
                 updateSoulsFound()
                 true

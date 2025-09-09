@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.area.westvillage.kloon
+package at.hannibal2.skyhanni.features.rift.area.westvillage.kloon import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -66,7 +66,7 @@ object KloonHacking {
             correctButtons.clear()
             for ((slot, stack) in event.inventoryItems) {
                 if (slot in 2..6) {
-                    correctButtons.add(stack.displayName.removeColor())
+                    correctButtons.add(stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor())
                 }
             }
         }
@@ -87,17 +87,17 @@ object KloonHacking {
             if (!config.solver) return
             var i = 0
             for (slot in InventoryUtils.getItemsInOpenChest()) {
-                if (slot.slotIndex == 11 + 10 * i) {
-                    val correctButton = slot.stack.displayName.removeColor() == correctButtons[i]
+                if (slot.index == 11 + 10 * i) {
+                    val correctButton = slot.stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor() == correctButtons[i]
                     slot.highlight(if (correctButton) LorenzColor.GREEN else LorenzColor.RED)
                     continue
                 }
-                if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18 &&
-                    slot.stack.displayName.removeColor() == correctButtons[i]
+                if (slot.index > i * 9 + 8 && slot.index < i * 9 + 18 &&
+                    slot.stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor() == correctButtons[i]
                 ) {
                     slot.highlight(LorenzColor.YELLOW)
                 }
-                if (slot.slotIndex == i * 9 + 17) {
+                if (slot.index == i * 9 + 17) {
                     i += 1
                 }
             }
@@ -149,7 +149,7 @@ object KloonHacking {
         if (!config.solver) return
 
         val neededTooltips = listOf(0, 2, 3, 4, 5, 6, 8, 9, 26, 27, 44, 45)
-        if (event.slot.slotIndex !in neededTooltips) {
+        if (event.slot.index !in neededTooltips) {
             event.toolTip.clear()
         }
     }

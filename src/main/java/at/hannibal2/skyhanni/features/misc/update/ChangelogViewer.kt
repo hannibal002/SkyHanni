@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.ModVersion
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import java.util.NavigableMap
 import java.util.TreeMap
 
@@ -60,7 +60,7 @@ object ChangelogViewer {
     }
 
     private fun openChangelog() {
-        if (Minecraft.getMinecraft().currentScreen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen = ChangeLogViewerScreen()
+        if (MinecraftClient.getInstance().currentScreen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen = ChangeLogViewerScreen()
     }
 
     private suspend fun getChangelog() {
@@ -131,7 +131,7 @@ object ChangelogViewer {
             description = "Shows the specified changelog. No arguments shows the latest changelog."
             category = CommandCategory.USERS_ACTIVE
             //#if TODO
-            context = { CommandContext() }
+            //$$ context = { CommandContext() }
             //#endif
             specifiers = listOf<CommandArgument<CommandContext>>(
                 CommandArgument(

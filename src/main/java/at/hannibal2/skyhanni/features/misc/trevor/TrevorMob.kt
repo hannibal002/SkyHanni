@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
-import net.minecraft.client.resources.I18n
+import net.minecraft.client.resource.language.I18n
 
 enum class TrevorMob(val mobName: String, val renderDistance: Double) {
     COW("Cow", 68.0),
@@ -13,10 +13,10 @@ enum class TrevorMob(val mobName: String, val renderDistance: Double) {
 
     private val i18n =
         //#if MC < 1.21
-        "entity.$mobName.name"
+        //$$ "entity.$mobName.name"
     //#else
-    //$$ "entity.minecraft.${mobName.lowercase()}"
+    "entity.minecraft.${mobName.lowercase()}"
     //#endif
 
-    val entityName get() = I18n.format(i18n)
+    val entityName get() = I18n.translate(i18n)
 }

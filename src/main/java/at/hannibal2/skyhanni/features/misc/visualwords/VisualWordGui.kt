@@ -24,9 +24,9 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
-import net.minecraft.util.MathHelper
-import org.lwjgl.input.Keyboard
+import net.minecraft.client.MinecraftClient
+import net.minecraft.util.math.MathHelper
+import org.lwjgl.glfw.GLFW
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
@@ -78,7 +78,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             }
         }
 
-        fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
+        fun isInGui() = MinecraftClient.getInstance().currentScreen is VisualWordGui
         var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
         var drawImport = false
 
@@ -254,7 +254,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             if (modifiedWords.isEmpty()) {
                 modifiedWords = ModifyVisualWords.userModifiedWords
                 //#if MC > 1.21
-                //$$ .map { it.toVisualWord() }.toMutableList()
+                .map { it.toVisualWord() }.toMutableList()
                 //#endif
             }
 
@@ -461,7 +461,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
         if (!currentlyEditing) {
-            if (keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_S) {
+            if (keyCode == GLFW.GLFW_KEY_DOWN || keyCode == GLFW.GLFW_KEY_S) {
                 if (KeyboardManager.isModifierKeyDown()) {
                     pageScroll = -(modifiedWords.size * 30 - 100)
                 } else {
@@ -469,7 +469,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 }
                 scrollScreen()
             }
-            if (keyCode == Keyboard.KEY_UP || keyCode == Keyboard.KEY_W) {
+            if (keyCode == GLFW.GLFW_KEY_UP || keyCode == GLFW.GLFW_KEY_W) {
                 if (KeyboardManager.isModifierKeyDown()) {
                     pageScroll = 0
                 } else {
@@ -482,7 +482,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         if (currentTextBox == SelectedTextBox.NONE) return
         if (currentIndex >= modifiedWords.size || currentIndex == -1) return
 
-        if (keyCode == Keyboard.KEY_BACK) {
+        if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             if (currentText.isNotEmpty()) {
                 currentText = if (KeyboardManager.isDeleteLineDown()) ""
                 else if (KeyboardManager.isDeleteWordDown()) {
@@ -546,7 +546,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             pageScroll = 0
         }
 
-        pageScroll = MathHelper.clamp_int(pageScroll, -(modifiedWords.size * 30 - 100), 0)
+        pageScroll = MathHelper.clamp(pageScroll, -(modifiedWords.size * 30 - 100), 0)
         lastMouseScroll = 0
     }
 
@@ -554,7 +554,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
         ModifyVisualWords.userModifiedWords = modifiedWords
         //#if MC > 1.21
-        //$$ .map { VisualWordText.fromVisualWord(it) }.toMutableList()
+        .map { VisualWordText.fromVisualWord(it) }.toMutableList()
         //#endif
         ModifyVisualWords.update()
 

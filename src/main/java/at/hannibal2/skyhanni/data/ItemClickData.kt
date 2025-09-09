@@ -10,13 +10,13 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getUsedItem
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraft.network.play.client.C07PacketPlayerDigging
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraft.network.play.client.C0APacketAnimation
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket
 //#if MC > 1.21
-//$$ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
-//$$ import net.minecraft.util.Hand
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
+import net.minecraft.util.Hand
 //#endif
 
 @SkyHanniModule
@@ -26,18 +26,18 @@ object ItemClickData {
     fun onItemClickSend(event: PacketSentEvent) {
         val packet = event.packet
         val cancelled = when {
-            packet is C08PacketPlayerBlockPlacement -> {
+            packet is PlayerInteractBlockC2SPacket -> {
                 val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post()
                 //#if MC < 1.16
-                val didntMiss = packet.placedBlockDirection != 255
+                //$$ val didntMiss = packet.placedBlockDirection != 255
                 //#else
-                //$$ val didntMiss = !packet.blockHitResult.missed
+                val didntMiss = !packet.blockHitResult.missed
                 //#endif
                 if (didntMiss) {
                     //#if MC < 1.16
-                    val position = packet.position.toLorenzVec()
+                    //$$ val position = packet.position.toLorenzVec()
                     //#else
-                    //$$ val position = packet.blockHitResult.blockPos.toLorenzVec()
+                    val position = packet.blockHitResult.blockPos.toLorenzVec()
                     //#endif
                     BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.getUsedItem()).post() || clickCancelled
                 } else {
@@ -46,44 +46,44 @@ object ItemClickData {
             }
 
             //#if MC > 1.21
-            //$$ packet is PlayerInteractItemC2SPacket -> {
-            //$$     ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post()
-            //$$ }
+            packet is PlayerInteractItemC2SPacket -> {
+                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post()
+            }
             //#endif
 
             //#if MC < 1.21
-            // MixinClientPlayerInteractionManager posts this on 1.21
-            packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK -> {
-                val position = packet.position.toLorenzVec()
-                val blockClickCancelled =
-                    BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).post()
-                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).also {
-                    if (blockClickCancelled) it.cancel()
-                }.post()
-            }
+            //$$ // MixinClientPlayerInteractionManager posts this on 1.21
+            //$$ packet is PlayerActionC2SPacket && packet.action == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK -> {
+            //$$     val position = packet.pos.toLorenzVec()
+            //$$     val blockClickCancelled =
+            //$$         BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).post()
+            //$$     ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).also {
+            //$$         if (blockClickCancelled) it.cancel()
+            //$$     }.post()
+            //$$ }
             //#endif
 
-            packet is C0APacketAnimation -> {
+            packet is HandSwingC2SPacket -> {
                 ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
             }
 
-            packet is C02PacketUseEntity -> {
-                val clickType = when (packet.action) {
-                    C02PacketUseEntity.Action.INTERACT -> ClickType.RIGHT_CLICK
-                    C02PacketUseEntity.Action.ATTACK -> ClickType.LEFT_CLICK
-                    C02PacketUseEntity.Action.INTERACT_AT -> ClickType.RIGHT_CLICK
+            packet is PlayerInteractEntityC2SPacket -> {
+                val clickType = when (packet.type.getType()) {
+                    PlayerInteractEntityC2SPacket.InteractType.INTERACT -> ClickType.RIGHT_CLICK
+                    PlayerInteractEntityC2SPacket.InteractType.ATTACK -> ClickType.LEFT_CLICK
+                    PlayerInteractEntityC2SPacket.InteractType.INTERACT_AT -> ClickType.RIGHT_CLICK
                     else -> return
                 }
                 //#if MC < 1.21
-                val clickedEntity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
+                //$$ val clickedEntity = packet.getEntity(MinecraftCompat.localWorld) ?: return
                 //#else
-                //$$ if (packet.type is PlayerInteractEntityC2SPacket.InteractHandler) {
-                //$$     if ((packet.type as PlayerInteractEntityC2SPacket.InteractHandler).hand == Hand.OFF_HAND) return
-                //$$ }
-                //$$ val world = MinecraftCompat.localPlayer.world
-                //$$ val clickedEntity = world.getEntityById(packet.entityId) ?: return
+                if (packet.type is PlayerInteractEntityC2SPacket.InteractHandler) {
+                    if ((packet.type as PlayerInteractEntityC2SPacket.InteractHandler).hand == Hand.OFF_HAND) return
+                }
+                val world = MinecraftCompat.localPlayer.world
+                val clickedEntity = world.getEntityById(packet.entityId) ?: return
                 //#endif
-                EntityClickEvent(clickType, packet.action, clickedEntity, InventoryUtils.getItemInHand()).post()
+                EntityClickEvent(clickType, packet.type.getType(), clickedEntity, InventoryUtils.getItemInHand()).post()
             }
 
             else -> {

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.skyhanni.features.garden import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -26,8 +26,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.client.network.ClientPlayerEntity
+import net.minecraft.util.math.Box
 import java.awt.Color
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -114,7 +114,7 @@ object GardenPlotApi {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+    class Plot(val id: Int, var inventorySlot: Int, val box: Box, val middle: LorenzVec)
 
     private var currentPlot: Plot? = null
 
@@ -350,11 +350,11 @@ object GardenPlotApi {
         for (plot in plots) {
             val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
             val lore = itemStack.getLore()
-            plotNamePattern.matchMatcher(itemStack.displayName) {
+            plotNamePattern.matchMatcher(itemStack.name.formattedTextCompatLeadingWhiteLessResets()) {
                 val plotName = group("name")
                 plot.name = plotName
             }
-            barnNamePattern.matchMatcher(itemStack.displayName) {
+            barnNamePattern.matchMatcher(itemStack.name.formattedTextCompatLeadingWhiteLessResets()) {
                 plot.name = group("name")
             }
             plot.locked = false
@@ -430,7 +430,7 @@ object GardenPlotApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<ClientPlayerEntity>) {
         if (event.isLocalPlayer) {
             DelayedRun.runDelayed(.5.seconds) {
                 checkCurrentPlot()

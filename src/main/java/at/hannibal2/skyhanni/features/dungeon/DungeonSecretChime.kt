@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.skyhanni.features.dungeon import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import net.minecraft.entity.item.EntityItem
+import net.minecraft.entity.ItemEntity
 
 @SkyHanniModule
 object DungeonSecretChime {
@@ -42,9 +42,9 @@ object DungeonSecretChime {
     }
 
     @HandleEvent
-    fun onItemPickup(event: EntityRemovedEvent<EntityItem>) {
+    fun onItemPickup(event: EntityRemovedEvent<ItemEntity>) {
         if (!isEnabled()) return
-        val itemName = event.entity.entityItem.displayName
+        val itemName = event.entity.stack.name.formattedTextCompatLeadingWhiteLessResets()
         if (NeuInternalName.fromItemName(itemName) in dungeonSecretItems) {
             playSound()
         }

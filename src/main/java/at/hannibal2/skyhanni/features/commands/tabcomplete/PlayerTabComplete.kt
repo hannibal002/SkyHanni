@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.commands.tabcomplete
+package at.hannibal2.skyhanni.features.commands.tabcomplete import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -23,7 +23,7 @@ object PlayerTabComplete {
     private val partyMembersEntry = lazyEntry { PartyApi.partyMembers }
     private val guildMembersEntry = lazyEntry { GuildApi.getAllMembers() }
     private val vipVisitsEntry = lazyEntry { vipVisits }
-    private val islandPlayersEntry = lazyEntry { EntityUtils.getPlayerEntities().map { it.name } }
+    private val islandPlayersEntry = lazyEntry { EntityUtils.getPlayerEntities().map { it.name.formattedTextCompatLessResets() } }
 
     private val suggestions = SuggestionProvider.build {
         parent("f", "friend") {
@@ -88,7 +88,7 @@ object PlayerTabComplete {
             addAll(FriendApi.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }.map { it.name })
         }
         if (config.islandPlayers && PlayerCategory.ISLAND_PLAYERS !in categories) {
-            addAll(EntityUtils.getPlayerEntities().map { it.name })
+            addAll(EntityUtils.getPlayerEntities().map { it.name.formattedTextCompatLessResets() })
         }
         if (config.party && PlayerCategory.PARTY !in categories) {
             addAll(PartyApi.partyMembers)

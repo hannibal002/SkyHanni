@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.hypixel.chat
+package at.hannibal2.skyhanni.data.hypixel.chat import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat import at.hannibal2.skyhanni.utils.compat.returnThis
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -34,8 +34,8 @@ import at.hannibal2.skyhanni.utils.compat.changeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
-import net.minecraft.util.EnumChatFormatting
-import net.minecraft.util.IChatComponent
+import net.minecraft.util.Formatting
+import net.minecraft.text.Text
 
 /**
  * Listening to the player chat events, and applying custom chat options to them.
@@ -171,10 +171,10 @@ object PlayerNameFormatter {
         guildRank: ComponentSpan? = null,
         privateIslandRank: ComponentSpan? = null,
         privateIslandGuest: ComponentSpan? = null,
-    ): IChatComponent {
+    ): Text {
         var cleanAuthor = cleanAuthor(author)
 
-        var emblemFormat: IChatComponent? = null
+        var emblemFormat: Text? = null
         emblemPattern.matchStyledMatcher(author) {
             emblemFormat = componentOrThrow("emblem")
             cleanAuthor = groupOrThrow("author").stripHypixelMessage()
@@ -194,7 +194,7 @@ object PlayerNameFormatter {
             listOf(faction, ironman, bingo)
         } ?: listOf(null, null, null)
 
-        val map = mutableMapOf<PlayerMessagesConfig.MessagePart, IChatComponent?>()
+        val map = mutableMapOf<PlayerMessagesConfig.MessagePart, Text?>()
         map[PlayerMessagesConfig.MessagePart.SKYBLOCK_LEVEL] = levelFormat
         map[PlayerMessagesConfig.MessagePart.EMBLEM] = emblemFormat
         map[PlayerMessagesConfig.MessagePart.PLAYER_NAME] = name.intoComponent()
@@ -211,7 +211,7 @@ object PlayerNameFormatter {
             if (first) {
                 first = false
             } else {
-                if (!all.unformattedText.endsWith(" ")) {
+                if (!all.unformattedTextCompat().endsWith(" ")) {
                     all.appendString(" ")
                 }
             }
@@ -221,7 +221,7 @@ object PlayerNameFormatter {
         return all
     }
 
-    private fun formatLevel(rawColor: String?, rawLevel: ComponentSpan?): IChatComponent? {
+    private fun formatLevel(rawColor: String?, rawLevel: ComponentSpan?): Text? {
         val color = rawColor ?: return null
         val level = rawLevel?.getText() ?: error("level is null, color is not null")
         val levelData = "$color$level"
@@ -258,23 +258,23 @@ object PlayerNameFormatter {
     ): ComponentSpan = when {
         MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
             (MarkedPlayerManager.replaceInChat(rankColor + removeColor)).asComponent()
-                .setChatStyle(name.sampleStyleAtStart()).intoSpan()
+                .setStyle(name.sampleStyleAtStart()).intoSpan()
 
         levelColor != null && config.useLevelColorForName ->
             (levelColor + removeColor).asComponent()
-                .setChatStyle(name.sampleStyleAtStart())
+                .setStyle(name.sampleStyleAtStart())
                 .intoSpan()
 
         config.playerRankHider ->
             removeColor.asComponent()
-                .setChatStyle(name.sampleStyleAtStart()?.createShallowCopy())
-                .style { color = EnumChatFormatting.AQUA }
+                .setStyle(name.sampleStyleAtStart()?.returnThis())
+                .style { withColor(Formatting.AQUA) }
                 .intoSpan()
 
         else ->
             if (rankColor.isEmpty()) name
             else (rankColor + removeColor).asComponent()
-                .setChatStyle(name.sampleStyleAtStart())
+                .setStyle(name.sampleStyleAtStart())
                 .intoSpan()
     }
 

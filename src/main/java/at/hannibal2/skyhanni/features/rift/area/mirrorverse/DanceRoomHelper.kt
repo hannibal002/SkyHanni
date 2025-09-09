@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.client.network.OtherClientPlayerEntity
+import net.minecraft.util.math.Box
 
 @SkyHanniModule
 object DanceRoomHelper {
@@ -29,7 +29,7 @@ object DanceRoomHelper {
     private val config get() = RiftApi.config.area.mirrorverse.danceRoomHelper
     private var index = 0
     private var found = false
-    private val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
+    private val danceRoom = Box(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
     private var inRoom = false
     private var instructions = emptyList<String>()
     private var countdown: String? = null
@@ -157,7 +157,7 @@ object DanceRoomHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<OtherClientPlayerEntity>) {
         if (config.hidePlayers && inRoom && event.entity.isRealPlayer()) {
             event.cancel()
         }

@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.inventory.Slot
+import net.minecraft.screen.slot.Slot
 import net.minecraft.item.ItemStack
 import java.util.regex.Matcher
 import kotlin.math.pow

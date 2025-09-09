@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.effect
+package at.hannibal2.skyhanni.data.effect import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -285,13 +285,13 @@ object EffectApi {
     private fun InventoryUpdatedEvent.isGodPotEffectsFilterSelect(): Boolean =
         effectsInventoryPattern.matches(this.inventoryName) &&
             this.inventoryItems.values.firstOrNull {
-                filterPattern.matches(it.displayName)
+                filterPattern.matches(it.name.formattedTextCompatLeadingWhiteLessResets())
             }?.getLore()?.any {
                 godPotEffectsFilterSelectPattern.matches(it)
             } ?: false
 
     private fun ItemStack.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
-        displayName.contains(it.inventoryItemName)
+        name.formattedTextCompatLeadingWhiteLessResets().contains(it.inventoryItemName)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

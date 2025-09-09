@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.entity.EntityLiving
+import net.minecraft.entity.mob.MobEntity
 
 @SkyHanniModule
 object HellionShieldHelper {
 
-    val hellionShieldMobs = mutableMapOf<EntityLiving, HellionShield>()
+    val hellionShieldMobs = mutableMapOf<MobEntity, HellionShield>()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -24,7 +24,7 @@ object HellionShieldHelper {
         hellionShieldMobs.clear()
     }
 
-    fun EntityLiving.setHellionShield(shield: HellionShield?) {
+    fun MobEntity.setHellionShield(shield: HellionShield?) {
         if (shield != null) {
             hellionShieldMobs[this] = shield
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(

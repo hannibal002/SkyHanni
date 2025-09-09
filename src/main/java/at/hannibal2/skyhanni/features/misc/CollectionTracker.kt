@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 
 @SkyHanniModule
 object CollectionTracker {
@@ -107,7 +107,7 @@ object CollectionTracker {
             ChatUtils.userError("Item '$rawName' does not exist!")
             return
         }
-        setNewCollection(foundInternalName, stack.displayName.removeColor())
+        setNewCollection(foundInternalName, stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor())
     }
 
     // TODO repo
@@ -201,7 +201,7 @@ object CollectionTracker {
         if (command != "shtrackcollection") return null
 
         return CollectionApi.collectionValue.keys.mapNotNull { it.getItemStackOrNull() }
-            .map { it.displayName.removeColor().replace(" ", "_") }
+            .map { it.name.formattedTextCompatLeadingWhiteLessResets().removeColor().replace(" ", "_") }
     }
 
     @HandleEvent
@@ -212,7 +212,7 @@ object CollectionTracker {
 
     private fun compareInventory() {
         if (lastAmountInInventory == -1) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (MinecraftClient.getInstance().currentScreen != null) return
 
         val currentlyInInventory = countCurrentlyInInventory()
         val diff = currentlyInInventory - lastAmountInInventory

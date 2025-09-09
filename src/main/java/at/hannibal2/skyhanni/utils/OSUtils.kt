@@ -11,7 +11,7 @@ import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import kotlin.time.Duration
 //#if MC > 1.21
-//$$ import net.minecraft.util.Util
+import net.minecraft.util.Util
 //#endif
 
 object OSUtils {
@@ -54,29 +54,29 @@ object OSUtils {
     @JvmStatic
     fun openBrowser(url: String) {
         //#if MC < 1.21
-        val desktopSupported = Desktop.isDesktopSupported()
-        val supportedActionBrowse = Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)
-        if (desktopSupported && supportedActionBrowse) {
-            try {
-                Desktop.getDesktop().browse(URI(url))
-            } catch (e: IOException) {
-                ErrorManager.logErrorWithData(
-                    e,
-                    "Error while opening website.",
-                    "url" to url,
-                )
-            }
-        } else {
-            copyToClipboard(url)
-            ErrorManager.logErrorStateWithData(
-                "Cannot open website! Copied url to clipboard instead", "Web browser is not supported",
-                "url" to url,
-                "desktopSupported" to desktopSupported,
-                "supportedActionBrowse" to supportedActionBrowse,
-            )
-        }
+        //$$ val desktopSupported = Desktop.isDesktopSupported()
+        //$$ val supportedActionBrowse = Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)
+        //$$ if (desktopSupported && supportedActionBrowse) {
+        //$$     try {
+        //$$         Desktop.getDesktop().browse(URI(url))
+        //$$     } catch (e: IOException) {
+        //$$         ErrorManager.logErrorWithData(
+        //$$             e,
+        //$$             "Error while opening website.",
+        //$$             "url" to url,
+        //$$         )
+        //$$     }
+        //$$ } else {
+        //$$     copyToClipboard(url)
+        //$$     ErrorManager.logErrorStateWithData(
+        //$$         "Cannot open website! Copied url to clipboard instead", "Web browser is not supported",
+        //$$         "url" to url,
+        //$$         "desktopSupported" to desktopSupported,
+        //$$         "supportedActionBrowse" to supportedActionBrowse,
+        //$$     )
+        //$$ }
         //#else
-        //$$ Util.getOperatingSystem().open(url)
+        Util.getOperatingSystem().open(url)
         //#endif
     }
 

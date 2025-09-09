@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.combat
+package at.hannibal2.skyhanni.features.combat import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -119,19 +119,19 @@ object InstanceChestProfit {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
             }
-            attributeShardPattern.matchMatcher(it.value.displayName) {
+            attributeShardPattern.matchMatcher(it.value.name.formattedTextCompatLeadingWhiteLessResets()) {
                 val name = group("name")
                 val count = group("count").toInt()
                 val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.displayName, price)
+                itemsWithCost.addOrPut(it.value.name.formattedTextCompatLeadingWhiteLessResets(), price)
             }
-            essencePattern.matchMatcher(it.value.displayName) {
+            essencePattern.matchMatcher(it.value.name.formattedTextCompatLeadingWhiteLessResets()) {
                 val name = group("name")
                 val rawCount = group("count").toInt()
                 val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
                 else rawCount.toDouble()
                 val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.displayName, price)
+                itemsWithCost.addOrPut(it.value.name.formattedTextCompatLeadingWhiteLessResets(), price)
             }
         }
 

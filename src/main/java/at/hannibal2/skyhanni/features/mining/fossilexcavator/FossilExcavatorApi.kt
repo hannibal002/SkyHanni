@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.fossilexcavator
+package at.hannibal2.skyhanni.features.mining.fossilexcavator import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -60,7 +60,7 @@ object FossilExcavatorApi {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inInventory) return
         val slots = InventoryUtils.getItemsInOpenChest()
-        val itemNames = slots.map { it.stack.displayName.removeColor() }
+        val itemNames = slots.map { it.stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor() }
         inExcavatorMenu = itemNames.any { it == "Start Excavator" }
     }
 

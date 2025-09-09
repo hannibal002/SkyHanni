@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.skyhanni.features.dungeon import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -39,9 +39,9 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.network.OtherClientPlayerEntity
 import net.minecraft.entity.Entity
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 
 // TODO replace all drawLineToEye with LineToMobHandler
 
@@ -52,12 +52,12 @@ object DungeonLividFinder {
 
     private val isBlind by RecalculatingValue(2.ticks, ::isCurrentlyBlind)
 
-    var livid: EntityOtherPlayerMP? = null
+    var livid: OtherClientPlayerEntity? = null
         private set
 
-    private var fakeLivids = mutableSetOf<EntityOtherPlayerMP>()
+    private var fakeLivids = mutableSetOf<OtherClientPlayerEntity>()
     private val lividEntities
-        get() = EntityUtils.getEntities<EntityOtherPlayerMP>().filter { it.isNpc() && lividNamePattern.matches(it.name) }.toList()
+        get() = EntityUtils.getEntities<OtherClientPlayerEntity>().filter { it.isNpc() && lividNamePattern.matches(it.name.formattedTextCompatLessResets()) }.toList()
 
     private var color: LorenzColor? = null
     private val lividNameColor = mapOf(
@@ -100,7 +100,7 @@ object DungeonLividFinder {
                 ErrorManager.logErrorStateWithData(
                     "Unknown Livid found",
                     "No color matches for name",
-                    "Livid Name" to entity.name,
+                    "Livid Name" to entity.name.formattedTextCompatLessResets(),
                 )
                 continue
             }
@@ -169,9 +169,9 @@ object DungeonLividFinder {
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!inLividBossRoom() || !config.hideWrong) return
         if (livid == null) return // in case livid detection fails, don't hide anything
-        if (event.entity is EntityOtherPlayerMP && event.entity in fakeLivids) event.cancel()
-        if (event.entity is EntityArmorStand) {
-            lividArmorStandNamePattern.matchMatcher(event.entity.name) {
+        if (event.entity is OtherClientPlayerEntity && event.entity in fakeLivids) event.cancel()
+        if (event.entity is ArmorStandEntity) {
+            lividArmorStandNamePattern.matchMatcher(event.entity.name.formattedTextCompatLessResets()) {
                 val colorChar = group("colorCode")[0]
 
                 if (colorChar.toLorenzColor() != color) event.cancel()
@@ -181,13 +181,13 @@ object DungeonLividFinder {
 
     private fun isCurrentlyBlind() = (MinecraftCompat.localPlayerOrNull?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
 
-    private fun EntityOtherPlayerMP.isLividColor(color: LorenzColor): Boolean {
+    private fun OtherClientPlayerEntity.isLividColor(color: LorenzColor): Boolean {
         val chatColor = color.getChatColor()
-        return name.startsWith("$chatColor﴾ $chatColor§lLivid")
+        return name.formattedTextCompatLessResets().startsWith("$chatColor﴾ $chatColor§lLivid")
     }
 
-    private fun EntityOtherPlayerMP.getLividColor(): LorenzColor? {
-        lividNamePattern.matchMatcher(this.name) {
+    private fun OtherClientPlayerEntity.getLividColor(): LorenzColor? {
+        lividNamePattern.matchMatcher(this.name.formattedTextCompatLessResets()) {
             val type = groupOrNull("type") ?: return null
 
             return lividNameColor.getOrElse(type) { null }
@@ -217,7 +217,7 @@ object DungeonLividFinder {
 
     private fun inLividBossRoom() = DungeonApi.inBossRoom && DungeonApi.getCurrentBoss() == DungeonFloor.F5
 
-    private fun EntityOtherPlayerMP.highlight(color: LorenzColor?) {
+    private fun OtherClientPlayerEntity.highlight(color: LorenzColor?) {
         if (color == null) {
             RenderLivingEntityHelper.removeEntityColor(this)
             RenderLivingEntityHelper.removeNoHurtTime(this)
@@ -300,7 +300,7 @@ object DungeonLividFinder {
             add("inBoss: ${inLividBossRoom()}")
             add("isBlind: $isBlind")
             add("blockColor: ${blockLocation.getBlockStateAt()}")
-            add("livid: '${livid?.name}'")
+            add("livid: '${livid?.name.formattedTextCompatLessResets()}'")
             add("color: ${color?.name}")
         }
     }

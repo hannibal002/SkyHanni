@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.skyhanni.features.event.diana import at.hannibal2.skyhanni.utils.compat.deceased import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -28,12 +28,12 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.network.OtherClientPlayerEntity
 //#if MC < 1.21
-import net.minecraft.network.play.server.S02PacketChat
+//$$ import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket
 //#else
-//$$ import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket
+import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket
 //#endif
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -98,7 +98,7 @@ object InquisitorWaypointShare {
     private var inquisitor = -1
     private var lastInquisitor = -1
     private var lastShareTime = SimpleTimeMark.farPast()
-    private var inquisitorsNearby = emptyList<EntityOtherPlayerMP>()
+    private var inquisitorsNearby = emptyList<OtherClientPlayerEntity>()
 
     var waypoints = mapOf<String, SharedInquisitor>()
 
@@ -114,7 +114,7 @@ object InquisitorWaypointShare {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
-            inquisitorsNearby = inquisitorsNearby.editCopy { removeIf { it.isDead } }
+            inquisitorsNearby = inquisitorsNearby.editCopy { removeIf { it.deceased } }
         }
 
         waypoints = waypoints.editCopy { values.removeIf { it.spawnTime.passedSince() > 75.seconds } }
@@ -134,7 +134,7 @@ object InquisitorWaypointShare {
         inquisitorsNearby = inquisitorsNearby.editCopy { add(inquisitor) }
         GriffinBurrowHelper.update()
 
-        lastInquisitor = inquisitor.entityId
+        lastInquisitor = inquisitor.id
         checkInquisFound()
     }
 
@@ -188,11 +188,11 @@ object InquisitorWaypointShare {
         if (!isEnabled()) return
         if (event.health > 0) return
 
-        val entityId = event.entity.entityId
+        val entityId = event.entity.id
         if (entityId == inquisitor) {
             sendDeath()
         }
-        inquisitorsNearby.find { it.entityId == entityId }?.let {
+        inquisitorsNearby.find { it.id == entityId }?.let {
             inquisitorsNearby = inquisitorsNearby.editCopy { remove(it) }
         }
     }
@@ -200,7 +200,7 @@ object InquisitorWaypointShare {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (MinecraftClient.getInstance().currentScreen != null) return
         if (event.keyCode == config.keyBindShare) sendInquisitor()
     }
 
@@ -230,7 +230,7 @@ object InquisitorWaypointShare {
             return
         }
 
-        if (inquisitor.isDead) {
+        if (inquisitor.deceased) {
             ChatUtils.chat("§cInquisitor is dead")
             return
         }
@@ -246,16 +246,16 @@ object InquisitorWaypointShare {
         if (!isEnabled()) return
         val packet = event.packet
         //#if MC < 1.21
-        if (packet !is S02PacketChat) return
-        val messageComponent = packet.chatComponent
+        //$$ if (packet !is GameMessageS2CPacket) return
+        //$$ val messageComponent = packet.chatComponent
         //#else
-        //$$ if (packet !is ChatMessageS2CPacket) return
-        //$$ val messageComponent = packet.unsignedContent
+        if (packet !is ChatMessageS2CPacket) return
+        val messageComponent = packet.unsignedContent
         //#endif
 
-        val message = messageComponent.formattedText.stripHypixelMessage()
+        val message = messageComponent.formattedTextCompat().stripHypixelMessage()
         //#if MC < 1.16
-        if (packet.type.toInt() != 0) return
+        //$$ if (packet.type.toInt() != 0) return
         //#endif
 
         if (partyInquisitorCheckerPattern.isDetected(message)) {

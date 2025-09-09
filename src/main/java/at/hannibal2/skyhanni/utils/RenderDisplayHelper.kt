@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.ingame.InventoryScreen
 
 /**
  * RenderDisplayHelper determines when to render displays based on
@@ -50,7 +50,7 @@ class RenderDisplayHelper(
 
         @HandleEvent
         fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-            val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+            val isInOwnInventory = MinecraftClient.getInstance().currentScreen is InventoryScreen
             for (display in currentlyVisibleDisplays) {
                 if (display.renderIn(isInOwnInventory)) {
                     display.render()
@@ -60,7 +60,7 @@ class RenderDisplayHelper(
 
         @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-            val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+            val isInOwnInventory = MinecraftClient.getInstance().currentScreen is InventoryScreen
             for (display in currentlyVisibleDisplays) {
                 if (display.outsideInventory && !display.renderIn(isInOwnInventory)) {
                     display.render()

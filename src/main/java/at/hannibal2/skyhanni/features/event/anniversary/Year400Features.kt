@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.anniversary
+package at.hannibal2.skyhanni.features.event.anniversary import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.network.OtherClientPlayerEntity
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -112,7 +112,7 @@ object Year400Features {
     }
 
     private fun addPlayer(mob: Mob) {
-        val displayName = mob.baseEntity.displayName.formattedText
+        val displayName = mob.baseEntity.displayName.formattedTextCompat()
         val colorCode = playerColorNametagPattern.matchMatcher(displayName) {
             group("color")
         } ?: run {
@@ -158,7 +158,7 @@ object Year400Features {
         if (!config.teamFinder) return
         val entity = event.clickedEntity
         if (colorInHand == null) return
-        if (entity !is EntityOtherPlayerMP) return
+        if (entity !is OtherClientPlayerEntity) return
         if (entity.isNpc()) return
 
         val mob = entity.mob ?: return

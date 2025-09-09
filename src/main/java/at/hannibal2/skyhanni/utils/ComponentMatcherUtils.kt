@@ -1,7 +1,7 @@
 /**
  * @author Linnea Gräf
  */
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.findStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.appendComponent
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.ChatStyle
+import net.minecraft.text.Text
+import net.minecraft.text.Style
 import java.util.Stack
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 //#if MC < 1.21
-import net.minecraft.util.IChatComponent
+//$$ import net.minecraft.text.Text
 //#endif
 
 object ComponentMatcherUtils {
@@ -26,8 +26,8 @@ object ComponentMatcherUtils {
      * Convert an [IChatComponent] into a [ComponentSpan], which allows taking substrings of the given component,
      * while preserving chat style.
      */
-    fun IChatComponent.intoSpan(): ComponentSpan {
-        val text = this.unformattedText
+    fun Text.intoSpan(): ComponentSpan {
+        val text = this.unformattedTextCompat()
         return ComponentSpan(
             this,
             text,
@@ -47,7 +47,7 @@ object ComponentMatcherUtils {
     /**
      * Equivalent to [matchMatcher], but while preserving [ChatStyle]
      */
-    inline fun <T> Pattern.matchStyledMatcher(chat: IChatComponent, consumer: ComponentMatcher.() -> T) =
+    inline fun <T> Pattern.matchStyledMatcher(chat: Text, consumer: ComponentMatcher.() -> T) =
         matchStyledMatcher(chat.intoSpan(), consumer)
 
     /**
@@ -59,7 +59,7 @@ object ComponentMatcherUtils {
     /**
      * Equivalent to [findMatcher], but while preserving [ChatStyle]
      */
-    inline fun <T> Pattern.findStyledMatcher(chat: IChatComponent, consumer: ComponentMatcher.() -> T) =
+    inline fun <T> Pattern.findStyledMatcher(chat: Text, consumer: ComponentMatcher.() -> T) =
         findStyledMatcher(chat.intoSpan(), consumer)
 
     /**
@@ -120,7 +120,7 @@ class ComponentMatcher internal constructor(
     /**
      * Return a span equivalent to the group with the given name found by [matches] or [find]
      */
-    fun component(name: String): IChatComponent? {
+    fun component(name: String): Text? {
         return group(name)?.intoComponent()
     }
 
@@ -136,7 +136,7 @@ class ComponentMatcher internal constructor(
      * Return a IChatComponent equivalent to the group with the given name found by [matches] or [find].
      * Returns not nullable object, or throws an error.
      */
-    fun componentOrThrow(name: String): IChatComponent {
+    fun componentOrThrow(name: String): Text {
         return groupOrThrow(name).intoComponent()
     }
 }
@@ -150,7 +150,7 @@ class ComponentMatcher internal constructor(
  * [ComponentMatcherUtils.intoSpan] instead of the constructor.
  */
 class ComponentSpan internal constructor(
-    val textComponent: IChatComponent,
+    val textComponent: Text,
     private val cachedText: String,
     val start: Int, val end: Int,
 ) {
@@ -183,14 +183,14 @@ class ComponentSpan internal constructor(
     /**
      * Sample the chat style at the start of the span.
      */
-    fun sampleStyleAtStart(): ChatStyle? = sampleAtStart().chatStyle
+    fun sampleStyleAtStart(): Style? = sampleAtStart().style
 
     /**
      * Sample all the components that intersect with this span. Note that some of the returned components may contain
      * children/siblings that are not intersecting this span, and that some of the returned components may only
      * partially intersect with this span.
      */
-    fun sampleComponents(): List<IChatComponent> {
+    fun sampleComponents(): List<Text> {
         return sampleSlicedComponents().map { it.first }
     }
 
@@ -206,12 +206,12 @@ class ComponentSpan internal constructor(
      *
      * @see intoComponent
      */
-    fun sampleSlicedComponents(): List<Triple<IChatComponent, Int, Int>> {
+    fun sampleSlicedComponents(): List<Triple<Text, Int, Int>> {
         var index = start
-        val workStack = Stack<IChatComponent>()
+        val workStack = Stack<Text>()
         workStack.push(textComponent)
         var lastComponent = textComponent
-        val listBuilder = mutableListOf<Triple<IChatComponent, Int, Int>>()
+        val listBuilder = mutableListOf<Triple<Text, Int, Int>>()
         while (workStack.isNotEmpty()) {
             val currentComponent = workStack.pop()
             if (index + length <= 0) {
@@ -220,7 +220,7 @@ class ComponentSpan internal constructor(
             for (sibling in currentComponent.siblings.reversed()) {
                 workStack.push(sibling)
             }
-            val rawText = currentComponent.unformattedTextForChat
+            val rawText = currentComponent.unformattedTextForChatCompat()
             index -= rawText.length
             if (index < 0) {
                 listBuilder.add(
@@ -241,7 +241,7 @@ class ComponentSpan internal constructor(
     /**
      * Returns the first [chat component][IChatComponent] that intersects with this span.
      */
-    fun sampleAtStart(): IChatComponent {
+    fun sampleAtStart(): Text {
         return sampleComponents().first()
     }
 
@@ -251,17 +251,17 @@ class ComponentSpan internal constructor(
      * inheritances as the old [textComponent]. Be therefore careful when modifying styles. This new component will also
      * only use [ChatComponentText], converting any other [IChatComponent] in the process.
      */
-    fun intoComponent(): IChatComponent {
+    fun intoComponent(): Text {
         val parent = "".asComponent()
-        parent.chatStyle = defaultStyleConstructor
+        parent.style = defaultStyleConstructor
         for ((component, start, end) in sampleSlicedComponents()) {
-            val copy = component.unformattedTextForChat.substring(start, end).asComponent()
+            val copy = component.unformattedTextForChatCompat().substring(start, end).asComponent()
             //#if MC < 1.21
-            copy.chatStyle = component.chatStyle.createDeepCopy()
+            //$$ copy.style = component.style.createDeepCopy()
             //#else
-            //$$ copy.style = component.style
+            copy.style = component.style
             //#endif
-            parent.appendSibling(copy)
+            parent.append(copy)
         }
         return parent
     }
@@ -269,8 +269,8 @@ class ComponentSpan internal constructor(
     /**
      * Returns a list of all the styles that intersect with this span.
      */
-    fun sampleStyles(): List<ChatStyle> {
-        return sampleComponents().map { it.chatStyle }
+    fun sampleStyles(): List<Style> {
+        return sampleComponents().map { it.style }
     }
 
     /**

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -45,7 +45,7 @@ object StatsTuning {
     }
 
     private fun templateStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        if (stack.displayName != "§aLoad") return false
+        if (stack.name.formattedTextCompatLeadingWhiteLessResets() != "§aLoad") return false
 
         var grab = false
         val list = mutableListOf<String>()
@@ -73,7 +73,7 @@ object StatsTuning {
     }
 
     private fun renderTunings(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        if (stack.displayName != "§aStats Tuning") return false
+        if (stack.name.formattedTextCompatLeadingWhiteLessResets() != "§aStats Tuning") return false
         val tunings = MaxwellApi.tunings ?: return false
 
         event.stackTip = tunings

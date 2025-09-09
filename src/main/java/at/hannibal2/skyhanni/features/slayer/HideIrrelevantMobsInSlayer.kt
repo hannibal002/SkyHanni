@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.entity.EntityOpacityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.LivingEntity
 
 @SkyHanniModule
 object HideIrrelevantMobsInSlayer {
@@ -28,7 +28,7 @@ object HideIrrelevantMobsInSlayer {
     }
 
     @HandleEvent
-    fun onEntityOpacity(event: EntityOpacityEvent<EntityLivingBase>) {
+    fun onEntityOpacity(event: EntityOpacityEvent<LivingEntity>) {
         val irrelevantMob = irrelevantMob ?: return
         if (event.entity.mob?.name in irrelevantMob.mobNames) {
             event.opacity = config.hideIrrelevantMobsOpacity

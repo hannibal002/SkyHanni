@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable
+package at.hannibal2.skyhanni.features.inventory.experimentationtable import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
@@ -193,7 +193,7 @@ object ExperimentsProfitTracker {
     }
 
     private fun NeuInternalName.formatWarningString(amount: Int) = buildString {
-        val displayName = getItemStackOrNull()?.displayName ?: "XP Bottle"
+        val displayName = getItemStackOrNull()?.name.formattedTextCompatLeadingWhiteLessResets() ?: "XP Bottle"
         val amountFormat = "§8${amount}x ".takeIf { amount > 1 }.orEmpty()
         appendLine("§aExperiments Tracker§7:")
         appendLine("§eAutomatically tracked usage of $amountFormat$displayName §ewhile near the Experimentation Table§7.")

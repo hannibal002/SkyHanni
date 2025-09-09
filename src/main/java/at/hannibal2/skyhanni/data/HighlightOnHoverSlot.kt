@@ -27,7 +27,7 @@ object HighlightOnHoverSlot {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         val list = currentSlots.flatMapTo(mutableSetOf()) { it.value }
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.slotNumber in list) {
+            if (slot.id in list) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }

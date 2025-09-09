@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -29,7 +29,7 @@ object MagicalPowerDisplay {
     private val config get() = SkyHanniMod.feature.inventory.magicalPower
     private var contactAmount: Int?
         get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount
-        private set(value) {
+        set(value) {
             ProfileStorageData.profileSpecific?.abiphoneContactAmount = value
         }
 
@@ -85,7 +85,7 @@ object MagicalPowerDisplay {
         val internalName = item.getInternalNameOrNull() ?: return
 
         var endMP = rarity.toMP() ?: ErrorManager.skyHanniError(
-            "Unknown rarity '$rarity' for item '${item.displayName}§7'",
+            "Unknown rarity '$rarity' for item '${item.name.formattedTextCompatLeadingWhiteLessResets()}§7'",
         )
 
         when (internalName) {

@@ -26,8 +26,8 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 
 @SkyHanniModule
 object ExcavatorProfitTracker {
@@ -218,11 +218,9 @@ object ExcavatorProfitTracker {
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled) return false
         if (!isEnabled()) return false
-        val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
+        val inChest = MinecraftClient.getInstance().currentScreen is GenericContainerScreen
         // Only show in excavation menu
-        if (inChest && !FossilExcavatorApi.inExcavatorMenu) return false
-
-        return true
+        return !(inChest && !FossilExcavatorApi.inExcavatorMenu)
     }
 
     @HandleEvent

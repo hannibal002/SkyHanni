@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -282,10 +282,10 @@ object CFStrayTracker {
     fun onSecondPassed() {
         if (!isEnabled()) return
         InventoryUtils.getItemsInOpenChest().filter {
-            claimedStraysSlots.contains(it.slotIndex)
+            claimedStraysSlots.contains(it.index)
         }.forEach {
-            if (!strayCaughtPattern.matches(it.stack.displayName)) {
-                claimedStraysSlots.removeAt(claimedStraysSlots.indexOf(it.slotIndex))
+            if (!strayCaughtPattern.matches(it.stack.name.formattedTextCompatLeadingWhiteLessResets())) {
+                claimedStraysSlots.removeAt(claimedStraysSlots.indexOf(it.index))
             }
         }
     }

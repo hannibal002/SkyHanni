@@ -38,7 +38,7 @@ object RiftApi {
 
     fun ItemStack.motesNpcPrice(): Double? {
         if (isRiftExportable() && wasRiftTransferred()) return null
-        return getInternalName().motesNpcPrice()?.times(stackSize)
+        return getInternalName().motesNpcPrice()?.times(count)
     }
 
     fun NeuInternalName.motesNpcPrice(): Double? {

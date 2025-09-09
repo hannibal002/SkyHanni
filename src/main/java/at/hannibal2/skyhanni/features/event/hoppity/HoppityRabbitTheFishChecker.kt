@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.skyhanni.features.event.hoppity import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -61,7 +61,7 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled()) return
 
         val index = rabbitTheFishIndex ?: return
-        InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(LorenzColor.RED)
+        InventoryUtils.getItemsInOpenChest().firstOrNull { it.index == index }?.highlight(LorenzColor.RED)
     }
 
     @HandleEvent
@@ -70,9 +70,9 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
         rabbitTheFishIndex = event.inventoryItems.filter {
-            it.value.displayName.isNotEmpty() && it.key != 22
+            it.value.name.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && it.key != 22
         }.entries.firstOrNull {
-            rabbitTheFishItemPattern.matches(it.value.displayName)
+            rabbitTheFishItemPattern.matches(it.value.name.formattedTextCompatLeadingWhiteLessResets())
         }?.key
     }
 
@@ -84,7 +84,7 @@ object HoppityRabbitTheFishChecker {
         val stack = event.slot?.stack ?: return
         if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
             event.sendPreventClosureTitle()
-        } else if (rabbitTheFishIndex == event.slot.slotIndex) {
+        } else if (rabbitTheFishIndex == event.slot.index) {
             rabbitTheFishIndex = null
         }
     }

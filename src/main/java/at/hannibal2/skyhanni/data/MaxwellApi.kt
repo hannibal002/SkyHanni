@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MaxwellPowersJson
@@ -202,7 +202,7 @@ object MaxwellApi {
 
         if (yourBagsGuiPattern.matches(event.inventoryName)) {
             for (stack in event.inventoryItems.values) {
-                if (accessoryBagStack.matches(stack.displayName)) processStack(stack)
+                if (accessoryBagStack.matches(stack.name.formattedTextCompatLeadingWhiteLessResets())) processStack(stack)
             }
         }
         if (statsTuningGuiPattern.matches(event.inventoryName)) {
@@ -215,11 +215,11 @@ object MaxwellApi {
         for (stack in inventoryItems.values) {
             for (line in stack.getLore()) {
                 statsTuningDataPattern.readTuningFromLine(line)?.let {
-                    it.name = "§.. (?<name>.+)".toPattern().matchMatcher(stack.displayName) {
+                    it.name = "§.. (?<name>.+)".toPattern().matchMatcher(stack.name.formattedTextCompatLeadingWhiteLessResets()) {
                         group("name")
                     } ?: ErrorManager.skyHanniError(
                         "found no name in thaumaturgy",
-                        "stack name" to stack.displayName,
+                        "stack name" to stack.name.formattedTextCompatLeadingWhiteLessResets(),
                         "line" to line,
                     )
                     map.add(it)
@@ -244,7 +244,7 @@ object MaxwellApi {
             inventoryItems.values.find {
                 powerSelectedPattern.matches(it.getLore().lastOrNull())
             } ?: return
-        val displayName = selectedPowerStack.displayName.removeColor().trim()
+        val displayName = selectedPowerStack.name.formattedTextCompatLeadingWhiteLessResets().removeColor().trim()
 
         currentPower = getPowerByNameOrNull(displayName) ?: run {
             ErrorManager.logErrorWithData(
@@ -319,7 +319,7 @@ object MaxwellApi {
                         UnknownMaxwellPower("Unknown power: $power"),
                         "Unknown power: $power",
                         "line" to line,
-                        "displayName" to stack.displayName,
+                        "displayName" to stack.name.formattedTextCompatLeadingWhiteLessResets(),
                         "lore" to stack.getLore(),
                     )
             }

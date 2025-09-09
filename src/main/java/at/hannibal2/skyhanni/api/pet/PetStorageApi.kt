@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.api.pet
+package at.hannibal2.skyhanni.api.pet import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -322,7 +322,7 @@ object PetStorageApi {
         if (inventoryName != "Your Equipment and Stats") return
         val petStorage = petStorage ?: return
         val currentPetItem = inventoryItems[EQUIP_MENU_CURRENT_PET_SLOT]?.takeIf {
-            it.displayName != "§7Empty Pet Slot"
+            it.name.formattedTextCompatLeadingWhiteLessResets() != "§7Empty Pet Slot"
         } ?: return
         val petInfo = currentPetItem.getPetInfo() ?: return
 
@@ -402,7 +402,7 @@ object PetStorageApi {
         petStorage.expSharePets.addAll(
             EXP_SHARE_SLOTS.map { expShareSlot ->
                 val slotItem = inventoryItems[expShareSlot]?.takeIf {
-                    it.displayName != "§7No pet in slot"
+                    it.name.formattedTextCompatLeadingWhiteLessResets() != "§7No pet in slot"
                 } ?: return@map null
                 slotItem.getPetInfo()?.uniqueId
             },

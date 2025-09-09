@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.bazaar
+package at.hannibal2.skyhanni.features.inventory.bazaar import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -41,8 +41,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.screen.GenericContainerScreenHandler
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
@@ -115,7 +115,7 @@ object BazaarApi {
 
     private var taxRate: Double
         get() = storage?.taxRate ?: 1.25
-        private set(value) {
+        set(value) {
             storage?.taxRate = value
         }
 
@@ -162,7 +162,7 @@ object BazaarApi {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val item = event.item ?: return
-        val itemName = item.displayName
+        val itemName = item.name.formattedTextCompatLeadingWhiteLessResets()
         if (isBazaarOrderInventory(InventoryUtils.openInventoryName())) {
             val internalName = item.getInternalNameOrNull() ?: return
             if (itemName.contains("SELL")) {
@@ -191,16 +191,16 @@ object BazaarApi {
     private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NeuInternalName? {
         val buyInstantly = inventoryItems[10] ?: return null
 
-        if (buyInstantly.displayName != "§aBuy Instantly") return null
+        if (buyInstantly.name.formattedTextCompatLeadingWhiteLessResets() != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
 
-        return NeuInternalName.fromItemName(bazaarItem.displayName)
+        return NeuInternalName.fromItemName(bazaarItem.name.formattedTextCompatLeadingWhiteLessResets())
     }
 
     private fun updateTaxRate(inventoryItems: Map<Int, ItemStack>) {
         val sellInstantly = inventoryItems[11] ?: return
 
-        if (sellInstantly.displayName != "§6Sell Instantly") return
+        if (sellInstantly.name.formattedTextCompatLeadingWhiteLessResets() != "§6Sell Instantly") return
         taxPattern.firstMatcher(sellInstantly.getLore()) {
             taxRate = group("tax").formatDouble()
         }
@@ -223,15 +223,15 @@ object BazaarApi {
         if (!SkyHanniMod.feature.inventory.bazaar.purchaseHelper) return
         if (currentSearchedItem == "") return
 
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is GenericContainerScreen) return
+        val chest = event.container as GenericContainerScreenHandler
 
         for ((slot, stack) in chest.getUpperItems()) {
-            if (chest.inventorySlots.indexOf(slot) !in 9..44) {
+            if (chest.slots.indexOf(slot) !in 9..44) {
                 continue
             }
 
-            if (stack.displayName.removeColor() == currentSearchedItem) {
+            if (stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor() == currentSearchedItem) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }
@@ -259,13 +259,13 @@ object BazaarApi {
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
-        if (items.any { it.displayName.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
+        if (items.any { it.name.formattedTextCompatLeadingWhiteLessResets().equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
             return true
         }
 
         // check for Buy Instantly
         event.inventoryItems[16]?.let {
-            if (it.displayName == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
+            if (it.name.formattedTextCompatLeadingWhiteLessResets() == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
                 return true
             }
         }

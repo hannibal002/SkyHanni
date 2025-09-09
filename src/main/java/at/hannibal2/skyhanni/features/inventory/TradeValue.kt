@@ -77,11 +77,11 @@ object TradeValue {
         val yourMap = mutableMapOf<Int, ItemStack>()
         // Gets total value of trade
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.slotIndex in otherList) {
-                otherMap[slot.slotIndex] = slot.stack
+            if (slot.index in otherList) {
+                otherMap[slot.index] = slot.stack
             }
-            if (slot.slotIndex in yourList) {
-                yourMap[slot.slotIndex] = slot.stack
+            if (slot.index in yourList) {
+                yourMap[slot.index] = slot.stack
             }
         }
         val (yourCoin, yourTotal) = calculatePrice(yourMap)
@@ -112,7 +112,7 @@ object TradeValue {
                 items.remove(slot)
                 continue
             }
-            total += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
+            total += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.count))
         }
         coin?.let {
             total += it

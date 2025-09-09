@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.mixins.hooks
 import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 
 fun renderItemOverlayPost(

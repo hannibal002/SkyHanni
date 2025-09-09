@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.visitor
+package at.hannibal2.skyhanni.features.garden.visitor import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.INFO_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.slots
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -34,12 +34,12 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.network.play.client.C02PacketUseEntity
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.21
-//$$ import net.minecraft.server.world.ServerWorld
+import net.minecraft.server.world.ServerWorld
 //#endif
 
 @SkyHanniModule
@@ -62,15 +62,15 @@ object VisitorListener {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSendEvent(event: PacketSentEvent) {
         val packet = event.packet
-        if (packet !is C02PacketUseEntity) return
+        if (packet !is PlayerInteractEntityC2SPacket) return
 
         //#if MC < 1.21
-        val entity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
+        //$$ val entity = packet.getEntity(MinecraftCompat.localWorld) ?: return
         //#else
-        //$$ val world = MinecraftCompat.localPlayer.world
-        //$$ val entity = world.getEntityById(packet.entityId) ?: return
+        val world = MinecraftCompat.localPlayer.world
+        val entity = world.getEntityById(packet.entityId) ?: return
         //#endif
-        val entityId = entity.entityId
+        val entityId = entity.id
 
         lastClickedNpc = entityId
     }
@@ -107,13 +107,13 @@ object VisitorListener {
         if (!VisitorApi.isVisitorInfo(lore)) return
 
         val offerItem = event.inventoryItems[ACCEPT_SLOT] ?: return
-        if (offerItem.displayName != "§aAccept Offer") return
+        if (offerItem.name.formattedTextCompatLeadingWhiteLessResets() != "§aAccept Offer") return
 
         VisitorApi.inInventory = true
 
         val visitorOffer = VisitorApi.VisitorOffer(offerItem)
 
-        var name = npcItem.displayName
+        var name = npcItem.name.formattedTextCompatLeadingWhiteLessResets()
         if (name.length == name.removeColor().length + 4) {
             name = name.substring(2)
         }
@@ -135,10 +135,10 @@ object VisitorListener {
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!VisitorApi.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return
-        val inventory = event.guiContainer as? AccessorGuiContainer ?: return
-        inventory as GuiContainer
+        val inventory = event.guiContainer as? AccessorHandledScreen ?: return
+        inventory as SkyHanniGuiContainer
         val slot = inventory.slots()[29]
-        InventoryCompat.clickInventorySlot(slot.slotIndex, mouseButton = 0, mode = 0)
+        InventoryCompat.clickInventorySlot(slot.index, mouseButton = 0, mode = 0)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -150,12 +150,12 @@ object VisitorListener {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStandEntity>) {
         if (!GardenApi.onBarnPlot) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
-        if (entity.name == "§e§lCLICK") {
+        if (entity.name.formattedTextCompatLessResets() == "§e§lCLICK") {
             event.cancel()
         }
     }

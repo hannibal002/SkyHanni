@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -19,13 +19,13 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getPlayerNames
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
-import net.minecraft.network.play.server.S3BPacketScoreboardObjective
-import net.minecraft.network.play.server.S3CPacketUpdateScore
-import net.minecraft.network.play.server.S3EPacketTeams
-import net.minecraft.scoreboard.IScoreObjectiveCriteria
-import net.minecraft.scoreboard.ScorePlayerTeam
+import net.minecraft.network.packet.s2c.play.ScoreboardObjectiveUpdateS2CPacket
+import net.minecraft.network.packet.s2c.play.ScoreboardScoreUpdateS2CPacket
+import net.minecraft.network.packet.s2c.play.TeamS2CPacket
+import net.minecraft.scoreboard.ScoreboardCriterion
+import net.minecraft.scoreboard.Team
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //#endif
 
 @SkyHanniModule
@@ -37,7 +37,7 @@ object ScoreboardData {
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
     val objectiveTitle: String
         get() =
-            MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
+            MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.formattedTextCompat().orEmpty()
 
     private var dirty = false
 
@@ -80,24 +80,24 @@ object ScoreboardData {
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
-            is S3CPacketUpdateScore -> {
+            is ScoreboardScoreUpdateS2CPacket -> {
                 if (packet.objectiveName == "update") {
                     dirty = true
                 }
             }
 
-            is S3EPacketTeams -> {
-                if (packet.name.startsWith("team_")) {
+            is TeamS2CPacket -> {
+                if (packet.teamName.startsWith("team_")) {
                     dirty = true
                 }
             }
 
-            is S3BPacketScoreboardObjective -> {
-                val type = packet.func_179817_d()
-                if (type != IScoreObjectiveCriteria.EnumRenderType.INTEGER) return
-                val objectiveName = packet.func_149339_c()
+            is ScoreboardObjectiveUpdateS2CPacket -> {
+                val type = packet.type
+                if (type != ScoreboardCriterion.RenderType.INTEGER) return
+                val objectiveName = packet.name
                 if (objectiveName == "health") return
-                val objectiveValue = packet.func_149337_d()
+                val objectiveValue = packet.displayName.formattedTextCompat()
                 ScoreboardTitleUpdateEvent(objectiveValue, objectiveName).post()
             }
         }
@@ -152,19 +152,19 @@ object ScoreboardData {
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = MinecraftCompat.localWorldOrNull?.scoreboard ?: return emptyList()
         val objective = scoreboard.getSidebarObjective() ?: return emptyList()
-        var scores = scoreboard.getSortedScores(objective)
+        var scores = scoreboard.getScoreboardEntries(objective)
         val list = scores.getPlayerNames(scoreboard)
         //#if MC < 1.21
-        scores = if (list.size > 15) {
-            list.drop(15)
-        } else {
-            list
-        }
-        return scores.map {
-            ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
-        }
+        //$$ scores = if (list.size > 15) {
+        //$$     list.drop(15)
+        //$$ } else {
+        //$$     list
+        //$$ }
+        //$$ return scores.map {
+        //$$     Team.formatPlayerName(scoreboard.getPlayerTeam(it.playerName), it.playerName)
+        //$$ }
         //#else
-        //$$ return list.map { it.formattedTextCompatLessResets() }
+        return list.map { it.formattedTextCompatLessResets() }
         //#endif
     }
 
@@ -186,11 +186,11 @@ object ScoreboardData {
         }
     }
 
-    private fun tryToReplaceScoreboardLineHarder(text: String): String? {
+    private fun tryToReplaceScoreboardLineHarder(text: String): String {
         //#if MC < 1.21
-        if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
-            return null
-        }
+        //$$ if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
+        //$$     return null
+        //$$ }
         //#endif
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
             PurseApi.piggyPattern.matchMatcher(text) {

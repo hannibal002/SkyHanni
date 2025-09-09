@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.utils.renderables.primitives
 
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.compat.Text
+import net.minecraft.text.Text
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import java.awt.Color
 
 // Extension Functions are not inside there Companion Object as it would be ambiguous on import.
@@ -34,7 +34,7 @@ class StringRenderable internal constructor(
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) : Renderable {
-    override val width by lazy { (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt() + 1 }
+    override val width by lazy { (MinecraftClient.getInstance().textRenderer.getWidth(text) * scale).toInt() + 1 }
     override val height = (9 * scale).toInt() + 1
 
     private val inverseScale = 1 / scale
@@ -60,7 +60,7 @@ class TextRenderable internal constructor(
         operator fun Renderable.invoke(string: String): TextRenderable = TextRenderable(Text.of(string))
     }
 
-    override val width by lazy { (Minecraft.getMinecraft().fontRendererObj.getStringWidth(fixStupid(text)) * scale).toInt() + 1 }
+    override val width by lazy { (MinecraftClient.getInstance().textRenderer.getWidth(fixStupid(text)) * scale).toInt() + 1 }
     override val height = (9 * scale).toInt() + 1
 
     private val inverseScale = 1 / scale
@@ -70,12 +70,12 @@ class TextRenderable internal constructor(
     }
 
     //#if MC < 1.21
-    private fun fixStupid(text: Text): String {
-        return text.text
-    }
-    //#else
-    //$$ private fun fixStupid(text: Text): Text {
-    //$$     return text
+    //$$ private fun fixStupid(text: Text): String {
+    //$$     return text.text
     //$$ }
+    //#else
+    private fun fixStupid(text: Text): Text {
+        return text
+    }
     //#endif
 }

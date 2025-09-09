@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.fishing.trophy
+package at.hannibal2.skyhanni.features.fishing.trophy import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.util.ChatStyle
+import net.minecraft.text.Style
 
 @SkyHanniModule
 object TrophyFishManager {
@@ -114,14 +114,14 @@ object TrophyFishManager {
         var updatedFishes = loadMissingTrophyFish()
         val savedFishes = fish ?: return
         for (stack in event.inventoryItems.values) {
-            val internalName = TrophyFishApi.getInternalName(stack.displayName.replace("§k", ""))
+            val internalName = TrophyFishApi.getInternalName(stack.name.formattedTextCompatLeadingWhiteLessResets().replace("§k", ""))
 
             fun getRarity(rawRarity: String, line: String): TrophyRarity =
                 TrophyRarity.getByName(rawRarity) ?: ErrorManager.skyHanniError(
                     "unknown trophy fish rarity in odger inventory",
                     "rawRarity" to rawRarity,
                     "line" to line,
-                    "stack.name" to stack.displayName,
+                    "stack.name" to stack.name.formattedTextCompatLeadingWhiteLessResets(),
                     "internalName" to internalName,
                 )
 
@@ -184,7 +184,7 @@ object TrophyFishManager {
         return fillet.getOrDefault(rarity, -1)
     }
 
-    fun getTooltip(internalName: String): ChatStyle? {
+    fun getTooltip(internalName: String): Style? {
         val display = TrophyFishApi.hoverInfo(internalName) ?: return null
         return defaultStyleConstructor.setHoverShowText(display)
     }

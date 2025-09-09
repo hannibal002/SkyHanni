@@ -41,8 +41,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.Screen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -83,14 +83,14 @@ object SkyHanniMod {
                 val title = InventoryUtils.openInventoryName()
                 if (shouldCloseScreen) {
                     //#if MC < 1.21
-                    MinecraftCompat.localPlayer.closeScreen()
+                    //$$ MinecraftCompat.localPlayer.closeScreen()
                     //#else
-                    //$$ MinecraftCompat.localPlayer.closeHandledScreen()
+                    MinecraftCompat.localPlayer.closeHandledScreen()
                     //#endif
                     OtherInventoryData.close(title)
                 }
                 shouldCloseScreen = true
-                Minecraft.getMinecraft().displayGuiScreen(it)
+                MinecraftClient.getInstance().setScreen(it)
                 screenTicks = 0
                 screenToOpen = null
             }
@@ -176,7 +176,7 @@ object SkyHanniMod {
         }
     }
 
-    var screenToOpen: GuiScreen? = null
+    var screenToOpen: Screen? = null
     var shouldCloseScreen: Boolean = true
     private var screenTicks = 0
     fun consoleLog(message: String) {

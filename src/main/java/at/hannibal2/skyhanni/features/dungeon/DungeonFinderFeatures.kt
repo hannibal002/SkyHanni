@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.skyhanni.features.dungeon import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -193,7 +193,7 @@ object DungeonFinderFeatures {
     private fun selectFloorStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
-            val name = stack.displayName.removeColor()
+            val name = stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
             map[slot] = if (anyFloorPattern.matches(name)) {
                 "A"
             } else if (entranceFloorPattern.matches(name)) {
@@ -209,7 +209,7 @@ object DungeonFinderFeatures {
     private fun partyFinderStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
-            val name = stack.displayName.removeColor()
+            val name = stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
             if (!checkIfPartyPattern.matches(name)) continue
             val lore = stack.getLore()
             val floor = lore.find { floorPattern.matches(it.removeColor()) } ?: continue
@@ -234,7 +234,7 @@ object DungeonFinderFeatures {
 
         if (!config.floorAsStackSize) return
         for ((slot, stack) in inventoryItems) {
-            val name = stack.displayName.removeColor()
+            val name = stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
             if (!floorTypePattern.matches(name)) continue
             val floorNum = floorNumberPattern.matchMatcher(name) {
                 group("floorNum").romanToDecimalIfNecessary()
@@ -259,7 +259,7 @@ object DungeonFinderFeatures {
         @Suppress("LoopWithTooManyJumpStatements")
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
-            if (!checkIfPartyPattern.matches(stack.displayName)) continue
+            if (!checkIfPartyPattern.matches(stack.name.formattedTextCompatLeadingWhiteLessResets())) continue
             if (config.markIneligibleGroups && ineligiblePattern.anyMatches(lore)) {
                 map[slot] = LorenzColor.DARK_RED
                 continue
@@ -351,7 +351,7 @@ object DungeonFinderFeatures {
         val featureActive = config.let { it.coloredClassLevel || it.showMissingClasses }
         if (!featureActive) return
 
-        val toolTip = toolTipMap[event.slot.slotNumber]
+        val toolTip = toolTipMap[event.slot.id]
         if (toolTip.isNullOrEmpty()) return
         // TODO @Thunderblade73 fix that to "event.toolTip = toolTip"
         val oldToolTip = event.toolTip
@@ -369,8 +369,8 @@ object DungeonFinderFeatures {
         if (!isEnabled()) return
         if (!config.floorAsStackSize) return
         val slot = event.slot
-        if (slot.slotNumber != slot.slotIndex) return
-        event.stackTip = (floorStackSize[slot.slotIndex]?.takeIf { it.isNotEmpty() } ?: return)
+        if (slot.id != slot.index) return
+        event.stackTip = (floorStackSize[slot.index]?.takeIf { it.isNotEmpty() } ?: return)
     }
 
     @HandleEvent
@@ -378,7 +378,7 @@ object DungeonFinderFeatures {
         if (!isEnabled()) return
         if (!inInventory) return
 
-        event.container.inventorySlots.associateWith { highlightParty[it.slotNumber] }.forEach { (slot, color) ->
+        event.container.slots.associateWith { highlightParty[it.id] }.forEach { (slot, color) ->
             color?.let { slot.highlight(it) }
         }
     }

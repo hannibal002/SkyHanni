@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.events.render.gui.GuiActionPerformedEvent
 import at.hannibal2.skyhanni.events.render.gui.InitializeGuiEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.client.gui.GuiButton
-import net.minecraft.client.gui.GuiIngameMenu
+import net.minecraft.client.gui.widget.Widget
+import net.minecraft.client.gui.screen.GameMenuScreen
 //#if MC > 1.21
-//$$ import net.minecraft.client.gui.widget.ButtonWidget
-//$$ import net.minecraft.text.Text
+import net.minecraft.client.gui.widget.ButtonWidget
+import net.minecraft.text.Text
 //#endif
 
 @SkyHanniModule
@@ -22,21 +22,21 @@ object ButtonOnPause {
     private val buttonId = System.nanoTime().toInt()
 
     //#if MC < 1.21
-    @HandleEvent
-    fun onGuiActionPerformed(event: GuiActionPerformedEvent) {
-        if (!SkyBlockUtils.onHypixel) return
-
-        if (config.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == buttonId) {
-            ConfigGuiManager.openConfigGui()
-        }
-    }
+    //$$ @HandleEvent
+    //$$ fun onGuiActionPerformed(event: GuiActionPerformedEvent) {
+    //$$     if (!SkyBlockUtils.onHypixel) return
+    //$$
+    //$$     if (config.configButtonOnPause && event.gui is GameMenuScreen && event.button.id == buttonId) {
+    //$$         ConfigGuiManager.openConfigGui()
+    //$$     }
+    //$$ }
     //#endif
 
     @HandleEvent
     fun onInitializeGuiPost(event: InitializeGuiEvent) {
         if (!SkyBlockUtils.onHypixel) return
 
-        if (config.configButtonOnPause && event.gui is GuiIngameMenu) {
+        if (config.configButtonOnPause && event.gui is GameMenuScreen) {
             val x = event.gui.width - 105
             val x2 = x + 100
             var y = event.gui.height - 22
@@ -53,11 +53,11 @@ object ButtonOnPause {
                 }
             }
             //#if MC < 1.21
-            event.buttonList.add(GuiButton(buttonId, x, 0.coerceAtLeast(y), 100, 20, "SkyHanni"))
+            //$$ event.buttonList.add(Widget(buttonId, x, 0.coerceAtLeast(y), 100, 20, "SkyHanni"))
             //#else
-            //$$ ButtonWidget.builder(Text.of("Skyhanni")) {
-            //$$     ConfigGuiManager.openConfigGui()
-            //$$ }.dimensions(x, 0.coerceAtLeast(y), 100, 20).build()
+            ButtonWidget.builder(Text.of("Skyhanni")) {
+                ConfigGuiManager.openConfigGui()
+            }.dimensions(x, 0.coerceAtLeast(y), 100, 20).build()
             //#endif
         }
     }

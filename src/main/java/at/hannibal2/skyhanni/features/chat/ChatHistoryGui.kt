@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.skyhanni.features.chat import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.convertToJsonString
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import net.minecraft.client.Minecraft
-import net.minecraft.util.IChatComponent
+import net.minecraft.client.MinecraftClient
+import net.minecraft.text.Text
 
 class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyhanniBaseScreen() {
 
@@ -28,7 +28,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         actionReason ?: modifiedReason
 
     private fun reasonLength(result: ChatManager.MessageFilteringResult): Int =
-        result.getReason()?.let { fontRenderer().getStringWidth(it) } ?: 0
+        result.getReason()?.let { fontRenderer().getWidth(it) } ?: 0
 
     private val historySize =
         history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
@@ -78,7 +78,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
                     OSUtils.copyToClipboard(msg.message.convertToJsonString())
                     ChatUtils.chat("Copied structured chat line to clipboard", false)
                 } else {
-                    val message = msg.message.formattedText.stripHypixelMessage()
+                    val message = msg.message.formattedTextCompat().stripHypixelMessage()
                     OSUtils.copyToClipboard(message)
                     ChatUtils.chat("Copied chat line to clipboard")
                 }
@@ -93,8 +93,8 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         }
     }
 
-    private fun splitLine(comp: IChatComponent): List<String> {
-        return comp.formattedText.splitLines(w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10)).split("\n")
+    private fun splitLine(comp: Text): List<String> {
+        return comp.formattedTextCompat().splitLines(w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10)).split("\n")
     }
 
     override fun onInitGui() {
@@ -114,7 +114,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         }
     }
 
-    private fun fontRenderer() = Minecraft.getMinecraft().fontRendererObj
+    private fun fontRenderer() = MinecraftClient.getInstance().textRenderer
 
     override fun onHandleMouseInput() {
         setScroll(scroll - MouseCompat.getScrollDelta())

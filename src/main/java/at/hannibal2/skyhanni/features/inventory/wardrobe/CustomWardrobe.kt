@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_PAGES
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils
@@ -40,8 +40,8 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.MinecraftClient
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.math.min
@@ -127,9 +127,9 @@ object CustomWardrobe {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!editMode) return
-        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
+        val gui = MinecraftClient.getInstance().currentScreen as? SkyHanniGuiContainer ?: return
         val renderable = inventoryButton ?: addReEnableButton().also { inventoryButton = it }
-        val accessorGui = gui as AccessorGuiContainer
+        val accessorGui = gui as AccessorHandledScreen
         val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
         val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
         inventoryButtonPosition.moveTo(posX, posY)
@@ -292,15 +292,15 @@ object CustomWardrobe {
         var scale = playerWidth
 
         //#if MC < 1.16
-        fakePlayer.inventory.armorInventory = slot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
+        //$$ fakePlayer.inventory.armorInventory = slot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
         //#else
-        //$$ for (equipment in net.minecraft.entity.player.PlayerInventory.EQUIPMENT_SLOTS.values) {
-        //$$     val armorOrdinal = equipment.ordinal - 2
-        //$$     if (armorOrdinal < 0 || armorOrdinal > 3) continue
-        //$$     var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
-        //$$     if (stack == null) stack = ItemStack.EMPTY
-        //$$     fakePlayer.inventory.equipment.put(equipment, stack)
-        //$$ }
+        for (equipment in net.minecraft.entity.player.PlayerInventory.EQUIPMENT_SLOTS.values) {
+            val armorOrdinal = equipment.ordinal - 2
+            if (armorOrdinal < 0 || armorOrdinal > 3) continue
+            var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
+            if (stack == null) stack = ItemStack.EMPTY
+            fakePlayer.inventory.equipment.put(equipment, stack)
+        }
         //#endif
 
         val playerColor = if (!slot.isInCurrentPage()) {

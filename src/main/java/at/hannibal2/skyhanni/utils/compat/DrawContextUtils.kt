@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.client.renderer.GlStateManager
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import net.minecraft.item.ItemStack
 import java.nio.FloatBuffer
 //#if MC > 1.21
-//$$ import com.mojang.blaze3d.systems.RenderSystem
-//$$ import net.minecraft.client.gui.DrawContext
-//$$ import org.joml.Matrix4f
-//$$ import org.joml.Quaternionf
+import com.mojang.blaze3d.systems.RenderSystem
+import net.minecraft.client.gui.DrawContext
+import org.joml.Matrix4f
+import org.joml.Quaternionf
 //#endif
 
 /**
@@ -37,10 +37,10 @@ object DrawContextUtils {
         get() = _drawContext ?: run {
             ErrorManager.crashInDevEnv("drawContext is null")
             //#if MC < 1.21
-            ErrorManager.logErrorStateWithData("drawContext is null", "drawContext is null, renderDepth: $renderDepth")
-            DrawContext()
+            //$$ ErrorManager.logErrorStateWithData("drawContext is null", "drawContext is null, renderDepth: $renderDepth")
+            //$$ DrawContext()
             //#else
-            //$$ ErrorManager.skyHanniError("drawContext is null")
+            ErrorManager.skyHanniError("drawContext is null")
             //#endif
         }
 
@@ -67,24 +67,24 @@ object DrawContextUtils {
 
     fun translate(x: Double, y: Double, z: Double) {
         //#if MC < 1.21.6
-        drawContext.matrices.translate(x, y, z)
+        //$$ drawContext.matrices.translate(x, y, z)
         //#else
-        //$$ drawContext.matrices.translate(x.toFloat(), y.toFloat())
+        drawContext.matrices.translate(x.toFloat(), y.toFloat())
         //#endif
     }
 
     fun translate(x: Float, y: Float, z: Float) {
         //#if MC < 1.21.6
-        drawContext.matrices.translate(x, y, z)
+        //$$ drawContext.matrices.translate(x, y, z)
         //#else
-        //$$ drawContext.matrices.translate(x, y)
+        drawContext.matrices.translate(x, y)
         //#endif
     }
 
     fun rotate(angle: Float, x: Number, y: Number, z: Number) {
-        val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
+        val (_, _, _) = listOf(x, y, z).map { it.toFloat() }
         //#if MC < 1.21
-        GlStateManager.rotate(angle, xf, yf, zf)
+        //$$ RenderSystem.rotate(angle, xf, yf, zf)
         //#elseif MC < 1.21.6
         //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, xf, yf, zf))
         //#endif
@@ -92,7 +92,7 @@ object DrawContextUtils {
 
     fun multMatrix(buffer: FloatBuffer) {
         //#if MC < 1.21
-        GlStateManager.multMatrix(buffer)
+        //$$ RenderSystem.multMatrix(buffer)
         //#elseif MC < 1.21.6
         //$$ multMatrix(Matrix4f(buffer))
         //#endif
@@ -106,27 +106,27 @@ object DrawContextUtils {
 
     fun scale(x: Float, y: Float, z: Float) {
         //#if MC < 1.21.6
-        drawContext.matrices.scale(x, y, z)
+        //$$ drawContext.matrices.scale(x, y, z)
         //#else
-        //$$ drawContext.matrices.scale(x, y)
+        drawContext.matrices.scale(x, y)
         //#endif
     }
 
     @Deprecated("Use pushPop instead")
     fun pushMatrix() {
         //#if MC < 1.21.6
-        drawContext.matrices.pushMatrix()
+        //$$ drawContext.matrices.push()
         //#else
-        //$$ drawContext.matrices.pushMatrix()
+        drawContext.matrices.pushMatrix()
         //#endif
     }
 
     @Deprecated("Use pushPop instead")
     fun popMatrix() {
         //#if MC < 1.21.6
-        drawContext.matrices.popMatrix()
+        //$$ drawContext.matrices.pop()
         //#else
-        //$$ drawContext.matrices.popMatrix()
+        drawContext.matrices.popMatrix()
         //#endif
     }
 
@@ -162,9 +162,9 @@ object DrawContextUtils {
 
     fun loadIdentity() {
         //#if MC < 1.21.6
-        drawContext.matrices.loadIdentity()
+        //$$ drawContext.matrices.loadIdentity()
         //#else
-        //$$ drawContext.matrices.identity()
+        drawContext.matrices.identity()
         //#endif
     }
 }

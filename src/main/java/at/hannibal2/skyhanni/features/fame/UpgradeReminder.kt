@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.fame
+package at.hannibal2.skyhanni.features.fame import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -200,7 +200,7 @@ object UpgradeReminder {
 
         companion object {
             fun fromItem(item: ItemStack): CommunityShopUpgrade? {
-                val name = item.displayName
+                val name = item.name.formattedTextCompatLeadingWhiteLessResets()
                 val lore = item.getLore()
                 val upgrade = CommunityShopUpgrade(name)
                 upgrade.duration = upgradeDurationPattern.firstMatcher(lore) {

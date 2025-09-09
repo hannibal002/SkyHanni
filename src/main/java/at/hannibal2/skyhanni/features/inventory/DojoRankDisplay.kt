@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -49,7 +49,7 @@ object DojoRankDisplay {
 
         var totalScore = 0
         for (stack in items) {
-            val name = stack.displayName ?: continue
+            val name = stack.name.formattedTextCompatLeadingWhiteLessResets() ?: continue
             testNamePattern.matchMatcher(name) {
                 val testColor = group("color")
                 val testName = group("name")

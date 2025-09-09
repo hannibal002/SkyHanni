@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.entity.projectile.EntitySmallFireball
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.entity.projectile.SmallFireballEntity
+import net.minecraft.particle.ParticleTypes
 
 @SkyHanniModule
 object ParticleHider {
@@ -30,16 +30,16 @@ object ParticleHider {
 
         val type = event.type
         if (config.hideCloseRedstoneParticles &&
-            type == EnumParticleTypes.REDSTONE && distanceToPlayer < 2
+            type == ParticleTypes.DUST && distanceToPlayer < 2
         ) {
             event.cancel()
             return
         }
 
         if (config.hideFireballParticles &&
-            (type == EnumParticleTypes.SMOKE_NORMAL || type == EnumParticleTypes.SMOKE_LARGE)
+            (type == ParticleTypes.SMOKE || type == ParticleTypes.LARGE_SMOKE)
         ) {
-            for (entity in EntityUtils.getEntities<EntitySmallFireball>()) {
+            for (entity in EntityUtils.getEntities<SmallFireballEntity>()) {
                 val distance = entity.getLorenzVec().distance(event.location)
                 if (distance < 5) {
                     event.cancel()

@@ -18,7 +18,7 @@ import com.google.gson.JsonElement
 import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.minecraft.util.IChatComponent
+import net.minecraft.text.Text
 import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -287,7 +287,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         if (!firstError()) return
 
-        val text = mutableListOf<IChatComponent>()
+        val text = mutableListOf<Text>()
         text.add(
             (
                 "§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Some features may not work. " +

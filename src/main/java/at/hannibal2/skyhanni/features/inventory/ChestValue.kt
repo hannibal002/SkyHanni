@@ -31,9 +31,9 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.addLine
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -71,7 +71,7 @@ object ChestValue {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
-        val inInv = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val inInv = MinecraftClient.getInstance().currentScreen is InventoryScreen
         inOwnInventory = inInv && config.enableInOwnInventory
         if (!inInventory) return
         update()
@@ -115,7 +115,7 @@ object ChestValue {
             if (rendered >= config.itemToShow) continue
             if (total < config.hideBelow) continue
             val textAmount = " §7x${amount.addSeparators()}:"
-            val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
+            val width = MinecraftClient.getInstance().textRenderer.getWidth(textAmount)
             val displayName = stack.repoItemNameCompact
             val name = "${displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
@@ -184,12 +184,12 @@ object ChestValue {
         } else {
             val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
             InventoryUtils.getItemsInOpenChest().filter {
-                it.hasStack && it.inventory != MinecraftCompat.localPlayer.inventory && (!isMinion || it.slotNumber % 9 != 1)
+                it.hasStack() && it.inventory != MinecraftCompat.localPlayer.inventory && (!isMinion || it.id % 9 != 1)
             }
         }
         val stacks = buildMap {
             slots.forEach {
-                put(it.slotIndex, it.stack)
+                put(it.index, it.stack)
             }
         }
         chestItems = createItems(stacks)
@@ -209,8 +209,8 @@ object ChestValue {
                 ChestItem(mutableListOf(), 0, stack, 0.0, list)
             }
             item.index.add(i)
-            item.amount += stack.stackSize
-            item.total += total * stack.stackSize
+            item.amount += stack.count
+            item.total += total * stack.count
         }
     }
 
@@ -228,7 +228,7 @@ object ChestValue {
     private fun isValidStorage(): Boolean {
         if (inOwnInventory) return true
         val name = InventoryUtils.openInventoryName().removeColor()
-        if (Minecraft.getMinecraft().currentScreen !is GuiChest) return false
+        if (MinecraftClient.getInstance().currentScreen !is GenericContainerScreen) return false
         if (BazaarApi.inBazaarInventory) return false
         if (MinionFeatures.minionInventoryOpen) return false
         if (MinionFeatures.minionStorageInventoryOpen) return false
@@ -246,15 +246,15 @@ object ChestValue {
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
-        val mc = Minecraft.getMinecraft()
-        val spaceWidth = mc.fontRendererObj.getStringWidth(char.toString())
+        val mc = MinecraftClient.getInstance()
+        val spaceWidth = mc.textRenderer.getWidth(char.toString())
 
         var currentString = this
-        var currentLength = mc.fontRendererObj.getStringWidth(currentString)
+        var currentLength = mc.textRenderer.getWidth(currentString)
 
         while (currentLength > targetLength) {
             currentString = currentString.dropLast(1)
-            currentLength = mc.fontRendererObj.getStringWidth(currentString)
+            currentLength = mc.textRenderer.getWidth(currentString)
         }
 
         val difference = targetLength - currentLength

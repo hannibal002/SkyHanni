@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
+package at.hannibal2.skyhanni.features.garden.fortuneguide.pages import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFInfos
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
@@ -104,7 +104,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         val moreInfo = "§2Select a piece for more info"
         val wordArmor = if (FarmingItemType.currentArmor == null) "Armor" else "Piece"
-        val armorName = FarmingItemType.currentArmor?.getItem()?.displayName.orEmpty()
+        val armorName = FarmingItemType.currentArmor?.getItem()?.name.formattedTextCompatLeadingWhiteLessResets().orEmpty()
 
         content.addTable(
             1,
@@ -162,7 +162,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         val wordEquip = if (FarmingItemType.currentEquip == null) "Equipment" else "Piece"
 
-        val equipmentName = FarmingItemType.currentEquip?.getItem()?.displayName.orEmpty()
+        val equipmentName = FarmingItemType.currentEquip?.getItem()?.name.formattedTextCompatLeadingWhiteLessResets().orEmpty()
 
         content.addTable(
             1,

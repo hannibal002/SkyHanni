@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.slayer
+package at.hannibal2.skyhanni.features.slayer import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.LivingEntity
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -121,13 +121,13 @@ object SlayerQuestWarning {
         }
     }
 
-    private fun isSlayerMob(entity: EntityLivingBase): Boolean {
+    private fun isSlayerMob(entity: LivingEntity): Boolean {
         val slayerType = SlayerApi.currentAreaType ?: return false
 
         // workaround for rift mob that is unrelated to slayer
-        if (entity.name == "Oubliette Guard") return false
+        if (entity.name.formattedTextCompatLessResets() == "Oubliette Guard") return false
         // workaround for Bladesoul in  Crimson Isle
-        if (SkyBlockUtils.scoreboardArea == "Stronghold" && entity.name == "Skeleton") return false
+        if (SkyBlockUtils.scoreboardArea == "Stronghold" && entity.name.formattedTextCompatLessResets() == "Skeleton") return false
 
         val isSlayer = slayerType.clazz.isInstance(entity)
         if (!isSlayer) return false

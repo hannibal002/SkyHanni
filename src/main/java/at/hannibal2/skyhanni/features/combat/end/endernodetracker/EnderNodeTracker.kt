@@ -139,7 +139,7 @@ object EnderNodeTracker {
         if (!isEnabled()) return
         miteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
             it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
-        }.sumOf { it.stackSize }
+        }.sumOf { it.count }
     }
 
     @HandleEvent
@@ -163,7 +163,7 @@ object EnderNodeTracker {
 
         val newMiteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
             it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
-        }.sumOf { it.stackSize }
+        }.sumOf { it.count }
 
         val change = newMiteGelInInventory - miteGelInInventory
         if (change > 0) {

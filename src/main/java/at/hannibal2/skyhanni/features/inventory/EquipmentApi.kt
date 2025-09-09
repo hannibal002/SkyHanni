@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
@@ -94,12 +94,12 @@ object EquipmentApi {
             }
             add("Equipment:")
             storage.slots.forEach { item ->
-                val name = item?.displayName
+                val name = item?.name.formattedTextCompatLeadingWhiteLessResets()
                 add(" - $name")
             }
             add("Rift Equipment:")
             storage.riftSlots.forEach { item ->
-                val name = item?.displayName
+                val name = item?.name.formattedTextCompatLeadingWhiteLessResets()
                 add(" - $name")
             }
         }

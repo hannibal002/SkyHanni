@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -18,13 +18,13 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.network.OtherClientPlayerEntity
 import net.minecraft.entity.Entity
-import net.minecraft.entity.boss.EntityDragon
-import net.minecraft.entity.boss.EntityWither
-import net.minecraft.entity.monster.EntityGhast
-import net.minecraft.entity.monster.EntityIronGolem
-import net.minecraft.entity.monster.EntityMagmaCube
+import net.minecraft.entity.boss.dragon.EnderDragonEntity
+import net.minecraft.entity.boss.WitherEntity
+import net.minecraft.entity.mob.GhastEntity
+import net.minecraft.entity.passive.IronGolemEntity
+import net.minecraft.entity.mob.MagmaCubeEntity
 
 @SkyHanniModule
 object HideFarEntities {
@@ -45,7 +45,7 @@ object HideFarEntities {
         val minDistance = config.minDistance.coerceAtLeast(3)
 
         ignored = EntityUtils.getAllEntities()
-            .map { it.entityId to it.distanceToPlayer() }
+            .map { it.id to it.distanceToPlayer() }
             .filter { it.second > minDistance && it.first !in neverHide }
             .sortedBy { it.second }.drop(maxAmount)
             .map { it.first }.toSet()
@@ -72,39 +72,39 @@ object HideFarEntities {
 
         if (DungeonApi.inDungeon()) {
             list += allEntities.filter { it.mob?.name == "Mort" }
-            list += allEntities.filter { it is EntityWither || it is EntityDragon }
+            list += allEntities.filter { it is WitherEntity || it is EnderDragonEntity }
             list += DungeonMobManager.starredVisibleMobs.map { it.baseEntity }
             // other party members
-            list += allEntities.filter { it is EntityOtherPlayerMP && !it.isNpc() }
+            list += allEntities.filter { it is OtherClientPlayerEntity && !it.isNpc() }
         }
         if (KuudraApi.inKuudra) {
             list += allEntities.filter { it.mob?.name == "Elle" }
             // other party members
-            list += allEntities.filter { it is EntityOtherPlayerMP && !it.isNpc() }
+            list += allEntities.filter { it is OtherClientPlayerEntity && !it.isNpc() }
         }
         if (IslandType.WINTER.isCurrent()) {
-            list += allEntities.filter { it is EntityMagmaCube }
+            list += allEntities.filter { it is MagmaCubeEntity }
         }
         if (IslandType.DWARVEN_MINES.isCurrent()) {
             // powder ghast & golem defender (from goblin raid event)
-            list += allEntities.filter { it is EntityGhast || it is EntityIronGolem }
+            list += allEntities.filter { it is GhastEntity || it is IronGolemEntity }
         }
 
         // Always show boss bar
-        list += allEntities.filter { it is EntityWither && it.entityId < 0 }
+        list += allEntities.filter { it is WitherEntity && it.id < 0 }
 
-        list += allEntities.filter { it is EntityOtherPlayerMP && it.name in PartyApi.partyMembers }
+        list += allEntities.filter { it is OtherClientPlayerEntity && it.name.formattedTextCompatLessResets() in PartyApi.partyMembers }
         list += DamageIndicatorManager.getAllMobs()
         list += AreaMiniBossFeatures.currentMobs.map { it.baseEntity }
 
-        neverHide = list.map { it.entityId }.toSet()
+        neverHide = list.map { it.id }.toSet()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!isEnabled()) return
         val entity = event.entity
-        if (entity.entityId in ignored) {
+        if (entity.id in ignored) {
             event.cancel()
         }
     }

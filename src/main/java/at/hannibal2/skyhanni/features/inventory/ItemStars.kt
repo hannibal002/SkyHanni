@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -37,9 +37,9 @@ object ItemStars {
     fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
         val stack = event.itemStack
-        if (stack.stackSize != 1) return
+        if (stack.count != 1) return
         val stars = stack.grabStarCount() ?: return
-        starPattern.findMatcher(stack.displayName) {
+        starPattern.findMatcher(stack.name.formattedTextCompatLeadingWhiteLessResets()) {
             val name = group("name")
             event.toolTip[0] = "$name §c$stars✪"
         }

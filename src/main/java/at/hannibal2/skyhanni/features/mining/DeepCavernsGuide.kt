@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.skyhanni.features.mining import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -24,8 +24,8 @@ import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.init.Items
+import net.minecraft.inventory.SimpleInventory
+import net.minecraft.item.Items
 
 @SkyHanniModule
 object DeepCavernsGuide {
@@ -38,7 +38,7 @@ object DeepCavernsGuide {
 
     private val startIcon by lazy {
         ItemUtils.createItemStack(
-            Items.map,
+            Items.MAP,
             "§bDeep Caverns Guide",
             "§8(From SkyHanni)",
             "",
@@ -111,7 +111,7 @@ object DeepCavernsGuide {
         showStartIcon = true
 
         event.inventoryItems[31]?.let {
-            if (it.displayName != "§aObsidian Sanctuary") {
+            if (it.name.formattedTextCompatLeadingWhiteLessResets() != "§aObsidian Sanctuary") {
                 start()
             }
         }
@@ -145,7 +145,7 @@ object DeepCavernsGuide {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (show) return
-        if (event.inventory is ContainerLocalMenu && showStartIcon && event.slot == 49) {
+        if (event.inventory is SimpleInventory && showStartIcon && event.slot == 49) {
             event.replace(startIcon)
         }
     }

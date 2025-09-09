@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.nether.ashfang
+package at.hannibal2.skyhanni.features.nether.ashfang import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 
 @SkyHanniModule
 object AshfangHider {
@@ -17,7 +17,7 @@ object AshfangHider {
     private val config get() = AshfangManager.config.hide
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStandEntity>) {
         if (!AshfangManager.active || !config.damageSplash) return
 
         if (DamageIndicatorManager.isDamageSplash(event.entity)) {
@@ -32,9 +32,9 @@ object AshfangHider {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStandEntity>) {
         if (!AshfangManager.active || !config.particles) return
-        if (event.entity.getAllEquipment().any { it?.displayName == "Glowstone" }) event.cancel()
+        if (event.entity.getAllEquipment().any { it?.name.formattedTextCompatLeadingWhiteLessResets() == "Glowstone" }) event.cancel()
     }
 
     @HandleEvent

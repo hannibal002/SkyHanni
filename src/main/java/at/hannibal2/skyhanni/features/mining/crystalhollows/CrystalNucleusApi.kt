@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.crystalhollows
+package at.hannibal2.skyhanni.features.mining.crystalhollows import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -63,7 +63,7 @@ object CrystalNucleusApi {
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
-        if (event.itemStack.displayName != "§fEnchanted Book") return
+        if (event.itemStack.name.formattedTextCompatLeadingWhiteLessResets() != "§fEnchanted Book") return
         when (event.itemStack.getHypixelEnchantments()?.keys?.firstOrNull() ?: return) {
             "lapidary" -> loot.addOrPut(LAPIDARY_I_BOOK_ITEM, 1)
             "fortune" -> loot.addOrPut(FORTUNE_IV_BOOK_ITEM, 1)

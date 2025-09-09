@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.pests
+package at.hannibal2.skyhanni.features.garden.pests import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -42,8 +42,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
-import org.lwjgl.input.Keyboard
+import net.minecraft.entity.decoration.ArmorStandEntity
+import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -297,8 +297,8 @@ object PestApi {
 
     fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
 
-    fun isNearPestTrap() = EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>().any {
-        it.distanceToPlayer() < 10 && pestTrapPattern.matches(it.displayName.formattedText)
+    fun isNearPestTrap() = EntityUtils.getAllEntities().filterIsInstance<ArmorStandEntity>().any {
+        it.distanceToPlayer() < 10 && pestTrapPattern.matches(it.displayName.formattedTextCompat())
     }
 
     private fun removePests(removedPests: Int) {
@@ -388,7 +388,7 @@ object PestApi {
             return
         }
         val disabled = with(config.pestFinder) {
-            !showDisplay && !showPlotInWorld && teleportHotkey == Keyboard.KEY_NONE
+            !showDisplay && !showPlotInWorld && teleportHotkey == GLFW.GLFW_KEY_UNKNOWN
         }
         if (disabled) {
             event.addIrrelevant("disabled in config")

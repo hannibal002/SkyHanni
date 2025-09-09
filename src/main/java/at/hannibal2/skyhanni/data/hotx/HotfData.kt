@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.inventory.Slot
+import net.minecraft.screen.slot.Slot
 import net.minecraft.item.ItemStack
 import java.util.regex.Matcher
 import java.util.regex.Pattern

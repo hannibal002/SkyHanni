@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraft.inventory.Slot
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import net.minecraft.screen.slot.Slot
 
 @SkyHanniModule
 object HighlightMissingRepoItems {
@@ -23,9 +23,9 @@ object HighlightMissingRepoItems {
 
         val gui = event.gui
 
-        if (gui is GuiChest) {
-            highlightItems(event.container.inventorySlots)
-        } else if (gui is GuiInventory) {
+        if (gui is GenericContainerScreen) {
+            highlightItems(event.container.slots)
+        } else if (gui is InventoryScreen) {
             highlightItems(InventoryUtils.getSlotsInOwnInventory())
         }
     }

@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.mixins.init;
 
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 import org.spongepowered.asm.lib.Opcodes;
-import org.spongepowered.asm.lib.tree.AbstractInsnNode;
-import org.spongepowered.asm.lib.tree.InsnList;
-import org.spongepowered.asm.lib.tree.VarInsnNode;
 import org.spongepowered.asm.mixin.injection.InjectionPoint;
 import org.spongepowered.asm.mixin.injection.struct.InjectionPointData;
 
@@ -40,8 +39,8 @@ public class BeforeForLoopInjectionPoint extends InjectionPoint {
     }
 
     @Override
-    public boolean find(String s, InsnList insnList, Collection<AbstractInsnNode> collection) {
-        for (AbstractInsnNode p = insnList.getFirst(); p != null; p = p.getNext()) {
+    public boolean find(String desc, org.objectweb.asm.tree.InsnList insns, Collection<AbstractInsnNode> nodes) {
+        for (AbstractInsnNode p = insns.getFirst(); p != null; p = p.getNext()) {
             if (p.getOpcode() != Opcodes.ARRAYLENGTH) {
                 continue;
             }
@@ -52,7 +51,7 @@ public class BeforeForLoopInjectionPoint extends InjectionPoint {
             AbstractInsnNode loadLoopArg = storeLoopVar.getPrevious();
             if (loadLoopArg == null || loadLoopArg.getOpcode() != Opcodes.ALOAD) continue;
             if (lvIndex != -1 && ((VarInsnNode) loadLoopArg).var != lvIndex) continue;
-            collection.add(loadLoopArg);
+            nodes.add(loadLoopArg);
         }
         return false;
     }

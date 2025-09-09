@@ -32,7 +32,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.netty.util.internal.ConcurrentSet
-import net.minecraft.init.Blocks
+import net.minecraft.block.Blocks
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
@@ -167,7 +167,7 @@ object MiningApi {
     private val allowedSoundNames = setOf(
         "dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb",
         //#if MC > 1.21
-        //$$ "block.metal.place",
+        "block.metal.place",
         //#endif
     )
 
@@ -346,8 +346,8 @@ object MiningApi {
         val newBlock = newState.block
 
         if (oldState == newState) return
-        if (oldBlock == Blocks.air || oldBlock == Blocks.bedrock) return
-        if (newBlock != Blocks.air && newBlock != Blocks.bedrock && !isTitanium(newState)) return
+        if (oldBlock == Blocks.AIR || oldBlock == Blocks.BEDROCK) return
+        if (newBlock != Blocks.AIR && newBlock != Blocks.BEDROCK && !isTitanium(newState)) return
 
         val pos = event.location
         if (pickobulusActive && pickobulusWaitingForBlock) {

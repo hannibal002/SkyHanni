@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.commands
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
-import net.minecraft.util.BlockPos
+import net.minecraft.util.math.BlockPos
 
 class SimpleCommand(
     private val name: String,

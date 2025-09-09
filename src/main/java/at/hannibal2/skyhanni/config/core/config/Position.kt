@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import io.github.notenoughupdates.moulconfig.gui.GuiElementWrapper
 import java.lang.reflect.Field
 
 class Position @JvmOverloads constructor(
@@ -205,7 +205,7 @@ class Position @JvmOverloads constructor(
         val option = editor.getOptionFromField(field) ?: return
         editor.search("")
         if (!editor.goToOption(option)) return
-        SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
+        SkyHanniMod.screenToOpen = GuiElementWrapper(editor)
     }
 
     fun setLink(configLink: ConfigLink) {

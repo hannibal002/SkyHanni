@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable
+package at.hannibal2.skyhanni.features.inventory.experimentationtable import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 
 @SkyHanniModule
 object ExperimentationXPOverlay {
@@ -41,9 +41,9 @@ object ExperimentationXPOverlay {
         if (!isEnabled()) return
         event.stack ?: return
         if (!event.stack.isDye()) return
-        enchantingXPPattern.matchMatcher(event.stack.displayName) {
+        enchantingXPPattern.matchMatcher(event.stack.name.formattedTextCompatLeadingWhiteLessResets()) {
             val text = "${group("xp")}k"
-            val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)
+            val stringWidth = MinecraftClient.getInstance().textRenderer.getWidth(text)
             event.drawSlotText(event.x + 2 + stringWidth, event.y + 10, text, .6f)
         }
     }

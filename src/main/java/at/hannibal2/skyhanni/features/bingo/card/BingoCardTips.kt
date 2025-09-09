@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.inventory.ContainerChest
+import net.minecraft.screen.GenericContainerScreenHandler
 
 @SkyHanniModule
 object BingoCardTips {
@@ -55,7 +55,7 @@ object BingoCardTips {
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
         val slot = event.slot
-        val goal = BingoApi.bingoGoals[slot.slotNumber] ?: return
+        val goal = BingoApi.bingoGoals[slot.id] ?: return
 
         val toolTip = event.toolTip
         // When hovering over a row
@@ -78,7 +78,7 @@ object BingoCardTips {
                 IndexOutOfBoundsException(),
                 "BingoCardTips reward line not found",
                 "goal displayName" to goal.displayName,
-                "slot slotNumber" to slot.slotNumber,
+                "slot slotNumber" to slot.id,
                 "toolTip" to toolTip,
             )
             return
@@ -99,9 +99,9 @@ object BingoCardTips {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
-        val chest = event.container as ContainerChest
+        val chest = event.container as GenericContainerScreenHandler
         for ((slot, _) in chest.getAllItems()) {
-            val goal = BingoApi.bingoGoals[slot.slotNumber] ?: continue
+            val goal = BingoApi.bingoGoals[slot.id] ?: continue
             if (config.hideDoneDifficulty && goal.done) continue
 
             val color = goal.getData()?.let {

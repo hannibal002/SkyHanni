@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
@@ -48,7 +48,7 @@ object SkillExperience {
         if (event.inventoryName != "Your Skills") return
 
         for ((_, stack) in event.inventoryItems) {
-            val name = stack.displayName.removeColor()
+            val name = stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
             if (!name.contains(" ")) continue
 
             val lore = stack.getLore()

@@ -27,7 +27,7 @@ object MinionCollectLogic {
             val internalName = stack.getInternalName()
             val (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName)
             val old = map[newId] ?: 0
-            map[newId] = old + amount * stack.stackSize
+            map[newId] = old + amount * stack.count
         }
         return map
     }

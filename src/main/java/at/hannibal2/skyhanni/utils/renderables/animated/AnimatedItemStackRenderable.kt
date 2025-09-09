@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable
 import net.minecraft.item.ItemStack
-import net.minecraft.util.EnumFacing.Axis
-import net.minecraft.util.Vec3
+import net.minecraft.util.math.Direction.Axis
+import net.minecraft.util.math.Vec3d
 import kotlin.math.sin
 import kotlin.time.Duration
 
@@ -103,17 +103,17 @@ class AnimatedItemStackRenderable private constructor(
     override val height = baseItemHeight + fullBounceHeight
     override val stack: ItemStack get() = frameDefs[frameIndex].stack
 
-    var currentRotation: Vec3 = Vec3(0.0, 0.0, 0.0)
-    private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(
-        currentRotation.xCoord + when (rotation.axis) {
+    var currentRotation: Vec3d = Vec3d(0.0, 0.0, 0.0)
+    private fun generateNextRotation(deltaTime: Double): Vec3d = Vec3d(
+        currentRotation.x + when (rotation.axis) {
             Axis.X -> rotation.rotationSpeed * deltaTime
             else -> 0.0
         },
-        currentRotation.yCoord + when (rotation.axis) {
+        currentRotation.y + when (rotation.axis) {
             Axis.Y -> rotation.rotationSpeed * deltaTime
             else -> 0.0
         },
-        currentRotation.zCoord + when (rotation.axis) {
+        currentRotation.z + when (rotation.axis) {
             Axis.Z -> rotation.rotationSpeed * deltaTime
             else -> 0.0
         },

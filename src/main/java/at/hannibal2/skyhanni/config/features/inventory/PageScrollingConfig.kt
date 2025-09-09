@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class PageScrollingConfig {
     @Expose
@@ -17,8 +17,8 @@ class PageScrollingConfig {
         name = "Bypass Key",
         desc = "When the key is held allows you to scroll even though you are over an item."
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
-    var bypassKey: Int = Keyboard.KEY_LSHIFT
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_LEFT_SHIFT)
+    var bypassKey: Int = GLFW.GLFW_KEY_LEFT_SHIFT
 
     @Expose
     @ConfigOption(

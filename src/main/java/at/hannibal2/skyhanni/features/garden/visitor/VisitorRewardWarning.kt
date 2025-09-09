@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.visitor
+package at.hannibal2.skyhanni.features.garden.visitor import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.inventory.Slot
+import net.minecraft.screen.slot.Slot
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -59,8 +59,8 @@ object VisitorRewardWarning {
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason
 
-        val isRefuseSlot = stack.displayName == "§cRefuse Offer"
-        val isAcceptSlot = stack.displayName == "§aAccept Offer"
+        val isRefuseSlot = stack.name.formattedTextCompatLeadingWhiteLessResets() == "§cRefuse Offer"
+        val isAcceptSlot = stack.name.formattedTextCompatLeadingWhiteLessResets() == "§aAccept Offer"
 
         val shouldBlock = blockReason?.run { blockRefusing && isRefuseSlot || !blockRefusing && isAcceptSlot } ?: false
         if (!config.bypassKey.isKeyHeld() && shouldBlock) {
@@ -91,8 +91,8 @@ object VisitorRewardWarning {
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         if (config.bypassKey.isKeyHeld()) return
 
-        val isRefuseSlot = event.itemStack.displayName == "§cRefuse Offer"
-        val isAcceptSlot = event.itemStack.displayName == "§aAccept Offer"
+        val isRefuseSlot = event.itemStack.name.formattedTextCompatLeadingWhiteLessResets() == "§cRefuse Offer"
+        val isAcceptSlot = event.itemStack.name.formattedTextCompatLeadingWhiteLessResets() == "§aAccept Offer"
 
         val blockReason = visitor.blockReason ?: return
         if (blockReason.blockRefusing && !isRefuseSlot) return

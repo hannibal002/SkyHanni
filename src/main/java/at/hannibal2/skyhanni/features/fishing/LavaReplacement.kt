@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 
 @SkyHanniModule
 object LavaReplacement {
@@ -40,7 +40,7 @@ object LavaReplacement {
         val newActive = shouldReplace()
         if (newActive == isActive) return
         isActive = newActive
-        Minecraft.getMinecraft().renderGlobal.loadRenderers()
+        MinecraftClient.getInstance().worldRenderer.reload()
     }
 
     private fun shouldReplace(): Boolean {

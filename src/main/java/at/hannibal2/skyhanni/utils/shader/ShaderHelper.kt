@@ -7,12 +7,12 @@ import org.lwjgl.opengl.ARBVertexShader
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20
 //#if MC < 1.21
-import org.lwjgl.opengl.ContextCapabilities
-import org.lwjgl.opengl.GLContext
+//$$ import org.lwjgl.opengl.ContextCapabilities
+//$$ import org.lwjgl.opengl.GLContext
 //#else
-//$$ import org.lwjgl.opengl.GL
-//$$ import org.lwjgl.opengl.GLCapabilities
-//$$ import org.joml.Matrix4f
+import org.lwjgl.opengl.GL
+import org.lwjgl.opengl.GLCapabilities
+import org.joml.Matrix4f
 //#endif
 
 /**
@@ -35,9 +35,9 @@ object ShaderHelper {
 
     init {
         //#if MC < 1.21
-        val capabilities: ContextCapabilities = GLContext.getCapabilities()
+        //$$ val capabilities: ContextCapabilities = GLContext.getCapabilities()
         //#else
-        //$$ val capabilities: GLCapabilities = GL.getCapabilities()
+        val capabilities: GLCapabilities = GL.getCapabilities()
         //#endif
 
         // Check OpenGL 2.0 Capabilities
@@ -177,12 +177,12 @@ object ShaderHelper {
     }
 
     //#if MC > 1.21
-    //$$ fun glUniformMatrix4f(location: Int, transpose: Boolean, matrix: Matrix4f) {
-    //$$    val matrixArray = FloatArray(16)
-    //$$    matrix.get(matrixArray)
-    //$$    if (USING_ARB_SHADERS) ARBShaderObjects.glUniformMatrix4fvARB(location, transpose, matrixArray)
-    //$$    else GL20.glUniformMatrix4fv(location, transpose, matrixArray)
-    //$$ }
+    fun glUniformMatrix4f(location: Int, transpose: Boolean, matrix: Matrix4f) {
+       val matrixArray = FloatArray(16)
+       matrix.get(matrixArray)
+       if (USING_ARB_SHADERS) ARBShaderObjects.glUniformMatrix4fvARB(location, transpose, matrixArray)
+       else GL20.glUniformMatrix4fv(location, transpose, matrixArray)
+    }
     //#endif
 
     fun glGetUniformLocation(program: Int, name: CharSequence): Int {

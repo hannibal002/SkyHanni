@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.teleportpad
+package at.hannibal2.skyhanni.features.misc.teleportpad import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -77,7 +77,7 @@ object TeleportPadInventoryNumber {
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!inTeleportPad) return
 
-        padNumberPattern.matchMatcher(event.stack.displayName.lowercase()) {
+        padNumberPattern.matchMatcher(event.stack.name.formattedTextCompatLeadingWhiteLessResets().lowercase()) {
             numbers[group("number")]?.let {
                 event.stackTip = "$it"
             }

@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.mixins.transformers.gui;
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.data.model.TextInput;
 import at.hannibal2.skyhanni.mixins.hooks.GuiScreenHookKt;
-import at.hannibal2.skyhanni.utils.compat.DrawContext;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 
-@Mixin(GuiScreen.class)
+@Mixin(Screen.class)
 public class MixinGuiScreen {
 
     @Inject(method = "renderToolTip", at = @At("TAIL"))
@@ -36,7 +36,7 @@ public class MixinGuiScreen {
         TextInput.Companion.onGuiInput(ci);
     }
 
-    @Redirect(method = "handleComponentClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiScreen;isShiftKeyDown()Z"))
+    @Redirect(method = "handleComponentClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;isShiftKeyDown()Z"))
     public boolean handleComponentClick() {
         return false;
     }

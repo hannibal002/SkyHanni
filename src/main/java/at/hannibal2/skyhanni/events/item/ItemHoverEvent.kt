@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.events.item
 
 import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 
 class ItemHoverEvent(context: DrawContext, val itemStack: ItemStack, private val toolTip0: MutableList<String>) :

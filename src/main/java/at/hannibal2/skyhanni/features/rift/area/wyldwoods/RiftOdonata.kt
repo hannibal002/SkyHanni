@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 
 @SkyHanniModule
 object RiftOdonata {
@@ -39,7 +39,7 @@ object RiftOdonata {
     }
 
     private fun findOdonatas() {
-        for (stand in getEntities<EntityArmorStand>()) {
+        for (stand in getEntities<ArmorStandEntity>()) {
             if (stand.holdingSkullTexture(ODONATA_SKULL_TEXTURE)) {
                 RenderLivingEntityHelper.setEntityColor(
                     stand,

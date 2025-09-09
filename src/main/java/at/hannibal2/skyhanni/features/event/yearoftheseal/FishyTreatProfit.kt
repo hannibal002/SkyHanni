@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.yearoftheseal
+package at.hannibal2.skyhanni.features.event.yearoftheseal import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -56,7 +56,7 @@ object FishyTreatProfit {
             // ignore the last line of menu items
             if (slot > 44) continue
             // background items
-            if (item.displayName == " ") continue
+            if (item.name.formattedTextCompatLeadingWhiteLessResets() == " ") continue
             try {
                 readItem(slot, item, table)
             } catch (e: Throwable) {
@@ -145,7 +145,7 @@ object FishyTreatProfit {
     }
 
     private fun getItemName(item: ItemStack): String {
-        val name = item.displayName
+        val name = item.name.formattedTextCompatLeadingWhiteLessResets()
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
             item.repoItemName
@@ -194,7 +194,7 @@ object FishyTreatProfit {
                     ErrorManager.logErrorStateWithData(
                         "Error in FishyTreat Profit", "Could not read item amount",
                         "rawItemName" to rawItemName,
-                        "name" to item.displayName,
+                        "name" to item.name.formattedTextCompatLeadingWhiteLessResets(),
                         "lore" to lore,
                     )
                     continue

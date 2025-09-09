@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.slayer.enderman
+package at.hannibal2.skyhanni.features.slayer.enderman import at.hannibal2.skyhanni.utils.compat.deceased import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -32,9 +32,9 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.entity.Entity
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityEnderman
-import net.minecraft.init.Blocks
+import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.entity.mob.EndermanEntity
+import net.minecraft.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 // TODO replace all drawLineToEye with LineToMobHandler
@@ -43,9 +43,9 @@ object EndermanSlayerFeatures {
 
     private val config get() = SlayerApi.config.endermen
     private val beaconConfig get() = config.beacon
-    private val endermenWithBeacons = mutableListOf<EntityEnderman>()
-    private val flyingBeacons = mutableSetOf<EntityArmorStand>()
-    private val nukekubiSkulls = mutableSetOf<EntityArmorStand>()
+    private val endermenWithBeacons = mutableListOf<EndermanEntity>()
+    private val flyingBeacons = mutableSetOf<ArmorStandEntity>()
+    private val nukekubiSkulls = mutableSetOf<ArmorStandEntity>()
     private var sittingBeacon = mapOf<LorenzVec, SimpleTimeMark>()
     private val logger = LorenzLogger("slayer/enderman")
 
@@ -56,7 +56,7 @@ object EndermanSlayerFeatures {
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
-        if (entity is EntityEnderman && showBeacon() && hasBeaconInHand(entity) && entity.canBeSeen(
+        if (entity is EndermanEntity && showBeacon() && hasBeaconInHand(entity) && entity.canBeSeen(
                 viewDistance = 15.0,
                 ignoreFrustum = true
             )
@@ -65,10 +65,10 @@ object EndermanSlayerFeatures {
             logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
         }
 
-        if (entity is EntityArmorStand) {
+        if (entity is ArmorStandEntity) {
             if (showBeacon()) {
                 val stack = entity.getStandHelmet() ?: return
-                if (stack.displayName == "Beacon" && entity.canBeSeen(viewDistance = 15.0, ignoreFrustum = true)) {
+                if (stack.name.formattedTextCompatLeadingWhiteLessResets() == "Beacon" && entity.canBeSeen(viewDistance = 15.0, ignoreFrustum = true)) {
                     flyingBeacons.add(entity)
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
@@ -94,14 +94,14 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun hasBeaconInHand(enderman: EntityEnderman) = enderman.getBlockInHand()?.block == Blocks.beacon
+    private fun hasBeaconInHand(enderman: EndermanEntity) = enderman.getBlockInHand()?.block == Blocks.BEACON
 
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (beaconConfig.highlightBeacon) {
-            endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
+            endermenWithBeacons.removeIf { it.deceased || !hasBeaconInHand(it) }
 
             for (location in endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }) {
                 event.drawColor(location, beaconConfig.beaconColor, alpha = 0.5f)
@@ -115,7 +115,7 @@ object EndermanSlayerFeatures {
 
     private fun drawNukekubiSkulls(event: SkyHanniRenderWorldEvent) {
         for (skull in nukekubiSkulls) {
-            if (skull.isDead) continue
+            if (skull.deceased) continue
             if (config.highlightNukekebi) {
                 event.drawDynamicText(
                     skull.getLorenzVec().add(-0.5, 1.5, -0.5),
@@ -184,16 +184,16 @@ object EndermanSlayerFeatures {
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onSecondPassed(event: SecondPassedEvent) {
         nukekubiSkulls.removeAll {
-            if (it.isDead) {
+            if (it.deceased) {
                 RenderLivingEntityHelper.removeEntityColor(it)
             }
-            it.isDead
+            it.deceased
         }
         flyingBeacons.removeAll {
-            if (it.isDead) {
+            if (it.deceased) {
                 RenderLivingEntityHelper.removeEntityColor(it)
             }
-            it.isDead
+            it.deceased
         }
 
         // Removing the beacon if It's still there after 7 seconds.

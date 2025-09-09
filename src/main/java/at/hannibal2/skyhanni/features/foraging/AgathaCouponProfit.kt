@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.foraging
+package at.hannibal2.skyhanni.features.foraging import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -121,8 +121,8 @@ object AgathaCouponProfit {
             val internalName = item.getInternalNameOrNull() ?: return null
             internalName to item.repoItemName
         } else {
-            val internalName = NeuInternalName.fromItemNameOrNull(item.displayName) ?: return null
-            internalName to item.displayName
+            val internalName = NeuInternalName.fromItemNameOrNull(item.name.formattedTextCompatLeadingWhiteLessResets()) ?: return null
+            internalName to item.name.formattedTextCompatLeadingWhiteLessResets()
         }
     }
 
@@ -142,7 +142,7 @@ object AgathaCouponProfit {
                 ErrorManager.logErrorStateWithData(
                     "Error in AnitaCoupon Profit", "Could not read item amount",
                     "rawItemName" to rawItemName,
-                    "name" to item.displayName,
+                    "name" to item.name.formattedTextCompatLeadingWhiteLessResets(),
                     "lore" to lore,
                 )
                 continue

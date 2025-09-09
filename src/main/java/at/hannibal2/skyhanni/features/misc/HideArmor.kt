@@ -14,9 +14,9 @@ import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
-import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.Entity
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 
 
@@ -26,7 +26,7 @@ object HideArmor {
     val config: HideArmorConfig get() = SkyHanniMod.feature.misc.hideArmor
     private var armor = mapOf<Int, ItemStack>()
 
-    fun shouldHideArmor(entity: EntityPlayer): Boolean {
+    fun shouldHideArmor(entity: PlayerEntity): Boolean {
         if (!SkyBlockUtils.inSkyBlock) return false
         if (entity is FakePlayer) return false
         if (entity.hasPotionEffect(EffectsCompat.INVISIBILITY)) return false
@@ -35,15 +35,15 @@ object HideArmor {
         return when (config.mode) {
             ModeEntry.ALL -> true
 
-            ModeEntry.OWN -> entity is EntityPlayerSP
-            ModeEntry.OTHERS -> entity !is EntityPlayerSP
+            ModeEntry.OWN -> entity is ClientPlayerEntity
+            ModeEntry.OTHERS -> entity !is ClientPlayerEntity
 
             else -> false
         }
     }
 
     @HandleEvent
-    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityPlayer>) {
+    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<PlayerEntity>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
         val armorInventory = entity.getArmorInventory() ?: return
@@ -61,7 +61,7 @@ object HideArmor {
     }
 
     @HandleEvent
-    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityPlayer>) {
+    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<PlayerEntity>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
         val armorInventory = entity.getArmorInventory() ?: return

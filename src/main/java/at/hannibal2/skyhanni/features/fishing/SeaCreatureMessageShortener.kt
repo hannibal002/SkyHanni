@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.skyhanni.features.fishing import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -14,7 +14,7 @@ object SeaCreatureMessageShortener {
     @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
 
-        val original = event.chatEvent.chatComponent.formattedText
+        val original = event.chatEvent.chatComponent.formattedTextCompat()
         var edited = original
 
         if (config.shortenFishingMessage) {

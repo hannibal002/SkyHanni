@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class BarnTimerConfig {
     @Expose
@@ -62,8 +62,8 @@ class BarnTimerConfig {
 
     @Expose
     @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manually.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var manualResetTimer: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var manualResetTimer: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Fishing Timer Alert", desc = "Change the amount of time in seconds until the timer dings.")

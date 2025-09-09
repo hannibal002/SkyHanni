@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.inventory
+package at.hannibal2.skyhanni.features.garden.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -53,7 +53,7 @@ object GardenInventoryNumbers {
         if (InventoryUtils.openInventoryName() == "Composter Upgrades") {
             if (!config.composterUpgrades) return
 
-            ComposterUpgrade.regex.matchMatcher(event.stack.displayName) {
+            ComposterUpgrade.regex.matchMatcher(event.stack.name.formattedTextCompatLeadingWhiteLessResets()) {
                 val level = group("level")?.romanToDecimalIfNecessary() ?: 0
                 event.stackTip = "$level"
             }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.slayer.blaze
+package at.hannibal2.skyhanni.features.slayer.blaze import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 
 @SkyHanniModule
 object FirePillarDisplay {
@@ -30,7 +30,7 @@ object FirePillarDisplay {
     fun onTick() {
         if (!isEnabled()) return
 
-        val entityNames = EntityUtils.getEntities<EntityArmorStand>().map { it.name }
+        val entityNames = EntityUtils.getEntities<ArmorStandEntity>().map { it.name.formattedTextCompatLessResets() }
         val seconds = entityNamePattern.firstMatcher(entityNames) { group("seconds") }
         display = seconds?.let { "§cFire Pillar: §b${it}s" }.orEmpty()
     }

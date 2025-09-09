@@ -6,7 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class TrackCommandConfig {
     @Expose
@@ -25,6 +25,6 @@ class TrackCommandConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "Press this keybind to start/stop tracking.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var toggleKeybind: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var toggleKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 }

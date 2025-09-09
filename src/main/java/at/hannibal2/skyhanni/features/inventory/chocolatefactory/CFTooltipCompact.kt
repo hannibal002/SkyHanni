@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -24,7 +24,7 @@ object CFTooltipCompact {
         if (!CFApi.inChocolateFactory) return
 
         if (config.tooltipMove) {
-            if (event.slot.slotNumber <= 44) {
+            if (event.slot.id <= 44) {
                 lastHover = SimpleTimeMark.now()
                 tooltipToHover = event.toolTip.toList().map { partyModeReplace(it) }
                 event.cancel()
@@ -55,7 +55,7 @@ object CFTooltipCompact {
         if (!lore.any { it == "§7§eClick to uncover the meaning of life!" }) return
         if (lastClick.passedSince() >= 1.seconds && !config.compactOnClickAlways) return
         val list = mutableListOf<String>()
-        list.add(itemStack.displayName)
+        list.add(itemStack.name.formattedTextCompatLeadingWhiteLessResets())
         lore.getOrNull(5)?.let {
             list.add(it)
         }

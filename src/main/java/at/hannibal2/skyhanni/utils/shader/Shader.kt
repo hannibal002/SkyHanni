@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.utils.shader
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.GL11
 //#if MC < 1.21
-import net.minecraft.client.renderer.OpenGlHelper
-import net.minecraft.client.resources.IReloadableResourceManager
-import net.minecraft.client.shader.ShaderLinkHelper
+//$$ import net.minecraft.client.renderer.OpenGlHelper
+//$$ import net.minecraft.client.resources.IReloadableResourceManager
+//$$ import net.minecraft.client.gl.GlProgramManager
 //#endif
 
 /**
@@ -33,29 +33,29 @@ abstract class Shader(val vertex: String, val fragment: String) {
         // as we let Minecraft make them with render passes, but we still need their
         // member variables to set uniforms.
         //#if MC < 1.21
-        recompile()
-        (Minecraft.getMinecraft().resourceManager as IReloadableResourceManager).registerReloadListener {
-            recompile()
-        }
+        //$$ recompile()
+        //$$ (MinecraftClient.getInstance().resourceManager as IReloadableResourceManager).registerReloadListener {
+        //$$     recompile()
+        //$$ }
         //#endif
     }
 
     fun deleteOldShaders() {
         if (vertexShaderID >= 0) {
             //#if MC < 1.21
-            OpenGlHelper.glDeleteShader(vertexShaderID)
+            //$$ OpenGlHelper.glDeleteShader(vertexShaderID)
             //#endif
             vertexShaderID = -1
         }
         if (fragmentShaderID >= 0) {
             //#if MC < 1.21
-            OpenGlHelper.glDeleteShader(fragmentShaderID)
+            //$$ OpenGlHelper.glDeleteShader(fragmentShaderID)
             //#endif
             fragmentShaderID = -1
         }
         if (shaderProgram >= 0) {
             //#if MC < 1.21
-            OpenGlHelper.glDeleteProgram(shaderProgram)
+            //$$ OpenGlHelper.glDeleteProgram(shaderProgram)
             //#endif
             shaderProgram = -1
         }
@@ -66,7 +66,7 @@ abstract class Shader(val vertex: String, val fragment: String) {
     fun recompile() {
         deleteOldShaders()
         //#if MC < 1.21
-        shaderProgram = ShaderLinkHelper.getStaticShaderLinkHelper().createProgram()
+        //$$ shaderProgram = GlProgramManager.getStaticShaderLinkHelper().createProgram()
         //#endif
         if (shaderProgram < 0) return
 

@@ -57,7 +57,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import java.awt.Color
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
@@ -218,7 +218,7 @@ object TunnelsMaps {
     @HandleEvent
     fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
-        clickTranslate[event.slot.slotIndex]?.let {
+        clickTranslate[event.slot.index]?.let {
             event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
         }
     }
@@ -485,7 +485,7 @@ object TunnelsMaps {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (MinecraftClient.getInstance().currentScreen != null) return
         campfireKey(event)
         nextSpotKey(event)
     }

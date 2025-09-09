@@ -19,7 +19,7 @@ object PetCandyUsedDisplay {
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!config.showCandy) return
 
-        val stack = event.stack?.takeIf { it.stackSize == 1 } ?: return
+        val stack = event.stack?.takeIf { it.count == 1 } ?: return
         if (config.hideOnMaxed) {
             if (stack.getPetLevel() == stack.getMaxPetLevel()) return
         }

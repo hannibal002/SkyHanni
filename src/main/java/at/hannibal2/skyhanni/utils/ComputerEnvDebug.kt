@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 //#if MC == 1.8.9
-import net.minecraftforge.fml.client.FMLClientHandler
-import net.minecraftforge.fml.common.Loader
+//$$ import net.minecraftforge.fml.client.FMLClientHandler
+//$$ import net.minecraftforge.fml.common.Loader
 //#endif
 import java.lang.management.ManagementFactory
 import kotlin.math.roundToInt
@@ -228,38 +228,38 @@ object ComputerEnvDebug {
         if (PlatformUtils.isDevEnvironment) return
         event.title("Performance Mods")
         //#if MC < 1.21
-        val hasOptifine = FMLClientHandler.instance().hasOptifine()
-        val hasPatcher = Loader.isModLoaded("patcher")
-        if (!hasOptifine || !hasPatcher) {
-            event.addData {
-                add("Optifine is ${if (hasOptifine) "" else "not"} installed")
-                add("Patcher is ${if (hasPatcher) "" else "not"} installed")
-                add("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
-                if (!hasOptifine) {
-                    add("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
-                }
-                if (!hasPatcher) {
-                    add("https://modrinth.com/mod/patcher")
-                }
-            }
-        } else {
-            event.addIrrelevant {
-                add("Optifine and Patcher are installed")
-            }
-        }
-        //#else
-        //$$ val hasSodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")
-        //$$ if (!hasSodium) {
+        //$$ val hasOptifine = FMLClientHandler.instance().hasOptifine()
+        //$$ val hasPatcher = Loader.isModLoaded("patcher")
+        //$$ if (!hasOptifine || !hasPatcher) {
         //$$     event.addData {
-        //$$         add("Sodium is not installed")
-        //$$         add("This mod greatly improve performance")
-        //$$         add("https://modrinth.com/mod/sodium")
+        //$$         add("Optifine is ${if (hasOptifine) "" else "not"} installed")
+        //$$         add("Patcher is ${if (hasPatcher) "" else "not"} installed")
+        //$$         add("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
+        //$$         if (!hasOptifine) {
+        //$$             add("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
+        //$$         }
+        //$$         if (!hasPatcher) {
+        //$$             add("https://modrinth.com/mod/patcher")
+        //$$         }
         //$$     }
         //$$ } else {
         //$$     event.addIrrelevant {
-        //$$         add("Sodium is installed")
+        //$$         add("Optifine and Patcher are installed")
         //$$     }
         //$$ }
+        //#else
+        val hasSodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")
+        if (!hasSodium) {
+            event.addData {
+                add("Sodium is not installed")
+                add("This mod greatly improve performance")
+                add("https://modrinth.com/mod/sodium")
+            }
+        } else {
+            event.addIrrelevant {
+                add("Sodium is installed")
+            }
+        }
         //#endif
     }
 

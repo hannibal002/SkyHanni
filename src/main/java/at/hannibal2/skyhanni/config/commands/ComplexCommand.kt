@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.CommandArgument.Companion.findSpecifierAndGet
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
-import net.minecraft.util.BlockPos
+import net.minecraft.util.math.BlockPos
 
 data class ComplexCommand<O : CommandContextAwareObject>(
     val name: String,
@@ -118,7 +118,7 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         return result
     }
 
-    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String>? {
+    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String> {
         val rawArgs = args.toList()
         val isPartial = rawArgs.last().isNotEmpty()
         val newArgs = if (isPartial) rawArgs.dropLast(1) else rawArgs

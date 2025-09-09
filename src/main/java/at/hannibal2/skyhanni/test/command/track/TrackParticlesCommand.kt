@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 //#if MC < 1.21
-import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
+//$$ import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 //#else
-//$$ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 //#endif
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -17,18 +17,18 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 //#if MC < 1.21
-import net.minecraft.util.EnumParticleTypes
+//$$ import net.minecraft.particle.ParticleTypes
 //#else
-//$$ import at.hannibal2.skyhanni.utils.ParticleUtils
-//$$ import net.minecraft.registry.Registries
-//$$ import net.minecraft.util.Identifier
+import at.hannibal2.skyhanni.utils.ParticleUtils
+import net.minecraft.registry.Registries
+import net.minecraft.util.Identifier
 //#endif
 
 @SkyHanniModule
 //#if MC < 1.21
-object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTypes>(
+//$$ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, ParticleTypes>(
 //#else
-//$$ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, Identifier>(
+object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, Identifier>(
 //#endif
     commonName = "particle",
 ) {
@@ -37,22 +37,22 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
     // todo add suggestion provider for particle types, maybe when we're fully in 1.21
     override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
         //#if MC < 1.21
-        argCallback("name", EnumArgumentType.name<EnumParticleTypes>()) {
-            handleIgnorable(it)
-        }
-        //#else
-        //$$ argCallback("name", BrigadierArguments.string()) {
-        //$$    val type = ParticleUtils.getParticleTypeByName(it, shouldError = true) ?: return@argCallback
-        //$$    handleIgnorable(type)
+        //$$ argCallback("name", EnumArgumentType.name<ParticleTypes>()) {
+        //$$     handleIgnorable(it)
         //$$ }
+        //#else
+        argCallback("name", BrigadierArguments.string()) {
+           val type = ParticleUtils.getParticleTypeByName(it, shouldError = true) ?: return@argCallback
+           handleIgnorable(type)
+        }
         //#endif
     }
 
     //#if MC < 1.21
-    override fun ReceiveParticleEvent.getTypeIdentifier(): EnumParticleTypes = type
+    //$$ override fun ReceiveParticleEvent.getTypeIdentifier(): ParticleTypes = type
     //#else
-    //$$ override fun ReceiveParticleEvent.getTypeIdentifier(): Identifier = Registries.PARTICLE_TYPE.getId(type)
-    //$$    ?: throw IllegalStateException("Particle type $type is not registered in the registry")
+    override fun ReceiveParticleEvent.getTypeIdentifier(): Identifier = Registries.PARTICLE_TYPE.getId(type)
+       ?: throw IllegalStateException("Particle type $type is not registered in the registry")
     //#endif
 
     override fun ReceiveParticleEvent.formatForDisplay() = "§3${getTypeIdentifier()} §8c:$count §7s:$speed"

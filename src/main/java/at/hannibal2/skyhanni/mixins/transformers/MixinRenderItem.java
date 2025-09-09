@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.RenderItemHookKt;
-import at.hannibal2.skyhanni.utils.compat.DrawContext;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinRenderItem {
 
     @Inject(method = "renderItemOverlayIntoGUI", at = @At("RETURN"))
-    private void renderItemOverlayPost(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text, CallbackInfo ci) {
+    private void renderItemOverlayPost(TextRenderer fr, ItemStack stack, int xPosition, int yPosition, String text, CallbackInfo ci) {
         RenderItemHookKt.renderItemOverlayPost(new DrawContext(), stack, xPosition, yPosition, text);
     }
 

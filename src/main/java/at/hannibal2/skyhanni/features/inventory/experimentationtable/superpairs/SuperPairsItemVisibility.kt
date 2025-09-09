@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable.superpairs
+package at.hannibal2.skyhanni.features.inventory.experimentationtable.superpairs import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
@@ -38,7 +38,7 @@ object SuperPairsItemVisibility {
         if (!config.enabled) return
         if (!ExperimentationTableApi.inTable || ExperimentationTableApi.currentExperimentType != TaskType.SUPERPAIRS) return
         if (superpairsSlotMap.isEmpty() || event.slot !in superpairsSlotMap.keys) return
-        if (!unknownSuperpairsClickPattern.matches(event.originalItem.displayName)) return
+        if (!unknownSuperpairsClickPattern.matches(event.originalItem.name.formattedTextCompatLeadingWhiteLessResets())) return
         val replacementItem = superpairsSlotMap[event.slot] ?: return
         event.replace(replacementItem)
     }
@@ -51,11 +51,11 @@ object SuperPairsItemVisibility {
 
     @HandleEvent
     fun GuiContainerEvent.SlotClickEvent.tryReadUncoveredItem() {
-        val slotNumber = slot?.slotNumber?.takeIf {
+        val slotNumber = slot?.id?.takeIf {
             it !in superpairsSlotMap.keys
         } ?: return
         val clickedItem = item ?: return
-        if (unknownSuperpairsClickPattern.matches(clickedItem.displayName)) superpairsSlotsToRead.add(slotNumber)
+        if (unknownSuperpairsClickPattern.matches(clickedItem.name.formattedTextCompatLeadingWhiteLessResets())) superpairsSlotsToRead.add(slotNumber)
         else superpairsSlotMap[slotNumber] = clickedItem
     }
 
@@ -65,7 +65,7 @@ object SuperPairsItemVisibility {
         if (superpairsSlotsToRead.isEmpty()) return
 
         inventoryItems.filter {
-            it.key in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(it.value.displayName)
+            it.key in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(it.value.name.formattedTextCompatLeadingWhiteLessResets())
         }.forEach {
             superpairsSlotMap[it.key] = it.value
             superpairsSlotsToRead.remove(it.key)

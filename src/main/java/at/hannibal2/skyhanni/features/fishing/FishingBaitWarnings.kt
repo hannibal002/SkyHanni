@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.skyhanni.features.fishing import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.entity.item.EntityItem
+import net.minecraft.entity.ItemEntity
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,9 +24,9 @@ object FishingBaitWarnings {
     private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarnings
 
     private data class Bait(
-        private val entity: EntityItem,
+        private val entity: ItemEntity,
         val bobberDistance: Double,
-        val name: String = entity.entityItem.displayName,
+        val name: String = entity.stack.name.formattedTextCompatLeadingWhiteLessResets(),
     )
 
     private var lastBait: String? = null
@@ -49,12 +49,12 @@ object FishingBaitWarnings {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityEnterWorld(event: EntityEnterWorldEvent<EntityItem>) {
+    fun onEntityEnterWorld(event: EntityEnterWorldEvent<ItemEntity>) {
         if (KuudraApi.inKuudra || !FishingApi.isFishing()) return
         val bobberDistance = event.entity.distanceTo(FishingApi.bobber?.getLorenzVec() ?: return)
         if (bobberDistance > 2) return
         DelayedRun.runNextTick {
-            if (event.entity.entityItem.isBait()) {
+            if (event.entity.stack.isBait()) {
                 baitEntities += Bait(event.entity, bobberDistance)
             }
         }

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers.neu;
 
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue;
-import at.hannibal2.skyhanni.utils.compat.DrawContext;
+import net.minecraft.client.gui.DrawContext;
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils;
 import io.github.moulberry.notenoughupdates.miscgui.StorageOverlay;
 import org.spongepowered.asm.mixin.Mixin;

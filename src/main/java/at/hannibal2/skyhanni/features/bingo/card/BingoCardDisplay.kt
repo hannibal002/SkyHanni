@@ -29,8 +29,8 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiChat
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.ChatScreen
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
@@ -128,7 +128,7 @@ object BingoCardDisplay {
             }
         }
         if (!config.stepHelper && displayMode == 1) displayMode = 2
-        if (displayMode == 0 && Minecraft.getMinecraft().currentScreen !is GuiChat) {
+        if (displayMode == 0 && MinecraftClient.getInstance().currentScreen !is ChatScreen) {
             config.bingoCardPos.renderRenderables(displayCache, posLabel = "Bingo Card")
         } else if (displayMode == 1) {
             val helpRenderable = Renderable.vertical(

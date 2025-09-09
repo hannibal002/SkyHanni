@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import net.minecraft.util.IChatComponent
+import net.minecraft.text.Text
 
 @SkyHanniModule
 object ActionBarData {
@@ -62,14 +62,14 @@ object ActionBarData {
     /**
      * If the action bar is modified return the new one, otherwise return null.
      */
-    fun onChatReceive(component: IChatComponent): IChatComponent? {
-        val message = debugActionBar ?: component.formattedText.stripHypixelMessage()
+    fun onChatReceive(component: Text): Text? {
+        val message = debugActionBar ?: component.formattedTextCompat().stripHypixelMessage()
 
         actionBar = message
         val actionBarEvent = ActionBarUpdateEvent(actionBar, component)
         actionBarEvent.post()
 
-        if (component.formattedText != actionBarEvent.chatComponent.formattedText) {
+        if (component.formattedTextCompat() != actionBarEvent.chatComponent.formattedTextCompat()) {
             return actionBarEvent.chatComponent
         }
         return null

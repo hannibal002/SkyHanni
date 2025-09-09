@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.contest
+package at.hannibal2.skyhanni.features.garden.contest import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -26,9 +26,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.inventory.Slot
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.screen.GenericContainerScreenHandler
+import net.minecraft.screen.slot.Slot
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -68,8 +68,8 @@ object JacobFarmingContestsInventory {
         for ((slot, item) in event.inventoryItems) {
             if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
 
-            foundEvents.add(item.displayName)
-            val time = FarmingContestApi.getSBTimeFor(item.displayName) ?: continue
+            foundEvents.add(item.name.formattedTextCompatLeadingWhiteLessResets())
+            val time = FarmingContestApi.getSBTimeFor(item.name.formattedTextCompatLeadingWhiteLessResets()) ?: continue
             FarmingContestApi.addContest(time, item)
             if (config.realTime) {
                 readRealTime(time, slot)
@@ -91,7 +91,7 @@ object JacobFarmingContestsInventory {
         if (!config.openOnElite.isKeyHeld()) return
 
         val slot = event.slot ?: return
-        val itemName = slot.stack?.displayName ?: return
+        val itemName = slot.stack?.name.formattedTextCompatLeadingWhiteLessResets() ?: return
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {
@@ -169,8 +169,8 @@ object JacobFarmingContestsInventory {
         // hide green border for a tick
         if (hideEverything) return
 
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is GenericContainerScreen) return
+        val chest = event.container as GenericContainerScreenHandler
 
         for ((slot, stack) in chest.getUpperItems()) {
             if (stack.getLore().any { it == "§eClick to claim reward!" }) {
@@ -183,7 +183,7 @@ object JacobFarmingContestsInventory {
     fun onToolTip(event: ToolTipEvent) {
         if (!FarmingContestApi.inInventory) return
 
-        val slot = event.slot.slotNumber
+        val slot = event.slot.id
         if (config.realTime) {
             realTime[slot]?.let {
                 val toolTip = event.toolTip

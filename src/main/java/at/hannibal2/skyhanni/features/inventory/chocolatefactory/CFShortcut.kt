@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import net.minecraft.client.player.inventory.ContainerLocalMenu
+import net.minecraft.inventory.SimpleInventory
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -48,7 +48,7 @@ object CFShortcut {
 
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (event.inventory is ContainerLocalMenu && showItem && event.slot == slotId) {
+        if (event.inventory is SimpleInventory && showItem && event.slot == slotId) {
             event.replace(item)
         }
     }

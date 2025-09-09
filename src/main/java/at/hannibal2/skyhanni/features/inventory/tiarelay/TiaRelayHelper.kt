@@ -107,7 +107,7 @@ object TiaRelayHelper {
         val slot = event.slot
         val stack = slot.stack
 
-        val slotNumber = slot.slotNumber
+        val slotNumber = slot.id
 
         val position = resultDisplay.getOrDefault(slotNumber, null)
         if (position != null) {

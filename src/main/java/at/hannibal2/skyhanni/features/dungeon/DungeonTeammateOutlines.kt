@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.network.OtherClientPlayerEntity
 import net.minecraft.entity.Entity
-import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.scoreboard.Team
+import net.minecraft.scoreboard.AbstractTeam
 import java.awt.Color
 
 @SkyHanniModule
@@ -27,11 +27,11 @@ object DungeonTeammateOutlines {
     private fun isEnabled() = DungeonApi.inDungeon() && config.highlightTeammates
 
     private fun getEntityOutlineColor(entity: Entity): Color? {
-        if (entity !is EntityOtherPlayerMP || entity.team == null) return null
+        if (entity !is OtherClientPlayerEntity || entity.scoreboardTeam == null) return null
 
         // Must be visible on the scoreboard
-        val team = entity.team as ScorePlayerTeam
-        if (team.nameTagVisibility == Team.EnumVisible.NEVER) return null
+        val team = entity.scoreboardTeam as Team
+        if (team.nameTagVisibilityRule == AbstractTeam.VisibilityRule.NEVER) return null
 
         val colorFormat = StringUtils.getFormatFromString(team.colorPrefix)
         return if (colorFormat.length >= 2)

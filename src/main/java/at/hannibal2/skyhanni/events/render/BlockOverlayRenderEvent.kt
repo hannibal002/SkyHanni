@@ -11,9 +11,9 @@ enum class OverlayType {
 
     companion object {
         //#if FORGE
-        fun fromForge(old: net.minecraftforge.client.event.RenderBlockOverlayEvent.OverlayType): OverlayType {
-            return entries[old.ordinal]
-        }
+        //$$ fun fromForge(old: net.minecraftforge.client.event.RenderBlockOverlayEvent.OverlayType): OverlayType {
+        //$$     return entries[old.ordinal]
+        //$$ }
         //#endif
     }
 }

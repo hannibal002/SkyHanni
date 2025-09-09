@@ -48,10 +48,10 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiInventory
-import org.lwjgl.input.Keyboard
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import org.lwjgl.glfw.GLFW
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -128,9 +128,9 @@ object HoppityLiveDisplay {
     fun onKeyPress(event: KeyPressEvent) {
         reCheckInventoryState()
         if (!config.enabled) return
-        if (config.toggleKeybind == Keyboard.KEY_NONE || config.toggleKeybind != event.keyCode) return
+        if (config.toggleKeybind == GLFW.GLFW_KEY_UNKNOWN || config.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
-        if (Minecraft.getMinecraft().currentScreen != null && !CFApi.inChocolateFactory) return
+        if (MinecraftClient.getInstance().currentScreen != null && !CFApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggledOff = !storage.hoppityStatLiveDisplayToggledOff
@@ -173,7 +173,7 @@ object HoppityLiveDisplay {
 
     private fun inMatchingInventory(): Boolean {
         val setting = config.specificInventories
-        val currentScreen = Minecraft.getMinecraft().currentScreen
+        val currentScreen = MinecraftClient.getInstance().currentScreen
             ?: return HoppityLiveDisplayInventoryType.NO_INVENTORY in setting
 
         // Get the inventory name and check if it matches any of the specific inventories
@@ -184,7 +184,7 @@ object HoppityLiveDisplay {
             miscCfInventoryPatterns.matches(inventoryName)
 
         return when {
-            currentScreen is GuiInventory -> HoppityLiveDisplayInventoryType.OWN_INVENTORY
+            currentScreen is InventoryScreen -> HoppityLiveDisplayInventoryType.OWN_INVENTORY
             inChocolateFactory -> HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY
             inventoryName == "Hoppity" -> HoppityLiveDisplayInventoryType.HOPPITY
             mealEggInventoryPattern.matches(inventoryName) -> HoppityLiveDisplayInventoryType.MEAL_EGGS
@@ -193,7 +193,7 @@ object HoppityLiveDisplay {
     }
 
     private fun isInInventory(): Boolean =
-        Minecraft.getMinecraft().currentScreen is GuiInventory || Minecraft.getMinecraft().currentScreen is GuiChest
+        MinecraftClient.getInstance().currentScreen is InventoryScreen || MinecraftClient.getInstance().currentScreen is GenericContainerScreen
 
     private fun HoppityEventStats.buildMealEggHover(statYear: Int): List<String> = buildList {
         val spawnedEggs: Map<HoppityEggType, Int> = getSpawnedEggCountsWithInfPossible(statYear).takeIfNotEmpty() ?: return@buildList

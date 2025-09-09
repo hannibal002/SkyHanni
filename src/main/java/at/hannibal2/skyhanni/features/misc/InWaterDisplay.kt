@@ -17,7 +17,7 @@ object InWaterDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        val text = "§7In Water: " + if (MinecraftCompat.localPlayer.isInWater) "§aTrue" else "§cFalse"
+        val text = "§7In Water: " + if (MinecraftCompat.localPlayer.isTouchingWater) "§aTrue" else "§cFalse"
         config.inWaterPosition.renderStrings(listOf(text), posLabel = "In Water Display")
     }
 

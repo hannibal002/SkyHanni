@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.skyhanni.features.dungeon import at.hannibal2.skyhanni.utils.compat.container import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -28,8 +28,8 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderabl
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.screen.GenericContainerScreenHandler
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.math.max
@@ -55,18 +55,18 @@ object DungeonSpiritLeapOverlay {
 
         val gui = event.gui
         // TODO find a way to make InventoryDetector usable here.
-        if (gui !is GuiChest || InventoryUtils.openInventoryName().removeColor() !in validInventoryNames) return
+        if (gui !is GenericContainerScreen || InventoryUtils.openInventoryName().removeColor() !in validInventoryNames) return
         containerWidth = gui.width
         containerHeight = gui.height
         scaleFactor = min(containerWidth, containerHeight).toDouble() / max(containerWidth, containerHeight).toDouble()
 
-        val chest = gui.inventorySlots as ContainerChest
+        val chest = gui.container as GenericContainerScreenHandler
         playerList = buildList {
             for ((slot, stack) in chest.getUpperItems()) {
                 val lore = stack.getLore()
                 if (lore.isNotEmpty()) {
-                    val playerInfo = DungeonApi.getPlayerInfo(stack.displayName.cleanPlayerName())
-                    add(PlayerStackInfo(playerInfo, stack, slot.slotNumber))
+                    val playerInfo = DungeonApi.getPlayerInfo(stack.name.formattedTextCompatLeadingWhiteLessResets().cleanPlayerName())
+                    add(PlayerStackInfo(playerInfo, stack, slot.id))
                 }
             }
         }.sortedBy { it.playerInfo?.dungeonClass?.ordinal }

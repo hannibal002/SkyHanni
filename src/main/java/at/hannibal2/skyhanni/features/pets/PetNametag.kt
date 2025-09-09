@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.pets
+package at.hannibal2.skyhanni.features.pets import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 //#if MC > 1.16
-//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //#endif
 
 @SkyHanniModule
@@ -30,14 +30,14 @@ object PetNametag {
     )
 
     @HandleEvent
-    fun onNameTagRender(event: EntityDisplayNameEvent<EntityArmorStand>) {
+    fun onNameTagRender(event: EntityDisplayNameEvent<ArmorStandEntity>) {
         if (!isEnabled()) return
 
         val standName: String =
             //#if MC < 1.16
-            event.chatComponent.unformattedText
+            //$$ event.chatComponent.unformattedText
         //#else
-        //$$ event.chatComponent.formattedTextCompatLessResets()
+        event.chatComponent.formattedTextCompatLessResets()
         //#endif
 
         petNametagPattern.matchMatcher(standName) {

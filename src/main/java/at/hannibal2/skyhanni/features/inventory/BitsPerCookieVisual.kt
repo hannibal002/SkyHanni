@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -52,7 +52,7 @@ object BitsPerCookieVisual {
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (event.itemStack.getInternalNameOrNull() != boosterCookie) return
-        if (wrongCookiePattern.matches(event.itemStack.displayName)) return
+        if (wrongCookiePattern.matches(event.itemStack.name.formattedTextCompatLeadingWhiteLessResets())) return
         var timeReplaced = false
 
         val toolTip = event.toolTip

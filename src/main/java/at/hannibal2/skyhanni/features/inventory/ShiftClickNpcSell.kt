@@ -53,7 +53,7 @@ object ShiftClickNpcSell {
 
         val slot = event.slot ?: return
 
-        if (slot.slotNumber == slot.slotIndex) return
+        if (slot.id == slot.index) return
 
         event.makeShiftClick()
     }

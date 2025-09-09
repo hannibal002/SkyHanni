@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -59,7 +59,7 @@ object HitmanSlots {
     private fun handleSlotStorageUpdate(event: InventoryOpenEvent) {
         if (!config.hitmanCosts) return
         val leftToPurchase = event.inventoryItems.filterNotBorderSlots().count { (_, item) ->
-            item.displayName.isNotEmpty() && item.getLore().isNotEmpty() &&
+            item.name.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && item.getLore().isNotEmpty() &&
                 slotCostPattern.matches(item.getSingleLineLore())
         }
         val ownedSlots = CFApi.hitmanCosts.size - leftToPurchase

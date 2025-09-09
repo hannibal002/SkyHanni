@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class PersonalCompactorConfig {
     @Expose
@@ -31,8 +31,8 @@ class PersonalCompactorConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "The keybind to hold to show the overlay.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
-    var keybind: Int = Keyboard.KEY_LSHIFT
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_LEFT_SHIFT)
+    var keybind: Int = GLFW.GLFW_KEY_LEFT_SHIFT
 
     @Expose
     @ConfigOption(

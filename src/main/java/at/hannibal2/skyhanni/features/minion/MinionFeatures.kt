@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.minion
+package at.hannibal2.skyhanni.features.minion import at.hannibal2.skyhanni.utils.compat.deceased import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -52,10 +52,10 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.init.Blocks
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.block.Blocks
 
 @SkyHanniModule
 object MinionFeatures {
@@ -120,14 +120,14 @@ object MinionFeatures {
         if (event.action != ClickAction.RIGHT_CLICK_BLOCK) return
 
         //#if MC < 1.21
-        val vec = event.face
+        //$$ val vec = event.face
         //#else
-        //$$ val vec = event.face?.vector
+        val vec = event.face?.vector
         //#endif
-        val lookingAt = event.pos?.offset(vec)?.toLorenzVec() ?: return
+        val lookingAt = event.pos?.add(vec)?.toLorenzVec() ?: return
         val equipped = InventoryUtils.getItemInHand() ?: return
 
-        if (equipped.displayName.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.air) {
+        if (equipped.name.formattedTextCompatLeadingWhiteLessResets().contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.AIR) {
             newMinion = lookingAt.add(0.5, 0.0, 0.5)
             newMinionName = getMinionName(equipped.cleanName())
         } else {
@@ -182,7 +182,7 @@ object MinionFeatures {
         if (!minionTitlePattern.find(inventoryName)) return
 
         event.inventoryItems[48]?.let {
-            if (minionCollectItemPattern.matches(it.displayName)) {
+            if (minionCollectItemPattern.matches(it.name.formattedTextCompatLeadingWhiteLessResets())) {
                 MinionOpenEvent(inventoryName, event.inventoryItems).post()
                 return
             }
@@ -244,7 +244,7 @@ object MinionFeatures {
         val removedEntities = mutableListOf<LorenzVec>()
         for (location in minions.keys) {
             if (location.distanceToPlayer() > 30) continue
-            val entitiesNearby = EntityUtils.getEntities<EntityArmorStand>().map { it.distanceTo(location) }
+            val entitiesNearby = EntityUtils.getEntities<ArmorStandEntity>().map { it.distanceTo(location) }
             if (!entitiesNearby.any { it == 0.0 }) {
                 removedEntities.add(location)
             }
@@ -293,7 +293,7 @@ object MinionFeatures {
         if (!isEnabled()) return
         if (coinsPerDay != "") return
 
-        if (Minecraft.getMinecraft().currentScreen is GuiChest && config.hopperProfitDisplay) {
+        if (MinecraftClient.getInstance().currentScreen is GenericContainerScreen && config.hopperProfitDisplay) {
             coinsPerDay = if (minionInventoryOpen) updateCoinsPerDay() else ""
         }
     }
@@ -309,7 +309,7 @@ object MinionFeatures {
 
     private fun updateCoinsPerDay(): String {
         val loc = lastMinion ?: return "§cNo last minion found! Try reopening the minion view."
-        val slot = InventoryUtils.getItemsInOpenChest().find { it.slotNumber == 28 } ?: return ""
+        val slot = InventoryUtils.getItemsInOpenChest().find { it.id == 28 } ?: return ""
 
         val stack = slot.stack
         val line = stack.getLore().find { it.contains("Held Coins") } ?: return ""
@@ -329,7 +329,7 @@ object MinionFeatures {
         val coinsPerDay = (coins / (duration.inWholeMilliseconds)) * 1000 * 60 * 60 * 24
 
         val format = coinsPerDay.toInt().addSeparators()
-        return "§7Coins/day with ${stack.displayName}§7: §6$format coins"
+        return "§7Coins/day with ${stack.name.formattedTextCompatLeadingWhiteLessResets()}§7: §6$format coins"
     }
 
     @HandleEvent
@@ -407,16 +407,16 @@ object MinionFeatures {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStandEntity>) {
         if (!isEnabled()) return
         if (!config.hideMobsNametagNearby) return
 
         val entity = event.entity
         if (!entity.hasCustomName()) return
-        if (entity.isDead) return
+        if (entity.deceased) return
         val minions = minions ?: return
 
-        if (entity.customNameTag.contains("§c❤")) {
+        if (entity.customName.formattedTextCompatLessResets().contains("§c❤")) {
             val loc = entity.getLorenzVec()
             if (minions.any { it.key.distance(loc) < 5 }) {
                 event.cancel()

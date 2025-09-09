@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.skyhanni.features.mining import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 import java.util.Collections
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -117,9 +117,9 @@ object KingTalismanHelper {
     }
 
     private fun checkOffset() {
-        val king = EntityUtils.getEntitiesNearby<EntityArmorStand>(LorenzVec(129.6, 196.0, 196.7), 2.0)
-            .firstOrNull { it.name.startsWith("§6§lKing ") } ?: return
-        val foundKing = kingPattern.matchMatcher(king.name) {
+        val king = EntityUtils.getEntitiesNearby<ArmorStandEntity>(LorenzVec(129.6, 196.0, 196.7), 2.0)
+            .firstOrNull { it.name.formattedTextCompatLessResets().startsWith("§6§lKing ") } ?: return
+        val foundKing = kingPattern.matchMatcher(king.name.formattedTextCompatLessResets()) {
             group("name")
         } ?: return
 

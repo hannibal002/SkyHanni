@@ -24,8 +24,8 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import net.minecraft.block.state.IBlockState
-import net.minecraft.init.Blocks
+import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -37,7 +37,7 @@ object TimiteHelper {
     private var lastClick = SimpleTimeMark.farPast()
     private val config get() = SkyHanniMod.feature.rift.area.mountaintop.timite
     private var currentPos: LorenzVec? = null
-    private var currentBlockState: IBlockState? = null
+    private var currentBlockState: BlockState? = null
     private var doubleTimeShooting = false
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
@@ -110,7 +110,7 @@ object TimiteHelper {
         val iterator = locations.entries.iterator()
         while (iterator.hasNext()) {
             val state = iterator.next().key.getBlockStateAt()
-            if (state.block == Blocks.air) {
+            if (state.block == Blocks.AIR) {
                 iterator.remove()
             } else if (state.isStainedGlassPane(ColoredBlockCompat.LIGHT_BLUE)) {
                 iterator.remove()

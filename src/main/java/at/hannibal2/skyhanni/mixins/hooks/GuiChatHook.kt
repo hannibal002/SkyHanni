@@ -1,26 +1,26 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.skyhanni.mixins.hooks import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import net.minecraft.event.HoverEvent
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.ChatStyle
+import net.minecraft.text.HoverEvent
+import net.minecraft.text.Text
+import net.minecraft.text.Style
 //#if MC < 1.21
-import net.minecraft.util.IChatComponent
+//$$ import net.minecraft.text.Text
 //#endif
 
 object GuiChatHook {
 
     @JvmStatic
-    var currentComponent: IChatComponent? = null
+    var currentComponent: Text? = null
 
-    lateinit var replacement: ChatComponentText
+    lateinit var replacement: Text
 
-    fun replaceEntireComponent(title: String, chatStyle: ChatStyle) {
+    fun replaceEntireComponent(title: String, chatStyle: Style) {
         if (!this::replacement.isInitialized) return
 
         // Initialise new component
         val newComponent = title.asComponent()
-        newComponent.setChatStyle(chatStyle)
+        newComponent.setStyle(chatStyle)
 
         replacement = newComponent
     }
@@ -29,19 +29,19 @@ object GuiChatHook {
         if (!this::replacement.isInitialized) return
 
         // Initialise new component
-        val newComponent = replacement.unformattedTextForChat.asComponent {
-            chatStyle = replacement.chatStyle
+        val newComponent = replacement.unformattedTextForChatCompat().asComponent {
+            style = replacement.style
             //#if MC < 1.21
-            chatStyle.chatHoverEvent = hoverEvent
+            //$$ style.chatHoverEvent = hoverEvent
             //#else
-            //$$ style.withHoverEvent(hoverEvent)
+            style.withHoverEvent(hoverEvent)
             //#endif
         }
 
         replacement = newComponent
     }
 
-    fun getReplacementAsIChatComponent(): IChatComponent {
+    fun getReplacementAsIChatComponent(): Text {
         if (!this::replacement.isInitialized) {
             // Return an extremely basic chat component as to not error downstream
             return "Original component was not set".asComponent()

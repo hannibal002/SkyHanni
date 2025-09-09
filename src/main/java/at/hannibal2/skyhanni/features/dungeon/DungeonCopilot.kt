@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.skyhanni.features.dungeon import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 
 @SkyHanniModule
 object DungeonCopilot {
@@ -107,16 +107,16 @@ object DungeonCopilot {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStandEntity>) {
         val entity = event.entity
 
         if (!searchForKey) return
 
-        if (entity.name == "§6§8Wither Key") {
+        if (entity.name.formattedTextCompatLessResets() == "§6§8Wither Key") {
             changeNextStep("Pick up Wither Key")
             searchForKey = false
         }
-        if (entity.name == "§c§cBlood Key") {
+        if (entity.name.formattedTextCompatLessResets() == "§c§cBlood Key") {
             changeNextStep("Pick up Blood Key")
             searchForKey = false
         }

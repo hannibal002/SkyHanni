@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.container
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -26,12 +26,12 @@ object SnakeGame {
     private var inInventory = false
 
     private val keys
-        get() = with(Minecraft.getMinecraft().gameSettings) {
+        get() = with(MinecraftClient.getInstance().options) {
             mapOf(
-                keyBindLeft.keyCode to 50,
-                keyBindForward.keyCode to 51,
-                keyBindRight.keyCode to 52,
-                keyBindBack.keyCode to 53,
+                leftKey.boundKey.getCode() to 50,
+                forwardKey.boundKey.getCode() to 51,
+                rightKey.boundKey.getCode() to 52,
+                backKey.boundKey.getCode() to 53,
             )
         }
 
@@ -40,7 +40,7 @@ object SnakeGame {
         if (!isEnabled()) return
         if (!inInventory) return
 
-        val chest = event.guiContainer as? GuiChest ?: return
+        val chest = event.guiContainer as? GenericContainerScreen ?: return
 
         if (lastClick.passedSince() < 100.milliseconds) return
 
@@ -48,7 +48,7 @@ object SnakeGame {
             if (!key.isKeyHeld()) continue
             event.cancel()
 
-            InventoryUtils.clickSlot(slot, chest.inventorySlots.windowId, mouseButton = 2, mode = 3)
+            InventoryUtils.clickSlot(slot, chest.container.syncId, mouseButton = 2, mode = 3)
 
             lastClick = SimpleTimeMark.now()
             break

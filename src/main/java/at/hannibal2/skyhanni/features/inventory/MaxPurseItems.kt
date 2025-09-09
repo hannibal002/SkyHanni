@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -44,7 +44,7 @@ object MaxPurseItems {
     private fun getPrices() {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val item = slot.stack
-            val name = item.displayName ?: continue
+            val name = item.name.formattedTextCompatLeadingWhiteLessResets() ?: continue
             createOrderPattern.matchMatcher(name) {
                 orderPattern.firstMatcher(item.getLore()) {
                     // +0.1 because I expect people to use the gold nugget option

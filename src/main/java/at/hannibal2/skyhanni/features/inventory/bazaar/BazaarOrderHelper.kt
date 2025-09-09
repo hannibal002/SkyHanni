@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.bazaar
+package at.hannibal2.skyhanni.features.inventory.bazaar import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.screen.GenericContainerScreenHandler
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -60,7 +60,7 @@ object BazaarOrderHelper {
         val slots = mutableMapOf<Int, LorenzColor>()
         val errorItems = mutableSetOf<NeuInternalName>()
         for ((slot, stack) in inventoryItems) {
-            bazaarItemNamePattern.matchMatcher(stack.displayName) {
+            bazaarItemNamePattern.matchMatcher(stack.name.formattedTextCompatLeadingWhiteLessResets()) {
                 val buyOrSell = group("type").let { (it == "BUY") to (it == "SELL") }
                 if (buyOrSell.let { !it.first && !it.second }) return@matchMatcher
 
@@ -80,10 +80,10 @@ object BazaarOrderHelper {
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!inventory.isInside()) return
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is GenericContainerScreen) return
+        val chest = event.container as GenericContainerScreenHandler
         for ((slot, _) in chest.getUpperItems()) {
-            highlightedSlots[slot.slotNumber]?.let {
+            highlightedSlots[slot.id]?.let {
                 slot.highlight(it)
             }
         }

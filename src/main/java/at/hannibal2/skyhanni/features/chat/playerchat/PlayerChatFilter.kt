@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.features.chat.playerchat
+package at.hannibal2.skyhanni.features.chat.playerchat import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.PlayerChatFilterJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MultiFilter
-import net.minecraft.util.IChatComponent
+import net.minecraft.text.Text
 
 @SkyHanniModule
 object PlayerChatFilter {
 
     private val filters = mutableMapOf<String, MultiFilter>()
 
-    fun shouldChatFilter(original: IChatComponent): Boolean {
-        val message = original.formattedText.lowercase()
+    fun shouldChatFilter(original: Text): Boolean {
+        val message = original.formattedTextCompat().lowercase()
         for (filter in filters) {
             filter.value.matchResult(message)?.let {
                 return true

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.event.HoverEvent
+import net.minecraft.text.HoverEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -69,14 +69,14 @@ object ReplaceRomanNumerals {
         if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled()) return
 
-        val lore = event.getHoverEvent().value().formattedText.split("\n").toMutableList()
+        val lore = event.getHoverEvent().value().formattedTextCompat().split("\n").toMutableList()
         lore.replaceAll { it.tryReplace() }
 
         val chatComponentText = lore.joinToString("\n").asComponent()
         //#if MC < 1.21
-        val hoverEvent = HoverEvent(event.component.chatStyle.chatHoverEvent?.action, chatComponentText)
+        //$$ val hoverEvent = HoverEvent(event.component.style.hoverEvent?.action, chatComponentText)
         //#else
-        //$$ val hoverEvent = HoverEvent.ShowText(chatComponentText)
+        val hoverEvent = HoverEvent.ShowText(chatComponentText)
         //#endif
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)

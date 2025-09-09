@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.contest
+package at.hannibal2.skyhanni.features.garden.contest import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -43,7 +43,7 @@ object JacobContestFFNeededDisplay {
             return
         }
 
-        val time = FarmingContestApi.getSBTimeFor(stack.displayName) ?: return
+        val time = FarmingContestApi.getSBTimeFor(stack.name.formattedTextCompatLeadingWhiteLessResets()) ?: return
         val contest = FarmingContestApi.getContestAtTime(time) ?: return
 
         val newDisplay = drawDisplay(contest)

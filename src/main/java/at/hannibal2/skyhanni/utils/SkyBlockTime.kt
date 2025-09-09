@@ -135,7 +135,7 @@ data class SkyBlockTime(
             }
         }
 
-        fun isDay(): Boolean = MinecraftCompat.localWorld.worldTime % 24000 in 1..12000
+        fun isDay(): Boolean = MinecraftCompat.localWorld.timeOfDay % 24000 in 1..12000
 
         fun getSBMonthByName(month: String): Int {
             var monthNr = 0

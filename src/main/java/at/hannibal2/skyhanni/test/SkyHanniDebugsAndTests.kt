@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.skyhanni.test import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -64,9 +64,9 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NbtCompound
 //#if FORGE
-import net.minecraftforge.common.MinecraftForge
+//$$ import net.minecraftforge.common.MinecraftForge
 //#endif
 import java.io.File
 import java.time.LocalDate
@@ -89,10 +89,10 @@ object SkyHanniDebugsAndTests {
 
     val debugLogger = LorenzLogger("debug/test")
 
-    private fun run(compound: NBTTagCompound, text: String) {
+    private fun run(compound: NbtCompound, text: String) {
         print("$text'$compound'")
-        for (s in compound.keySet) {
-            val element = compound.getCompoundTag(s)
+        for (s in compound.keys) {
+            val element = compound.getCompoundOrDefault(s)
             run(element, "$text  ")
         }
     }
@@ -264,7 +264,7 @@ object SkyHanniDebugsAndTests {
             val javaClass = original.javaClass
             val simpleName = javaClass.simpleName
             //#if FORGE
-            MinecraftForge.EVENT_BUS.unregister(original)
+            //$$ MinecraftForge.EVENT_BUS.unregister(original)
             //#endif
             SkyHanniEvents.unregister(original)
             println("Unregistered listener $simpleName")
@@ -273,7 +273,7 @@ object SkyHanniDebugsAndTests {
                 modules.remove(original)
                 modules.add(original)
                 //#if FORGE
-                MinecraftForge.EVENT_BUS.register(original)
+                //$$ MinecraftForge.EVENT_BUS.register(original)
                 //#endif
                 SkyHanniEvents.register(original)
                 println("Registered listener $simpleName")
@@ -293,7 +293,7 @@ object SkyHanniDebugsAndTests {
                     val javaClass = original.javaClass
                     val simpleName = javaClass.simpleName
                     //#if FORGE
-                    MinecraftForge.EVENT_BUS.unregister(original)
+                    //$$ MinecraftForge.EVENT_BUS.unregister(original)
                     //#endif
                     SkyHanniEvents.unregister(original)
                     println("Unregistered listener $simpleName")

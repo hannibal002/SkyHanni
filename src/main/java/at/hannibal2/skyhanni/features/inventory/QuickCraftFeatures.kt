@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.screen.GenericContainerScreenHandler
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -42,7 +42,7 @@ object QuickCraftFeatures {
     @HandleEvent
     fun onToolTip(event: ToolTipEvent) {
         val inventoryType = getInventoryType() ?: return
-        if (inventoryType.ignoreSlot(event.slot.slotNumber)) return
+        if (inventoryType.ignoreSlot(event.slot.id)) return
 
         if (needsQuickCraftConfirmation(event.itemStack)) {
             event.toolTip.replaceAll {
@@ -58,12 +58,12 @@ object QuickCraftFeatures {
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         val inventoryType = getInventoryType() ?: return
         if (KeyboardManager.isModifierKeyDown()) return
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is GenericContainerScreen) return
+        val chest = event.container as GenericContainerScreenHandler
 
         for ((slot, stack) in chest.getAllItems()) {
-            if (inventoryType.ignoreSlot(slot.slotNumber)) continue
-            if (stack.displayName == "§cQuick Crafting Slot") continue
+            if (inventoryType.ignoreSlot(slot.id)) continue
+            if (stack.name.formattedTextCompatLeadingWhiteLessResets() == "§cQuick Crafting Slot") continue
             if (needsQuickCraftConfirmation(stack)) {
                 slot.highlight(LorenzColor.DARK_GRAY.addOpacity(180))
             }
@@ -73,7 +73,7 @@ object QuickCraftFeatures {
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val inventoryType = getInventoryType() ?: return
-        if (inventoryType.ignoreSlot(event.slot?.slotNumber)) return
+        if (inventoryType.ignoreSlot(event.slot?.id)) return
 
         val clickedItem = event.slot?.stack ?: return
         if (!KeyboardManager.isModifierKeyDown() && needsQuickCraftConfirmation(clickedItem)) {
@@ -82,7 +82,7 @@ object QuickCraftFeatures {
     }
 
     private fun needsQuickCraftConfirmation(item: ItemStack): Boolean {
-        return !quickCraftableItems.contains(item.displayName.removeColor())
+        return !quickCraftableItems.contains(item.name.formattedTextCompatLeadingWhiteLessResets().removeColor())
     }
 
     private fun getInventoryType(): InventoryType? {

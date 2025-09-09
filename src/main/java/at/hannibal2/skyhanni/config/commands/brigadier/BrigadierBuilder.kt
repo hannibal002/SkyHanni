@@ -13,7 +13,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.CommandNode
 //#if MC < 1.21
-import net.minecraft.command.ICommand
+//$$ import net.minecraft.command.ICommand
 //#endif
 
 typealias LiteralCommandBuilder = BrigadierBuilder<LiteralArgumentBuilder<Any?>>
@@ -32,7 +32,7 @@ class BaseBrigadierBuilder(override val name: String) : CommandData, BrigadierBu
     lateinit var node: CommandNode<Any?>
 
     //#if MC < 1.21
-    override fun toCommand(dispatcher: CommandDispatcher<Any?>): ICommand = BrigadierCommand(this, dispatcher)
+    //$$ override fun toCommand(dispatcher: CommandDispatcher<Any?>): ICommand = BrigadierCommand(this, dispatcher)
     //#endif
 }
 

@@ -76,15 +76,15 @@ class HoppityWaypointsConfig {
 
     @Expose
     //#if FORGE
-    @ConfigOption(
-        name = "Load from NEU PV",
-        desc = "Load Hoppity Egg Location data from API when opening the NEU Profile Viewer."
-    )
+    //$$ @ConfigOption(
+    //$$     name = "Load from NEU PV",
+    //$$     desc = "Load Hoppity Egg Location data from API when opening the NEU Profile Viewer."
+    //$$ )
     //#else
-    //$$@ConfigOption(
-    //$$    name = "Load from SkyBlock PV",
-    //$$    desc = "Load Hoppity Egg Location data from API when opening the SkyBlock Profile Viewer mod."
-    //$$)
+    @ConfigOption(
+       name = "Load from SkyBlock PV",
+       desc = "Load Hoppity Egg Location data from API when opening the SkyBlock Profile Viewer mod."
+    )
     //#endif
     @ConfigEditorBoolean
     @FeatureToggle

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.api.enoughupdates
+package at.hannibal2.skyhanni.api.enoughupdates import at.hannibal2.skyhanni.utils.compat.getStringOrDefault import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault import at.hannibal2.skyhanni.utils.compat.getIntOrDefault import at.hannibal2.skyhanni.utils.compat.container
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -17,32 +17,32 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.init.Items
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.inventory.IInventory
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.item.Items
+import net.minecraft.screen.GenericContainerScreenHandler
+import net.minecraft.inventory.Inventory
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NbtCompound
 import java.util.regex.Matcher
 //#if MC > 1.21
-//$$ import net.minecraft.component.ComponentMap
+import net.minecraft.component.ComponentMap
 //#endif
 
 // Code taken from NotEnoughUpdates
 class ItemResolutionQuery {
 
     //#if MC < 1.21
-    private var compound: NBTTagCompound? = null
-
+    //$$ private var compound: NbtCompound? = null
+    //$$
     //#else
-    //$$ private var compound: ComponentMap? = null
+    private var compound: ComponentMap? = null
     //#endif
     private var itemType: Item? = null
     private var knownInternalName: String? = null
-    private var guiContext: GuiScreen? = null
+    private var guiContext: Screen? = null
 
     @SkyHanniModule
     companion object {
@@ -167,7 +167,7 @@ class ItemResolutionQuery {
 
     fun withItemStack(stack: ItemStack): ItemResolutionQuery {
         this.itemType = stack.item
-        this.compound = stack.tagCompound
+        this.compound = stack.components
         return this
     }
 
@@ -177,7 +177,7 @@ class ItemResolutionQuery {
     }
 
     fun withCurrentGuiContext(): ItemResolutionQuery {
-        this.guiContext = Minecraft.getMinecraft().currentScreen
+        this.guiContext = MinecraftClient.getInstance().currentScreen
         return this
     }
 
@@ -207,7 +207,7 @@ class ItemResolutionQuery {
     }
 
     private fun resolvePetName(): String? {
-        val petInfo = getExtraAttributes().getString("petInfo")
+        val petInfo = getExtraAttributes().getStringOrDefault("petInfo")
         if (petInfo.isNullOrEmpty()) return null
         try {
             val petInfoObject = ConfigManager.gson.fromJson(petInfo, JsonObject::class.java)
@@ -225,40 +225,40 @@ class ItemResolutionQuery {
     }
 
     private fun resolveRuneName(): String? {
-        val runes = getExtraAttributes().getCompoundTag("runes")
-        val runeName = runes.keySet.singleOrNull()
+        val runes = getExtraAttributes().getCompoundOrDefault("runes")
+        val runeName = runes.keys.singleOrNull()
         if (runeName.isNullOrEmpty()) return null
-        return runeName.uppercase() + "_RUNE;" + runes.getInteger(runeName)
+        return runeName.uppercase() + "_RUNE;" + runes.getIntOrDefault(runeName)
     }
 
     private fun resolveEnchantedBookNameFromNBT(): String? {
-        val enchantments = getExtraAttributes().getCompoundTag("enchantments")
-        val enchantName = enchantments.keySet.singleOrNull()
+        val enchantments = getExtraAttributes().getCompoundOrDefault("enchantments")
+        val enchantName = enchantments.keys.singleOrNull()
         if (enchantName.isNullOrEmpty()) return null
-        return enchantName.uppercase() + ";" + enchantments.getInteger(enchantName)
+        return enchantName.uppercase() + ";" + enchantments.getIntOrDefault(enchantName)
     }
 
     private fun resolveCrabHatName(): String {
-        val crabHatYear = getExtraAttributes().getInteger("party_hat_year")
-        val color = getExtraAttributes().getString("party_hat_color")
+        val crabHatYear = getExtraAttributes().getIntOrDefault("party_hat_year")
+        val color = getExtraAttributes().getStringOrDefault("party_hat_color")
         return "PARTY_HAT_CRAB_" + color.uppercase() + (if (crabHatYear == 2022) "_ANIMATED" else "")
     }
 
     private fun resolvePhoneCase(): String {
-        val model = getExtraAttributes().getString("model")
+        val model = getExtraAttributes().getStringOrDefault("model")
         return "ABICASE_" + model.uppercase()
     }
 
     private fun resolveSlothHatName(): String {
-        val emoji = getExtraAttributes().getString("party_hat_emoji")
+        val emoji = getExtraAttributes().getStringOrDefault("party_hat_emoji")
         return "PARTY_HAT_SLOTH_" + emoji.uppercase()
     }
 
     private fun resolvePotionName(): String {
-        val potion = getExtraAttributes().getString("potion")
-        val potionLvl = getExtraAttributes().getInteger("potion_level")
-        val potionName = getExtraAttributes().getString("potion_name").replace(" ", "_")
-        val potionType = getExtraAttributes().getString("potion_type")
+        val potion = getExtraAttributes().getStringOrDefault("potion")
+        val potionLvl = getExtraAttributes().getIntOrDefault("potion_level")
+        val potionName = getExtraAttributes().getStringOrDefault("potion_name").replace(" ", "_")
+        val potionType = getExtraAttributes().getStringOrDefault("potion_type")
         return if (potionName.isNotEmpty()) {
             "POTION_" + potionName.uppercase() + ";" + potionLvl
         } else if (!potion.isNullOrEmpty()) {
@@ -271,16 +271,16 @@ class ItemResolutionQuery {
     }
 
     private fun resolveBalloonHatName(): String {
-        val color = getExtraAttributes().getString("party_hat_color")
-        val balloonHatYear = getExtraAttributes().getInteger("party_hat_year")
+        val color = getExtraAttributes().getStringOrDefault("party_hat_color")
+        val balloonHatYear = getExtraAttributes().getIntOrDefault("party_hat_year")
         return "BALLOON_HAT_" + balloonHatYear + "_" + color.uppercase()
     }
 
     private fun resolveAttributeShardName(): String? {
-        val attributes = getExtraAttributes().getCompoundTag("attributes")
-        val attributeName = attributes.keySet.singleOrNull()
+        val attributes = getExtraAttributes().getCompoundOrDefault("attributes")
+        val attributeName = attributes.keys.singleOrNull()
         if (attributeName.isNullOrEmpty()) return null
-        return "ATTRIBUTE_SHARD_" + attributeName.uppercase() + ";" + attributes.getInteger(attributeName)
+        return "ATTRIBUTE_SHARD_" + attributeName.uppercase() + ";" + attributes.getIntOrDefault(attributeName)
     }
 
     private fun resolveItemInCatacombsRngMeter(): String? {
@@ -308,16 +308,16 @@ class ItemResolutionQuery {
     }
 
     private fun resolveContextualName(): String? {
-        val chest = guiContext as? GuiChest ?: return null
-        val inventorySlots = chest.inventorySlots as ContainerChest
+        val chest = guiContext as? GenericContainerScreen ?: return null
+        val inventorySlots = chest.container as GenericContainerScreenHandler
         val guiName = InventoryUtils.openInventoryName()
-        val isOnBazaar: Boolean = isBazaar(inventorySlots.lowerChestInventory)
+        val isOnBazaar: Boolean = isBazaar(inventorySlots.inventory)
         var displayName: String = ItemUtils.getDisplayName(compound) ?: return null
         displayName = displayName.removePrefix("§6§lSELL ").removePrefix("§a§lBUY ")
-        if (itemType === Items.enchanted_book && isOnBazaar && compound != null) {
+        if (itemType === Items.ENCHANTED_BOOK && isOnBazaar && compound != null) {
             return resolveEnchantmentByName(displayName)
         }
-        if (itemType === Items.skull && displayName.contains("Essence")) {
+        if (itemType === Items.PLAYER_HEAD && displayName.contains("Essence")) {
             findInternalNameByDisplayName(displayName, false)?.let { return it }
         }
         if (displayName.endsWith("Enchanted Book") && guiName.startsWith("Superpairs")) {
@@ -345,23 +345,23 @@ class ItemResolutionQuery {
         return null
     }
 
-    private fun isBazaar(chest: IInventory): Boolean {
+    private fun isBazaar(chest: Inventory): Boolean {
         if (InventoryUtils.openInventoryName().startsWith("Bazaar ➜ ")) {
             return true
         }
-        val bazaarSlot = chest.sizeInventory - 5
+        val bazaarSlot = chest.size() - 5
         if (bazaarSlot < 0) return false
-        val stackInSlot = chest.getStackInSlot(bazaarSlot) ?: return false
-        if (stackInSlot.stackSize == 0) return false
+        val stackInSlot = chest.getStack(bazaarSlot) ?: return false
+        if (stackInSlot.count == 0) return false
 
         val lore: List<String> = stackInSlot.getLore()
         return lore.contains("§7To Bazaar")
     }
 
-    private fun getExtraAttributes(): NBTTagCompound = compound?.extraAttributes ?: NBTTagCompound()
+    private fun getExtraAttributes(): NbtCompound = compound?.extraAttributes ?: NbtCompound()
 
     private fun resolveFromSkyblock(): String? {
-        val internalName = getExtraAttributes().getString("id")
+        val internalName = getExtraAttributes().getStringOrDefault("id")
         if (internalName.isNullOrEmpty()) return null
         return internalName.uppercase().replace(":", "-")
     }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.skyhanni.test import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -68,7 +68,7 @@ object TestCopyBestiaryValues {
     }
 
     private fun copy(titleItem: ItemStack, inventoryItems: Map<Int, ItemStack>) {
-        val titleName = titleItem.displayName.removeWordsAtEnd(1)
+        val titleName = titleItem.name.formattedTextCompatLeadingWhiteLessResets().removeWordsAtEnd(1)
 
         val obj = BestiaryObject()
         obj.name = titleName
@@ -88,7 +88,7 @@ object TestCopyBestiaryValues {
         val mobs = mutableListOf<String>()
         for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
-            bestiaryTypePattern.matchMatcher(stack.displayName.removeColor()) {
+            bestiaryTypePattern.matchMatcher(stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
                 val lvl = group("lvl").toInt()
                 var text = group("text").lowercase().replace(" ", "_")
 

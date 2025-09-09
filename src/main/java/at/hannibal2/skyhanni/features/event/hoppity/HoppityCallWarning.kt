@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import net.minecraft.client.renderer.GlStateManager
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import java.time.Instant
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.seconds
@@ -104,7 +104,7 @@ object HoppityCallWarning {
             // Apply the shifted alpha and combine it with the RGB components of flashColor.
             shiftedRandomAlpha or (config.flashColor.toColor().rgb and 0xFFFFFF),
         )
-        GlStateManager.color(1F, 1F, 1F, 1F)
+        ModernGlStateManager.color(1F, 1F, 1F, 1F)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

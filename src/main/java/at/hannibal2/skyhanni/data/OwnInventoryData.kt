@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -22,9 +22,9 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.network.play.client.C0EPacketClickWindow
-import net.minecraft.network.play.server.S0DPacketCollectItem
-import net.minecraft.network.play.server.S2FPacketSetSlot
+import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket
+import net.minecraft.network.packet.s2c.play.ItemPickupAnimationS2CPacket
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -46,14 +46,14 @@ object OwnInventoryData {
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true, onlyOnSkyblock = true)
     fun onItemPickupReceivePacket(event: PacketReceivedEvent) {
         val packet = event.packet
-        if (packet is S2FPacketSetSlot || packet is S0DPacketCollectItem) {
+        if (packet is ScreenHandlerSlotUpdateS2CPacket || packet is ItemPickupAnimationS2CPacket) {
             dirty = true
         }
-        if (packet is S2FPacketSetSlot) {
-            val windowId = packet.func_149175_c()
+        if (packet is ScreenHandlerSlotUpdateS2CPacket) {
+            val windowId = packet.syncId
             if (windowId == 0) {
-                val slot = packet.func_149173_d()
-                val item = packet.func_149174_e() ?: return
+                val slot = packet.slot
+                val item = packet.stack ?: return
                 DelayedRun.runNextTick {
                     OwnInventoryItemUpdateEvent(item, slot).post()
                 }
@@ -65,7 +65,7 @@ object OwnInventoryData {
     fun onClickEntity(event: PacketSentEvent) {
         val packet = event.packet
 
-        if (packet is C0EPacketClickWindow) {
+        if (packet is ClickSlotC2SPacket) {
             dirty = true
         }
     }
@@ -90,7 +90,7 @@ object OwnInventoryData {
         val map = mutableMapOf<NeuInternalName, Int>()
         for (itemStack in InventoryUtils.getItemsInOwnInventory()) {
             val internalName = itemStack.getInternalNameOrNull() ?: continue
-            map.addOrPut(internalName, itemStack.stackSize)
+            map.addOrPut(internalName, itemStack.count)
         }
         return map
     }
@@ -120,7 +120,7 @@ object OwnInventoryData {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         ignoreItem(500.milliseconds) { true }
 
-        val itemName = event.item?.displayName ?: return
+        val itemName = event.item?.name.formattedTextCompatLeadingWhiteLessResets() ?: return
         checkAHMovements(itemName)
     }
 

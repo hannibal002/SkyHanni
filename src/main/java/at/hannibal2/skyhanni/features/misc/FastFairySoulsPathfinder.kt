@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -211,7 +211,7 @@ object FastFairySoulsPathfinder {
         if (event.inventoryName != "Fairy Souls Guide") return
 
         for (stack in event.inventoryItems.values) {
-            val island = IslandType.getByNameOrNull(stack.displayName.removeColor()) ?: continue
+            val island = IslandType.getByNameOrNull(stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()) ?: continue
             val have = stack.getLore().firstOrNull()?.let {
                 loreSoulPattern.matchMatcher(it) {
                     group("have").toIntOrNull()

@@ -1,20 +1,21 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.resources.DefaultPlayerSkin
-import net.minecraft.entity.player.EnumPlayerModelParts
-import net.minecraft.scoreboard.ScorePlayerTeam
+import net.minecraft.client.network.OtherClientPlayerEntity
+import net.minecraft.client.util.DefaultSkinHelper
+import net.minecraft.client.util.SkinTextures
+import net.minecraft.entity.player.PlayerModelPart
+import net.minecraft.scoreboard.Team
 
-class FakePlayer : EntityOtherPlayerMP(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
+class FakePlayer : OtherClientPlayerEntity(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
 
-    override fun getLocationSkin() =
-        MinecraftCompat.localPlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(MinecraftCompat.localPlayer.uniqueID)
+    override fun getSkinTextures(): SkinTextures =
+        MinecraftCompat.localPlayer.skinTextures ?: DefaultSkinHelper.getSkinTextures(MinecraftCompat.localPlayer.uuid)
 
-    override fun getTeam() = object : ScorePlayerTeam(null, null) {
-        override fun getNameTagVisibility() = EnumVisible.NEVER
+    override fun getScoreboardTeam() = object : Team(null, "") {
+        override fun getNameTagVisibilityRule() = VisibilityRule.NEVER
     }
 
-    override fun isWearing(part: EnumPlayerModelParts): Boolean =
-        MinecraftCompat.localPlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
+    override fun isPartVisible(part: PlayerModelPart): Boolean =
+        MinecraftCompat.localPlayer.isPartVisible(part) && part != PlayerModelPart.CAPE
 }

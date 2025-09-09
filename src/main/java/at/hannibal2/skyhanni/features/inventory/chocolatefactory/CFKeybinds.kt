@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory import at.hannibal2.skyhanni.utils.compat.container
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -20,7 +20,7 @@ object CFKeybinds {
         if (!config.enabled) return
         if (!CFApi.inChocolateFactory) return
 
-        val chest = event.guiContainer as? GuiChest ?: return
+        val chest = event.guiContainer as? GenericContainerScreen ?: return
 
         for (index in 0..6) {
             val key = getKey(index) ?: error("no key for index $index")
@@ -30,7 +30,7 @@ object CFKeybinds {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(28 + index, chest.inventorySlots.windowId, mouseButton = 2, mode = 3)
+            InventoryUtils.clickSlot(28 + index, chest.container.syncId, mouseButton = 2, mode = 3)
             break
         }
     }

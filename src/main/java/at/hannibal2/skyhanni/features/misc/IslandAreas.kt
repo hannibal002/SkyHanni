@@ -33,9 +33,9 @@ import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.network.ClientPlayerEntity
+import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -93,7 +93,7 @@ object IslandAreas {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<ClientPlayerEntity>) {
         if (isEnabled() && event.isLocalPlayer) {
             hasMoved = true
         }
@@ -104,7 +104,7 @@ object IslandAreas {
         if (!isEnabled()) return
         if (!isPathfinderEnabled()) return
         if (!config.pathfinder.showAlways) return
-        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val isInOwnInventory = MinecraftClient.getInstance().currentScreen is InventoryScreen
         if (isInOwnInventory) return
 
         display?.let {
@@ -116,7 +116,7 @@ object IslandAreas {
     fun onBackgroundDraw() {
         if (!isEnabled()) return
         if (!isPathfinderEnabled()) return
-        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val isInOwnInventory = MinecraftClient.getInstance().currentScreen is InventoryScreen
         if (!isInOwnInventory) return
 
         display?.let {
@@ -255,7 +255,7 @@ object IslandAreas {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.inWorld) return
-        for ((node, distance) in nodes) {
+        for ((node, _) in nodes) {
             val name = node.name ?: continue
             if (name == currentArea) continue
             if (name == "no_area") continue

@@ -3,16 +3,16 @@ package at.hannibal2.skyhanni.data.hypixel.chat.event
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import net.minecraft.util.IChatComponent
+import net.minecraft.text.Text
 
 // A SkyHanniChatEvent after filtering all player send events, leaving messages from the game/system.
 @PrimaryFunction("onSystemMessage")
 open class SystemMessageEvent(
     open val message: String,
-    open var chatComponent: IChatComponent,
+    open var chatComponent: Text,
     open var blockedReason: String? = null,
 ) : SkyHanniEvent() {
-    fun replaceComponent(newComponent: IChatComponent, reason: String) {
+    fun replaceComponent(newComponent: Text, reason: String) {
         ChatManager.addReplacementContext(chatComponent, reason)
         chatComponent = newComponent
     }

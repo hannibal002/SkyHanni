@@ -15,7 +15,7 @@ import java.util.List;
 @Mixin(value = EquipmentOverlay.class, remap = false)
 public class MixinEquipmentOverlay {
 
-    @Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getTooltip(Lnet/minecraft/entity/player/EntityPlayer;Z)Ljava/util/List;"))
+    @Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getTooltip(Lnet/minecraft/entity/player/PlayerEntity;Z)Ljava/util/List;"))
     public void drawSlot(ItemStack stack, int x, int y, int mouseX, int mouseY, List<String> tooltip, CallbackInfo ci) {
         EstimatedItemValue.INSTANCE.onNeuDrawEquipment(stack);
     }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.skyhanni.features.garden.farming import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -162,7 +162,7 @@ object DicerRngDropTracker {
         val crop = event.crop
         cropInHand = if (crop == CropType.MELON || crop == CropType.PUMPKIN) crop else null
         if (cropInHand != null) {
-            toolName = event.toolItem!!.displayName
+            toolName = event.toolItem!!.name.formattedTextCompatLeadingWhiteLessResets()
         }
         tracker.update()
     }

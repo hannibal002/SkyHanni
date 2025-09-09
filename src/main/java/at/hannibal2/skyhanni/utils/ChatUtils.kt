@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 //#if MC < 1.21
-import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
+//$$ import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
@@ -25,9 +25,9 @@ import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ChatLine
-import net.minecraft.util.IChatComponent
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.hud.ChatHudLine
+import net.minecraft.text.Text
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.reflect.KProperty0
@@ -125,8 +125,8 @@ object ChatUtils {
         }
     }
 
-    fun chat(message: IChatComponent, send: Boolean = true): Boolean {
-        val formattedMessage = message.formattedText
+    fun chat(message: Text, send: Boolean = true): Boolean {
+        val formattedMessage = message.formattedTextCompat()
         log.log(formattedMessage)
 
         if (!MinecraftCompat.localPlayerExists) {
@@ -275,7 +275,7 @@ object ChatUtils {
      * @see CHAT_PREFIX
      */
     fun multiComponentMessage(
-        components: List<IChatComponent>,
+        components: List<Text>,
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {
@@ -283,39 +283,39 @@ object ChatUtils {
         chat(TextHelper.join(components).prefix(msgPrefix))
     }
 
-    private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
+    private val chatGui get() = MinecraftClient.getInstance().inGameHud.chatHud
 
     //#if MC < 1.21
-    var chatLines: MutableList<ChatLine>
-        get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
-        set(value) {
-            (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni = value
-        }
-
-    var drawnChatLines: MutableList<ChatLine>
-        get() = (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni
-        set(value) {
-            (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
-        }
-    //#else
     //$$ var chatLines: MutableList<ChatHudLine>
-    //$$     get() = chatGui.messages
+    //$$     get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
     //$$     set(value) {
-    //$$         chatGui.messages = value
+    //$$         (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni = value
     //$$     }
     //$$
-    //$$ var drawnChatLines: MutableList<ChatHudLine.Visible>
-    //$$     get() = chatGui.visibleMessages
+    //$$ var drawnChatLines: MutableList<ChatHudLine>
+    //$$     get() = (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni
     //$$     set(value) {
-    //$$         chatGui.visibleMessages = value
+    //$$         (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
     //$$     }
+    //#else
+    var chatLines: MutableList<ChatHudLine>
+        get() = chatGui.messages
+        set(value) {
+            chatGui.messages = value
+        }
+
+    var drawnChatLines: MutableList<ChatHudLine.Visible>
+        get() = chatGui.visibleMessages
+        set(value) {
+            chatGui.visibleMessages = value
+        }
     //#endif
 
     /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
     fun editFirstMessage(
-        component: (IChatComponent) -> IChatComponent,
+        component: (Text) -> Text,
         reason: String,
-        predicate: (ChatLine) -> Boolean,
+        predicate: (ChatHudLine) -> Boolean,
     ) {
         chatLines.editChatLine(component, predicate, reason)
         refreshChat()
@@ -327,7 +327,7 @@ object ChatUtils {
     fun deleteMessage(
         reason: String,
         amount: Int = 1,
-        predicate: (ChatLine) -> Boolean,
+        predicate: (ChatHudLine) -> Boolean,
     ) {
         chatLines.deleteChatLine(amount, reason, predicate)
         refreshChat()
@@ -335,7 +335,7 @@ object ChatUtils {
 
     private fun refreshChat() {
         DelayedRun.onThread.execute {
-            chatGui.refreshChat()
+            chatGui.reset()
         }
     }
 
@@ -374,7 +374,7 @@ object ChatUtils {
     @HandleEvent
     fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
-            MinecraftCompat.localPlayer.sendChatMessage(sendQueue.poll() ?: return)
+            MinecraftCompat.localPlayer.networkHandler.sendChatMessage(sendQueue.poll() ?: return)
             lastMessageSent = SimpleTimeMark.now()
         }
     }
@@ -382,7 +382,7 @@ object ChatUtils {
     fun sendMessageToServer(message: String) {
         if (canSendInstantly()) {
             MinecraftCompat.localPlayerOrNull?.let {
-                it.sendChatMessage(message)
+                it.networkHandler.sendChatMessage(message)
                 lastMessageSent = SimpleTimeMark.now()
                 return
             }
@@ -436,21 +436,21 @@ object ChatUtils {
         )
     }
 
-    var ChatLine.fullComponent: IChatComponent
+    var ChatHudLine.fullComponent: Text
         get() = (this as ChatLineData).skyHanni_fullComponent
         set(value) {
             (this as ChatLineData).skyHanni_fullComponent = value
         }
 
     //#if MC < 1.16
-    val ChatLine.chatMessage get() = chatComponent.formattedText.stripHypixelMessage()
-    fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
+    //$$ val ChatLine.chatMessage get() = chatComponent.formattedText.stripHypixelMessage()
+    //$$ fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
     //#elseif MC < 1.21
-    //$$ val GuiMessage<Component>.chatMessage get() = message.formattedTextCompat().stripHypixelMessage()
-    //$$ fun GuiMessage<Component>.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime).ticks
+    //$$ val ChatHudLine<Text>.chatMessage get() = text.formattedTextCompat().stripHypixelMessage()
+    //$$ fun ChatHudLine<Text>.passedSinceSent() = (MinecraftClient.getInstance().inGameHud.ticks - creationTick).ticks
     //#else
-    //$$ val ChatHudLine.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
-    //$$ fun ChatHudLine.passedSinceSent() = (MinecraftClient.getInstance().inGameHud.ticks - creationTick).ticks
+    val ChatHudLine.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
+    fun ChatHudLine.passedSinceSent() = (MinecraftClient.getInstance().inGameHud.ticks - creationTick).ticks
     //#endif
 
     fun consoleLog(text: String) {

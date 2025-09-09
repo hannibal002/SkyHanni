@@ -49,8 +49,8 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.decoration.ArmorStandEntity
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -113,7 +113,7 @@ object GoldenFishTimer {
     private val isFishing get() = FishingApi.isFishing() || lastRodThrowTime.passedSince() < maxRodTime
     private var hasLavaRodInInventory = false
 
-    private fun checkGoldenFish(entity: EntityArmorStand) {
+    private fun checkGoldenFish(entity: ArmorStandEntity) {
         if (!entity.wearingSkullTexture(GOLDEN_FISH_SKULL_TEXTURE)) return
         possibleGoldenFishEntity = entity
         lastFishEntity = SimpleTimeMark.now()
@@ -133,8 +133,8 @@ object GoldenFishTimer {
     private var goingDownPost = false
     private var hasWarnedRod = false
 
-    private var possibleGoldenFishEntity: EntityLivingBase? = null
-    private var confirmedGoldenFishEntity: EntityLivingBase? = null
+    private var possibleGoldenFishEntity: LivingEntity? = null
+    private var confirmedGoldenFishEntity: LivingEntity? = null
 
     private var display: Renderable? = null
 
@@ -315,9 +315,9 @@ object GoldenFishTimer {
         // This makes it only count as the rod being throw into lava if the rod goes down, up, and down again.
         // Not confirmed that this is correct, but it's the best solution found.
         val bobber = FishingApi.bobber ?: return
-        if (!bobber.isInLava || bobber.ticksExisted < 5) return
-        if (bobber.motionY > 0 && goingDownInit) goingDownInit = false
-        else if (bobber.motionY < 0 && !goingDownInit && !goingDownPost) {
+        if (!bobber.isInLava || bobber.age < 5) return
+        if (bobber.velocity.y > 0 && goingDownInit) goingDownInit = false
+        else if (bobber.velocity.y < 0 && !goingDownInit && !goingDownPost) {
             hasWarnedRod = false
             goingDownPost = true
             lastRodThrowTime = ServerTimeMark.now()
@@ -336,7 +336,7 @@ object GoldenFishTimer {
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (!isActive()) return
         if (isGoldenFishActive()) return
-        val entity = event.entity as? EntityArmorStand ?: return
+        val entity = event.entity as? ArmorStandEntity ?: return
 
         DelayedRun.runDelayed(1.seconds) { checkGoldenFish(entity) }
     }

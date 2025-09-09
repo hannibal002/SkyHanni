@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.attribute
+package at.hannibal2.skyhanni.features.inventory.attribute import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
@@ -279,7 +279,7 @@ object AttributeShardsData {
             if (!isAttributeShard(internalName)) continue
             var tier = 0
             var toNextTier = 0
-            attributeShardNamePattern.matchMatcher(item.displayName) {
+            attributeShardNamePattern.matchMatcher(item.name.formattedTextCompatLeadingWhiteLessResets()) {
                 tier = groupOrNull("tier")?.romanToDecimal() ?: 0
             }
             syphonAmountPattern.firstMatcher(item.getLore()) {

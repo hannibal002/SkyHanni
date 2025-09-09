@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.entity.monster.EntityEnderman
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.entity.mob.EndermanEntity
+import net.minecraft.particle.ParticleTypes
 
 @SkyHanniModule
 object EndermanSlayerHideParticles {
@@ -21,7 +21,7 @@ object EndermanSlayerHideParticles {
     fun onTick() {
         if (!isEnabled()) return
 
-        endermanLocations = EntityUtils.getEntities<EntityEnderman>().map { it.getLorenzVec() }.toList()
+        endermanLocations = EntityUtils.getEntities<EndermanEntity>().map { it.getLorenzVec() }.toList()
     }
 
     @HandleEvent
@@ -29,9 +29,9 @@ object EndermanSlayerHideParticles {
         if (!isEnabled()) return
 
         when (event.type) {
-            EnumParticleTypes.SMOKE_LARGE,
-            EnumParticleTypes.FLAME,
-            EnumParticleTypes.SPELL_WITCH,
+            ParticleTypes.LARGE_SMOKE,
+            ParticleTypes.FLAME,
+            ParticleTypes.WITCH,
             -> Unit
 
             else -> return
