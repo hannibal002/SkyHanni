@@ -1,5 +1,5 @@
 
-net.minecraft.GameVersion name() getName()
+net.minecraft.GameVersion getName() name()
 
-net.minecraft.client.gl.RenderPipelines TRANSFORMS_AND_PROJECTION_SNIPPET MATRICES_SNIPPET
+net.minecraft.client.gl.RenderPipelines MATRICES_SNIPPET TRANSFORMS_AND_PROJECTION_SNIPPET
 
