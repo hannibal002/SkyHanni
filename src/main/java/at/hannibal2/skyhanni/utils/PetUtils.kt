@@ -111,7 +111,7 @@ object PetUtils {
      */
     private val neuPetLorePattern by CurrentPetApi.patternGroup.pattern(
         "neu.pet.lore",
-        "§7§eRight-click to add this pet to(?: your)?",
+        "(?:§7)?§eRight-click to add this pet to(?: your)?",
     )
     // </editor-fold>
 
