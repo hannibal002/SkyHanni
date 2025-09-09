@@ -172,7 +172,7 @@ enum class EliteLeaderboards(
                     entry
                 }
             }
-            event.add(106, "garden.EliteFarmersLeaderboards.display") {
+            event.add(106, "garden.eliteFarmersLeaderboards.display") {
                 ConfigManager.gson.toJsonTree(leaderboardDisplayList)
             }
             event.move(106, "$oldConfig.pos", "garden.eliteFarmersLeaderboards.displayPositions") {entry ->
