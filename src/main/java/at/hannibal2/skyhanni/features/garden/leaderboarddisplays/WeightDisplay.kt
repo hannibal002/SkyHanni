@@ -21,7 +21,7 @@ class WeightDisplay : EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboar
     name = "Farming Weight Display"
 ) {
     val config get() = configBase.farmingWeightLeaderboard
-    var lastFarmedCrop: CropType? = null
+    private var lastFarmedCrop: CropType? = null
 
     private val weightStorage get() = GardenApi.storage?.farmingWeight?.weightDisplayType
 

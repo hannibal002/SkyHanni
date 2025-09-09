@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardRankConfig
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearEntries
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -26,7 +25,8 @@ import kotlin.reflect.KClass
 enum class EliteLeaderboards(
     private val displayName: String,
     val display: EliteLeaderboardDisplayBase<*, *>,
-    val leaderboardType: KClass<out EliteLeaderboardType>,) {
+    val leaderboardType: KClass<out EliteLeaderboardType>
+) {
     WEIGHT("Farming Weight", PestDisplay(), EliteLeaderboardType.Weight::class),
     CROP("Crop Collection", CropDisplay(), EliteLeaderboardType.Crop::class),
     PEST("Pest Kills", WeightDisplay(), EliteLeaderboardType.Pest::class)
@@ -175,7 +175,7 @@ enum class EliteLeaderboards(
             event.add(106, "garden.eliteFarmersLeaderboards.display") {
                 ConfigManager.gson.toJsonTree(leaderboardDisplayList)
             }
-            event.move(106, "$oldConfig.pos", "garden.eliteFarmersLeaderboards.displayPositions") {entry ->
+            event.move(106, "$oldConfig.pos", "garden.eliteFarmersLeaderboards.displayPositions") { entry ->
                 val positionList = PositionList(EliteLeaderboards.entries.size)
                 positionList[0] = ConfigManager.gson.fromJson<Position>(entry)
                 ConfigManager.gson.toJsonTree(positionList)
@@ -189,7 +189,7 @@ enum class EliteLeaderboards(
             event.move(106, "$oldConfig.showLbChange", "$newConfig.showLbChange")
             event.move(106, "$oldConfig.etaGoalRank", "$rankGoal.rankGoal")
             event.move(106, "$oldConfig.etaGoalRank", "$rankGoal.monthlyRankGoal")
-            event.move(106, "$oldConfig.etaGoalRank","$rankGoal.useRankGoal") { entry ->
+            event.move(106, "$oldConfig.etaGoalRank", "$rankGoal.useRankGoal") { entry ->
                 ConfigManager.gson.toJsonTree(entry.asString != "10000")
             }
             event.move(106, "$oldConfig.ignoreLow", "$display.ignoreLow")

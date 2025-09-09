@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getConfigFromClass
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getAmount
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLastPlayer
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
@@ -40,15 +41,17 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     private val createType: (E, EliteLeaderboardMode) -> EliteLeaderboardType,
     private val name: String
 ) {
+    protected val configBase get() = GardenApi.config.eliteFarmersLeaderboards
+    private val config get() = baseClass?.let { getConfigFromClass(it) }
     @Suppress("Unchecked_cast")
     private val baseClass: KClass<out EliteLeaderboardType>?
         get() = typeClass as? KClass<out EliteLeaderboardType>
-    protected val configBase get() = GardenApi.config.eliteFarmersLeaderboards
 
+
+    var lastUpdate = SimpleTimeMark.farPast()
+    protected var inventoryOpen = false
     protected var display = emptyList<Renderable>()
     protected var apiError = false
-    var inventoryOpen = false
-    var lastUpdate = SimpleTimeMark.farPast()
     protected var amount: Double? = null
     private var leaderboardPos: Int? = null
     private var nextPlayer: Pair<String, Double>? = null
@@ -56,9 +59,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     protected abstract var currentMode: EliteLeaderboardMode
     protected abstract var currentEnum: E?
 
-    private val config get() = baseClass?.let { getConfigFromClass(it) }
     abstract fun getDefaultEnum(): E?
-
 
     val errorMessage by lazy {
         listOf(
@@ -70,7 +71,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
             Renderable.clickable(
                 it,
                 tips = listOf("§eClick here to reload the data right now!"),
-                onLeftClick = ::resetData,
+                onLeftClick = ::reset,
             )
         }
     }
@@ -79,6 +80,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         get() = (currentEnum ?: getDefaultEnum())?.let { createType(it, currentMode) }
 
     fun update(overrideCooldown: Boolean = false) {
+        // we want to avoid unnecessarily calling the api as much as possible
         if (!isEnabled()) return
         val type = currentLeaderboardType ?: return
         leaderboardPos = getLeaderboardPosition(type, overrideCooldown)
@@ -206,13 +208,8 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         return " §7[§b#$format§7]"
     }
 
-    private fun resetData() {
-        leaderboardPos = null
-        amount = null
-        nextPlayer = null
-    }
-
     fun reset() {
+        baseClass?.let { clearCategories(it) }
         amount = null
         leaderboardPos = null
         nextPlayer = null

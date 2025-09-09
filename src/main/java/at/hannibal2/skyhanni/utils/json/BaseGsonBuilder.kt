@@ -37,7 +37,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(IslandType::class.java, SkyHanniTypeAdapters.ISLAND_TYPE.nullSafe())
         .registerTypeAdapter(ModVersion::class.java, SkyHanniTypeAdapters.MOD_VERSION.nullSafe())
         .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
-        .registerTypeAdapter(EliteLeaderboardType::class.java, EliteLeaderboardTypeAdapter().nullSafe())
+        .registerTypeAdapter(EliteLeaderboardType::class.java, SkyHanniTypeAdapters.ELITE_LEADERBOARD_TYPE.nullSafe())
         .registerTypeAdapter(
             SkyHanniTracker.DefaultDisplayMode::class.java,
             SkyHanniTypeAdapters.TRACKER_DISPLAY_MODE.nullSafe(),
