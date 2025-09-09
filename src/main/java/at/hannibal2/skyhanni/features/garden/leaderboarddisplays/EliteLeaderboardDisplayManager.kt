@@ -141,17 +141,16 @@ enum class EliteLeaderboards(
 
             val displayList: List<FarmingWeightTextEntry> = buildList {
                 add(FarmingWeightTextEntry.WEIGHT_POSITION)
-                event.transform(103, "garden.eliteFarmingWeights.overtakeETA") { entry ->
+                event.transform(105, "garden.eliteFarmingWeights.overtakeETA") { entry ->
                     if (entry.asBoolean) add(FarmingWeightTextEntry.OVERTAKE)
                     entry
                 }
 
             }
 
-            event.add(103, "garden.eliteFarmingWeights.text") {
+            event.add(105, "garden.eliteFarmingWeights.text") {
                 ConfigManager.gson.toJsonTree(displayList)
             }
-
 
             val oldConfig = "garden.eliteFarmingWeights"
             val newConfig = "garden.eliteFarmersLeaderboards.farmingWeightLeaderboard"
@@ -160,39 +159,40 @@ enum class EliteLeaderboards(
 
             // While pest and crop leaderboards are new, we'll guess if players want them on or off based on their other preferences
             val leaderboardDisplayList: List<EliteLeaderboards> = buildList {
-                event.transform(104, "$oldConfig.display") { entry ->
+                event.transform(106, "$oldConfig.display") { entry ->
                     if (entry.asBoolean) add(WEIGHT)
                     entry
                 }
-                event.transform(104, "garden.cropmilestones.progress") { entry ->
+                event.transform(106, "garden.cropmilestones.progress") { entry ->
                     if (entry.asBoolean) add(CROP)
                     entry
                 }
-                event.transform(104, "garden.pests.pestProfitTracker.enabled") { entry ->
+                event.transform(106, "garden.pests.pestProfitTracker.enabled") { entry ->
                     if (entry.asBoolean) add(PEST)
                     entry
                 }
             }
-            event.add(104, "garden.EliteFarmersLeaderboards.display") {
+            event.add(106, "garden.EliteFarmersLeaderboards.display") {
                 ConfigManager.gson.toJsonTree(leaderboardDisplayList)
             }
-            event.move(104, "$oldConfig.pos", "garden.eliteFarmersLeaderboards.displayPositions") {entry ->
+            event.move(106, "$oldConfig.pos", "garden.eliteFarmersLeaderboards.displayPositions") {entry ->
                 val positionList = PositionList(EliteLeaderboards.entries.size)
                 positionList[0] = ConfigManager.gson.fromJson<Position>(entry)
                 ConfigManager.gson.toJsonTree(positionList)
             }
 
-            event.move(104, "$oldConfig.text", "$display.text")
-            event.move(104, "$oldConfig.leaderboard", "$display.leaderboard")
-            event.move(104, "$oldConfig.overtakeETA", "$display.overtakeETA")
-            event.move(104, "$oldConfig.overtakeETAAlways", "$display.overtakeETA.always")
-            event.move(104, "$oldConfig.showLbChange", "$newConfig.showLbChange")
-            event.move(104, "$oldConfig.etaGoalRank", "$rankGoal.rankGoal")
-            event.move(104, "$oldConfig.etaGoalRank", "$rankGoal.monthlyRankGoal")
-            event.move(104, "$oldConfig.etaGoalRank","$rankGoal.useRankGoal") { entry ->
-                ConfigManager.gson.toJsonTree(entry.asString == "10000")
+            event.move(106, "$oldConfig.showOutsideGarden", "$display.showOutsideGarden")
+            event.move(106, "$oldConfig.text", "$display.text")
+            event.move(106, "$oldConfig.leaderboard", "$display.leaderboard")
+            event.move(106, "$oldConfig.overtakeETA", "$display.overtakeETA")
+            event.move(106, "$oldConfig.overtakeETAAlways", "$display.overtakeETA.always")
+            event.move(106, "$oldConfig.showLbChange", "$newConfig.showLbChange")
+            event.move(106, "$oldConfig.etaGoalRank", "$rankGoal.rankGoal")
+            event.move(106, "$oldConfig.etaGoalRank", "$rankGoal.monthlyRankGoal")
+            event.move(106, "$oldConfig.etaGoalRank","$rankGoal.useRankGoal") { entry ->
+                ConfigManager.gson.toJsonTree(entry.asString != "10000")
             }
-            event.move(104, "$oldConfig.ignoreLow", "$display.ignoreLow")
+            event.move(106, "$oldConfig.ignoreLow", "$display.ignoreLow")
         }
 
 
