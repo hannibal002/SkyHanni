@@ -36,28 +36,31 @@ import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
 abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType.WithEnum<E>>(
-    private val typeClass: KClass<T>,
+    private val typeClass: KClass<out T>,
     private val createType: (E, EliteLeaderboardMode) -> EliteLeaderboardType,
     private val name: String
 ) {
+    @Suppress("Unchecked_cast")
+    private val baseClass: KClass<out EliteLeaderboardType>?
+        get() = typeClass as? KClass<out EliteLeaderboardType>
     protected val configBase get() = GardenApi.config.eliteFarmersLeaderboards
 
     protected var display = emptyList<Renderable>()
     protected var apiError = false
     var inventoryOpen = false
+    var lastUpdate = SimpleTimeMark.farPast()
     protected var amount: Double? = null
-    protected var leaderboardPos: Int? = null
+    private var leaderboardPos: Int? = null
     private var nextPlayer: Pair<String, Double>? = null
 
     protected abstract var currentMode: EliteLeaderboardMode
     protected abstract var currentEnum: E?
 
-    @Suppress("Unchecked_cast")
-    private val config get() = (typeClass as? KClass<out EliteLeaderboardType>)?.let { getConfigFromClass(it) }
+    private val config get() = baseClass?.let { getConfigFromClass(it) }
     abstract fun getDefaultEnum(): E?
 
 
-    protected val errorMessage by lazy {
+    val errorMessage by lazy {
         listOf(
             "§cFarming Weight error: Cannot load",
             "§cdata from Elite Farmers!",
@@ -99,13 +102,13 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         display = formatDisplay(lineMap)
     }
 
-    private fun formatDisplay(lineMap: MutableMap<LeaderboardTextEntry, Renderable>): List<Renderable> {
+    open fun formatDisplay(lineMap: MutableMap<LeaderboardTextEntry, Renderable>): List<Renderable> {
         if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) return errorMessage
 
         val newList = mutableListOf<Renderable>()
         if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
         config?.display?.text?.get()?.let { newList.addAll(it.mapNotNull { lineMap[it] }) }
-        if (inventoryOpen) newList.buildTypeSwitcher() else newList.addVerticalSpacer()
+        if (inventoryOpen) newList.buildTypeSwitcher()
         return newList
     }
 
@@ -216,7 +219,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         apiError = false
     }
 
-    fun isEnabled(): Boolean = (config?.display?.display ?: false) && (inGardenEnabled())
+    fun isEnabled(): Boolean = (baseClass?.let { EliteLeaderboards.getFromTypeOrNull(it)?.isEnabled } ?: false) && (inGardenEnabled())
 
     private fun inGardenEnabled() =
         SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || (config?.display?.showOutsideGarden ?: false))
@@ -242,6 +245,11 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         if (inventoryOpen != currentlyOpen) {
             inventoryOpen = currentlyOpen
             update()
+        }
+
+        if (lastUpdate.passedSince() > 1.seconds) {
+            update()
+            lastUpdate = SimpleTimeMark.now()
         }
 
         position.renderRenderables(display, posLabel = name)

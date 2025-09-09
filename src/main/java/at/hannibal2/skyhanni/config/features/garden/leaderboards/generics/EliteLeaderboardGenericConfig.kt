@@ -22,7 +22,7 @@ open class EliteLeaderboardGenericConfig<RankGoal : RankGoalGenericConfig, Displ
     @Expose
     @ConfigOption(
         name = "Show LB Change",
-        desc = "Show the change of your position on your current pest leaderboard while you were offline."
+        desc = "Show the change of your position on your current leaderboard while you were offline."
     )
     @ConfigEditorBoolean
     var showLbChange: Boolean = false

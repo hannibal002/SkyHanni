@@ -1,12 +1,20 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
 import at.hannibal2.skyhanni.features.garden.pests.PestType
+import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import com.google.gson.annotations.Expose
+import kotlin.time.Duration.Companion.seconds
 
 class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.Pest>(
     EliteLeaderboardType.Pest::class,
@@ -42,6 +50,17 @@ class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.P
         update()
     }
 
+    override fun formatDisplay(lineMap: MutableMap<LeaderboardTextEntry, Renderable>): List<Renderable> {
+        if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) return errorMessage
+
+        val newList = mutableListOf<Renderable>()
+        if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
+        config.display.text.get()?.let { newList.addAll(it.mapNotNull { lineMap[it] }) }
+        // Elite only supports monthly leaderboards for all pests
+        if (inventoryOpen && currentEnum == null) newList.buildTypeSwitcher()
+        return newList
+    }
+
     override fun MutableList<Renderable>.buildTypeSwitcher() {
         this.addRenderableNullableButton(
             label = "Pest Type",
@@ -55,7 +74,16 @@ class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.P
         )
     }
 
-    override fun shouldShowDisplay(): Boolean = !GardenApi.hideExtraGuis()
+    // basing this on pest profit tracker
+    override fun shouldShowDisplay(): Boolean {
+        if (GardenApi.hideExtraGuis()) return false
+        if (!config.display.hideWhenInactive) return true
+        val allInactive = lastPestKillTimes.all {
+            it.value.passedSince() > config.display.timeDisplayed.seconds
+        }
+        val notHoldingTool = !PestApi.hasVacuumInHand() && !PestApi.hasSprayonatorInHand()
+        return !(allInactive && notHoldingTool)
+    }
 }
 
 data class PestLeaderboardStorage(

@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import org.lwjgl.input.Keyboard
@@ -51,6 +52,7 @@ object PestApi {
 
     val config get() = GardenApi.config.pests
     val storage get() = GardenApi.storage
+    val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
     private val SPRAYONATOR_ITEM = "SPRAYONATOR".toInternalName()
 
     var scoreboardPests: Int
@@ -63,6 +65,7 @@ object PestApi {
     var lastPestSpawnTime = SimpleTimeMark.farPast()
     var lastTimeVacuumHeld = SimpleTimeMark.farPast()
     var lastTimeLassoHeld = SimpleTimeMark.farPast()
+
 
     fun hasVacuumInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.VACUUM
     fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO

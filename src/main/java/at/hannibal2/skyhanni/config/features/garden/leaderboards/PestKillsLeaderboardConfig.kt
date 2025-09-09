@@ -6,16 +6,18 @@ import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.Multip
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.PestTypeRankGoalsConfig
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestKillsLeaderboardConfig : EliteLeaderboardGenericConfig<
     PestRankGoalConfig,
-    EliteDisplayGenericConfig
+    PestKillsDisplayConfig
     >(
     { PestRankGoalConfig() },
-    { EliteDisplayGenericConfig() },
+    { PestKillsDisplayConfig() },
 )
 
 class PestRankGoalConfig : MultipleTypeRankGoalConfig<PestTypeWithAll, PestTypeRankGoalsConfig>(
@@ -28,6 +30,21 @@ class PestRankGoalConfig : MultipleTypeRankGoalConfig<PestTypeWithAll, PestTypeR
     )
     @ConfigEditorDraggableList
     override val rankGoalTypes: Property<MutableList<PestTypeWithAll>> = Property.of(mutableListOf())
+}
+
+class PestKillsDisplayConfig : EliteDisplayGenericConfig() {
+    @Expose
+    @ConfigOption(
+        name = "Hide When Inactive",
+        desc = "Hides the display when you haven't recently killed a pest and aren't holding a vacuum."
+    )
+    @ConfigEditorBoolean
+    val hideWhenInactive: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Time Displayed", desc = "Time displayed after killing a pest.")
+    @ConfigEditorSlider(minValue = 5f, maxValue = 60f, minStep = 1f)
+    var timeDisplayed: Int = 30
 }
 
 enum class PestTypeWithAll(val pestType: PestType?, val displayName: String) {

@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.WeightProfile
-import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.EliteLeaderboardDisplayManager
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.EliteLeaderboards
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -79,8 +79,8 @@ object EliteDevApi {
             updateCollections()
             FarmingWeightData.reset()
             EliteFarmersLeaderboard.reset()
-            EliteLeaderboardDisplayManager.resetDisplays()
-            EliteLeaderboardDisplayManager.updateDisplays()
+            EliteLeaderboards.resetDisplays()
+            EliteLeaderboards.updateDisplays()
             ChatUtils.userError("Invalid uuid!")
             return
         }
@@ -91,8 +91,8 @@ object EliteDevApi {
         updateCollections()
         FarmingWeightData.reset()
         EliteFarmersLeaderboard.reset()
-        EliteLeaderboardDisplayManager.resetDisplays()
-        EliteLeaderboardDisplayManager.updateDisplays()
+        EliteLeaderboards.resetDisplays()
+        EliteLeaderboards.updateDisplays()
     }
 
     private suspend fun fetchResourceCommand(resourceType: EliteResourceType) = runCatching {
