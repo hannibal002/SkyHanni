@@ -615,11 +615,10 @@ class ProfileSpecificStorage(
             @Expose
             var pestDisplayType: PestLeaderboardStorage = PestLeaderboardStorage(null, EliteLeaderboardMode.ALL_TIME)
 
-            // TODO config fix this
             @Expose
             var weightDisplayType: WeightLeaderboardStorage =
                 WeightLeaderboardStorage(FarmingWeight.FARMING_WEIGHT, EliteLeaderboardMode.ALL_TIME)
-            // TODO config fix this
+
             @Expose
             var minAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
 

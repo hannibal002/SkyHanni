@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getConfigFromClass
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardRankConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearEntries
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
@@ -14,16 +16,15 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 
 @SkyHanniModule
 object EliteLeaderboardDisplayManager {
     val config get() = GardenApi.config.eliteFarmersLeaderboards
-    private val cropConfig get() = config.cropCollectionDisplay
-    private val pestConfig get() = config.pestKillsDisplay
-    private val weightConfig get() = config.farmingWeightDisplay
+    private val cropConfig get() = config.cropCollectionLeaderboard
+    private val pestConfig get() = config.pestKillsLeaderboard
+    private val weightConfig get() = config.farmingWeightLeaderboard
 
     private val pestDisplay = PestDisplay()
     private val cropDisplay = CropDisplay()
@@ -110,5 +111,53 @@ object EliteLeaderboardDisplayManager {
         }
     }
 
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
+        event.move(3, "garden.eliteFarmingWeightDisplay", "garden.eliteFarmingWeights.display")
+        event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")
+        event.move(3, "garden.eliteFarmingWeightLeaderboard", "garden.eliteFarmingWeights.leaderboard")
+        event.move(3, "garden.eliteFarmingWeightOvertakeETA", "garden.eliteFarmingWeights.overtakeETA")
+        event.move(3, "garden.eliteFarmingWeightOffScreenDropMessage", "garden.eliteFarmingWeights.offScreenDropMessage")
+        event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways", "garden.eliteFarmingWeights.overtakeETAAlways")
+        event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
+        event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
+        event.move(14, "garden.eliteFarmingWeight.offScreenDropMessage", "garden.eliteFarmingWeights.showLbChange")
+        event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
+
+        val base = "#garden.farmingWeight"
+        event.move(101, "$base.lastFarmingWeightLeaderboard", "$base.lastLeaderboard")
+
+        val displayList: List<FarmingWeightTextEntry> = buildList {
+            add(FarmingWeightTextEntry.WEIGHT_POSITION)
+            event.transform(103, "garden.eliteFarmingWeights.overtakeETA") { entry ->
+                if (entry.asBoolean) add(FarmingWeightTextEntry.OVERTAKE)
+                entry
+            }
+        }
+
+        event.add(103, "garden.eliteFarmingWeights.text") {
+            ConfigManager.gson.toJsonTree(displayList)
+        }
+        val display = "garden.eliteFarmersLeaderboards.farmingWeightLeaderboard.display"
+        event.move(104, "$base.text", "$display.display")
+        event.move(104, "$base.display", "$display.display")
+        event.move(104, "$base.pos", "$display.pos"
+
+            )
+
+
+
+
+    }
+
+
     // TODO a shit ton of config fixes
+    enum class FarmingWeightTextEntry(private val displayName: String) {
+        WEIGHT_POSITION("§6Farming Weight: §e104,481.49 §7[§b#5§7]"),
+        OVERTAKE("§e170.21 §7(§b12h 32m 15s§7) §7behind §bChissl")
+        ;
+
+        override fun toString() = displayName
+    }
 }

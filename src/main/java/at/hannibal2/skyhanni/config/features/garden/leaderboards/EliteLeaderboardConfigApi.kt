@@ -13,9 +13,9 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty0
 
 object EliteLeaderboardConfigApi {
-    private val weightConfig get() = GardenApi.config.eliteFarmersLeaderboards.farmingWeightDisplay
-    private val cropConfig get() = GardenApi.config.eliteFarmersLeaderboards.cropCollectionDisplay
-    private val pestConfig get() = GardenApi.config.eliteFarmersLeaderboards.pestKillsDisplay
+    private val weightConfig get() = GardenApi.config.eliteFarmersLeaderboards.farmingWeightLeaderboard
+    private val cropConfig get() = GardenApi.config.eliteFarmersLeaderboards.cropCollectionLeaderboard
+    private val pestConfig get() = GardenApi.config.eliteFarmersLeaderboards.pestKillsLeaderboard
 
     fun getLeaderboardConfig(leaderboardType: EliteLeaderboardType): EliteLeaderboardGenericConfig<*, *> = when (leaderboardType) {
         is EliteLeaderboardType.Weight -> weightConfig

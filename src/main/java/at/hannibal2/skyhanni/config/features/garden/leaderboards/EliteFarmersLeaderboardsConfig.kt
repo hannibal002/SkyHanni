@@ -8,15 +8,15 @@ class EliteFarmersLeaderboardsConfig {
     @Expose
     @ConfigOption(name = "Farming Weight Display", desc = "")
     @Accordion
-    val farmingWeightDisplay: WeightLeaderboardConfig = WeightLeaderboardConfig()
+    val farmingWeightLeaderboard: WeightLeaderboardConfig = WeightLeaderboardConfig()
 
     @Expose
     @ConfigOption(name = "Crop Collection Display", desc = "")
     @Accordion
-    val cropCollectionDisplay: CropCollectionLeaderboardConfig = CropCollectionLeaderboardConfig()
+    val cropCollectionLeaderboard: CropCollectionLeaderboardConfig = CropCollectionLeaderboardConfig()
 
     @Expose
     @ConfigOption(name = "Pest Kills Display", desc = "")
     @Accordion
-    val pestKillsDisplay: PestKillsLeaderboardConfig = PestKillsLeaderboardConfig()
+    val pestKillsLeaderboard: PestKillsLeaderboardConfig = PestKillsLeaderboardConfig()
 }

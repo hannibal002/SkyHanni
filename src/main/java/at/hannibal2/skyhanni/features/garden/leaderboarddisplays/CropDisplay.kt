@@ -18,7 +18,7 @@ class CropDisplay : EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.C
     { crop, mode -> EliteLeaderboardType.Crop(crop, mode) },
     name = "Crop Leaderboard Display"
 ) {
-    val config get() = configBase.cropCollectionDisplay
+    val config get() = configBase.cropCollectionLeaderboard
     private val cropStorage get() = GardenApi.storage?.farmingWeight?.cropDisplayType
 
     override var currentMode: EliteLeaderboardMode

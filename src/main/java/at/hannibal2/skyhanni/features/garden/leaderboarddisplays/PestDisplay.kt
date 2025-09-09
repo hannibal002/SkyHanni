@@ -13,7 +13,7 @@ class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.P
     { pest, mode -> EliteLeaderboardType.Pest(pest, mode) },
     name = "Pest Leaderboard Display"
 ) {
-    val config get() = configBase.pestKillsDisplay
+    val config get() = configBase.pestKillsLeaderboard
     private val pestStorage get() = GardenApi.storage?.farmingWeight?.pestDisplayType
 
     override var currentMode: EliteLeaderboardMode
