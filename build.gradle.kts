@@ -237,7 +237,7 @@ dependencies {
         isTransitive = false
     }
 
-    if (target == ProjectTarget.MAIN) {
+    if (target.isLegacy) {
         shadowModImpl(libs.moulconfig)
     } else if (target.isModern) {
         shadowModImpl("org.notenoughupdates.moulconfig:modern-${target.minecraftVersion.versionName}:${libs.versions.moulconfig.get()}")

@@ -15,14 +15,14 @@ enum class ProjectTarget(
     val modrinthInfo: ModrinthInfo? = null,
     linkTo: String?,
 ) {
-    MAIN(
+    OLD_189(
         "1.8.9",
         MinecraftVersion.MC189,
         "de.oceanlabs.mcp:mcp_stable:22-1.8.9@zip",
         MappingStyle.SEARGE,
         forgeDep = "net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9",
         modrinthInfo = ModrinthInfo.FORGE_1_8_9,
-        linkTo = "BRIDGE116FORGE",
+        linkTo = null,
     ),
     BRIDGE116FORGE(
         "1.16.5-forge",
@@ -30,14 +30,14 @@ enum class ProjectTarget(
         "official",
         MappingStyle.SEARGE,
         forgeDep = "net.minecraftforge:forge:1.16.5-36.2.39",
-        linkTo = "BRIDGE116FABRIC",
+        linkTo = "OLD_189",
     ),
     BRIDGE116FABRIC(
         "1.16.5-fabric",
         MinecraftVersion.MC11605,
         yarn("1.16.5+build.10"),
         MappingStyle.YARN,
-        linkTo = "MODERN_12105",
+        linkTo = "BRIDGE116FORGE",
     ),
     MODERN_12105(
         "1.21.5",
@@ -49,9 +49,9 @@ enum class ProjectTarget(
         modMenuVersion = "14.0.0-rc.2",
         isModern = true,
         modrinthInfo = ModrinthInfo.FABRIC_1_21_5,
-        linkTo = "MODERN_12107",
+        linkTo = "BRIDGE116FABRIC",
     ),
-    MODERN_12107(
+    MAIN(
         "1.21.7",
         MinecraftVersion.MC12107,
         yarn("1.21.7+build.6"),
@@ -61,12 +61,13 @@ enum class ProjectTarget(
         modMenuVersion = "15.0.0-beta.3",
         isModern = true,
         modrinthInfo = ModrinthInfo.FABRIC_1_21_7,
-        linkTo = null,
+        linkTo = "MODERN_12105",
     ),
     ;
 
     val isBridge get() = name.contains("bridge")
 
+    val isLegacy get() = (!isModern&&!isBridge)
     val linkTo by lazy {
         if (linkTo == null) null
         else {
