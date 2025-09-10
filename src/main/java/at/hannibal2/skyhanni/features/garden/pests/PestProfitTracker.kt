@@ -55,7 +55,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     { it.garden.pestProfitTracker },
     { drawDisplay(it) },
 ) {
-    val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTacker
+    val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTracker
 
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
@@ -344,6 +344,9 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
                     it.key != PestType.UNKNOWN
                 }.sumOf { it.value },
             )
+        }
+        event.move(106, "garden.pests.pestProfitTacker", "garden.pests.pestProfitTracker") { entry ->
+            entry
         }
     }
 }
