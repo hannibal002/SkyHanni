@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.billion
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -39,7 +40,7 @@ object CrownOfAvariceCounter {
     private val internalName = "CROWN_OF_AVARICE".toInternalName()
 
     private var display: List<Renderable> = emptyList()
-    private const val MAX_AVARICE_COINS: Int = 1_000_000_000
+    private val MAX_AVARICE_COINS = 1.billion
     private var inventoryOpen = false
     private val isWearingCrown by RecalculatingValue(1.seconds) {
         InventoryUtils.getHelmet()?.getInternalNameOrNull() == internalName
@@ -71,8 +72,8 @@ object CrownOfAvariceCounter {
     }
 
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         if (!isWearingCrown) return
         // No need to update if paused, we'll unpause with onInventoryUpdated
@@ -97,7 +98,7 @@ object CrownOfAvariceCounter {
             return
         }
 
-        sessionUptime.start() // does nothing if already unpaused
+        sessionUptime.start() // does nothing if already un-paused
         sessionUptime.lap() // mark last added coins time for afk timeout
         coinsEarned += coinsDifference ?: 0
         totalCoins = coins
@@ -105,8 +106,8 @@ object CrownOfAvariceCounter {
         update()
     }
 
-    @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    @HandleEvent(IslandChangeEvent::class)
+    fun onIslandChange() {
         if (config.resetOnWorldChange) reset()
         totalCoins = InventoryUtils.getHelmet()?.getCoinsOfAvarice()
     }
@@ -118,7 +119,7 @@ object CrownOfAvariceCounter {
         display = buildDisplay()
     }
 
-    private fun fmtDisplay(lines: MutableMap<CrownOfAvariceLines, Renderable>): List<Renderable> {
+    private fun formatDisplay(lines: Map<CrownOfAvariceLines, Renderable>): List<Renderable> {
         val newList = mutableListOf<Renderable>()
         newList.addLine {
             addItemStack(internalName.getItemStack())
@@ -168,7 +169,7 @@ object CrownOfAvariceCounter {
             addString("§aSession Time: §6${sessionUptime.getDuration().format()}")
         }
 
-        return fmtDisplay(lines)
+        return formatDisplay(lines)
     }
 
 
