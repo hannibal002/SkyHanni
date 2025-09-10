@@ -14,12 +14,14 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -64,6 +66,8 @@ import java.util.UUID
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
  * @property uniqueId Unique identifier for each Mob instance
+ *
+ * @property hypixelTypes The types hypixel has assigned for that mob as the icons
  */
 @Suppress("TooManyFunctions")
 class Mob(
@@ -76,6 +80,7 @@ class Mob(
     val hasStar: Boolean = false,
     val attribute: MobFilter.DungeonAttribute? = null,
     val levelOrTier: Int = -1,
+    val hypixelTypes: String = "",
 ) {
 
     private val uniqueId: UUID = UUID.randomUUID()
@@ -83,7 +88,11 @@ class Mob(
 
     val owner: MobUtils.OwnerShip?
 
-    fun belongsToPlayer(): Boolean = owner?.equals(PlayerUtils.getName()) ?: false
+    companion object {
+
+        fun Entity?.belongsToPlayer(): Boolean = this?.mob.belongsToPlayer()
+        fun Mob?.belongsToPlayer(): Boolean = this?.owner?.equals(PlayerUtils.getName()) ?: false
+    }
 
     val hologram1Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
     val hologram2Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 2) }
@@ -113,10 +122,12 @@ class Mob(
             else -> false
         }
     }
+
     /**
      * @property isCorrupted can change.
      */
     val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted()
+
     /**
      * @property isRunic does not change.
      */

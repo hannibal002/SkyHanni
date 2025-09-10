@@ -59,6 +59,7 @@ object CrystalNucleusApi {
         "SYNTHETIC_HEART",
     ).map { it.toInternalName() }
 
+    // Fallback to the inventory based system in case of changed chat message
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
@@ -128,8 +129,16 @@ object CrystalNucleusApi {
         if (itemName.contains(" Powder")) return null
         // Books are not directly added to the loot map, but are checked for later.
         if (itemName.startsWith("§fEnchanted")) {
-            unCheckedBooks += amount
-            return null
+            val bookType = ItemUtils.readBookType(itemName)
+            return when (bookType) {
+                "Lapidary I" -> LAPIDARY_I_BOOK_ITEM to 1
+                "Fortune IV" -> FORTUNE_IV_BOOK_ITEM to 1
+                // Fallback to inventory based system
+                else -> {
+                    unCheckedBooks += amount
+                    null
+                }
+            }
         }
         val item = fromItemNameOrNull(itemName) ?: return null
         return Pair(item, amount)

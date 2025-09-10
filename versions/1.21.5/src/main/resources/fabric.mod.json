@@ -1,5 +1,17 @@
 {
-    "_note": "If you make changes here you must also make changes to all other fabric.mod.json files in other versions.",
+    "custom": {
+        "_note": "If you make changes here you must also make changes to all other fabric.mod.json files in other versions.",
+        "modmenu": {
+            "update_checker": true,
+            "links": {
+                "Discord Link": "https://discord.gg/skyhanni-997079228510117908",
+                "Modrinth Page": "https://modrinth.com/mod/skyhanni",
+                "List of all Features": "https://github.com/hannibal002/SkyHanni/blob/beta/docs/FEATURES.md",
+                "Source Code on Github": "https://github.com/hannibal002/SkyHanni",
+                "Contributing Guide Docs": "https://github.com/hannibal002/SkyHanni/blob/beta/CONTRIBUTING.md"
+            }
+        }
+    },
     "schemaVersion": 1,
     "version": "${version}",
     "id": "skyhanni",
@@ -37,17 +49,5 @@
     "contact": {
         "homepage": "https://modrinth.com/mod/skyhanni",
         "issues": "https://discord.gg/skyhanni-997079228510117908"
-    },
-    "custom": {
-        "modmenu": {
-            "update_checker": true,
-            "links": {
-                "Discord Link": "https://discord.gg/skyhanni-997079228510117908",
-                "Modrinth Page": "https://modrinth.com/mod/skyhanni",
-                "List of all Features": "https://github.com/hannibal002/SkyHanni/blob/beta/docs/FEATURES.md",
-                "Source Code on Github": "https://github.com/hannibal002/SkyHanni",
-                "Contributing Guide Docs": "https://github.com/hannibal002/SkyHanni/blob/beta/CONTRIBUTING.md"
-            }
-        }
     }
 }

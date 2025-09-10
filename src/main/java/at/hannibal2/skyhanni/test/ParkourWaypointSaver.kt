@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -69,10 +70,18 @@ object ParkourWaypointSaver {
     private fun loadClipboard() {
         SkyHanniMod.launchCoroutine {
             val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
-            locations = clipboard.split("\n").map { line ->
-                val raw = line.replace("\"", "").replace(",", "")
-                raw.split(":").map { it.toDouble() }.toLorenzVec()
-            }.toMutableList()
+            try {
+                locations = clipboard.split("\n").map { line ->
+                    val raw = line.replace("\"", "").replace(",", "")
+                    raw.split(":").map { it.toDouble() }.toLorenzVec()
+                }.toMutableList()
+            } catch (e: NumberFormatException) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "Failed to load parkour waypoint data from clipboard.",
+                    "clipboard" to clipboard,
+                )
+            }
             update()
         }
     }
