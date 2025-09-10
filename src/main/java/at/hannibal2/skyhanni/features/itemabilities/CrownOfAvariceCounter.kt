@@ -155,13 +155,14 @@ object CrownOfAvariceCounter {
         lines[CrownOfAvariceLines.TIMEUNTILMAX] = Renderable.horizontal {
             val timeUntilMax = calculateTimeUntilMax()
             addString(
-                "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " +
+                "§aTime until Max: §b${if (isSessionActive) "Calculating..." else timeUntilMax} " +
                     if (sessionUptime.isPaused()) "§c(PAUSED)" else "",
             )
         }
 
         lines[CrownOfAvariceLines.COINDIFFERENCE] = Renderable.horizontal {
-            addString("§aLast coins gained: §6$coinsDifference")
+            val format = coinsDifference ?: "§cnever"
+            addString("§aLast coins gained: §6$format")
         }
 
         lines[CrownOfAvariceLines.SESSIONCOINS] = Renderable.horizontal {
@@ -169,7 +170,7 @@ object CrownOfAvariceCounter {
         }
 
         lines[CrownOfAvariceLines.SESSIONTIME] = Renderable.horizontal {
-            addString("§aSession Time: §6${sessionUptime.getDuration().format()}")
+            addString("§aSession Time: §b${sessionUptime.getDuration().format()}")
         }
 
         return formatDisplay(lines)
