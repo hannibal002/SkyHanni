@@ -48,6 +48,7 @@ object DicerRngDropTracker {
         var drops: MutableMap<CropType, MutableMap<DropRarity, Int>> = mutableMapOf()
     }
 
+    // TODO eventually repo patterns
     private val melonPatternGroup = RepoPattern.group("garden.dicer.melon")
     @Suppress("RepoPatternRegexTestMissing")
     private val melonUncommonDropPattern by melonPatternGroup.pattern(
