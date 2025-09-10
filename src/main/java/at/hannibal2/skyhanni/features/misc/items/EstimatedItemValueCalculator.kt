@@ -180,7 +180,7 @@ object EstimatedItemValueCalculator {
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
         val rawReforgeName = stack.getReforgeModifier() ?: return 0.0
 
-        val reforge = ReforgeApi.reforgeStoneList.firstOrNull {
+        val reforge = ReforgeApi.reforgeStones.firstOrNull {
             rawReforgeName == it.nbtModifier
         } ?: return 0.0
         val internalName = reforge.reforgeStone ?: return 0.0

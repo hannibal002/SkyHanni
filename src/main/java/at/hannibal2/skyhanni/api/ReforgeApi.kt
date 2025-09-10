@@ -24,17 +24,17 @@ import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object ReforgeApi {
-    var reforgeList: List<Reforge> = emptyList()
+    var reforges: List<Reforge> = emptyList()
         private set(value) {
             field = value
-            basicReforgeList = value.filterNot { it.isReforgeStone }
-            reforgeStoneList = value.filter { it.isReforgeStone }
+            basicReforges = value.filterNot { it.isReforgeStone }
+            reforgeStones = value.filter { it.isReforgeStone }
         }
 
-    var basicReforgeList: List<Reforge> = emptyList()
+    var basicReforges: List<Reforge> = emptyList()
         private set
 
-    var reforgeStoneList: List<Reforge> = emptyList()
+    var reforgeStones: List<Reforge> = emptyList()
         private set
 
     enum class ReforgeType {
@@ -151,7 +151,7 @@ object ReforgeApi {
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val reforgeStoneData = event.getConstant<Map<String, NeuReforgeJson>>("reforgestones", gson = reforgeGson).values
         val reforgeData = event.getConstant<Map<String, NeuReforgeJson>>("reforges", gson = reforgeGson).values
-        reforgeList = (reforgeStoneData + reforgeData).map { it.mapReforge() }
+        reforges = (reforgeStoneData + reforgeData).map { it.mapReforge() }
     }
 
     private val reforgeGson: Gson = BaseGsonBuilder.gson()

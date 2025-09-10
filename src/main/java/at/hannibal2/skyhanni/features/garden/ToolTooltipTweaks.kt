@@ -53,7 +53,7 @@ object ToolTooltipTweaks {
         val dedicationFortune = FarmingFortuneDisplay.getDedicationFortune(itemStack, crop)
 
         val reforgeName = itemStack.getReforgeModifier()?.let { modifier ->
-            ReforgeApi.reforgeList.firstOrNull { it.nbtModifier == modifier }?.name
+            ReforgeApi.reforges.firstOrNull { it.nbtModifier == modifier }?.name
         }
 
         val sunderFortune = FarmingFortuneDisplay.getSunderFortune(itemStack)

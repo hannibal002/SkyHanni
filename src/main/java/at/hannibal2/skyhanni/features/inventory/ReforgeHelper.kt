@@ -119,7 +119,7 @@ object ReforgeHelper {
         itemToReforge = newItem
         val newReforgeName = itemToReforge?.getReforgeModifier().orEmpty()
         if (newReforgeName == currentReforge?.nbtModifier) return
-        currentReforge = ReforgeApi.reforgeList.firstOrNull { it.nbtModifier == newReforgeName }
+        currentReforge = ReforgeApi.reforges.firstOrNull { it.nbtModifier == newReforgeName }
         updateDisplay()
     }
 
@@ -235,7 +235,7 @@ object ReforgeHelper {
         val itemRarity = item.getItemRarityOrNull() ?: return@buildList
 
         val rawReforgeList =
-            if (!isInHexReforgeMenu && config.reforgeStonesOnlyHex) ReforgeApi.basicReforgeList else ReforgeApi.reforgeList
+            if (!isInHexReforgeMenu && config.reforgeStonesOnlyHex) ReforgeApi.basicReforges else ReforgeApi.reforges
         val reforgeList = rawReforgeList.filter { it.isValid(itemType, internalName) }
 
         val statTypes = reforgeList.mapNotNull { it.stats[itemRarity]?.keys }.flatten().toSet()
