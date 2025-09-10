@@ -66,7 +66,7 @@ object AbiphoneFeatures {
         val constant = event.getConstant<Map<String, AbiphoneContactInfo>>("abiphone", NeuAbiphoneJson.TYPE)
         abiphoneContacts = constant.flatMap { (key, value) ->
             value.callNames ?: listOf(key.removeAllNonLettersAndNumbers().replace(" ", ""))
-        }.toMutableSet()
+        }.toSet()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
