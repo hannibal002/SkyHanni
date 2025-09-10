@@ -147,7 +147,7 @@ object AttributeShardsData {
      * REGEX-TEST: §aYou caught §7x2 §fHideonleaf §aShards§a!
      * REGEX-TEST: §aYou caught §7x2 §fVoracious Spider §aShards§a!
      */
-    val caughtShardsPattern by patternGroup.pattern(
+    private val caughtShardsPattern by patternGroup.pattern(
         "caught.shards",
         "§aYou caught(?: [an]+)?(?: §7x(?<amount>\\d+))? §.(?<shardName>.+) §aShard(?:s§a)?!",
     )
