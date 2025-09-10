@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
@@ -132,9 +133,27 @@ object CrownOfAvariceCounter {
 
         if (inventoryOpen) {
             newList.addLine {
-                add(Renderable.clickable(text = "§c[Reset session]", onLeftClick = ::reset))
+                add(
+                    if (coinsEarned == 0L) {
+                        Renderable.text("§8[Reset session]")
+                    } else {
+                        Renderable.clickable(text = "§c[Reset session]", onLeftClick = ::reset)
+                    },
+                )
                 addHorizontalSpacer(3)
-                add(Renderable.clickable(text = "§6[Pause session]", onLeftClick = ::pauseSession))
+                add(
+                    if (sessionUptime.isPaused()) {
+                        Renderable.text("§8[Pause session]")
+                    } else {
+                        Renderable.clickable(
+                            text = "§6[Pause session]",
+                            onLeftClick = {
+                                pauseSession()
+                                update()
+                            },
+                        )
+                    },
+                )
             }
         }
         return newList
