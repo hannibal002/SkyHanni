@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
@@ -18,7 +19,7 @@ object FixIronman {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltipEvent(event: ItemHoverEvent) {
         // We don't need to always fix this
-        if (!SkyHanniMod.isAprilFoolsDay) return
+        if (!TimeUtils.isAprilFoolsDay) return
 
         if (!profileManagementInventory.isInside() &&
             !selectModeInventory.isInside() &&
@@ -44,7 +45,7 @@ object FixIronman {
     @HandleEvent
     fun onChat(event: SystemMessageEvent) {
         // We don't need to always fix this
-        if (!SkyHanniMod.isAprilFoolsDay) return
+        if (!TimeUtils.isAprilFoolsDay) return
 
         if (event.message.contains("Ironman")) {
             event.chatComponent = event.message.replace("Ironman", "Ironperson").asComponent()
@@ -52,13 +53,13 @@ object FixIronman {
     }
 
     fun fixScoreboard(text: String): String? {
-        return if (SkyHanniMod.isAprilFoolsDay && text.contains("Ironman")) {
+        return if (TimeUtils.isAprilFoolsDay && text.contains("Ironman")) {
             text.replace("Ironman", "Ironperson")
         } else null
     }
 
     fun getIronmanName(): String {
-        return if (SkyHanniMod.isAprilFoolsDay) {
+        return if (TimeUtils.isAprilFoolsDay) {
             "Ironperson"
         } else "Ironman"
     }

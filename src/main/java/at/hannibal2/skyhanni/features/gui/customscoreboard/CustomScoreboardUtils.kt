@@ -17,13 +17,14 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.skyhanni.utils.TimeUtils
 import java.util.regex.Pattern
 
 @Suppress("TooManyFunctions")
 object CustomScoreboardUtils {
 
     fun formatNumberDisplay(text: String, number: String, color: String): String {
-        val formattedNumber = if (SkyHanniMod.isAprilFoolsDay) {
+        val formattedNumber = if (TimeUtils.isAprilFoolsDay) {
             "-$number"
         } else {
             number
