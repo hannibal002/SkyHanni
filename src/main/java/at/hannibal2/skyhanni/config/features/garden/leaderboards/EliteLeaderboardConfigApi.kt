@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteLeaderboardGenericConfig
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.MultipleTypeRankGoalConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.MultiModeTypeRankGoalConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.RankGoalGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.SingleTypeRankGoalConfig
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
@@ -34,7 +34,7 @@ object EliteLeaderboardConfigApi {
     fun getRankGoalIfValid(leaderboardType: EliteLeaderboardType): Property<String>? {
         val config = getRankConfig(leaderboardType)
         if (!config.useRankGoal.get()) return null
-        if (config is MultipleTypeRankGoalConfig<*, *> && leaderboardType.type !in config.rankGoalTypes.get()) return null
+        if (config is MultiModeTypeRankGoalConfig<*, *, *> && leaderboardType.type !in config.rankGoalTypes.get()) return null
         return getLeaderboardRankConfig(leaderboardType)?.get()
     }
 
@@ -44,7 +44,7 @@ object EliteLeaderboardConfigApi {
                 EliteLeaderboardMode.ALL_TIME -> config::rankGoal
                 EliteLeaderboardMode.MONTHLY -> config::monthlyRankGoal
             }
-            is MultipleTypeRankGoalConfig<*, *> -> config.getGoal(leaderboardType)
+            is MultiModeTypeRankGoalConfig<*, *, *> -> config.getGoal(leaderboardType)
             else -> null
         }
 

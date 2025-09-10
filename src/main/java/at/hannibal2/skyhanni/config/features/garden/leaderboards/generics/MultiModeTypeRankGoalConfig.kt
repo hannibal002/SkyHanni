@@ -9,8 +9,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.reflect.KProperty0
 
-abstract class MultipleTypeRankGoalConfig<E : Enum<E>, Config : TypeRankGoalGenericConfig<E>>(
-    createConfig: () -> Config
+abstract class MultiModeTypeRankGoalConfig<
+    E : Enum<E>,
+    Config : TypeRankGoalGenericConfig<E>,
+    ConfigMonthly : TypeRankGoalGenericConfig<E>
+    >(
+    createConfig: () -> Config,
+    createMonthlyConfig: () -> ConfigMonthly,
 ) : RankGoalGenericConfig() {
     // moulconfig requires concrete types
     @Suppress("StorageNeedsExpose")
@@ -30,7 +35,7 @@ abstract class MultipleTypeRankGoalConfig<E : Enum<E>, Config : TypeRankGoalGene
         desc = ""
     )
     @Accordion
-    val monthlyRankGoalsConfig: Config = createConfig()
+    val monthlyRankGoalsConfig: ConfigMonthly = createMonthlyConfig()
 
     @Suppress("UNCHECKED_CAST")
     fun getGoal(leaderboardType: EliteLeaderboardType): KProperty0<Property<String>> {

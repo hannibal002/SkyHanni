@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteLeaderboardGenericConfig
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.MultipleTypeRankGoalConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.MultiTypeRankGoalConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.CropTypeRankGoalsConfig
 import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.annotations.Expose
@@ -40,7 +40,7 @@ class CropCollectionDisplayConfig : EliteDisplayGenericConfig() {
     val hideWhenNotFarming: Boolean = true
 }
 
-class CropRankGoalConfig : MultipleTypeRankGoalConfig<CropType, CropTypeRankGoalsConfig>(
+class CropRankGoalConfig : MultiTypeRankGoalConfig<CropType, CropTypeRankGoalsConfig>(
     { CropTypeRankGoalsConfig() }
 ) {
     @Expose

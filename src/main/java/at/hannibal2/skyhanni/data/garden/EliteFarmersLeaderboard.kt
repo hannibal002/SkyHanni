@@ -65,8 +65,8 @@ object EliteFarmersLeaderboard {
     private var lastFetchAttempt = SimpleTimeMark.farPast()
 
     fun clearEntries(leaderboardType: EliteLeaderboardType) {
+        lastApiData.remove(leaderboardType)
         rankGoal.remove(leaderboardType)
-        nextPlayers.remove(leaderboardType)
         leaderboardPosMap?.remove(leaderboardType)
         shouldRefreshLeaderboard.remove(leaderboardType)
         nextPlayers.remove(leaderboardType)
@@ -74,8 +74,8 @@ object EliteFarmersLeaderboard {
     }
 
     fun clearCategories(category: KClass<out EliteLeaderboardType>) {
+        lastApiData.clearCategory(category)
         rankGoal.clearCategory(category)
-        nextPlayers.clearCategory(category)
         leaderboardPosMap?.clearCategory(category)
         shouldRefreshLeaderboard.clearCategory(category)
         nextPlayers.clearCategory(category)
@@ -129,7 +129,7 @@ object EliteFarmersLeaderboard {
         }
 
         // We want to prevent spamming the api, especially when swapping leaderboard displays
-        if (lastFetchAttempt.passedSince() <= 5.seconds) return null
+        if (lastFetchAttempt.passedSince() <= 3.seconds) return null
         lastFetchAttempt = SimpleTimeMark.now()
         fetchAttempts++
 
@@ -263,22 +263,29 @@ object EliteFarmersLeaderboard {
             upcomingCount = upcomingPlayers,
             atRank = atRank,
         )
-
+        // elite only updates player profiles once an hour, so assume it's wrong if it's the same as last fetch
         val shouldUpdateData = shouldUpdateData(leaderboardType, apiData)
-        // don't update anything besides upcoming players if data hasn't changed since last request
-        if (shouldUpdateData) handleDiff(leaderboardType, apiData)
-        handleUpcomingPlayers(leaderboardType, apiData)
-
         minAmount?.set(leaderboardType, apiData.minAmount)
         lastApiData[leaderboardType] = apiData
         lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
-        shouldRefreshLeaderboard[leaderboardType] = false // Don't want to fetch again if api call was successful
+        shouldRefreshLeaderboard[leaderboardType] = false
         apiError = false
         if (apiData.rank <= 0) { // api returns -1 for unranked players
             isUnranked[leaderboardType] = true
+            // correct wrong data
+            leaderboardAmountMap?.remove(leaderboardType)
+            leaderboardPosMap?.remove(leaderboardType)
+            if (!useRankGoal) {
+                nextPlayers.remove(leaderboardType)
+                lastPlayer.remove(leaderboardType)
+            }
+
             return null
         }
-        // api caches data, so prefer our lb pos if api pos hasn't changed since last request
+        isUnranked[leaderboardType] = false
+        if (shouldUpdateData) handleDiff(leaderboardType, apiData)
+        handleUpcomingPlayers(leaderboardType, apiData)
+        // prefer our lb pos
         return if (!shouldUpdateData && currentPos != Int.MAX_VALUE) currentPos else apiData.rank
     }
 

@@ -95,7 +95,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         val lineMap = mutableMapOf<LeaderboardTextEntry, Renderable>()
         val isFirst = leaderboardPos == 1
 
-        lineMap[LeaderboardTextEntry.WEIGHT_POSITION] = weightPosRenderable(leaderboardType)
+        lineMap[LeaderboardTextEntry.WEIGHT_POSITION] = amountPosRenderable(leaderboardType)
         lineMap[LeaderboardTextEntry.OVERTAKE] = overtakeRenderable(leaderboardType, isFirst)
         if (!isFirst && !isUnranked(leaderboardType) && config?.display?.text?.get()?.contains(LeaderboardTextEntry.OVERTAKE) == true) {
             lineMap[LeaderboardTextEntry.LAST_PLAYER] = overtakeRenderable(leaderboardType, true)
@@ -116,7 +116,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
 
     abstract fun MutableList<Renderable>.buildTypeSwitcher()
 
-    private fun weightPosRenderable(leaderboardType: EliteLeaderboardType): Renderable {
+    private fun amountPosRenderable(leaderboardType: EliteLeaderboardType): Renderable {
         val amountText = amount?.roundTo(2)?.addSeparators() ?: if (isUnranked(leaderboardType)) {
             "Not ranked!"
         } else {

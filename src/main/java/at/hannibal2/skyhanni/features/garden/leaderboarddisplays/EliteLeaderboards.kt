@@ -54,7 +54,7 @@ enum class EliteLeaderboards(
         }
 
         @HandleEvent
-        fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        fun onRenderOverlay(event: GuiRenderEvent) {
             if (config.displayPositions.isEmpty()) return
             config.display.get().forEach { leaderboard ->
                 leaderboard.display.renderDisplay(leaderboard.position)
@@ -177,7 +177,7 @@ enum class EliteLeaderboards(
             }
             event.move(106, "$oldConfig.pos", "garden.eliteFarmersLeaderboards.displayPositions") { entry ->
                 val positionList = PositionList(EliteLeaderboards.entries.size)
-                positionList[0] = ConfigManager.gson.fromJson<Position>(entry)
+                positionList[WEIGHT.ordinal] = ConfigManager.gson.fromJson<Position>(entry)
                 ConfigManager.gson.toJsonTree(positionList)
             }
 
