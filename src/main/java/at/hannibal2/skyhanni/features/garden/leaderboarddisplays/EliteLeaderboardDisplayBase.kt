@@ -109,7 +109,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
 
         val newList = mutableListOf<Renderable>()
         if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
-        config?.display?.text?.get()?.let { newList.addAll(it.mapNotNull { lineMap[it] }) }
+        config?.display?.text?.get()?.let { leaderboardTextEntries -> newList.addAll(leaderboardTextEntries.mapNotNull { lineMap[it] }) }
         if (inventoryOpen) newList.buildTypeSwitcher()
         return newList
     }

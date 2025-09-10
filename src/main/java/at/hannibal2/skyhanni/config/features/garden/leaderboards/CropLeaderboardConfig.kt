@@ -37,7 +37,7 @@ class CropCollectionDisplayConfig : EliteDisplayGenericConfig() {
     @Expose
     @ConfigOption(name = "Hide When Not Farming", desc = "Hides the display unless actively farming.")
     @ConfigEditorBoolean
-    val hideWhenNotFarming: Boolean = true
+    var hideWhenNotFarming: Boolean = true
 }
 
 class CropRankGoalConfig : MultiTypeRankGoalConfig<CropType, CropTypeRankGoalsConfig>(

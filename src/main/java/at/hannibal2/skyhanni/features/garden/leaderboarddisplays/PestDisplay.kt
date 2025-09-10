@@ -35,7 +35,7 @@ class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.P
         return null
     }
 
-    override val currentLeaderboardType: EliteLeaderboardType?
+    override val currentLeaderboardType: EliteLeaderboardType
         get() = EliteLeaderboardType.Pest(currentEnum, currentMode)
 
     // We don't track pest kills over a time period so we can't support this right now
@@ -54,7 +54,7 @@ class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.P
 
         val newList = mutableListOf<Renderable>()
         if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
-        config.display.text.get()?.let { newList.addAll(it.mapNotNull { lineMap[it] }) }
+        config.display.text.get()?.let { leaderboardTextEntries -> newList.addAll(leaderboardTextEntries.mapNotNull { lineMap[it] }) }
         // Elite only supports monthly leaderboards for all pests
         if (inventoryOpen && currentEnum == null) newList.buildTypeSwitcher()
         return newList

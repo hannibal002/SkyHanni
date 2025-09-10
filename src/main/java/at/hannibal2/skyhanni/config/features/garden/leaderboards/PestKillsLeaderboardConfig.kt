@@ -43,7 +43,7 @@ class PestKillsDisplayConfig : EliteDisplayGenericConfig() {
         desc = "Hides the display when you haven't recently killed a pest and aren't holding a vacuum."
     )
     @ConfigEditorBoolean
-    val hideWhenInactive: Boolean = true
+    var hideWhenInactive: Boolean = true
 
     @Expose
     @ConfigOption(name = "Time Displayed", desc = "Time displayed after killing a pest.")
