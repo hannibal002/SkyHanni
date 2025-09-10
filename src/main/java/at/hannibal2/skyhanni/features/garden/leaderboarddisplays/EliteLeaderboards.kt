@@ -163,7 +163,7 @@ enum class EliteLeaderboards(
                     if (entry.asBoolean) add(WEIGHT)
                     entry
                 }
-                event.transform(106, "garden.cropmilestones.progress") { entry ->
+                event.transform(106, "garden.cropMilestones.progress") { entry ->
                     if (entry.asBoolean) add(CROP)
                     entry
                 }
