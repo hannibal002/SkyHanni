@@ -139,7 +139,7 @@ object CrownOfAvariceCounter {
                         Renderable.clickable(
                             text = "§c[Reset session]",
                             onLeftClick = ::reset,
-                            tips = listOf("§§eClick to reset the current session!"),
+                            tips = listOf("§eClick to reset the current session!"),
                         )
                     },
                 )
@@ -154,7 +154,7 @@ object CrownOfAvariceCounter {
                                 pauseSession()
                                 update()
                             },
-                            tips = listOf("§§eClick to pause the current session!"),
+                            tips = listOf("§eClick to pause the current session!"),
                         )
                     },
                 )
