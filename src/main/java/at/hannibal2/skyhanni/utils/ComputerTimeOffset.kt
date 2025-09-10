@@ -75,7 +75,7 @@ object ComputerTimeOffset {
             return
         } else if (stableRuns++ > 10 && state != State.NORMAL) {
             stableRuns = 0
-            state = state.previous(false) ?: state
+            state = state.previous() ?: state
         }
 
         val wasOffsetBefore = (offsetDuration?.absoluteValue ?: 0.seconds) > 5.seconds
