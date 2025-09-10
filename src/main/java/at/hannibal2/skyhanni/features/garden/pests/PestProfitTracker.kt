@@ -49,7 +49,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PestProfitTracker {
-    val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTacker
+    val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTracker
 
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
@@ -359,5 +359,6 @@ object PestProfitTracker {
                 }.sumOf { it.value },
             )
         }
+        event.move(105, "garden.pests.pestProfitTacker", "garden.pests.pestProfitTracker")
     }
 }
