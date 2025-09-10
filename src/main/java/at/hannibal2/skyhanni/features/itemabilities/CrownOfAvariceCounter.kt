@@ -57,7 +57,7 @@ object CrownOfAvariceCounter {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { isEnabled() && isWearingCrown },
-            onRender = { renderDisplay(config.position) }
+            onRender = { renderDisplay(config.position) },
         )
     }
 
@@ -123,7 +123,10 @@ object CrownOfAvariceCounter {
         val newList = mutableListOf<Renderable>()
         newList.addLine {
             addItemStack(internalName.getItemStack())
-            addString("§6" + if (config.shortFormat) totalCoins?.shortFormat() else totalCoins?.addSeparators())
+            val format = totalCoins?.let {
+                if (config.shortFormat) it.shortFormat() else it.addSeparators()
+            } ?: "0"
+            addString("§6$format")
         }
         newList.addAll(config.text.mapNotNull { lines[it] })
 
