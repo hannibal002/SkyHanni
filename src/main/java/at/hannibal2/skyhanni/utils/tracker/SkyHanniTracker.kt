@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -47,6 +48,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     private val trackUptime: Boolean = true,
     private val drawDisplay: (Data) -> List<Searchable>,
+    private val trackerConfig: TrackerGenericConfig
 ) {
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
@@ -57,11 +59,10 @@ open class SkyHanniTracker<Data : TrackerData>(
     private var dirty = false
     private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
     val textInput = SearchTextInput()
+    val config get() = trackerConfig
 
     @SkyHanniModule
     companion object {
-
-        private val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
         private val unpausedTrackers: MutableSet<SkyHanniTracker<*>> = mutableSetOf()
 
@@ -75,9 +76,8 @@ open class SkyHanniTracker<Data : TrackerData>(
                 }
             }
         }
-
-        fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
     }
+    fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
 
     fun isInventoryOpen() = inventoryOpen
 
