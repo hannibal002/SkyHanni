@@ -137,7 +137,11 @@ object CrownOfAvariceCounter {
                     if (coinsEarned == 0L) {
                         Renderable.text("§8[Reset session]")
                     } else {
-                        Renderable.clickable(text = "§c[Reset session]", onLeftClick = ::reset)
+                        Renderable.clickable(
+                            text = "§c[Reset session]",
+                            onLeftClick = ::reset,
+                            tips = listOf("§§eClick to reset the current session!"),
+                        )
                     },
                 )
                 addHorizontalSpacer(3)
@@ -151,6 +155,7 @@ object CrownOfAvariceCounter {
                                 pauseSession()
                                 update()
                             },
+                            tips = listOf("§§eClick to pause the current session!"),
                         )
                     },
                 )
