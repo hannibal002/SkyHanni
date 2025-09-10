@@ -26,7 +26,7 @@ class PestTimerSoundSettings {
     @Expose
     @ConfigOption(
         name = "Repeat Duration",
-        desc = "Change how often the sound should be repeated in ticks. Change to 20 for only once per second."
+        desc = "Change how often the sound should be repeated in ticks. Change to 20 for only once per second.",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 20f, minStep = 1f)
     var repeatDuration: Int = 20

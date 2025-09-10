@@ -42,7 +42,7 @@ class PestTimerConfig {
     @ConfigEditorDraggableList
     val pestDisplay: MutableList<PestTimerTextEntry> = mutableListOf(
         PestTimerTextEntry.PEST_TIMER,
-        PestTimerTextEntry.PEST_COOLDOWN
+        PestTimerTextEntry.PEST_COOLDOWN,
     )
 
     enum class PestTimerTextEntry(private val displayName: String) {
@@ -73,7 +73,7 @@ class PestTimerConfig {
     @Expose
     @ConfigOption(
         name = "AFK Timeout",
-        desc = "Don't include spawn time in average spawn time display when the player goes AFK for at least this many seconds."
+        desc = "Don't include spawn time in average spawn time display when the player goes AFK for at least this many seconds.",
     )
     @ConfigEditorSlider(minValue = 5f, maxValue = 300f, minStep = 1f)
     var averagePestSpawnTimeout: Int = 30
@@ -81,7 +81,7 @@ class PestTimerConfig {
     @Expose
     @ConfigOption(
         name = "Pest Spawn Time Chat Message",
-        desc = "When a pest spawns, send the time it took to spawn it in chat."
+        desc = "When a pest spawns, send the time it took to spawn it in chat.",
     )
     @ConfigEditorBoolean
     var pestSpawnChatMessage: Boolean = false
