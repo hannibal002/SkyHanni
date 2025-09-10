@@ -38,9 +38,7 @@ object ColorfulItemStats {
 
                 val statId = stat.uppercase().replace(" ", "_")
 
-                val skyblockStatIcon = SkyblockStat.getIconOrNull(
-                    statId
-                ) ?: return@replace this.group()
+                val skyblockStatIcon = SkyblockStat.getIconOrNull(statId) ?: return@replace this.group()
 
                 val bonusGroup = group("bonus")
                 val bonus = when {

@@ -52,23 +52,25 @@ object ClientEvents {
             },
         )
 
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(object : IdentifiableResourceReloadListener {
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
+            object : IdentifiableResourceReloadListener {
 
-            override fun getFabricId(): Identifier = Identifier.of("skyhanni", "resources")
+                override fun getFabricId(): Identifier = Identifier.of("skyhanni", "resources")
 
-            override fun reload(
-                synchronizer: ResourceReloader.Synchronizer,
-                manager: ResourceManager,
-                prepareExecutor: Executor,
-                applyExecutor: Executor,
-            ): CompletableFuture<Void> {
+                override fun reload(
+                    synchronizer: ResourceReloader.Synchronizer,
+                    manager: ResourceManager,
+                    prepareExecutor: Executor,
+                    applyExecutor: Executor,
+                ): CompletableFuture<Void> {
 
-                return CompletableFuture.runAsync({
-                    ResourcePackReloadEvent(manager).post()
-                }, applyExecutor).thenCompose(synchronizer::whenPrepared)
-            }
-
-        })
+                    return CompletableFuture.runAsync(
+                        { ResourcePackReloadEvent(manager).post() },
+                        applyExecutor,
+                    ).thenCompose(synchronizer::whenPrepared)
+                }
+            },
+        )
 
     }
 

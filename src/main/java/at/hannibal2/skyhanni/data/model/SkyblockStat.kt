@@ -223,7 +223,7 @@ enum class SkyblockStat(
         @HandleEvent
         fun onResourcePackLoad(event: ResourcePackReloadEvent) {
             val packOverrides = event.getJsonResource<Map<String, String>>(
-                createResourceLocation("skyhanni", "icon_overrides.json")
+                createResourceLocation("skyhanni", "icon_overrides.json"),
             )
 
             resourcePackOverrides = packOverrides.orEmpty()

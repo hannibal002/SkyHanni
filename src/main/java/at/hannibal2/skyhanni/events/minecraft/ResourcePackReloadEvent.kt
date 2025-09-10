@@ -14,7 +14,7 @@ import java.io.IOException
 //#endif
 
 class ResourcePackReloadEvent(
-    val resourceManager: IResourceManager
+    val resourceManager: IResourceManager,
 ) : SkyHanniEvent() {
     inline fun <reified T : Any> getJsonResource(location: ResourceLocation): T? {
         return try {
