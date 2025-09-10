@@ -13,10 +13,8 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -25,9 +23,11 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
 import java.util.Collections
+import kotlin.collections.buildList
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object KingTalismanHelper {
@@ -38,38 +38,12 @@ object KingTalismanHelper {
     private val patternGroup = RepoPattern.group("mining.kingtalisman")
 
     /**
-     * REGEX-TEST: §6§lKing Brammor
-     * REGEX-TEST: §6§lKing Emkam
-     * REGEX-TEST: §6§lKing Kevin
-     * REGEX-TEST: §6§lKing Redros
-     */
-    private val kingPattern by patternGroup.pattern(
-        "king",
-        "§6§lKing (?<name>.*)",
-    )
-
-    /**
      * REGEX-TEST: §7You have received a §r§fKing Talisman§r§7!
      */
     private val talismanPattern by patternGroup.pattern(
         "talisman",
         "§7You have received a §r§fKing Talisman§r§7!",
     )
-
-    private var currentOffset: Int? = null
-    private var skyblockYear = 0
-
-    private fun getCurrentOffset(): Int? {
-        if (SkyBlockTime.now().year != skyblockYear) {
-            return null
-        }
-        return currentOffset
-    }
-
-    private fun kingFix() {
-        currentOffset = null
-        ChatUtils.chat("Reset internal offset of King Talisman Helper.")
-    }
 
     private fun resetKings() {
         storage?.kingsTalkedTo = mutableListOf<String>()
@@ -98,36 +72,11 @@ object KingTalismanHelper {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        val storage = storage ?: return
-
-        val nearby = isNearby()
-        if (nearby && getCurrentOffset() == null) {
-            checkOffset()
-        }
-
-        val kingsTalkedTo = storage.kingsTalkedTo
-        if (getCurrentOffset() == null) {
-            val allKings = kingsTalkedTo.size == kingCircles.size
-            display = if (allKings) emptyList() else listOf("§cVisit the king to sync up.")
-            return
-        }
 
         update()
-        display = if (nearby) allKingsDisplay else Collections.singletonList(farDisplay)
+        display = if (isNearby()) allKingsDisplay else Collections.singletonList(farDisplay)
     }
 
-    private fun checkOffset() {
-        val king = EntityUtils.getEntitiesNearby<EntityArmorStand>(LorenzVec(129.6, 196.0, 196.7), 2.0)
-            .firstOrNull { it.name.startsWith("§6§lKing ") } ?: return
-        val foundKing = kingPattern.matchMatcher(king.name) {
-            group("name")
-        } ?: return
-
-        val currentId = kingCircles.indexOf(getCurrentKing())
-        val foundId = kingCircles.indexOf(foundKing)
-        currentOffset = currentId - foundId
-        skyblockYear = SkyBlockTime.now().year
-    }
 
     fun isEnabled() = config.enabled &&
         SkyBlockUtils.inSkyBlock &&
@@ -137,7 +86,6 @@ object KingTalismanHelper {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Commissions") return
         if (!isEnabled()) return
-        if (getCurrentOffset() == null) return
         if (!isNearby()) return
         val storage = storage ?: return
 
@@ -169,11 +117,11 @@ object KingTalismanHelper {
                 val current = king == currentKing
 
                 val missingTimeFormat = if (current) {
-                    val changedTime = timeUntil - 1000 * 60 * 20 * (kingCircles.size - 1)
+                    val changedTime = timeUntil.inWholeMilliseconds - 1000 * 60 * 20 * (kingCircles.size - 1)
                     val time = changedTime.milliseconds.format(maxUnits = 2)
                     "§7(§b$time remaining§7)"
                 } else {
-                    val time = timeUntil.milliseconds.format(maxUnits = 2)
+                    val time = timeUntil.format(maxUnits = 2)
                     "§7(§bin $time§7)"
                 }
 
@@ -194,28 +142,26 @@ object KingTalismanHelper {
         val storage = storage ?: error("profileSpecific is null")
         val kingsTalkedTo = storage.kingsTalkedTo
         val (nextKing, until) = getKingTimes().filter { it.key !in kingsTalkedTo }.sorted().firstNotNullOf { it }
-        val time = until.milliseconds.format(maxUnits = 2)
+        val time = until.format(maxUnits = 2)
 
         return "§cNext missing king: §7$nextKing §7(§bin $time§7)"
     }
 
-    private fun getKingTimes(): MutableMap<String, Long> {
-        val currentOffset = getCurrentOffset() ?: 0
-        val oneSBDay = 1000 * 60 * 20
+    private fun getKingTimes(): Map<String, Duration> {
+        val sbTime = SkyBlockTime.now()
+        val kingIndex = (sbTime.day + 5) % kingCircles.size
+        val absDay = (sbTime.year - 1) * 372 + (sbTime.month - 1) * 31 + sbTime.day
+        val startTime = SkyBlockTime.fromAbsoluteDay(absDay - kingIndex)
+        val oneSBDay = 20.minutes
         val oneCircleTime = oneSBDay * kingCircles.size
-        val kingTime = mutableMapOf<String, Long>()
-        for ((index, king) in kingCircles.withIndex()) {
-//             val startTime = SkyBlockTime(day = index + 2 - kingCircles.size)
-//             val startTime = SkyBlockTime(day = index - kingCircles.size)
-            val startTime = SkyBlockTime(day = index + currentOffset - kingCircles.size)
-            var timeNext = startTime.toMillis()
-            while (timeNext < System.currentTimeMillis()) {
+
+        return kingCircles.mapIndexed { index, king ->
+            var timeNext = (startTime + oneSBDay * index).toTimeMark().timeUntil()
+            while (timeNext.isNegative()) {
                 timeNext += oneCircleTime
             }
-            val timeUntil = timeNext - System.currentTimeMillis()
-            kingTime[king] = timeUntil
-        }
-        return kingTime
+            king to timeNext
+        }.toMap()
     }
 
     private fun getCurrentKing() = getKingTimes().sortedDesc().firstNotNullOf { it.key }
@@ -240,11 +186,6 @@ object KingTalismanHelper {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shkingfix") {
-            description = "Resets the local King Talisman Helper offset."
-            category = CommandCategory.USERS_BUG_FIX
-            callback { kingFix() }
-        }
         event.register("shresetkinghelper") {
             description = "Resets the King Talisman Helper"
             category = CommandCategory.USERS_RESET
