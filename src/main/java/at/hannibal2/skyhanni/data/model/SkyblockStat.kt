@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -12,11 +13,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import org.intellij.lang.annotations.Language
 import java.util.EnumMap
 import java.util.regex.Pattern
+import kotlin.collections.orEmpty
 import kotlin.math.roundToInt
 
 @Language("RegExp")
@@ -24,7 +27,7 @@ private const val VALUE_PATTERN = "(?<value>[\\d,.]+)(?: .*)?"
 
 @Suppress("MaxLineLength")
 enum class SkyblockStat(
-    val icon: String,
+    val hypixelIcon: String,
     @Language("RegExp") tabListPatternS: String,
     @Language("RegExp") menuPatternS: String,
     private val hypxelId: String? = null,
@@ -167,13 +170,18 @@ enum class SkyblockStat(
             ProfileStorageData.profileSpecific?.stats?.set(this, value)
         }
 
+    @Suppress("UNNECESSARY_SAFE_CALL")
+    val icon: String
+        get() = resourcePackOverrides?.get(name) ?: hypixelIcon
+
     var lastSource: StatSourceType = StatSourceType.UNKNOWN
 
     var lastAssignment: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private val capitalizedName = name.lowercase().allLettersFirstUppercase()
 
-    val iconWithName = "$icon $capitalizedName"
+    val iconWithName
+        get() = "$icon $capitalizedName"
 
     private val keyName = name.lowercase().replace('_', '.')
 
@@ -206,6 +214,19 @@ enum class SkyblockStat(
         fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             onSkyblockMenu(event)
             onStatsMenu(event)
+        }
+
+        fun getIconOrNull(string: String): String? = resourcePackOverrides[string] ?: getValueOrNull(string)?.icon
+
+        private var resourcePackOverrides = emptyMap<String, String>()
+
+        @HandleEvent
+        fun onResourcePackLoad(event: ResourcePackReloadEvent) {
+            val packOverrides = event.getJsonResource<Map<String, String>>(
+                createResourceLocation("skyhanni", "icon_overrides.json"),
+            )
+
+            resourcePackOverrides = packOverrides.orEmpty()
         }
 
         private const val PLAYER_STATS_SLOT_INDEX = 13
