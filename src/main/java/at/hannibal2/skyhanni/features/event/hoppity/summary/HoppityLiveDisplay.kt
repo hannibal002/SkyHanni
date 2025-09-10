@@ -241,7 +241,7 @@ object HoppityLiveDisplay {
         return percentText to percentageColor
     }
 
-    private fun buildTitle(statYear: Int) = Renderable.vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {
+    private fun buildTitle(statYear: Int) = Renderable.vertical(horizontalAlign = RenderUtils.HorizontalAlignment.LEFT) {
         addString(
             CFApi.partyModeReplace(
                 when (statYear) {
@@ -249,7 +249,7 @@ object HoppityLiveDisplay {
                     else -> "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats"
                 },
             ),
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
         )
         if (statYear == Int.MAX_VALUE) {
             val numberEvents = storage?.hoppityEventStats?.keys?.count { it <= currentSbYear } ?: 0
@@ -404,7 +404,7 @@ object HoppityLiveDisplay {
         val container = Renderable.horizontal(
             renderable,
             spacing = 5,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
         )
         add(container)
     }
