@@ -58,18 +58,18 @@ object CrownOfAvariceCounter {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { isEnabled() && isWearingCrown },
-            onRender = { renderDisplay(config.position) },
+            onRender = { renderDisplay() },
         )
     }
 
-    fun renderDisplay(pos: Position) {
+    fun renderDisplay() {
         val invCurrentlyOpen = InventoryUtils.inAnyInventory()
         if (inventoryOpen != invCurrentlyOpen) {
             inventoryOpen = invCurrentlyOpen
             update()
         }
 
-        pos.renderRenderables(display, posLabel = "Crown of Avarice Counter")
+        config.position.renderRenderables(display, posLabel = "Crown of Avarice Counter")
     }
 
 
