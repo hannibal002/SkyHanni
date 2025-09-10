@@ -137,6 +137,8 @@ object HoppityLiveDisplay {
         lastToggleMark = SimpleTimeMark.now()
     }
 
+    private var inventoryOpen = false
+
     @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
     fun onRenderOverlay() {
         if (!liveDisplayEnabled()) return
@@ -144,6 +146,11 @@ object HoppityLiveDisplay {
         val stats = getYearStats(HoppityEventSummary.statYear) ?: return
         // Calculate a 'hash' of the stats to determine if they have changed
         val statsHash = stats.hashCode()
+        val invCurrentlyOpen = InventoryUtils.inAnyInventory()
+        if (inventoryOpen != invCurrentlyOpen) {
+            inventoryOpen = invCurrentlyOpen
+            lastKnownStatHash = 0
+        }
         if (statsHash != lastKnownStatHash) {
             lastKnownStatHash = statsHash
             displayCardRenderables = buildDisplayRenderables(stats, HoppityEventSummary.statYear)
