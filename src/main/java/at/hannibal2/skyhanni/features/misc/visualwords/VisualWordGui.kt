@@ -598,7 +598,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
     }
 
     private fun drawUnmodifiedString(str: String, x: Float, y: Float) {
-        GuiRenderUtils.drawString("§§$str", x, y)
+        ModifyVisualWords.changeWords = false
+        GuiRenderUtils.drawString(str, x, y)
+        ModifyVisualWords.changeWords = true
     }
 
     private fun drawUnmodifiedString(str: String, x: Int, y: Int) {
@@ -606,7 +608,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
     }
 
     private fun drawUnmodifiedStringCentered(str: String?, x: Int, y: Int) {
-        GuiRenderUtils.drawStringCentered("§§$str", x, y)
+        ModifyVisualWords.changeWords = false
+        GuiRenderUtils.drawStringCentered(str ?: "null", x, y)
+        ModifyVisualWords.changeWords = true
     }
 
     private fun drawUnmodifiedStringCentered(str: String?, x: Float, y: Float) {

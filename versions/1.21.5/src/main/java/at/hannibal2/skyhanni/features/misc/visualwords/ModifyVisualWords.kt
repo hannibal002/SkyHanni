@@ -39,15 +39,15 @@ object ModifyVisualWords {
     fun transformText(orderedText: OrderedText?): OrderedText? {
         if (orderedText == null) return null
 
-        if (!config.enabled) return orderedText
-        if (!changeWords) return orderedText
+        if (!config.enabled) return null
+        if (!changeWords) return null
 
         if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
             userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
             update()
         }
 
-        if (userModifiedWords.isEmpty()) return orderedText
+        if (userModifiedWords.isEmpty()) return null
 
         return textCache.getOrPut(orderedText) {
 
@@ -92,15 +92,15 @@ object ModifyVisualWords {
     fun transformStringVisitable(stringVisitable: StringVisitable?) : StringVisitable? {
         if (stringVisitable == null) return null
 
-        if (!config.enabled) return stringVisitable
-        if (!changeWords) return stringVisitable
+        if (!config.enabled) return null
+        if (!changeWords) return null
 
         if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
             userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
             update()
         }
 
-        if (userModifiedWords.isEmpty()) return stringVisitable
+        if (userModifiedWords.isEmpty()) return null
 
         return stringVisitableCache.getOrPut(stringVisitable) {
             var characters = mutableListOf<StyledCharacter>()
