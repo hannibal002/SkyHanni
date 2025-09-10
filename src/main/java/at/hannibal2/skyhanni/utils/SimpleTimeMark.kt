@@ -45,13 +45,14 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         else -> Instant.ofEpochMilli(millis).toString()
     }
 
-    fun formattedDate(pattern: String): String {
-        val newPattern = if (SkyHanniMod.feature.gui.timeFormat24h) {
-            pattern.replace("h", "H").replace("a", "")
-        } else {
-            pattern
-        }
+    private fun String.applyTimeFormat(): String {
+        return if (SkyHanniMod.feature.gui.timeFormat24h) {
+            replace("h", "H").replace("a", "")
+        } else this
+    }
 
+    fun formattedDate(pattern: String): String {
+        val newPattern = pattern.applyTimeFormat()
         val instant = Instant.ofEpochMilli(millis)
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
         val formatter = DateTimeFormatter.ofPattern(newPattern.trim())

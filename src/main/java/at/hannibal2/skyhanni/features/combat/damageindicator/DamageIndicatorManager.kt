@@ -141,9 +141,6 @@ object DamageIndicatorManager {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
-        // only render when actually enabled
-        if (!config.enabled) return
-
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
 
@@ -169,7 +166,6 @@ object DamageIndicatorManager {
         }
 
         for (data in data.values) {
-
             val vecYOffset = when (data.bossType) {
                 BossType.END_ENDSTONE_PROTECTOR -> 3.0
                 BossType.SLAYER_SPIDER_5_1 -> 2.0
@@ -178,7 +174,7 @@ object DamageIndicatorManager {
             }
 
             if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0, vecYOffset = vecYOffset)) continue
-            if (!data.isConfigEnabled()) continue
+            val showNameAndHealth = data.shouldShowNameAndHealth()
 
             val entity = data.entity
 
@@ -199,8 +195,9 @@ object DamageIndicatorManager {
                 loc
             }.add(-0.5, 0.0, -0.5)
 
-
-            event.drawDynamicText(location, healthText, sizeHealth, smallestDistanceVew = smallestDistanceVew)
+            if (showNameAndHealth) {
+                event.drawDynamicText(location, healthText, sizeHealth, smallestDistanceVew = smallestDistanceVew)
+            }
 
             if (data.nameAbove.isNotEmpty()) {
                 event.drawDynamicText(
@@ -212,11 +209,13 @@ object DamageIndicatorManager {
                 )
             }
 
-            var bossName = when (config.bossName) {
-                NameVisibility.HIDDEN -> ""
-                NameVisibility.FULL_NAME -> data.bossType.fullName
-                NameVisibility.SHORT_NAME -> data.bossType.shortName
-            }
+            var bossName = if (showNameAndHealth) {
+                when (config.bossName) {
+                    NameVisibility.HIDDEN -> ""
+                    NameVisibility.FULL_NAME -> data.bossType.fullName
+                    NameVisibility.SHORT_NAME -> data.bossType.shortName
+                }
+            } else ""
 
             if (data.namePrefix.isNotEmpty()) {
                 bossName = data.namePrefix + bossName
@@ -224,7 +223,9 @@ object DamageIndicatorManager {
             if (data.nameSuffix.isNotEmpty()) {
                 bossName += data.nameSuffix
             }
-            event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
+            if (bossName.isNotEmpty()) {
+                event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
+            }
 
             val icons = iconCache.getOrPut(data) {
                 buildList {
@@ -256,7 +257,7 @@ object DamageIndicatorManager {
                 diff += 22f
             } else diff += 4f
 
-            if (config.showDamageOverTime) {
+            if (showNameAndHealth && config.showDamageOverTime) {
                 val currentDamage = data.damageCounter.currentDamage
                 val currentHealing = data.damageCounter.currentHealing
                 if (currentDamage != 0L || currentHealing != 0L) {
@@ -303,7 +304,7 @@ object DamageIndicatorManager {
         GlStateManager.enableCull()
     }
 
-    private fun EntityData.isConfigEnabled() = bossType.bossTypeToggle in config.bossesToShow
+    private fun EntityData.shouldShowNameAndHealth() = config.enabled && bossType.bossTypeToggle in config.bossesToShow
 
     @Suppress("Indentation")
     private fun noDeathDisplay(bossType: BossType): Boolean = when (bossType) {
@@ -315,6 +316,8 @@ object DamageIndicatorManager {
         BossType.SLAYER_BLAZE_QUAZII_2,
         BossType.SLAYER_BLAZE_QUAZII_3,
         BossType.SLAYER_BLAZE_QUAZII_4,
+
+        BossType.SLAYER_SPIDER_5_1,
 
             // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
         -> true
@@ -371,11 +374,14 @@ object DamageIndicatorManager {
 
     @HandleEvent
     fun onSkyHanniTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
         data.values.forEach(::update)
         // TODO config to define between 100ms and 5 sec
-        data.removeIf {
-            val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4.seconds else 100.milliseconds
-            (SimpleTimeMark.now() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
+        // TODO fix bug that the time is always 100 ms, even when the config is enabled?
+        data.removeIf { (_, value) ->
+            val noDeathDisplay = noDeathDisplay(value.bossType)
+            val waitForRemoval = if (value.dead && !noDeathDisplay) 4.seconds else 100.milliseconds
+            (SimpleTimeMark.now() > value.timeLastTick + waitForRemoval) || (value.dead && noDeathDisplay)
         }
     }
 
@@ -954,25 +960,24 @@ object DamageIndicatorManager {
         val entityData = data.values.find {
             val distance = it.entity.getLorenzVec().distance(entity.getLorenzVec())
             distance < 4.5
-        }
+        } ?: return
 
+        val showNameAndHealth = entityData.shouldShowNameAndHealth()
         if (isDamageSplash(entity)) {
             val name = entity.customNameTag.removeColor().replace(",", "")
 
-            if (entityData != null) {
-                if (config.hideDamageSplash) {
-                    event.cancel()
-                }
-                if (entityData.bossType == BossType.DUMMY) {
-                    val uuid = entity.uniqueID
-                    if (dummyDamageCache.contains(uuid)) return
-                    dummyDamageCache.add(uuid)
-                    val dmg = name.toCharArray().filter { Character.isDigit(it) }.joinToString("").toLong()
-                    entityData.damageCounter.currentDamage += dmg
-                }
+            if (showNameAndHealth && config.hideDamageSplash) {
+                event.cancel()
+            }
+            if (entityData.bossType == BossType.DUMMY) {
+                val uuid = entity.uniqueID
+                if (dummyDamageCache.contains(uuid)) return
+                dummyDamageCache.add(uuid)
+                val dmg = name.toCharArray().filter { Character.isDigit(it) }.joinToString("").toLong()
+                entityData.damageCounter.currentDamage += dmg
             }
         } else {
-            if (entityData != null && config.hideVanillaNametag && entityData.isConfigEnabled()) {
+            if (showNameAndHealth && config.hideVanillaNametag) {
                 val name = entity.name
                 if (name.contains("Plasmaflux")) return
                 if (name.contains("Overflux")) return

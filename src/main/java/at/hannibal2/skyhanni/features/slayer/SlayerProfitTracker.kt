@@ -119,7 +119,7 @@ object SlayerProfitTracker {
         }
         // TODO spawn costs in repo
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
-            if (coins < -100000 || coins > 0) {
+            if (coins < -150000 || coins > 0) {
                 ChatUtils.debug("Wrong Slayer Spawn Cost! Ignoring!")
                 return
             }

@@ -3,7 +3,11 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AbiphoneContactInfo
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAbiphoneJson
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -12,6 +16,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
+import at.hannibal2.skyhanni.utils.StringUtils.removeAllNonLettersAndNumbers
 import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import org.lwjgl.input.Keyboard
@@ -52,6 +57,26 @@ object AbiphoneFeatures {
         val acceptUUID = acceptUUID ?: return
         HypixelCommands.callback(acceptUUID)
         AbiphoneFeatures.acceptUUID = null
+    }
+
+    private var abiphoneContacts: Set<String>? = null
+
+    @HandleEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        val constant = event.getConstant<Map<String, AbiphoneContactInfo>>("abiphone", NeuAbiphoneJson.TYPE)
+        val completions = mutableSetOf<String>()
+        for (contact in constant) {
+            val names = contact.value.callNames ?: listOf(contact.key.removeAllNonLettersAndNumbers().replace(" ", ""))
+            completions.addAll(names)
+        }
+        abiphoneContacts = completions
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTabCompletion(event: TabCompletionEvent) {
+        if (!config.commands.tabComplete.call) return
+        if (event.command != "call") return
+        abiphoneContacts?.let { event.addSuggestions(it) }
     }
 
     @HandleEvent

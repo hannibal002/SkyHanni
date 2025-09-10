@@ -49,21 +49,25 @@ object DicerRngDropTracker {
     }
 
     private val melonPatternGroup = RepoPattern.group("garden.dicer.melon")
+    @Suppress("RepoPatternRegexTestMissing")
     private val melonUncommonDropPattern by melonPatternGroup.pattern(
         "uncommon",
-        "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon§r§e!",
+        "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon Slice§r§e!",
     )
+    @Suppress("RepoPatternRegexTestMissing")
     private val melonRareDropPattern by melonPatternGroup.pattern(
         "rare",
-        "§9§lRARE DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon§r§e!",
+        "§9§lRARE DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon Slice§r§e!",
     )
+    @Suppress("RepoPatternRegexTestMissing")
     private val melonCrazyRareDropPattern by melonPatternGroup.pattern(
         "crazyrare",
-        "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9]\\d+x §r§[a|9]Enchanted Melon(?: Block)?§r§e!",
+        "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9]\\d+x §r§[a|9]Enchanted Melon(?: Block| Slice)?§r§e!",
     )
+    @Suppress("RepoPatternRegexTestMissing")
     private val melonRngesusDropPattern by melonPatternGroup.pattern(
         "rngesus",
-        "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§9\\d+x §r§9Enchanted Melon Block§r§e!",
+        "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§9\\d+x §r§9Enchanted Melon§r§e!",
     )
 
     private val pumpkinPatternGroup = RepoPattern.group("garden.dicer.pumpkin")
