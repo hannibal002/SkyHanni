@@ -309,12 +309,19 @@ object PacketTest {
             //#if MC < 1.21
             is S0FPacketSpawnMob -> entityID
             is S0EPacketSpawnObject -> entityID
-            is S19PacketEntityHeadLook -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
+            is S19PacketEntityHeadLook ->
+                javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
             //#endif
-            is S19PacketEntityStatus -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
-            /* is S14PacketEntity.S15PacketEntityRelMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
-            is S14PacketEntity.S16PacketEntityLook -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
-            is S14PacketEntity.S17PacketEntityLookMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int */
+            is S19PacketEntityStatus ->
+                javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
+            /*
+            is S14PacketEntity.S15PacketEntityRelMove ->
+                packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
+            is S14PacketEntity.S16PacketEntityLook ->
+                packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
+            is S14PacketEntity.S17PacketEntityLookMove ->
+                packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
+            */
             else -> null
         }
     } catch (e: NoSuchFieldException) {
