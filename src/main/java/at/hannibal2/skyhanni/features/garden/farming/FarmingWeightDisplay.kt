@@ -328,13 +328,13 @@ object FarmingWeightDisplay {
 
         val displayList: List<FarmingWeightTextEntry> = buildList {
             add(FarmingWeightTextEntry.WEIGHT_POSITION)
-            event.transform(106, "garden.eliteFarmingWeights.overtakeETA") { entry ->
+            event.transform(107, "garden.eliteFarmingWeights.overtakeETA") { entry ->
                 if (entry.asBoolean) add(FarmingWeightTextEntry.OVERTAKE)
                 entry
             }
         }
 
-        event.add(106, "garden.eliteFarmingWeights.text") {
+        event.add(107, "garden.eliteFarmingWeights.text") {
             ConfigManager.gson.toJsonTree(displayList)
         }
 
