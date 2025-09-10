@@ -10,8 +10,9 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class NeuReforgeJson(
-    @Expose val internalName: NeuInternalName?,
     @Expose val reforgeName: String,
+    @Expose @SerializedName("nbtModifier") val rawNbtModifier: String?,
+    @Expose val internalName: NeuInternalName?,
     @Expose @SerializedName("itemTypes") val rawItemTypes: Any,
     @Expose val requiredRarities: List<LorenzRarity>,
     @Expose val reforgeCosts: Map<LorenzRarity, Long>?,
@@ -19,48 +20,57 @@ data class NeuReforgeJson(
     @Expose @SerializedName("reforgeAbility") val rawReforgeAbility: Any?,
 ) {
 
+    // NOTE: Lateinit fields are used here because `by lazy` causes errors
+    private lateinit var nbtModifierField: String
     private lateinit var reforgeAbilityField: Map<LorenzRarity, String>
     private lateinit var itemTypeField: Pair<String, List<NeuInternalName>>
 
-    val reforgeAbility
-        get() = if (this::reforgeAbilityField.isInitialized) reforgeAbilityField
-        else {
-            reforgeAbilityField = when (this.rawReforgeAbility) {
-                is String -> {
-                    this.requiredRarities.associateWith { this.rawReforgeAbility }
-                }
-
-                is Map<*, *> -> (this.rawReforgeAbility as? Map<String, String>)?.mapKeys {
-                    LorenzRarity.valueOf(
-                        it.key.uppercase().replace(" ", "_"),
-                    )
-                }.orEmpty()
-
-                else -> emptyMap()
+    val nbtModifier: String
+        get() {
+            if (!this::nbtModifierField.isInitialized) {
+                nbtModifierField = rawNbtModifier ?: reforgeName
+                    .lowercase()
+                    .replace("[^a-z0-9\\s_-]".toRegex(), "")
+                    .replace("[\\s-]".toRegex(), "_")
             }
-            reforgeAbilityField
+            return nbtModifierField
+        }
+
+    val reforgeAbility: Map<LorenzRarity, String>
+        get() {
+            if (!this::reforgeAbilityField.isInitialized) {
+                reforgeAbilityField = when (rawReforgeAbility) {
+                    is String -> requiredRarities.associateWith { rawReforgeAbility }
+
+                    is Map<*, *> -> (rawReforgeAbility as? Map<String, String>)?.mapKeys {
+                        LorenzRarity.getByNameOrError(it.key)
+                    }.orEmpty()
+
+                    else -> emptyMap()
+                }
+            }
+            return reforgeAbilityField
         }
 
     val itemType: Pair<String, List<NeuInternalName>>
-        get() = if (this::itemTypeField.isInitialized) itemTypeField
-        else run {
-            return when (val any = this.rawItemTypes) {
-                is String -> {
-                    any.replace("/", "_AND_").uppercase() to emptyList()
-                }
+        get() {
+            if (!this::itemTypeField.isInitialized) {
+                itemTypeField = when (rawItemTypes) {
+                    is String -> rawItemTypes.replace("/", "_AND_").uppercase() to emptyList()
 
-                is Map<*, *> -> {
-                    val type = "SPECIAL_ITEMS"
-                    val map = any as? Map<String, List<String>> ?: return type to emptyList()
-                    val internalNames = map["internalName"]?.toInternalNames().orEmpty()
-                    val itemType = map["itemid"]?.map {
-                        NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
-                    }?.flatten().orEmpty()
-                    type to (internalNames + itemType)
-                }
+                    is Map<*, *> -> {
+                        val type = "SPECIAL_ITEMS"
+                        val map = rawItemTypes as? Map<String, List<String>> ?: return type to emptyList()
+                        val internalNames = map["internalName"]?.toInternalNames().orEmpty()
+                        val itemType = map["itemid"]?.map {
+                            NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
+                        }?.flatten().orEmpty()
+                        type to (internalNames + itemType)
+                    }
 
-                else -> throw IllegalStateException()
+                    else -> error("rawItemTypes is neither String nor Map: $rawItemTypes")
+                }
             }
+            return itemTypeField
         }
 }
-
