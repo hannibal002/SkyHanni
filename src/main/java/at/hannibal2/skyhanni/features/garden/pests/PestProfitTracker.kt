@@ -359,6 +359,8 @@ object PestProfitTracker {
                 }.sumOf { it.value },
             )
         }
-        event.move(105, "garden.pests.pestProfitTacker", "garden.pests.pestProfitTracker")
+        event.move(105, "garden.pests.pestProfitTacker", "garden.pests.pestProfitTracker") { entry ->
+            entry
+        }
     }
 }
