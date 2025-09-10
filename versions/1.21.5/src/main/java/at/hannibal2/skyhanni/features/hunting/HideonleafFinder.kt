@@ -27,7 +27,7 @@ object HideonleafFinder {
             calculateRoute().also { route = it } ?: error("Current island graph is null and there is a mistake")
         }
 
-        val goal = route.first()
+        val goal = route.firstOrNull() ?: error("no hideonleaf route found in galatea!")
         route.removeAt(0)
         IslandGraphs.pathFind(
             goal,
@@ -41,6 +41,7 @@ object HideonleafFinder {
      private fun calculateRoute(): MutableList<LorenzVec>? {
         val graph = IslandGraphs.currentIslandGraph ?: return null
         val list = graph.filter { it.hasTag(GraphNodeTag.HIDEONLEAF) }
+
         return NavigationUtils.getRoute(list, maxIterations = 300, neighborhoodSize = 50).toMutableList()
     }
 }
