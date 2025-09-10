@@ -68,10 +68,11 @@ object DungeonsRaceGuide {
     @HandleEvent(OwnInventoryItemUpdateEvent::class, onlyOnIsland = IslandType.DUNGEON_HUB)
     fun onOwnInventoryItemUpdate() {
         val menuStack = InventoryUtils.getItemsInOwnInventoryWithNull()?.get(8)
-        inRace = menuStack?.getInternalNameOrNull() == CANCEL_RACE_ITEM
-        if (!inRace) {
+        val nowInRace = menuStack?.getInternalNameOrNull() == CANCEL_RACE_ITEM
+        if (inRace && !nowInRace) {
             reset()
         }
+        inRace = nowInRace
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DUNGEON_HUB)
