@@ -55,6 +55,8 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
 
         fun getByName(name: String): LorenzRarity? = entries.find { it.name.equals(name, ignoreCase = true) }
 
+        fun getByNameOrError(name: String): LorenzRarity = getByName(name) ?: error("LorenzRarity not found by name: '$name'")
+
         fun getByColorCode(colorCode: Char): LorenzRarity? = entries.find { it.color.chatColorCode == colorCode }
     }
 }

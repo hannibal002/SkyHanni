@@ -1327,6 +1327,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Customizable trigger permissions for party commands.
 + Added Prevent command early execution. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3377)
 + Added /shping to show your ping in chat. - nopo (https://github.com/hannibal002/SkyHanni/pull/4478)
++ Added tab complete for /call. - nopo (https://github.com/hannibal002/SkyHanni/pull/4632)
++ Added tab complete to the /show command. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4605)
 
 </details>
 <details open><summary>

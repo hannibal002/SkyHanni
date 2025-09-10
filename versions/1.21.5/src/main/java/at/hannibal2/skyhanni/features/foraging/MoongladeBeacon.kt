@@ -252,8 +252,8 @@ object MoongladeBeacon {
             )
             return event.cancel()
         }
-        if (!config.useMiddleClick) return
 
+        if (!config.useMiddleClick) return
         if (event.clickedButton != 0) return
         event.makePickblock()
     }
@@ -401,8 +401,9 @@ object MoongladeBeacon {
     }
 
     private inline fun <reified E : Enum<E>> E.internalGetOffset(other: E): Int {
-        val raw = this.ordinal - other.ordinal
-        return if (raw < 0) raw + enumValues<E>().size else raw
+        val size = enumValues<E>().size
+        val offset = ((this.ordinal - other.ordinal) + size) % size
+        return if (offset > size / 2) offset - size else offset
     }
 
     private inline fun <reified T : Enum<T>> NullableDataPair<T>.getOffset(): Int? {
@@ -523,7 +524,7 @@ object MoongladeBeacon {
 
         fun RenderInventoryItemTipEvent.tryLabelIfAble() {
             if (isEnchanted && !upgradingStrength) return
-            val offset = getOffsetBySlot(slot.index)?.takeIf { it > 0 } ?: return
+            val offset = getOffsetBySlot(slot.index)?.takeIf { it != 0 } ?: return
             stackTip = "§a$offset"
         }
 
