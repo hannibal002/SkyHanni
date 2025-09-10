@@ -52,7 +52,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import org.lwjgl.input.Keyboard
+import java.time.LocalDateTime
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
 private typealias DTType = HoppityLiveDisplayConfig.HoppityDateTimeDisplayType
@@ -283,15 +285,33 @@ object HoppityLiveDisplay {
             else -> if (timeMarkAbs) "Starts" else "Starts in"
         }
 
-        addCenteredString(
-            CFApi.partyModeReplace(
-                when {
-                    isCurrentEvent -> "§7$grammarFormat §f$timeMarkFormat"
-                    isPastEvent -> "§7Ended §f$timeMarkFormat$grammarFormat"
-                    else -> "§7$grammarFormat §f$timeMarkFormat"
-                },
+        val text = when {
+            isCurrentEvent -> "§7$grammarFormat §b$timeMarkFormat"
+            isPastEvent -> "§7Ended §b$timeMarkFormat$grammarFormat"
+            else -> "§7$grammarFormat §b$timeMarkFormat"
+        }
+
+        val eventStart = eventEnd - 31.hours
+        add(
+            Renderable.hoverTips(
+                CFApi.partyModeReplace(text),
+                tips = listOf(
+                    "§7From: §b${eventStart.format()}",
+                    "§7Until: §b${eventEnd.format()}",
+                ),
             ),
         )
+    }
+
+    private fun SimpleTimeMark.format(): String {
+        val date = toLocalDate()
+        val now = LocalDateTime.now()
+        val pattern = if (date.year != now.year) {
+            "yyyy MMM d h:mm a"
+        } else {
+            "MMM d h:mm a"
+        }
+        return formattedDate(pattern)
     }
 
     private fun SimpleTimeMark.formatForHoppity(): Pair<String, Boolean> =
