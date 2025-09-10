@@ -347,7 +347,7 @@ object HoppityEventSummary {
                 val totalMealEggs = stats.getMealEggCounts().sumAllValues().toInt().takeIf { it > 0 } ?: return@put
                 val spawnedMealEggs = stats.getSpawnedEggCountsWithInfPossible(year).sumAllValues()
                 val eggFormat = StringUtils.pluralize(totalMealEggs, "Egg")
-                val amount = "$totalMealEggs§7/§a${spawnedMealEggs.addSeparators()}"
+                val amount = "${totalMealEggs.addSeparators()}§7/§a${spawnedMealEggs.addSeparators()}"
                 statList.addStr("§7You found §b$amount §6Chocolate Meal $eggFormat§7.")
             }
 
@@ -364,14 +364,14 @@ object HoppityEventSummary {
                 }.toMap().sumAllValues().toInt()
 
                 val eggFormat = StringUtils.pluralize(missedMealEggs, "Egg")
-                val divisorFormat = "§b$hitmanCount§7/§a$missedMealEggs"
+                val divisorFormat = "§b${hitmanCount.addSeparators()}§7/§a${missedMealEggs.addSeparators()}"
                 statList.addStr("§7You recovered $divisorFormat §7missed §6Meal $eggFormat §7from §cRabbit Hitman§7.")
             }
 
             put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { statList, stats, _ ->
                 val boughtCount = stats.getBoughtCount().takeIf { it > 0 } ?: return@put
                 val rabbitFormat = StringUtils.pluralize(boughtCount, "Rabbit")
-                statList.addStr("§7You bought §b$boughtCount §f$rabbitFormat §7from §aHoppity§7.")
+                statList.addStr("§7You bought §b${boughtCount.addSeparators()} §f$rabbitFormat §7from §aHoppity§7.")
             }
 
             put(HoppityStat.SIDE_DISH_EGGS) { statList, stats, _ ->
