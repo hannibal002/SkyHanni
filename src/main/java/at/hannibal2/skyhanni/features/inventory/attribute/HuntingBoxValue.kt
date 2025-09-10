@@ -78,13 +78,13 @@ object HuntingBoxValue {
         } ?: return
         totalShards += amountOwned
 
-        val pricePerInstantSell = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL).toLong()
+        val pricePerInstantSell = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
         val totalPriceInstantSell = pricePerInstantSell * amountOwned
-        totalInstantSell += totalPriceInstantSell
+        totalInstantSell += totalPriceInstantSell.toLong()
 
-        val pricePerInstantBuy = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY).toLong()
+        val pricePerInstantBuy = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
         val totalPriceInstantBuy = pricePerInstantBuy * amountOwned
-        totalInstantBuy += totalPriceInstantBuy
+        totalInstantBuy += totalPriceInstantBuy.toLong()
 
         val hover = buildList {
             add(internalName.repoItemName)
