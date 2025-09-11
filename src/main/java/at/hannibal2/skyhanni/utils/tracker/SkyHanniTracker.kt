@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
@@ -40,7 +38,7 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
-open class SkyHanniTracker<Data : TrackerData, Config: GenericIndividualTrackerConfig<*>>(
+open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTrackerConfig<*>>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
@@ -49,7 +47,7 @@ open class SkyHanniTracker<Data : TrackerData, Config: GenericIndividualTrackerC
     private val trackerConfig: () -> Config,
     private val drawDisplay: (Data) -> List<Searchable>,
 
-    ) {
+) {
     val trackerSpecificConfig: Config get() = trackerConfig()
     private val config: TrackerGenericConfig get() =
         if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig

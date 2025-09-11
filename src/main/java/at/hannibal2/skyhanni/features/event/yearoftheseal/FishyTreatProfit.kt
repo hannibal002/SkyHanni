@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule

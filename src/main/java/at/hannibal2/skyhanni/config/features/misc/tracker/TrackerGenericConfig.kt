@@ -1,16 +1,13 @@
 package at.hannibal2.skyhanni.config.features.misc.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DefaultDisplayMode
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 open class TrackerGenericConfig {

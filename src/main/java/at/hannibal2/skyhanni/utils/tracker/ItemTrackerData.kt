@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose

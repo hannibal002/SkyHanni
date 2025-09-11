@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ItemAddEvent

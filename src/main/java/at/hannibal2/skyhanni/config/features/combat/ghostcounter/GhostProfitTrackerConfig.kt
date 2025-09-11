@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.combat.ghostcounter
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.garden.pests.PestProfitTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker.GhostTrackerLines
 import com.google.gson.annotations.Expose

@@ -39,7 +39,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButt
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.inventory.ContainerChest
 import org.lwjgl.input.Keyboard.KEY_DOWN

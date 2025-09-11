@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import java.util.EnumMap
 

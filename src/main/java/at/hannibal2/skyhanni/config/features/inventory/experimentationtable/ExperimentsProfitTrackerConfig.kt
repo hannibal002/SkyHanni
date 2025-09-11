@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.event.diana
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

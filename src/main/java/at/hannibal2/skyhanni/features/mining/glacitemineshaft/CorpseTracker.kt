@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule

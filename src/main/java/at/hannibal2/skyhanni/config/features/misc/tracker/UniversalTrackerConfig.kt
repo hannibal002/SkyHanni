@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class UniversalTrackerConfig: ItemTrackerGenericConfig() {
+class UniversalTrackerConfig : ItemTrackerGenericConfig() {
     @ConfigOption(
         name = "Sync All Trackers",
         desc = "Sync all Skyhanni Trackers with these settings."
