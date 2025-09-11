@@ -111,6 +111,14 @@ enum class GraphNodeTag(
         "A Fairy Soul.",
     ),
 
+    HIDEONLEAF(
+        "hideonleaf",
+        LorenzColor.YELLOW,
+        "Hideonleaf",
+        "The green Shulkers.",
+        onlyIslands = setOf(IslandType.GALATEA),
+    ),
+
     ;
 
     val displayName: String = color.getChatColor() + cleanName

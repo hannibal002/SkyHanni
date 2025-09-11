@@ -75,6 +75,7 @@ object SackApi {
     )
 
     /**
+     * REGEX-TEST:  Rough: §e78,999 §8(78,999)
      * REGEX-TEST:  §fRough: §e78,999 §8(78,999)
      * REGEX-TEST:  §aFlawed: §e604 §8(48,320)
      * REGEX-TEST:  §9Fine: §e35 §8(224,000)
@@ -83,10 +84,11 @@ object SackApi {
     @Suppress("MaxLineLength")
     private val gemstoneCountPattern by patternGroup.pattern(
         "gemstone.count",
-        " §[0-9a-f](?<quality>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?",
+        " (?:§.)?(?<quality>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?",
     )
 
     /**
+     * REGEX-TEST: ☘ Rough Jade Gemstone
      * REGEX-TEST: §f☘ Rough Jade Gemstone
      * REGEX-TEST: §f⸕ Rough Amber Gemstone
      * REGEX-TEST: §f✧ Rough Topaz Gemstone
@@ -103,7 +105,7 @@ object SackApi {
      */
     private val gemstoneItemNamePattern by patternGroup.pattern(
         "gemstone.name",
-        "(?:§.)+(?:[❤❈☘⸕✎✧❁☠❂☂] )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
+        "(?:(?:§.)?[❤❈☘⸕✎✧❁☠❂☂] |§.)(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
     )
 
     /**
