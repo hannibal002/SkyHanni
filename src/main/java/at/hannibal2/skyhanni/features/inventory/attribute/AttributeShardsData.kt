@@ -491,7 +491,7 @@ object AttributeShardsData {
         }
 
     private fun getLevel(shardName: String): Int =
-        storage?.get(shardName)?.amountInBox?.let {
+        storage?.get(shardName)?.amountSyphoned?.let {
             findTierAndAmountUntilNext(shardName, it).first
         } ?: 0
 
