@@ -1,13 +1,19 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.misc.tracker.UniversalTrackerConfig.TextPart
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig.ItemTrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
@@ -26,6 +32,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -42,12 +49,24 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
     extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
-    drawDisplay: (Data) -> List<Searchable>,
-) : SkyHanniTracker<Data>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
-
+    trackerConfig: () -> IndividualItemTrackerConfig,
+    drawDisplay: (Data) -> List<Searchable>
+) : SkyHanniTracker<Data, IndividualItemTrackerConfig>(
+    name,
+    createNewSession,
+    getStorage,
+    extraDisplayModes,
+    drawDisplay = drawDisplay,
+    trackerConfig = { trackerConfig() }
+) {
     companion object {
-        private val config get() = SkyHanniMod.feature.misc.tracker
+        private val universalTracker get() = SkyHanniMod.feature.misc.tracker
     }
+
+    private val config: ItemTrackerGenericConfig get() =
+        if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
+
+    private val itemTrackerConfig: ItemTrackerGenericConfig.ItemTrackerConfig get() = config.itemTracker
 
     private var scrollValue = ScrollValue()
 
@@ -136,14 +155,14 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
             if (!filter(internalName)) continue
 
             val amount = itemProfit.totalAmount
-            val pricePer = if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
+            val pricePer = if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName, this)
             val price = (pricePer * amount).toLong()
             val hidden = itemProfit.hidden
 
             if (isInventoryOpen() || !hidden) {
                 items[internalName] = price
             }
-            if (!hidden || !config.excludeHiddenItemsInPrice) {
+            if (!hidden || !itemTrackerConfig.excludeHiddenItemsInPrice) {
                 profit += price
             }
         }
@@ -160,7 +179,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
 
             val hidden = itemProfit.hidden
             val priceFormat = price.formatCoin(gray = hidden)
-            val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
+            val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && itemTrackerConfig.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
 
             val formattedName = cleanName.removeColor(keepFormatting = true).replace("§r", "")
@@ -193,7 +212,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
             row[TextPart.TOTAL_PRICE] = string(" $priceFormat")
             row[TextPart.AMOUNT] = string(" $numberColor${displayAmount.addSeparators()}x")
 
-            val line = config.textOrder.get().mapNotNull { row[it] }
+            val line = itemTrackerConfig.textOrder.get().mapNotNull { row[it] }
             table[line] = cleanName
         }
 
@@ -201,11 +220,11 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
         Renderable.searchableScrollable(
             table,
             key = 99,
-            lines = min(items.size, config.itemsShown.get()),
+            lines = min(items.size, itemTrackerConfig.itemsShown.get()),
             velocity = 5.0,
             textInput = textInput,
             scrollValue = scrollValue,
-            asTable = config.showTable.get(),
+            asTable = itemTrackerConfig.showTable.get(),
             showScrollableTipsInList = isInventoryOpen(),
         )?.let {
             lists.add(it.toSearchable())
@@ -296,7 +315,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
             }
         )
         val profitPerHourRenderable =
-            if (config.profitPerHour.get()) profitPerHourRenderable(profit, duration) else Renderable.empty()
+            if (itemTrackerConfig.profitPerHour.get()) profitPerHourRenderable(profit, duration) else Renderable.empty()
         return listOf(profitRenderable.toSearchable(), profitPerHourRenderable.toSearchable())
     }
 
@@ -330,5 +349,30 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
         if (KeyboardManager.isShiftKeyDown()) ClipboardUtils.copyToClipboard(fullTipsLine)
         else ClipboardUtils.copyToClipboard(line)
         ChatUtils.chat("§eCopied $name $type to clipboard!")
+    }
+
+    fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int, message: Boolean = true) {
+        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
+        if (itemTrackerConfig.warnings.chat && price >= itemTrackerConfig.warnings.minimumChat && message) {
+            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
+        }
+        if (itemTrackerConfig.warnings.title && price >= itemTrackerConfig.warnings.minimumTitle) {
+            TitleManager.sendTitle("§a+ $itemName", weight = price)
+        }
+    }
+
+    fun addPriceFromButton(lists: MutableList<Searchable>) {
+        if (isInventoryOpen()) {
+            lists.addButton<ItemPriceSource>(
+                label = "Price Source",
+                current = config.priceSource,
+                getName = { it.sellName },
+                onChange = {
+                    config.priceSource = it
+                    update()
+                },
+                universe = ItemPriceSource.entries,
+            )
+        }
     }
 }

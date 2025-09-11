@@ -55,6 +55,7 @@ object ExperimentsProfitTracker {
         "Experiments Profit Tracker",
         { Data() },
         { it.experimentation.experimentsProfitTracker },
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
     // Warn once per session about tracking XP bottle usage
@@ -201,7 +202,7 @@ object ExperimentsProfitTracker {
     }
 
     private fun calculateBottlePrice(internalName: NeuInternalName): Int {
-        val price = SkyHanniTracker.getPricePer(internalName)
+        val price = tracker.getPricePer(internalName)
         val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
         return npcPrice.coerceAtLeast(price).toInt()
     }

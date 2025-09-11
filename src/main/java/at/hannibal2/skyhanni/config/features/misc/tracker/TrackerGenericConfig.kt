@@ -14,8 +14,6 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 open class TrackerGenericConfig {
-    private val config get() = SkyHanniMod.feature.misc
-
     @Expose
     @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown on default.")
     @ConfigEditorDropdown
@@ -55,57 +53,15 @@ open class TrackerGenericConfig {
     @ConfigEditorDropdown
     var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY
 
-    @Expose
-    @ConfigOption(name = "Hide with Item Value", desc = "Hide while the Estimated Item Value is visible.")
-    @ConfigEditorBoolean
-    var hideInEstimatedItemValue: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Hide outside Inventory", desc = "Hide Profit Trackers while not inside an inventory.")
-    @ConfigEditorBoolean
-    var hideOutsideInventory: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Item Warnings", desc = "Item Warnings")
-    @SearchTag("Tracker Title, Drop Title")
-    @Accordion
-    val warnings: TrackerItemWarningsConfig = TrackerItemWarningsConfig()
-
-    class TrackerItemWarningsConfig {
-        @Expose
-        @ConfigOption(
-            name = "Price in Chat",
-            desc = "Show an extra chat message when you pick up an expensive item. (This contains name, amount and price)"
-        )
-        @ConfigEditorBoolean
-        @FeatureToggle
-        var chat: Boolean = true
-
-        @Expose
-        @ConfigOption(name = "Minimum Price", desc = "Items below this price will not show up in chat.")
-        @ConfigEditorSlider(minValue = 1f, maxValue = 20000000f, minStep = 1f)
-        var minimumChat: Int = 5000000
-
-        @Expose
-        @ConfigOption(name = "Title Warning", desc = "Show a title for expensive item pickups.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        var title: Boolean = true
-
-        @Expose
-        @ConfigOption(name = "Title Price", desc = "Items above this price will show up as a title.")
-        @ConfigEditorSlider(minValue = 1f, maxValue = 50000000f, minStep = 1f)
-        var minimumTitle: Int = 5000000
-    }
-
-
     private fun syncGenericSettings() {
-        priceSource = config.tracker.priceSource
+        val config = SkyHanniMod.feature.misc
         onlyShowSession.set(config.tracker.onlyShowSession.get())
         afkTimeout = config.tracker.afkTimeout
         onlyShowSession.set(config.tracker.onlyShowSession.get())
         showUptime.set(config.tracker.showUptime.get())
         defaultDisplayMode.set(config.tracker.defaultDisplayMode.get())
+        trackerSearchEnabled.set(config.tracker.trackerSearchEnabled.get())
+        priceSource = config.tracker.priceSource
     }
 
     open fun syncSettings() {

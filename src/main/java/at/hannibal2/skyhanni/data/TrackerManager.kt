@@ -1,15 +1,12 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
 
@@ -20,6 +17,7 @@ object TrackerManager {
     var dirty = false
     var commandEditTrackerSuccess = false
 
+    /*
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         with(SkyHanniMod.feature.misc.tracker) {
@@ -34,7 +32,7 @@ object TrackerManager {
                 hasChanged = true
             }
         }
-    }
+    }*/
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRenderOverlayFirst(event: GuiRenderEvent) {

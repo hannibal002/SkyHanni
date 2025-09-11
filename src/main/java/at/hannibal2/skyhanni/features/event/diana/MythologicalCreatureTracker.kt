@@ -66,6 +66,7 @@ object MythologicalCreatureTracker {
                 )
             },
         ),
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
     class Data : TrackerData() {
