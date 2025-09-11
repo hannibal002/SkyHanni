@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
@@ -17,11 +20,21 @@ class AuctionHouseConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Auctions",
-        desc = "Highlight own items that are sold in green and that are expired in red."
+        desc = "Highlight own items that are sold and expired."
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightAuctions: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Sold Color", desc = "Color of sold items.")
+    @ConfigEditorColour
+    var soldColor: ChromaColour = LorenzColor.GREEN.toChromaColor(255)
+
+    @Expose
+    @ConfigOption(name = "Expired Color", desc = "Color of expired items.")
+    @ConfigEditorColour
+    var expiredColor: ChromaColour = LorenzColor.RED.toChromaColor(255)
 
     @Expose
     @ConfigOption(
@@ -31,6 +44,11 @@ class AuctionHouseConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightAuctionsUnderbid: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Underbid Color", desc = "Color of underbid BIN items.")
+    @ConfigEditorColour
+    var underbidColor: ChromaColour = LorenzColor.GOLD.toChromaColor(255)
 
     @Expose
     @ConfigOption(
