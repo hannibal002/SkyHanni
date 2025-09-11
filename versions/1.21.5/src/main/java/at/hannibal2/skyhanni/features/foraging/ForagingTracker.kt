@@ -52,6 +52,7 @@ object ForagingTracker {
         { ForagingTrackerLegacy.BucketData() },
         { it.foraging.trackerData },
         { drawDisplay(it) },
+        trackerConfig = { config.perTrackerConfig }
     )
 
     init {
