@@ -50,8 +50,8 @@ object OldSkyblockMenu {
         if (!isEnabled()) return
 
         val sbButton = slotMap[event.slot]?.takeIf { !it.disabled } ?: return
-        val isAlreadySbButton = event.originalItem?.displayName?.endsWith(sbButton.displayName)
-        if (isAlreadySbButton == true) return
+        val isAlreadySbButton = event.originalItem?.displayName?.endsWith(sbButton.displayName) == true
+        if (isAlreadySbButton) return
 
         event.replace(sbButton.item)
     }
