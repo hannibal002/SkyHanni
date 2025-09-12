@@ -54,7 +54,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrato
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRodParts
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSilexCount
@@ -178,10 +178,10 @@ object EstimatedItemValueCalculator {
     private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
-        val rawReforgeName = stack.getReforgeName() ?: return 0.0
+        val rawReforgeName = stack.getReforgeModifier() ?: return 0.0
 
-        val reforge = ReforgeApi.onlyPowerStoneReforge.firstOrNull {
-            rawReforgeName == it.lowercaseName || rawReforgeName == it.reforgeStone?.asString()?.lowercase()
+        val reforge = ReforgeApi.reforgeStones.firstOrNull {
+            rawReforgeName == it.nbtModifier
         } ?: return 0.0
         val internalName = reforge.reforgeStone ?: return 0.0
         val reforgeStonePrice = internalName.getPrice()

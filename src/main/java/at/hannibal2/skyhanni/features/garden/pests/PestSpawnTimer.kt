@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTi
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.pestCooldownEndTime
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasLassoInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasVacuumInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -32,8 +34,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.average
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -69,6 +73,9 @@ object PestSpawnTimer {
     private var ready = false
     private var shouldRender = false
     private var display: List<Renderable> = emptyList()
+    private var shouldRepeatWarning = false
+    private var countdownTitleContext: TitleContext? = null
+    private var lastPlayedSound: SimpleTimeMark = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -80,7 +87,10 @@ object PestSpawnTimer {
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")
 
-            if (ready || maxPests) return
+            if (ready || maxPests) {
+                shouldRepeatWarning = false
+                return
+            }
             if (minutes == null && seconds == null) return
 
             val tablistCooldownEnd = SimpleTimeMark.now() + (minutes?.minutes ?: 0.seconds) + (seconds?.seconds ?: 0.seconds)
@@ -102,6 +112,7 @@ object PestSpawnTimer {
 
     @HandleEvent
     fun onPestSpawn(event: PestSpawnEvent) {
+        shouldRepeatWarning = false
         val spawnTime = lastPestSpawnTime.passedSince()
 
         if (!lastPestSpawnTime.isFarPast()) {
@@ -141,6 +152,12 @@ object PestSpawnTimer {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         update()
+        if (shouldRepeatWarning) {
+            countdownTitleContext?.stop()
+            countdownTitleContext = null
+            countdownWarn(pestCooldownEndTime.timeUntil())
+        }
+
         if (hasWarned || !config.cooldownOverWarning) return
 
         if (pestCooldownEndTime.isInPast()) {
@@ -149,17 +166,27 @@ object PestSpawnTimer {
         }
         if ((pestCooldownEndTime - ((config.cooldownWarningTime.seconds) + 1.seconds)).isInPast()) {
             cooldownReminder()
-        }
+        } else shouldRepeatWarning = false
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
+        if (shouldRepeatWarning) {
+            if (WardrobeApi.inWardrobe()) {
+                shouldRepeatWarning = false
+                countdownTitleContext?.stop()
+                countdownTitleContext = null
+                return
+            }
+            repeatSound()
+        }
         if (!event.isMod(5)) return
         shouldRender = shouldRender()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onIslandChange(event: IslandChangeEvent) {
+        shouldRepeatWarning = false
         longestCropBrokenTime = lastCropBrokenTime.passedSince()
     }
 
@@ -232,18 +259,57 @@ object PestSpawnTimer {
     private fun cooldownExpired() {
         TitleManager.sendTitle("§cPest Cooldown Has Expired!", duration = 3.seconds)
         ChatUtils.chat("§cPest spawn cooldown has expired!")
-        SoundUtils.playPlingSound()
+        playUserSound()
         hasWarned = true
     }
 
     private fun cooldownReminder() {
-        TitleManager.sendTitle("§cPest Cooldown Expires Soon!", duration = 3.seconds)
         ChatUtils.chat("§cPest spawn cooldown expires in ${pestCooldownEndTime.timeUntil().format()}")
-        SoundUtils.playPlingSound()
         hasWarned = true
+
+        if (config.repeatWarning) {
+            countdownWarn(pestCooldownEndTime.timeUntil())
+            shouldRepeatWarning = true
+            return
+        }
+
+        TitleManager.sendTitle("§cPest Cooldown Expires Soon!", duration = 3.seconds)
+        playUserSound()
     }
 
     private fun isEnabled() = GardenApi.inGarden() && config.enabled
+
+    @JvmStatic
+    fun playUserSound() {
+        with(config.sound) {
+            SoundUtils.createSound(name, pitch).playSound()
+        }
+    }
+
+    // TODO: Change to countdown title when that works
+    private fun countdownWarn(timeLeft: Duration) {
+        countdownTitleContext = TitleManager.sendTitle(
+            "§cPest spawn cooldown expires in ${timeLeft.format()}",
+            duration = 1.seconds,
+            intention = PestTitleIntention.COOLDOWN_COUNTDOWN,
+            addType = TitleManager.TitleAddType.FORCE_FIRST,
+            // countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
+        )
+    }
+
+    private fun repeatSound() {
+        with(config) {
+            if (!enabled || !GardenApi.inGarden()) return
+            if (lastPlayedSound.passedSince() >= sound.repeatDuration.ticks) {
+                lastPlayedSound = SimpleTimeMark.now()
+                playUserSound()
+            }
+        }
+    }
+
+    private enum class PestTitleIntention {
+        COOLDOWN_COUNTDOWN
+    }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
