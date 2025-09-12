@@ -1,12 +1,19 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig.TrackerSync.configSet
+import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig.TrackerSync.syncAllTrackers
+import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
 
@@ -17,22 +24,45 @@ object TrackerManager {
     var dirty = false
     var commandEditTrackerSuccess = false
 
-    /*
+
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         with(SkyHanniMod.feature.misc.tracker) {
             ConditionalUtils.onToggle(
-                textOrder,
-                showTable,
-                itemsShown,
+                this.itemTracker.textOrder,
+                this.itemTracker.showTable,
+                this.itemTracker.itemsShown,
                 showUptime,
                 onlyShowSession,
-                profitPerHour
+                this.itemTracker.profitPerHour
             ) {
                 hasChanged = true
             }
         }
-    }*/
+        for (config in configSet) {
+            with(config.trackerConfig) {
+                ConditionalUtils.onToggle(
+                    showUptime,
+                    onlyShowSession,
+                ) {
+                    hasChanged = true
+                }
+            }
+
+            if (config.trackerConfig is ItemTrackerGenericConfig) {
+                with(config.trackerConfig.itemTracker) {
+                    ConditionalUtils.onToggle(
+                        textOrder,
+                        showTable,
+                        itemsShown,
+                        profitPerHour
+                    ) {
+                        hasChanged = true
+                    }
+                }
+            }
+        }
+    }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRenderOverlayFirst(event: GuiRenderEvent) {
@@ -86,6 +116,34 @@ object TrackerManager {
         if (event.source != ItemAddManager.Source.COMMAND || event.isCancelled) return
         if (!commandEditTrackerSuccess) {
             ChatUtils.userError("Could not edit the Item Tracker! Does this item belong to this tracker? Is the tracker active right now?")
+        }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val oldBase = "misc.tracker"
+        val newBase = "misc.tracker.itemTracker"
+        val movedList: List<String> = listOf(
+            "showRecentDrops",
+            "excludeHiddenItemsInPrice",
+            "showTable",
+            "itemsShown",
+            "profitPerHour",
+            "hideInEstimatedItemValue",
+            "hideOutsideInventory",
+            "textOrder"
+        )
+        for (entry in movedList) {
+            event.move(109, "$oldBase.$entry", "$newBase.$entry")
+        }
+        // if we don't include the transformation it bricks the config
+        event.move(109, "$oldBase.warnings", "$newBase.warnings") { entry ->
+            entry
+        }
+        // sync all individual tracker settings if this is the first time a user is using a build with them
+        event.transform(109, oldBase) { entry ->
+            syncAllTrackers()
+            entry
         }
     }
 }
