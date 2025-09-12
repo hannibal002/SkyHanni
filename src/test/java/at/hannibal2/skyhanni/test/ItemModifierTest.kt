@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import org.junit.jupiter.api.Test
@@ -15,7 +15,7 @@ class ItemModifierTest {
     fun testUpgradeLevelMasterStars() {
         val itemStack = TestExportTools.getTestData(TestExportTools.Item, "10starnecronhead")
         assert(!itemStack.isRecombobulated())
-        assert(itemStack.getReforgeName() == "ancient")
+        assert(itemStack.getReforgeModifier() == "ancient")
         assert(itemStack.getItemUuid() == "2810b7fe-33af-4dab-bb41-b4815f5847af")
         assert(itemStack.isEnchanted())
         assert(itemStack.getHotPotatoCount() == 15)
