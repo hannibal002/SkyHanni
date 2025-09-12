@@ -2,23 +2,22 @@ package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class ParticleHiderConfig {
+    @Expose
+    @ConfigOption(name = "Block Break Particle", desc = "")
+    @Accordion
+    val blockBreakParticleConfig: BlockBreakParticleConfig = BlockBreakParticleConfig()
+
     @JvmField
     @Expose
     @ConfigOption(name = "Blaze Particles", desc = "Hide Blaze particles.")
     @ConfigEditorBoolean
     @FeatureToggle
     var hideBlazeParticles: Boolean = false
-
-    @JvmField
-    @Expose
-    @ConfigOption(name = "Block Break Particles", desc = "Hide Block Break particles.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var hideBlockBreakParticles: Boolean = false
 
     @JvmField
     @Expose

@@ -64,6 +64,5 @@ object ParticleHider {
         event.move(3, "misc.hideCloseRedstoneparticles", "misc.particleHiders.hideCloseRedstoneParticles")
         event.move(3, "misc.hideFireBlockParticles", "misc.particleHiders.hideFireBlockParticles")
         event.move(3, "misc.hideSmokeParticles", "misc.particleHiders.hideSmokeParticles")
-        event.move(3, "misc.hideBlockBreakParticles", "misc.particleHiders.hideBlockBreakParticles")
     }
 }
