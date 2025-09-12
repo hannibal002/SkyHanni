@@ -18,7 +18,7 @@ open class ItemTrackerGenericConfig : TrackerGenericConfig() {
         desc = ""
     )
     @Accordion
-    var itemTracker: ItemTrackerConfig = ItemTrackerConfig()
+    val itemTracker: ItemTrackerConfig = ItemTrackerConfig()
 
     override fun syncSettings() {
         super.syncSettings()
