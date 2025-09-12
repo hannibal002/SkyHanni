@@ -234,14 +234,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.hasAttributes() = getAttributes() != null
 
-    fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
-        when {
-            it == "pitchin" -> "pitchin_koi"
-            it == "warped" && displayName.removeColor().startsWith("Hyper ") -> "endstone_geode"
-
-            else -> it
-        }
-    }
+    fun ItemStack.getReforgeModifier() = getAttributeString("modifier")
 
     fun ItemStack.isRecombobulated() = getAttributeInt("rarity_upgrades").isPositive()
 

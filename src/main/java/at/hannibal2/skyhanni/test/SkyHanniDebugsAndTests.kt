@@ -119,7 +119,7 @@ object SkyHanniDebugsAndTests {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
-            event.drawDynamicText(it, "Test", 1.5)
+            event.drawDynamicText(it, "Debug Test", 1.5)
         }
     }
 

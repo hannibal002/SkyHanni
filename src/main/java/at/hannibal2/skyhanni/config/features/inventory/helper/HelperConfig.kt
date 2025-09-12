@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class HelperConfig {
     @Expose
@@ -63,6 +64,7 @@ class HelperConfig {
 
     @Expose
     @ConfigOption(name = "Reforge Helper", desc = "")
+    @SearchTag("overlay")
     @Accordion
     val reforge: ReforgeHelperConfig = ReforgeHelperConfig()
 }

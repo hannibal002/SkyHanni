@@ -2,7 +2,7 @@ import at.skyhanni.sharedvariables.ProjectTarget
 import com.replaymod.gradle.preprocess.Node
 
 plugins {
-    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "1.0.5"
+    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "1.0.6"
     id("gg.essential.loom") version "1.10.34" apply false
     kotlin("jvm") version "2.0.0" apply false
     kotlin("plugin.power-assert") version "2.0.0" apply false
