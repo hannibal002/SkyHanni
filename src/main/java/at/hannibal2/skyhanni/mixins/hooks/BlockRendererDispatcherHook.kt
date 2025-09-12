@@ -9,7 +9,6 @@ import net.minecraft.util.BlockPos
 import net.minecraft.world.IBlockAccess
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-
 // Taken and modified from Skytils
 @Suppress("UnusedParameter")
 fun modifyGetModelFromBlockState(
@@ -28,6 +27,4 @@ fun modifyGetModelFromBlockState(
     if (returnState != state) {
         cir.returnValue = blockRendererDispatcher.blockModelShapes.getModelForState(returnState)
     }
-
-
 }
