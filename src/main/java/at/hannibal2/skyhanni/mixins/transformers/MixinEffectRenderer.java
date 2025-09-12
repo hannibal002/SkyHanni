@@ -65,7 +65,6 @@ public class MixinEffectRenderer {
     //#endif
 
     //#if MC > 1.21
-    //#if MC > 1.21
     //$$@Inject(
     //$$    method = "addBlockBreakingParticles",
     //$$    at = @At("HEAD"),
