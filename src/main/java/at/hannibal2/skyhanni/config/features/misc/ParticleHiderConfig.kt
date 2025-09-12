@@ -15,6 +15,13 @@ class ParticleHiderConfig {
 
     @JvmField
     @Expose
+    @ConfigOption(name = "Block Break Particles", desc = "Hide Block Break particles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideBlockBreakParticles: Boolean = false
+
+    @JvmField
+    @Expose
     @ConfigOption(name = "Enderman Particles", desc = "Hide Enderman particles.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -54,4 +61,5 @@ class ParticleHiderConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideCloseRedstoneParticles: Boolean = false
+
 }
