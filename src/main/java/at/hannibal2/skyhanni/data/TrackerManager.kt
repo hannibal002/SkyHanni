@@ -134,14 +134,14 @@ object TrackerManager {
             "textOrder"
         )
         for (entry in movedList) {
-            event.move(109, "$oldBase.$entry", "$newBase.$entry")
+            event.move(107, "$oldBase.$entry", "$newBase.$entry")
         }
         // if we don't include the transformation it bricks the config
-        event.move(109, "$oldBase.warnings", "$newBase.warnings") { entry ->
+        event.move(107, "$oldBase.warnings", "$newBase.warnings") { entry ->
             entry
         }
         // sync all individual tracker settings if this is the first time a user is using a build with them
-        event.transform(109, oldBase) { entry ->
+        event.transform(107, oldBase) { entry ->
             syncAllTrackers()
             entry
         }

@@ -1,9 +1,6 @@
 package at.hannibal2.skyhanni.config.features.misc.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DefaultDisplayMode
 import com.google.gson.annotations.Expose
