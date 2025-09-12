@@ -54,7 +54,6 @@ open class TrackerGenericConfig {
         val config = SkyHanniMod.feature.misc
         onlyShowSession.set(config.tracker.onlyShowSession.get())
         afkTimeout = config.tracker.afkTimeout
-        onlyShowSession.set(config.tracker.onlyShowSession.get())
         showUptime.set(config.tracker.showUptime.get())
         defaultDisplayMode.set(config.tracker.defaultDisplayMode.get())
         trackerSearchEnabled.set(config.tracker.trackerSearchEnabled.get())

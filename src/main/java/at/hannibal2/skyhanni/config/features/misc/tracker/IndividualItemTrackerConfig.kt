@@ -18,8 +18,8 @@ class IndividualItemTrackerConfig : GenericIndividualTrackerConfig<ItemTrackerGe
     val universalTracker: Runnable = Runnable { config::tracker.jumpToEditor() }
 
     @ConfigOption(
-        name = "Sync",
-        desc = "Sync these settings with universal tracker settings"
+        name = "Sync Settings",
+        desc = "Sync these settings with universal tracker settings.\n§c§lTHIS WILL OVERRIDE ALL OF YOUR CURRENT TRACKER SETTINGS!"
     )
     @ConfigEditorButton(buttonText = "SYNC")
     val syncButton: Runnable = Runnable { syncSettings() }

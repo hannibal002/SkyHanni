@@ -23,6 +23,7 @@ object TrackerManager {
     private var hasChanged = false
     var dirty = false
     var commandEditTrackerSuccess = false
+    private var shouldSyncTrackers = false // used for config migration
 
 
     @HandleEvent
@@ -61,6 +62,11 @@ object TrackerManager {
                     }
                 }
             }
+        }
+
+        if (shouldSyncTrackers) {
+            syncAllTrackers()
+            shouldSyncTrackers = false
         }
     }
 
@@ -140,10 +146,6 @@ object TrackerManager {
         event.move(107, "$oldBase.warnings", "$newBase.warnings") { entry ->
             entry
         }
-        // sync all individual tracker settings if this is the first time a user is using a build with them
-        event.transform(107, oldBase) { entry ->
-            syncAllTrackers()
-            entry
-        }
+        if (event.oldVersion < 107) shouldSyncTrackers = true
     }
 }

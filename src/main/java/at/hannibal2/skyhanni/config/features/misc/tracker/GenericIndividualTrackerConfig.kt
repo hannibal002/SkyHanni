@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.misc.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.ChatUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -25,13 +26,14 @@ abstract class GenericIndividualTrackerConfig<Type : TrackerGenericConfig>(
     @Expose
     @ConfigOption(
         name = "Use Universal Settings",
-        desc = "Use the config options listed in universal tracker config instead of the ones below."
+        desc = "Use the config options listed in the universal tracker config instead of the ones above."
     )
     @ConfigEditorBoolean
     var useUniversalConfig = false
 
     fun syncSettings() {
         trackerConfig.syncSettings()
+        ChatUtils.debug("Synced tracker!")
     }
 
     companion object TrackerSync {
@@ -42,6 +44,13 @@ abstract class GenericIndividualTrackerConfig<Type : TrackerGenericConfig>(
         fun syncAllTrackers() {
             for (config in configSet) {
                 config.syncSettings()
+            }
+            ChatUtils.debug("Synced All Trackers")
+        }
+
+        fun setUseUniversalConfig(useUniversalConfig: Boolean) {
+            for (config in configSet) {
+                config.useUniversalConfig = useUniversalConfig
             }
         }
     }
