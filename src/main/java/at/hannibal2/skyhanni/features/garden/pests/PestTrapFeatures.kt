@@ -62,7 +62,7 @@ object PestTrapFeatures {
     @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!PestTrapApi.inInventory) return
-        if (!config.collectHotkey.isKeyHeld()) return
+        if (!config.releaseHotkey.isKeyHeld()) return
         val inventory = event.guiContainer as? AccessorGuiContainer ?: return
         inventory as GuiContainer
         val slot = inventory.slots()[16]

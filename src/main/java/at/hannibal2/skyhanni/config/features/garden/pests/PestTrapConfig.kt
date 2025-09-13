@@ -25,11 +25,11 @@ class PestTrapConfig {
 
     @Expose
     @ConfigOption(
-        name = "Collect All Hotkey",
-        desc = "Collect all pests in a pest trap when you press this keybind."
+        name = "Release All Hotkey",
+        desc = "Release all pests in a pest trap when you press this keybind."
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var collectHotkey: Int = Keyboard.KEY_NONE
+    var releaseHotkey: Int = Keyboard.KEY_NONE
 
     @Expose
     @ConfigOption(name = "Warnings", desc = "")
