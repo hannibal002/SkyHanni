@@ -87,7 +87,7 @@ object OrderedWaypoints {
                 )
             }
 
-            if (config.setupMode || config.showAll || i in 0..(1 + config.nextCount.toInt())) {
+            if (config.showName && (config.setupMode || config.showAll || i in 0..(1 + config.nextCount.toInt()))) {
                 // Waypoint name (number)
                 event.drawString(
                     orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.5, 0.5),
