@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -41,6 +42,7 @@ object PestTrapApi {
     private var timeEnteredGarden: SimpleTimeMark? = null
     var MAX_TRAPS = 3
         private set
+    val inInventory get() = InventoryUtils.openInventoryName() == "Mouse Trap" || InventoryUtils.openInventoryName() == "Pest Trap"
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {

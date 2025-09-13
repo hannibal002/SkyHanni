@@ -6,20 +6,26 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTrapConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.MAX_TRAPS
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.fullTraps
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.noBaitTraps
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.trapsPlaced
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.slots
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.audio.ISound
+import net.minecraft.client.gui.inventory.GuiContainer
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 
@@ -52,6 +58,16 @@ object PestTrapFeatures {
 
     private fun getNextWarningMark() = SimpleTimeMark.now() + virtualReminderInterval
     private fun refreshSound() = soundString.takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f) }
+
+    @HandleEvent
+    fun onKeybind(event: GuiKeyPressEvent) {
+        if (!PestTrapApi.inInventory) return
+        if (!config.collectHotkey.isKeyHeld()) return
+        val inventory = event.guiContainer as? AccessorGuiContainer ?: return
+        inventory as GuiContainer
+        val slot = inventory.slots()[16]
+        InventoryCompat.clickInventorySlot(slot.slotIndex, mouseButton = 0, mode = 0)
+    }
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
