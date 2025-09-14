@@ -220,6 +220,7 @@ object TimeUtils {
             val tabCooldownEnd = SimpleTimeMark.now() + (minutes ?: 0.seconds) + (seconds ?: 0.seconds)
             return if (shouldSetCooldown(tabCooldownEnd, currentCooldownEnd, seconds)) {
                 if (seconds == null) {
+                    // tablist always rounds down, so we'll assume it just updated and add a minute
                     tabCooldownEnd + 1.minutes + largerDuration
                 } else {
                     tabCooldownEnd + largerDuration
