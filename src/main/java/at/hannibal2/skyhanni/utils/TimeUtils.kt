@@ -9,6 +9,8 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -195,6 +197,48 @@ object TimeUtils {
 
     // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
+
+    fun String.getTablistEndTime(currentCooldownEnd: SimpleTimeMark?): SimpleTimeMark? =
+        UtilsPatterns.timeAmountPattern.matchMatcher(this.lowercase().trim()) {
+            val years = group("y")?.toLong()?.times(365.25)?.days ?: 0.seconds
+            val days = group("d")?.toLong()?.days ?: 0.seconds
+            val hours = group("h")?.toLong()?.hours ?: 0.seconds
+            val minutes = group("m")?.toLong()?.minutes
+            val seconds = group("s")?.toLong()?.seconds
+
+            // we don't care about precision with these values
+            val largerDuration = years + days + hours
+            if (minutes == null && seconds == null) {
+                return if (largerDuration == 0.seconds) {
+                    // assume passed string was invalid
+                    null
+                } else {
+                    SimpleTimeMark.now() + largerDuration
+                }
+            }
+
+            val tabCooldownEnd = SimpleTimeMark.now() + (minutes ?: 0.seconds) + (seconds ?: 0.seconds)
+            return if (shouldSetCooldown(tabCooldownEnd, currentCooldownEnd, seconds)) {
+                if (seconds == null) {
+                    tabCooldownEnd + 1.minutes + largerDuration
+                } else {
+                    tabCooldownEnd + largerDuration
+                }
+            } else {
+                currentCooldownEnd
+            }
+        }
+
+    private fun shouldSetCooldown(tabCooldownEnd: SimpleTimeMark, currentCooldownEnd: SimpleTimeMark?, seconds: Duration?): Boolean = when {
+        currentCooldownEnd == null -> true
+        // tablist can have up to 6 seconds of delay, besides this, there is no scenario where tablist will overestimate cooldown
+        tabCooldownEnd > ((currentCooldownEnd) + 6.seconds) -> true
+        // tablist sometimes rounds down to nearest min
+        (tabCooldownEnd + 1.minutes) < (currentCooldownEnd) && seconds == null -> true
+        // tablist shouldn't underestimate if it is displaying seconds
+        (tabCooldownEnd + 1.seconds) < (currentCooldownEnd) && seconds != null -> true
+        else -> false
+    }
 }
 
 private const val FACTOR_SECONDS = 1000L
