@@ -87,7 +87,7 @@ object OrderedWaypoints {
                 )
             }
 
-            if (shouldRenderName()) {
+            if (shouldRenderName(i)) {
                 // Waypoint name (number)
                 event.drawString(
                     orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.5, 0.5),
@@ -223,7 +223,7 @@ object OrderedWaypoints {
         }
     }
 
-    private fun shouldRenderName() = config.showName && (config.setupMode || config.showAll || i in 0..(1 + config.nextCount.toInt()))
+    private fun shouldRenderName(waypointIndice: Int) = config.showName && (config.setupMode || config.showAll || waypointIndice in 0..(1 + config.nextCount.toInt()))
 
     private fun getRouteNames() = ProfileStorageData.orderedWaypointsRoutes?.routes?.keys.orEmpty()
 
