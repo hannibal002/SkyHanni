@@ -367,7 +367,7 @@ object ComposterOverlay {
 
             addLine(
                 tips = listOf(
-                    "§7The variables below are calcualted with",
+                    "§7The variables below are calculated with",
                     "${organicMatterItem.repoItemName} §7and ${fuelItem.repoItemName}.",
                 ),
             ) {
@@ -387,7 +387,7 @@ object ComposterOverlay {
             addString(
                 " §7$compostPerTitle: §e${multiplier.roundTo(2).addSeparators()}$compostPerTitlePreview",
                 tips = listOf(
-                    "§7The §aCompost Factor §7is calcualted by adding",
+                    "§7The §aCompost Factor §7is calculated by adding",
                     "§aMulti Drop §7and §aComposter Speed §7together.",
                 ),
             )
