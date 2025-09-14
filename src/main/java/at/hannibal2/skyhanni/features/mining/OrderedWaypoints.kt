@@ -223,7 +223,8 @@ object OrderedWaypoints {
         }
     }
 
-    private fun shouldRenderName(waypointIndice: Int) = config.showName && (config.setupMode || config.showAll || waypointIndice in 0..(1 + config.nextCount.toInt()))
+    private fun shouldRenderName(waypointIndice: Int) =
+        config.showName && (config.setupMode || config.showAll || waypointIndice in 0..(1 + config.nextCount.toInt()))
 
     private fun getRouteNames() = ProfileStorageData.orderedWaypointsRoutes?.routes?.keys.orEmpty()
 
