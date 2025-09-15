@@ -258,7 +258,7 @@ object FarmingFortuneDisplay {
         val bonusInfo = if (pestBuffExpireTime.isInPast()) {
             "§cInactive!"
         } else {
-            "§6$pestBuffFortune☘ §b${pestBuffExpireTime.timeUntil().format()}"
+            "§6+$pestBuffFortune☘ §b${pestBuffExpireTime.timeUntil().format()}"
         }
         return if (config.compactFormat) bonusInfo else "§eBonus: $bonusInfo"
     }
