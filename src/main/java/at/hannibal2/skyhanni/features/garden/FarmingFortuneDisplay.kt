@@ -161,17 +161,19 @@ object FarmingFortuneDisplay {
                 val time = group("time")?.getTablistEndTime(pestBonusExpireTime)
                 val fortune = group("fortune")?.toIntOrNull()
 
-                if (inactive != null || time == null || fortune == null) {
+                if (inactive != null) {
                     pestBonusExpireTime = SimpleTimeMark.farPast()
                     pestBonusFortune = 0
                     if (!hasWarnedPestBonus) {
                         pestBuffExpireWarning()
                     }
-                } else {
+                } else if (time != null && fortune != null) {
                     hasWarnedPestBonus = false
                     pestBonusFortune = fortune
                     pestBonusExpireTime = time
+
                 }
+                update()
             }
         }
     }
@@ -193,7 +195,7 @@ object FarmingFortuneDisplay {
         if (config.bonusFortuneChat) ChatUtils.clickableChat(
             "§cPest fortune buff has expired!",
             onClick = { HypixelCommands.teleportToPlot("barn") },
-            hover = "Click to teleport to barn!"
+            hover = "§cClick to teleport to barn!"
         )
         if (config.bonusFortuneTitle) {
             TitleManager.sendTitle("§cPest Fortune Buff Has Expired!", duration = 3.seconds)
