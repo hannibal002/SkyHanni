@@ -1,15 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
-import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
-import at.hannibal2.skyhanni.data.garden.FarmingWeightData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
 import at.hannibal2.skyhanni.features.garden.pests.PestType
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import com.google.gson.annotations.Expose
@@ -43,30 +39,14 @@ class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.P
         return ""
     }
 
-    private fun changeEnum(pestType: PestType?) {
-        if (pestType != null) currentMode = EliteLeaderboardMode.ALL_TIME // Specific pest lbs don't support monthly
-        currentEnum = pestType
-        update()
-    }
-
-    override fun formatDisplay(lineMap: MutableMap<LeaderboardTextEntry, Renderable>): List<Renderable> {
-        if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) return errorMessage
-
-        val newList = mutableListOf<Renderable>()
-        if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
-        config.display.text.get()?.let { leaderboardTextEntries -> newList.addAll(leaderboardTextEntries.mapNotNull { lineMap[it] }) }
-        // Elite only supports monthly leaderboards for all pests
-        if (inventoryOpen && currentEnum == null) newList.buildTypeSwitcher()
-        return newList
-    }
-
     override fun MutableList<Renderable>.buildTypeSwitcher() {
         this.addRenderableNullableButton(
             label = "Pest Type",
             current = currentEnum,
             nullLabel = "All",
             onChange = { new ->
-                changeEnum(new)
+                currentEnum = new
+                update()
             },
             universe = PestType.filterableEntries,
             enableUniverseScroll = false // would infinitely scroll while hovered

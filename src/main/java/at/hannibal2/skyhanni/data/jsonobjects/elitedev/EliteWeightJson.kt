@@ -101,8 +101,7 @@ sealed class EliteLeaderboardType {
         get() = when (this) {
             is Weight -> "${weight.apiName}${mode.lbSuffix}"
             is Crop -> "${crop.eliteLbName}${mode.lbSuffix}"
-            // Only "all pests" (when pests is null) have a monthly leaderboard
-            is Pest -> pest?.eliteLbName ?: "pests${mode.lbSuffix}"
+            is Pest -> "${pest?.eliteLbName ?: "pests"}${mode.lbSuffix}"
         }
 
     val type
