@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.fromItemNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -39,13 +38,6 @@ object CrystalNucleusApi {
     private val endPattern by patternGroup.pattern(
         "loot.end",
         "§3§l▬{64}",
-    )
-    /**
-     * REGEX-TEST: §fEnchanted Book (Lapidary I)
-     */
-    private val bookTypePattern by RepoPattern.pattern(
-        "filter.crystalnucleus.run.enchantedbook",
-        "§fEnchanted Book \\((?<type>\\S*).*\\)"
     )
 
     private var inLootLoop = false
@@ -137,12 +129,10 @@ object CrystalNucleusApi {
         if (itemName.contains(" Powder")) return null
         // Books are not directly added to the loot map, but are checked for later.
         if (itemName.startsWith("§fEnchanted")) {
-            val bookType = bookTypePattern.matchMatcher(itemName) {
-                group("type").lowercase()
-            }
+            val bookType = ItemUtils.readBookType(itemName)
             return when (bookType) {
-                "lapidary" -> LAPIDARY_I_BOOK_ITEM to 1
-                "fortune" -> FORTUNE_IV_BOOK_ITEM to 1
+                "Lapidary I" -> LAPIDARY_I_BOOK_ITEM to 1
+                "Fortune IV" -> FORTUNE_IV_BOOK_ITEM to 1
                 // Fallback to inventory based system
                 else -> {
                     unCheckedBooks += amount

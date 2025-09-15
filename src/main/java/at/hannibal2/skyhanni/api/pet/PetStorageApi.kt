@@ -185,7 +185,8 @@ object PetStorageApi {
             val level = group("level").toInt()
             val rarity = getRarityOrNull() ?: return@firstMatcher false
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
-                PetUtils.resolvePetItemOrNull(line.trim().removeResets())
+                val trimmedLine = line.trim().removeResets().takeIf { it.isNotBlank() } ?: return@firstNotNullOfOrNull null
+                PetUtils.resolvePetItemOrNull(trimmedLine)
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) expFirstMatcher@{

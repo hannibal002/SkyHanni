@@ -88,7 +88,7 @@ class DevConfig {
     val debugItemPos: Position = Position(90, 70)
 
     @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "raytracedOreblock")
+    @ConfigLink(owner = DebugConfig::class, field = "rayTracedOreBlock")
     val debugOrePos: Position = Position(1, 200)
 
     // TODO move [these] to a ContributorAppearanceConfig, or something similar
