@@ -158,7 +158,7 @@ object FarmingFortuneDisplay {
         } else if (event.isWidget(TabWidget.PESTS)) {
             pestFortuneBuffPattern.firstMatcher(event.widget.lines) {
                 val inactive = group("inactive")
-                val time = group("time").getTablistEndTime(pestBuffExpireTime)
+                val time = group("time")?.getTablistEndTime(pestBuffExpireTime)
                 val fortune = group("fortune")?.toIntOrNull()
 
                 if (inactive != null || time == null || fortune == null) {
