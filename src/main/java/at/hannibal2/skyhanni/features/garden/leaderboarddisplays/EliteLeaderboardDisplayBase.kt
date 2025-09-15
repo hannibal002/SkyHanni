@@ -97,7 +97,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
 
         lineMap[LeaderboardTextEntry.WEIGHT_POSITION] = amountPosRenderable(leaderboardType)
         lineMap[LeaderboardTextEntry.OVERTAKE] = overtakeRenderable(leaderboardType, isFirst)
-        if (!isFirst && !isUnranked(leaderboardType) && config?.display?.text?.get()?.contains(LeaderboardTextEntry.OVERTAKE) == true) {
+        if (!(isFirst && config?.display?.text?.get()?.contains(LeaderboardTextEntry.OVERTAKE) == true) && !isUnranked(leaderboardType)) {
             lineMap[LeaderboardTextEntry.LAST_PLAYER] = overtakeRenderable(leaderboardType, true)
         }
 
