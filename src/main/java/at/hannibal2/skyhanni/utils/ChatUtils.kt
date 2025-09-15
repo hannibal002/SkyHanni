@@ -419,8 +419,10 @@ object ChatUtils {
         action: () -> Unit,
         oneTimeClick: Boolean = false,
     ) {
+        val hint = if (SkyHanniMod.feature.chat.hideClickableHint) "" else
+            "\n§e[CLICK to $actionName or disable this feature]"
         clickableChat(
-            "$message\n§e[CLICK to $actionName or disable this feature]",
+            "$message$hint",
             onClick = {
                 if (KeyboardManager.isShiftKeyDown() || KeyboardManager.isModifierKeyDown()) {
                     option.jumpToEditor()

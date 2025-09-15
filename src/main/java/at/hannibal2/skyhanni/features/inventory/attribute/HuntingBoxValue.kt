@@ -57,8 +57,8 @@ object HuntingBoxValue {
             }
 
             addString("§7Total Attribute Shards: §a$totalShards")
-            addString("§7Total Instant Sell Value: §6${totalInstantSell.toInt().addSeparators()}")
-            addString("§7Total Instant Buy Value: §6${totalInstantBuy.toInt().addSeparators()}")
+            addString("§7Total Instant Sell Value: §6${totalInstantSell.toLong().addSeparators()}")
+            addString("§7Total Instant Buy Value: §6${totalInstantBuy.toLong().addSeparators()}")
         }
     }
 
@@ -93,14 +93,14 @@ object HuntingBoxValue {
             add("§7Price per Instant Buy: §6${pricePerInstantBuy.toInt().addSeparators()}")
             add("")
             add("§7Amount Owned: §a$amountOwned")
-            add("§7Total Price Instant Sell: §6${totalPriceInstantSell.toInt().addSeparators()}")
-            add("§7Total Price Instant Buy: §6${totalPriceInstantBuy.toInt().addSeparators()}")
+            add("§7Total Price Instant Sell: §6${totalPriceInstantSell.toLong().addSeparators()}")
+            add("§7Total Price Instant Buy: §6${totalPriceInstantBuy.toLong().addSeparators()}")
         }
 
         table.add(
             DisplayTableEntry(
                 "${internalName.repoItemName} §8x$amountOwned",
-                "§6${totalPriceInstantSell.toInt().addSeparators()}",
+                "§6${totalPriceInstantSell.toLong().addSeparators()}",
                 totalPriceInstantSell,
                 internalName,
                 hover,

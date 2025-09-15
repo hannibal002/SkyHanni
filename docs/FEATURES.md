@@ -1118,6 +1118,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added customizable keybinds to easily repeat and confirm fusions. - Luna (https://github.com/hannibal002/SkyHanni/pull/4440)
 + Added Prevent Huntrap Misclick. - Roboo (https://github.com/hannibal002/SkyHanni/pull/4533)
     + Empty traps in the Hunting Toolkit are now unclickable.
++ Added Hideonleaf Finder in Galatea. - Motte + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4615)
+    + Shows a route to the nearest Hideonleaf spawn; toggle via keybind.
 
 </details>
 <details open><summary>
@@ -1327,6 +1329,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Customizable trigger permissions for party commands.
 + Added Prevent command early execution. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3377)
 + Added /shping to show your ping in chat. - nopo (https://github.com/hannibal002/SkyHanni/pull/4478)
++ Added tab complete for /call. - nopo (https://github.com/hannibal002/SkyHanni/pull/4632)
++ Added tab complete to the /show command. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4605)
 
 </details>
 <details open><summary>
