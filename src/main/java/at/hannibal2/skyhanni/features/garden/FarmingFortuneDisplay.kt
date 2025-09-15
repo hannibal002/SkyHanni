@@ -191,7 +191,7 @@ object FarmingFortuneDisplay {
 
     private fun pestBuffExpireWarning() {
         if (config.pestBuffWarning) ChatUtils.chat("§cPest fortune buff has expired!")
-        if (config.pestBuffTitle){
+        if (config.pestBuffTitle) {
             TitleManager.sendTitle("§cPest Fortune Buff Has Expired!", duration = 3.seconds)
             playUserSound()
         }
