@@ -83,8 +83,6 @@ object SkyHanniDebugsAndTests {
     @Suppress("MemberVisibilityCanBePrivate")
     var displayList = emptyList<Renderable>()
 
-    var globalRender = true
-
     var a = 1.0
     var b = 60.0
     var c = 0.0
@@ -121,7 +119,7 @@ object SkyHanniDebugsAndTests {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
-            event.drawDynamicText(it, "Test", 1.5)
+            event.drawDynamicText(it, "Debug Test", 1.5)
         }
     }
 
@@ -460,7 +458,7 @@ object SkyHanniDebugsAndTests {
                 config.debugLocationPos.renderRenderables(renderables, posLabel = "SkyBlock Area (Debug)")
             }
 
-            if (debugConfig.raytracedOreblock) {
+            if (debugConfig.rayTracedOreBlock) {
                 BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
@@ -522,6 +520,7 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+        event.move(103, "dev.debug.raytracedOreblock", "dev.debug.rayTracedOreBlock")
     }
 
     @Suppress("LongMethod")
@@ -617,18 +616,6 @@ object SkyHanniDebugsAndTests {
                     ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
                 } else {
                     ChatUtils.chat("§eYou are not in Skyblock.")
-                }
-            }
-        }
-        event.registerBrigadier("shrendertoggle") {
-            description = "Disables/enables the rendering of all skyhanni guis."
-            category = CommandCategory.USERS_BUG_FIX
-            callback {
-                globalRender = !globalRender
-                if (globalRender) {
-                    ChatUtils.chat("§aEnabled global renderer!")
-                } else {
-                    ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
                 }
             }
         }

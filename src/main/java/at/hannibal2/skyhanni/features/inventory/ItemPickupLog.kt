@@ -107,8 +107,8 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    @HandleEvent(GuiRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled()) return
         display?.let { config.position.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
@@ -150,8 +150,8 @@ object ItemPickupLog {
         updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), event.coins < 0)
     }
 
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent(SkyHanniTickEvent::class)
+    fun onTick() {
         if (!isEnabled()) return
         val oldItemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
 

@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoin
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -66,7 +67,7 @@ object TunnelsMaps {
 
     private val config get() = SkyHanniMod.feature.mining.tunnelMaps
 
-    private var graph: Graph = Graph(emptyList())
+    private var graph: Graph = Graph()
     private lateinit var campfire: GraphNode
 
     private var goalReached = false
@@ -398,7 +399,7 @@ object TunnelsMaps {
         if (!isEnabled()) return
         if (checkGoalReached()) return
         val prevClosest = closestNode
-        closestNode = graph.minBy { it.position.distanceSqToPlayer() }
+        closestNode = graph.getNearestNode()
         val closest = closestNode ?: return
         val goal = goal ?: return
         if (closest == prevClosest && goal == prevGoal) return

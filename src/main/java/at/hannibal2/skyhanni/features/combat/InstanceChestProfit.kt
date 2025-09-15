@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -187,7 +188,7 @@ object InstanceChestProfit {
             add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color ${total.formatCoin()}")))
         }
 
-        display = Renderable.table(newDisplay, yPadding = 1)
+        display = Renderable.table(newDisplay, ySpacing = 1)
     }
 
     private fun getKuudraEssenceBonus(): Double {

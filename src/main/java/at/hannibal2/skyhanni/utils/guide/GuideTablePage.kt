@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.tableStr
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 
 abstract class GuideTablePage(
     val sizeX: Int,
@@ -23,8 +24,8 @@ abstract class GuideTablePage(
         renderable = Renderable.vertical(
             Renderable.table(
                 content,
-                xPadding = content.tableStretchXPadding(sizeX - paddingX * 2),
-                yPadding = ySpace,
+                xSpacing = content.tableStretchXPadding(sizeX - paddingX * 2),
+                ySpacing = ySpace,
             ),
             Renderable.horizontal(footer, footerSpacing, horizontalAlign = HorizontalAlignment.CENTER),
             spacing = ySpace,

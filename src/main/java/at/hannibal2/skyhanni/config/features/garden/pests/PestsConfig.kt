@@ -38,7 +38,7 @@ class PestsConfig {
     @Expose
     @ConfigOption(name = "Pest Profit Tracker", desc = "")
     @Accordion
-    val pestProfitTacker: PestProfitTrackerConfig = PestProfitTrackerConfig()
+    val pestProfitTracker: PestProfitTrackerConfig = PestProfitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Spray", desc = "")

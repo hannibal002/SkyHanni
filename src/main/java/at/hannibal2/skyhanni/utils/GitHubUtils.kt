@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
+import at.hannibal2.skyhanni.data.repo.RepoCommit
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.api.ApiUtils
@@ -37,12 +38,18 @@ object GitHubUtils {
         private val apiName = "GitHub - $location"
         private val commitApiUrl: String = "https://api.github.com/repos/$user/$repo/commits/$branch"
 
-        suspend fun getLatestCommit(silentError: Boolean = true): CommitsApiResponse? {
+        suspend fun getLatestCommit(silentError: Boolean = true): RepoCommit? {
             val (_, jsonResponse) = ApiUtils.getJsonResponse(commitApiUrl, apiName, silentError).assertSuccessWithData() ?: run {
                 SkyHanniMod.logger.error("Failed to fetch latest commits.")
                 return null
             }
-            return ConfigManager.gson.fromJson(jsonResponse, CommitsApiResponse::class.java)
+            val apiResponse = runCatching {
+                ConfigManager.gson.fromJson(jsonResponse, CommitsApiResponse::class.java)
+            }.getOrNull() ?: run {
+                SkyHanniMod.logger.error("Failed to parse latest commit response: $jsonResponse")
+                return null
+            }
+            return RepoCommit(sha = apiResponse.sha, time = apiResponse.commit.committer.date)
         }
 
         suspend fun downloadCommitZipToFile(destinationZip: File, shaOverride: String? = null): Boolean {

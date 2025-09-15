@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
-import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -38,6 +38,8 @@ object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
 
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
+
+    fun ItemStack.getWetBookCount() = getAttributeInt("wet_book_count")
 
     fun ItemStack.getFarmingForDummiesCount() = getAttributeInt("farming_for_dummies_count")
 
@@ -130,9 +132,6 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.wasRiftTransferred(): Boolean = getAttributeBoolean("rift_transferred")
-
-    @Suppress("CAST_NEVER_SUCCEEDS")
-    inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
     val warnedAboutPetParseFailure: MutableSet<String> = mutableSetOf()
     var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -235,14 +234,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.hasAttributes() = getAttributes() != null
 
-    fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
-        when {
-            it == "pitchin" -> "pitchin_koi"
-            it == "warped" && displayName.removeColor().startsWith("Hyper ") -> "endstone_geode"
-
-            else -> it
-        }
-    }
+    fun ItemStack.getReforgeModifier() = getAttributeString("modifier")
 
     fun ItemStack.isRecombobulated() = getAttributeInt("rarity_upgrades").isPositive()
 
