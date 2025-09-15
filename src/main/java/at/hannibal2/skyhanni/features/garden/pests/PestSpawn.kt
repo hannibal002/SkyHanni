@@ -24,15 +24,15 @@ object PestSpawn {
     private val patternGroup = RepoPattern.group("garden.pests.spawn")
 
     /**
-     * REGEX-TEST: §6§lGROSS! §7A §2ൠ §2Pest §7has appeared in §aPlot §7- §b4§7!
+     * REGEX-TEST: §6§lGROSS! §7A §2ൠ Pest §7has appeared in §aPlot §7- §bS 4§7!
      */
     private val onePestPattern by patternGroup.pattern(
         "one",
-        "§6§l.*! §7A §2ൠ §2Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!",
+        "§6§l.*! §7A §2ൠ Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!",
     )
 
     /**
-     * REGEX-TEST: §6§lEWW! §22 §2ൠ Pest §7have spawned in §aPlot §7- §b15§7!
+     * REGEX-TEST: §6§lYUCK! §24 §2ൠ Pest §7have spawned in §aPlot §7- §b14§7!
      */
     private val multiplePestsSpawn by patternGroup.pattern(
         "multiple",
