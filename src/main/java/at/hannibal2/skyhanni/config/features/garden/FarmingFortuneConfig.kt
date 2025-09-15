@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerSoundSettings
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -28,6 +30,37 @@ class FarmingFortuneConfig {
     @ConfigOption(name = "Hide Missing Fortune Warnings", desc = "Hide missing fortune warnings from the display.")
     @ConfigEditorBoolean
     var hideMissingFortuneWarnings: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Show Pest Fortune Buff",
+        desc = "Display the Pest Fortune Buff amount and time left."
+    )
+    @ConfigEditorBoolean
+    var pestBuff: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Pest Buff Expire Warning",
+        desc = "Warn in chat when the pest fortune buff expires."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var pestBuffWarning: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Pest Buff Expire Title",
+        desc = "Send a title and sound when the pest fortune buff expires."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var pestBuffTitle: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Sound Settings", desc = "")
+    @Accordion
+    val sound: PestBuffWarningSoundConfig = PestBuffWarningSoundConfig()
 
     @ConfigOption(
         name = "Farming Fortune Guide",

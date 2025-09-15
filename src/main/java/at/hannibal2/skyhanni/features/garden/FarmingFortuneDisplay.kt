@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -23,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -30,7 +33,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -82,6 +89,17 @@ object FarmingFortuneDisplay {
         "§7.*§7Grants §6(?<bonus>.*)☘.*",
     )
 
+    /**
+     * REGEX-TEST:  Bonus: §r§c§lINACTIVE
+     * REGEX-TEST:  Bonus: §r§6+200☘ §r§b29m
+     * REGEX-TEST:  Bonus: §r§6+200☘ §r§b5m 2s
+     * REGEX-TEST:  Bonus: §r§6+200☘ §r§b8s
+     */
+    private val pestFortuneBuffPattern by patternGroup.pattern(
+        "pestfortunebuff",
+        " Bonus: §r§.(?<inactive>§lINACTIVE)?(?:\\+(?<fortune>\\d+)☘ §r§b(?<time>.*))?.*"
+    )
+
     private var display = emptyList<Renderable>()
 
     private var lastToolSwitch = SimpleTimeMark.farPast()
@@ -106,13 +124,16 @@ object FarmingFortuneDisplay {
     private var firstBrokenCropTime = SimpleTimeMark.farPast()
     private var lastUniversalFortuneMissingError = SimpleTimeMark.farPast()
     private var lastCropFortuneMissingError = SimpleTimeMark.farPast()
+    private var pestBuffExpireTime = SimpleTimeMark.farPast()
+    private var hasWarnedPestBuff = true
+    private var pestBuffFortune = 0
 
     private val ZORROS_CAPE = "ZORROS_CAPE".toInternalName()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        event.tabList.firstNotNullOfOrNull {
-            universalTabFortunePattern.matchMatcher(it) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (event.isWidget(TabWidget.STATS)) {
+            universalTabFortunePattern.firstMatcher(event.widget.lines) {
                 val fortune = group("fortune").toDouble()
                 foundTabUniversalFortune = true
                 if (fortune != tabFortuneUniversal) {
@@ -120,7 +141,7 @@ object FarmingFortuneDisplay {
                     update()
                 }
             }
-            cropSpecificTabFortunePattern.matchMatcher(it) {
+            cropSpecificTabFortunePattern.firstMatcher(event.widget.lines) {
                 val crop = CropType.getByName(group("crop"))
                 val cropFortune = group("fortune").toDouble()
 
@@ -132,6 +153,24 @@ object FarmingFortuneDisplay {
                 }
                 if (GardenApi.cropInHand == crop) {
                     latestFF?.put(crop, getCurrentFarmingFortune())
+                }
+            }
+        } else if (event.isWidget(TabWidget.PESTS)) {
+            pestFortuneBuffPattern.firstMatcher(event.widget.lines) {
+                val inactive = group("inactive")
+                val time = group("time").getTablistEndTime(pestBuffExpireTime)
+                val fortune = group("fortune")?.toIntOrNull()
+
+                if (inactive != null || time == null || fortune == null) {
+                    pestBuffExpireTime = SimpleTimeMark.farPast()
+                    pestBuffFortune = 0
+                    if (!hasWarnedPestBuff) {
+                        pestBuffExpireWarning()
+                    }
+                } else {
+                    hasWarnedPestBuff = false
+                    pestBuffFortune = fortune
+                    pestBuffExpireTime = time
                 }
             }
         }
@@ -148,6 +187,15 @@ object FarmingFortuneDisplay {
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null) return
         config.position.renderRenderables(display, posLabel = "True Farming Fortune")
+    }
+
+    private fun pestBuffExpireWarning() {
+        if (config.pestBuffWarning) ChatUtils.chat("§cPest fortune buff has expired!")
+        if (config.pestBuffTitle){
+            TitleManager.sendTitle("§cPest Fortune Buff Has Expired!", duration = 3.seconds)
+            playUserSound()
+        }
+        hasWarnedPestBuff = true
     }
 
     private fun update() {
@@ -191,6 +239,8 @@ object FarmingFortuneDisplay {
             ),
         )
 
+        if (config.pestBuff) addString(pestBuffString())
+
         if (ffReduction > 0) {
             if (config.compactFormat) {
                 addString("§cPests: §7-§e$ffReduction%")
@@ -202,6 +252,15 @@ object FarmingFortuneDisplay {
         if (wrongTabCrop && !config.hideMissingFortuneWarnings && !config.compactFormat) {
             addString(wrongTabCropText)
         }
+    }
+
+    private fun pestBuffString(): String {
+        val bonusInfo = if (pestBuffExpireTime.isInPast()) {
+            "§cInactive!"
+        } else {
+            "§6$pestBuffFortune☘ §b${pestBuffExpireTime.timeUntil().format()}"
+        }
+        return if (config.compactFormat) bonusInfo else "§eBonus: $bonusInfo"
     }
 
     private fun drawMissingFortuneDisplay(cropFortune: Boolean) = buildList {
@@ -400,6 +459,13 @@ object FarmingFortuneDisplay {
             greenThumbFortune = if (tool.getInternalName().let { it.contains("LOTUS") || it == ZORROS_CAPE }) {
                 displayedFortune - reforgeFortune - itemBaseFortune
             } else 0.0
+        }
+    }
+
+    @JvmStatic
+    fun playUserSound() {
+        with(config.sound) {
+            SoundUtils.createSound(name, pitch).playSound()
         }
     }
 
