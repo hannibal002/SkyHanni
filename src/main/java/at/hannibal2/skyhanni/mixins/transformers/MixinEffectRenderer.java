@@ -21,76 +21,44 @@ import net.minecraft.util.EnumFacing;
 //#endif
 
 //#if MC > 1.21
-//$$ @Mixin(ParticleManager.class)
+//$$@Mixin(ParticleManager.class)
 //#else
 @Mixin(EffectRenderer.class)
 //#endif
 public class MixinEffectRenderer {
 
     //#if MC > 1.21
-    //$$@Inject(
-    //$$    method = "addBlockBreakParticles",
-    //$$    at = @At("HEAD"),
-    //$$    cancellable = true
-    //$$)
+    //$$@Inject(method = "addBlockBreakParticles", at = @At("HEAD"), cancellable = true)
     //$$private void onAddBlockBreakParticles(BlockPos pos, BlockState state, CallbackInfo ci) {
-    //$$    BlockBreakParticleConfig config = SkyHanniMod.feature.misc.particleHiders.getBlockBreakParticleConfig();
-    //$$
-    //$$    if (config.hideBlockBreakParticles) {
-    //$$        if (config.hideBlockBreakParticlesGarden) {
-    //$$            if (IslandType.GARDEN.isCurrent()) {
-    //$$                ci.cancel();
-    //$$            }
-    //$$        } else {
-    //$$            ci.cancel();
-    //$$        }
-    //$$    }
-    //$$}
     //#else
     @Inject(method = "addBlockDestroyEffects", at = @At("HEAD"), cancellable = true)
     private void onAddBlockDestroyEffects(BlockPos pos, IBlockState state, CallbackInfo ci) {
+    //#endif
         BlockBreakParticleConfig config = SkyHanniMod.feature.misc.particleHiders.getBlockBreakParticleConfig();
 
-        if (config.hideBlockBreakParticles){
-            if (config.hideBlockBreakParticlesGarden){
-                if (IslandType.GARDEN.isCurrent()){
+        if (config.hideBlockBreakParticles) {
+            if (config.hideBlockBreakParticlesGarden) {
+                if (IslandType.GARDEN.isCurrent()) {
                     ci.cancel();
                 }
             } else {
                 ci.cancel();
             }
         }
-
     }
-    //#endif
 
     //#if MC > 1.21
-    //$$@Inject(
-    //$$    method = "addBlockBreakingParticles",
-    //$$    at = @At("HEAD"),
-    //$$    cancellable = true
-    //$$)
+    //$$@Inject(method = "addBlockBreakingParticles", at = @At("HEAD"), cancellable = true)
     //$$private void onAddBlockBreakingParticles(BlockPos pos, Direction side, CallbackInfo ci) {
-    //$$    BlockBreakParticleConfig config = SkyHanniMod.feature.misc.particleHiders.getBlockBreakParticleConfig();
-    //$$
-    //$$    if (config.hideBlockBreakParticles) {
-    //$$        if (config.hideBlockBreakParticlesGarden) {
-    //$$            if (IslandType.GARDEN.isCurrent()) {
-    //$$                ci.cancel();
-    //$$            }
-    //$$        } else {
-    //$$            ci.cancel();
-    //$$        }
-    //$$    }
-    //$$}
     //#else
     @Inject(method = "addBlockHitEffects*", at = @At("HEAD"), cancellable = true)
     private void onAddBlockHitEffects(BlockPos pos, EnumFacing side, CallbackInfo ci) {
+    //#endif
         BlockBreakParticleConfig config = SkyHanniMod.feature.misc.particleHiders.getBlockBreakParticleConfig();
 
-        if (config.hideBlockBreakParticles){
-            if (config.hideBlockBreakParticlesGarden){
-                if (IslandType.GARDEN.isCurrent()){
+        if (config.hideBlockBreakParticles) {
+            if (config.hideBlockBreakParticlesGarden) {
+                if (IslandType.GARDEN.isCurrent()) {
                     ci.cancel();
                 }
             } else {
@@ -98,5 +66,6 @@ public class MixinEffectRenderer {
             }
         }
     }
-    //#endif
+
+
 }
