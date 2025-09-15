@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden
 
-import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
+import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.utils.OSUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
@@ -21,7 +21,7 @@ class PestBuffWarningSoundConfig {
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    val testSound: Runnable = Runnable(PestSpawnTimer::playUserSound)
+    val testSound: Runnable = Runnable(FarmingFortuneDisplay::playUserSound)
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
