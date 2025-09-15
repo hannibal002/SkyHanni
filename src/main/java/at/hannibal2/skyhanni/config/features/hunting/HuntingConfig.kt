@@ -8,9 +8,11 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
+import org.lwjgl.input.Keyboard
 
 /**
  * Attention developers:
@@ -56,5 +58,20 @@ class HuntingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var huntrapMisclick = false
+
+    @Expose
+    @ConfigOption(
+        name = "Hideonleaf Finder",
+        desc = "Shows a route from your position to the nearest possibly spawn point for Hideonleaf for easy finding."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideonleafFinder = false
+
+    @Expose
+    @OnlyModern
+    @ConfigOption(name = "Show next Hideonleaf", desc = "Press this key to show the next Hideonleaf.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    var nextHideonleafKeybind: Int = Keyboard.KEY_NONE
 
 }

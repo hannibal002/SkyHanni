@@ -52,7 +52,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import org.lwjgl.input.Keyboard
+import java.time.LocalDateTime
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
 private typealias DTType = HoppityLiveDisplayConfig.HoppityDateTimeDisplayType
@@ -137,6 +139,8 @@ object HoppityLiveDisplay {
         lastToggleMark = SimpleTimeMark.now()
     }
 
+    private var inventoryOpen = false
+
     @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
     fun onRenderOverlay() {
         if (!liveDisplayEnabled()) return
@@ -144,6 +148,11 @@ object HoppityLiveDisplay {
         val stats = getYearStats(HoppityEventSummary.statYear) ?: return
         // Calculate a 'hash' of the stats to determine if they have changed
         val statsHash = stats.hashCode()
+        val invCurrentlyOpen = InventoryUtils.inAnyInventory()
+        if (inventoryOpen != invCurrentlyOpen) {
+            inventoryOpen = invCurrentlyOpen
+            lastKnownStatHash = 0
+        }
         if (statsHash != lastKnownStatHash) {
             lastKnownStatHash = statsHash
             displayCardRenderables = buildDisplayRenderables(stats, HoppityEventSummary.statYear)
@@ -234,7 +243,7 @@ object HoppityLiveDisplay {
         return percentText to percentageColor
     }
 
-    private fun buildTitle(statYear: Int) = Renderable.vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {
+    private fun buildTitle(statYear: Int) = Renderable.vertical(horizontalAlign = RenderUtils.HorizontalAlignment.LEFT) {
         addString(
             CFApi.partyModeReplace(
                 when (statYear) {
@@ -242,7 +251,7 @@ object HoppityLiveDisplay {
                     else -> "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats"
                 },
             ),
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
         )
         if (statYear == Int.MAX_VALUE) {
             val numberEvents = storage?.hoppityEventStats?.keys?.count { it <= currentSbYear } ?: 0
@@ -276,15 +285,33 @@ object HoppityLiveDisplay {
             else -> if (timeMarkAbs) "Starts" else "Starts in"
         }
 
-        addCenteredString(
-            CFApi.partyModeReplace(
-                when {
-                    isCurrentEvent -> "§7$grammarFormat §f$timeMarkFormat"
-                    isPastEvent -> "§7Ended §f$timeMarkFormat$grammarFormat"
-                    else -> "§7$grammarFormat §f$timeMarkFormat"
-                },
+        val text = when {
+            isCurrentEvent -> "§7$grammarFormat §b$timeMarkFormat"
+            isPastEvent -> "§7Ended §b$timeMarkFormat$grammarFormat"
+            else -> "§7$grammarFormat §b$timeMarkFormat"
+        }
+
+        val eventStart = eventEnd - 31.hours
+        add(
+            Renderable.hoverTips(
+                CFApi.partyModeReplace(text),
+                tips = listOf(
+                    "§7From: §b${eventStart.format()}",
+                    "§7Until: §b${eventEnd.format()}",
+                ),
             ),
         )
+    }
+
+    private fun SimpleTimeMark.format(): String {
+        val date = toLocalDate()
+        val now = LocalDateTime.now()
+        val pattern = if (date.year != now.year) {
+            "yyyy MMM d h:mm a"
+        } else {
+            "MMM d h:mm a"
+        }
+        return formattedDate(pattern)
     }
 
     private fun SimpleTimeMark.formatForHoppity(): Pair<String, Boolean> =
@@ -397,7 +424,7 @@ object HoppityLiveDisplay {
         val container = Renderable.horizontal(
             renderable,
             spacing = 5,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
         )
         add(container)
     }
