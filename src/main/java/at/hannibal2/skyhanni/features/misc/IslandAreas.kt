@@ -153,7 +153,7 @@ object IslandAreas {
 
             var suffix = ""
             paths[node]?.let { path ->
-                val passedAreas = path.nodes.filter { it.getAreaTag() != null }.map { it.name }.distinct().toMutableList()
+                val passedAreas = path.filter { it.getAreaTag() != null }.map { it.name }.distinct().toMutableList()
                 passedAreas.remove(name)
                 passedAreas.remove(null)
                 passedAreas.remove("null")
