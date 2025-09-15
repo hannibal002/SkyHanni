@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -71,17 +72,15 @@ object HuntingProfitTracker {
         var totalShardAmount = 0L
     }
 
-//    private val LARVA_HOOK = "LARVA_HOOK".toInternalName()
-
-    //SMALL_POCKET_BLACK_HOLE
-    //MEDIUM_POCKET_BLACK_HOLE
-//
-//    VENATOR_GENESIS
-//    SILVA_DOMINUS
-//    CURSUS_FERAE
-//    APEX_PRAEDATOR
-//    NEX_TITANIUM
-//    private val LARVA_HOOK = "".toInternalName()
+    private val toolInternalNames = setOf(
+        "SMALL_POCKET_BLACK_HOLE".toInternalName(),
+        "MEDIUM_POCKET_BLACK_HOLE".toInternalName(),
+        "VENATOR_GENESIS".toInternalName(),
+        "SILVA_DOMINUS".toInternalName(),
+        "CURSUS_FERAE".toInternalName(),
+        "APEX_PRAEDATOR".toInternalName(),
+        "NEX_TITANIUM".toInternalName()
+    )
 
     private val ItemTrackerData.TrackedItem.timesCaught get() = timesGained
 
@@ -147,7 +146,7 @@ object HuntingProfitTracker {
 
     @HandleEvent
     fun onShardGainEvent(event: ShardGainEvent) {
-        if (event.amount <= 0) return
+        if (event.amount <= 0 || !event.caught) return
         addShard(event.amount)
         tracker.addItem(event.shardInternalName, event.amount, command = false)
     }
@@ -162,13 +161,16 @@ object HuntingProfitTracker {
     private var hasHeldTool: Boolean = false
 
     private fun isHuntingTool(itemStack: ItemStack?): Boolean {
+        val itemCategoryOrNull = itemStack?.getItemCategoryOrNull()
 
-        var itemCategoryOrNull = InventoryUtils.getItemInHand()?.getItemCategoryOrNull()
+        // Check if the item is one of the general hunting tool categories
+        if (itemCategoryOrNull == ItemCategory.FISHING_NET ||
+            itemCategoryOrNull == ItemCategory.LASSO ||
+            itemCategoryOrNull == ItemCategory.AXE
+        ) return true
 
-        if (itemCategoryOrNull == ItemCategory.FISHING_NET || itemCategoryOrNull == ItemCategory.LASSO || itemCategoryOrNull == ItemCategory.AXE) return true
-
-        // TODO: check if black hole item or axe is hunting one?
-        return false;
+        // Check if the item’s internal name is in the set of specific hunting tools
+        return toolInternalNames.contains(itemStack?.getInternalNameOrNull())
     }
 
     @HandleEvent
