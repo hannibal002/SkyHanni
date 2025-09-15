@@ -25,7 +25,7 @@ class EndermanConfig {
     var drawLineToNukekebi: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer in damage indicator.")
+    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer.")
     @ConfigEditorBoolean
     var phaseDisplay: Boolean = false
 

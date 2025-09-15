@@ -13,7 +13,7 @@ object MobFactories {
     fun slayer(
         baseEntity: EntityLivingBase,
         armorStand: EntityArmorStand,
-        extraEntityList: List<EntityLivingBase>
+        extraEntityList: List<EntityLivingBase>,
     ): Mob? =
         MobFilter.slayerNameFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
@@ -22,7 +22,8 @@ object MobFactories {
                 armorStand = armorStand,
                 name = this.group("name"),
                 additionalEntities = extraEntityList,
-                levelOrTier = this.groupOrNull("tier")?.romanToDecimal() ?: 5
+                levelOrTier = this.groupOrNull("tier")?.romanToDecimal() ?: 5,
+                hypixelTypes = this.groupOrNull("mobtype").orEmpty(),
             )
         }
 
@@ -30,7 +31,7 @@ object MobFactories {
         baseEntity: EntityLivingBase,
         armorStand: EntityArmorStand,
         extraEntityList: List<EntityLivingBase> = emptyList(),
-        overriddenName: String? = null
+        overriddenName: String? = null,
     ): Mob? =
         MobFilter.bossMobNameFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
@@ -39,14 +40,15 @@ object MobFactories {
                 armorStand = armorStand,
                 name = overriddenName ?: this.group("name"),
                 levelOrTier = group("level")?.takeIf { it.isNotEmpty() }?.toInt() ?: -1,
-                additionalEntities = extraEntityList
+                additionalEntities = extraEntityList,
+                hypixelTypes = this.groupOrNull("mobtype").orEmpty(),
             )
         }
 
     fun dungeon(
         baseEntity: EntityLivingBase,
         armorStand: EntityArmorStand,
-        extraEntityList: List<EntityLivingBase> = emptyList()
+        extraEntityList: List<EntityLivingBase> = emptyList(),
     ): Mob? =
         MobFilter.dungeonNameFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
@@ -59,14 +61,15 @@ object MobFactories {
                 attribute = this.group("attribute")?.takeIf { it.isNotEmpty() }
                     ?.let {
                         EnumUtils.enumValueOfOrNull<MobFilter.DungeonAttribute>(it)
-                    }
+                    },
+                hypixelTypes = this.groupOrNull("mobtype").orEmpty(),
             )
         }
 
     fun basic(
         baseEntity: EntityLivingBase,
         armorStand: EntityArmorStand,
-        extraEntityList: List<EntityLivingBase>? = null
+        extraEntityList: List<EntityLivingBase>? = null,
     ): Mob? =
         MobFilter.mobNameFilter.findMatcher(armorStand.cleanName()) {
             Mob(
@@ -74,11 +77,12 @@ object MobFactories {
                 mobType = Mob.Type.BASIC,
                 armorStand = armorStand,
                 name = this.group("name").removeCorruptedSuffix(
-                    this.group("corrupted")?.isNotEmpty() ?: false
+                    this.group("corrupted")?.isNotEmpty() ?: false,
                 ),
                 additionalEntities = extraEntityList,
                 levelOrTier = this.group("level")?.takeIf { it.isNotEmpty() }
-                    ?.toInt() ?: -1
+                    ?.toInt() ?: -1,
+                hypixelTypes = this.groupOrNull("mobtype").orEmpty(),
             )
         }
 
@@ -88,7 +92,7 @@ object MobFactories {
     fun summon(
         baseEntity: EntityLivingBase,
         armorStand: EntityArmorStand,
-        extraEntityList: List<EntityLivingBase>
+        extraEntityList: List<EntityLivingBase>,
     ): Mob? =
         MobFilter.summonFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
@@ -97,7 +101,7 @@ object MobFactories {
                 armorStand = armorStand,
                 name = this.group("name"),
                 additionalEntities = extraEntityList,
-                ownerName = this.group("owner")
+                ownerName = this.group("owner"),
             )
         }
 
@@ -107,7 +111,7 @@ object MobFactories {
             mobType = Mob.Type.DISPLAY_NPC,
             armorStand = armorStand,
             name = armorStand.cleanName(),
-            additionalEntities = listOf(clickArmorStand)
+            additionalEntities = listOf(clickArmorStand),
         )
 
     fun player(baseEntity: EntityLivingBase): Mob = Mob(baseEntity, Mob.Type.PLAYER, name = baseEntity.name)
@@ -126,7 +130,7 @@ object MobFactories {
                 armorStand = armorStand,
                 name = if (this.group("points")
                         ?.isNotEmpty() == true
-                ) "Points: " + this.group("points") else this.group("empty").toString()
+                ) "Points: " + this.group("points") else this.group("empty").toString(),
             )
         }
 

@@ -39,6 +39,7 @@ accessible field net/minecraft/entity/LivingEntity HEALTH Lnet/minecraft/entity/
 accessible field net/minecraft/client/gui/hud/ChatHud scrolledLines I
 accessible method net/minecraft/client/gui/hud/ChatHud toChatLineX (D)D
 accessible method net/minecraft/client/gui/hud/ChatHud toChatLineY (D)D
+accessible field net/minecraft/client/option/StickyKeyBinding toggleGetter Ljava/util/function/BooleanSupplier;
 
 # 1.21.7 stuff
 accessible field net/minecraft/client/render/RenderLayer$MultiPhase pipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;
