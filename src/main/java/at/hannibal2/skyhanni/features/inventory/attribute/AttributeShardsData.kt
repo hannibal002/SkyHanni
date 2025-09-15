@@ -188,10 +188,11 @@ object AttributeShardsData {
      * REGEX-TEST: §7You sent §aan §9Invisibug Shard §7to your §aHunting Box§7.
      * REGEX-TEST: §7You sent §a6 §fVoracious Spider Shards §7to your §aHunting Box§7.
      * REGEX-TEST: §7You sent §aa §fVoracious Spider Shard §7to your §aHunting Box§7.
+     * REGEX-TEST: §7You sent a §fVerdant Shard §7to your §aHunting Box§7.
      */
     private val sentToHuntingBoxPattern by patternGroup.pattern(
         "sent.to.hunting.box",
-        "§7You sent §a(?:an?|(?<amount>\\d+)) §.(?<shardName>.+) Shards? §7to your §aHunting Box§7.",
+        "§7You sent (?:§a)?(?:an?|(?<amount>\\d+)) §.(?<shardName>.+) Shards? §7to your §aHunting Box§7.",
     )
 
     private val shardChatPatterns = setOf(

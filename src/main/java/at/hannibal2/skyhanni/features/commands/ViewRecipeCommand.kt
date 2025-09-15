@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -58,14 +59,15 @@ object ViewRecipeCommand {
     val list by lazy {
         val list = mutableListOf<String>()
         for ((key, value) in NeuItems.allNeuRepoItems()) {
-            if (value.recipe != null) {
-                list.add(key.asString().lowercase())
+            if (value.has("recipe")) {
+                list.add(key.lowercase())
             }
         }
         list
     }
 
     fun customTabComplete(command: String): List<String>? {
+        if (!SkyBlockUtils.inSkyBlock) return null
         if (command == "viewrecipe" && config.tabComplete.viewrecipeItems) {
             return list
         }

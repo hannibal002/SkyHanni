@@ -122,14 +122,10 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                 try {
                     return primaryConstructor.callBy(args)
                 } catch (e: IllegalArgumentException) {
-                    val errorString = buildString {
-                        appendLine("❗ Failed to invoke constructor for ${kotlinClass.simpleName}")
-                        appendLine("  Reason: ${e.message}")
-                        args.forEach { (param, value) ->
-                            appendLine("  • ${param.name} : expected=${param.type}  value=$value  actualType=${value?.javaClass}")
-                        }
+                    System.err.println("❗ Failed to invoke constructor for ${kotlinClass.qualifiedName}: ${e.message}")
+                    args.forEach { (param, value) ->
+                        System.err.println("  • ${param.name} : expected=${param.type}  value=$value  actualType=${value?.javaClass}")
                     }
-                    System.err.println(errorString)
                     throw e
                 }
             }

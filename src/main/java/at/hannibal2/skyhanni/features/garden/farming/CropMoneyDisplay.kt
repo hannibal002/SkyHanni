@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.moveEntryToTop
@@ -142,8 +142,8 @@ object CropMoneyDisplay {
 
     private fun buildDisplayBody(): Renderable {
         GardenApi.getCurrentlyFarmedCrop()?.let {
-            val reforgeName = InventoryUtils.getItemInHand()?.getReforgeName()
-            toolHasBountiful?.put(it, reforgeName == "bountiful")
+            val reforge = InventoryUtils.getItemInHand()?.getReforgeModifier()
+            toolHasBountiful?.put(it, reforge == "bountiful")
 
             if (GardenApi.mushroomCowPet && it != CropType.MUSHROOM && config.mooshroom) {
                 val redMushroom = "ENCHANTED_RED_MUSHROOM".toInternalName()
@@ -348,20 +348,17 @@ object CropMoneyDisplay {
 
     private fun isSeeds(internalName: NeuInternalName) = internalName == ENCHANTED_SEEDS || internalName == SEEDS
 
-    private val ENCHANTED_PAPER = "ENCHANTED_PAPER".toInternalName()
-    private val ENCHANTED_BREAD = "ENCHANTED_BREAD".toInternalName()
-    private val SIMPLE_CARROT_CANDY = "SIMPLE_CARROT_CANDY".toInternalName()
-
     private fun init() {
         if (loaded) return
         loaded = true
 
         SkyHanniMod.launchIOCoroutine {
             val map = mutableMapOf<NeuInternalName, Int>()
-            for (internalName in NeuItems.allNeuRepoInternalNames()) {
-                if (internalName == ENCHANTED_PAPER) continue
-                if (internalName == ENCHANTED_BREAD) continue
-                if (internalName == SIMPLE_CARROT_CANDY) continue
+            for ((rawInternalName, _) in NeuItems.allNeuRepoItems()) {
+                if (rawInternalName == "ENCHANTED_PAPER") continue
+                if (rawInternalName == "ENCHANTED_BREAD") continue
+                if (rawInternalName == "SIMPLE_CARROT_CANDY") continue
+                val internalName = rawInternalName.toInternalName()
                 if (!internalName.isBazaarItem()) continue
 
                 val (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName)

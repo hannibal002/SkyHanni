@@ -302,11 +302,8 @@ object ItemUtils {
         if (getLore().getOrNull(0) == "§7Lump-sum amount") {
             return NeuInternalName.SKYBLOCK_COIN
         }
-        val rawInternalName = NeuItems.getInternalName(this)?.asString()?.replace(
-            "ULTIMATE_ULTIMATE_",
-            "ULTIMATE_"
-        )
-        return rawInternalName?.let { ItemNameResolver.fixEnchantmentName(it) }
+        val internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
+        return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
 
     fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
@@ -590,6 +587,20 @@ object ItemUtils {
 
         val itemName = color + matcher.group("name").trim()
         return makePair(input, itemName, matcher)
+    }
+
+    /**
+     * REGEX-TEST: §fEnchanted Book (Lapidary I)
+     * REGEX-TEST: §fEnchanted Book (Ice Cold I§r§f)
+     */
+    private val enchantedBookPattern by RepoPattern.pattern(
+        "item.enchantedbook",
+        "§fEnchanted Book \\((?<item>.+)\\)"
+    )
+    fun readBookType(input: String): String? {
+        return enchantedBookPattern.matchMatcher(input) {
+            group("item").removeColor()
+        }
     }
 
     private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {

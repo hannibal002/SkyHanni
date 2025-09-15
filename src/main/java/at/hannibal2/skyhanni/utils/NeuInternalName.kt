@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.minutes
 
-class NeuInternalName private constructor(private val internalName: String) : Comparable<NeuInternalName> {
+class NeuInternalName private constructor(private val internalName: String) {
 
     companion object {
 
@@ -67,8 +67,6 @@ class NeuInternalName private constructor(private val internalName: String) : Co
 
     fun asString() = internalName
 
-    override fun compareTo(other: NeuInternalName): Int = internalName.compareTo(other.internalName)
-
     override fun equals(other: Any?) = this === other
 
     override fun toString(): String = "internalName:$internalName"
@@ -104,7 +102,7 @@ class NeuInternalName private constructor(private val internalName: String) : Co
 
     val isPet: Boolean
         get() = petCache.getOrPut(this) {
-            PetUtils.isKnownPetInternalName(this) || this.getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET
+            PetUtils.isKnownPetInternalName(this) || (getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET)
         }
 
     private val isEnchantedBook: Boolean

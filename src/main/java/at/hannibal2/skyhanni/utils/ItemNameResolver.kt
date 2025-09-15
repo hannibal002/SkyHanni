@@ -14,8 +14,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 @SkyHanniModule
 object ItemNameResolver {
     private val itemNameCache = mutableMapOf<String, NeuInternalName>() // item name -> internal name
-    private val HAY_BALE = "HAY_BALE".toInternalName()
-    private val HAY_BLOCK = "HAY_BLOCK".toInternalName()
 
     @Suppress("ReturnCount", "CyclomaticComplexMethod")
     internal fun getInternalNameOrNull(itemName: String): NeuInternalName? {
@@ -33,7 +31,7 @@ object ItemNameResolver {
         }
 
         ItemResolutionQuery.resolveEnchantmentByName(itemName)?.let {
-            return itemNameCache.getOrPut(lowercase) { fixEnchantmentName(it.asString()) }
+            return itemNameCache.getOrPut(lowercase) { fixEnchantmentName(it) }
         }
 
         resolveEnchantmentByCleanName(itemName)?.let {
@@ -63,7 +61,7 @@ object ItemNameResolver {
                     }
                 } ${split.joinToString("_").allLettersFirstUppercase()}"
                 ItemResolutionQuery.findInternalNameByDisplayName(gemstoneQuery, true)?.let {
-                    return itemNameCache.getOrPut(lowercase) { it }
+                    return itemNameCache.getOrPut(lowercase) { it.toInternalName() }
                 }
             }
         }
@@ -72,8 +70,11 @@ object ItemNameResolver {
             "SUPERBOOM TNT" -> "SUPERBOOM_TNT".toInternalName()
             else -> {
                 ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
+
                     // This fixes a NEU bug with §9Hay Bale (cosmetic item)
-                    if (it == HAY_BALE) HAY_BLOCK else it
+                    // TODO remove workaround when this is fixed in neu
+                    val rawInternalName = if (it == "HAY_BALE") "HAY_BLOCK" else it
+                    rawInternalName.toInternalName()
                 } ?: return null
             }
         }
@@ -114,7 +115,6 @@ object ItemNameResolver {
         return null
     }
 
-    // Todo use repo for this
     // Workaround for duplex
     private val duplexPattern = "ULTIMATE_DUPLEX;(?<tier>.*)".toPattern()
 
@@ -123,6 +123,7 @@ object ItemNameResolver {
             val tier = group("tier")
             return "ULTIMATE_REITERATE;$tier".toInternalName()
         }
+        // TODO USE SH-REPO
         return originalName.toInternalName()
     }
 

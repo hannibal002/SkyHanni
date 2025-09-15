@@ -160,7 +160,8 @@ object MinionCraftHelper {
 
         allIngredients.clear()
 
-        for (internalName in NeuItems.allNeuRepoInternalNames()) {
+        for (internalId in NeuItems.allNeuRepoItems().keys) {
+            val internalName = internalId.toInternalName()
             if (internalName.endsWith("_GENERATOR_1")) {
                 if (internalName == "REVENANT_GENERATOR_1".toInternalName() ||
                     internalName == "TARANTULA_GENERATOR_1".toInternalName() ||
