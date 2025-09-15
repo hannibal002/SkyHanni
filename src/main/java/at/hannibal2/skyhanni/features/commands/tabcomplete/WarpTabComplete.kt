@@ -20,7 +20,7 @@ object WarpTabComplete {
         warps = data.warpCommands
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTabComplete(event: TabCompletionEvent) {
         if (event.isCommand("warp")) {
             event.addSuggestions(warps)

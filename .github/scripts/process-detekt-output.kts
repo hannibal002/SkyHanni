@@ -18,8 +18,9 @@ val lines = detektOutput.split('\n')
  * REGEX-TEST: ::warning file=src/main/java/at/hannibal2/skyhanni/config/features/dev/NeuRepositoryConfig.kt,line=27,title=detekt.FormattingRules.StorageVarOrVal,col=5,endColumn=60::RepositoryLocation `location` should be a val
  * REGEX-TEST: ::warning file=src/main/java/at/hannibal2/skyhanni/config/features/dev/NeuRepositoryConfig.kt,line=33,title=detekt.FormattingRules.StorageVarOrVal,col=9,endColumn=93::Runnable `resetRepoLocation` should be a val
  * REGEX-TEST: ::warning file=src/main/java/at/hannibal2/skyhanni/features/foraging/ForagingTrackerLegacy.kt,line=148,title=detekt.RepoRules.RepoPatternRegexTestFailed,col=28,endColumn=6::Repo pattern `hoverRewardPattern` failed regex test: `§2Forest Essence §8x4` pattern: `(?:§.)+(?<item>.*) (?:§.)+§8x(?<amount>[\d,-]+)`.
+ * REGEX-TEST: ::warning file=src/common/main/kotlin/me/owdding/skyocean/features/mining/hollows/MetalDetectorSolver.kt,line=243,title=detekt.potential-bugs.UnsafeCallOnNullableType,col=41,endColumn=56::Calling !! on a nullable type will throw a NullPointerException at runtime in case the value is null. It should be avoided.
  */
-val sarifRegex = Regex("^::warning file=(?<filePath>src\\/[^,]*\\/(?<file>[^,]+)),line=(?<line>\\d+),title=(?<wholeRule>(?<provider>[^.]+)\\.(?:(?:\\w+)\\.)+(?<rule>[^.]+)),col=(?<col>\\d+),endColumn=(?<endcol>\\d+)::(?<message>(?:.|)*\\n*)\$")
+val sarifRegex = Regex("^::warning file=(?<filePath>src\\/[^,]*\\/(?<file>[^,]+)),line=(?<line>\\d+),title=(?<wholeRule>(?<provider>[^.]+)\\.(?:(?:[\\w-]+)\\.)+(?<rule>[^.]+)),col=(?<col>\\d+),endColumn=(?<endcol>\\d+)::(?<message>(?:.|)*\\n*)\$")
 val sarifPattern = sarifRegex.toPattern()
 
 val urlBase = "https://github.com/$githubRepo/blob/$prSha/src/"
