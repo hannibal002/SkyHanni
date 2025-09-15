@@ -32,29 +32,29 @@ class FarmingFortuneConfig {
 
     @Expose
     @ConfigOption(
-        name = "Show Pest Fortune Buff",
-        desc = "Display the Pest Fortune Buff amount and time left."
+        name = "Show Pesthunter Bonus Fortune",
+        desc = "Display the bonus fortune amount and time left from the bonus given by trading in pests at Pesthunter Phillip."
     )
     @ConfigEditorBoolean
-    var pestBuff: Boolean = false
+    var showPestBonusFortune: Boolean = false
 
     @Expose
     @ConfigOption(
-        name = "Pest Buff Expire Warning",
+        name = "Bonus Fortune Expire Warning",
         desc = "Warn in chat when the pest fortune buff expires."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var pestBuffWarning: Boolean = true
+    var bonusFortuneChat: Boolean = true
 
     @Expose
     @ConfigOption(
-        name = "Pest Buff Expire Title",
+        name = "Bonus Fortune Expire Title",
         desc = "Send a title and sound when the pest fortune buff expires."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var pestBuffTitle: Boolean = false
+    var bonusFortuneTitle: Boolean = false
 
     @Expose
     @ConfigOption(name = "Sound Settings", desc = "")

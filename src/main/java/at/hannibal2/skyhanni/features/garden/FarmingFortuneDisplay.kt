@@ -124,9 +124,9 @@ object FarmingFortuneDisplay {
     private var firstBrokenCropTime = SimpleTimeMark.farPast()
     private var lastUniversalFortuneMissingError = SimpleTimeMark.farPast()
     private var lastCropFortuneMissingError = SimpleTimeMark.farPast()
-    private var pestBuffExpireTime = SimpleTimeMark.farPast()
-    private var hasWarnedPestBuff = true
-    private var pestBuffFortune = 0
+    private var pestBonusExpireTime = SimpleTimeMark.farPast()
+    private var hasWarnedPestBonus = true
+    private var pestBonusFortune = 0
 
     private val ZORROS_CAPE = "ZORROS_CAPE".toInternalName()
 
@@ -158,19 +158,19 @@ object FarmingFortuneDisplay {
         } else if (event.isWidget(TabWidget.PESTS)) {
             pestFortuneBuffPattern.firstMatcher(event.widget.lines) {
                 val inactive = group("inactive")
-                val time = group("time")?.getTablistEndTime(pestBuffExpireTime)
+                val time = group("time")?.getTablistEndTime(pestBonusExpireTime)
                 val fortune = group("fortune")?.toIntOrNull()
 
                 if (inactive != null || time == null || fortune == null) {
-                    pestBuffExpireTime = SimpleTimeMark.farPast()
-                    pestBuffFortune = 0
-                    if (!hasWarnedPestBuff) {
+                    pestBonusExpireTime = SimpleTimeMark.farPast()
+                    pestBonusFortune = 0
+                    if (!hasWarnedPestBonus) {
                         pestBuffExpireWarning()
                     }
                 } else {
-                    hasWarnedPestBuff = false
-                    pestBuffFortune = fortune
-                    pestBuffExpireTime = time
+                    hasWarnedPestBonus = false
+                    pestBonusFortune = fortune
+                    pestBonusExpireTime = time
                 }
             }
         }
@@ -190,12 +190,16 @@ object FarmingFortuneDisplay {
     }
 
     private fun pestBuffExpireWarning() {
-        if (config.pestBuffWarning) ChatUtils.chat("§cPest fortune buff has expired!")
-        if (config.pestBuffTitle) {
+        if (config.bonusFortuneChat) ChatUtils.clickableChat(
+            "§cPest fortune buff has expired!",
+            onClick = { HypixelCommands.teleportToPlot("barn") },
+            hover = "Click to teleport to barn!"
+        )
+        if (config.bonusFortuneTitle) {
             TitleManager.sendTitle("§cPest Fortune Buff Has Expired!", duration = 3.seconds)
             playUserSound()
         }
-        hasWarnedPestBuff = true
+        hasWarnedPestBonus = true
     }
 
     private fun update() {
@@ -239,7 +243,7 @@ object FarmingFortuneDisplay {
             ),
         )
 
-        if (config.pestBuff) addString(pestBuffString())
+        if (config.showPestBonusFortune) addString(pestBuffString())
 
         if (ffReduction > 0) {
             if (config.compactFormat) {
@@ -255,10 +259,10 @@ object FarmingFortuneDisplay {
     }
 
     private fun pestBuffString(): String {
-        val bonusInfo = if (pestBuffExpireTime.isInPast()) {
+        val bonusInfo = if (pestBonusExpireTime.isInPast()) {
             "§cInactive!"
         } else {
-            "§6+$pestBuffFortune☘ §b${pestBuffExpireTime.timeUntil().format()}"
+            "§6+$pestBonusFortune☘ §b${pestBonusExpireTime.timeUntil().format()}"
         }
         return if (config.compactFormat) bonusInfo else "§eBonus: $bonusInfo"
     }
