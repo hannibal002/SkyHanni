@@ -99,7 +99,7 @@ object NeuItems {
         allNeuRepoItems().keys.forEach { internalName ->
             // we ignore all builder blocks from the item name -> internal name cache
             // because builder blocks can have the same display name as normal items.
-            if (internalName.asString().startsWith("BUILDER_")) return@forEach
+            if (internalName.startsWith("BUILDER_")) return@forEach
 
             val stack = internalName.getItemStackOrNull() ?: run {
                 ChatUtils.debug("skipped `$this`from readAllNeuItems")
