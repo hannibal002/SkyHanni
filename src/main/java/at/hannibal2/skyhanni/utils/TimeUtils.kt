@@ -21,8 +21,7 @@ object TimeUtils {
 
     val isAprilFoolsDay: Boolean by RecalculatingValue(1.seconds) {
         val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
-        val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
-        val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
+        val (always, never) = SkyHanniMod.feature.dev.debug.let { it.alwaysFunnyTime to it.neverFunnyTime }
         !never && (always || itsTime)
     }
 
