@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.slots
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -65,8 +64,7 @@ object PestTrapFeatures {
         if (!config.releaseHotkey.isKeyHeld()) return
         val inventory = event.guiContainer as? AccessorGuiContainer ?: return
         inventory as GuiContainer
-        val slot = inventory.slots()[16]
-        InventoryCompat.clickInventorySlot(slot.slotIndex, mouseButton = 0, mode = 0)
+        InventoryCompat.clickInventorySlot(16, mouseButton = 0, mode = 0)
     }
 
     @HandleEvent
