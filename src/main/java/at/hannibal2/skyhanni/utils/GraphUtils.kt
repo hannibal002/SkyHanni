@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.model.findPathToDestination
 import java.util.PriorityQueue
 import java.util.Stack
 
+@Suppress("TooManyFunctions")
 object GraphUtils {
     /**
      * Find the fastest path from [closestNode] to *any* node that matches [condition].
@@ -137,7 +138,7 @@ object GraphUtils {
         bailout: (GraphNode) -> Boolean = { false },
     ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(start), bailout)
 
-    fun nearestNodeOnCurrentIsland() = nearestNodeOnCurrentIsland(playerGraphGridLocation())
+    fun nearestNodeOnCurrentIsland() = nearestNodeOnCurrentIsland(playerPosition)
 
     fun nearestNodeOnCurrentIsland(location: LorenzVec): GraphNode {
         val graph = IslandGraphs.currentIslandGraph ?: error("no island found")
@@ -166,5 +167,32 @@ object GraphUtils {
         return mappedNodes.zipWithNext { a, b -> findShortestDistance(a, b) }.sum()
     }
 
-    fun playerGraphGridLocation() = LocationUtils.playerEyeLocation().roundToBlock()
+    var playerPosition = LorenzVec(0, 0, 0)
+        private set
+
+    fun updatePlayerPosition() {
+        playerPosition = LocationUtils.playerEyeLocation().roundToBlock()
+    }
+
+    fun GenericNode.distanceToPlayer(): Double = position.distance(playerPosition)
+    fun GenericNode.distanceSqToPlayer(): Double = position.distanceSq(playerPosition)
+    fun distanceSqToPlayer(location: LorenzVec) = location.distanceSq(playerPosition)
+
+    interface GenericNode {
+        val position: LorenzVec
+    }
+
+    fun <N : GenericNode, T : List<N>> T.getNearestNode(
+        location: LorenzVec = playerPosition,
+        condition: (N) -> Boolean = { true },
+    ): N = asSequence()
+        .filter(condition)
+        .minBy { it.position.distanceSq(location) }
+
+    fun <T : List<LorenzVec>> T.getNearestToPlayer(
+        location: LorenzVec = playerPosition,
+        condition: (LorenzVec) -> Boolean = { true },
+    ): LorenzVec = asSequence()
+        .filter(condition)
+        .minBy { it.distanceSq(location) }
 }
