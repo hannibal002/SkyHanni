@@ -21,15 +21,14 @@ object TimeUtils {
 
     private var previousApril = false
 
-    val isAprilFoolsDay: Boolean
-        get() {
-            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
-            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
-            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
-            val result = (!never && (always || itsTime))
-            previousApril = result
-            return result
-        }
+    val isAprilFoolsDay: Boolean by RecalculatingValue(1.seconds) {
+        val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
+        val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
+        val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
+        val result = (!never && (always || itsTime))
+        previousApril = result
+        result
+    }
 
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
