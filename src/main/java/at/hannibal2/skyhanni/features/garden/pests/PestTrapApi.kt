@@ -42,7 +42,8 @@ object PestTrapApi {
     private var timeEnteredGarden: SimpleTimeMark? = null
     var MAX_TRAPS = 3
         private set
-    val inInventory get() = InventoryUtils.openInventoryName() == "Mouse Trap" || InventoryUtils.openInventoryName() == "Pest Trap"
+    private val inventoryNames = setOf("Mouse Trap", "Pest Trap")
+    val inInventory get() = InventoryUtils.openInventoryName() in inventoryNames
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -67,14 +68,17 @@ object PestTrapApi {
                 widgetEnabledAndVisible[TabWidget.PEST_TRAPS] = true
                 trapsPlaced = event.lines.firstNotNullOfOrNull { it.getTrapsPlacedOrNull() }
             }
+
             TabWidget.FULL_TRAPS -> {
                 widgetEnabledAndVisible[TabWidget.FULL_TRAPS] = true
                 fullTraps = event.lines.firstNotNullOfOrNull { it.getFullTrapsOrNull() }
             }
+
             TabWidget.NO_BAIT -> {
                 widgetEnabledAndVisible[TabWidget.NO_BAIT] = true
                 noBaitTraps = event.lines.firstNotNullOfOrNull { it.getNoBaitTrapsOrNull() }
             }
+
             else -> return
         }
 
