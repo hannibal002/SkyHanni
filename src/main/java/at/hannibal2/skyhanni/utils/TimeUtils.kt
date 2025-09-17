@@ -18,6 +18,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
+@Suppress("TooManyFunctions")
 object TimeUtils {
 
     fun Duration.format(
