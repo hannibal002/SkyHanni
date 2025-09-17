@@ -56,6 +56,7 @@ object ViewRecipeCommand {
         HypixelCommands.viewRecipe(item.toInternalName(), page)
     }
 
+    // TODO add neu repo reload support
     val list by lazy {
         val list = mutableListOf<String>()
         for ((key, value) in NeuItems.allNeuRepoItems()) {

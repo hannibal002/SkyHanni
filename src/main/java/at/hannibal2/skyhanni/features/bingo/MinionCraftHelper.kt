@@ -155,6 +155,7 @@ object MinionCraftHelper {
         return false
     }
 
+    // TODO add neu repo reload support
     private fun init() {
         if (tierOneMinions.isNotEmpty()) return
 

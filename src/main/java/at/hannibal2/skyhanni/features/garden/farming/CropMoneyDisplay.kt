@@ -359,6 +359,7 @@ object CropMoneyDisplay {
     private val ENCHANTED_BREAD = "ENCHANTED_BREAD".toInternalName()
     private val SIMPLE_CARROT_CANDY = "SIMPLE_CARROT_CANDY".toInternalName()
 
+    // TODO add neu repo reload support
     private fun init() {
         if (loaded) return
         loaded = true

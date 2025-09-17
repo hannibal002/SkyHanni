@@ -610,6 +610,7 @@ object ComposterOverlay {
         }
     }
 
+    // TODO add neu repo reload support
     private fun updateOrganicMatterFactors() {
         try {
             organicMatterFactors = updateOrganicMatterFactors(organicMatter)
