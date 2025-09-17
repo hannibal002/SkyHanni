@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
 import at.hannibal2.skyhanni.config.storage.Storage
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.TimeUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
@@ -40,7 +40,7 @@ class Features : Config() {
     }
 
     override fun alignCategory(category: ProcessedCategory, isSelected: Boolean): HorizontalAlign {
-        if (SkyHanniDebugsAndTests.isAprilFoolsDay) return HorizontalAlign.RIGHT
+        if (TimeUtils.isAprilFoolsDay) return HorizontalAlign.RIGHT
         return super.alignCategory(category, isSelected)
     }
 
@@ -57,7 +57,7 @@ class Features : Config() {
     }
 
     override fun getTitle(): String {
-        val modName = if (SkyHanniDebugsAndTests.isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
+        val modName = if (TimeUtils.isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
         return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89"
     }
 
