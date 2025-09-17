@@ -430,6 +430,7 @@ object HypixelData {
                     EnoughUpdatesRepoManager.displayRepoStatus(true)
                 }
             }
+
             wasOnHypixel && !nowOnHypixel -> {
                 if (skyBlock) {
                     skyBlock = false
