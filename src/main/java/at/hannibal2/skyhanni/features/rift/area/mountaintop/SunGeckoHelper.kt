@@ -56,10 +56,12 @@ object SunGeckoHelper {
      * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
      * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
      * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
+     * WRAPPED-REGEX-TEST: "                           §r§c§lACTIVE MODIFIERS!"
      */
     private val sunGeckoActiveModifiers by patternGroup.pattern(
         "modifiers",
-        "§f {27}§r§c§lACTIVE MODIFIERS!",
+        "(?:§.)* {27}§r§c§lACTIVE MODIFIERS!",
+
     )
 
     private val sunGeckoChatLine by patternGroup.pattern(

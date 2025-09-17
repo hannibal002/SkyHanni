@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -122,9 +123,9 @@ object UserLuckBreakdown {
             return
         }
         val inventoryName = event.inventoryItems[4]?.displayName.orEmpty()
-        if (inventoryName != "§dMisc Stats") return
+        if (inventoryName != "§dMiscellaneous Stats") return
         inMiscStats = true
-        replaceSlot = findValidSlot(event.inventoryItems)
+        replaceSlot = findValidSlot(event.inventoryItemsWithNull)
         val showAllStatsLore = event.inventoryItems[50]?.getLore() ?: listOf("")
         for (line in showAllStatsLore) {
             showAllStatsPattern.matchMatcher(line) {
@@ -143,11 +144,10 @@ object UserLuckBreakdown {
         inCustomBreakdown = false
     }
 
-    private fun findValidSlot(input: Map<Int, ItemStack>): Int? {
+    private fun findValidSlot(input: Map<Int, ItemStack?>): Int? {
         for (slot in input.keys) {
             if (slot !in validItemSlots && slot < 44) continue
-            val itemStack = input[slot]
-            if (itemStack?.displayName == " ") {
+            if (input[slot].orNull() == null) {
                 return slot
             }
         }
@@ -199,7 +199,7 @@ object UserLuckBreakdown {
     private fun skyblockMenuTooltip(event: ToolTipEvent) {
         if (event.slot.slotIndex != 13) return
         val luckEvent = getOrPostLuckEvent()
-        val lastIndex = event.toolTip.indexOfLast { it.removeColor() == "" }
+        val lastIndex = event.toolTip.indexOfLast { it.removeColor() == " and more..." }
         if (lastIndex == -1) return
 
         val luckString = tryTruncateFloat(luckEvent.getTotalLuck())
