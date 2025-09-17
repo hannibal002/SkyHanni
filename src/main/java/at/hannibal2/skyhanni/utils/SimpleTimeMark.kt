@@ -29,9 +29,9 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun isInFuture() = timeUntil().isPositive()
 
-    fun isFarPast() = millis == 0L
+    fun isFarPast() = millis == FAR_PAST_MS
 
-    fun isFarFuture() = millis == Long.MAX_VALUE
+    fun isFarFuture() = millis == FAR_FUTURE_MS
 
     fun takeIfInitialized() = if (isFarPast() || isFarFuture()) null else this
 
