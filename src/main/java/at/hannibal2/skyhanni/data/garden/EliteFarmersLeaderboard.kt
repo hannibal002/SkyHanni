@@ -98,6 +98,7 @@ object EliteFarmersLeaderboard {
     @HandleEvent
     fun onPestKill(event: PestKillEvent) {
         addPestKill(EliteLeaderboardType.Pest(event.pest, EliteLeaderboardMode.ALL_TIME))
+        addPestKill(EliteLeaderboardType.Pest(event.pest, EliteLeaderboardMode.MONTHLY))
         addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.MONTHLY))
         addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.ALL_TIME))
     }
