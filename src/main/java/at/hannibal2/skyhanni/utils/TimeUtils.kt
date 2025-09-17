@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 import java.time.ZoneId
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
@@ -16,6 +18,12 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 object TimeUtils {
+
+    val isAprilFoolsDay: Boolean by RecalculatingValue(1.seconds) {
+        val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
+        val (always, never) = SkyHanniMod.feature.dev.debug.let { it.alwaysFunnyTime to it.neverFunnyTime }
+        !never && (always || itsTime)
+    }
 
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,

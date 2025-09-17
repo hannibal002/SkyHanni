@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
@@ -424,9 +425,12 @@ object HypixelData {
         when {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
-                SkyHanniRepoManager.displayRepoStatus(true)
-                EnoughUpdatesRepoManager.displayRepoStatus(true)
+                SkyHanniMod.launchIOCoroutine {
+                    SkyHanniRepoManager.displayRepoStatus(true)
+                    EnoughUpdatesRepoManager.displayRepoStatus(true)
+                }
             }
+
             wasOnHypixel && !nowOnHypixel -> {
                 if (skyBlock) {
                     skyBlock = false

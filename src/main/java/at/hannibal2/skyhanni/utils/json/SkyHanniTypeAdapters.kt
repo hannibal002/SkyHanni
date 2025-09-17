@@ -115,6 +115,8 @@ object SkyHanniTypeAdapters {
         }
     }
 
+
+
     inline fun <reified T> GsonBuilder.registerTypeAdapter(
         crossinline write: (JsonWriter, T) -> Unit,
         crossinline read: (JsonReader) -> T,

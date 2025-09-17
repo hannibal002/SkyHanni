@@ -26,14 +26,6 @@ class GraphConfig {
     var placeKey: Int = Keyboard.KEY_F
 
     @Expose
-    @ConfigOption(
-        name = "Toggle Ghost Position",
-        desc = "Creates or removes the Ghost Position. This helps editing nodes tht are in the air."
-    )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var toggleGhostPosition: Int = Keyboard.KEY_NONE
-
-    @Expose
     @ConfigOption(name = "Select Key", desc = "Select the nearest node to be active. Double press to unselect.")
     @ConfigEditorKeybind(defaultKey = KeyboardManager.MIDDLE_MOUSE)
     var selectKey: Int = KeyboardManager.MIDDLE_MOUSE
