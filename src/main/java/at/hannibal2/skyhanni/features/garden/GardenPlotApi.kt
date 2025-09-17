@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -373,7 +374,7 @@ object GardenPlotApi {
 
         plotSprayedTablistPattern.firstMatcher(event.lines.map { it.trim() }) {
             val sprayName = group("spray").trim()
-            val time = group("time")?.getTablistEndTime(plot.getData()?.sprayExpiryTime)
+            val time = groupOrNull("time")?.let { getTablistEndTime(it, plot.getData()?.sprayExpiryTime) }
             if (time == null) {
                 plot.removeSpray()
                 return
