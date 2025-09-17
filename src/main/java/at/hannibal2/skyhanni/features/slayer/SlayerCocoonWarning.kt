@@ -24,8 +24,8 @@ object SlayerCocoonWarning {
     @HandleEvent
     fun onChatMessage(event: SkyHanniChatEvent) {
         if (slayerCocoonPattern.matches(event.message)) {
-            if (config.slayerCocoonTitle) TitleManager.sendTitle("§lSlayer Boss Cocooned!")
-            if (config.slayerCocoonDing) SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
+            if (config.cocoonTitle) TitleManager.sendTitle("§lSlayer Boss Cocooned!")
+            if (config.cocoonDing) SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
         }
     }
 }
