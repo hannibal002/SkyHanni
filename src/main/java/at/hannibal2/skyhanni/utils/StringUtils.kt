@@ -204,10 +204,11 @@ object StringUtils {
 
     //#if FORGE
     fun String.splitLines(width: Int): String = ForgeFontRenderer(Minecraft.getMinecraft().fontRendererObj).splitText(
+        this.asStructuredText(),
         //#else
         //$$ fun String.splitLines(width: Int): String = splitText(
+        //$$ this,
         //#endif
-        this.asStructuredText(),
         width,
     ).joinToString("\n") { it.toString().removePrefix("§r") }
 
