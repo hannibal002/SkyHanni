@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.audio.ISound
-import net.minecraft.client.gui.inventory.GuiContainer
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 
@@ -62,13 +61,12 @@ object PestTrapFeatures {
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!PestTrapApi.inInventory) return
         if (!config.releaseHotkey.isKeyHeld()) return
-        val inventory = event.guiContainer as? AccessorGuiContainer ?: return
-        inventory as GuiContainer
+        if (event.guiContainer !is AccessorGuiContainer) return
         InventoryCompat.clickInventorySlot(16, mouseButton = 0, mode = 0)
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.warningConfig.warningSound) {
             warningSound = refreshSound()
         }
