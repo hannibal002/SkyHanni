@@ -373,7 +373,7 @@ object GardenPlotApi {
 
         plotSprayedTablistPattern.firstMatcher(event.lines.map { it.trim() }) {
             val sprayName = group("spray").trim()
-            val time = group("time")?.getTablistEndTime(plot.getData()?.sprayExpiryTime)
+            val time = getTablistEndTime(group("time"), plot.getData()?.sprayExpiryTime)
             if (time == null) {
                 plot.removeSpray()
                 return
