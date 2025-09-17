@@ -1,2 +1,4 @@
 
 net.minecraft.entity.Entity getEntityWorld() getWorld()
+
+net.minecraft.client.render.WorldRenderer capturedFrustum frustum

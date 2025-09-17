@@ -69,11 +69,16 @@ object ComponentUtils {
     fun convertToNeuNbtInfoJson(stack: ItemStack): JsonObject {
         val isUnbreakable = NbtBoolean(stack.contains(DataComponentTypes.UNBREAKABLE))
         val profile = stack.get(DataComponentTypes.PROFILE)
+        //#if MC < 1.21.9
         val profileProperties = profile?.properties?.get("textures")?.firstOrNull()
+        val uuid = profile?.id?.getOrNull() ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
+        //#else
+        //$$ val profileProperties = profile?.gameProfile?.properties?.get("textures")?.firstOrNull()
+        //$$ val uuid = profile?.gameProfile?.id ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
+        //#endif
         val value = profileProperties?.value
         val signature = profileProperties?.signature
         val propertiesInfo = PropertiesInfo(listOf(TextureInfo(value = value, signature = signature)))
-        val uuid = profile?.id?.getOrNull() ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
         val skullOwner = SkullOwnerInfo(
             uuid = uuid.toString(),
             properties = propertiesInfo,

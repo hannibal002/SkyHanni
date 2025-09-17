@@ -20,7 +20,7 @@ object FrustumUtils {
         //#if MC < 1.21
         frustum?.isBoundingBoxInFrustum(box) ?: false
     //#else
-    //$$ frustum.isVisible(box)
+    //$$ frustum?.isVisible(box) ?: true
     //#endif
 
     fun isVisible(minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double) =

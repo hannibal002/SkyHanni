@@ -336,8 +336,10 @@ object ItemUtils {
         val compound = tagCompound ?: return null
         if (!compound.hasKey("SkullOwner")) return null
         return compound.getCompoundTag("SkullOwner").getSkullTexture()
-        //#else
+        //#elseif MC < 1.21.9
         //$$ return this.get(DataComponentTypes.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
+        //#else
+        //$$ return this.get(DataComponentTypes.PROFILE)?.gameProfile?.properties?.get("textures")?.firstOrNull()?.value
         //#endif
 
     }
@@ -354,8 +356,10 @@ object ItemUtils {
 
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
-        //#else
+        //#elseif MC < 1.21.9
         //$$ return this.get(DataComponentTypes.PROFILE)?.id?.get().toString()
+        //#else
+        //$$ return this.get(DataComponentTypes.PROFILE)?.gameProfile?.id.toString()
         //#endif
     }
 
