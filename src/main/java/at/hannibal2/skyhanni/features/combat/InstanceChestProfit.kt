@@ -37,6 +37,7 @@ object InstanceChestProfit {
 
     /**
      * REGEX-TEST: §6Kraken Shard §8x1
+     * REGEX-TEST: §6Apex Dragon Shard §8x1
      */
     private val attributeShardPattern by patternGroup.pattern(
         "attributeshard",
