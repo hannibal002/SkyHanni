@@ -18,7 +18,6 @@ import com.google.gson.JsonElement
 import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.minecraft.util.IChatComponent
 import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -121,7 +120,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (shouldRegisterStatusCommand) event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            simpleCallback { displayRepoStatus(false) }
+            coroutineSimpleCallback { displayRepoStatus(joinEvent = true, command = true) }
         }
         if (shouldRegisterReloadCommand) event.registerBrigadier(reloadCommand) {
             description = "Reloads the local $commonName repo"
@@ -168,7 +167,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun updateRepo(forceReset: Boolean = false) {
         shouldManuallyReload = true
         if (!config.location.valid) {
-            ChatUtils.userError("Invalid $commonName Repo settings detected, resetting default settings.")
+            logger.errorToChat("Invalid $commonName Repo settings detected, resetting default settings.")
             resetRepositoryLocation()
         }
 
@@ -186,13 +185,13 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 "unsuccessfulConstants" to unsuccessfulConstants,
             )
             if (informed) return@launchIOCoroutine
-            ChatUtils.chat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
+            logger.logToChat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
         }
     }
 
     private fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
         if (hasDefaultSettings()) {
-            if (manual) ChatUtils.chat("$commonShortNameCased Repo settings are already on default!")
+            if (manual) logger.logToChat("$commonShortNameCased Repo settings are already on default!")
             return
         }
 
@@ -245,63 +244,62 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     open fun reportExtraStatusInfo(): Unit = Unit
 
-    fun displayRepoStatus(joinEvent: Boolean) {
+    private suspend fun isRepeatErrorOrFixed(): Boolean {
+        if (latestError.passedSince() < 5.minutes || !config.repoAutoUpdate) return true
+        latestError = SimpleTimeMark.now()
+
+        val comparison = getCommitComparison(silentError = false)
+        val isOutdated = comparison?.let { !it.hashesMatch } ?: run {
+            logger.logNonDestructiveError("Failed to fetch latest commit for repo status check.")
+            false
+        }
+        if (isOutdated) {
+            logger.logToChat("Repo Issue caught, however the repo is outdated.\n§aTrying to update it now...")
+            val result = fetchAndUnpackRepo(command = false)
+            if (result == FetchUnpackResult.SUCCESS) {
+                logger.logToChat("§a$commonName Repo updated successfully!")
+                return true
+            } else logger.logToChat("§cFailed to update the $commonName Repo.")
+        }
+        return false
+    }
+
+    suspend fun displayRepoStatus(joinEvent: Boolean, command: Boolean = false) {
         if (joinEvent) return onJoinStatusError()
 
         val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("$commonName Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
+            logger.logToChat("$commonName Repo working fine! Commit hash: §b$currentDownloadedCommit§r")
             reportExtraStatusInfo()
             return
         }
 
-        if (!firstError()) return
+        if (!command && isRepeatErrorOrFixed()) return
+        logger.errorToChat("$commonName Repo has errors! Commit hash: §b$currentDownloadedCommit§r")
 
-        ChatUtils.chat("$commonName Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
-        if (successfulConstants.isNotEmpty()) ChatUtils.chat(
-            "Successful Constants §7(${successfulConstants.size}):",
-            prefixColor = "§a",
-        )
-        for (constant in successfulConstants) {
-            ChatUtils.chat("   §a- §7$constant", false)
-        }
-        ChatUtils.chat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):")
-        for (constant in unsuccessfulConstants) {
-            ChatUtils.chat("   §e- §7$constant", false)
-        }
+        if (successfulConstants.isNotEmpty()) logger.logToChat("Successful Constants §7(${successfulConstants.size}):")
+        for (constant in successfulConstants) logger.logToChat("   - §7$constant")
+
+        logger.logToChat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):", color = "§e")
+        for (constant in unsuccessfulConstants) logger.logToChat("   - §7$constant", color = "§e")
+
         reportExtraStatusInfo()
     }
 
-    private fun firstError(): Boolean {
-        if (latestError.passedSince() < 5.minutes) return false
-        if (!config.repoAutoUpdate) return false
-
-        latestError = SimpleTimeMark.now()
-        ChatUtils.chat("[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Trying to auto fix it for you...")
-        updateRepo(forceReset = true)
-        return true
-    }
-
-    private fun onJoinStatusError() {
-        if (unsuccessfulConstants.isEmpty()) return
-
-        if (!firstError()) return
-
-        val text = mutableListOf<IChatComponent>()
-        text.add(
-            (
-                "§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Some features may not work. " +
-                    "Please report this error on the Discord!"
-                ).asComponent(),
-        )
-        text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
-        text.add("§7Backup Repo Value: §c$isUsingBackup".asComponent())
-        text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
-        text.add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):".asComponent())
-
-        for (constant in unsuccessfulConstants) {
-            text.add("   §e- §7$constant".asComponent())
-        }
+    private suspend fun onJoinStatusError() {
+        if (unsuccessfulConstants.isEmpty() || isRepeatErrorOrFixed()) return
+        // Last sanity check, we want to make sure repo is up to date before displaying
+        val text = buildList {
+            add("§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue!")
+            add("§cSome features may not work. Please report this error on the Discord if it persists!")
+            add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}")
+            add("§7Backup Repo Value: §c$isUsingBackup")
+            if (!config.repoAutoUpdate) add("§4You have Repo Auto Update turned off, please try turning that on.")
+            add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):")
+            for (constant in unsuccessfulConstants) {
+                add("   §e- §7$constant")
+            }
+        }.map { it.asComponent() }
         TextHelper.multiline(text).send()
     }
 
@@ -309,6 +307,19 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         SUCCESS,
         SWITCHED_TO_BACKUP,
         FAILED(false),
+    }
+
+    /**
+     * Returns a [RepoComparison] object that represents the 'diff' between the local commit,
+     * and the latest commit from GitHub.
+     * May return null if the latest commit could not be fetched.
+     *
+     * @param silentError If true, will not show errors to the user.
+     */
+    private suspend fun getCommitComparison(silentError: Boolean): RepoComparison? {
+        localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
+        val latestRepoCommit = githubRepoLocation.getLatestCommit(silentError) ?: return null
+        return RepoComparison(localRepoCommit, latestRepoCommit)
     }
 
     /**
@@ -331,23 +342,19 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         forceReset: Boolean = false,
         switchToBackupOnFail: Boolean = true,
     ): FetchUnpackResult = repoMutex.withLock {
-        localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
-
-        val latestRepoCommit = githubRepoLocation.getLatestCommit(silentError) ?: run {
+        val comparison = getCommitComparison(silentError) ?: run {
             return if (switchToBackupOnFail) switchToBackupRepo()
             else FetchUnpackResult.FAILED
         }
-
-        val diffCheck = RepoComparison(localRepoCommit, latestRepoCommit)
-        if (diffCheck.hashesMatch && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
+        if (comparison.hashesMatch && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
             if (command) {
-                diffCheck.reportRepoUpToDate()
+                comparison.reportRepoUpToDate()
                 shouldManuallyReload = false
             }
             return FetchUnpackResult.SUCCESS
         } else if (command) {
-            if (!diffCheck.hashesMatch) diffCheck.reportRepoOutdated()
-            else if (forceReset) diffCheck.reportForceRebuild()
+            if (!comparison.hashesMatch) comparison.reportRepoOutdated()
+            else if (forceReset) comparison.reportForceRebuild()
         }
 
         prepCleanRepoFileSystem()
@@ -365,7 +372,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             else FetchUnpackResult.FAILED
         }
 
-        commitStorage.writeToFile(latestRepoCommit)
+        commitStorage.writeToFile(comparison.latest)
         isUsingBackup = false
         return FetchUnpackResult.SUCCESS
     }
@@ -404,9 +411,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         // the MemoryRepoFileSystem for the event, and writing to disk after the event.
         repoFileSystem = repoFileSystem.transitionAfterReload()
 
-        if (answerMessage.isNotEmpty() && !loadingError) {
-            ChatUtils.chat("§a$answerMessage")
-        } else if (loadingError) {
+        if (answerMessage.isNotEmpty() && !loadingError) logger.logToChat("§a$answerMessage")
+        else if (loadingError) {
             ChatUtils.clickableChat(
                 "Error with the $commonShortName Repo detected, try /$updateCommand to fix it!",
                 onClick = ::updateRepo,
