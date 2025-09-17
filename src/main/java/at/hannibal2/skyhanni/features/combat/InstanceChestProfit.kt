@@ -40,7 +40,7 @@ object InstanceChestProfit {
      */
     private val attributeShardPattern by patternGroup.pattern(
         "attributeshard",
-        "§.(?<name>\\w+ Shard) §.x(?<count>\\d+)",
+        "§.(?<name>.+ Shard) §.x(?<count>\\d+)",
     )
 
     /**
