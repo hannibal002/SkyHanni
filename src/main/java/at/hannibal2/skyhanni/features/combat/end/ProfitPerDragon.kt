@@ -28,7 +28,7 @@ object ProfitPerDragon {
     private fun scanForLoot() {
         val entities = EntityUtils.getEntities<EntityArmorStand>()
 
-        scannedLootUUIDs.removeIf { uuid -> entities.none { it.uniqueID == uuid} }
+        scannedLootUUIDs.removeIf { uuid -> entities.none { it.uniqueID == uuid } }
 
         for (entity in entities) {
             val entityName = entity.name
