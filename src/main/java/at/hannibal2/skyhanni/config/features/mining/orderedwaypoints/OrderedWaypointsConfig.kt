@@ -77,6 +77,11 @@ class OrderedWaypointsConfig {
     var showDistance: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Show Name", desc = "Whether the name for ordered waypoints should be shown.")
+    @ConfigEditorBoolean
+    var showName: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Setup Mode", desc = "Setup mode for route clearing.")
     @ConfigEditorBoolean
     var setupMode: Boolean = false

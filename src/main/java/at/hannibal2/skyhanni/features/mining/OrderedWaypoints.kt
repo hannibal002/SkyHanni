@@ -63,9 +63,7 @@ object OrderedWaypoints {
             if (config.fillBlock) drawFilledSelf(waypointColor)
             else drawEdgesSelf(waypointColor, config.blockOutlineThickness.toInt())
 
-            val inHighlightRange = waypointNumber in 0..configNext
-            if (config.setupMode || config.showAll || inHighlightRange) drawName()
-
+            if (shouldRenderName(waypointNumber)) drawName()
             if (config.showDistance) drawDistanceTo()
         }
     }
@@ -188,6 +186,9 @@ object OrderedWaypoints {
             }
         }
     }
+
+    private fun shouldRenderName(waypointIndex: Int) =
+        config.showName && (config.setupMode || config.showAll || waypointIndex in 0..(1 + config.nextCount))
 
     private fun getRouteNames() = profileStorage?.routes?.keys.orEmpty()
 
