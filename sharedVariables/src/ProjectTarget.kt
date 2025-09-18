@@ -66,7 +66,7 @@ enum class ProjectTarget(
     MODERN_12109(
         "1.21.9",
         MinecraftVersion.MC12109,
-        yarn("1.21.9-pre1+build.2"),
+        yarn("1.21.9-pre1+build.8"),
         MappingStyle.YARN,
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.17.2",
         fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.133.7+1.21.9",
