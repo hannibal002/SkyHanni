@@ -108,7 +108,7 @@ object GardenPlotApi {
      * REGEX-TEST: Spray: §r§aHoney Jar §r§7(53s)
      */
     private val plotSprayedTablistPattern by patternGroup.pattern(
-        "tablist.spray",
+        "tablist.spraytime",
         "Spray: §r§[7a](?<spray>[\\w\\s]+)(?:§r§7\\((?<time>.*)\\))?",
     )
     var plots = listOf<Plot>()
