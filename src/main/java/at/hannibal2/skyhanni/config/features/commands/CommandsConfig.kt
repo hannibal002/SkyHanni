@@ -59,6 +59,15 @@ class CommandsConfig {
     @FeatureToggle
     var shortenWarp: Boolean = false
 
+    @ConfigOption(
+        name = "Shorten §e/call",
+        desc = "Allows calling without the need for the §ecall §7prefix.\n(§e/call maddox §7-> §e/maddox§7)",
+    )
+    @Expose
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var shortenCall: Boolean = false
+
     @Expose
     @ConfigOption(name = "Replace §e/warp is", desc = "Add §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
     @ConfigEditorBoolean

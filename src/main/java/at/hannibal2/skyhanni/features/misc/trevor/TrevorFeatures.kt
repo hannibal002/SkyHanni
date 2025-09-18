@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -96,6 +97,10 @@ object TrevorFeatures {
         "clickoption",
         "Click an option: §r§a§l\\[YES]§r§7 - §r§c§l\\[NO]",
     )
+    private val rewardedWithPelts by patternGroup.pattern(
+        "rewarded",
+        "Killing the animal rewarded you (?<peltCount>.*) pelts.",
+    )
     private val areaTrappersDenPattern by patternGroup.pattern(
         "area.trappersden",
         "Trapper's Den",
@@ -139,7 +144,8 @@ object TrevorFeatures {
                 lastTitle = TitleManager.sendTitle("§2Mob Died")
                 SoundUtils.playBeepSound()
             }
-            trapperReady = true
+//             trapperReady = true
+            questActive = false
             TrevorSolver.mobLocation = TrapperMobArea.NONE
             if (timeUntilNextReady <= 0) {
                 currentStatus = TrapperStatus.READY
@@ -149,6 +155,7 @@ object TrevorFeatures {
                 currentLabel = if (timeUntilNextReady == 1) "§31 second left" else "§3$timeUntilNextReady seconds left"
             }
             TrevorSolver.mobLocation = TrapperMobArea.NONE
+            updateTrapper()
         }
 
         trapperPattern.matchMatcher(formattedMessage) {
@@ -174,6 +181,11 @@ object TrevorFeatures {
         }
 
         outOfTimePattern.matchMatcher(formattedMessage) {
+            resetTrapper()
+        }
+
+        rewardedWithPelts.matchMatcher(formattedMessage) {
+            // this could also be used for calculating pelts
             resetTrapper()
         }
 
@@ -306,14 +318,55 @@ object TrevorFeatures {
                 lastChatPromptTime = SimpleTimeMark.farPast()
                 HypixelCommands.chatPrompt(lastChatPrompt)
                 lastChatPrompt = ""
-                timeLastWarped = SimpleTimeMark.now()
+//                 timeLastWarped = SimpleTimeMark.now()
                 return
             }
         }
 
-        if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds) {
-            HypixelCommands.warp("trapper")
-            timeLastWarped = SimpleTimeMark.now()
+        if (timeLastWarped.passedSince() < 3.seconds) {
+            return // cooldown!
+        }
+
+        if (questActive && config.warpToClosest) {
+            val mobLocation = TrevorSolver.mobLocation
+            val mobCoordinates = mobLocation.coordinates
+
+            val trapperCoordinates = LorenzVec(281.5, 104.0, -547.5) // TODO
+            val desertCoordinates = LorenzVec(160.5, 77.0, -370.5)
+
+            val currentDistanceSqToMob = mobCoordinates.distanceSqToPlayer()
+            var warpTarget: String? = null
+            var bestDistanceSq = currentDistanceSqToMob
+
+            // Check if warping to X is a better option
+            // SETTLEMENT, OASIS and GORGE filters because you may be close, but mob is underground
+            // A better way to do this would be real pathfinding and time-spent-on-turns estimation
+
+            if (mobLocation == TrapperMobArea.GORGE) {
+                val distSqFromTrapper = trapperCoordinates.distanceSq(mobCoordinates)
+                if (distSqFromTrapper < bestDistanceSq) {
+                    bestDistanceSq = distSqFromTrapper
+                    warpTarget = "trapper"
+                }
+            }
+
+            if (mobLocation == TrapperMobArea.SETTLEMENT || mobLocation == TrapperMobArea.OASIS) {
+                val distSqFromDesert = desertCoordinates.distanceSq(mobCoordinates)
+                if (distSqFromDesert < bestDistanceSq) {
+                    bestDistanceSq = distSqFromDesert
+                    warpTarget = "desert"
+                }
+            }
+
+            if (warpTarget != null) {
+                HypixelCommands.warp(warpTarget)
+                timeLastWarped = SimpleTimeMark.now()
+            }
+        } else { // with no quest, maybe you want to warp to Trapper
+            if (config.warpToTrapper) {
+                HypixelCommands.warp("trapper")
+                timeLastWarped = SimpleTimeMark.now()
+            }
         }
     }
 

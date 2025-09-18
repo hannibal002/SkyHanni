@@ -93,12 +93,32 @@ class TrevorTheTrapperConfig {
 
     @Expose
     @ConfigOption(
+        name = "Warp to closest area",
+        desc = "When the mob is in the Desert Settlement or Oasis, the keybind will warp you to the desert.\n" +
+            "When mob is in Mushroom Gorge, keybind will warp you to the trapper.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var warpToClosest = false
+
+    @Expose
+    @ConfigOption(
         name = "Accept Trapper Quest",
         desc = "Click this key after the chat prompt to accept Trevor's quest."
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var acceptQuest: Boolean = false
+
+//     @Expose
+//     @ConfigOption(
+//         name = "Prevent warping to Trapper with active Quest)",
+//         desc = "Prevents accidental warp missclicks when Trapper Quest is active. Now you can spam Warp button!"
+//     )
+//     @ConfigEditorBoolean
+//     @FeatureToggle
+//     var preventMissclickWarp: Boolean = true
+
 
     @Expose
     @ConfigOption(
