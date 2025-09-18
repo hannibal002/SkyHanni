@@ -40,12 +40,12 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.average
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -64,7 +64,7 @@ object PestSpawnTimer {
 
     private val pestCooldownPattern by patternGroup.pattern(
         "cooldown",
-        "\\sCooldown: §r§.(?:§.)?(?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
+        "\\sCooldown: §r§.(?:§.)?(?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
     )
 
     private val pestSpawnTimes: MutableList<Duration> = mutableListOf()
@@ -85,31 +85,25 @@ object PestSpawnTimer {
         if (!event.isWidget(TabWidget.PESTS)) return
 
         pestCooldownPattern.firstMatcher(event.widget.lines) {
-            val minutes = groupOrNull("minutes")?.formatInt()
-            val seconds = groupOrNull("seconds")?.formatInt()
+            val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")
 
             if (ready || maxPests) {
+                pestCooldownEndTime = SimpleTimeMark.farPast()
                 shouldRepeatWarning = false
                 return
             }
-            if (minutes == null && seconds == null) return
+            if (time == null) return
+            pestCooldownEndTime = if (config.customCooldown.get()) {
+                lastPestSpawnTime + config.customCooldownTime.get().seconds
+            } else {
+                time
+            }
 
-            val tablistCooldownEnd = SimpleTimeMark.now() + (minutes?.minutes ?: 0.seconds) + (seconds?.seconds ?: 0.seconds)
-
-            if (shouldSetCooldown(tablistCooldownEnd, seconds)) {
-                // hypixel sometimes rounds time down, we'll assume times are rounded down if seconds are null and add a minute
-                pestCooldownEndTime = when {
-                    config.customCooldown.get() -> lastPestSpawnTime + config.customCooldownTime.get().seconds
-                    seconds == null -> tablistCooldownEnd + 1.minutes
-                    else -> tablistCooldownEnd
-                }
-
-                if (pestSpawned) {
-                    hasWarned = false
-                    pestSpawned = false
-                }
+            if (pestSpawned) {
+                hasWarned = false
+                pestSpawned = false
             }
         }
     }
@@ -207,16 +201,6 @@ object PestSpawnTimer {
 
     private fun setCustomCooldown() {
         if (config.customCooldown.get()) pestCooldownEndTime = lastPestSpawnTime + config.customCooldownTime.get().seconds
-    }
-
-    private fun shouldSetCooldown(tabCooldownEnd: SimpleTimeMark, seconds: Int?): Boolean {
-        // tablist can have up to 6 seconds of delay, besides this, there is no scenario where tablist will overestimate cooldown
-        if (tabCooldownEnd > ((pestCooldownEndTime) + 6.seconds)) return true
-        // tablist sometimes rounds down to nearest min
-        if ((tabCooldownEnd + 1.minutes) < (pestCooldownEndTime) && seconds == null) return true
-        // tablist shouldn't underestimate if it is displaying seconds
-        if ((tabCooldownEnd + 1.seconds) < (pestCooldownEndTime) && seconds != null) return true
-        return false
     }
 
     private fun drawDisplay(): List<Renderable> {

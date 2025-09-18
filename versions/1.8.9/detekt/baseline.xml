@@ -93,10 +93,10 @@
     <ID>RepoPatternRegexTestMissing:CroesusChestTracker.kt$CroesusChestTracker$by patternGroup.pattern("chest.state.opened", "§8Opened Chest:.*")</ID>
     <ID>RepoPatternRegexTestMissing:DianaProfitTracker.kt$DianaProfitTracker$by patternGroup.pattern( "burrow.dug", "(?:§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*", )</ID>
     <ID>RepoPatternRegexTestMissing:DianaProfitTracker.kt$DianaProfitTracker$by patternGroup.pattern( "coins", "§6§lWow! §r§eYou dug out §r§6(?&lt;coins&gt;.*) coins§r§e!", )</ID>
-    <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by melonPatternGroup.pattern( "crazyrare", "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9]\\d+x §r§[a|9]Enchanted Melon(?: Block)?§r§e!", )</ID>
-    <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by melonPatternGroup.pattern( "rare", "§9§lRARE DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon§r§e!", )</ID>
-    <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by melonPatternGroup.pattern( "rngesus", "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§9\\d+x §r§9Enchanted Melon Block§r§e!", )</ID>
-    <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by melonPatternGroup.pattern( "uncommon", "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon§r§e!", )</ID>
+    <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by melonPatternGroup.pattern( "crazyrare", "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9]\\d+x §r§[a|9]Enchanted Melon(?: Block| Slice)?§r§e!", )</ID>
+    <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by melonPatternGroup.pattern( "rare", "§9§lRARE DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon Slice§r§e!", )</ID>
+    <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by melonPatternGroup.pattern( "rngesus", "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§9\\d+x §r§9Enchanted Melon§r§e!", )</ID>
+    <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by melonPatternGroup.pattern( "uncommon", "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon Slice§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by pumpkinPatternGroup.pattern( "crazyrare", "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Pumpkin§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by pumpkinPatternGroup.pattern( "rare", "§9§lRARE DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Pumpkin§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by pumpkinPatternGroup.pattern( "rngesus", "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§[a|9]\\d+x §r§(?:aEnchanted|9Polished) Pumpkin§r§e!", )</ID>
@@ -114,7 +114,7 @@
     <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "armorabilityfortune", "§7.*§7Grants §6(?&lt;bonus&gt;.*)☘.*", )</ID>
     <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "collection", "§7You have §6\\+(?&lt;ff&gt;\\d{1,3})☘ .*", )</ID>
     <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "lotusability", "§7Piece Bonus: §6+(?&lt;bonus&gt;.*)☘", )</ID>
-    <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "tablist.cropspecific", " (?&lt;crop&gt;Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?&lt;fortune&gt;\\d+)", )</ID>
+    <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "tablist.cropspecific", " (?&lt;crop&gt;Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon Slice|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?&lt;fortune&gt;\\d+)", )</ID>
     <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "tablist.universal", " Farming Fortune: §r§6☘(?&lt;fortune&gt;\\d+)", )</ID>
     <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "tooltip.new", "^§7Farming Fortune: §a\\+(?&lt;display&gt;[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?&lt;reforge&gt;\\d+)\\))?(?: §d\\(\\+(?&lt;gemstone&gt;\\d+)\\))?\$", )</ID>
     <ID>RepoPatternRegexTestMissing:GardenCropMilestoneFix.kt$GardenCropMilestoneFix$by patternGroup.pattern( "levelup", " {2}§r§b§lGARDEN MILESTONE §3(?&lt;crop&gt;.*) §8.*➜§3(?&lt;tier&gt;.*)", )</ID>
@@ -147,7 +147,6 @@
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.petcare", "^\\[\\w+ (?&lt;level&gt;\\d+)\\] (?&lt;name&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.summon.owner", ".*Spawned by: (?&lt;name&gt;.*).*", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern("displaynpc.name", "[a-z0-9]{10}")</ID>
-    <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern("filter.slayer", "^. (?&lt;name&gt;.*) (?&lt;tier&gt;[IV]+) \\d+.*")</ID>
     <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "gaiaconstruct", ".* §r§eYou dug out a §r§2Gaia Construct§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minoschampion", ".* §r§eYou dug out a §r§2Minos Champion§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minoshunter", ".* §r§eYou dug out a §r§2Minos Hunter§r§e!", )</ID>
@@ -220,15 +219,12 @@
     <ID>ReturnCount:MobFilter.kt$MobFilter$internal fun createSkyblockEntity(baseEntity: EntityLivingBase): MobResult</ID>
     <ID>ReturnCount:MobFilter.kt$MobFilter$private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): MobResult?</ID>
     <ID>ReturnCount:MobFilter.kt$MobFilter$private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): MobResult?</ID>
-    <ID>ReturnCount:MobFinder.kt$MobFinder$private fun tryAddEntitySpider(entity: EntityLivingBase): EntityResult?</ID>
-    <ID>ReturnCount:MobFinder.kt$MobFinder$private fun tryAddRift(entity: EntityLivingBase): EntityResult?</ID>
     <ID>ReturnCount:MultiFilter.kt$MultiFilter$fun matchResult(string: String): String?</ID>
     <ID>ReturnCount:PacketTest.kt$PacketTest$private fun Packet&lt;*&gt;.print()</ID>
     <ID>ReturnCount:PowderMiningChatFilter.kt$PowderMiningChatFilter$@Suppress("CyclomaticComplexMethod") fun block(message: String): String?</ID>
     <ID>ReturnCount:PurseApi.kt$PurseApi$private fun getCause(diff: Double): PurseChangeCause</ID>
     <ID>ReturnCount:QuestLoader.kt$QuestLoader$private fun addQuest(name: String, state: QuestState, needAmount: Int): Quest</ID>
     <ID>ReturnCount:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$private suspend fun setCommand(args: Array&lt;String&gt;): String</ID>
-    <ID>SpacingAroundCurly:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$}</ID>
     <ID>SpreadOperator:ItemUtils.kt$ItemUtils$(tag, displayName, *lore.toTypedArray())</ID>
     <ID>SpreadOperator:LimboPlaytime.kt$LimboPlaytime$( itemID.getItemStack().item, ITEM_NAME, *createItemLore() )</ID>
     <ID>SpreadOperator:TextHelper.kt$TextHelper$(*component.toTypedArray(), separator = separator)</ID>
@@ -317,7 +313,6 @@
     <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var x = globalMouseX * scaledWindowWidth / displayWidth</ID>
     <ID>VarCouldBeVal:GuiScreenUtils.kt$GuiScreenUtils$var y = globalMouseY * height / displayHeight</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
-    <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt$RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>
     <ID>VarCouldBeVal:RepoPatternManager.kt$RepoPatternManager$/** * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for * checking duplicate registrations. */ private var usedKeys: NavigableMap&lt;String, CommonPatternInfo&lt;*, *&gt;&gt; = TreeMap()</ID>
     <ID>VarCouldBeVal:SkyHanniItemTracker.kt$SkyHanniItemTracker$private var scrollValue = ScrollValue()</ID>
