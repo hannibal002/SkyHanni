@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#if MC > 1.21.7
 //$$ import net.minecraft.client.input.CharInput;
+//$$ import net.minecraft.client.input.KeyInput;
 //#endif
 
 @Mixin(Keyboard.class)
