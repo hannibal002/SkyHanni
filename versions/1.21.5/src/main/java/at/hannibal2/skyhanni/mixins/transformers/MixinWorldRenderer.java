@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent;
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -12,6 +13,7 @@ import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.DefaultFramebufferSet;
 import net.minecraft.client.render.OutlineVertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.util.Handle;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Final;
@@ -29,14 +31,20 @@ public class MixinWorldRenderer {
     @Final
     private DefaultFramebufferSet framebufferSet;
 
+    //#if MC < 1.21.9
     @Inject(method = "getEntitiesToRender", at = @At(value = "HEAD"))
     public void resetRealGlowing(CallbackInfoReturnable<Boolean> cir) {
+        //#else
+        //$$ @Inject(method = "fillEntityRenderStates", at = @At(value = "HEAD"))
+        //$$ public void resetRealGlowing(CallbackInfo ci) {
+        //#endif
         RenderLivingEntityHelper.check();
         RenderEntityOutlineEvent noXrayOutlineEvent = new RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.NO_XRAY, null);
         RenderLivingEntityHelper.setCurrentGlowEvent(noXrayOutlineEvent);
         noXrayOutlineEvent.post();
     }
 
+    //#if MC < 1.21.9
     @WrapOperation(method = {"renderEntities", "getEntitiesToRender"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"))
     public boolean shouldAlsoGlow(MinecraftClient instance, Entity entity, Operation<Boolean> original) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
@@ -45,7 +53,18 @@ public class MixinWorldRenderer {
         }
         return true;
     }
+    //#else
+    //$$ @WrapOperation(method = "fillEntityRenderStates", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/state/EntityRenderState;hasOutline()Z"))
+    //$$ public boolean shouldAlsoGlow(EntityRenderState instance, Operation<Boolean> original, @Local Entity entity) {
+    //$$     Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
+    //$$     if (glowColor == null) {
+    //$$         return original.call(instance);
+    //$$     }
+    //$$     return true;
+    //$$ }
+    //#endif
 
+    //#if MC < 1.21.9
     @WrapOperation(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getTeamColorValue()I"))
     public int changeGlowColour(Entity entity, Operation<Integer> original) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
@@ -54,7 +73,10 @@ public class MixinWorldRenderer {
         }
         return glowColor;
     }
+    //#endif
 
+    // TODO need to use our own custom one on 1.21
+    //#if MC < 1.21.9
     @WrapOperation(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilderStorage;getOutlineVertexConsumers()Lnet/minecraft/client/render/OutlineVertexConsumerProvider;"))
     private OutlineVertexConsumerProvider modifyVertexConsumerProvider(BufferBuilderStorage storage, Operation<OutlineVertexConsumerProvider> original, @Local Entity entity) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
@@ -63,6 +85,7 @@ public class MixinWorldRenderer {
         }
         return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers();
     }
+    //#endif
 
     @Inject(method = "method_62214", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))
     private void setGlowDepth(CallbackInfo ci) {

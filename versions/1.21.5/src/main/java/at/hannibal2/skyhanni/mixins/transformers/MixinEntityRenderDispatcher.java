@@ -39,12 +39,12 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
         //$$ @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
         //$$ public void onRenderPre(S renderState, CameraRenderState cameraRenderState, double d, double e, double f, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, CallbackInfo ci) {
         //$$     Entity entity = this.targetedEntity;
-        //$$         if (entity instanceof LivingEntity livingEntity) {
-        //$$             // TODO confirm these are the right values for position
-        //$$             if (new SkyHanniRenderEntityEvent.Pre<>(livingEntity, d, e, f).post()) {
-        //$$                 ci.cancel();
-        //$$             }
-        //$$       }
+        //$$     if (entity instanceof LivingEntity livingEntity) {
+        //$$         // TODO confirm these are the right values for position
+        //$$         if (new SkyHanniRenderEntityEvent.Pre<>(livingEntity, d, e, f).post()) {
+        //$$             ci.cancel();
+        //$$         }
+        //$$     }
         //#endif
         EntityRenderDispatcherHookKt.setEntity(entity);
     }
@@ -62,7 +62,7 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
         //$$     if (entity instanceof LivingEntity livingEntity) {
         //$$         // TODO confirm these are the right values for position
         //$$         new SkyHanniRenderEntityEvent.Post<>(livingEntity, d, e, f).post();
-        //$$ }
+        //$$     }
         //#endif
         EntityRenderDispatcherHookKt.clearEntity();
     }
