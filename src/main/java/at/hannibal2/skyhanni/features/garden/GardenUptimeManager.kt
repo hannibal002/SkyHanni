@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -6,7 +6,8 @@ import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
+import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object GardenUptimeTracker {
+object GardenUptimeManager {
     private val config get() = GardenApi.config.trackerUptimeSettings
     private val trackerSet = setOf(ArmorDropTracker.tracker, DicerRngDropTracker.tracker, PestProfitTracker.tracker)
     private val afkTracker = Stopwatch()
