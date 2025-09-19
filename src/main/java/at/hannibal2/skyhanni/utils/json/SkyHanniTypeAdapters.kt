@@ -16,9 +16,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
-import at.hannibal2.skyhanni.utils.tracker.GardenSession
-import at.hannibal2.skyhanni.utils.tracker.NormalSession
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
+import at.hannibal2.skyhanni.utils.tracker.SessionUptimeTypeAdapter
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
@@ -83,25 +82,7 @@ object SkyHanniTypeAdapters {
         { this.toLongOrNull()?.milliseconds?.let { Stopwatch(it) } ?: error("Could not parse Stopwatch duration from '$this'") },
     )
 
-    val SESSION_UPTIME: TypeAdapter<SessionUptime> = SimpleStringTypeAdapter(
-        {
-            when (this) {
-                is SessionUptime.Normal -> "normal:${this.sessionType.name}"
-                is SessionUptime.Garden -> "garden:${this.sessionType.name}"
-            }
-        },
-        {
-            val parts = this.split(":", limit = 2)
-            if (parts.size != 2) error("Invalid SessionUptime encoding: '$this'")
-
-            val (type, value) = parts
-            when (type) {
-                "normal" -> SessionUptime.Normal(NormalSession.valueOf(value))
-                "garden" -> SessionUptime.Garden(GardenSession.valueOf(value))
-                else -> error("Unknown SessionUptime type: '$type'")
-            }
-        }
-    )
+    val SESSION_UPTIME: TypeAdapter<SessionUptime> = SessionUptimeTypeAdapter()
 
     val CROP_TYPE: TypeAdapter<CropType> = SimpleStringTypeAdapter(
         { name },

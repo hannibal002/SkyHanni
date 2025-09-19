@@ -7,7 +7,7 @@ import kotlin.time.Duration.Companion.seconds
 
 abstract class TrackerData {
     @Expose
-    private var sessionUptime: Map<SessionUptime, Stopwatch> = mapOf(
+    private val sessionUptime: Map<SessionUptime, Stopwatch> = mapOf(
         Pair(SessionUptime.Normal(NormalSession.NORMAL), Stopwatch())
     )
 
@@ -38,20 +38,4 @@ abstract class TrackerData {
 
     protected abstract fun resetData()
 }
-
-sealed class SessionUptime {
-    data class Normal(val sessionType: NormalSession) : SessionUptime()
-    data class Garden(val sessionType: GardenSession) : SessionUptime()
-}
-
-enum class NormalSession {
-    NORMAL,
-}
-
-enum class GardenSession {
-    PEST,
-    VISITOR,
-    CROP,
-}
-
 
