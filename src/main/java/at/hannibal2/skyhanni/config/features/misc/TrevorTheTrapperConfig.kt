@@ -93,6 +93,16 @@ class TrevorTheTrapperConfig {
 
     @Expose
     @ConfigOption(
+        name = "Warp to closest area",
+        desc = "Warps to /desert for Desert Settlement or Oasis mobs,\n" +
+            "or /trapper for Mushroom Gorge mobs, if closer to the mob than your current position.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var warpToClosest = false
+
+    @Expose
+    @ConfigOption(
         name = "Accept Trapper Quest",
         desc = "Click this key after the chat prompt to accept Trevor's quest."
     )
