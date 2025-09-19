@@ -55,6 +55,10 @@ object HypixelCommands {
         send("warp $warp")
     }
 
+    fun call(contact: String) {
+        send("call $contact")
+    }
+
     fun island() {
         send("is")
     }
