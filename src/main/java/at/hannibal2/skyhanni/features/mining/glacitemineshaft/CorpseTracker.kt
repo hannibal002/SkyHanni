@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
 
@@ -42,7 +43,7 @@ object CorpseTracker {
         trackerConfig = { config.perTrackerConfig }
     )
 
-    class BucketData : BucketedItemTrackerData<CorpseType>(CorpseType::class) {
+    class BucketData : BucketedItemTrackerData<CorpseType, SessionUptime.Normal>(CorpseType::class, SessionUptime.Normal::class) {
         override fun resetItems() {
             corpsesLooted = enumMapOf()
         }

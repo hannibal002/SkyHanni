@@ -43,7 +43,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 open class
-SkyHanniItemTracker<Data : ItemTrackerData>(
+SkyHanniItemTracker<Data : ItemTrackerData<*>>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
@@ -215,7 +215,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
             table[line] = cleanName
         }
 
-        val scrollValue = (data as? BucketedItemTrackerData<*>)?.selectedScrollValue ?: scrollValue
+        val scrollValue = (data as? BucketedItemTrackerData<*, *>)?.selectedScrollValue ?: scrollValue
         Renderable.searchableScrollable(
             table,
             key = 99,

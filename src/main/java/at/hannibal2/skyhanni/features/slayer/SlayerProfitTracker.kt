@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -56,7 +57,7 @@ object SlayerProfitTracker {
         "§7Took (?<coins>.+) coins from your bank for auto-slayer\\.\\.\\.",
     )
 
-    class Data : ItemTrackerData() {
+    class Data : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
 
         override fun resetItems() {
             slayerSpawnCost = 0

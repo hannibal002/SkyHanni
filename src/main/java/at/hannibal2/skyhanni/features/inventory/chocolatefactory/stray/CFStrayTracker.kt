@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonElement
@@ -147,7 +148,7 @@ object CFStrayTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData() {
+    class Data : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun resetData() {
             straysCaught.clear()
             straysExtraChocMs.clear()

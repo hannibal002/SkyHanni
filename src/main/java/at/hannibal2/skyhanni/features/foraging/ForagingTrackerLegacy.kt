@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import com.google.gson.annotations.Expose
 
 // todo move back to TreeGiftTracker when 1.8 is no longer supported
@@ -34,7 +35,7 @@ object ForagingTrackerLegacy {
         }
     }
 
-    class BucketData : BucketedItemTrackerData<TreeType>(TreeType::class) {
+    class BucketData : BucketedItemTrackerData<TreeType, SessionUptime.Normal>(TreeType::class, SessionUptime.Normal::class) {
         override fun resetItems() {
             treesCut = enumMapOf()
             wholeTreesCut = enumMapOf()

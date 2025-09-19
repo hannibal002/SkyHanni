@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import kotlin.math.absoluteValue
@@ -60,7 +61,7 @@ object ExperimentsProfitTracker {
     // Warn once per session about tracking XP bottle usage
     private var warnedAboutTracking = false
 
-    class Data : ItemTrackerData() {
+    class Data : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun resetItems() {
             experimentsDone = 0L
             xpGained = 0L

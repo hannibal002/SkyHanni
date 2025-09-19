@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
@@ -79,7 +80,7 @@ object PestProfitTracker {
 
     val DUNG_ITEM = "DUNG".toInternalName()
     private val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
-    private val tracker = SkyHanniBucketedItemTracker(
+    val tracker = SkyHanniBucketedItemTracker(
         "Pest Profit Tracker",
         { BucketData() },
         { it.garden.pestProfitTracker },
@@ -88,7 +89,7 @@ object PestProfitTracker {
     )
     private var adjustmentMap: Map<PestType, Map<NeuInternalName, Int>> = mapOf()
 
-    class BucketData : BucketedItemTrackerData<PestType>(PestType::class) {
+    class BucketData : BucketedItemTrackerData<PestType, SessionUptime.Garden>(PestType::class, SessionUptime.Garden::class) {
         override fun resetItems() {
             @Suppress("DEPRECATION")
             totalPestsKills = 0L

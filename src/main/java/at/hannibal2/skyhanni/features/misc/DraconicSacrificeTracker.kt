@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
@@ -63,7 +64,7 @@ object DraconicSacrificeTracker {
     private val altarArea = AxisAlignedBB(-601.0, 4.0, -282.0, -586.0, 15.0, -269.0)
     private val ESSENCE_DRAGON = "ESSENCE_DRAGON".toInternalName()
 
-    class Data : ItemTrackerData() {
+    class Data : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun resetItems() {
             sacrificedItemsMap.clear()
             itemsSacrificed = 0

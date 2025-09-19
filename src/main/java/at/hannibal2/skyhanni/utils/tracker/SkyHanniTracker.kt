@@ -39,7 +39,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
-open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTrackerConfig<*>>(
+open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrackerConfig<*>>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
@@ -195,7 +195,7 @@ open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTracker
         update()
     }
 
-    private fun pauseSessionUptime() {
+    fun pauseSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.pause(true) }
@@ -203,7 +203,7 @@ open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTracker
         update()
     }
 
-    private fun swapActiveSession(session: SessionUptime) {
+    fun swapActiveSession(session: SessionUptime) {
         if (!this.customUptimeControl) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.setActiveStopwatch(session) }
@@ -310,7 +310,7 @@ open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTracker
         )
     }
 
-    inner class SharedTracker<Data : TrackerData>(
+    inner class SharedTracker<Data : TrackerData<*>>(
         private val entries: Map<DisplayMode, Data>,
     ) {
 

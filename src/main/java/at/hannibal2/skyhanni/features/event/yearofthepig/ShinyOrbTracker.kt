@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
 import com.google.gson.annotations.Expose
@@ -46,7 +47,7 @@ object ShinyOrbTracker {
         ) { config.enabled && IslandType.HUB.isCurrent() && passesHoldingItem() && PigFeaturesApi.isYearOfThePig() }
     }
 
-    class ShinyOrbData : ItemTrackerData() {
+    class ShinyOrbData : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
 
         override fun resetItems() {
             orbsUsed = 0L

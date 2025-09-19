@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 
 @Suppress("SpreadOperator")
-class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTrackerData<E>>(
+class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTrackerData<E, *>>(
     name: String,
     createNewSession: () -> BucketedData,
     getStorage: (ProfileSpecificStorage) -> BucketedData,

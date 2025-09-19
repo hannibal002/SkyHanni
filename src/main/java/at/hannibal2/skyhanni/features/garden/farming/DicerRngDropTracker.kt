@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -34,7 +35,7 @@ object DicerRngDropTracker {
 
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = GardenApi.config.dicerRngDropTracker
-    private val tracker = SkyHanniTracker(
+    val tracker = SkyHanniTracker(
         "Dicer RNG Drop Tracker",
         { Data() },
         { it.garden.dicerDropTracker },
@@ -43,7 +44,7 @@ object DicerRngDropTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData() {
+    class Data : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class) {
 
         override fun resetData() {
             drops.clear()

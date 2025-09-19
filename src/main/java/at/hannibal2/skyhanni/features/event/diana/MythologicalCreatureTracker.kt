@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -69,7 +70,7 @@ object MythologicalCreatureTracker {
         trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
-    class Data : TrackerData() {
+    class Data : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
 
         override fun resetData() {
             count.clear()

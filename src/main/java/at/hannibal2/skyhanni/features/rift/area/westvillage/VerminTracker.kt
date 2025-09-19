@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -81,7 +82,7 @@ object VerminTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData() {
+    class Data : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
 
         override fun resetData() {
             count.clear()

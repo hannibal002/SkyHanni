@@ -23,6 +23,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.NormalSession
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
 import java.util.EnumMap
@@ -42,7 +44,7 @@ object DragonProfitTracker {
         trackerConfig = { config.perTrackerConfig }
     )
 
-    class BucketData : BucketedItemTrackerData<DragonType>(DragonType::class) {
+    class BucketData : BucketedItemTrackerData<DragonType, SessionUptime.Normal>(DragonType::class, SessionUptime.Normal::class) {
         override fun getCoinName(bucket: DragonType?, item: TrackedItem) = "<no coins>"
         override fun getCoinDescription(bucket: DragonType?, item: TrackedItem): List<String> = listOf("<no coins>")
 
