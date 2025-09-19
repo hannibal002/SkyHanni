@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.event.yearofthepig
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -19,6 +21,14 @@ class ShinyOrbTrackerConfig {
     @ConfigOption(name = "Only Holding Items", desc = "Only show the tracker while holding a Shiny Orb or Shiny Rod.")
     @ConfigEditorBoolean
     var holdingItems: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Tracker Settings",
+        desc = ""
+    )
+    @Accordion
+    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     @Expose
     @ConfigLink(owner = ShinyOrbTrackerConfig::class, field = "enabled")

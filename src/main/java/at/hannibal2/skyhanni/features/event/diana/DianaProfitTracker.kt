@@ -60,7 +60,9 @@ object DianaProfitTracker {
                 )
             },
         ),
-    ) { drawDisplay(it) }
+        drawDisplay = { drawDisplay(it) },
+        trackerConfig = { config.perTrackerConfig }
+    )
 
     class Data : ItemTrackerData() {
 

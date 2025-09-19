@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.event.winter
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -81,6 +83,14 @@ class FrozenTreasureConfig {
     @ConfigOption(name = "Hide Chat Messages", desc = "Hide the chat messages from Frozen Treasures.")
     @ConfigEditorBoolean
     var hideMessages: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Tracker Settings",
+        desc = ""
+    )
+    @Accordion
+    val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 
     @Expose
     @ConfigLink(owner = FrozenTreasureConfig::class, field = "enabled")

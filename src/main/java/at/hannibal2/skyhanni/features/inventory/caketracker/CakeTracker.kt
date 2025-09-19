@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -38,7 +39,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButt
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.inventory.ContainerChest
 import org.lwjgl.input.Keyboard.KEY_DOWN
@@ -296,7 +296,7 @@ object CakeTracker {
     private fun getCakePrice(year: Int): Double {
         return cakePriceCache.getOrPut(year) {
             val cakeItem = "NEW_YEAR_CAKE+$year".toInternalName()
-            SkyHanniTracker.getPricePer(cakeItem)
+            cakeItem.getPrice(SkyHanniMod.feature.misc.tracker.priceSource)
         }
     }
 

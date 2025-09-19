@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -40,6 +39,7 @@ object CorpseTracker {
         { BucketData() },
         { it.mining.mineshaft.corpseProfitTracker },
         { drawDisplay(it) },
+        trackerConfig = { config.perTrackerConfig }
     )
 
     class BucketData : BucketedItemTrackerData<CorpseType>(CorpseType::class) {
@@ -113,7 +113,7 @@ object CorpseTracker {
             applicableKeys.forEach { keyData ->
                 keyData.key?.let { key ->
                     val keyName = key.repoItemName
-                    val price = SkyHanniTracker.getPricePer(key)
+                    val price = tracker.getPricePer(key)
                     val count = bucketData.corpsesLooted[keyData] ?: 0
                     val totalPrice = price * count
                     if (totalPrice > 0) {

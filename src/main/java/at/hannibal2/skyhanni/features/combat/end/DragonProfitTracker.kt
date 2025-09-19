@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import java.util.EnumMap
 
@@ -40,6 +39,7 @@ object DragonProfitTracker {
         { BucketData() },
         { it.dragonProfitTracker },
         { drawDisplay(it) },
+        trackerConfig = { config.perTrackerConfig }
     )
 
     class BucketData : BucketedItemTrackerData<DragonType>(DragonType::class) {
@@ -89,7 +89,7 @@ object DragonProfitTracker {
 
         var profit = tracker.drawItems(bucketData, { true }, this)
 
-        val eyePrice = SkyHanniTracker.getPricePer(SUMMONING_EYE)
+        val eyePrice = tracker.getPricePer(SUMMONING_EYE)
         val totalEyePrice = eyePrice * bucketData.eyesPlaced
         profit -= totalEyePrice
         val eyeFormat = "§7${bucketData.eyesPlaced}x §5Summoning Eye §c${(-totalEyePrice).shortFormat()}"
@@ -150,7 +150,7 @@ object DragonProfitTracker {
         val lootMap = mutableMapOf<String, Double>()
         var totalProfit = 0.0
         items.forEach { (internalName, amount) ->
-            SkyHanniTracker.getPricePer(internalName).takeIf { price: Double -> price != -1.0 }?.let { pricePer: Double ->
+            tracker.getPricePer(internalName).takeIf { price: Double -> price != -1.0 }?.let { pricePer: Double ->
                 val profit: Double = amount * pricePer
                 val nameFormat = internalName.repoItemName
                 val text = "§eFound $nameFormat §8${amount}x §7(§6${profit.shortFormat()}§7)"
@@ -160,7 +160,7 @@ object DragonProfitTracker {
         }
 
 
-        val eyePrice = SkyHanniTracker.getPricePer(SUMMONING_EYE)
+        val eyePrice = tracker.getPricePer(SUMMONING_EYE)
         totalProfit -= eyePrice * lastPlaced
 
         val hover = lootMap.sortedDesc().keys.toMutableList()
