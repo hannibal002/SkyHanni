@@ -85,7 +85,7 @@ object DragonProfitTracker {
         addSearchString("§b§lDragon Profit Tracker")
         tracker.addBucketSelector(this, bucketData, "Dragon Type")
 
-        val duration = bucketData.sessionUptime.getDuration()
+        val duration = bucketData.getTotalUptime()
 
         var profit = tracker.drawItems(bucketData, { true }, this)
 

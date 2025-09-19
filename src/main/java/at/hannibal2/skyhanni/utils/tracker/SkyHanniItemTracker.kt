@@ -296,9 +296,12 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
             }
         )
         val profitPerHourRenderable =
-            if (config.profitPerHour.get()) profitPerHourRenderable(profit, duration) else Renderable.empty()
+            if (shouldShowProfitPerHour()) profitPerHourRenderable(profit, duration) else Renderable.empty()
         return listOf(profitRenderable.toSearchable(), profitPerHourRenderable.toSearchable())
     }
+
+    private fun shouldShowProfitPerHour() =
+        config.profitPerHour.get() && !(getDisplayMode() == DisplayMode.TOTAL && config.onlyShowSession.get())
 
     private fun profitPerHourRenderable(profit: Double, duration: Duration): Renderable {
         if (duration == 0.seconds) return Renderable.empty()

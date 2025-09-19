@@ -264,7 +264,7 @@ object PestProfitTracker {
             )
         }
 
-        val duration = bucketData.sessionUptime.getDuration()
+        val duration = bucketData.getTotalUptime()
         addAll(tracker.addTotalProfit(profit, bucketData.getTotalPestCount(), "kill", duration, "Kills"))
 
         tracker.addPriceFromButton(this)

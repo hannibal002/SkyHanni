@@ -213,7 +213,7 @@ object SlayerProfitTracker {
             ).toSearchable(),
         )
 
-        val duration = data.sessionUptime.getDuration()
+        val duration = data.getTotalUptime()
         addAll(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss", duration, "Bosses"))
 
         tracker.addPriceFromButton(this)
