@@ -219,7 +219,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         val pausedText = if (getCurrentStopwatch()?.isPaused() == true) " §c(Paused!)" else ""
         val sessionList: List<String> = buildList {
             getDisplayModeTracker()?.getSessionMap()?.entries?.forEach {
-                if(it.value.getDuration() > 0.seconds) add("${it.key} Uptime: ${it.value.getDuration().format()}")
+                if (it.value.getDuration() > 0.seconds) add("${it.key} Uptime: ${it.value.getDuration().format()}")
             }
         }
 
