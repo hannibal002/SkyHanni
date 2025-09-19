@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
@@ -183,11 +184,13 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
-    fun getTotalUptime(): Duration? = displayMode?.let { getSharedTracker()?.get(it)?.getTotalUptime() }
+    private fun getDisplayModeTracker(dispMode: DisplayMode? = displayMode) = dispMode?.let { getSharedTracker()?.get(it) }
 
-    open fun getCurrentStopwatch(): Stopwatch? = displayMode?.let { getSharedTracker()?.get(it)?.getActiveStopwatch() }
+    fun getTotalUptime(): Duration? = getDisplayModeTracker()?.getTotalUptime()
 
-    private fun startSessionUptime() {
+    fun getCurrentStopwatch(): Stopwatch? = getDisplayModeTracker()?.getActiveStopwatch()
+
+    fun startSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.start(true) }
@@ -203,10 +206,10 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
-    fun swapActiveSession(session: SessionUptime) {
+    fun swapActiveSession(session: SessionUptime, swapExtraTime: Boolean = true) {
         if (!this.customUptimeControl) return
         val sharedTracker = getSharedTracker() ?: return
-        sharedTracker.modify { it.setActiveStopwatch(session) }
+        sharedTracker.modify { it.setActiveStopwatch(session, swapExtraTime) }
         update()
     }
 
@@ -214,18 +217,25 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         val sessionUptime = getTotalUptime() ?: return Renderable.empty()
         val isTotalDisplay = displayMode == DisplayMode.TOTAL
         val pausedText = if (getCurrentStopwatch()?.isPaused() == true) " §c(Paused!)" else ""
-        // Uptime added after trackers already had data
-        return if (isTotalDisplay) {
-            Renderable.hoverTips(
-                Renderable.text("§eTotal Uptime: §b${sessionUptime.format()}$pausedText"),
-                tips = listOf(
-                    "§eⓘ §7Uptime tracked only from",
-                    "§7SkyHanni version 6.0.0 onwards",
-                )
-            )
-        } else {
-            Renderable.text("§eSession Uptime: §b${sessionUptime.format()}$pausedText")
+        val sessionList: List<String> = buildList {
+            getDisplayModeTracker()?.getSessionMap()?.entries?.forEach {
+                add("${it.key} Uptime: ${it.value.getDuration().format()}")
+            }
         }
+
+        return Renderable.hoverTips(
+                Renderable.text("§eTotal Uptime: §b${sessionUptime.format()}$pausedText"),
+                tips = buildList {
+                    addAll(sessionList)
+                    if (isTotalDisplay) {
+                        // Uptime added after trackers already had data
+                        addAll(
+                            "§eⓘ §7Uptime tracked only from",
+                            "§7SkyHanni version 6.0.0 onwards",
+                        )
+                    }
+                }
+            )
     }
 
     private fun buildSessionResetButton() = Renderable.clickable(

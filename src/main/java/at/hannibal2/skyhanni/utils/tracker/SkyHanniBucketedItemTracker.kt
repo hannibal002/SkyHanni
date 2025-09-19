@@ -17,12 +17,14 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
     getStorage: (ProfileSpecificStorage) -> BucketedData,
     drawDisplay: (BucketedData) -> List<Searchable>,
     extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> BucketedData> = emptyMap(),
-    trackerConfig: () -> IndividualItemTrackerConfig
+    trackerConfig: () -> IndividualItemTrackerConfig,
+    customUptimeControl: Boolean = false
 ) : SkyHanniItemTracker<BucketedData>(
     name,
     createNewSession,
     getStorage,
     extraDisplayModes,
+    customUptimeControl = customUptimeControl,
     drawDisplay = drawDisplay,
     trackerConfig = { trackerConfig() },
 ) {

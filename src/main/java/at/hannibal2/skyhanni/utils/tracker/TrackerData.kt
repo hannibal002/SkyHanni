@@ -16,8 +16,8 @@ abstract class TrackerData<T : SessionUptime>(
 
     init {
         addSessionUptime()
-        activeSession = sessionUptime.keys.firstOrNull()
     }
+
     private fun addSessionUptime() {
         when (uptimeClass) {
             SessionUptime.Normal::class -> {
@@ -34,15 +34,23 @@ abstract class TrackerData<T : SessionUptime>(
         }
     }
 
-    fun getActiveStopwatch(): Stopwatch? = activeSession?.let { sessionUptime[it] }
+    fun getSessionMap() = sessionUptime.toMap()
 
-    fun setActiveStopwatch(session: SessionUptime) {
-        if (session != activeSession) {
-            val duration = sessionUptime[activeSession]?.pause(revertLap = true)
-            activeSession = session
-            sessionUptime[activeSession]?.add(duration ?: 0.seconds)
+    fun getActiveStopwatch(): Stopwatch? {
+        val active = activeSession
+        return active?.let { sessionUptime.getOrPut(active) { Stopwatch() } } ?: run {
+            activeSession = sessionUptime.keys.firstOrNull()
+            sessionUptime.getOrPut(activeSession ?: return null) { Stopwatch() }
         }
-        sessionUptime[activeSession]?.start(true)
+    }
+
+    fun setActiveStopwatch(session: SessionUptime, swapExtraTime: Boolean) {
+        if (session != activeSession) {
+            val duration = getActiveStopwatch()?.pause(revertLap = swapExtraTime)
+            activeSession = session
+            if(swapExtraTime) getActiveStopwatch()?.add(duration ?: 0.seconds)
+        }
+        getActiveStopwatch()?.start(true)
     }
 
     open fun getTotalUptime(): Duration =

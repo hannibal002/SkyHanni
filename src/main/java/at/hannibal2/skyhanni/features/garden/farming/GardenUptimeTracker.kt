@@ -21,7 +21,10 @@ object GardenUptimeTracker {
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
-        if ((afkTracker.getLapTime() ?: INFINITE) >= 15.seconds) {
+        if (!afkTracker.isPaused()) {
+            trackerSet.forEach { it.update() }
+        }
+        if ((afkTracker.getLapTime() ?: return) >= 15.seconds) {
             trackerSet.forEach { it.pauseSessionUptime() }
             afkTracker.pause()
         }
@@ -29,7 +32,8 @@ object GardenUptimeTracker {
 
     @HandleEvent
     fun onCropBreak(event: CropClickEvent) {
-        trackerSet.forEach { it.swapActiveSession(SessionUptime.Garden(GardenSession.CROP)) }
+        // we do not want this tracker to be greedy, and exclude visitor/pest downtime whenever possible
+        trackerSet.forEach { it.swapActiveSession(SessionUptime.Garden(GardenSession.CROP), false) }
         afkTracker.start(true)
     }
 

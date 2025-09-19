@@ -49,12 +49,14 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
     getStorage: (ProfileSpecificStorage) -> Data,
     extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     trackerConfig: () -> IndividualItemTrackerConfig,
-    drawDisplay: (Data) -> List<Searchable>
+    customUptimeControl: Boolean = false,
+    drawDisplay: (Data) -> List<Searchable>,
 ) : SkyHanniTracker<Data, IndividualItemTrackerConfig>(
     name,
     createNewSession,
     getStorage,
     extraDisplayModes,
+    customUptimeControl = customUptimeControl,
     drawDisplay = drawDisplay,
     trackerConfig = { trackerConfig() }
 ) {

@@ -39,7 +39,8 @@ object DicerRngDropTracker {
         "Dicer RNG Drop Tracker",
         { Data() },
         { it.garden.dicerDropTracker },
-        trackerConfig = { config.perTrackerConfig }
+        trackerConfig = { config.perTrackerConfig },
+        customUptimeControl = true
     ) {
         drawDisplay(it)
     }

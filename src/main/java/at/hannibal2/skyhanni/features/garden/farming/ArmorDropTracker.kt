@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
+import kotlin.math.truncate
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -52,8 +53,8 @@ object ArmorDropTracker {
         "Armor Drop Tracker",
         { Data() },
         { it.garden.armorDropTracker },
-        trackerConfig = { config.perTrackerConfig }
-
+        trackerConfig = { config.perTrackerConfig },
+        customUptimeControl = true
     ) {
         drawDisplay(it)
     }
