@@ -394,7 +394,11 @@ object ItemUtils {
         //$$ val stack = ItemStack(Items.PLAYER_HEAD)
         //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo")
         //$$ profile.properties.put("textures", Property("textures", value))
+        //#if MC < 1.21.9
         //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent(profile))
+        //#else
+        //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent.ofStatic(profile))
+        //#endif
         //$$ stack.setCustomItemName(displayName)
         //$$ stack.setLore(lore.toList())
         //$$ return stack

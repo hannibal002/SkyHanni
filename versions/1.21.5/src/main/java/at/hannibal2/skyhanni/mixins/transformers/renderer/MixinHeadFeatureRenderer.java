@@ -11,8 +11,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 //#if MC > 1.21.7
-//$$ import net.minecraft.client.render.entity.command.EntityRenderCommandQueue;
-//$$ import net.minecraft.client.render.entity.state.EntityRenderState;
+//$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 //#endif
 
 @Mixin(HeadFeatureRenderer.class)
@@ -22,8 +21,8 @@ public class MixinHeadFeatureRenderer {
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/state/LivingEntityRenderState;FF)V", at = @At("HEAD"), cancellable = true)
     private void onRenderArmor(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, LivingEntityRenderState renderState, float f, float g, CallbackInfo ci) {
         //#else
-        //$$ @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/entity/command/EntityRenderCommandQueue;ILnet/minecraft/client/render/entity/state/EntityRenderState;FF)V", at = @At("HEAD"), cancellable = true)
-        //$$ private void onRenderArmor(MatrixStack matrices, EntityRenderCommandQueue queue, int light, EntityRenderState state, float limbAngle, float limbDistance, CallbackInfo ci) {
+        //$$ @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;ILnet/minecraft/client/render/entity/state/LivingEntityRenderState;FF)V", at = @At("HEAD"), cancellable = true)
+        //$$ private void onRenderArmor(MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, int i, LivingEntityRenderState livingEntityRenderState, float f, float g, CallbackInfo ci) {
         //#endif
         if (HideArmorHookKt.shouldHideArmor()) {
             ci.cancel();

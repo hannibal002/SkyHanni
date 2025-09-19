@@ -6,6 +6,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+//#if MC > 1.21.7
+//$$ import net.minecraft.client.gui.Click;
+//#endif
 
 @Mixin(ChatScreen.class)
 public class MixinGuiChat {
@@ -13,11 +16,14 @@ public class MixinGuiChat {
     @Inject(method = "mouseClicked", at = @At("HEAD"))
     //#if MC < 1.21.9
     public void mouseClicked(double mouseX, double mouseY, int mouseButton, CallbackInfoReturnable<Boolean> cir) {
-        //#else
-        //$$ public void mouseClicked(double mouseX, double mouseY, int mouseButton, boolean bl,CallbackInfoReturnable<Boolean> cir) {
-        //#endif
         if (mouseButton != 1) return;
         CopyChat.handleCopyChat((int) mouseX, (int) mouseY);
     }
+    //#else
+    //$$ public void mouseClicked(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+    //$$    if (click.button() != 1) return;
+    //$$    CopyChat.handleCopyChat((int) click.x(), (int) click.y());
+    //$$ }
+    //#endif
 
 }

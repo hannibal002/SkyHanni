@@ -33,12 +33,12 @@ public class MixinCapeFeatureRenderer {
         return original.call(instance, renderLayer);
     }
     //#else
-    //$$ @ModifyArg(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/entity/command/EntityRenderCommandQueue;ILnet/minecraft/client/render/entity/state/PlayerEntityRenderState;FF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/command/EntityRenderCommandQueue;pushModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/RenderLayer;III)V"), index = 3)
+    //$$ @ModifyArg(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;ILnet/minecraft/client/render/entity/state/PlayerEntityRenderState;FF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/RenderLayer;IIILnet/minecraft/client/render/command/ModelCommandRenderer$CrumblingOverlayCommand;)V"), index = 3)
     //$$ private RenderLayer replaceRenderLayer(RenderLayer original, @Local SkinTextures skinTextures) {
-    //$$      if (skinTextures.capeTexture() != null && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+    //$$     if (skinTextures.cape() != null && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
     //$$         Integer entityAlpha = EntityOpacityManager.getEntityOpacity(livingEntity);
     //$$         if (entityAlpha == null) return original;
-    //$$         return RenderLayer.getItemEntityTranslucentCull(skinTextures.capeTexture());
+    //$$         return RenderLayer.getItemEntityTranslucentCull(skinTextures.cape().texturePath());
     //$$     }
     //$$     return original;
     //$$ }

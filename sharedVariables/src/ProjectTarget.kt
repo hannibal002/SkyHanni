@@ -70,7 +70,8 @@ enum class ProjectTarget(
         MappingStyle.YARN,
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.17.2",
         fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.133.7+1.21.9",
-        modMenuVersion = "15.0.0",
+        // TODO update modmenu when available
+        modMenuVersion = null,
         isModern = true,
 //         modrinthInfo = ModrinthInfo.FABRIC_1_21_9,
         linkTo = null,

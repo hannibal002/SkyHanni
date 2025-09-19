@@ -12,7 +12,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 //#if MC > 1.21.7
-//$$ import net.minecraft.client.render.entity.command.EntityRenderCommandQueue;
+//$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 //$$ import net.minecraft.client.render.entity.state.BipedEntityRenderState;
 //#endif
 
@@ -23,7 +23,7 @@ public class MixinArmorFeatureRenderer {
         //#if MC < 1.21.9
         MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, ItemStack stack, EquipmentSlot slot, int light, BipedEntityModel armorModel, CallbackInfo ci
         //#else
-        //$$ MatrixStack matrices, EntityRenderCommandQueue entityRenderCommandQueue, ItemStack stack, EquipmentSlot slot, int light, BipedEntityRenderState bipedEntityRenderState, CallbackInfo ci
+        //$$ MatrixStack matrices, OrderedRenderCommandQueue orderedRenderCommandQueue, ItemStack stack, EquipmentSlot slot, int light, BipedEntityRenderState bipedEntityRenderState, CallbackInfo ci
         //#endif
     ) {
         if (HideArmorHookKt.shouldHideHead(slot)) {

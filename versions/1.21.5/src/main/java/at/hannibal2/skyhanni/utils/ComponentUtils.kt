@@ -61,7 +61,11 @@ object ComponentUtils {
         }
         if (nbtInfo.skullOwner != null) {
             val skullOwner = nbtInfo.skullOwner
+            //#if MC < 1.21.9
             stack.set(DataComponentTypes.PROFILE, ProfileComponent(skullOwner.toGameProfile()))
+            //#else
+            //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent.ofStatic(skullOwner.toGameProfile()))
+            //#endif
         }
 
     }

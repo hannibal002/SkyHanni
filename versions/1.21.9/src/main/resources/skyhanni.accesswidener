@@ -45,3 +45,4 @@ accessible field net/minecraft/client/render/RenderLayer$MultiPhase pipeline Lco
 
 # 1.21.9 stuff
 accessible class net/minecraft/client/font/BakedGlyphImpl$DrawnGlyph
+accessible field net/minecraft/client/option/StickyKeyBinding toggleGetter Ljava/util/function/BooleanSupplier;
