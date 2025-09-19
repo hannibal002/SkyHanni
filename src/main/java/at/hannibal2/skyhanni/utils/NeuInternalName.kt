@@ -91,8 +91,10 @@ class NeuInternalName private constructor(private val internalName: String) {
         get() = when {
             isPet -> internalName.split(";").first()
             isEnchantedBook -> {
-                val (name, level) = internalName.split(";", limit = 2)
-                "ENCHANTED_BOOK_${name}_$level"
+                if (internalName.contains(";")) {
+                    val (name, level) = internalName.split(";", limit = 2)
+                    "ENCHANTED_BOOK_${name}_$level"
+                } else internalName
             }
 
             else -> internalName

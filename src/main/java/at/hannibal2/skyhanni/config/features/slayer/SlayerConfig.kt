@@ -145,4 +145,14 @@ class SlayerConfig {
     @ConfigOption(name = "Compact Time Messages", desc = "Shorter Time to Kill and Quest Complete messages.")
     @ConfigEditorBoolean
     var compactTimeMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer Cocoon Title", desc = "Send title when Slayer Boss is cocooned.")
+    @ConfigEditorBoolean
+    var cocoonTitle: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer Cocoon Notification Sound", desc = "Sends note.pling when Slayer Boss is cocooned.")
+    @ConfigEditorBoolean
+    var cocoonDing: Boolean = false
 }

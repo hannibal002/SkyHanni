@@ -180,7 +180,7 @@ object GhostTracker {
             addSearchString(line.line(data))
         }
 
-        val duration = data.sessionUptime.getDuration()
+        val duration = data.getTotalUptime()
         addAll(tracker.addTotalProfit(profit, data.kills, "kill", duration, "Kills"))
     }
 

@@ -20,21 +20,18 @@ class HypixelItemApi {
     @SkyHanniModule
     companion object {
 
+        // prices = george prices + npc prices
+        private var prices = mapOf<NeuInternalName, Double>()
         private var npcPrices = mapOf<NeuInternalName, Double>()
         private var georgePrices = mapOf<NeuInternalName, Double>()
 
-        fun getNpcPrice(internalName: NeuInternalName) = npcPrices[internalName]
+        fun getNpcPrice(internalName: NeuInternalName) = prices[internalName]
 
         @HandleEvent
         fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
             val constant = event.getConstant<NeuGeorgeJson>("george")
-            val prices = constant.prices ?: return
-            georgePrices = prices
-            val newMap = npcPrices.toMutableMap()
-            for (price in prices) {
-                newMap[price.key] = price.value
-            }
-            npcPrices = newMap
+            georgePrices = constant.prices ?: return
+            prices = georgePrices + npcPrices
         }
     }
 
@@ -63,7 +60,8 @@ class HypixelItemApi {
 
     fun start() {
         SkyHanniMod.launchIOCoroutine {
-            npcPrices = loadNpcPrices() + georgePrices
+            npcPrices = loadNpcPrices()
+            prices = georgePrices + npcPrices
         }
 
         // TODO use SecondPassedEvent

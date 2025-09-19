@@ -145,7 +145,7 @@ object FishingProfitTracker {
             ).toSearchable(),
         )
 
-        val duration = data.sessionUptime.getDuration()
+        val duration = data.getTotalUptime()
         addAll(tracker.addTotalProfit(profit, data.totalCatchAmount, "catch", duration, "Catches"))
 
         tracker.addPriceFromButton(this)
