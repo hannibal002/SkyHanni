@@ -11,7 +11,9 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.BAL_SHARD_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.EPIC_BAL_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JUNGLE_KEY_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.LEGENDARY_BAL_ITEM
@@ -81,7 +83,7 @@ object CrystalNucleusTracker {
         var runsCompleted = 0L
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onChat(event: SkyHanniChatEvent) {
         balObtainedPattern.matchMatcher(event.message) {
             if (!group("player").equals(PlayerUtils.getName(), ignoreCase = true)) return@matchMatcher
@@ -92,8 +94,17 @@ object CrystalNucleusTracker {
                 else -> return@matchMatcher
             }
             tracker.modify {
-                it.addItem(item, amount = 1, false)
+                it.addItem(item, amount = 1, command = false)
             }
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
+    fun onShardGain(event: ShardGainEvent) {
+        if (event.shardInternalName != BAL_SHARD_ITEM) return
+
+        tracker.modify {
+            it.addItem(BAL_SHARD_ITEM, event.amount, command = false)
         }
     }
 

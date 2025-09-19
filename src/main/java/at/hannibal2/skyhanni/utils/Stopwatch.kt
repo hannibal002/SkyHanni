@@ -28,8 +28,8 @@ class Stopwatch(
     }
 
     // hard set
-    fun set(setDuration: Duration) {
-        duration = setDuration
+    fun set(duration: Duration) {
+        this.duration = duration
         if (!paused) startTime = SimpleTimeMark.now()
     }
 
@@ -46,10 +46,7 @@ class Stopwatch(
         return startTime.passedSince()
     }
 
-    fun getDuration(): Duration {
-        if (paused) return duration
-        return duration + startTime.passedSince()
-    }
+    fun getDuration(): Duration = duration + (getLapTime() ?: Duration.ZERO)
 
     fun isPaused(): Boolean = paused
 
