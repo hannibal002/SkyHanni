@@ -46,8 +46,8 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     private val getStorage: (ProfileSpecificStorage) -> Data,
     private val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     private val trackUptime: Boolean = true,
-    private val customUptimeControl: Boolean = false,
     private val trackerConfig: () -> Config,
+    private val customUptimeControl: Boolean = false,
     private val drawDisplay: (Data) -> List<Searchable>,
 
 ) {
