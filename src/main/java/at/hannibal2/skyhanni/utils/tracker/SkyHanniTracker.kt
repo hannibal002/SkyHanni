@@ -224,18 +224,18 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         }
 
         return Renderable.hoverTips(
-                Renderable.text("§eTotal Uptime: §b${sessionUptime.format()}$pausedText"),
-                tips = buildList {
-                    addAll(sessionList)
-                    if (isTotalDisplay) {
-                        // Uptime added after trackers already had data
-                        addAll(
-                            "§eⓘ §7Uptime tracked only from",
-                            "§7SkyHanni version 6.0.0 onwards",
-                        )
-                    }
+            Renderable.text("§eTotal Uptime: §b${sessionUptime.format()}$pausedText"),
+            tips = buildList {
+                addAll(sessionList)
+                if (isTotalDisplay) {
+                    // Uptime added after trackers already had data
+                    addAll(
+                        "§eⓘ §7Uptime tracked only from",
+                        "§7SkyHanni version 6.0.0 onwards",
+                    )
                 }
-            )
+            }
+        )
     }
 
     private fun buildSessionResetButton() = Renderable.clickable(

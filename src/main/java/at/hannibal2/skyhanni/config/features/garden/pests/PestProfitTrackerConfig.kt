@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.garden.pests
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.garden.GardenIndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
 import kotlin.reflect.KClass
 
-abstract class ItemTrackerData<T: SessionUptime>(clazz: KClass<T>) : TrackerData<T>(clazz) {
+abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerData<T>(clazz) {
 
     abstract fun resetItems()
 

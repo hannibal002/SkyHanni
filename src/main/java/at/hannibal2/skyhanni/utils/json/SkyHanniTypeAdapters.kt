@@ -16,8 +16,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
-import at.hannibal2.skyhanni.utils.tracker.GardenSession
-import at.hannibal2.skyhanni.utils.tracker.NormalSession
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SessionUptimeTypeAdapter
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker

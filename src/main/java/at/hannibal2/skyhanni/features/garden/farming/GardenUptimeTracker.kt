@@ -12,18 +12,17 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.tracker.GardenSession
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
-import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenUptimeTracker {
-    val config get() = GardenApi.config
+    val config get() = GardenApi.config.trackerUptimeSettings
     val trackerSet = setOf(ArmorDropTracker.tracker, DicerRngDropTracker.tracker, PestProfitTracker.tracker)
     val afkTracker = Stopwatch()
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.trackerUptimeSettings.types) {
+        ConditionalUtils.onToggle(config.types) {
             trackerSet.forEach { it.update() }
         }
     }
@@ -34,7 +33,7 @@ object GardenUptimeTracker {
         if (!afkTracker.isPaused()) {
             trackerSet.forEach { it.update() }
         }
-        if ((afkTracker.getLapTime() ?: return) >= 15.seconds) {
+        if ((afkTracker.getLapTime() ?: return) >= config.afkTimeout.seconds) {
             trackerSet.forEach { it.pauseSessionUptime() }
             afkTracker.pause()
         }

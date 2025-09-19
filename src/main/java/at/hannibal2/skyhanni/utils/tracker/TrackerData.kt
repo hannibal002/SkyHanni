@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.Stopwatch
 import com.google.gson.annotations.Expose
-import com.sun.org.apache.bcel.internal.classfile.Unknown
 import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -52,7 +51,7 @@ abstract class TrackerData<T : SessionUptime>(
         if (session != activeSession) {
             val duration = getActiveStopwatch()?.pause(revertLap = swapExtraTime)
             activeSession = session
-            if(swapExtraTime) getActiveStopwatch()?.add(duration ?: 0.seconds)
+            if (swapExtraTime) getActiveStopwatch()?.add(duration ?: 0.seconds)
         }
         getActiveStopwatch()?.start(true)
     }
@@ -93,7 +92,7 @@ abstract class TrackerData<T : SessionUptime>(
             !entryType.isInstance(entry.key)
         }
         entries.forEach { entry ->
-            val unknown = sessionUptime.getOrPut(SessionUptime.Garden(GardenSession.UNKNOWN)) { Stopwatch() }
+            val unknown = sessionUptime.getOrPut(migratedSessionType) { Stopwatch() }
             unknown.add(entry.value.getDuration())
             sessionUptime.remove(entry.key)
         }

@@ -24,7 +24,8 @@ enum class GardenSession(val displayName: String) {
     PEST("Pest Killing"),
     VISITOR("Accepting Visitors"),
     CROP("Breaking Crops"),
-    UNKNOWN("Unknown");
+    UNKNOWN("Unknown")
     ;
+
     override fun toString() = displayName
 }
