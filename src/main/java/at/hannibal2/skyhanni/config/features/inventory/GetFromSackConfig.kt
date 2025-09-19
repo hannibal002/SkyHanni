@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.config.features.inventory
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import org.lwjgl.input.Keyboard
 
 class GetFromSackConfig {
     @Expose
@@ -37,4 +39,12 @@ class GetFromSackConfig {
     @ConfigOption(name = "Default Amount GfS", desc = "The default amount of items used when an amount isn't provided.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 64f, minStep = 1f)
     var defaultAmountGFS: Int = 1
+
+    @Expose
+    @ConfigOption(
+        name = "GfS Keybind",
+        desc = "Fills your inventory with the item you are hovering over."
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    var gfsKeybind: Int = Keyboard.KEY_NONE
 }
