@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.garden
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.garden.GardenIndividualTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -35,7 +36,7 @@ class DicerRngDropTrackerConfig {
         desc = ""
     )
     @Accordion
-    val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
+    val perTrackerConfig: GardenIndividualTrackerConfig = GardenIndividualTrackerConfig()
 
     @Expose
     @ConfigLink(owner = DicerRngDropTrackerConfig::class, field = "enabled")

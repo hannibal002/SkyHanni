@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 // have to make this an abstract class and make subclasses that specify the types and add buttons
 // or else moulconfig causes a crash when the user clicks a button
-abstract class GenericIndividualTrackerConfig<Type : TrackerGenericConfig>(
+abstract class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig>(
     createType: () -> Type
 ) {
     @Expose

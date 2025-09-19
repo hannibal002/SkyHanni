@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils.tracker
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.Stopwatch
 import com.google.gson.annotations.Expose
+import com.sun.org.apache.bcel.internal.classfile.Unknown
 import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -11,6 +13,8 @@ abstract class TrackerData<T : SessionUptime>(
 ) {
     @Expose
     private val sessionUptime: MutableMap<SessionUptime, Stopwatch> = mutableMapOf()
+
+    private var migrated = false
 
     private var activeSession: SessionUptime? = null
 
@@ -53,16 +57,47 @@ abstract class TrackerData<T : SessionUptime>(
         getActiveStopwatch()?.start(true)
     }
 
-    open fun getTotalUptime(): Duration =
-        sessionUptime.values.fold(Duration.ZERO) { acc, stopwatch ->
-            acc + stopwatch.getDuration()
+    fun getTotalUptime(): Duration {
+        if (!migrated) migrateData()
+        val entries = if (uptimeClass == SessionUptime.Garden::class) {
+            sessionUptime.entries.filter { SkyHanniMod.feature.garden.trackerUptimeSettings.types.get().contains(it.key.garden) }
+        } else sessionUptime.entries
+
+        var uptime = Duration.ZERO
+        entries.forEach { entry ->
+            uptime += entry.value.getDuration()
         }
+        return uptime
+    }
 
     fun reset() {
         for (session in sessionUptime.entries) {
             sessionUptime[session.key]?.reset()
         }
         resetData()
+    }
+
+    private fun migrateData() {
+        when (uptimeClass) {
+            SessionUptime.Normal::class -> {
+                filterAndRemove(uptimeClass, SessionUptime.Normal(NormalSession.NORMAL))
+            }
+            SessionUptime.Garden::class -> {
+                filterAndRemove(uptimeClass, SessionUptime.Garden(GardenSession.UNKNOWN))
+            }
+        }
+    }
+
+    private fun filterAndRemove(entryType: KClass<out SessionUptime>, migratedSessionType: SessionUptime) {
+        val entries = sessionUptime.entries.filter { entry ->
+            !entryType.isInstance(entry.key)
+        }
+        entries.forEach { entry ->
+            val unknown = sessionUptime.getOrPut(SessionUptime.Garden(GardenSession.UNKNOWN)) { Stopwatch() }
+            unknown.add(entry.value.getDuration())
+            sessionUptime.remove(entry.key)
+        }
+        migrated = true
     }
 
     protected abstract fun resetData()

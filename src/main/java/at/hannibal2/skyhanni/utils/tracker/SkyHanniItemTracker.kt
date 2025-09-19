@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig.ItemTrackerConfig.TextPart
@@ -48,10 +49,10 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
     extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
-    trackerConfig: () -> IndividualItemTrackerConfig,
+    trackerConfig: () -> GenericIndividualTrackerConfig<ItemTrackerGenericConfig>,
     customUptimeControl: Boolean = false,
     drawDisplay: (Data) -> List<Searchable>,
-) : SkyHanniTracker<Data, IndividualItemTrackerConfig>(
+) : SkyHanniTracker<Data, GenericIndividualTrackerConfig<ItemTrackerGenericConfig>>(
     name,
     createNewSession,
     getStorage,

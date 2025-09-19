@@ -7,18 +7,24 @@ sealed class SessionUptime {
     data class Garden(val sessionType: GardenSession) : SessionUptime() {
         override fun toString(): String = sessionType.toString()
     }
+
+    val garden get() = when (this) {
+        is Garden -> sessionType
+        else -> null
+    }
 }
 
 enum class NormalSession(val displayName: String) {
-    NORMAL("Normal"),
+    NORMAL("All"),
     ;
     override fun toString() = displayName
 }
 
 enum class GardenSession(val displayName: String) {
-    PEST("Pest"),
-    VISITOR("Visitor"),
-    CROP("Crop"),
+    PEST("Pest Killing"),
+    VISITOR("Accepting Visitors"),
+    CROP("Breaking Crops"),
+    UNKNOWN("Unknown");
     ;
     override fun toString() = displayName
 }
