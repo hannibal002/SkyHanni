@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardJson
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
@@ -76,6 +77,15 @@ object AttributeShardsData {
     )
 
     /**
+     * REGEX-TEST: §7Enabled: §aYes
+     * REGEX-TEST: §7Enabled: §cNo
+     */
+    val attributeStatePattern by patternGroup.pattern(
+        "state",
+        "§7Enabled: §.(?<state>.+)",
+    )
+
+    /**
      * REGEX-TEST: §7Syphon §b3 §7more to level up!
      * REGEX-TEST: §7Syphon §b1 §7shard to unlock!
      * REGEX-TEST: §7Syphon §b1 §7more to level up!
@@ -137,6 +147,22 @@ object AttributeShardsData {
     private val advancedModeNotUnlocked by patternGroup.pattern(
         "advanced.mode",
         "§7§cAdvanced Mode unlocked at 30",
+    )
+
+    /**
+     * REGEX-TEST: §6Nature Elemental §r§ais now enabled!
+     */
+    private val attributeEnabledPattern by patternGroup.pattern(
+        "chat.enabled",
+        "§6(?<attributeName>.+) §r§ais now enabled!",
+    )
+
+    /**
+     * REGEX-TEST: §6Nature Elemental §r§cis now disabled!
+     */
+    private val attributeDisabledPattern by patternGroup.pattern(
+        "chat.disabled",
+        "§6(?<attributeName>.+) §r§cis now disabled!",
     )
 
     /**
@@ -204,7 +230,7 @@ object AttributeShardsData {
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val attributesJson = event.getConstant<NeuAttributeShardJson>("attribute_shards")
         attributeLevelling = attributesJson.attributeLevelling
         unconsumableAttributes = attributesJson.unconsumableAttributes
@@ -233,6 +259,7 @@ object AttributeShardsData {
             lastSyphonedMessage = SimpleTimeMark.now()
             return
         }
+
         shardSyphonedMaxedPattern.matchMatcher(event.message) {
             val attributeName = group("attributeName")
             val shardName = abilityNameToShardName(attributeName) ?: return
@@ -244,6 +271,7 @@ object AttributeShardsData {
             lastSyphonedMessage = SimpleTimeMark.now()
             return
         }
+
         andMoreMessagePattern.matchMatcher(event.message) {
             if (lastSyphonedMessage.passedSince() > 1.seconds) return
             if (!config.enabled) return
@@ -255,6 +283,21 @@ object AttributeShardsData {
                 )
             }
         }
+
+        attributeEnabledPattern.matchMatcher(event.message) {
+            val attributeName = group("attributeName")
+            val shardName = abilityNameToShardName(attributeName) ?: return
+            val shardInternalName = shardNameToInternalName(shardName) ?: return
+            setAttributeState(shardInternalName, true)
+        }
+
+        attributeDisabledPattern.matchMatcher(event.message) {
+            val attributeName = group("attributeName")
+            val shardName = abilityNameToShardName(attributeName) ?: return
+            val shardInternalName = shardNameToInternalName(shardName) ?: return
+            setAttributeState(shardInternalName, false)
+        }
+
         for (pattern in shardChatPatterns) {
             pattern.matchMatcher(event.message) {
                 val shardName = group("shardName")
@@ -272,6 +315,16 @@ object AttributeShardsData {
         }
     }
 
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Active Attribute Levels")
+        event.addIrrelevant {
+            for (shardName in attributeInfo.keys) {
+                add("- $shardName: Level ${getActiveLevel(shardName)}/10")
+            }
+        }
+    }
+
     private fun processAttributeMenuItems() {
         val items = InventoryUtils.getItemsInOpenChest().map { it.stack }
         for (item in items) {
@@ -282,10 +335,15 @@ object AttributeShardsData {
             attributeShardNamePattern.matchMatcher(item.displayName) {
                 tier = groupOrNull("tier")?.romanToDecimal() ?: 0
             }
-            syphonAmountPattern.firstMatcher(item.getLore()) {
+            val lore = item.getLore()
+            syphonAmountPattern.firstMatcher(lore) {
                 toNextTier = group("amount").toInt()
             }
             processShard(internalName, tier, toNextTier)
+            attributeStatePattern.firstMatcher(lore) {
+                val enabled = group("state") == "Yes"
+                setAttributeState(internalName, enabled)
+            }
         }
 
         val advancedModeStack = InventoryUtils.getSlotAtIndex(52)?.stack?.orNull()
@@ -327,7 +385,9 @@ object AttributeShardsData {
                 amountOwnedPattern.matchMatcher(line) {
                     val amount = group("amount").formatInt()
                     val attributeName = shardInternalNameToShardName(internalName)
-                    storage?.getOrPut(attributeName) { ProfileSpecificStorage.AttributeShardData() }?.amountInBox = amount
+                    storage?.getOrPut(attributeName) {
+                        ProfileSpecificStorage.AttributeShardData()
+                    }?.amountInBox = amount
                 }
             }
             processShard(internalName, tier, toNextTier)
@@ -340,7 +400,9 @@ object AttributeShardsData {
         val attributeName = shardInternalNameToShardName(event.shardInternalName)
         val existing = storage?.get(attributeName)?.amountInBox ?: 0
         val newAmount = (existing + event.amount).coerceAtLeast(0)
-        storage?.getOrPut(attributeName) { ProfileSpecificStorage.AttributeShardData() }?.amountInBox = newAmount
+        storage?.getOrPut(attributeName) {
+            ProfileSpecificStorage.AttributeShardData()
+        }?.amountInBox = newAmount
     }
 
     private fun processShard(
@@ -353,7 +415,22 @@ object AttributeShardsData {
         val rarity = attributeInfo[attributeName]?.rarity
             ?: ErrorManager.skyHanniError("Unknown attribute shard rarity for $attributeName")
         val totalAmount = findTotalAmount(currentTier, toNextTier, rarity)
-        storage?.getOrPut(attributeName) { ProfileSpecificStorage.AttributeShardData() }?.amountSyphoned = totalAmount
+        storage?.getOrPut(attributeName) {
+            ProfileSpecificStorage.AttributeShardData()
+        }?.amountSyphoned = totalAmount
+    }
+
+    private fun setAttributeState(
+        internalName: NeuInternalName,
+        enabled: Boolean,
+    ) {
+        val attributeName = shardInternalNameToShardName(internalName)
+        if (attributeName in unconsumableAttributes) {
+            ErrorManager.skyHanniError("Unconsumable attribute was toggled: $attributeName. This should never happen.")
+        }
+        storage?.getOrPut(attributeName) {
+            ProfileSpecificStorage.AttributeShardData()
+        }?.enabled = enabled
     }
 
     private fun findTotalAmount(currentTier: Int, toNextTier: Int, rarity: LorenzRarity): Int {
@@ -408,8 +485,19 @@ object AttributeShardsData {
         return internalName
     }
 
-    fun isAttributeShard(internalName: NeuInternalName): Boolean {
-        val asString = internalName.asString()
-        return asString.startsWith("ATTRIBUTE_SHARD_") && asString.endsWith(";1")
-    }
+    fun isAttributeShard(internalName: NeuInternalName): Boolean =
+        internalName.asString().let {
+            it.startsWith("ATTRIBUTE_SHARD_") && it.endsWith(";1")
+        }
+
+    private fun getLevel(shardName: String): Int =
+        storage?.get(shardName)?.amountSyphoned?.let {
+            findTierAndAmountUntilNext(shardName, it).first
+        } ?: 0
+
+    private fun isEnabled(shardName: String): Boolean =
+        storage?.get(shardName)?.enabled ?: false
+
+    fun getActiveLevel(shardName: String) =
+        if (isEnabled(shardName)) getLevel(shardName) else 0
 }

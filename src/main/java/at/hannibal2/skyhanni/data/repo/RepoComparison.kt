@@ -20,6 +20,9 @@ data class RepoComparison(
         latestCommitTime = latestCommit?.time,
     )
 
+    val local: RepoCommit by lazy { RepoCommit(localSha, localCommitTime) }
+    val latest: RepoCommit by lazy { RepoCommit(latestSha, latestCommitTime) }
+
     val hashesMatch = localSha == latestSha
 
     fun reportRepoUpToDate() = ChatUtils.clickToClipboard(
@@ -36,7 +39,7 @@ data class RepoComparison(
     fun reportForceRebuild() = reportRepoOutdated("Force redownloading repo..")
 
     fun reportRepoOutdated(
-        mainMessage: String = "Repo is outdated, updating.."
+        mainMessage: String = "Repo is outdated, updating..",
     ) = ChatUtils.clickToClipboard(
         mainMessage,
         lines = buildList {

@@ -425,7 +425,7 @@ internal object RenderableUtils {
         data: List<DisplayTableEntry>,
         itemScale: Double = NeuItems.ITEM_FONT_SIZE,
     ): MutableList<List<Renderable>> {
-        val sorted = data.sortedByDescending { it.sort }
+        val sorted = data.sortedByDescending { it.sort.toDouble() }
         val outerList = mutableListOf<List<Renderable>>()
         for (entry in sorted) {
             val item = entry.item.getItemStackOrNull()?.let {
