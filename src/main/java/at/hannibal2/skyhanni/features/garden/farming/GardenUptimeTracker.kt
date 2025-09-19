@@ -12,18 +12,19 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.tracker.GardenSession
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenUptimeTracker {
-    val config get() = GardenApi.config.trackerUptimeSettings
-    val trackerSet = setOf(ArmorDropTracker.tracker, DicerRngDropTracker.tracker, PestProfitTracker.tracker)
-    val afkTracker = Stopwatch()
+    private val config get() = GardenApi.config.trackerUptimeSettings
+    private val trackerSet = setOf(ArmorDropTracker.tracker, DicerRngDropTracker.tracker, PestProfitTracker.tracker)
+    private val afkTracker = Stopwatch()
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.types) {
-            trackerSet.forEach { it.update() }
+            modify { it.update() }
         }
     }
 
@@ -31,10 +32,10 @@ object GardenUptimeTracker {
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
         if (!afkTracker.isPaused()) {
-            trackerSet.forEach { it.update() }
+            modify { it.update() }
         }
         if ((afkTracker.getLapTime() ?: return) >= config.afkTimeout.seconds) {
-            trackerSet.forEach { it.pauseSessionUptime() }
+            modify { it.pauseSessionUptime() }
             afkTracker.pause()
         }
     }
@@ -42,19 +43,23 @@ object GardenUptimeTracker {
     @HandleEvent
     fun onCropBreak(event: CropClickEvent) {
         // we do not want this tracker to be greedy, and exclude visitor/pest downtime whenever possible
-        trackerSet.forEach { it.swapActiveSession(SessionUptime.Garden(GardenSession.CROP), false) }
+        modify { it.swapActiveSession(SessionUptime.Garden(GardenSession.CROP), false) }
         afkTracker.start(true)
     }
 
     @HandleEvent
     fun onPestKill(event: PestKillEvent) {
-        trackerSet.forEach { it.swapActiveSession(SessionUptime.Garden(GardenSession.PEST)) }
+        modify { it.swapActiveSession(SessionUptime.Garden(GardenSession.PEST)) }
         afkTracker.start(true)
     }
 
     @HandleEvent
     fun onVisitorOpen(event: VisitorOpenEvent) {
-        trackerSet.forEach { it.swapActiveSession(SessionUptime.Garden(GardenSession.VISITOR)) }
+        modify { it.swapActiveSession(SessionUptime.Garden(GardenSession.VISITOR)) }
         afkTracker.start(true)
+    }
+
+    fun modify(modifyFunction: (SkyHanniTracker<*, *>) -> Unit) {
+        trackerSet.forEach(modifyFunction)
     }
 }
