@@ -29,10 +29,11 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -78,13 +79,13 @@ object TrevorFeatures {
         "You are at the exact height!",
     )
 
-    /**
-     * REGEX-TEST: Location: Mushroom Gorge
-     */
-    private val locationPattern by patternGroup.pattern(
-        "zone",
-        "Location: (?<zone>.*)",
-    )
+//     /**
+//      * REGEX-TEST: Location: Mushroom Gorge
+//      */
+//     private val locationPattern by patternGroup.pattern(
+//         "zone",
+//         "Location: (?<zone>.*)",
+//     )
     private val mobDiedPattern by patternGroup.pattern(
         "mob.died",
         "§aReturn to the Trapper soon to get a new animal to hunt!",
@@ -226,13 +227,12 @@ object TrevorFeatures {
                 val seconds = remaining.inWholeSeconds.coerceAtLeast(0)
                 if (seconds == 1L) "1 second left" else "$seconds seconds left"
             }
-
             TrapperState.PENDING -> "Starting Quest"
         }
 
-        config.cooldownGuiPosition.renderString(
-            "${state.colorCode}Trapper: $message",
-            posLabel = "Trapper Cooldown GUI",
+        config.cooldownGuiPosition.renderRenderables(
+            buildList { addString("${state.colorCode}Trapper: $message") },
+            posLabel = "Trapper Cooldown GUI"
         )
     }
 
@@ -345,7 +345,7 @@ object TrevorFeatures {
         resetTrapper()
     }
 
-    @HandleEvent
+    @HandleEvent(GraphAreaChangeEvent::class)
     fun onGraphAreaChange(event: GraphAreaChangeEvent) {
         inTrapperDen = areaTrappersDenPattern.matches(event.area)
     }
