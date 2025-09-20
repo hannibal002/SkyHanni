@@ -106,11 +106,6 @@ class MiscConfig {
     val tracker: UniversalTrackerConfig = UniversalTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Tracker", desc = "Tracker Config")
-    @Accordion
-    val timedTracker: TimedTrackerConfig = TimedTrackerConfig()
-
-    @Expose
     @ConfigOption(name = "Pet Candy Display", desc = "")
     @Accordion
     val petCandy: PetCandyDisplayConfig = PetCandyDisplayConfig()

@@ -1,10 +1,17 @@
 package at.hannibal2.skyhanni.config.features.misc.tracker
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class TimedTrackerConfig {
+    @Expose
+    @ConfigOption(name = "Reset Session on Game Start", desc = "Reset session display mode when opening the game.")
+    @ConfigEditorBoolean
+    var resetSession: Boolean = false
+
     @Expose
     @ConfigOption(
         name = "Days to Keep",
@@ -37,4 +44,13 @@ class TimedTrackerConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
     var years: Int = 0
 
+    private val config get() = SkyHanniMod.feature.misc.tracker.timedTracker
+
+    fun syncSettings() {
+        resetSession = config.resetSession
+        days = config.days
+        weeks = config.weeks
+        months = config.months
+        years = config.years
+    }
 }
