@@ -21,11 +21,6 @@ class GardenUptimeConfig {
     var showDisplay: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Tracker Timeout", desc = "Set the duration before timer pauses when not farming.")
-    @ConfigEditorSlider(minValue = 5f, maxValue = 60f, minStep = 1f)
-    var timeout: Double = 10.0
-
-    @Expose
     @ConfigOption(name = "Reset Session on Game Start", desc = "Reset session display mode when opening the game.")
     @ConfigEditorBoolean
     var resetSession: Boolean = false
@@ -49,8 +44,6 @@ class GardenUptimeConfig {
 
     enum class GardenUptimeDisplayText(private val str: String) {
         TITLE("Garden Uptime"),
-        DATE("Date: Today"),
-        UPTIME("Uptime: 1h 27m 52s"),
         BPS("Blocks/Second: 17.11"),
         BLOCKS_BROKEN("Blocks Broken: 17,912"),
         ;
@@ -63,8 +56,6 @@ class GardenUptimeConfig {
             @Suppress("StorageNeedsExpose")
             val defaultValues: List<GardenUptimeDisplayText> = Arrays.asList(
                 TITLE,
-                DATE,
-                UPTIME,
                 BPS,
                 BLOCKS_BROKEN
             )

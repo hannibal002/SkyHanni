@@ -11,7 +11,7 @@ class TimedTrackerConfig {
         desc = "If there are more than these many day entries, delete the oldest. Set to 0 to never delete."
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
-    var days: Int = 7
+    var days: Int = 8
 
     @Expose
     @ConfigOption(
@@ -19,7 +19,7 @@ class TimedTrackerConfig {
         desc = "If there are more than these many week entries, delete the oldest. Set to 0 to never delete."
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
-    var weeks: Int = 4
+    var weeks: Int = 5
 
     @Expose
     @ConfigOption(
@@ -27,7 +27,7 @@ class TimedTrackerConfig {
         desc = "If there are more than these many month entries, delete the oldest. Set to 0 to never delete."
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
-    var months: Int = 12
+    var months: Int = 13
 
     @Expose
     @ConfigOption(

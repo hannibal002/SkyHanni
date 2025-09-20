@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrack
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DateChangeEvent
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker.tracker
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.dayToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
@@ -44,6 +46,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : GenericIndividualTracke
     trackerConfig = trackerConfig,
     customUptimeControl = customUptimeControl
 ) {
+    @SkyHanniModule
     companion object {
         private val trackerSet: MutableSet<SkyhanniTimedTracker<*, *>> = mutableSetOf()
 
@@ -51,10 +54,19 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : GenericIndividualTracke
         fun onDateChange(event: DateChangeEvent) {
             trackerSet.forEach { it.changeDate(event.oldDate, event.newDate) }
         }
+
+        @HandleEvent
+        fun onConfigLoad(event: ConfigLoadEvent) {
+            trackerSet.forEach { it.cleanEntries() }
+        }
     }
 
     init {
         trackerSet.add(this)
+    }
+
+    private fun cleanEntries() {
+        ProfileStorageData.profileSpecific?.getData()?.cleanEntries()
     }
 
     override val availableTrackers = listOf(
@@ -84,7 +96,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : GenericIndividualTracke
         )
     }
 
-    fun getData() =  ProfileStorageData.profileSpecific?.let { ps ->
+    private fun getData(): Data? =  ProfileStorageData.profileSpecific?.let { ps ->
         when (getDisplayMode()) {
             DisplayMode.WEEK -> ps.getDisplay(getDisplayMode(), week)
             DisplayMode.MONTH -> ps.getDisplay(getDisplayMode(), month)
@@ -93,13 +105,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : GenericIndividualTracke
         }
     }
 
-    override fun getDisplay() = ProfileStorageData.profileSpecific?.let { ps ->
-        val data = when (getDisplayMode()) {
-            DisplayMode.WEEK -> ps.getDisplay(getDisplayMode(), week)
-            DisplayMode.MONTH -> ps.getDisplay(getDisplayMode(), month)
-            DisplayMode.YEAR -> ps.getDisplay(getDisplayMode(), year)
-            else -> ps.getDisplay(getDisplayMode(), date)
-        }
+    override fun getDisplay() = getData()?.let { data ->
         val searchables = drawDisplay(data)
         if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
         else buildFinalDisplay(Renderable.vertical(searchables.toRenderable()))
@@ -207,23 +213,10 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : GenericIndividualTracke
         next: LocalDate?,
     ): List<Renderable> {
         return listOfNotNull(
-            previous?.let {
-                Renderable.optionalLink(
-                    "§a[ §r§f§l<- §a]",
-                    onLeftClick = { updateDate(it) },
-                )
-            },
-            next?.let {
-                Renderable.optionalLink(
-                    "§a[ §r§f§l-> §r§a]",
-                    onLeftClick = { updateDate(it) },
-                )
-            },
+            previous?.let { Renderable.optionalLink("§a[ §r§f§l<- §a]", onLeftClick = { updateDate(it) } ) },
+            next?.let { Renderable.optionalLink("§a[ §r§f§l-> §r§a]", onLeftClick = { updateDate(it) } ) },
             if (next?.isInPast(getDisplayMode()) == true) {
-                Renderable.optionalLink(
-                    "§a[ §r§f§l->> §r§a]",
-                    onLeftClick = { updateDatesToNow(getDisplayMode()) }
-                )
+                Renderable.optionalLink("§a[ §r§f§l->> §r§a]", onLeftClick = { updateDatesToNow(getDisplayMode()) } )
             } else null
         )
     }

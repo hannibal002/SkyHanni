@@ -42,14 +42,6 @@ object GardenBpsTracker {
         trackerConfig = { config.perTrackerConfig }
     )
 
-    class TimeData : TimedTrackerData<Data, SessionUptime.Garden>(SessionUptime.Garden::class, { Data() }) {
-        init {
-            if (config.resetSession) {
-                getOrPutEntry(DisplayMode.SESSION).reset()
-            }
-        }
-    }
-
     class Data : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class) {
         override fun resetData() {
             blocksBroken = 0

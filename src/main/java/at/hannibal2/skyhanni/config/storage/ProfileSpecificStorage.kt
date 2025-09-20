@@ -64,6 +64,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
+import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
@@ -598,7 +600,8 @@ class ProfileSpecificStorage(
         var activeVinyl: VinylType? = null
 
         @Expose
-        var uptimeTracker: GardenBpsTracker.TimeData = GardenBpsTracker.TimeData()
+        var uptimeTracker: TimedTrackerData<GardenBpsTracker.Data, SessionUptime.Garden> =
+            TimedTrackerData(SessionUptime.Garden::class) { GardenBpsTracker.Data() }
     }
 
     // - gui
