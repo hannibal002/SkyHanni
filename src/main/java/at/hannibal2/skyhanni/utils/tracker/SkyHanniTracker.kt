@@ -214,6 +214,8 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
+    fun isPaused(): Boolean = getCurrentStopwatch()?.isPaused() == true
+
     private fun buildSessionUptime(): Renderable {
         val sessionUptime = getTotalUptime() ?: return Renderable.empty()
         val isTotalDisplay = displayMode == DisplayMode.TOTAL

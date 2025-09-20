@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.utils.tracker
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.DateChangeEvent
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.dayToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
@@ -20,7 +22,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
-import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData.TrackerManager.trackerSet
 import java.time.LocalDate
 
 @Suppress("SpreadOperator")
@@ -39,6 +40,19 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : GenericIndividualTracke
     drawDisplay = drawDisplay,
     trackerConfig = trackerConfig
 ) {
+    companion object {
+        private val trackerSet: MutableSet<SkyhanniTimedTracker<*, *>> = mutableSetOf()
+
+        @HandleEvent
+        fun onDateChange(event: DateChangeEvent) {
+            trackerSet.forEach { it.changeDate(event.oldDate, event.newDate) }
+        }
+    }
+
+    init {
+        trackerSet.add(this)
+    }
+
     override val availableTrackers = listOf(
         DisplayMode.TOTAL,
         DisplayMode.SESSION,
@@ -51,10 +65,10 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : GenericIndividualTracke
     private val config: TrackerGenericConfig
         get() = if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
 
-    var date = LocalDate.now()
-    var week = date.format(weekFormatter).weekToLocalDate()
-    var month = date.format(monthFormatter).monthToLocalDate()
-    var year = date.format(yearFormatter).yearToLocalDate()
+    var date: LocalDate = LocalDate.now()
+    var week: LocalDate = date.format(weekFormatter).weekToLocalDate()
+    var month: LocalDate = date.format(monthFormatter).monthToLocalDate()
+    var year: LocalDate = date.format(yearFormatter).yearToLocalDate()
 
     private fun getNextDisplay(): DisplayMode {
         return availableTrackers[(availableTrackers.indexOf(displayMode) + 1) % availableTrackers.size]
