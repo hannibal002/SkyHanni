@@ -1,0 +1,40 @@
+package at.hannibal2.skyhanni.config.features.misc.tracker
+
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+
+class TimedTrackerConfig {
+    @Expose
+    @ConfigOption(
+        name = "Days to Keep",
+        desc = "If there are more than these many day entries, delete the oldest. Set to 0 to never delete."
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
+    var days: Int = 7
+
+    @Expose
+    @ConfigOption(
+        name = "Weeks to Keep",
+        desc = "If there are more than these many week entries, delete the oldest. Set to 0 to never delete."
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
+    var weeks: Int = 4
+
+    @Expose
+    @ConfigOption(
+        name = "Months to Keep",
+        desc = "If there are more than these many month entries, delete the oldest. Set to 0 to never delete."
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
+    var months: Int = 12
+
+    @Expose
+    @ConfigOption(
+        name = "Years to Keep",
+        desc = "If there are more than these many day entries, delete the oldest. Set to 0 to never delete."
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
+    var years: Int = 0
+
+}

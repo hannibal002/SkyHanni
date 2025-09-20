@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TimedTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.UniversalTrackerConfig
 import at.hannibal2.skyhanni.config.features.pets.PetConfig
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
@@ -103,6 +104,11 @@ class MiscConfig {
     @ConfigOption(name = "Tracker", desc = "Tracker Config")
     @Accordion
     val tracker: UniversalTrackerConfig = UniversalTrackerConfig()
+
+    @Expose
+    @ConfigOption(name = "Tracker", desc = "Tracker Config")
+    @Accordion
+    val timedTracker: TimedTrackerConfig = TimedTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Pet Candy Display", desc = "")
