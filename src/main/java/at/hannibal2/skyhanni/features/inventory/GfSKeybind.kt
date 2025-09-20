@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 
 @SkyHanniModule
@@ -14,7 +14,7 @@ object GfSKeybind {
 
     @HandleEvent
     fun onKey(event: GuiKeyPressEvent) {
-        if (!SkyHanniMod.feature.inventory.gfs.gfsKeybind.isKeyHeld()) return
+        if (!SkyHanniMod.feature.inventory.gfs.gfsKeybind.isKeyClicked()) return
         val stack = stackUnderCursor() ?: return
         val internalName = stack.getInternalNameOrNull() ?: return
         GetFromSackApi.getFromSack(internalName, 9999)
