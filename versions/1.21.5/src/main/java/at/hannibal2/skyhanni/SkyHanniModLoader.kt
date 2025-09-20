@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.SkyHanniMod.modules
+import at.hannibal2.skyhanni.compat.IrisCompat
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.fabricmc.api.ModInitializer
 
 class SkyHanniModLoader : ModInitializer {
@@ -8,6 +10,7 @@ class SkyHanniModLoader : ModInitializer {
     override fun onInitialize() {
         SkyHanniMod.preInit()
         SkyHanniMod.init()
+        if (PlatformUtils.isModInstalled("iris")) IrisCompat.assignPipelines()
         loadedClasses.clear()
     }
 
