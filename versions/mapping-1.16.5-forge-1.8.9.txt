@@ -401,6 +401,7 @@ net.minecraft.world.entity.item.ItemEntity net.minecraft.entity.item.EntityItem
 
 net.minecraft.world.entity.item.ItemEntity getItem() getEntityItem()
 
+net.minecraft.world.entity.monster.AbstractSkeleton net.minecraft.entity.monster.EntitySkeleton
 net.minecraft.world.entity.monster.Blaze net.minecraft.entity.monster.EntityBlaze
 net.minecraft.world.entity.monster.CaveSpider net.minecraft.entity.monster.EntityCaveSpider
 net.minecraft.world.entity.monster.Creeper net.minecraft.entity.monster.EntityCreeper
@@ -412,7 +413,6 @@ net.minecraft.world.entity.monster.Guardian net.minecraft.entity.monster.EntityG
 net.minecraft.world.entity.monster.MagmaCube net.minecraft.entity.monster.EntityMagmaCube
 net.minecraft.world.entity.monster.Monster net.minecraft.entity.monster.EntityMob
 net.minecraft.world.entity.monster.Silverfish net.minecraft.entity.monster.EntitySilverfish
-net.minecraft.world.entity.monster.AbstractSkeleton net.minecraft.entity.monster.EntitySkeleton
 net.minecraft.world.entity.monster.Slime net.minecraft.entity.monster.EntitySlime
 net.minecraft.world.entity.monster.Spider net.minecraft.entity.monster.EntitySpider
 net.minecraft.world.entity.monster.Witch net.minecraft.entity.monster.EntityWitch
