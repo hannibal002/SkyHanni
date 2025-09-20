@@ -68,6 +68,16 @@ class CommandsConfig {
     @FeatureToggle
     var shortenCall: Boolean = false
 
+    @ConfigOption(
+        name = "Warp or call on §e/forge",
+        desc = "If both §e/warp§7 and §e/call§7 shortening features enabled, controls §e/forge§7 behaviour\n" +
+            "When disabled, §e/forge§7 does §e/warp forge§7. Otherwise §e/forge§7 does §e/call forge§7. Or you can just use §e/fred§7 ",
+    )
+    @Expose
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var shortenForgeToCallNotWarp: Boolean = false
+
     @Expose
     @ConfigOption(name = "Replace §e/warp is", desc = "Add §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
     @ConfigEditorBoolean

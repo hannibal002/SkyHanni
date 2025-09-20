@@ -59,13 +59,17 @@ object AbiphoneFeatures {
         AbiphoneFeatures.acceptUUID = null
     }
 
-    private var abiphoneContacts: Set<String>? = null
+    var abiphoneContacts: Set<String>? = null
+        private set
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val constant = event.getConstant<Map<String, AbiphoneContactInfo>>("abiphone", NeuAbiphoneJson.TYPE)
         abiphoneContacts = constant.flatMap { (key, value) ->
-            value.callNames ?: listOf(key.removeAllNonLettersAndNumbers().replace(" ", ""))
+            // In NEU repo, callNames are optional shortenings and do not include actual contact name
+            val cleanKey = key.removeAllNonLettersAndNumbers().replace(" ", "").lowercase()
+            val aliases = value.callNames?.map { it.lowercase() } ?: listOf()
+            listOf(cleanKey) + aliases
         }.toSet()
     }
 
