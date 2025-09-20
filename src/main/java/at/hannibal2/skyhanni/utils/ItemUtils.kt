@@ -66,7 +66,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //$$ import net.minecraft.component.DataComponentTypes
@@ -79,6 +78,10 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.component.type.ItemEnchantmentsComponent
 //$$ import net.minecraft.component.type.ProfileComponent
 //$$ import net.minecraft.registry.Registries
+//#endif
+//#if MC > 1.21.7
+//$$ import com.google.common.collect.ImmutableMultimap
+//$$ import com.mojang.authlib.properties.PropertyMap
 //#endif
 
 @SkyHanniModule
@@ -392,11 +395,14 @@ object ItemUtils {
         return stack
         //#else
         //$$ val stack = ItemStack(Items.PLAYER_HEAD)
+        //#if MC < 1.21.9
         //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo")
         //$$ profile.properties.put("textures", Property("textures", value))
-        //#if MC < 1.21.9
         //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent(profile))
         //#else
+        //$$ val builder = ImmutableMultimap.builder<String, Property>()
+        //$$ builder.put("textures", Property("textures", value))
+        //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo", PropertyMap(builder.build()))
         //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent.ofStatic(profile))
         //#endif
         //$$ stack.setCustomItemName(displayName)
