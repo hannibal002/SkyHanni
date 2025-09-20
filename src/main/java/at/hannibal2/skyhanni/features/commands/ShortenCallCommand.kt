@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.features.misc.AbiphoneFeatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.HypixelCommands.call
 
 
 @SkyHanniModule

@@ -68,7 +68,7 @@ object AbiphoneFeatures {
         abiphoneContacts = constant.flatMap { (key, value) ->
             // In NEU repo, callNames are optional shortenings and do not include actual contact name
             val cleanKey = key.removeAllNonLettersAndNumbers().replace(" ", "").lowercase()
-            val aliases = value.callNames?.map { it.lowercase() } ?: listOf()
+            val aliases = value.callNames.orEmpty().map { it.lowercase() }
             listOf(cleanKey) + aliases
         }.toSet()
     }
