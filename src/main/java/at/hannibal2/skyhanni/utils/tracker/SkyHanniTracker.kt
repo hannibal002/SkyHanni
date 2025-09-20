@@ -168,7 +168,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         }
     }
 
-    private fun showSessionUptime(): Boolean =
+    fun showSessionUptime(): Boolean =
         config.showUptime.get() && (!config.onlyShowSession.get() || displayMode != DisplayMode.TOTAL)
 
     private fun checkAfk() {
@@ -216,12 +216,12 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
 
     fun isPaused(): Boolean = getCurrentStopwatch()?.isPaused() == true
 
-    private fun buildSessionUptime(): Renderable {
-        val sessionUptime = getTotalUptime() ?: return Renderable.empty()
+    fun buildSessionUptime(tracker: Data? = getDisplayModeTracker(getDisplayMode())): Renderable {
+        val sessionUptime = tracker?.getTotalUptime() ?: return Renderable.empty()
         val isTotalDisplay = displayMode == DisplayMode.TOTAL
         val pausedText = if (getCurrentStopwatch()?.isPaused() == true) " §c(Paused!)" else ""
         val sessionList: List<String> = buildList {
-            getDisplayModeTracker()?.getSessionMap()?.entries?.forEach {
+            tracker.getSessionMap().entries.forEach {
                 if (it.value.getDuration() > 0.seconds) add("${it.key} Uptime: ${it.value.getDuration().format()}")
             }
         }
@@ -346,14 +346,19 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         )
     }
 
-    enum class DisplayMode(internal val displayName: String, val shortenedName: String = displayName) {
+    enum class DisplayMode(
+        val displayName: String,
+        val shortenedName: String = displayName,
+        val alternateName: String = displayName,
+        val isDate: Boolean = false
+    ) {
         TOTAL("Total"),
-        SESSION("Session", "Session"),
+        SESSION("Session"),
         MAYOR("This Mayor", "Mayor"),
-        DAY("Day"),
-        WEEK("Week"),
-        MONTH("Month"),
-        YEAR("Year"),
+        DAY("Day", alternateName = "Date", isDate = true),
+        WEEK("Week", isDate = true),
+        MONTH("Month", isDate = true),
+        YEAR("Year", isDate = true),
         ;
 
         override fun toString(): String = displayName

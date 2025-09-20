@@ -10,6 +10,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.time.temporal.WeekFields
@@ -238,8 +239,8 @@ object TimeUtils {
         else -> false
     }
 
-    val weekFields = WeekFields.of(Locale.getDefault())
-    val weekFormatter =
+    private val weekFields: WeekFields = WeekFields.of(Locale.getDefault())
+    val weekFormatter: DateTimeFormatter =
         DateTimeFormatterBuilder()
             .appendValue(ChronoField.YEAR)
             .appendLiteral('-')
@@ -247,13 +248,13 @@ object TimeUtils {
             .parseDefaulting(ChronoField.DAY_OF_WEEK, weekFields.firstDayOfWeek.value.toLong())
             .toFormatter()
 
-    val monthFormatter =
+    val monthFormatter: DateTimeFormatter =
         DateTimeFormatterBuilder().appendPattern("yyyy'-'MM").parseDefaulting(ChronoField.DAY_OF_MONTH, 1).toFormatter()
 
-    val yearFormatter =
+    val yearFormatter: DateTimeFormatter =
         DateTimeFormatterBuilder().appendPattern("yyyy").parseDefaulting(ChronoField.DAY_OF_YEAR, 1).toFormatter()
 
-    val weekTextFormatter =
+    val weekTextFormatter: DateTimeFormatter =
         DateTimeFormatterBuilder()
             .appendValue(ChronoField.YEAR)
             .appendLiteral(", week ")

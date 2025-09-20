@@ -21,35 +21,9 @@ class GardenUptimeConfig {
     var showDisplay: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Include Visitors", desc = "Include doing visitors in active farming time.")
-    @ConfigEditorBoolean
-    var includeVisitors: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(name = "Include Pests", desc = "Include doing pests in active farming time.")
-    @ConfigEditorBoolean
-    var includePests: Property<Boolean> = Property.of(true)
-
-    @Expose
     @ConfigOption(name = "Tracker Timeout", desc = "Set the duration before timer pauses when not farming.")
     @ConfigEditorSlider(minValue = 5f, maxValue = 60f, minStep = 1f)
     var timeout: Double = 10.0
-
-    @Expose
-    @ConfigOption(
-        name = "Movement Timeout",
-        desc = "Custom timeout duration if the player is moving but isn't farming."
-    )
-    @ConfigEditorBoolean
-    var movementTimeout: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "Movement Timeout",
-        desc = "Set the duration before timer pauses when player is moving but not farming."
-    )
-    @ConfigEditorSlider(minValue = 5f, maxValue = 60f, minStep = 1f)
-    var movementTimeoutDuration: Double = 20.0
 
     @Expose
     @ConfigOption(name = "Reset Session on Game Start", desc = "Reset session display mode when opening the game.")

@@ -91,7 +91,7 @@ class GardenConfig {
     @Expose
     @ConfigOption(name = "Garden Uptime Tracker", desc = "")
     @Accordion
-    val gardenUptime: GardenUptimeConfig = GardenUptimeConfig()
+    val gardenBpsTracker: GardenUptimeConfig = GardenUptimeConfig()
 
     @Expose
     @ConfigOption(name = "Anita Shop", desc = "")

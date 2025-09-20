@@ -8,24 +8,22 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.tracker.GardenSession
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenUptimeCommand {
-    private val config get() = GardenApi.config.gardenUptime
+    private val config get() = GardenApi.config.trackerUptimeSettings
     private val storage get() = GardenApi.storage?.uptimeTracker
 
     fun onCommand(args: Array<String>) {
-        if (!config.showDisplay) {
-            ChatUtils.userError("shgardenuptime requires 'Show Garden Uptime' to be enabled")
-        }
-
         val dayAmount = args.getOrNull(0)?.toIntOrNull()?.coerceAtMost(31) ?: 7
 
         val date = LocalDate.now()
-        var totalUptime = 0
+        var totalUptime = 0.seconds
 
         val commandString = mutableListOf(
             "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r",
@@ -37,24 +35,19 @@ object GardenUptimeCommand {
 
             val day = date.minusDays(num.toLong())
             val entry = storage?.getEntry(SkyHanniTracker.DisplayMode.DAY, day)
-
-            val cropBreakTime = entry?.cropBreakTime ?: 0
-            val pestTime = if (config.includePests.get()) entry?.pestTime ?: 0 else 0
-            val visitorTime = if (config.includeVisitors.get()) entry?.visitorTime ?: 0 else 0
-
-            val uptime = cropBreakTime + pestTime + visitorTime
+            val uptime = entry?.getTotalUptime() ?: 0.seconds
 
             val dayString = if (day == LocalDate.now()) "Today" else day.toString()
 
-            val outputString = "    §e$dayString:    §b${uptime.seconds}"
+            val outputString = "    §e$dayString:    §b${uptime}"
 
             totalUptime += uptime
             commandString += outputString
         }
 
         commandString += ""
-        commandString += "§bTotal Uptime: §e${totalUptime.seconds}"
-        commandString += "§bAverage Uptime: §e${(totalUptime / dayAmount).seconds}"
+        commandString += "§bTotal Uptime: §e${totalUptime}"
+        commandString += "§bAverage Uptime: §e${(totalUptime / dayAmount)}"
         commandString += "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r"
 
         chat(commandString.joinToString("\n"), false)

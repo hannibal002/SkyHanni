@@ -67,7 +67,7 @@ abstract class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
         sessions.keys.forEach { cleanEntry(it, config) }
     }
 
-    fun cleanEntry(displayMode: DisplayMode, config: TimedTrackerConfig) {
+    private fun cleanEntry(displayMode: DisplayMode, config: TimedTrackerConfig) {
         when (displayMode) {
             DisplayMode.DAY -> sessions[displayMode]?.cleanEntries(config.days)
             DisplayMode.WEEK -> sessions[displayMode]?.cleanEntries(config.weeks)

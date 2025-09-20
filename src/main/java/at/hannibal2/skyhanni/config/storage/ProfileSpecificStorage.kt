@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
-import at.hannibal2.skyhanni.features.garden.tracker.GardenUptimeTracker
+import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
@@ -598,7 +598,7 @@ class ProfileSpecificStorage(
         var activeVinyl: VinylType? = null
 
         @Expose
-        var uptimeTracker: GardenUptimeTracker.TimeData = GardenUptimeTracker.TimeData()
+        var uptimeTracker: GardenBpsTracker.TimeData = GardenBpsTracker.TimeData()
     }
 
     // - gui
