@@ -600,7 +600,7 @@ class ProfileSpecificStorage(
         var activeVinyl: VinylType? = null
 
         @Expose
-        var uptimeTracker: TimedTrackerData<GardenBpsTracker.Data, SessionUptime.Garden> =
+        var gardenBpsTracker: TimedTrackerData<GardenBpsTracker.Data, SessionUptime.Garden> =
             TimedTrackerData(SessionUptime.Garden::class) { GardenBpsTracker.Data() }
     }
 

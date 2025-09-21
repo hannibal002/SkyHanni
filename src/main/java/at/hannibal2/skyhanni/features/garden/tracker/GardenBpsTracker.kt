@@ -30,7 +30,7 @@ object GardenBpsTracker {
     val tracker = SkyhanniTimedTracker(
         "Garden Block Break Tracker",
         { Data() },
-        { it.garden.uptimeTracker },
+        { it.garden.gardenBpsTracker },
         { drawDisplay(it) },
         customUptimeControl = true,
         trackerConfig = { config.perTrackerConfig }

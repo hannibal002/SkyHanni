@@ -13,7 +13,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenUptimeCommand {
-    private val storage get() = GardenApi.storage?.uptimeTracker
+    private val storage get() = GardenApi.storage?.gardenBpsTracker
 
     fun onCommand(args: Array<String>) {
         val dayAmount = args.getOrNull(0)?.toIntOrNull()?.coerceAtMost(31) ?: 7
