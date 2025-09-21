@@ -37,11 +37,12 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object CropCollectionTracker {
     private val config get() = GardenApi.config.cropCollections
-    private val tracker = SkyhanniTimedTracker(
+    val tracker = SkyhanniTimedTracker(
         "Crop Collection Tracker",
         { Data() },
         { it.garden.cropCollectionTracker },
         { drawDisplay(it) },
+        customUptimeControl = true,
         trackerConfig = { config.perTrackerConfig },
     )
 
