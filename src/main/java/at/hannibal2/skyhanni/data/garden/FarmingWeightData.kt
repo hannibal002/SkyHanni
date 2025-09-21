@@ -9,15 +9,16 @@ import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.updateTotalCollection
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -38,7 +39,7 @@ object FarmingWeightData {
 
     private val collectionMutex = Mutex()
     private val cropWeightValues = mutableMapOf<CropType, Double>()
-    private val weightMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+    private val weightMap: MutableMap<EliteLeaderboardMode, Double> = mutableMapOf()
     private val ignoredCollection: MutableMap<CropType, Long> = mutableMapOf()
 
     private var weightGain: Double = 0.0
@@ -84,23 +85,24 @@ object FarmingWeightData {
         }
     }
 
-    fun setWeight(leaderboardType: EliteLeaderboardType, value: Double) {
-        weightMap[leaderboardType] = value
+    fun setWeight(leaderboardMode: EliteLeaderboardMode, value: Double) {
+        weightMap[leaderboardMode] = value
         weightGain = 0.0
-        FarmingWeightDisplay.update()
+        // TODO: Update event post
     }
 
-    fun getWeight(leaderboardType: EliteLeaderboardType, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
-        if (weightMap[leaderboardType] == null || override) {
-            when (leaderboardType) {
-                EliteLeaderboardType.ALL_TIME -> updateCollections()
-                EliteLeaderboardType.MONTHLY -> getLeaderboardPosition(leaderboardType)
+    fun getWeight(leaderboardMode: EliteLeaderboardMode, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
+        if (weightMap[leaderboardMode] == null || override) {
+            when (leaderboardMode) {
+                EliteLeaderboardMode.ALL_TIME -> updateCollections()
+                EliteLeaderboardMode.MONTHLY ->
+                    getLeaderboardPosition(EliteLeaderboardType.Weight(FarmingWeight.FARMING_WEIGHT, leaderboardMode))
             }
         }
         if (shouldRecalculateWeight) {
-            weightMap[EliteLeaderboardType.ALL_TIME] = recalculateTotalWeight()
+            weightMap[EliteLeaderboardMode.ALL_TIME] = recalculateTotalWeight()
         }
-        val weight = weightMap[leaderboardType]
+        val weight = weightMap[leaderboardMode]
         if (cropWeightOnly) {
             if (weight != null) {
                 return weight - bonusWeight
@@ -109,7 +111,7 @@ object FarmingWeightData {
         return weight
     }
 
-    private fun addWeight(amount: Double, type: EliteLeaderboardType? = null) {
+    private fun addWeight(amount: Double, type: EliteLeaderboardMode? = null) {
         if (type == null) {
             weightMap.forEach { (type, value) -> weightMap[type] = value + amount }
         } else {
