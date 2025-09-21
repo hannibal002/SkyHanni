@@ -10,7 +10,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import java.util.Arrays
 
 class GardenBpsTrackerConfig {
     @Expose
@@ -22,11 +21,7 @@ class GardenBpsTrackerConfig {
     @Expose
     @ConfigOption(name = "Stats List", desc = "Drag text to change what displays in the summary card.")
     @ConfigEditorDraggableList
-    var uptimeDisplayText: Property<List<GardenUptimeDisplayText>> = Property.of(
-        ArrayList(
-            GardenUptimeDisplayText.defaultValues
-        )
-    )
+    val uptimeDisplayText: Property<MutableList<GardenUptimeDisplayText>> = Property.of(GardenUptimeDisplayText.defaultValues)
 
     @Expose
     @ConfigOption(
@@ -48,7 +43,7 @@ class GardenBpsTrackerConfig {
 
         companion object {
             @Suppress("StorageNeedsExpose")
-            val defaultValues: List<GardenUptimeDisplayText> = Arrays.asList(
+            val defaultValues: MutableList<GardenUptimeDisplayText> = mutableListOf(
                 TITLE,
                 BPS,
                 BLOCKS_BROKEN
@@ -58,5 +53,5 @@ class GardenBpsTrackerConfig {
 
     @Expose
     @ConfigLink(owner = GardenBpsTrackerConfig::class, field = "showDisplay")
-    var pos: Position = Position(5, -180, false, true)
+    val pos: Position = Position(5, -180, false, true)
 }
