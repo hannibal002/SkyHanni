@@ -69,6 +69,10 @@ abstract class TrackerData<T : SessionUptime>(
         return uptime
     }
 
+    fun getSession(session: SessionUptime): Stopwatch? {
+        return sessionUptime[session]
+    }
+
     fun reset() {
         for (session in sessionUptime.entries) {
             sessionUptime[session.key]?.reset()

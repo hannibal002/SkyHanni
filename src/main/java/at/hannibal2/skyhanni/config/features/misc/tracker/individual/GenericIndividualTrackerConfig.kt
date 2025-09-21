@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.config.features.misc.tracker
+package at.hannibal2.skyhanni.config.features.misc.tracker.individual
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.utils.ChatUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -9,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 // have to make this an abstract class and make subclasses that specify the types and add buttons
 // or else moulconfig causes a crash when the user clicks a button
-abstract class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig>(
+open class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig>(
     createType: () -> Type
 ) {
     @Expose
@@ -31,7 +32,7 @@ abstract class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig>(
     @ConfigEditorBoolean
     var useUniversalConfig = false
 
-    fun syncSettings() {
+    open fun syncSettings() {
         trackerConfig.syncSettings()
         ChatUtils.debug("Synced tracker!")
     }
