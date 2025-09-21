@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
-import at.hannibal2.skyhanni.data.garden.CropCollectionApi.updateTotalCollection
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardPosition
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
@@ -50,8 +50,6 @@ object FarmingWeightData {
     private var attemptingCropWeightFetch = false
     private var hasFetchedCropWeights = false
     private var shouldRecalculateWeight = false
-
-
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
@@ -149,8 +147,8 @@ object FarmingWeightData {
                     val storedAmount = crop.getCollection()
                     val diff = value - storedAmount
                     val weightDiff = abs(diff / crop.getFactor())
-                    if (diff > 0 || weightDiff >= 10) { // 10 weight diff is at least half an hour of farming
-                        crop.updateTotalCollection(value)
+                    if (diff > 0 || weightDiff >= 30) { // 10 weight diff is an half an hour of farming
+                        crop.setCollectionCounter(value)
                     }
                 }
 

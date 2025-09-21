@@ -198,6 +198,7 @@ object EliteFarmersLeaderboard {
     private fun updateNextPlayer(leaderboardType: EliteLeaderboardType): EliteLeaderboardPlayer? {
         val nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
         lastPlayer[leaderboardType] = nextPlayer
+        if (leaderboardPosMap?.get(leaderboardType) == 1) return null
         farmingChatMessage("You passed §b${nextPlayer.name} §ein the §6$leaderboardType §eLeaderboard!")
         nextPlayers[leaderboardType]?.removeFirstOrNull() ?: return null
 
