@@ -11,21 +11,39 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 
 @SkyHanniModule
 object CropCollectionApi {
+    private val storage get() = GardenApi.storage
+
+    private val cropCollectionCounter:
+        MutableMap<CropType, Long>? get() = storage?.cropCollectionCounter
+
     var lastGainedCrop: CropType?
-        get() = GardenApi.storage?.lastGainedCrop
+        get() = storage?.lastGainedCrop
         set(value) {
             value?.let {
                 GardenApi.storage?.lastGainedCrop = it
             }
         }
 
+    var lastGainedCollectionTime = SimpleTimeMark.farPast()
+
+    var needCollectionUpdate = true
+
+    fun CropType.getCollection() =
+        cropCollectionCounter?.get(this) ?: 0L
+
     fun CropType.addCollectionCounter(type: CropCollectionType, amount: Long) {
         if (amount == 0L) return
         if (type !in listOf(CropCollectionType.UNKNOWN, CropCollectionType.MOOSHROOM_COW) && amount > 1) lastGainedCrop = this
 
+        this.setCollectionCounter(amount + this.getCollection())
+
+        if (type != CropCollectionType.UNKNOWN) {
+            lastGainedCollectionTime = SimpleTimeMark.now()
+        }
         CropCollectionAddEvent(this, type, amount).post()
     }
 
@@ -37,6 +55,15 @@ object CropCollectionApi {
             CropCollectionType.DICER,
             CropCollectionType.PEST_RNG,
         )
+
+    fun CropType.updateTotalCollection(amount: Long) {
+        this.addCollectionCounter(CropCollectionType.UNKNOWN, amount - this.getCollection())
+    }
+
+
+    private fun CropType.setCollectionCounter(counter: Long) {
+        cropCollectionCounter?.set(this, counter)
+    }
 
     private fun addCollectionCommand(cropText: String, amount: Long, typeText: String) {
         val crop = CropType.getByNameOrNull(cropText.replace("_", " ")) ?: run {
@@ -64,6 +91,16 @@ object CropCollectionApi {
                         callback { addCollectionCommand(getArg(crop), getArg(amount), getArg(type)) }
                     }
                 }
+            }
+        }
+        event.registerBrigadier("shshowcropcollection") {
+            description = "Show current crop collection amounts"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback {
+                for (entry in CropType.entries) {
+                    ChatUtils.chat("$entry collection: ${entry.getCollection()}")
+                }
+                ChatUtils.debug("$cropCollectionCounter")
             }
         }
     }

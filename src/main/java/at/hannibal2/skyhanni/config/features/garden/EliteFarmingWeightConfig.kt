@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -33,19 +33,24 @@ class EliteFarmingWeightConfig {
             "Only if your farming weight is high enough! Updates periodically."
     )
     @ConfigEditorBoolean
-    var leaderboard: Boolean = true
+    val leaderboard: Property<Boolean> = Property.of(true)
 
     @Expose
-    @ConfigOption(name = "Leaderboard Type", desc = "Select normal or monthly weight leaderboard!")
-    @ConfigEditorDropdown
-    val eliteLBType: Property<EliteFarmingWeightLBType> = Property.of(EliteFarmingWeightLBType.DEFAULT)
+    @ConfigOption(
+        name = "Farming Weight Text",
+        desc = "Drag text to change the appearance of the overlay.\n"
+    )
+    @ConfigEditorDraggableList
+    val text: Property<MutableList<FarmingWeightTextEntry>> = Property.of(
+        mutableListOf(
+            FarmingWeightTextEntry.WEIGHT_POSITION,
+            FarmingWeightTextEntry.OVERTAKE
+        )
+    )
 
-    enum class EliteFarmingWeightLBType(
-        private val displayName: String,
-        val leaderboardName: String = displayName
-    ) {
-        DEFAULT("All-Time", leaderboardName = ""),
-        MONTHLY("Monthly"),
+    enum class FarmingWeightTextEntry(private val displayName: String) {
+        WEIGHT_POSITION("§6Farming Weight: §e104,481.49 §7[§b#5§7]"),
+        OVERTAKE("§e170.21 §7(§b12h 32m 15s§7) §7behind §bChissl")
         ;
 
         override fun toString() = displayName
@@ -55,10 +60,10 @@ class EliteFarmingWeightConfig {
     @ConfigOption(
         name = "Overtake ETA",
         desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
-            "Will show an ETA to placement weight required if you're not on the leaderboard yet."
+            "Does not factor in pests or dicer drops. Garden Milestones Display must be enabled."
     )
     @ConfigEditorBoolean
-    var overtakeETA: Boolean = false
+    val overtakeETA: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -71,7 +76,7 @@ class EliteFarmingWeightConfig {
     @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
     @ConfigEditorBoolean
-    var overtakeETAAlways: Boolean = true
+    val overtakeETAAlways: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(

@@ -19,15 +19,16 @@ data class WeightProfile(
     @Expose val profileId: String,
     @Expose val profileName: String,
     @Expose val totalWeight: Double,
+    @Expose val crops: Map<String, Long>,
     @Expose val cropWeight: Map<String, Double>,
     @Expose val bonusWeight: Map<String, Int>,
     @Expose val uncountedCrops: Map<String, Int>,
     @Expose val pests: Map<String, Int>,
 )
 
-enum class EliteLeaderboardType(private val displayName: String, val suffix: String = "") {
-    NORMAL("Normal"),
-    MONTHLY("Monthly", "-monthly"),
+enum class EliteLeaderboardType(val displayName: String, val specificDisplayName: String, val suffix: String = "") {
+    ALL_TIME("All-Time", "Farming Weight"),
+    MONTHLY("Monthly", "Monthly Farming Weight", "-monthly"),
     ;
 
     override fun toString() = displayName

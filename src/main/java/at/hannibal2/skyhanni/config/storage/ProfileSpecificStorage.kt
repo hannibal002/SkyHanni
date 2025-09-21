@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -427,6 +428,12 @@ class ProfileSpecificStorage(
         var lastGainedCrop: CropType? = null
 
         @Expose
+        var lastGainedCropCollectionTime: SimpleTimeMark = farPast()
+
+        @Expose
+        var cropCollectionCounter: MutableMap<CropType, Long> = enumMapOf()
+
+        @Expose
         var cropMilestoneCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
 
         @Expose
@@ -591,7 +598,13 @@ class ProfileSpecificStorage(
 
         class FarmingWeightConfig {
             @Expose
-            var lastLeaderboard: Int = -1
+            var lastLeaderboardMap: MutableMap<EliteLeaderboardType, Int> = enumMapOf()
+
+            @Expose
+            var minWeight: MutableMap<EliteLeaderboardType, Double> = enumMapOf()
+
+            @Expose
+            var lastLeaderboardType: EliteLeaderboardType = EliteLeaderboardType.ALL_TIME
         }
 
         @Expose

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteAuctionsResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteBazaarResponse
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.WeightProfile
+import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -42,6 +44,10 @@ object EliteDevApi {
         override fun toString() = displayName
     }
 
+    private var spoofProfile = false
+    private var PlayerUuid = ""
+    private var PlayerProfile = ""
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shfetcheliteresource") {
@@ -53,6 +59,29 @@ object EliteDevApi {
                 }
             }
         }
+        event.registerBrigadier("shspoofweightprofile") {
+            description = "Set yourself to another player for the elite dev api"
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("uuid", BrigadierArguments.string()) { uuid ->
+                arg("profile", BrigadierArguments.string()) { profile ->
+                    callback { spoofProfile(getArg(uuid), getArg(profile)) }
+                }
+            }
+        }
+    }
+
+    private fun spoofProfile(uuid: String, profile: String) {
+        if (uuid.length <= 20) {
+            spoofProfile = false
+            FarmingWeightDisplay.resetData()
+            ChatUtils.userError("Invalid uuid!")
+            return
+        }
+        ChatUtils.chat("Setting uuid: $uuid, profile: $profile")
+        spoofProfile = true
+        PlayerUuid = uuid
+        PlayerProfile = profile
+        FarmingWeightDisplay.resetData()
     }
 
     private suspend fun fetchResourceCommand(resourceType: EliteResourceType) = runCatching {
@@ -114,8 +143,10 @@ object EliteDevApi {
     private var weightProfileApiResponse: JsonApiResponse<JsonObject>? = null
     suspend fun fetchWeightProfile(localProfile: String): WeightProfile? = try {
         require(localProfile.isNotBlank()) { "Local profile cannot be blank" }
-
-        weightUrl = "$FARMING_WEIGHT_URL/${PlayerUtils.getUuid()}"
+        val profile = if (spoofProfile) PlayerProfile else localProfile
+        val uuid = if (spoofProfile) PlayerUuid else PlayerUtils.getUuid()
+        weightUrl = "$FARMING_WEIGHT_URL/$uuid?collections=true"
+        ChatUtils.debug("Fetching weight profile from $weightUrl")
         weightProfileApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(weightUrl, apiName = FARMING_WEIGHT_API_NAME)
         val (_, apiData) = weightProfileApiResponse?.assertSuccessWithData()
             ?: throw IllegalStateException("Response was not successful, or data was null")
@@ -124,13 +155,12 @@ object EliteDevApi {
         val selectedProfileId = weightData.selectedProfileId
         val selectedProfileEntry = weightData.profiles.firstOrNull {
             val idMatch = it.profileId == selectedProfileId
-            val nameMatch = it.profileName.lowercase() == localProfile.lowercase()
+            val nameMatch = it.profileName.lowercase() == profile.lowercase()
             // Prioritize matching by ID, but also allow matching by name
             (idMatch && nameMatch) || nameMatch
         } ?: throw IllegalStateException(
-            "No profile found matching the local profile: $localProfile",
+            "No profile found matching the local profile: $profile",
         )
-
         selectedProfileEntry
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
@@ -164,7 +194,7 @@ object EliteDevApi {
         atRank: Int? = null,
     ): EliteLeaderboard? {
         require(profileId.isNotBlank()) { "Profile ID cannot be blank" }
-        val uuid = PlayerUtils.getUuid()
+        val uuid = if (spoofProfile) PlayerUuid else PlayerUtils.getUuid()
 
         val upcomingPlayersParam = upcomingCount?.let { "upcoming=$it" }
         val atRankParam = atRank?.let { "atRank=$it" }
@@ -174,6 +204,7 @@ object EliteDevApi {
         }
         val lbSuffix = lbType.suffix
         val lbUrl = "$WEIGHT_LEADERBOARD_URL$lbSuffix/$uuid/$profileId$paramString"
+        ChatUtils.debug("Fetching leaderboard information from $lbUrl")
 
         val lbApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(lbUrl, apiName = WEIGHT_LEADERBOARD_API_NAME)
         val (_, apiData) = lbApiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
