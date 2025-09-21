@@ -59,10 +59,10 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
     private val config: TrackerGenericConfig
         get() = if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
 
-    private var date: LocalDate = LocalDate.now()
-    private var week: LocalDate = date.format(weekFormatter).weekToLocalDate()
-    private var month: LocalDate = date.format(monthFormatter).monthToLocalDate()
-    private var year: LocalDate = date.format(yearFormatter).yearToLocalDate()
+    var date: LocalDate = LocalDate.now()
+    var week: LocalDate = date.format(weekFormatter).weekToLocalDate()
+    var month: LocalDate = date.format(monthFormatter).monthToLocalDate()
+    var year: LocalDate = date.format(yearFormatter).yearToLocalDate()
 
     @SkyHanniModule
     companion object {
@@ -130,7 +130,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         if (changed) update()
     }
 
-    private fun dateString(): String {
+    fun dateString(): String {
         val today = LocalDate.now()
         return when (displayMode) {
             DisplayMode.DAY -> if (date == today) "Today" else date.toString()

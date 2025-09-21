@@ -6,32 +6,29 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.DateChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.garden.DisplayCropChange
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
-import at.hannibal2.skyhanni.events.garden.farming.CropCollectionUpdateEvent
-import at.hannibal2.skyhanni.events.utils.TimedTrackerUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenApi.storage
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay.update
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyhanniTimedTracker
-import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import java.util.EnumMap
@@ -54,20 +51,7 @@ object CropCollectionTracker {
         }
 
         @Expose
-        var cropCollection: MutableMap<CropType, CropCollection> = EnumMap(CropType::class.java)
-    }
-
-    class CropCollection {
-        fun getTotal(): Long {
-            return cropCollectionType.sumAllValues().toLong()
-        }
-
-        fun getCollection(collectionType: CropCollectionType): Long {
-            return cropCollectionType.getOrPut(collectionType) { 0 }
-        }
-
-        @Expose
-        var cropCollectionType: MutableMap<CropCollectionType, Long> = EnumMap(CropCollectionType::class.java)
+        var cropCollection: MutableMap<CropType, CropCollectionApi.CropCollection> = EnumMap(CropType::class.java)
     }
 
     @HandleEvent
@@ -90,33 +74,21 @@ object CropCollectionTracker {
             return
         }
         tracker.modify {
-            val cropType = it.cropCollection.getOrPut(crop) { CropCollection() }
+            val cropType = it.cropCollection.getOrPut(crop) { CropCollectionApi.CropCollection() }
             cropType.cropCollectionType[type] = cropType.cropCollectionType.getOrDefault(type, 0) + amount
         }
     }
 
     private var cropDisplayMode: CropType? = null
 
-    private fun selectNextCrop() {
-        cropDisplayMode = if (cropDisplayMode == null) CropType.entries.first()
-        else cropDisplayMode?.let { sb ->
-            CropType.entries.filter { it.ordinal > sb.ordinal }.minByOrNull { it.ordinal }
-        }
-    }
+    private fun getDisplayCrop() = cropDisplayMode
 
-    // Todo add bucketed tracker
+    // Todo make bucketed tracker
     private fun drawDisplay(data: Data): List<Searchable> {
         val crop: CropType = cropDisplayMode ?: CropCollectionApi.lastGainedCrop ?: return emptyList()
         val allTime = crop.getCollection()
-        val cropData = data.cropCollection.getOrPut(crop) { CropCollection() }
+        val cropData = data.cropCollection.getOrPut(crop) { CropCollectionApi.CropCollection() }
         val lineMap = mutableMapOf<CropCollectionDisplayText, Searchable>()
-        val displayMode = tracker.displayMode ?: return emptyList()
-        val date = when (displayMode) {
-            SkyHanniTracker.DisplayMode.WEEK -> tracker.week
-            SkyHanniTracker.DisplayMode.MONTH -> tracker.month
-            SkyHanniTracker.DisplayMode.YEAR -> tracker.year
-            else -> tracker.date
-        }
 
         lineMap[CropCollectionDisplayText.TITLE] = Renderable.horizontal(
             buildList {
@@ -133,16 +105,12 @@ object CropCollectionTracker {
                 "§7${tracker.dateString()}: §e${total.addSeparators()}", buildCropBreakdown(cropData)
             ).toSearchable()
 
-        val uptimeData = storage?.uptimeTracker?.getEntry(displayMode, date)
+        val uptime = data.getTotalUptime()
 
-        // Todo respect config
-        if (uptimeData != null) {
-            val uptime = uptimeData.pestTime + uptimeData.visitorTime + uptimeData.cropBreakTime
-            if (uptime != 0) {
-                val collectionPerHour = total / uptime.seconds.inPartialHours
-                lineMap[CropCollectionDisplayText.PER_HOUR] =
-                    StringRenderable("§7Per hour: §e${collectionPerHour.toLong().addSeparators()}").toSearchable()
-            }
+        if (uptime > 0.seconds) {
+            val collectionPerHour = total / uptime.inPartialHours
+            lineMap[CropCollectionDisplayText.PER_HOUR] =
+                StringRenderable("§7Per hour: §e${collectionPerHour.toLong().addSeparators()}").toSearchable()
         }
 
         lineMap[CropCollectionDisplayText.BREAKDOWN] = StringRenderable("§6§lCollection Breakdown").toSearchable()
@@ -184,7 +152,7 @@ object CropCollectionTracker {
         return formatDisplay(lineMap)
     }
 
-    private fun buildCropBreakdown(cropData: CropCollection) = buildList {
+    private fun buildCropBreakdown(cropData: CropCollectionApi.CropCollection) = buildList {
 
         add("§6§lCollection Breakdown")
 
@@ -216,21 +184,23 @@ object CropCollectionTracker {
         tracker.renderDisplay(config.collectionDisplayPos)
     }
 
+    private fun MutableList<Searchable>.buildCropSwitcher() {
+        this.addNullableButton(
+            label = "Crop Type",
+            current = getDisplayCrop(),
+            nullLabel = "Default",
+            onChange = { new ->
+                cropDisplayMode = new
+                update()
+            },
+            universe = CropType.entries,
+            enableUniverseScroll = false // would infinitely scroll while hovered
+        )
+    }
+
     private fun formatDisplay(lineMap: MutableMap<CropCollectionDisplayText, Searchable>): List<Searchable> {
         val newList = mutableListOf<Searchable>()
-        if (tracker.isInventoryOpen()) {
-            newList.add(
-                Renderable.clickable(
-                    "§7[§a${cropDisplayMode ?: "Default"}§7]",
-                    tips = listOf("Click for next crop"),
-                    onLeftClick = {
-                        selectNextCrop()
-                        tracker.update()
-                        DisplayCropChange(cropDisplayMode).post()
-                    }
-                ).toSearchable()
-            )
-        }
+        if (tracker.isInventoryOpen()) newList.buildCropSwitcher() else newList.add(Renderable.placeholder(10).toSearchable())
         newList.addAll(config.statDisplayList.mapNotNull { lineMap[it] })
         return newList
     }
