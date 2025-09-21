@@ -34,7 +34,7 @@ object IrisCompat {
 
             IRIS_ASSIGN_PIPELINE_METHOD = irisInstanceClass.getMethod("assignPipeline", RenderPipeline::class.java, irisProgramEnum)
         } catch (exception: Exception) {
-            ErrorManager.logErrorWithData(exception, "Failed to initialize iris compat!")
+            ErrorManager.logErrorWithData(exception, "Failed to initialize Iris compat!")
         }
     }
 
