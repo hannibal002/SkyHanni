@@ -23,7 +23,6 @@ class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
     session: KClass<T>,
     private val createNewSession: () -> Data,
 ) : TrackerData<T>(session) {
-    val tempConfig get() = SkyHanniMod.feature.misc.tracker.timedTracker
     override fun resetData() {
         sessions = EnumMap(DisplayMode::class.java)
     }
@@ -57,7 +56,7 @@ class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
         return getEntries(displayMode)?.get(key)
     }
 
-    fun cleanEntries(config: TimedTrackerConfig = tempConfig) {
+    fun cleanEntries(config: TimedTrackerConfig) {
         ChatUtils.debug("Cleaning Tracker Entries (before): ${sessions.mapValues { it.value.size }}")
         ChatUtils.debug(sessions.toString())
         sessions.keys.toList().forEach { displayMode ->

@@ -2,7 +2,8 @@ package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedGardenIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedIndividualItemTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedIndividualTrackerConfig
 import com.google.gson.annotations.Expose
@@ -36,7 +37,7 @@ class GardenBpsTrackerConfig {
         desc = ""
     )
     @Accordion
-    val perTrackerConfig: TimedIndividualTrackerConfig = TimedIndividualTrackerConfig()
+    val perTrackerConfig: TimedGardenIndividualTrackerConfig = TimedGardenIndividualTrackerConfig()
 
     enum class GardenUptimeDisplayText(private val str: String) {
         TITLE("Garden Uptime"),

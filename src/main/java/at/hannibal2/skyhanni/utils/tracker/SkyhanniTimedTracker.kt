@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TimedTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedGenericIndividualConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -29,7 +31,7 @@ import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import java.time.LocalDate
 
 @Suppress("SpreadOperator")
-class SkyhanniTimedTracker<Data : TrackerData<*>, Type : GenericIndividualTrackerConfig<*>>(
+class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualConfig<*>>(
     name: String,
     createNewSession: () -> Data,
     private var storage: (ProfileSpecificStorage) -> TimedTrackerData<Data, *>,
@@ -46,6 +48,8 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : GenericIndividualTracke
     trackerConfig = trackerConfig,
     customUptimeControl = customUptimeControl
 ) {
+    val timedConfig: TimedTrackerConfig get() =
+        if (trackerSpecificConfig.useUniversalConfig) universalTracker.timedTracker else trackerSpecificConfig.timedTracker
     @SkyHanniModule
     companion object {
         private val trackerSet: MutableSet<SkyhanniTimedTracker<*, *>> = mutableSetOf()
@@ -66,7 +70,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : GenericIndividualTracke
     }
 
     private fun cleanEntries() {
-        ProfileStorageData.profileSpecific?.getData()?.cleanEntries()
+        ProfileStorageData.profileSpecific?.getData()?.cleanEntries(timedConfig)
     }
 
     override val availableTrackers = listOf(
