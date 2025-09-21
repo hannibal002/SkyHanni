@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -48,7 +49,8 @@ object CropCollectionApi {
             lastGainedCollectionTime = SimpleTimeMark.now()
         }
 
-        cropCollectionCounter?.get(this)?.addCollection(type, amount)
+        val collectionCounter = cropCollectionCounter?.getOrPut(this) { CropCollection() }
+        collectionCounter?.addCollection(type, amount)
 
         CropCollectionAddEvent(this, type, amount).post()
     }
@@ -63,7 +65,8 @@ object CropCollectionApi {
         )
 
     fun CropType.setCollectionCounter(counter: Long) {
-        cropCollectionCounter?.get(this)?.setTotal(counter)
+        val collectionCounter = cropCollectionCounter?.getOrPut(this) { CropCollection() }
+        collectionCounter?.setTotal(counter)
         // Some displays update off add events
         CropCollectionAddEvent(this, CropCollectionType.UNKNOWN, 0).post()
     }
