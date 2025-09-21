@@ -145,6 +145,7 @@ object EliteFarmersLeaderboard {
     }
 
     fun getNextPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
+        if (leaderboardPosMap?.get(leaderboardType) == 1) return null
         val amount = getAmount(leaderboardType) ?: return null
         var nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
         var amountBehind = nextPlayer.amount - amount
@@ -152,7 +153,7 @@ object EliteFarmersLeaderboard {
             nextPlayer = updateNextPlayer(leaderboardType) ?: break
             amountBehind = nextPlayer.amount - amount
         }
-        if (amountBehind < 0 && leaderboardPosMap?.get(leaderboardType) != 1) {
+        if (amountBehind < 0) {
             shouldRefreshLeaderboard[leaderboardType] = true
             return null
         }
