@@ -152,7 +152,7 @@ object EliteFarmersLeaderboard {
             nextPlayer = updateNextPlayer(leaderboardType) ?: break
             amountBehind = nextPlayer.amount - amount
         }
-        if (amountBehind < 0 && leaderboardPosMap?.get(leaderboardType) != 1) {
+        if (amountBehind < 0) {
             shouldRefreshLeaderboard[leaderboardType] = true
             return null
         }
@@ -198,7 +198,6 @@ object EliteFarmersLeaderboard {
     private fun updateNextPlayer(leaderboardType: EliteLeaderboardType): EliteLeaderboardPlayer? {
         val nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
         lastPlayer[leaderboardType] = nextPlayer
-        if (leaderboardPosMap?.get(leaderboardType) == 1) return null
         farmingChatMessage("You passed §b${nextPlayer.name} §ein the §6$leaderboardType §eLeaderboard!")
         nextPlayers[leaderboardType]?.removeFirstOrNull() ?: return null
 
@@ -312,7 +311,6 @@ object EliteFarmersLeaderboard {
     }
 
     private fun getAtRank(currentPos: Int, rankGoal: Int?, useRankGoal: Boolean): Int? = when {
-        currentPos == 1 -> 3
         useRankGoal -> minOf((rankGoal ?: 0) + 1, currentPos)
         currentPos != Int.MAX_VALUE -> currentPos
         else -> null
