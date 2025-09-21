@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
