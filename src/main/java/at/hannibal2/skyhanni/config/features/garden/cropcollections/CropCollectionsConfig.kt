@@ -15,12 +15,12 @@ class CropCollectionsConfig {
     @Expose
     @ConfigOption(
         name = "Collection Display",
-        desc = """Show the progress and ETA until the next crop milestone is reached and the current crops/minute value.
+        desc = """Show your current crop collection.
 §eRequires a tool with either a counter or Cultivating enchantment for full accuracy."""
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var collectionDisplay: Boolean = true
+    var collectionDisplay: Boolean = false
 
     @Expose
     @ConfigLink(owner = CropCollectionsConfig::class, field = "collectionDisplay")
