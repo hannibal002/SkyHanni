@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -240,6 +240,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
             }
         )
     }
+
     protected fun buildSessionResetButton() = Renderable.clickable(
         "§cReset session!",
         tips = listOf(

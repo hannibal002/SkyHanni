@@ -1,11 +1,6 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.misc.tracker.TimedTrackerConfig
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.dayToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
 import at.hannibal2.skyhanni.utils.TimeUtils.monthToLocalDate
@@ -16,7 +11,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.yearToLocalDate
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
 import com.google.gson.annotations.Expose
 import java.time.LocalDate
-import java.util.*
+import java.util.EnumMap
 import kotlin.reflect.KClass
 
 class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
@@ -57,14 +52,12 @@ class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
     }
 
     fun cleanEntries(config: TimedTrackerConfig) {
-        ChatUtils.debug("Cleaning Tracker Entries (before): ${sessions.mapValues { it.value.size }}")
-        ChatUtils.debug(sessions.toString())
         sessions.keys.toList().forEach { displayMode ->
             val keep = when (displayMode) {
-                DisplayMode.DAY   -> config.days
-                DisplayMode.WEEK  -> config.weeks
+                DisplayMode.DAY -> config.days
+                DisplayMode.WEEK -> config.weeks
                 DisplayMode.MONTH -> config.months
-                DisplayMode.YEAR  -> config.years
+                DisplayMode.YEAR -> config.years
                 else -> null
             } ?: return@forEach
 
@@ -72,7 +65,6 @@ class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
                 cleanEntries(map, keep, displayMode)
             }
         }
-        ChatUtils.debug("Cleaning Tracker Entries (after): ${sessions.mapValues { it.value.size }}")
     }
 
 
@@ -90,10 +82,8 @@ class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
         }
 
         val toRemove = keysSorted.dropLast(keepAmount)
-
         if (toRemove.isEmpty()) return
 
-        ChatUtils.debug("Removing ${toRemove.size} entries: $toRemove")
         toRemove.forEach { key ->
             map.remove(key)
         }

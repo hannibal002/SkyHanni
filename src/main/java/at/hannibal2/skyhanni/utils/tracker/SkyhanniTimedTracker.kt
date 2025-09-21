@@ -2,14 +2,12 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.misc.tracker.TimedTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedGenericIndividualConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DateChangeEvent
-import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker.tracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.dayToLocalDate
@@ -48,8 +46,24 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
     trackerConfig = trackerConfig,
     customUptimeControl = customUptimeControl
 ) {
-    val timedConfig: TimedTrackerConfig get() =
+    private val timedConfig: TimedTrackerConfig get() =
         if (trackerSpecificConfig.useUniversalConfig) universalTracker.timedTracker else trackerSpecificConfig.timedTracker
+    override val availableTrackers = listOf(
+        DisplayMode.TOTAL,
+        DisplayMode.SESSION,
+        DisplayMode.DAY,
+        DisplayMode.WEEK,
+        DisplayMode.MONTH,
+        DisplayMode.YEAR,
+    ) + extraDisplayModes.keys
+    private val config: TrackerGenericConfig
+        get() = if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
+
+    private var date: LocalDate = LocalDate.now()
+    private var week: LocalDate = date.format(weekFormatter).weekToLocalDate()
+    private var month: LocalDate = date.format(monthFormatter).monthToLocalDate()
+    private var year: LocalDate = date.format(yearFormatter).yearToLocalDate()
+
     @SkyHanniModule
     companion object {
         private val trackerSet: MutableSet<SkyhanniTimedTracker<*, *>> = mutableSetOf()
@@ -66,33 +80,12 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
     }
 
     init {
+        if (timedConfig.resetSession) {
+            ProfileStorageData.profileSpecific?.getData()?.getEntry(DisplayMode.SESSION)?.reset()
+        }
         trackerSet.add(this)
     }
-
-    private fun cleanEntries() {
-        ProfileStorageData.profileSpecific?.getData()?.cleanEntries(timedConfig)
-    }
-
-    override val availableTrackers = listOf(
-        DisplayMode.TOTAL,
-        DisplayMode.SESSION,
-        DisplayMode.DAY,
-        DisplayMode.WEEK,
-        DisplayMode.MONTH,
-        DisplayMode.YEAR,
-    ) + extraDisplayModes.keys
-
-    private val config: TrackerGenericConfig
-        get() = if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
-
-    var date: LocalDate = LocalDate.now()
-    var week: LocalDate = date.format(weekFormatter).weekToLocalDate()
-    var month: LocalDate = date.format(monthFormatter).monthToLocalDate()
-    var year: LocalDate = date.format(yearFormatter).yearToLocalDate()
-
-    private fun ProfileSpecificStorage.getData() = storage(this)
-    private fun ProfileSpecificStorage.getDisplay(displayMode: DisplayMode, date: LocalDate = LocalDate.now()) =
-        this.getData().getOrPutEntry(displayMode, date)
+    private fun cleanEntries() = ProfileStorageData.profileSpecific?.getData()?.cleanEntries(timedConfig)
 
     override fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
         SharedTracker(
@@ -100,12 +93,16 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         )
     }
 
-    private fun getData(): Data? =  ProfileStorageData.profileSpecific?.let { ps ->
-        when (getDisplayMode()) {
-            DisplayMode.WEEK -> ps.getDisplay(getDisplayMode(), week)
-            DisplayMode.MONTH -> ps.getDisplay(getDisplayMode(), month)
-            DisplayMode.YEAR -> ps.getDisplay(getDisplayMode(), year)
-            else -> ps.getDisplay(getDisplayMode(), date)
+    private fun ProfileSpecificStorage.getData() = storage(this)
+    private fun ProfileSpecificStorage.getDisplay(displayMode: DisplayMode, date: LocalDate = LocalDate.now()) =
+        this.getData().getOrPutEntry(displayMode, date)
+
+    private fun getData(displayMode: DisplayMode = getDisplayMode()): Data? = ProfileStorageData.profileSpecific?.let { ps ->
+        when (displayMode) {
+            DisplayMode.WEEK -> ps.getDisplay(displayMode, week)
+            DisplayMode.MONTH -> ps.getDisplay(displayMode, month)
+            DisplayMode.YEAR -> ps.getDisplay(displayMode, year)
+            else -> ps.getDisplay(displayMode, date)
         }
     }
 
@@ -176,13 +173,13 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
 
     private fun buildDateRenderable(onlyShowDates: Boolean = true) = Renderable.vertical(
         buildList {
-            val displayText: String = if (tracker.displayMode?.isDate == true) {
-                "§7${displayMode?.alternateName}: §a${tracker.dateString()}"
+            val displayText: String = if (getDisplayMode().isDate) {
+                "§7${displayMode?.alternateName}: §a${dateString()}"
             } else {
                 if (onlyShowDates) {
                     ""
                 } else {
-                    "§7Mode: §a${tracker.displayMode?.displayName ?: "none"}"
+                    "§7Mode: §a${getDisplayMode().displayName}"
                 }
             }
 
@@ -217,10 +214,10 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         next: LocalDate?,
     ): List<Renderable> {
         return listOfNotNull(
-            previous?.let { Renderable.optionalLink("§a[ §r§f§l<- §a]", onLeftClick = { updateDate(it) } ) },
-            next?.let { Renderable.optionalLink("§a[ §r§f§l-> §r§a]", onLeftClick = { updateDate(it) } ) },
+            previous?.let { Renderable.optionalLink("§a[ §r§f§l<- §a]", onLeftClick = { updateDate(it) }) },
+            next?.let { Renderable.optionalLink("§a[ §r§f§l-> §r§a]", onLeftClick = { updateDate(it) }) },
             if (next?.isInPast(getDisplayMode()) == true) {
-                Renderable.optionalLink("§a[ §r§f§l->> §r§a]", onLeftClick = { updateDatesToNow(getDisplayMode()) } )
+                Renderable.optionalLink("§a[ §r§f§l->> §r§a]", onLeftClick = { updateDatesToNow(getDisplayMode()) })
             } else null
         )
     }
