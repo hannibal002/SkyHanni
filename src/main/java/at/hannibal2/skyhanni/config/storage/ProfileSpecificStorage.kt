@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
@@ -431,7 +432,7 @@ class ProfileSpecificStorage(
         var lastGainedCropCollectionTime: SimpleTimeMark = farPast()
 
         @Expose
-        var cropCollectionCounter: MutableMap<CropType, Long> = enumMapOf()
+        var cropCollectionCounter: MutableMap<CropType, CropCollectionApi.CropCollection> = enumMapOf()
 
         @Expose
         var cropMilestoneCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
