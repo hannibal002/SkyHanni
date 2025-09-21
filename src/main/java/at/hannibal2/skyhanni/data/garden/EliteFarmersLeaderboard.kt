@@ -152,7 +152,7 @@ object EliteFarmersLeaderboard {
             nextPlayer = updateNextPlayer(leaderboardType) ?: break
             amountBehind = nextPlayer.amount - amount
         }
-        if (amountBehind < 0) {
+        if (amountBehind < 0 && leaderboardPosMap?.get(leaderboardType) != 1) {
             shouldRefreshLeaderboard[leaderboardType] = true
             return null
         }
