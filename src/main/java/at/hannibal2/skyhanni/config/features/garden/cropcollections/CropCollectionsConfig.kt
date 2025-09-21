@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.Arrays
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class CropCollectionsConfig {
     @Expose
@@ -24,7 +24,7 @@ class CropCollectionsConfig {
 
     @Expose
     @ConfigLink(owner = CropCollectionsConfig::class, field = "collectionDisplay")
-    var collectionDisplayPos: Position = Position(-400, -200, false, true)
+    val collectionDisplayPos: Position = Position(-400, -200, false, true)
 
     @Expose
     @ConfigOption(
@@ -32,8 +32,8 @@ class CropCollectionsConfig {
         desc = "Drag text to change what displays in the summary card."
     )
     @ConfigEditorDraggableList
-    var statDisplayList: List<CropCollectionDisplayText> =
-        ArrayList(CropCollectionDisplayText.defaultCollectionDisplayList)
+    val statDisplayList: Property<MutableList<CropCollectionDisplayText>> =
+        Property.of(CropCollectionDisplayText.defaultCollectionDisplayList)
 
     @Expose
     @ConfigOption(
@@ -64,7 +64,7 @@ class CropCollectionsConfig {
 
         companion object {
             @Suppress("StorageNeedsExpose")
-            val defaultCollectionDisplayList: List<CropCollectionDisplayText> = Arrays.asList(
+            val defaultCollectionDisplayList: MutableList<CropCollectionDisplayText> = mutableListOf(
                 TITLE,
                 ALL_TIME,
                 SESSION,

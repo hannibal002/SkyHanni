@@ -13,7 +13,9 @@ import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.inPartialHours
@@ -54,7 +56,9 @@ object CropCollectionTracker {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        tracker.update()
+        ConditionalUtils.onToggle(config.statDisplayList) {
+            tracker.update()
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -199,7 +203,7 @@ object CropCollectionTracker {
     private fun formatDisplay(lineMap: MutableMap<CropCollectionDisplayText, Searchable>): List<Searchable> {
         val newList = mutableListOf<Searchable>()
         if (tracker.isInventoryOpen()) newList.buildCropSwitcher() else newList.add(Renderable.placeholder(10).toSearchable())
-        newList.addAll(config.statDisplayList.mapNotNull { lineMap[it] })
+        newList.addAll(config.statDisplayList.get().mapNotNull { lineMap[it] })
         return newList
     }
 
