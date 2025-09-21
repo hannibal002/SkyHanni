@@ -85,7 +85,7 @@ object GardenBpsTracker {
         var bps = 0.0
         // impossible bps amounts when under a second
         if (uptime > 1.seconds) bps =
-            (data.blocksBroken.toDouble()) / uptime.inPartialSeconds
+            (data.blocksBroken.toDouble()) / uptime.inWholeSeconds
         if (bps > 0) {
             lineMap[GardenUptimeDisplayText.BPS] =
                 StringRenderable("§7Blocks/Second: §e${bps.roundTo(2)}").toSearchable()
