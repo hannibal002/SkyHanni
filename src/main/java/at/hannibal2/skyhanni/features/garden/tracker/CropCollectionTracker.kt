@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay.update
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
@@ -190,7 +189,7 @@ object CropCollectionTracker {
             nullLabel = "Default",
             onChange = { new ->
                 cropDisplayMode = new
-                update()
+                tracker.update()
             },
             universe = CropType.entries,
             enableUniverseScroll = false // would infinitely scroll while hovered
