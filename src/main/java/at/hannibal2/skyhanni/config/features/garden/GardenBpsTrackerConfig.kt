@@ -17,10 +17,10 @@ import java.util.Arrays
 
 class GardenBpsTrackerConfig {
     @Expose
-    @ConfigOption(name = "Enable Tracker", desc = "Track garden uptime.")
+    @ConfigOption(name = "Enable Tracker", desc = "Track garden block breaks.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var showDisplay: Boolean = true
+    var showDisplay: Boolean = false
 
     @Expose
     @ConfigOption(name = "Stats List", desc = "Drag text to change what displays in the summary card.")
@@ -40,7 +40,7 @@ class GardenBpsTrackerConfig {
     val perTrackerConfig: TimedGardenIndividualTrackerConfig = TimedGardenIndividualTrackerConfig()
 
     enum class GardenUptimeDisplayText(private val str: String) {
-        TITLE("Garden Uptime"),
+        TITLE("Garden Block Break Tracker"),
         BPS("Blocks/Second: 17.11"),
         BLOCKS_BROKEN("Blocks Broken: 17,912"),
         ;

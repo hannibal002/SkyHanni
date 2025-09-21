@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -28,7 +29,7 @@ object GardenBpsTracker {
     private val config get() = GardenApi.config.gardenBpsTracker
 
     val tracker = SkyhanniTimedTracker(
-        "Garden Bps Tracker",
+        "Garden Block Break Tracker",
         { Data() },
         { it.garden.uptimeTracker },
         { drawDisplay(it) },
@@ -54,7 +55,7 @@ object GardenBpsTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (event.isMod(5)) return
+        if (!event.isMod(5)) return
         if (blockBreaksLastFiveTicks == 0) return
         tracker.modify { it.blocksBroken += blockBreaksLastFiveTicks }
         blockBreaksLastFiveTicks = 0
@@ -78,7 +79,7 @@ object GardenBpsTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         val lineMap = mutableMapOf<GardenUptimeDisplayText, Searchable>()
-        lineMap[GardenUptimeDisplayText.TITLE] = StringRenderable("§6Garden BPS Tracker").toSearchable()
+        lineMap[GardenUptimeDisplayText.TITLE] = StringRenderable("§6Garden Block Break Tracker").toSearchable()
 
         val uptime = data.getTotalUptime()
 
