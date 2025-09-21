@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
@@ -18,7 +16,6 @@ import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.tracker.GardenSession
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule

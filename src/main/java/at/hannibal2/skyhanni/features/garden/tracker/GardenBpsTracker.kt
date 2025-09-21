@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -95,10 +94,10 @@ object GardenBpsTracker {
         lineMap[GardenUptimeDisplayText.BLOCKS_BROKEN] =
             StringRenderable("§7Blocks Broken: §e${data.blocksBroken.addSeparators()}").toSearchable()
 
-        return formatDisplay(lineMap, data)
+        return formatDisplay(lineMap)
     }
 
-    private fun formatDisplay(lineMap: MutableMap<GardenUptimeDisplayText, Searchable>, data: Data): List<Searchable> {
+    private fun formatDisplay(lineMap: MutableMap<GardenUptimeDisplayText, Searchable>): List<Searchable> {
         val newList = mutableListOf<Searchable>()
         newList.addAll(config.uptimeDisplayText.get().mapNotNull { lineMap[it] })
         return newList

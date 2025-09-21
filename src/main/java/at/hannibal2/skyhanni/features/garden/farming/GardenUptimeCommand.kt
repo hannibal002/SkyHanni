@@ -5,11 +5,8 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.tracker.GardenSession
-import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
@@ -39,14 +36,14 @@ object GardenUptimeCommand {
 
             val dayString = if (day == LocalDate.now()) "Today" else day.toString()
 
-            val outputString = "    §e$dayString:    §b${uptime}"
+            val outputString = "    §e$dayString:    §b$uptime"
 
             totalUptime += uptime
             commandString += outputString
         }
 
         commandString += ""
-        commandString += "§bTotal Uptime: §e${totalUptime}"
+        commandString += "§bTotal Uptime: §e$totalUptime"
         commandString += "§bAverage Uptime: §e${(totalUptime / dayAmount)}"
         commandString += "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r"
 
