@@ -45,10 +45,6 @@ class GardenConfig {
     @Category(name = "Crop Milestones", desc = "Crop Milestones Settings")
     val cropMilestones: CropMilestonesConfig = CropMilestonesConfig()
 
-    @Expose
-    @Category(name = "Crop Collection Tracker", desc = "Crop Collection Tracker Settings")
-    val cropCollections: CropCollectionsConfig = CropCollectionsConfig()
-
     // TODO Write ConditionalUtils.onToggle()-s for these values in their feature classes
     @Expose
     @ConfigOption(name = "Custom Keybinds", desc = "")
@@ -77,6 +73,11 @@ class GardenConfig {
     @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")
     @Accordion
     val dicerRngDropTracker: DicerRngDropTrackerConfig = DicerRngDropTrackerConfig()
+
+    @Expose
+    @ConfigOption(name = "Crop Collection Tracker", desc = "Crop Collection Tracker Settings")
+    @Accordion
+    val cropCollectionTracker: CropCollectionsConfig = CropCollectionsConfig()
 
     @Expose
     @ConfigOption(name = "Money per Hour", desc = "")
