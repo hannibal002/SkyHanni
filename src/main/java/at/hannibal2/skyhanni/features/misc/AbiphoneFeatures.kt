@@ -66,10 +66,12 @@ object AbiphoneFeatures {
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val constant = event.getConstant<Map<String, AbiphoneContactInfo>>("abiphone", NeuAbiphoneJson.TYPE)
         abiphoneContacts = constant.flatMap { (key, value) ->
-            // In NEU repo, callNames are optional shortenings and do not include actual contact name
             val cleanKey = key.removeAllNonLettersAndNumbers().replace(" ", "").lowercase()
-            val aliases = value.callNames.orEmpty().map { it.lowercase() }
-            listOf(cleanKey) + aliases
+            value.callNames.orEmpty().let { callNames ->
+                if (callNames.isEmpty()) listOf(cleanKey)
+                // just in case, it is not explicitly stated anywhere that they are guaranteed to be lowercase
+                else callNames.map { it.lowercase() }
+            }
         }.toSet()
     }
 

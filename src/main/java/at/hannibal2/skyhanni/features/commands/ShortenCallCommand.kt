@@ -24,8 +24,9 @@ object ShortenCallCommand {
         val command = message.lowercase().removePrefix("/").trimEnd()
 
         val contacts = AbiphoneFeatures.abiphoneContacts
+        val warps = ShortenWarpCommand.warps
         if ((contacts != null) && (command in contacts)) {
-            if (!config.shortenForgeToCallNotWarp && command == "forge") return
+            if (command in warps && !config.preferCallOverWarp) return
             event.cancel()
             HypixelCommands.call(command)
         }
