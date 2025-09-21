@@ -89,7 +89,7 @@ class GardenConfig {
     val armorDropTracker: ArmorDropTrackerConfig = ArmorDropTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Garden Block Break Tracker", desc = "")
+    @ConfigOption(name = "Crop Break Tracker", desc = "")
     @Accordion
     val gardenBpsTracker: GardenBpsTrackerConfig = GardenBpsTrackerConfig()
 
