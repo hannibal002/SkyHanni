@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.contest.JacobContestConfig
+import at.hannibal2.skyhanni.config.features.garden.cropcollections.CropCollectionsConfig
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig
 import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteFarmersLeaderboardsConfig
@@ -43,6 +44,10 @@ class GardenConfig {
     @Expose
     @Category(name = "Crop Milestones", desc = "Crop Milestones Settings")
     val cropMilestones: CropMilestonesConfig = CropMilestonesConfig()
+
+    @Expose
+    @Category(name = "Crop Collection Tracker", desc = "Crop Collection Tracker Settings")
+    val cropCollections: CropCollectionsConfig = CropCollectionsConfig()
 
     // TODO Write ConditionalUtils.onToggle()-s for these values in their feature classes
     @Expose

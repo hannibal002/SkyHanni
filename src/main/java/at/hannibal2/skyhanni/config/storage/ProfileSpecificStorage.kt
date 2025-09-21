@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboard
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
+import at.hannibal2.skyhanni.features.garden.tracker.CropCollectionTracker
 import at.hannibal2.skyhanni.features.garden.tracker.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
@@ -69,6 +70,9 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
+import at.hannibal2.skyhanni.utils.tracker.SkyhanniTimedTracker
+import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
@@ -436,7 +440,7 @@ class ProfileSpecificStorage(
         var lastGainedCropCollectionTime: SimpleTimeMark = farPast()
 
         @Expose
-        var cropCollectionCounter: MutableMap<CropType, Long> = enumMapOf()
+        var cropCollectionCounter: MutableMap<CropType, CropCollectionTracker.CropCollection> = enumMapOf()
 
         @Expose
         var cropMilestoneCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
@@ -635,6 +639,10 @@ class ProfileSpecificStorage(
 
         @Expose
         var activeVinyl: VinylType? = null
+
+        @Expose
+        var cropCollectionTracker: TimedTrackerData<CropCollectionTracker.Data, SessionUptime.Garden> =
+            TimedTrackerData(SessionUptime.Garden::class) { CropCollectionTracker.Data() }
     }
 
     // - gui
