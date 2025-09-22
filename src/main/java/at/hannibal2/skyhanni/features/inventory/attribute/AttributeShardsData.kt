@@ -61,6 +61,9 @@ object AttributeShardsData {
         pattern = "\\(\\d+/\\d+\\) Oddities ➜ Shards".toPattern(),
         openInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
     )
+    val confirmFusionInventory = InventoryDetector(
+        openInventory = { DelayedRun.runNextTick { FusionData.updateFusionData() } },
+    ) { name -> name == "Confirm Fusion" }
 
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
 
@@ -81,7 +84,7 @@ object AttributeShardsData {
      * REGEX-TEST: §7Enabled: §aYes
      * REGEX-TEST: §7Enabled: §cNo
      */
-    val attributeStatePattern by patternGroup.pattern(
+    private val attributeStatePattern by patternGroup.pattern(
         "state",
         "§7Enabled: §.(?<state>.+)",
     )
@@ -114,6 +117,14 @@ object AttributeShardsData {
     val amountOwnedPattern by patternGroup.pattern(
         "owned",
         "§7Owned: §b(?<amount>[\\d,]+) Shards?",
+    )
+
+    /**
+     * REGEX-TEST: §7Required to fuse: §b5
+     */
+    val requiredToFusePattern by patternGroup.pattern(
+        "fuse.required",
+        "§7Required to fuse: §b(?<amount>\\d)",
     )
 
     /**
@@ -189,14 +200,14 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §5§lFUSION! §r§7You obtained §r§9Bolt Shard §r§8x2§r§7!
-     * REGEX-TEST: §5§lFUSION! §r§7You obtained §r§9Bolt Shard §r§8x2§r§7! §r§d§lNEW!
-     * REGEX-TEST: §5§lFUSION! §r§7You obtained a §r§fTadgang Shard§r§7!
-     * REGEX-TEST: §5§lFUSION! §r§7You obtained a §r§fTadgang Shard§r§7! §r§d§lNEW!
+     * REGEX-TEST: §5§lFUSION! §7You obtained §9Bolt Shard §8x2§7!
+     * REGEX-TEST: §5§lFUSION! §7You obtained §9Bolt Shard §8x2§7! §d§lNEW!
+     * REGEX-TEST: §5§lFUSION! §7You obtained a §fTadgang Shard§7!
+     * REGEX-TEST: §5§lFUSION! §7You obtained a §fTadgang Shard§7! §d§lNEW!
      */
     private val fusionShardPattern by patternGroup.pattern(
         "fusion.shard",
-        "§5§lFUSION! §r§7You obtained(?: an?)? (?:§.)+(?<shardName>.+) Shard(?: §r§8x(?<amount>\\d+))?§r§7!(?: §r§d§lNEW!)?",
+        "§5§lFUSION! §7You obtained(?: an?)? (?:§.)+(?<shardName>.+) Shard(?: §8x(?<amount>\\d+))?§7!(?: §d§lNEW!)?",
     )
 
     /**
@@ -226,7 +237,6 @@ object AttributeShardsData {
         caughtShardsPattern to true,
         lootShareShardPattern to true,
         charmedShardPattern to true,
-        fusionShardPattern to false,
         sentToHuntingBoxPattern to false,
     )
 
@@ -317,6 +327,14 @@ object AttributeShardsData {
                 }
                 return
             }
+        }
+
+        fusionShardPattern.matchMatcher(event.message) {
+            val currentFusionData = FusionData.currentFusionData ?: return
+            val amount = groupOrNull("amount")?.toInt() ?: 1
+            ShardEvent(currentFusionData.outputShard, amount).post()
+            ShardEvent(currentFusionData.firstShard.internalName, -currentFusionData.firstShard.amount).post()
+            ShardEvent(currentFusionData.secondShard.internalName, -currentFusionData.secondShard.amount).post()
         }
     }
 
