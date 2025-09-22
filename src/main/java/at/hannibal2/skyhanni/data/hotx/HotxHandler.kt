@@ -179,6 +179,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     }
 
     // This event is fired by an InventoryDetector, and should NOT have @HandleEvent
+    @Suppress("UnusedParameter")
     fun onInventoryClose(event: InventoryCloseEvent) {
         data.forEach {
             it.slot = null
@@ -188,6 +189,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     }
 
     // This event is fired by an InventoryDetector, and should NOT have @HandleEvent
+    @Suppress("UnusedParameter")
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         DelayedRun.runNextTick {
             InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
