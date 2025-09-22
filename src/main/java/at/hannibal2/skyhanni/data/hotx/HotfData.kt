@@ -470,10 +470,10 @@ enum class HotfData(
             }
         }
 
-        @HandleEvent
+        // This event is fired by an InventoryDetector, and should NOT have @HandleEvent
         override fun onInventoryClose(event: InventoryCloseEvent) = super.onInventoryClose(event)
 
-        @HandleEvent(onlyOnSkyblock = true)
+        // This event is fired by an InventoryDetector, and should NOT have @HandleEvent
         override fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) = super.onInventoryFullyOpened(event)
 
         @HandleEvent(onlyOnSkyblock = true)
