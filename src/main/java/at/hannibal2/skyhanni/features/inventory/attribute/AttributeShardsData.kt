@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.item.ShardEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -221,12 +222,12 @@ object AttributeShardsData {
         "§7You sent (?:§a)?(?:an?|(?<amount>\\d+)) §.(?<shardName>.+) Shards? §7to your §aHunting Box§7.",
     )
 
-    private val shardChatPatterns = setOf(
-        caughtShardsPattern,
-        lootShareShardPattern,
-        fusionShardPattern,
-        charmedShardPattern,
-        sentToHuntingBoxPattern,
+    private val shardGainChatPatterns = mapOf(
+        caughtShardsPattern to true,
+        lootShareShardPattern to true,
+        charmedShardPattern to true,
+        fusionShardPattern to false,
+        sentToHuntingBoxPattern to false,
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
@@ -254,7 +255,7 @@ object AttributeShardsData {
             val shardInternalName = shardNameToInternalName(shardName) ?: return
             processShard(shardInternalName, level, untilNext)
 
-            ShardGainEvent(shardInternalName, -group("amount").toInt()).post()
+            ShardEvent(shardInternalName, -group("amount").toInt()).post()
 
             lastSyphonedMessage = SimpleTimeMark.now()
             return
@@ -266,7 +267,7 @@ object AttributeShardsData {
             val shardInternalName = shardNameToInternalName(shardName) ?: return
             processShard(shardInternalName, 10, 0)
 
-            ShardGainEvent(shardInternalName, -group("amount").toInt()).post()
+            ShardEvent(shardInternalName, -group("amount").toInt()).post()
 
             lastSyphonedMessage = SimpleTimeMark.now()
             return
@@ -298,7 +299,7 @@ object AttributeShardsData {
             setAttributeState(shardInternalName, false)
         }
 
-        for (pattern in shardChatPatterns) {
+        for ((pattern, shouldPostGainEvent) in shardGainChatPatterns) {
             pattern.matchMatcher(event.message) {
                 val shardName = group("shardName")
                 val amount = groupOrNull("amount")?.toInt() ?: 1
@@ -309,7 +310,11 @@ object AttributeShardsData {
                     return
                 }
 
-                ShardGainEvent(shardInternalName, amount).post()
+                if (shouldPostGainEvent) {
+                    ShardGainEvent(shardInternalName, amount).post()
+                } else {
+                    ShardEvent(shardInternalName, amount).post()
+                }
                 return
             }
         }
@@ -396,7 +401,7 @@ object AttributeShardsData {
     }
 
     @HandleEvent
-    fun onShardGain(event: ShardGainEvent) {
+    fun onShardGain(event: ShardEvent) {
         val attributeName = shardInternalNameToShardName(event.shardInternalName)
         val existing = storage?.get(attributeName)?.amountInBox ?: 0
         val newAmount = (existing + event.amount).coerceAtLeast(0)
