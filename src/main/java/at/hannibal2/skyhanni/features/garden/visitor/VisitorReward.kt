@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfi
 import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 
 private typealias StatsEntry = DropsStatisticsConfig.DropsStatisticsTextEntry
 
