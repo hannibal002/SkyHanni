@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -77,26 +78,8 @@ object PestProfitTracker {
         "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- .* §r§7with §r§.(?<spray>.*)§r§7!",
     )
 
-    /**
-     * REGEX-TEST: §5§lCHARM§7 You charmed a §aPest§7 and captured §92 Shards §7from it.
-     * REGEX-TEST: §6§lNAGA§7 You charmed a §aPest§7 and captured §93 Shards §7from it.
-     * REGEX-TEST: §d§lSALT§7 You charmed a §aPest§7 and captured §92 Shards §7from it.
-     */
-    private val pestShardDropPattern by patternGroup.pattern(
-        "sharddrop",
-        "§.§l\\w{4,5}§7 You charmed a §aPest§7 and captured §9(?<amount>\\d+) Shards? §7from it\\."
-    )
-
-    /**
-     * REGEX-TEST: §aYou caught §7x3 §aPest §aShards§a!
-     */
-    private val pestBlackHoleDropPattern by patternGroup.pattern(
-        "blackholedrop",
-        "§aYou caught §7x(?<amount>\\d+) §aPest §aShards?§a!"
-    )
-
     val DUNG_ITEM = "DUNG".toInternalName()
-    val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
+    private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
     private val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
     private val tracker = SkyHanniBucketedItemTracker(
         "Pest Profit Tracker",
@@ -204,15 +187,12 @@ object PestProfitTracker {
             tracker.addItem(pest, internalName, amount, command = false)
             // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
-        // we can't easily tell what pest either of these messages comes from so we'll just add it to total and not a bucket
-        pestShardDropPattern.matchMatcher(message) {
-            val shardGroup = group("amount").toIntOrNull() ?: return
-            tracker.addItem(PestType.UNKNOWN, PEST_SHARD, shardGroup, command = false)
-        }
-        pestBlackHoleDropPattern.matchMatcher(message) {
-            val shardGroup = group("amount").toIntOrNull() ?: return
-            tracker.addItem(PestType.UNKNOWN, PEST_SHARD, shardGroup, command = false)
-        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onShardGain(event: ShardGainEvent) {
+        if (event.shardInternalName != PEST_SHARD) return
+        tracker.addItem(PestType.UNKNOWN, PEST_SHARD, event.amount, command = false)
     }
 
     private fun SkyHanniChatEvent.checkSprayChats() {
