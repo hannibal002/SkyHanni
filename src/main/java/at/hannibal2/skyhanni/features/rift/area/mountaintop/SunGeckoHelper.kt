@@ -69,6 +69,8 @@ object SunGeckoHelper {
         "§6§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
     )
 
+    private val COMBO_MANIA_TALISMAN = "COMBO_MANIA_TALISMAN".toInternalName()
+
     private var healthLeft = 250
     private var totalHealth = 250
     private var actionBarFormatted: String = ""
@@ -113,7 +115,10 @@ object SunGeckoHelper {
 
         // this is just a total guess but it looks right enough
         // i think its inconsistent because of how often the action bar updates
-        var expiryTime = 5.seconds + 200.milliseconds
+        var expiryTime = 4.seconds + 700.milliseconds
+        if (InventoryUtils.isItemInInventory(COMBO_MANIA_TALISMAN)) {
+            expiryTime += 500.milliseconds
+        }
         if (modifiers.contains(Modifiers.COLLECTIVE)) {
             expiryTime += (modifiers.size * 200).milliseconds
         }
