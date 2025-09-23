@@ -116,7 +116,8 @@ object CropCollectionApi {
         }
 
         fun setTotal(amount: Long) {
-            val diff = amount - getTotal()
+            val total = cropCollectionType.filter { it.key != CropCollectionType.UNKNOWN }.sumAllValues().toLong()
+            val diff = amount - total
             setCollection(CropCollectionType.UNKNOWN, diff)
         }
 
