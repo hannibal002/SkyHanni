@@ -145,7 +145,7 @@ object EliteFarmersLeaderboard {
     private fun loadLeaderboardIfAble(leaderboardType: EliteLeaderboardType): Int? {
         if (loadingLeaderboardMutex.isLocked) return null
         if (profileId == "") updateCollections()
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("load elite lb") {
             loadingLeaderboardMutex.withLock {
                 val oldPos = leaderboardPosMap?.get(leaderboardType)
                 val lbPos = loadLeaderboardPosition(leaderboardType)
