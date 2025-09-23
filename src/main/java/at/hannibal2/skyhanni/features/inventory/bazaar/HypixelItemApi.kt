@@ -40,27 +40,27 @@ class HypixelItemApi {
         "Hypixel SkyBlock Items",
     )
 
-    private suspend fun loadNpcPrices(): MutableMap<NeuInternalName, Double> {
-        val list = mutableMapOf<NeuInternalName, Double>()
-        val (_, apiResponseData) = ApiUtils.getJsonResponse(hypixelItemStatic).assertSuccessWithData() ?: return list
+    private suspend fun loadItemData() {
+        val (_, apiResponseData) = ApiUtils.getJsonResponse(hypixelItemStatic).assertSuccessWithData() ?: return
         val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponseData)
 
+        val npcPrices = mutableMapOf<NeuInternalName, Double>()
         val motesPrice = mutableMapOf<NeuInternalName, Double>()
         val allStats = mutableMapOf<NeuInternalName, Map<String, Int>>()
         for (item in itemsData.items) {
             val neuItemId = NeuItems.transHypixelNameToInternalName(item.id ?: continue)
-            item.npcPrice?.let { list[neuItemId] = it }
+            item.npcPrice?.let { npcPrices[neuItemId] = it }
             item.motesPrice?.let { motesPrice[neuItemId] = it }
             item.stats?.let { stats -> allStats[neuItemId] = stats }
         }
         ItemUtils.updateBaseStats(allStats)
         RiftApi.motesPrice = motesPrice
-        return list
+        HypixelItemApi.npcPrices = npcPrices
     }
 
     fun start() {
-        SkyHanniMod.launchIOCoroutine {
-            npcPrices = loadNpcPrices()
+        SkyHanniMod.launchIOCoroutine("hypixel item api fetch") {
+            loadItemData()
             prices = georgePrices + npcPrices
         }
 

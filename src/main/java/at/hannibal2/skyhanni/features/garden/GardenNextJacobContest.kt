@@ -432,7 +432,7 @@ object GardenNextJacobContest {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
         if (config.warnPopup && !Minecraft.getMinecraft().inGameHasFocus) {
-            SkyHanniMod.launchCoroutine {
+            SkyHanniMod.launchCoroutine("garden jacob contest openPopupWindow") {
                 DialogUtils.openPopupWindow(
                     title = "SkyHanni Jacob Contest Notification",
                     message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",
@@ -467,7 +467,7 @@ object GardenNextJacobContest {
         // Allows retries every 10 minutes when it's after 1 day into the new year
         if (lastFetchAttempted.passedSince() < 10.minutes || nextContestsAvailableAt.isInFuture()) return
 
-        SkyHanniMod.launchIOCoroutineWithMutex(fetchingContestsMutex) {
+        SkyHanniMod.launchIOCoroutineWithMutex("garden jacob contest fetch", fetchingContestsMutex) {
             knownContests = EliteDevApi.fetchUpcomingContests().orEmpty()
             handleFetchedContests()
             lastFetchAttempted = SimpleTimeMark.now()
@@ -496,7 +496,7 @@ object GardenNextJacobContest {
 
     private fun sendContestsIfAble() {
         if (!haveAllContests || isCloseToNewYear()) return
-        SkyHanniMod.launchIOCoroutineWithMutex(sendingContestsMutex) {
+        SkyHanniMod.launchIOCoroutineWithMutex("garden jacob contest send", sendingContestsMutex) {
             if (EliteDevApi.submitContests(knownContests)) {
                 ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
             } else ErrorManager.logErrorStateWithData(

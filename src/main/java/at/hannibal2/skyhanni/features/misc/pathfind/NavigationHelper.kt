@@ -50,7 +50,7 @@ object NavigationHelper {
             }
         }
 
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("shnavigate command") {
             doCommandAsync(args)
         }
     }

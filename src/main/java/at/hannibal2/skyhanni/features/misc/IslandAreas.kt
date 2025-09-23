@@ -66,7 +66,7 @@ object IslandAreas {
 
     fun nodeMoved() {
         if (nodeSaveJob?.isActive == true) return
-        nodeSaveJob = SkyHanniMod.launchCoroutineWithMutex(nodeSaveMutex) {
+        nodeSaveJob = SkyHanniMod.launchCoroutineWithMutex("§island area node moved", nodeSaveMutex) {
             updateNodes()
         }
     }

@@ -806,7 +806,7 @@ object ItemUtils {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("shtestitem") {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }

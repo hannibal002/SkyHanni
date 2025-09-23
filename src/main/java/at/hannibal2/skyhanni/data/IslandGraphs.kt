@@ -255,7 +255,7 @@ object IslandGraphs {
     private fun reloadFromJson(islandName: String) {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("reload island graphs") {
             try {
                 val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
                 IslandAreas.display = null
@@ -264,6 +264,7 @@ object IslandGraphs {
                 }
             } catch (e: Error) {
                 currentIslandGraph = null
+                throw e
             }
         }
     }

@@ -239,7 +239,7 @@ object OrderedWaypoints {
         loadJob?.join()
     }
 
-    private fun setupLoadJob(name: String): Job = SkyHanniMod.launchIOCoroutine {
+    private fun setupLoadJob(name: String): Job = SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
         val loadedRoute = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
         else storage?.routes?.get(name) ?: return@launchIOCoroutine ChatUtils.userError(
             "Route $name doesn't exist.\n" +
@@ -340,7 +340,7 @@ object OrderedWaypoints {
     }
 
     private fun export(format: String) {
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("ordered waypoints export format:$format") {
             val route = if (format.isEmpty()) exportWaypoints(orderedWaypointsList, "coleweight")
             else exportWaypoints(orderedWaypointsList, format.lowercase(Locale.getDefault()))
 

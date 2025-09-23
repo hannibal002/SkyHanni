@@ -61,7 +61,7 @@ object ChangelogViewer {
 
     private fun setupFetchJob() {
         if (fetchJob?.isActive == true) return
-        fetchJob = SkyHanniMod.launchIOCoroutine { getChangelog() }
+        fetchJob = SkyHanniMod.launchIOCoroutine("changelog viewer fetch data") { getChangelog() }
     }
 
     private fun openChangelog() {

@@ -111,7 +111,7 @@ object DiscordRPCManager {
     }
 
     private fun setupPresenceJob() {
-        presenceJob = SkyHanniMod.launchNoScopeCoroutine(timeout = Duration.INFINITE) {
+        presenceJob = SkyHanniMod.launchNoScopeCoroutine("discord rpc updatePresence", timeout = Duration.INFINITE) {
             while (isConnected()) {
                 updatePresence()
                 delay(5.seconds)
@@ -193,7 +193,7 @@ object DiscordRPCManager {
         if (SkyBlockUtils.inSkyBlock) {
             // todo discord rpc doesnt connect on 1.21
             //#if TODO
-            SkyHanniMod.launchNoScopeCoroutine { start() }
+            SkyHanniMod.launchNoScopeCoroutine("discord rpc start") { start() }
             //#endif
             started = true
         }
@@ -226,7 +226,7 @@ object DiscordRPCManager {
 
         ChatUtils.chat("Attempting to start Discord Rich Presence...")
         try {
-            SkyHanniMod.launchCoroutine { start(true) }
+            SkyHanniMod.launchCoroutine("discord rpc manual start") { start(true) }
             updateDebugStatus("Successfully started")
         } catch (e: Exception) {
             updateDebugStatus("Unable to start: ${e.message}", error = true)
