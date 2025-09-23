@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 
 @SkyHanniModule
 object GfSKeybind {
+    private val config get() = SkyHanniMod.feature.inventory.gfs
 
     @HandleEvent
     fun onKey(event: GuiKeyPressEvent) {
-        if (!SkyHanniMod.feature.inventory.gfs.gfsKeybind.isKeyClicked()) return
-        val stack = stackUnderCursor() ?: return
-        val internalName = stack.getInternalNameOrNull() ?: return
-        GetFromSackApi.getFromSack(internalName, 9999)
-
+        if (!config.keybind.isKeyClicked()) return
+        stackUnderCursor()?.getInternalNameOrNull()?.let {
+            GetFromSackApi.getFromSack(it, 9999)
+        }
     }
 }
