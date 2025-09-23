@@ -98,8 +98,8 @@ class DiscordRPCConfig {
     @ConfigOption(
         name = "Credits",
         desc = "Rich presence assets were created by\n" +
-        "Hypixel Pack HQ (packshq.com) for the old images\n" +
-        "and @unfamiliartunes (unfamiliartunes.straw.page) for the new images"
+            "Hypixel Pack HQ (packshq.com) for the old images\n" +
+            "and @unfamiliartunes (unfamiliartunes.straw.page) for the new images"
     )
     @ConfigEditorInfoText
     val credits = ""
