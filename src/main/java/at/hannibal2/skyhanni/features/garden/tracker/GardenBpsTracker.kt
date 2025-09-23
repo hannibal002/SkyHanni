@@ -77,7 +77,7 @@ object GardenBpsTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         val lineMap = mutableMapOf<GardenUptimeDisplayText, Searchable>()
-        lineMap[GardenUptimeDisplayText.TITLE] = StringRenderable("§Crop Break Tracker").toSearchable()
+        lineMap[GardenUptimeDisplayText.TITLE] = StringRenderable("§6Crop Break Tracker").toSearchable()
 
         val uptime = data.getTotalUptime()
 
