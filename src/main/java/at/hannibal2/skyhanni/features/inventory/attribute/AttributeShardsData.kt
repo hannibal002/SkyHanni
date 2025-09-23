@@ -348,16 +348,6 @@ object AttributeShardsData {
         }
     }
 
-    @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Active Attribute Levels")
-        event.addIrrelevant {
-            for (shardName in attributeInfo.keys) {
-                add("- $shardName: Level ${getActiveLevel(shardName)}/10")
-            }
-        }
-    }
-
     private fun processAttributeMenuItems() {
         val items = InventoryUtils.getItemsInOpenChest().map { it.stack }
         for (item in items) {
