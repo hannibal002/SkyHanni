@@ -178,7 +178,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onShardGain(event: ShardGainEvent) {
         if (event.shardInternalName != PEST_SHARD) return
-        tracker.addItem(PestType.UNKNOWN, PEST_SHARD, event.amount, command = false)
+        addItem(PestType.UNKNOWN, PEST_SHARD, event.amount, command = false)
     }
 
     private fun SkyHanniChatEvent.checkSprayChats() {
