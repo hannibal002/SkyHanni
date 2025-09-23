@@ -95,9 +95,6 @@ object FishingProfitTracker {
         }
     }
 
-    @Suppress("unused")
-    private val ItemTrackerData.TrackedItem.timesCaught get() = timesGained
-
     private val MAGMA_FISH = "MAGMA_FISH".toInternalName()
 
     private const val NAME_ALL: CategoryName = "All"
