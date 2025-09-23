@@ -53,7 +53,7 @@ object FannCost {
         var expEarned: Double? = null,
         var expDaily: Double? = null,
         var duration: Duration = Duration.ZERO,
-    ) : Resettable()
+    ) : Resettable
 
     private const val TRAINING_DURATION_SLOT_NUM = 15
     private const val BEGIN_TRAINING_SLOT_NUM = 22

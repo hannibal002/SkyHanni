@@ -20,7 +20,7 @@ object GraphEditorBugFinder {
     private var errorsInWorld = emptyMap<GraphNode, String>()
 
     fun runTests() {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("graph editor bug finder") {
             asyncTest()
         }
     }
