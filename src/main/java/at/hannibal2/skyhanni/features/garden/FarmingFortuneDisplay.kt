@@ -52,7 +52,7 @@ object FarmingFortuneDisplay {
         "tablist.universal",
         " Farming Fortune: §r§6☘(?<fortune>\\d+)",
     )
-    @Suppress("MaxLineLength", "RepoPatternRegexTestMissing")
+    @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific",
         " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon Slice|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)",
