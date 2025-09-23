@@ -345,6 +345,9 @@ class ItemResolutionQuery {
         if (guiName == "Confirm Fusion") {
             return resolveItemInHuntingBoxMenu(compound.getLore().firstOrNull() ?: return null)
         }
+        if (guiName == "Dye Compendium") {
+            return findInternalNameByDisplayName(displayName, false)
+        }
         return null
     }
 

@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
@@ -31,7 +32,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -61,7 +61,7 @@ object CropMoneyDisplay {
     private var moneyPerHour: Map<NeuInternalName, CropMoneyData> = mutableMapOf()
     private val extraMoneyPerHour: ExtraMoneyData = ExtraMoneyData(0.0, 0.0, 0.0)
 
-    private val BOX_OF_SEEDS by lazy { "BOX_OF_SEEDS".toInternalName().getItemStack() }
+    private val BOX_OF_SEEDS by AutoUpdatingItemStack("BOX_OF_SEEDS")
     private val SEEDS = "SEEDS".toInternalName()
     private val ENCHANTED_SEEDS = "ENCHANTED_SEEDS".toInternalName()
 
