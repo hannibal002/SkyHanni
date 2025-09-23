@@ -340,7 +340,7 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     fun addPriceFromButton(lists: MutableList<Searchable>) {
         if (isInventoryOpen()) {
-            lists.addButton<ItemPriceSource>(
+            lists.addButton(
                 label = "Price Source",
                 current = config.priceSource,
                 getName = { it.sellName },

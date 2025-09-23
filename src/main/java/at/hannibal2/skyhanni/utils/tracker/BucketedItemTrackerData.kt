@@ -33,10 +33,11 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
         }
     }
 
-    override fun resetData() {
+    @Deprecated("Make data class extend Resettable instead")
+    final override fun resetData() {
+        super.reset()
         bucketedItems.clear()
         selectedBucket = null
-        resetItems()
     }
 
     final override fun removeItem(internalName: NeuInternalName) =
