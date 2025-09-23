@@ -4,3 +4,6 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.NeuInternalName
 
 open class ShardEvent(val shardInternalName: NeuInternalName, val amount: Int) : SkyHanniEvent()
+
+class ShardGainEvent(shardInternalName: NeuInternalName, amount: Int) : ShardEvent(shardInternalName, amount)
+
