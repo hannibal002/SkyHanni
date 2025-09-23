@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -78,7 +78,7 @@ object PunchcardHighlight {
     private val playerQueue = mutableListOf<String>()
 
     private val PUNCHCARD_ARTIFACT = "PUNCHCARD_ARTIFACT".toInternalName()
-    private val displayIcon by lazy { PUNCHCARD_ARTIFACT.getItemStack() }
+    private val displayIcon by AutoUpdatingItemStack(PUNCHCARD_ARTIFACT)
     private var display: Renderable = Renderable.text("hello")
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
