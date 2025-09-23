@@ -51,14 +51,14 @@ object AttributeShardsData {
         private set
 
     val attributeMenuInventory = InventoryDetector(
-        openInventory = { DelayedRun.runNextTick { processAttributeMenuItems() } },
+        onOpenInventory = { DelayedRun.runNextTick { processAttributeMenuItems() } },
     ) { name -> name == "Attribute Menu" }
     val huntingBoxInventory = InventoryDetector(
-        openInventory = { DelayedRun.runNextTick { processHuntingBoxItems() } },
+        onOpenInventory = { DelayedRun.runNextTick { processHuntingBoxItems() } },
     ) { name -> name == "Hunting Box" }
     val bazaarShardsInventory = InventoryDetector(
         pattern = "\\(\\d+/\\d+\\) Oddities ➜ Shards".toPattern(),
-        openInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
+        onOpenInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
     )
 
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
