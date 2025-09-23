@@ -193,14 +193,14 @@ object MoongladeBeacon {
     private val acceptablePitchMargin = 50.milliseconds
 
     private val colorMinigameInventory = InventoryDetector(
-        openInventory = openInventory@{
+        onOpenInventory = openInventory@{
             if (!solverEnabled()) return@openInventory
             currentServerTicks = 0
             checkPants()
             normalTuning = BeaconTuneData()
             enchantedTuning = BeaconTuneData(isEnchanted = true)
         },
-        closeInventory = closeInventory@{
+        onCloseInventory = closeInventory@{
             if (!solverEnabled()) return@closeInventory
             normalTuning.reset()
             enchantedTuning.reset()
