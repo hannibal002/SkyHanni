@@ -359,7 +359,7 @@ object CropMoneyDisplay {
         if (loaded) return
         loaded = true
 
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("garden crop money display init") {
             val map = mutableMapOf<NeuInternalName, Int>()
             for ((rawInternalName, _) in NeuItems.allNeuRepoItems()) {
                 if (rawInternalName == "ENCHANTED_PAPER") continue

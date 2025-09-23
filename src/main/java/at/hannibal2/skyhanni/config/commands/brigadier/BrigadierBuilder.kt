@@ -63,7 +63,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     /** Alternative to [simpleCallback] when a block needs to be executed in a coroutine. */
     fun coroutineSimpleCallback(block: suspend ArgContext.() -> Unit) {
         this.builder.executes {
-            SkyHanniMod.launchIOCoroutine {
+            SkyHanniMod.launchIOCoroutine("brigadier builder coroutineSimpleCallback") {
                 block(ArgContext(it))
             }
             1

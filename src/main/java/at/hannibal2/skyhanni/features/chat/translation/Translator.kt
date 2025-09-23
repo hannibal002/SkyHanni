@@ -135,7 +135,7 @@ object Translator {
     private fun toNativeLanguage(args: Array<String>) {
         val message = args.joinToString(" ").removeColor()
 
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("translator toNativeLanguage") {
             val translation = getTranslation(message, getNativeLanguage())
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = translation?.get(1) ?: "Error!"
@@ -160,7 +160,7 @@ object Translator {
         val language = args[0]
         val message = args.drop(1).joinToString(" ")
 
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("translator fromNativeLanguage") {
             val translation = getTranslation(message, language, getNativeLanguage())?.get(0) ?: "Error!"
             ChatUtils.clickableChat(
                 "Copied §f$language §etranslation to clipboard: §f$translation",
@@ -199,7 +199,7 @@ object Translator {
         val targetLanguage = args[1]
         val message = args.drop(2).joinToString(" ")
 
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("shtranslateadvanced") {
             val translation = getTranslation(message, targetLanguage, sourceLanguage)
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""

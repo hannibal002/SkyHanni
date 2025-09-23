@@ -130,7 +130,7 @@ object OSUtils {
      * @param expiryDuration the duration threshold used to determine if a file is expired.
      */
     fun deleteExpiredFiles(root: File, expiryDuration: Duration) {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("deleteExpiredFiles") {
             val allFiles = root.walk().filter { it.isFile }.toList()
             val lastModified = allFiles.associateWith { file ->
                 file.lastModifiedTime()

@@ -171,7 +171,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             resetRepositoryLocation()
         }
 
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("$commonName updateRepo") {
             if (!fetchAndUnpackRepo(command = true, forceReset = forceReset).canContinue) {
                 logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
                 return@launchIOCoroutine
@@ -207,7 +207,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     fun initRepo() {
         shouldManuallyReload = true
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("$commonName repo init") {
             if (config.repoAutoUpdate && !fetchAndUnpackRepo(command = false).canContinue) {
                 logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
                 return@launchIOCoroutine
@@ -386,7 +386,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     fun reloadLocalRepo(answerMessage: String = "$commonName Repo loaded from local files successfully.") {
         shouldManuallyReload = true
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("$commonName reloadLocalRepo") {
             reloadRepository(answerMessage)
         }
     }

@@ -169,7 +169,8 @@ object DanceRoomHelper {
         instructions = event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions").instructions
     }
 
-    fun start(interval: Long) = SkyHanniMod.launchCoroutine(timeout = Duration.INFINITE) {
+    // TODO maybe change to run delayed or tick based timer
+    fun start(interval: Long) = SkyHanniMod.launchCoroutine("rift dance room helper", timeout = Duration.INFINITE) {
         while (isActive && foundNext) {
             index++
             startCountdown(0, 500)

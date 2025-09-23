@@ -53,7 +53,7 @@ object ComputerTimeOffset {
     }
 
     init {
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("computer time offset init") {
             while (state != State.TOTALLY_OFF) {
                 delay(state.duration)
                 detectTimeChange()
@@ -79,7 +79,7 @@ object ComputerTimeOffset {
         }
 
         val wasOffsetBefore = (offsetDuration?.absoluteValue ?: 0.seconds) > 5.seconds
-        checkJob = SkyHanniMod.launchIOCoroutine {
+        checkJob = SkyHanniMod.launchIOCoroutine("computer time offset calculation") {
             offsetDuration = getNtpOffset(devConfig.ntpServer)
             offsetDuration?.let {
                 tryDisplayOffset(wasOffsetBefore)

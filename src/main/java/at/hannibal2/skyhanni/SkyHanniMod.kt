@@ -142,10 +142,11 @@ object SkyHanniMod {
      * @param block The suspend function to execute within the IO context.
      */
     fun launchIOCoroutineWithMutex(
+        name: String,
         mutex: Mutex,
         timeout: Duration = 10.seconds,
         block: suspend CoroutineScope.() -> Unit,
-    ): Job = launchCoroutine(timeout) {
+    ): Job = launchCoroutine("launchIOCoroutineWithMutex $name", timeout) {
         mutex.withLock {
             withContext(Dispatchers.IO, block)
         }
@@ -157,9 +158,10 @@ object SkyHanniMod {
      * @param block The suspend function to execute within the IO context.
      */
     fun launchIOCoroutine(
+        name: String,
         timeout: Duration = 10.seconds,
-        block: suspend CoroutineScope.() -> Unit
-    ): Job = launchCoroutine(timeout) {
+        block: suspend CoroutineScope.() -> Unit,
+    ): Job = launchCoroutine("launchIOCoroutine $name", timeout) {
         withContext(Dispatchers.IO, block)
     }
 
@@ -170,9 +172,10 @@ object SkyHanniMod {
      * @param block The block to execute in the coroutine.
      */
     fun launchNoScopeCoroutine(
+        name: String,
         timeout: Duration = 10.seconds,
-        block: suspend () -> Unit
-    ): Job = launchCoroutine(timeout) { block() }
+        block: suspend () -> Unit,
+    ): Job = launchCoroutine("launchNoScopeCoroutine $name", timeout) { block() }
 
     /**
      * Launch a coroutine with a lock on the provided mutex.
@@ -181,10 +184,11 @@ object SkyHanniMod {
      * @param block The suspend function to execute within the IO context.
      */
     fun launchCoroutineWithMutex(
+        name: String,
         mutex: Mutex,
         timeout: Duration = 10.seconds,
         block: suspend CoroutineScope.() -> Unit,
-    ): Job = launchCoroutine(timeout) {
+    ): Job = launchCoroutine("launchCoroutineWithMutex $name", timeout) {
         mutex.withLock { block() }
     }
 
@@ -195,8 +199,9 @@ object SkyHanniMod {
      */
     @OptIn(InternalCoroutinesApi::class)
     fun launchCoroutine(
+        name: String,
         timeout: Duration = 10.seconds,
-        function: suspend CoroutineScope.() -> Unit
+        function: suspend CoroutineScope.() -> Unit,
     ): Job = coroutineScope.launch {
         val mainJob = launch {
             try {
@@ -205,11 +210,12 @@ object SkyHanniMod {
                 // Don't notify the user about cancellation exceptions - these are to be expected at times
                 val jobState = coroutineContext[Job]?.toString() ?: "unknown job"
                 val cancellationCause = coroutineContext[Job]?.getCancellationException()
-                logger.debug("Job $jobState was cancelled with cause: $cancellationCause", e)
+                logger.debug("Job $jobState/$name was cancelled with cause: $cancellationCause", e)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
                     e,
                     e.message ?: "Asynchronous exception caught",
+                    "coroutine name" to name,
                 )
             }
         }
@@ -223,6 +229,7 @@ object SkyHanniMod {
                         "Coroutine timed out",
                         "The coroutine took longer than the specified timeout of $timeout",
                         "timeout" to timeout,
+                        "coroutine name" to name,
                     )
                 }
             }

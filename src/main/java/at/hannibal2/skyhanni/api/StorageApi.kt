@@ -127,7 +127,7 @@ object StorageApi {
     }
 
     private fun setupSaveJob() {
-        saveJob = SkyHanniMod.launchIOCoroutineWithMutex(saveMutex) {
+        saveJob = SkyHanniMod.launchIOCoroutineWithMutex("storage api save", saveMutex) {
             if (!shouldSave) return@launchIOCoroutineWithMutex
             SkyHanniMod.configManager.saveConfig(ConfigFileType.STORAGE, "Updated Items")
             shouldSave = false

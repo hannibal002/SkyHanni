@@ -56,7 +56,7 @@ object ForagingTrackerLegacy {
             )
         }
 
-        override fun getCoinName(bucket: TreeType?, item: TrackedItem) = "<no coins>"
+        override fun getCoinName(bucket: TreeType?, item: TrackedItem) = "§6Coins"
         override fun getCoinDescription(bucket: TreeType?, item: TrackedItem): List<String> {
             val mobKillCoinsFormat = item.totalAmount.shortFormat()
             return listOf(
