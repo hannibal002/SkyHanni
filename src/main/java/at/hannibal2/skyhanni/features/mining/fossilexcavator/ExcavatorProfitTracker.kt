@@ -201,7 +201,7 @@ object ExcavatorProfitTracker {
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled) return false
         if (!isEnabled()) return false
-        if (Minecraft.getMinecraft().currentScreen !is GuiChest) return false
+        if (Minecraft.getMinecraft().currentScreen !is GuiChest) return true
         // Only show in excavation menu
         return FossilExcavatorApi.inExcavatorMenu
     }
