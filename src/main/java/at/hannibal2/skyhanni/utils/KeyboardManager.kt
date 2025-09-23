@@ -122,7 +122,7 @@ object KeyboardManager {
         false
     }
 
-    fun getKeyName(keyCode: Int): String = IMinecraft.instance.getKeyName(keyCode)
+    fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode).toString()
 
     object WasdInputMatrix : Iterable<KeyBinding> {
         operator fun contains(keyBinding: KeyBinding) = when (keyBinding) {
