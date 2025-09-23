@@ -14,8 +14,6 @@ import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.craftedPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoinWithBrackets
-import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
