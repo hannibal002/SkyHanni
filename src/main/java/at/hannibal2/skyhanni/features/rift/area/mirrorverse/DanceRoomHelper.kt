@@ -39,14 +39,16 @@ object DanceRoomHelper {
     private var instructions = emptyList<String>()
     private var countdown: String? = null
 
-    private val emptyInstructionsDisplay = buildList {
-        addString("§cError fetching Dance Room Instructions!")
-        Renderable.optionalLink(
-            "§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo §c(Click to update now)",
-            onLeftClick = {
-                SkyHanniRepoManager::updateRepo
-            }
-        ).let { add(it) }
+    private val emptyInstructionsDisplay by lazy {
+        buildList {
+            addString("§cError fetching Dance Room Instructions!")
+            Renderable.optionalLink(
+                "§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo §c(Click to update now)",
+                onLeftClick = {
+                    SkyHanniRepoManager::updateRepo
+                }
+            ).let { add(it) }
+        }
     }
 
     fun update() {
