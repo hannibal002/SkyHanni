@@ -32,7 +32,7 @@ class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
             DisplayMode.YEAR -> date.format(yearFormatter)
         }
         val display = sessions.getOrPut(displayMode) { mutableMapOf() }
-        return display.getOrPut(key) { createNewSession() }
+        return display[key] ?: createNewSession().also { display[key] = it }
     }
 
     fun getEntries(displayMode: DisplayMode): MutableMap<String, Data>? {
