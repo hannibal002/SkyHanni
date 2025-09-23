@@ -31,6 +31,7 @@
 + Optimal Angles Overlay for Squeaky Mousemat. - nikijul (https://github.com/hannibal002/SkyHanni/pull/2999)
 + Added Pest Trap tab widgets to Tab Widget Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
 + Added warnings for Pest Traps being full or out of bait. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
++ Added keybind to release all pests in a Pest Trap. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4675)
 
 #### Commands
 
@@ -38,6 +39,8 @@
 + Added /shping to show your ping in chat. - nopo (https://github.com/hannibal002/SkyHanni/pull/4478)
 + Added tab complete for /call. - nopo (https://github.com/hannibal002/SkyHanni/pull/4632)
 + Added tab complete to the /show command. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4605)
++ Added /shmodlist command. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4583)
+    + Modern equivalent of NEU's /neustats modlist.
 
 #### Rift
 
@@ -122,6 +125,7 @@
     + Sends time to kill a slayer in chat.
 + Added Slayer Time messages. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4518)
     + Sends time to complete (Spawn & Kill) a slayer quest in chat.
++ Added Title/Sound when a Slayer is cocooned. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4569)
 
 ### Improvements
 
@@ -133,6 +137,7 @@
 + Added option to repeat Pest Cooldown Warning. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4509)
     + Repeats until the pest cooldown ends or the wardrobe is opened.
 + Added option to set custom sounds for the Pest Cooldown Warning. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4509)
++ Updated Garden Money-Per-Hour display on pet change. - Stuflo19 (https://github.com/hannibal002/SkyHanni/pull/4648)
 
 #### Slayer
 
@@ -194,6 +199,9 @@
 + Allowed texture packs to override icons. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4621)
 + Improved spelling of the Rabbit the Fish line. - ReyMaratov (https://github.com/hannibal002/SkyHanni/pull/4659)
 + Made navigation through Hoppity Egg Stats pages easier. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4667)
++ Added more edge-case detection to Repo Management. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4574)
++ Added Session Time and Reset on World Change toggle to Crown of Avarice Tracker. - Tryp0xd (https://github.com/hannibal002/SkyHanni/pull/4603)
+    + Session Time now pauses after 2 minutes AFK instead of resetting.
 
 #### Foraging
 
@@ -233,6 +241,8 @@
 
 + Added option to only show powder chest features when great explorer 20. - nopo (https://github.com/hannibal002/SkyHanni/pull/4481)
 + Added detection of Nucleus Run Enchanted Books from chat messages. - formicacidgd (https://github.com/hannibal002/SkyHanni/pull/4565)
++ Added Bal Shard to Crystal Nucleus Profit Tracker. - Luna (https://github.com/hannibal002/SkyHanni/pull/4660)
++ Added option to hide Ordered Waypoint name. - Trendt (https://github.com/hannibal002/SkyHanni/pull/4676)
 
 #### GUI
 
@@ -266,6 +276,7 @@
 + Fixed Ubik Reminder sending every second in chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4464)
 + Fixed Puff not showing in Crux Talisman Display on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4506)
 + Fixed Wilted Berberis Helper occasionally not removing old waypoints. - Luna (https://github.com/hannibal002/SkyHanni/pull/4535)
++ Fixed Sun Gecko Helper always showing no active modifiers on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4682)
 
 #### Crimson Isle
 
@@ -319,6 +330,7 @@
 + Fixed a typo in the Changelog Viewer. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4655)
 + Fixed Dungeon Races Guide breaking when using abilities or gaining Bits mid-race. - Luna (https://github.com/hannibal002/SkyHanni/pull/4619)
 + Fixed trackers showing incorrect pet names. - nopo (https://github.com/hannibal002/SkyHanni/pull/4662)
++ Fixed shwords not checking color correctly. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4683)
 
 #### Chat
 
@@ -401,6 +413,13 @@
 #### GUI
 
 + Fixed some reforges not detected in Estimated Item Value and Reforge Overlay. - Luna (https://github.com/hannibal002/SkyHanni/pull/4524)
++ Fixed SkyHanni User Luck in SB Menu. - nopo (https://github.com/hannibal002/SkyHanni/pull/4672)
+
+#### Garden
+
++ Fixed Garden Visitor detection not working with Rainbow Rune again. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4681)
+    + Unlike the last fix, this time it actually works.
++ Fixed typo in Composter Overlay. - aphased (https://github.com/hannibal002/SkyHanni/pull/4677)
 
 ### Technical Details
 
@@ -571,6 +590,12 @@
 + Renamed `ItemStack.getReforgeName()` to `ItemStack.getReforgeModifier()`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4524)
 + Renamed `ReforgeApi.nonePowerStoneReforge` to `ReforgeApi.basicReforgeList`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4524)
 + Renamed `ReforgeApi.onlyPowerStoneReforge` to `ReforgeApi.reforgeStoneList`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4524)
++ Added `coroutineSimpleCallback` to Brigadier ArgContext funs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4574)
+    + Allows running `suspend` funs from a command callback.
++ Cleaned up and improved performance in Graph Editor and Island Path. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4599)
++ Cleaned up miscellaneous functions in ChatUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4574)
++ Moved isAprilFoolsDay into TimeUtils. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4560)
++ Removed the Ghost Position feature from Graph Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4599)
 
 ## Version 4.0.0
 

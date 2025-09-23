@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -57,8 +58,14 @@ object ForagingTrackerLegacy {
             )
         }
 
-        override fun getCoinName(bucket: TreeType?, item: TrackedItem) = "<no coins>"
-        override fun getCoinDescription(bucket: TreeType?, item: TrackedItem): List<String> = listOf("<no coins>")
+        override fun getCoinName(bucket: TreeType?, item: TrackedItem) = "§6Coins"
+        override fun getCoinDescription(bucket: TreeType?, item: TrackedItem): List<String> {
+            val mobKillCoinsFormat = item.totalAmount.shortFormat()
+            return listOf(
+                "§7Cutting trees gives you coins.",
+                "§7You got §6$mobKillCoinsFormat coins §7that way.",
+            )
+        }
 
         override fun TreeType.isBucketSelectable() = true
 

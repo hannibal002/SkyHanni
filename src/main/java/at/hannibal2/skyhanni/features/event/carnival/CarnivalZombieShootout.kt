@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -134,8 +135,13 @@ object CarnivalZombieShootout {
             val entity = EntityUtils.getEntityByID(zombie.entityId) ?: continue
             val isSmall = (entity as? EntityZombie)?.isChild ?: false
 
-            val boundingBox = if (isSmall) entity.entityBoundingBox.expand(0.0, -0.4, 0.0).offset(0.0, -0.4, 0.0)
-            else entity.entityBoundingBox
+            val boundingBox = entity.entityBoundingBox.let {
+                if (PlatformUtils.IS_LEGACY && isSmall) {
+                    it.expand(0.0, -0.4, 0.0).offset(0.0, -0.4, 0.0)
+                } else {
+                    it
+                }
+            }
 
             drawHitbox(
                 boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),

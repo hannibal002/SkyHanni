@@ -16,6 +16,11 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 class SlayerConfig {
 
     @Expose
+    @ConfigOption(name = "Zombie", desc = "")
+    @Accordion
+    val zombie: ZombieConfig = ZombieConfig()
+
+    @Expose
     @ConfigOption(name = "Spider", desc = "")
     @Accordion
     val spider: SpiderConfig = SpiderConfig()
