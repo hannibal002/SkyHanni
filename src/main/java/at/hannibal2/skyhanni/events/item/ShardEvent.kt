@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.NeuInternalName
 
 /**
- * All shard events
+ * All shard events, e.g. fusions and syphoning
  */
 open class ShardEvent(val shardInternalName: NeuInternalName, val amount: Int) : SkyHanniEvent()
 
