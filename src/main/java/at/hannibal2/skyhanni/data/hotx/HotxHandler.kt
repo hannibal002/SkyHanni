@@ -177,7 +177,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
                     extraInventoryHandling()
                 }
             },
-            onCloseInventory = {
+            onCloseInventory = { _ ->
                 data.forEach {
                     it.slot = null
                     it.item = null
