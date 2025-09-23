@@ -7,10 +7,12 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
+import org.lwjgl.input.Keyboard
 
 class PestTrapConfig {
 
@@ -20,6 +22,14 @@ class PestTrapConfig {
     )
     @ConfigEditorButton(buttonText = "Go")
     val displayRunnable = Runnable { SkyHanniMod.feature.gui.tabWidget::display.jumpToEditor() }
+
+    @Expose
+    @ConfigOption(
+        name = "Release All Hotkey",
+        desc = "Release all pests in a pest trap when you press this keybind."
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    var releaseHotkey: Int = Keyboard.KEY_NONE
 
     @Expose
     @ConfigOption(name = "Warnings", desc = "")
