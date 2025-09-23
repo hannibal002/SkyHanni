@@ -110,7 +110,7 @@ enum class HotmData(
         140,
         { level -> (level + 1.0).pow(2.3) },
         { level -> mapOf(HotmReward.MINING_SPEED to 50.0 + (level * 5.0)) },
-        HotmApi.PowderType.GEMSTONE
+        HotmApi.PowderType.GEMSTONE,
     ),
     MOLE(
         "Mole",
