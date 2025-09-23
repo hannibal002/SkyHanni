@@ -55,7 +55,7 @@ object MobFilter {
     private val patternGroup = RepoPattern.group("mob.detection")
 
     @Language("RegExp")
-    private val mobType = "(?<mobType>[^\\s✯]+ )?"
+    private val mobType = "(?<mobType>[^\\w\\s✯\\-]+ )?"
     @Language("RegExp")
     private val level = "(?:\\[Lv(?<level>\\d+)\\] )?"
 

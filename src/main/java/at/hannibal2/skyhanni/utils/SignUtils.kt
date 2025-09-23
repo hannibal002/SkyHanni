@@ -40,7 +40,7 @@ object SignUtils {
     fun checkDeleting(gui: GuiScreen?) {
         val deleteClicked = KeyboardManager.isDeleteWordDown() || KeyboardManager.isDeleteLineDown()
         if (!deleteLastClicked && deleteClicked && gui is AccessorGuiEditSign) {
-            SkyHanniMod.launchCoroutine {
+            SkyHanniMod.launchCoroutine("sign utils check deleting") {
                 val newLine = if (KeyboardManager.isDeleteLineDown()) ""
                 else if (KeyboardManager.isDeleteWordDown()) {
                     val currentLine = gui.signText[gui.currentRow].unformattedText
@@ -57,7 +57,7 @@ object SignUtils {
     fun checkCopying(gui: GuiScreen?) {
         val copyClicked = KeyboardManager.isCopyingKeysDown()
         if (!copyLastClicked && copyClicked && gui is AccessorGuiEditSign) {
-            SkyHanniMod.launchCoroutine {
+            SkyHanniMod.launchCoroutine("sign utils copy copying") {
                 ClipboardUtils.copyToClipboard(gui.signText[gui.currentRow].unformattedText)
             }
         }
@@ -67,7 +67,7 @@ object SignUtils {
     fun checkPaste() {
         val pasteClicked = KeyboardManager.isPastingKeysDown()
         if (!pasteLastClicked && pasteClicked) {
-            SkyHanniMod.launchCoroutine {
+            SkyHanniMod.launchCoroutine("sign utils check pasting") {
                 OSUtils.readFromClipboard()?.let {
                     addTextIntoSign(it)
                 }

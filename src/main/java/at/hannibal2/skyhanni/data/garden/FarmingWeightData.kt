@@ -78,7 +78,7 @@ object FarmingWeightData {
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
 
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("get crop weights") {
             getCropWeights()
         }
     }
@@ -131,7 +131,7 @@ object FarmingWeightData {
         fetchCollections()
     }
 
-    private fun fetchCollections() = SkyHanniMod.launchIOCoroutine {
+    private fun fetchCollections() = SkyHanniMod.launchIOCoroutine("fetch collections") {
         collectionMutex.withLock {
             val apiData = EliteDevApi.fetchWeightProfile(HypixelData.profileName) ?: run {
                 if (weightMap.isEmpty()) {

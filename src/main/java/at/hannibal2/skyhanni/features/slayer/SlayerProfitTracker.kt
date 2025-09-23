@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -56,25 +55,16 @@ object SlayerProfitTracker {
         "§7Took (?<coins>.+) coins from your bank for auto-slayer\\.\\.\\.",
     )
 
-    class Data : ItemTrackerData() {
-
-        override fun resetItems() {
-            slayerSpawnCost = 0
-            slayerCompletedCount = 0
-        }
-
-        @Expose
-        var slayerSpawnCost: Long = 0
-
-        @Expose
-        var slayerCompletedCount = 0L
-
-        override fun getDescription(timesDropped: Long): List<String> {
-            val percentage = timesDropped.toDouble() / slayerCompletedCount
+    data class Data(
+        @Expose var slayerSpawnCost: Long = 0L,
+        @Expose var slayerCompletedCount: Long = 0L,
+    ) : ItemTrackerData() {
+        override fun getDescription(timesGained: Long): List<String> {
+            val percentage = timesGained.toDouble() / slayerCompletedCount
             val perBoss = percentage.coerceAtMost(1.0).formatPercentage()
 
             return listOf(
-                "§7Dropped §e${timesDropped.addSeparators()} §7times.",
+                "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop rate: §c$perBoss",
             )
         }
@@ -89,8 +79,6 @@ object SlayerProfitTracker {
             )
         }
     }
-
-    private val ItemTrackerData.TrackedItem.timesDropped get() = timesGained
 
     private fun addSlayerCosts(price: Double) {
         require(price < 0) { "slayer costs can not be positive" }
@@ -187,7 +175,7 @@ object SlayerProfitTracker {
         return internalName in allowedList
     }
 
-    private fun drawDisplay(data: Data) = buildList<Searchable> {
+    private fun drawDisplay(data: Data) = buildList {
         val tracker = getTracker() ?: return@buildList
         addSearchString("§e§l$categoryName Profit Tracker")
 
