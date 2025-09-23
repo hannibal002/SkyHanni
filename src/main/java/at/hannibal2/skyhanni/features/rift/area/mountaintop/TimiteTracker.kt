@@ -34,10 +34,6 @@ object TimiteTracker {
     private val TIMITE = "TIMITE".toInternalName()
 
     class Data : ItemTrackerData() {
-        override fun resetItems() {
-            return
-        }
-
         override fun getDescription(timesGained: Long): List<String> = emptyList()
 
         override fun getCoinName(item: TrackedItem): String = "§5Motes"

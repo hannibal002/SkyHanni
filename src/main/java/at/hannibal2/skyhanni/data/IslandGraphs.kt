@@ -211,6 +211,9 @@ object IslandGraphs {
     }
 
     private fun loadIsland(newIsland: IslandType) {
+        // island graphs doesn't support private island and garden
+        if (IslandTypeTags.PERSONAL_ISLAND.inAny()) return
+
         if (newIsland == IslandType.DWARVEN_MINES) {
             loadDwarvenMines()
         } else {
@@ -255,7 +258,7 @@ object IslandGraphs {
     private fun reloadFromJson(islandName: String) {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("reload island graphs") {
             try {
                 val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
                 IslandAreas.display = null
@@ -264,6 +267,11 @@ object IslandGraphs {
                 }
             } catch (e: Error) {
                 currentIslandGraph = null
+                ErrorManager.logErrorWithData(
+                    e,
+                    "failed to load graph data for island $islandName",
+                    "island name" to islandName,
+                )
             }
         }
     }

@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -30,6 +29,9 @@ import dev.cbyrne.kdiscordipc.core.event.impl.DisconnectedEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ErrorEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ReadyEvent
 import dev.cbyrne.kdiscordipc.data.activity.Activity
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -43,6 +45,7 @@ object DiscordRPCManager {
     private var startTimestamp: SimpleTimeMark = SimpleTimeMark.farPast()
     private var started = false
     private var nextUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var presenceJob: Job? = null
 
     private var debugError = false
     private var debugStatusMessage = "nothing"
@@ -73,6 +76,7 @@ object DiscordRPCManager {
             client?.on<DisconnectedEvent> { onIPCDisconnect() }
             client?.on<ErrorEvent> { onError(data) }
             client?.connect()
+            setupPresenceJob()
             updateDebugStatus("Successfully started")
             if (!fromCommand) return
             // confirm that /shrpcstart worked
@@ -98,12 +102,20 @@ object DiscordRPCManager {
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
         ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
-            if (isConnected()) {
-                SkyHanniMod.launchNoScopeCoroutine(::updatePresence)
-            }
+            if (isConnected()) setupPresenceJob()
+            else presenceJob?.cancel()
         }
         config.enabled.whenChanged { _, new ->
             if (!new) stop()
+        }
+    }
+
+    private fun setupPresenceJob() {
+        presenceJob = SkyHanniMod.launchNoScopeCoroutine("discord rpc updatePresence", timeout = Duration.INFINITE) {
+            while (isConnected()) {
+                updatePresence()
+                delay(5.seconds)
+            }
         }
     }
 
@@ -152,11 +164,10 @@ object DiscordRPCManager {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isConnected()) return
-        if (event.repeatSeconds(5)) {
-            SkyHanniMod.launchNoScopeCoroutine(::updatePresence)
-        }
+    fun onSecondPassed() {
+        if (!isConnected()) return presenceJob?.cancel() ?: Unit
+        else if (presenceJob?.isActive == true) return
+        setupPresenceJob()
     }
 
     private fun onIPCDisconnect() {
@@ -182,7 +193,7 @@ object DiscordRPCManager {
         if (SkyBlockUtils.inSkyBlock) {
             // todo discord rpc doesnt connect on 1.21
             //#if TODO
-            SkyHanniMod.launchNoScopeCoroutine(::start)
+            SkyHanniMod.launchNoScopeCoroutine("discord rpc start") { start() }
             //#endif
             started = true
         }
@@ -215,7 +226,7 @@ object DiscordRPCManager {
 
         ChatUtils.chat("Attempting to start Discord Rich Presence...")
         try {
-            SkyHanniMod.launchCoroutine { start(true) }
+            SkyHanniMod.launchCoroutine("discord rpc manual start") { start(true) }
             updateDebugStatus("Successfully started")
         } catch (e: Exception) {
             updateDebugStatus("Unable to start: ${e.message}", error = true)

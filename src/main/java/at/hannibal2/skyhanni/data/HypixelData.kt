@@ -425,7 +425,7 @@ object HypixelData {
         when {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
-                SkyHanniMod.launchIOCoroutine {
+                SkyHanniMod.launchIOCoroutine("hypixel join repo update") {
                     SkyHanniRepoManager.displayRepoStatus(true)
                     EnoughUpdatesRepoManager.displayRepoStatus(true)
                 }

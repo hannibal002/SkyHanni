@@ -4,13 +4,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -25,7 +24,6 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.seconds
@@ -51,15 +49,9 @@ object ArmorDropTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData() {
-
-        override fun reset() {
-            drops.clear()
-        }
-
-        @Expose
-        var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
+    ) : Resettable
 
     // Todo use repo pattern
     enum class ArmorDropType(val dropName: String, val chatMessage: String) {
@@ -69,7 +61,7 @@ object ArmorDropTracker {
     }
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         hasArmor = false
     }
 
@@ -119,7 +111,7 @@ object ArmorDropTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         checkArmor()
     }
 
