@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.skyhanni.features.garden.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator

@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotApi.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.uncleared
-import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.DUNG_ITEM
+import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.DUNG_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import org.lwjgl.input.Keyboard
@@ -51,6 +52,7 @@ object PestApi {
 
     val config get() = GardenApi.config.pests
     val storage get() = GardenApi.storage
+    val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
     private val SPRAYONATOR_ITEM = "SPRAYONATOR".toInternalName()
 
     var scoreboardPests: Int
@@ -252,7 +254,7 @@ object PestApi {
             if (pest == PestType.FIELD_MOUSE && item != DUNG_ITEM) return
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
-            PestKillEvent.post()
+            PestKillEvent(pest).post()
         }
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()

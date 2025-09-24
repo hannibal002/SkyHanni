@@ -4,6 +4,10 @@ import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -29,12 +33,15 @@ import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
-import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
-import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
-import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
+import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
+import at.hannibal2.skyhanni.features.garden.tracker.DicerRngDropTracker
+import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
@@ -67,6 +74,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
+import java.util.EnumMap
 import java.util.UUID
 import kotlin.time.Duration
 
@@ -421,7 +429,22 @@ class ProfileSpecificStorage(
         var experience: Long? = null
 
         @Expose
-        var cropCounter: MutableMap<CropType, Long> = enumMapOf()
+        var lastMilestoneFix: SimpleTimeMark = farPast()
+
+        @Expose
+        var lastGainedCrop: CropType? = null
+
+        @Expose
+        var lastGainedCropCollectionTime: SimpleTimeMark = farPast()
+
+        @Expose
+        var cropCollectionCounter: MutableMap<CropType, CropCollectionApi.CropCollection> = enumMapOf()
+
+        @Expose
+        var cropMilestoneCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
+
+        @Expose
+        var toolCounterData: MutableMap<String, Long> = HashMap()
 
         @Expose
         var cropUpgrades: MutableMap<CropType, Int> = enumMapOf()
@@ -581,8 +604,26 @@ class ProfileSpecificStorage(
         var farmingWeight: FarmingWeightConfig = FarmingWeightConfig()
 
         class FarmingWeightConfig {
+            // TODO config fix this
             @Expose
-            var lastLeaderboard: Int = -1
+            var lastLeaderboardPosMap: MutableMap<EliteLeaderboardType, Int> = mutableMapOf()
+
+            @Expose
+            var leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+
+            @Expose
+            var cropDisplayType: CropLeaderboardStorage = CropLeaderboardStorage(null, EliteLeaderboardMode.ALL_TIME)
+
+            @Expose
+            var pestDisplayType: PestLeaderboardStorage = PestLeaderboardStorage(null, EliteLeaderboardMode.ALL_TIME)
+
+            @Expose
+            var weightDisplayType: WeightLeaderboardStorage =
+                WeightLeaderboardStorage(FarmingWeight.FARMING_WEIGHT, EliteLeaderboardMode.ALL_TIME)
+
+            @Expose
+            var minAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+
         }
 
         @Expose
