@@ -175,7 +175,7 @@ object ErrorManager {
     // log with stack trace from other try catch block
     fun logErrorWithData(
         throwable: Throwable,
-        message: String,
+        message: String = throwable.message ?: "message is null",
         vararg extraData: Pair<String, Any?>,
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
@@ -193,6 +193,9 @@ object ErrorManager {
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
     ): Boolean {
+        if (MinecraftCompat.localPlayerOrNull == null) {
+            println("extra data:\n${getExtraDataOrCached(extraData)}")
+        }
         if (betaOnly && !SkyHanniMod.isBetaVersion) return false
         val throwable = originalThrowable.maybeSkipError()
         if (!ignoreErrorCache) {
