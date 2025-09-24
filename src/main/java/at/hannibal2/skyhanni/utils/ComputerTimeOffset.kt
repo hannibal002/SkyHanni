@@ -53,7 +53,7 @@ object ComputerTimeOffset {
     }
 
     init {
-        SkyHanniMod.launchIOCoroutine("computer time offset init") {
+        SkyHanniMod.launchIOCoroutine("computer time offset init", timeout = 5.minutes) {
             while (state != State.TOTALLY_OFF) {
                 delay(state.duration)
                 detectTimeChange()

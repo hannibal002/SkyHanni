@@ -125,7 +125,7 @@ object DeepCavernsGuide {
             ChatUtils.clickableChat(
                 "DeepCavernsParkour missing in SkyHanni Repo! Try /shupdaterepo to fix it!",
                 onClick = {
-                    SkyHanniRepoManager.updateRepo()
+                    SkyHanniRepoManager.updateRepo("click on chat after deep caverns parkour error")
                 },
                 "§eClick to update the repo!",
                 prefixColor = "§c",
