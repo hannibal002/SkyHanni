@@ -62,11 +62,9 @@ object CrystalNucleusTracker {
         trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
-    class Data : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
-        override fun resetItems() {
-            runsCompleted = 0L
-        }
-
+    data class Data(
+        @Expose var runsCompleted: Long = 0L
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / runsCompleted
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -79,9 +77,6 @@ object CrystalNucleusTracker {
         // No direct coin drops from nuc runs
         override fun getCoinName(item: TrackedItem) = ""
         override fun getCoinDescription(item: TrackedItem) = mutableListOf<String>()
-
-        @Expose
-        var runsCompleted = 0L
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)

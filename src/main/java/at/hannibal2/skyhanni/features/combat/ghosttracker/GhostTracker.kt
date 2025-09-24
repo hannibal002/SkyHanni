@@ -82,34 +82,15 @@ object GhostTracker {
         trackerConfig = { config.perTrackerConfig }
     )
 
-    class Data : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
-
-        override fun resetItems() {
-            kills = 0
-            ghostsSinceSorrow = 0
-            maxKillCombo = 0
-            combatXpGained = 0
-        }
-
-        @Expose
-        var kills = 0L
-
-        @Expose
-        var ghostsSinceSorrow = 0L
-
-        @Expose
-        var maxKillCombo = 0L
-
+    data class Data(
+        @Expose var kills: Long = 0L,
+        @Expose var ghostsSinceSorrow: Long = 0L,
+        @Expose var maxKillCombo: Long = 0L,
         // TODO rename to combatXPGained
-        @Expose
-        var combatXpGained = 0L
-
-        @Expose
-        var totalMagicFind = 0L
-
-        @Expose
-        var totalMagicFindKills = 0L
-
+        @Expose var combatXpGained: Long = 0L,
+        @Expose var totalMagicFind: Long = 0L,
+        @Expose var totalMagicFindKills: Long = 0L,
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / kills
             val perKill = percentage.coerceAtMost(1.0).formatPercentage()

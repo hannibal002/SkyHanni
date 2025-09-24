@@ -22,7 +22,14 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
+import at.hannibal2.skyhanni.utils.TimeUtils.dayToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.monthToLocalDate
+import at.hannibal2.skyhanni.utils.TimeUtils.weekFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.weekToLocalDate
+import at.hannibal2.skyhanni.utils.TimeUtils.yearFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.yearToLocalDate
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
@@ -36,6 +43,8 @@ import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
+import java.time.LocalDate
+import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -85,7 +94,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
 
     fun isInventoryOpen() = inventoryOpen
 
-    fun resetCommand() = ChatUtils.clickableChat(
+    open fun resetCommand() = ChatUtils.clickableChat(
         "Are you sure you want to reset your total $name? Click here to confirm.",
         onClick = {
             reset(DisplayMode.TOTAL, "Reset total $name!")
@@ -191,7 +200,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
 
     fun getCurrentStopwatch(): Stopwatch? = getDisplayModeTracker()?.getActiveStopwatch()
 
-    fun startSessionUptime() {
+    open fun startSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.start(true) }
@@ -199,7 +208,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
-    fun pauseSessionUptime() {
+    open fun pauseSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.pause(true) }
@@ -349,17 +358,59 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
 
     enum class DisplayMode(
         val displayName: String,
-        val shortenedName: String = displayName,
+        val currentName: String = "This $displayName",
         val alternateName: String = displayName,
-        val isDate: Boolean = false
+        val type: KClass<*>,
+        val toValue: (String) -> Comparable<*>?,
+        val fromValue: (Comparable<*>) -> String,
+        val isDate: Boolean = (type == LocalDate::class),
     ) {
-        TOTAL("Total"),
-        SESSION("Session"),
-        MAYOR("This Mayor", "Mayor"),
-        DAY("Day", alternateName = "Date", isDate = true),
-        WEEK("Week", isDate = true),
-        MONTH("Month", isDate = true),
-        YEAR("Year", isDate = true),
+        TOTAL(
+            "Total",
+            "Total",
+            type = String::class,
+            toValue = { it },
+            fromValue = { it as String }
+        ),
+        SESSION(
+            "Session",
+            type = Int::class,
+            toValue = { it.toIntOrNull() },
+            fromValue = { (it as Int).toString() }
+        ),
+        MAYOR(
+            "Mayor",
+            alternateName = "Mayor, Year",
+            type = Int::class,
+            toValue = { it.toIntOrNull() },
+            fromValue = { (it as Int).toString() }
+        ),
+        DAY(
+            "Day",
+            "Today",
+            alternateName = "Date",
+            type = LocalDate::class,
+            toValue = { it.dayToLocalDate() },
+            fromValue = { (it as LocalDate).toString() }
+        ),
+        WEEK(
+            "Week",
+            type = LocalDate::class,
+            toValue = { it.weekToLocalDate() },
+            fromValue = { (it as LocalDate).format(weekFormatter) }
+        ),
+        MONTH(
+            "Month",
+            type = LocalDate::class,
+            toValue = { it.monthToLocalDate() },
+            fromValue = { (it as LocalDate).format(monthFormatter) }
+        ),
+        YEAR(
+            "Year",
+            type = LocalDate::class,
+            toValue = { it.yearToLocalDate() },
+            fromValue = { (it as LocalDate).format(yearFormatter) }
+        )
         ;
 
         override fun toString(): String = displayName

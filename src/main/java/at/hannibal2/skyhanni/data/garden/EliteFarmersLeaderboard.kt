@@ -213,7 +213,7 @@ object EliteFarmersLeaderboard {
 
         val category = leaderboardType::class
 
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("load elite lb") {
             loadingLeaderboardMutex[leaderboardType::class]?.withLock {
                 val oldPos = leaderboardPosMap?.get(leaderboardType)
                 val lbPos = loadLeaderboardPosition(leaderboardType)

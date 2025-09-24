@@ -8,9 +8,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -58,15 +56,11 @@ object ArmorDropTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class) {
-
-        override fun resetData() {
-            drops.clear()
-        }
-
+    data class Data(
         @Expose
         var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
-    }
+    ) : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class)
+
 
     // Todo use repo pattern
     enum class ArmorDropType(val dropName: String, val chatMessage: String) {
@@ -76,7 +70,7 @@ object ArmorDropTracker {
     }
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         hasArmor = false
     }
 
@@ -126,7 +120,7 @@ object ArmorDropTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         checkArmor()
     }
 

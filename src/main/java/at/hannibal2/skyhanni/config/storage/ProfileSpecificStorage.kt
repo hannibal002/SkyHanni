@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.CropCollectionTracker
 import at.hannibal2.skyhanni.features.garden.tracker.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
+import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
@@ -324,7 +325,7 @@ class ProfileSpecificStorage(
             @Expose var singleSlotCooldownMark: SimpleTimeMark? = null,
             @Expose var allSlotsCooldownMark: SimpleTimeMark? = null,
             @Expose var purchasedHitmanSlots: Int = 0,
-        ) : Resettable()
+        ) : Resettable
 
         @Expose
         var hitmanStats: HitmanStatsStorage = HitmanStatsStorage()
@@ -502,7 +503,7 @@ class ProfileSpecificStorage(
         var visitorDrops: VisitorDrops = VisitorDrops()
 
         // Todo: Move to a SkyhanniTracker (preferably bucketed by rarity)
-        class VisitorDrops : Resettable() {
+        class VisitorDrops : Resettable {
             @Expose
             var acceptedVisitors: Int = 0
 
@@ -637,6 +638,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var activeVinyl: VinylType? = null
+
+        @Expose
+        var gardenBpsTracker: GardenBpsTracker.TimedData = GardenBpsTracker.TimedData()
 
         @Expose
         var cropCollectionTracker: CropCollectionTracker.TimedData = CropCollectionTracker.TimedData()

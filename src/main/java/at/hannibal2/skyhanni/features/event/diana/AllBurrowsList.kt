@@ -53,7 +53,7 @@ object AllBurrowsList {
     }
 
     private fun addFromClipboard() {
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("diana burrows all addFromClipboard") {
             val text = OSUtils.readFromClipboard() ?: return@launchIOCoroutine
 
             var new = 0

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.core.elements
 
+import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import java.awt.Color
 
@@ -19,6 +20,6 @@ class GuiElementButton {
         context.drawColoredRect(x.toFloat(), y.toFloat(), (x + width).toFloat(), (y + 18).toFloat(), Color.WHITE.rgb)
         context.drawColoredRect((x + 1).toFloat(), (y + 1).toFloat(), (x + width - 1).toFloat(), (y + 18 - 1).toFloat(), Color.BLACK.rgb)
         val fr = context.minecraft.defaultFontRenderer
-        context.drawString(fr, text, x + 5, y + 5, -1, true)
+        context.drawString(fr, text.asStructuredText(), x + 5, y + 5, -1, true)
     }
 }

@@ -43,3 +43,4 @@ accessible field net/minecraft/client/option/StickyKeyBinding toggleGetter Ljava
 
 # 1.21.7 stuff
 accessible field net/minecraft/client/render/RenderLayer$MultiPhase pipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+accessible method net/minecraft/client/gui/screen/ingame/HandledScreen drawBackground (Lnet/minecraft/client/gui/DrawContext;FII)V
