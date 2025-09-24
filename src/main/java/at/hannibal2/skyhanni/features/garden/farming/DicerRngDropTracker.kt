@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -45,15 +44,9 @@ object DicerRngDropTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class) {
-
-        override fun resetData() {
-            drops.clear()
-        }
-
-        @Expose
-        var drops: MutableMap<CropType, MutableMap<DropRarity, Int>> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var drops: MutableMap<CropType, MutableMap<DropRarity, Int>> = mutableMapOf()
+    ) : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class)
 
     // TODO eventually regex tests
     private val melonPatternGroup = RepoPattern.group("garden.dicer.melon")
@@ -126,7 +119,7 @@ object DicerRngDropTracker {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.compact) {
             tracker.update()
         }

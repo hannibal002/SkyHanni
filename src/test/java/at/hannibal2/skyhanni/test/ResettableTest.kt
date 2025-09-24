@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import io.github.notenoughupdates.moulconfig.observer.Property
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -24,7 +25,9 @@ class ResettableTest {
         var nullInt: Int? = null,
         @Transient var transientString: String = "transient",
         val defaultBool: Boolean = false,
-    ) : Resettable() {
+        val defProp: Property<String> = Property.of("def"),
+        @NoReset var noResetProp: Property<String> = Property.of("noReset"),
+    ) : Resettable {
         val list: MutableList<String> = mutableListOf()
         private val privateList: MutableList<String> = mutableListOf("privateListItem")
         val map: MutableMap<String, Int> = mutableMapOf()
@@ -51,6 +54,8 @@ class ResettableTest {
             list.add("item2")
             map["key1"] = 1
             map["key2"] = 2
+            defProp.set("newValue")
+            noResetProp.set("newValue")
         }
 
         storage.reset()
@@ -123,6 +128,18 @@ class ResettableTest {
         Assertions.assertTrue(
             storage.noResetList.isNotEmpty(),
             "Transient list should not be cleared"
+        )
+
+        Assertions.assertEquals(
+            "def",
+            storage.defProp.get(),
+            "Default property should be reset to its default value"
+        )
+
+        Assertions.assertEquals(
+            "newValue",
+            storage.noResetProp.get(),
+            "NoReset property should not be reset"
         )
 
     }

@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
@@ -20,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenUptimeManager {
     private val config get() = GardenApi.config.trackerUptimeSettings
-    private val trackerSet = setOf(ArmorDropTracker.tracker, DicerRngDropTracker.tracker, PestProfitTracker.tracker)
+    private val trackerSet: Set<SkyHanniTracker<*, *>> = setOf(ArmorDropTracker.tracker, DicerRngDropTracker.tracker, PestProfitTracker)
     private val afkTracker = Stopwatch()
 
     @HandleEvent
@@ -31,6 +33,11 @@ object GardenUptimeManager {
     }
 
     @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        modify { it.pauseSessionUptime() }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
         if (!afkTracker.isPaused()) {

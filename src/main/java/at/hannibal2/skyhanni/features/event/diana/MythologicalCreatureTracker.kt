@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -70,19 +69,10 @@ object MythologicalCreatureTracker {
         trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
-    class Data : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
-
-        override fun resetData() {
-            count.clear()
-            creaturesSinceLastInquisitor = 0
-        }
-
-        @Expose
-        var creaturesSinceLastInquisitor: Int = 0
-
-        @Expose
-        var count: MutableMap<MythologicalCreatureType, Int> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var creaturesSinceLastInquisitor: Int = 0,
+        @Expose var count: MutableMap<MythologicalCreatureType, Int> = mutableMapOf(),
+    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
 
     enum class MythologicalCreatureType(val displayName: String, val pattern: Pattern) {
         MINOTAUR("§2Minotaur", minotaurPattern),
@@ -130,7 +120,7 @@ object MythologicalCreatureTracker {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.showPercentage) {
             tracker.update()
         }

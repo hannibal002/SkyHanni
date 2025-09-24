@@ -7,8 +7,6 @@ import kotlin.reflect.KClass
 
 abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerData<T>(clazz) {
 
-    abstract fun resetItems()
-
     abstract fun getDescription(timesGained: Long): List<String>
 
     abstract fun getCoinName(item: TrackedItem): String
@@ -18,9 +16,9 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
 
     open fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>) = tracker.getPricePer(internalName)
 
-    override fun resetData() {
+    override fun reset() {
+        super.reset()
         items.clear()
-        resetItems()
     }
 
     open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {

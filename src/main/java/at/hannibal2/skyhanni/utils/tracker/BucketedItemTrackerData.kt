@@ -33,10 +33,11 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
         }
     }
 
-    override fun resetData() {
+    @Deprecated("Make data class extend Resettable instead")
+    final override fun reset() {
+        super.reset()
         bucketedItems.clear()
         selectedBucket = null
-        resetItems()
     }
 
     final override fun removeItem(internalName: NeuInternalName) =

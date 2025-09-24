@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.foraging.ForagingTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -43,20 +44,17 @@ import net.minecraft.text.Text
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ForagingTracker {
-
-    private val config get() = SkyHanniMod.feature.foraging.tracker
-
-    private val tracker = SkyHanniBucketedItemTracker(
+object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeType, ForagingTrackerLegacy.BucketData>(
         "Foraging Tracker",
         { ForagingTrackerLegacy.BucketData() },
         { it.foraging.trackerData },
         { drawDisplay(it) },
-        trackerConfig = { config.perTrackerConfig }
-    )
+        trackerConfig = { SkyHanniMod.feature.foraging.tracker.perTrackerConfig }
+    ){
+    private val config get() = SkyHanniMod.feature.foraging.tracker
 
     init {
-        tracker.initRenderer({ config.position }) { isInIsland() && heldItemEnabled() && config.enabled }
+        initRenderer({ config.position }) { isInIsland() && heldItemEnabled() && config.enabled }
     }
 
     private fun heldItemEnabled() = !config.onlyHoldingAxe ||
@@ -69,12 +67,12 @@ object ForagingTracker {
 
     private fun drawDisplay(bucketData: ForagingTrackerLegacy.BucketData): List<Searchable> = buildList {
         addSearchString("§a§lForaging Tracker")
-        tracker.addBucketSelector(this, bucketData, "Tree Type")
+        addBucketSelector(this, bucketData, "Tree Type")
 
         val treesContributedTo = bucketData.getTreeCount()
         if (treesContributedTo == 0L) return@buildList
 
-        val profit = tracker.drawItems(bucketData, { true }, this)
+        val profit = drawItems(bucketData, { true }, this)
 
         val foragingXp = bucketData.getForagingExperience()
         if (foragingXp > 0) addSearchString("§eForaging Experience: §3${foragingXp.addSeparators()}")
@@ -111,16 +109,14 @@ object ForagingTracker {
         add(totalRenderable)
 
         val duration = bucketData.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, treesContributedTo, "gift", duration, "Gifts"))
-        tracker.addPriceFromButton(this)
+        addAll(addTotalProfit(profit, treesContributedTo, "gift", duration, "Gifts"))
+        addPriceFromButton(this)
     }
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isInIsland() || event.source != ItemAddManager.Source.COMMAND) return
-        with(tracker) {
-            event.addItemFromEvent()
-        }
+        event.addItemFromEvent()
     }
 
     private val rangedItems: MutableSet<NeuInternalName> = mutableSetOf()
@@ -138,7 +134,7 @@ object ForagingTracker {
         sackChanges.filter {
             it.delta > 0 && it.internalName in rangedItems
         }.forEach {
-            tracker.addItem(
+            addItem(
                 treeType,
                 it.internalName,
                 it.delta,
@@ -163,12 +159,10 @@ object ForagingTracker {
         }
     }.values.forEach { (treeType, delta, deltaEnchanted) ->
         val baseLog = treeType.getBaseLog()
-        if (delta > 0)
-            tracker.addItem(treeType, baseLog, delta, command = false)
+        if (delta > 0) addItem(treeType, baseLog, delta, command = false)
 
         val enchantedLog = treeType.getEnchantedLog()
-        if (deltaEnchanted > 0)
-            tracker.addItem(treeType, enchantedLog, deltaEnchanted, command = false)
+        if (deltaEnchanted > 0) addItem(treeType, enchantedLog, deltaEnchanted, command = false)
     }
 
     private fun SackChangeEvent.extractLogs(): List<LogSackChange> = sackChanges.asSequence()
@@ -214,7 +208,7 @@ object ForagingTracker {
         val change = stretchingSticksNow - currentStretchingSticks
         currentStretchingSticks = stretchingSticksNow
         if (change <= 0) return
-        tracker.addItem(treeType, STRETCHING_STICKS, change, command = false)
+        addItem(treeType, STRETCHING_STICKS, change, command = false)
     }
 
     private fun SkyHanniChatEvent.tryReadLoot() {
@@ -227,7 +221,7 @@ object ForagingTracker {
                 sendTreeGiftStats()
                 val treeType = treeType ?: ForagingTrackerLegacy.TreeType.FIG
                 loot.forEach { (item, count) ->
-                    tracker.addItem(treeType, item, count, command = false)
+                    addItem(treeType, item, count, command = false)
                 }
                 loot.clear()
             }
@@ -247,7 +241,7 @@ object ForagingTracker {
             val type = group("type")
             treeType = ForagingTrackerLegacy.TreeType.byNameOrNull(type)
             val treeType = treeType ?: return@matchMatcher
-            tracker.modify {
+            modify {
                 it.treesCut.addOrPut(treeType, 1)
                 it.wholeTreesCut.addOrPut(treeType, percentage / 100.0)
             }
@@ -305,15 +299,15 @@ object ForagingTracker {
             }
             val amount = amountString.formatIntOrNull() ?: return@forEach
             when (item) {
-                "HOTF Experience" -> tracker.modify {
+                "HOTF Experience" -> modify {
                     it.hotfExperience.addOrPut(treeType, amount.toLong())
                 }
 
-                "Foraging Experience" -> tracker.modify {
+                "Foraging Experience" -> modify {
                     it.foragingExperience.addOrPut(treeType, amount.toLong())
                 }
 
-                "Forest Whispers" -> tracker.modify {
+                "Forest Whispers" -> modify {
                     it.forestWhispers.addOrPut(treeType, amount.toLong())
                 }
 
@@ -348,7 +342,7 @@ object ForagingTracker {
     @HandleEvent(IslandChangeEvent::class)
     fun onIslandChange() {
         if (!isInIsland()) return
-        tracker.firstUpdate()
+        firstUpdate()
     }
 
     private fun isInIsland() = IslandTypeTags.FORAGING_CUSTOM_TREES.inAny()
@@ -358,7 +352,7 @@ object ForagingTracker {
         event.registerBrigadier("shresetforagingtracker") {
             description = "Resets the Foraging Tracker."
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 
