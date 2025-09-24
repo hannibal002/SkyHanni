@@ -227,7 +227,7 @@ object SkyHanniMod {
                 if (mainJob.isActive) {
                     ErrorManager.logErrorStateWithData(
                         "Coroutine timed out",
-                        "The coroutine took longer than the specified timeout of $timeout",
+                        "The coroutine '$name' took longer than the specified timeout of $timeout",
                         "timeout" to timeout,
                         "coroutine name" to name,
                     )

@@ -23,8 +23,8 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
@@ -217,18 +217,20 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun initRepo() {
         progress.start("init $commonName repo")
         shouldManuallyReload = true
-        SkyHanniMod.launchIOCoroutine("$commonName repo init") {
+        val loaded = AtomicBoolean(false)
+        val job = SkyHanniMod.launchIOCoroutine("$commonName repo init", timeout = 2.minutes) {
             if (config.repoAutoUpdate && !fetchAndUnpackRepo(command = false).canContinue) {
                 progress.end("Failed to fetch & unpack repo - aborting repository reload.")
                 logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
                 return@launchIOCoroutine
             }
+            loaded.set(true)
             reloadRepository()
         }
-        progress.update("outside job")
         job.invokeOnCompletion {
-            progress.update("invokeOnCompletion")
-            progress.update("launchIOCoroutine.isCancelled ${job.isCancelled}")
+            if (!loaded.get()) {
+                progress.update("reached timeout")
+            }
         }
     }
 
@@ -381,7 +383,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             return FetchUnpackResult.SUCCESS
         } else if (command) {
             if (!comparison.hashesMatch) {
-                progress.update("hashes dont match, outdated!")
+                progress.update("hashes don't match, outdated!")
                 comparison.reportRepoOutdated()
             } else if (forceReset) comparison.reportForceRebuild()
         }
@@ -467,6 +469,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 prefixColor = "§c",
             )
             if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")
+        } else {
+            progress.end("done.")
         }
     }
 }

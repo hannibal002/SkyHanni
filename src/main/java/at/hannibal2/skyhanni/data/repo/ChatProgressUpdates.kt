@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -24,7 +25,7 @@ class ChatProgressUpdates {
     private var startOfFirst: SimpleTimeMark? = null
     private var title: String? = null
 
-    private var currentlyRunning = false
+    private val currentlyRunning get() = currentStep != null
     private var chatId: Int? = null
 
     private var previousSteps = mutableListOf<String>()
@@ -56,6 +57,7 @@ class ChatProgressUpdates {
 
         @HandleEvent(onlyOnSkyblock = true)
         fun onTick(event: SkyHanniTickEvent) {
+            if (!SkyBlockUtils.debug) return
             if (event.isMod(2)) {
                 for (update in updates) {
                     if (update.currentlyRunning) {
@@ -89,7 +91,6 @@ class ChatProgressUpdates {
                 error("trying to start an already running chat: $nextStep")
             }
             startOfFirst = SimpleTimeMark.now()
-            currentlyRunning = true
             chatId = ChatUtils.getUniqueMessageId()
             title = nextStep
         }
@@ -99,6 +100,7 @@ class ChatProgressUpdates {
             previousSteps.add("$it $innerProgress$format")
         }
         innerProgress = ""
+        if (!SkyBlockUtils.debug) return
 
         val time = SimpleTimeMark.now().toLocalDateTime()
         println("$time: $nextStep")
@@ -108,10 +110,10 @@ class ChatProgressUpdates {
             if (!currentlyRunning) {
                 error("trying to end an not running chat: $nextStep")
             }
-            currentlyRunning = false
             update()
             currentStep = null
             startOfCurrent = null
+            previousSteps.clear()
         } else {
             startOfCurrent = SimpleTimeMark.now()
             update()
