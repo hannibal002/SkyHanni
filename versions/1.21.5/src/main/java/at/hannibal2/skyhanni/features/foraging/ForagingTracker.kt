@@ -49,7 +49,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         { ForagingTrackerLegacy.BucketData() },
         { it.foraging.trackerData },
         { drawDisplay(it) },
-        trackerConfig = { SkyHanniMod.feature.foraging.tracker }
+        trackerConfig = { SkyHanniMod.feature.foraging.tracker.perTrackerConfig }
     ){
     private val config get() = SkyHanniMod.feature.foraging.tracker
 
