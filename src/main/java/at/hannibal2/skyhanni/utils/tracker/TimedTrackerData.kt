@@ -168,10 +168,10 @@ open class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
         val keys = getEntries(displayMode)?.keys ?: return null to null
 
         val sortedKeys = runCatching {
-            keys.map { it to (displayMode.toValue(it) as Comparable<Any>) }
-                .sortedBy { it.second }
+            keys.map { key -> key to (displayMode.toValue(key) as Comparable<Any>) }
+                .sortedBy { pair -> pair.second }
         }.getOrElse {
-            keys.map { it to it }
+            keys.map { key -> key to key }
         }
 
         val index = sortedKeys.indexOfFirst { it.first == current }
