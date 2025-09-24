@@ -29,7 +29,7 @@ object ActionBarData {
     }
 
     private fun debugCommand() {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("action bar debug command") {
             val clipboard = OSUtils.readFromClipboard()
             if (debugActionBar == clipboard) {
                 debugActionBar = null

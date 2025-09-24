@@ -140,7 +140,7 @@ object FossilSolverDisplay {
             }
         }
 
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("fossil solver findBestTile") {
             FossilSolver.findBestTile(fossilLocations, dirtLocations, percentage)
         }
     }

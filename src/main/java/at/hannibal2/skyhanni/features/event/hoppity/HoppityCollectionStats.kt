@@ -282,6 +282,7 @@ object HoppityCollectionStats {
 
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
+        if (event.originalItem == null) return
         replacementCache[event.originalItem.displayName]?.let { event.replace(it) }
     }
 

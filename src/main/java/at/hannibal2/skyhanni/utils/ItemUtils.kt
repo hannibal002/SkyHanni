@@ -589,6 +589,20 @@ object ItemUtils {
         return makePair(input, itemName, matcher)
     }
 
+    /**
+     * REGEX-TEST: §fEnchanted Book (Lapidary I)
+     * REGEX-TEST: §fEnchanted Book (Ice Cold I§r§f)
+     */
+    private val enchantedBookPattern by RepoPattern.pattern(
+        "item.enchantedbook",
+        "§fEnchanted Book \\((?<item>.+)\\)"
+    )
+    fun readBookType(input: String): String? {
+        return enchantedBookPattern.matchMatcher(input) {
+            group("item").removeColor()
+        }
+    }
+
     private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {
         val matcherAmount = matcher.group("amount")
         val amount = matcherAmount?.formatInt() ?: 1
@@ -792,7 +806,7 @@ object ItemUtils {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("shtestitem") {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }
@@ -937,7 +951,7 @@ object ItemUtils {
     }
 
     fun NeuInternalName.getNumberedName(amount: Number): String {
-        val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
+        val prefix = if (amount.toDouble() == 1.0) "" else "§8${amount.addSeparators()}x "
         return "$prefix§r$repoItemName"
     }
 

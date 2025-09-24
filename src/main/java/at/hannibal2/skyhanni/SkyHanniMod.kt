@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
+import at.hannibal2.skyhanni.events.utils.InitFinishedEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,8 +36,10 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -46,6 +49,9 @@ import net.minecraft.client.gui.GuiScreen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SkyHanniMod {
@@ -72,7 +78,9 @@ object SkyHanniMod {
             SkyHanniRepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
+            SkyHanniRepoManager.progress.end("Error reading repo data: ${e.message}")
         }
+        InitFinishedEvent.post()
     }
 
     @HandleEvent
@@ -135,9 +143,11 @@ object SkyHanniMod {
      * @param block The suspend function to execute within the IO context.
      */
     fun launchIOCoroutineWithMutex(
+        name: String,
         mutex: Mutex,
+        timeout: Duration = 10.seconds,
         block: suspend CoroutineScope.() -> Unit,
-    ): Job = launchCoroutine {
+    ): Job = launchCoroutine("launchIOCoroutineWithMutex $name", timeout) {
         mutex.withLock {
             withContext(Dispatchers.IO, block)
         }
@@ -148,7 +158,11 @@ object SkyHanniMod {
      * This coroutine will catch any exceptions thrown by the provided function.
      * @param block The suspend function to execute within the IO context.
      */
-    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit): Job = launchCoroutine {
+    fun launchIOCoroutine(
+        name: String,
+        timeout: Duration = 10.seconds,
+        block: suspend CoroutineScope.() -> Unit,
+    ): Job = launchCoroutine("launchIOCoroutine $name", timeout) {
         withContext(Dispatchers.IO, block)
     }
 
@@ -156,23 +170,70 @@ object SkyHanniMod {
      * Launches a coroutine in the SkyHanni scope.
      * This coroutine will catch any exceptions thrown by the provided function.
      * The function provided here must not rely on the CoroutineScope's context.
-     * @param function The function to execute in the coroutine.
+     * @param block The block to execute in the coroutine.
      */
-    fun launchNoScopeCoroutine(function: suspend () -> Unit): Job = launchCoroutine { function() }
+    fun launchNoScopeCoroutine(
+        name: String,
+        timeout: Duration = 10.seconds,
+        block: suspend () -> Unit,
+    ): Job = launchCoroutine("launchNoScopeCoroutine $name", timeout) { block() }
+
+    /**
+     * Launch a coroutine with a lock on the provided mutex.
+     * This coroutine will catch any exceptions thrown by the provided function.
+     * @param mutex The mutex to lock during the execution of the block.
+     * @param block The suspend function to execute within the IO context.
+     */
+    fun launchCoroutineWithMutex(
+        name: String,
+        mutex: Mutex,
+        timeout: Duration = 10.seconds,
+        block: suspend CoroutineScope.() -> Unit,
+    ): Job = launchCoroutine("launchCoroutineWithMutex $name", timeout) {
+        mutex.withLock { block() }
+    }
 
     /**
      * Launches a coroutine in the SkyHanni scope.
      * This coroutine will catch any exceptions thrown by the provided function.
      * @param function The suspend function to execute in the coroutine.
      */
-    fun launchCoroutine(function: suspend CoroutineScope.() -> Unit): Job = coroutineScope.launch {
-        try {
-            function()
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e,
-                e.message ?: "Asynchronous exception caught",
-            )
+    @OptIn(InternalCoroutinesApi::class)
+    fun launchCoroutine(
+        name: String,
+        timeout: Duration = 10.seconds,
+        function: suspend CoroutineScope.() -> Unit,
+    ): Job = coroutineScope.launch {
+        val mainJob = launch {
+            try {
+                function()
+            } catch (e: CancellationException) {
+                // Don't notify the user about cancellation exceptions - these are to be expected at times
+                val jobState = coroutineContext[Job]?.toString() ?: "unknown job"
+                val cancellationCause = coroutineContext[Job]?.getCancellationException()
+                logger.debug("Job $jobState/$name was cancelled with cause: $cancellationCause", e)
+            } catch (e: Throwable) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    e.message ?: "Asynchronous exception caught",
+                    "coroutine name" to name,
+                )
+            }
+        }
+
+        if (timeout != Duration.INFINITE && timeout != Duration.ZERO) {
+            launch {
+                delay(timeout)
+                if (mainJob.isActive) {
+                    ErrorManager.logErrorStateWithData(
+                        "Coroutine timed out",
+                        "The coroutine '$name' took longer than the specified timeout of $timeout",
+                        "timeout" to timeout,
+                        "coroutine name" to name,
+                    )
+                    mainJob.cancel(CancellationException("Coroutine $name timed out after $timeout"))
+                }
+            }
         }
     }
 

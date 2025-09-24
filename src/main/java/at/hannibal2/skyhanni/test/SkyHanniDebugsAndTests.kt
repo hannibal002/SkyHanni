@@ -69,8 +69,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 //#endif
 import java.io.File
-import java.time.LocalDate
-import java.time.Month
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -101,25 +99,13 @@ object SkyHanniDebugsAndTests {
         LorenzDebug.log(text)
     }
 
-    private var previousApril = false
-
-    val isAprilFoolsDay: Boolean
-        get() {
-            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
-            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
-            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
-            val result = (!never && (always || itsTime))
-            previousApril = result
-            return result
-        }
-
     private var testLocation: LorenzVec? = null
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
-            event.drawDynamicText(it, "Test", 1.5)
+            event.drawDynamicText(it, "Debug Test", 1.5)
         }
     }
 
@@ -145,7 +131,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("shtest command") {
             asyncTest(args)
         }
     }
@@ -458,7 +444,7 @@ object SkyHanniDebugsAndTests {
                 config.debugLocationPos.renderRenderables(renderables, posLabel = "SkyBlock Area (Debug)")
             }
 
-            if (debugConfig.raytracedOreblock) {
+            if (debugConfig.rayTracedOreBlock) {
                 BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
@@ -520,6 +506,7 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+        event.move(103, "dev.debug.raytracedOreblock", "dev.debug.rayTracedOreBlock")
     }
 
     @Suppress("LongMethod")
