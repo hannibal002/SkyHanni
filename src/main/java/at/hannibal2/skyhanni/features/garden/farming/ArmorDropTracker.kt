@@ -62,7 +62,7 @@ object ArmorDropTracker {
     ) : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class)
 
 
-        // Todo use repo pattern
+    // Todo use repo pattern
     enum class ArmorDropType(val dropName: String, val chatMessage: String) {
         CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
         SQUASH("§5Squash", "§6§lRARE CROP! §r§f§r§5Squash §r§b(Armor Set Bonus)"),
