@@ -16,6 +16,7 @@ import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.ZipFile
 import kotlin.sequences.forEach
+import kotlin.time.Duration.Companion.minutes
 
 sealed interface RepoFileSystem {
     fun exists(path: String): Boolean
@@ -51,7 +52,7 @@ sealed interface RepoFileSystem {
                     val outPath = root.toPath().resolve(relative).normalize()
                     if (!outPath.startsWith(root.toPath())) throw RuntimeException(
                         "SkyHanni detected an invalid zip file. This is a potential security risk, " +
-                            "please report this on the SkyHanni discord."
+                            "please report this on the SkyHanni discord.",
                     )
                 }
 
@@ -112,8 +113,9 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
     }.map { it.removePrefix("$path/") }
 
     override fun loadFromZip(zipFile: File, logger: RepoLogger): Boolean {
+        println("loadFromZip")
         val success = super.loadFromZip(zipFile, logger)
-        if (flushJob == null) flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk") { saveToDisk(diskRoot) }
+        if (flushJob == null) flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk", timeout = 2.minutes) { saveToDisk(diskRoot) }
         return success
     }
 

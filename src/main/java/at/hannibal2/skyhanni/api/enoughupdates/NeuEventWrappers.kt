@@ -72,6 +72,7 @@ object NeuEventWrappers {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: RepositoryReloadEvent) {
+        EnoughUpdatesRepoManager.progress.start("listened on RepositoryReloadEvent: NEU repo")
         EnoughUpdatesRepoManager.reloadLocalRepo()
     }
 }

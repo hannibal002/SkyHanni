@@ -997,6 +997,7 @@ object DamageIndicatorManager {
                 if (name.contains("Overflux")) return
                 if (name.contains("Mana Flux")) return
                 if (name.contains("Radiant")) return
+                if (!entity.hasCustomName()) return
                 event.cancel()
             }
         }
