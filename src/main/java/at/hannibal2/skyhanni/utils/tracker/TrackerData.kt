@@ -1,15 +1,21 @@
 package at.hannibal2.skyhanni.utils.tracker
 
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.Stopwatch
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-abstract class TrackerData {
+abstract class TrackerData : Resettable {
     @Expose
     private val sessionUptime: Map<SessionUptime, Stopwatch> = mapOf(
         Pair(SessionUptime.Normal(NormalSession.NORMAL), Stopwatch())
     )
+
+    override fun reset() {
+        super.reset()
+        sessionUptime.values.forEach { it.reset() }
+    }
 
     private var activeSession: SessionUptime? = sessionUptime.keys.firstOrNull()
 
@@ -28,14 +34,5 @@ abstract class TrackerData {
         sessionUptime.values.fold(Duration.ZERO) { acc, stopwatch ->
             acc + stopwatch.getDuration()
         }
-
-    fun reset() {
-        for (session in sessionUptime.entries) {
-            sessionUptime[session.key]?.reset()
-        }
-        resetData()
-    }
-
-    protected abstract fun resetData()
 }
 

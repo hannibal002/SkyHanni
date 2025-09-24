@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
 
-abstract class ItemTrackerData : Resettable {
+abstract class ItemTrackerData : TrackerData() {
 
     abstract fun getDescription(timesGained: Long): List<String>
 
@@ -16,7 +15,7 @@ abstract class ItemTrackerData : Resettable {
 
     open fun getCustomPricePer(internalName: NeuInternalName) = SkyHanniTracker.getPricePer(internalName)
 
-    override fun resetData() {
+    override fun reset() {
         super.reset()
         items.clear()
     }
