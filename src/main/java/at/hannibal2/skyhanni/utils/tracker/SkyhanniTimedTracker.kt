@@ -70,6 +70,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         }
         cleanEntries()
         add()
+        update()
     }
 
     private fun add() = trackerSet.add(this)
@@ -121,7 +122,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
 
     private fun ProfileSpecificStorage.getData() = storage(this)
     private fun ProfileSpecificStorage.getOrPutNewestData(displayMode: DisplayMode = getDisplayMode()) =
-        this.getData().getOrPutCurrentData(displayMode)
+        this.getData().getOrPutNewestData(displayMode)
 
     override fun getDisplay(): List<Renderable> {
         val searchables = getOrPutCurrentData()?.let { drawDisplay(it) } ?: return emptyList()
