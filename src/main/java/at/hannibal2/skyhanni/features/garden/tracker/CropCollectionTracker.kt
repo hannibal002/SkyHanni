@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.features.garden.cropcollections.CropCollecti
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
@@ -45,19 +44,14 @@ object CropCollectionTracker {
         trackerConfig = { config.perTrackerConfig },
     )
 
-    class TimedData : TimedTrackerData<Data, SessionUptime.Garden>(SessionUptime.Garden::class, { Data() })
+    class TimedData : TimedTrackerData<Data, SessionUptime.Garden>({ Data() })
 
-    class Data : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class) {
-        override fun resetData() {
-            cropCollection.clear()
-        }
-
-        @Expose
-        var cropCollection: MutableMap<CropType, CropCollectionApi.CropCollection> = EnumMap(CropType::class.java)
-    }
+    data class Data(
+        @Expose val cropCollection: MutableMap<CropType, CropCollectionApi.CropCollection> = EnumMap(CropType::class.java)
+    ) : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class)
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.statDisplayList) {
             tracker.update()
         }
@@ -106,7 +100,7 @@ object CropCollectionTracker {
         val total: Long = cropData.getTotal()
         lineMap[CropCollectionDisplayText.SESSION] =
             Renderable.hoverTips(
-                "§7${tracker.dateString()}: §e${total.addSeparators()}", buildCropBreakdown(cropData)
+                "§7${tracker.displayMode?.currentName}: §e${total.addSeparators()}", buildCropBreakdown(cropData)
             ).toSearchable()
 
         val uptime = data.getTotalUptime()
