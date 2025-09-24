@@ -30,12 +30,12 @@ import java.util.EnumMap
 
 @SkyHanniModule
 object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfitTracker.BucketData>(
-        "Dragon Profit Tracker",
-        { BucketData() },
-        { it.dragonProfitTracker },
-        { drawDisplay(it) },
-        trackerConfig = { config.perTrackerConfig }
-    ){
+    "Dragon Profit Tracker",
+    { BucketData() },
+    { it.dragonProfitTracker },
+    { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker.perTrackerConfig }
+) {
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker
 
     private var lastPlaced: Int = 0

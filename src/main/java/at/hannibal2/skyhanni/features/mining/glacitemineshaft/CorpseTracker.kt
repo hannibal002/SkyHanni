@@ -33,12 +33,12 @@ import com.google.gson.annotations.Expose
 
 @SkyHanniModule
 object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.BucketData>(
-        "Corpse Tracker",
-        { BucketData() },
-        { it.mining.mineshaft.corpseProfitTracker },
-        { drawDisplay(it) },
-        trackerConfig = { config.perTrackerConfig }
-    ){
+    "Corpse Tracker",
+    { BucketData() },
+    { it.mining.mineshaft.corpseProfitTracker },
+    { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker.perTrackerConfig }
+) {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
 
     data class BucketData(
