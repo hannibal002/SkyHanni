@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -38,6 +39,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -97,13 +99,8 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
     }
 
     fun logCommandAdd(internalName: NeuInternalName, amount: Int) {
-        val displayName = internalName.repoItemName
-        val message = if (amount > 0) {
-            "Manually added to $name: §r$displayName §7(${amount}x§7)"
-        } else {
-            "Manually removed from $name: §r$displayName §7(${-amount}x§7)"
-        }
-        ChatUtils.chat(message)
+        val action = if (amount > 0) "added to" else "removed from"
+        ChatUtils.chat("Manually $action $name: ${internalName.getPriceName(amount.absoluteValue)}")
     }
 
     fun ItemAddEvent.logCompletedAddEvent() {

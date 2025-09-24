@@ -68,7 +68,7 @@ object ParkourWaypointSaver {
      */
 
     private fun loadClipboard() {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("parkour waypoint load clipboard") {
             val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
             try {
                 locations = clipboard.split("\n").map { line ->

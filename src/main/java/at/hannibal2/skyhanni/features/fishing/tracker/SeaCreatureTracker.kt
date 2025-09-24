@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
@@ -43,15 +41,9 @@ object SeaCreatureTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData() {
-
-        override fun resetData() {
-            amount.clear()
-        }
-
-        @Expose
-        var amount: MutableMap<String, Int> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var amount: MutableMap<String, Int> = mutableMapOf()
+    ) : TrackerData()
 
     @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
@@ -84,7 +76,7 @@ object SeaCreatureTracker {
     }
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         needMigration = true
     }
 
@@ -149,7 +141,7 @@ object SeaCreatureTracker {
         }
 
         if (tracker.isInventoryOpen()) {
-            addButton<String>(
+            addButton(
                 label = "Category",
                 current = currentCategory,
                 getName = { it.allLettersFirstUppercase() + " §7(" + amounts[it] + ")" },
@@ -180,7 +172,7 @@ object SeaCreatureTracker {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.showPercentage) {
             tracker.update()
         }

@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.combat.end.EnderNodeConfig.EnderNodeDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -72,23 +70,11 @@ object EnderNodeTracker {
         trackerConfig = { config.perTrackerConfig }
     )
 
-    class Data : TrackerData() {
-
-        override fun resetData() {
-            totalNodesMined = 0
-            totalEndermiteNests = 0
-            lootCount.clear()
-        }
-
-        @Expose
-        var totalNodesMined = 0
-
-        @Expose
-        var totalEndermiteNests = 0
-
-        @Expose
-        var lootCount: MutableMap<EnderNode, Int> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var totalNodesMined: Long = 0,
+        @Expose var totalEndermiteNests: Long = 0,
+        @Expose var lootCount: MutableMap<EnderNode, Int> = mutableMapOf(),
+    ) : TrackerData()
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
@@ -139,7 +125,7 @@ object EnderNodeTracker {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    fun onIslandChange() {
         if (!isEnabled()) return
         miteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
             it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
@@ -183,7 +169,7 @@ object EnderNodeTracker {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         config.textFormat.afterChange {
             tracker.update()
         }

@@ -6,8 +6,6 @@ import com.google.gson.annotations.Expose
 
 abstract class ItemTrackerData : TrackerData() {
 
-    abstract fun resetItems()
-
     abstract fun getDescription(timesGained: Long): List<String>
 
     abstract fun getCoinName(item: TrackedItem): String
@@ -17,9 +15,9 @@ abstract class ItemTrackerData : TrackerData() {
 
     open fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>) = tracker.getPricePer(internalName)
 
-    override fun resetData() {
+    override fun reset() {
+        super.reset()
         items.clear()
-        resetItems()
     }
 
     open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {

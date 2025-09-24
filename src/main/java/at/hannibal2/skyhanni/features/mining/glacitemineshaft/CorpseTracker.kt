@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -31,22 +32,18 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
-object CorpseTracker {
-    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
-
-    private val tracker = SkyHanniBucketedItemTracker(
+object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.BucketData>(
         "Corpse Tracker",
         { BucketData() },
         { it.mining.mineshaft.corpseProfitTracker },
         { drawDisplay(it) },
         trackerConfig = { config.perTrackerConfig }
-    )
+    ){
+    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
 
-    class BucketData : BucketedItemTrackerData<CorpseType>(CorpseType::class) {
-        override fun resetItems() {
-            corpsesLooted = enumMapOf()
-        }
-
+    data class BucketData(
+        @Expose var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
+    ) : BucketedItemTrackerData<CorpseType>(CorpseType::class) {
         override fun getDescription(bucket: CorpseType?, timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
                 selectedBucket?.let {
@@ -63,25 +60,18 @@ object CorpseTracker {
 
         override fun getCoinName(bucket: CorpseType?, item: TrackedItem) = "<no coins>"
         override fun getCoinDescription(bucket: CorpseType?, item: TrackedItem): List<String> = listOf("<no coins>")
-
         override fun CorpseType.isBucketSelectable() = true
-
-        override fun bucketName(): String {
-            return "Corpse"
-        }
-
-        @Expose
-        var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
+        override fun bucketName(): String = "Corpse"
 
         fun getCorpseCount(): Long = selectedBucket?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
     }
 
-    private fun addLootedCorpse(type: CorpseType) = tracker.modify { it.corpsesLooted.addOrPut(type, 1) }
+    private fun addLootedCorpse(type: CorpseType) = modify { it.corpsesLooted.addOrPut(type, 1) }
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (isEnabled() && event.source == ItemAddManager.Source.COMMAND) {
-            with(tracker) { event.addItemFromEvent() }
+            event.addItemFromEvent()
         }
     }
 
@@ -91,18 +81,18 @@ object CorpseTracker {
         for ((itemName, amount) in event.loot) {
             if (itemName.removeColor().trim() == "Glacite Powder") continue
             NeuInternalName.fromItemNameOrNull(itemName)?.let { item ->
-                tracker.addItem(event.corpseType, item, amount, command = false, message = false)
+                addItem(event.corpseType, item, amount, command = false, message = false)
             }
         }
     }
 
     private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
         addSearchString("§b§lMineshaft Corpse Profit Tracker")
-        tracker.addBucketSelector(this, bucketData, "Corpse Type")
+        addBucketSelector(this, bucketData, "Corpse Type")
 
         if (bucketData.getCorpseCount() == 0L) return@buildList
 
-        var profit = tracker.drawItems(bucketData, { true }, this)
+        var profit = drawItems(bucketData, { true }, this)
         val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let {
             listOf(it)
         } ?: enumValues<CorpseType>().toList()
@@ -113,7 +103,7 @@ object CorpseTracker {
             applicableKeys.forEach { keyData ->
                 keyData.key?.let { key ->
                     val keyName = key.repoItemName
-                    val price = tracker.getPricePer(key)
+                    val price = getPricePer(key)
                     val count = bucketData.corpsesLooted[keyData] ?: 0
                     val totalPrice = price * count
                     if (totalPrice > 0) {
@@ -139,19 +129,19 @@ object CorpseTracker {
         }
 
         val duration = bucketData.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, bucketData.getCorpseCount(), "corpse", duration, "Corpses"))
+        addAll(addTotalProfit(profit, bucketData.getCorpseCount(), "corpse", duration, "Corpses"))
 
-        tracker.addPriceFromButton(this)
+        addPriceFromButton(this)
     }
 
     init {
-        tracker.initRenderer({ config.position }) { isEnabled() }
+        initRenderer({ config.position }) { isEnabled() }
     }
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.MINESHAFT || event.newIsland == IslandType.DWARVEN_MINES) {
-            tracker.firstUpdate()
+            firstUpdate()
         }
     }
 
@@ -160,7 +150,7 @@ object CorpseTracker {
         event.register("shresetcorpsetracker") {
             description = "Resets the Glacite Mineshaft Corpse Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            callback { resetCommand() }
         }
     }
 

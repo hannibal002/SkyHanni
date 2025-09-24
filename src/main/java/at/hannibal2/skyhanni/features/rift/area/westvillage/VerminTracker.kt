@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -81,15 +80,9 @@ object VerminTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData() {
-
-        override fun resetData() {
-            count.clear()
-        }
-
-        @Expose
-        var count: MutableMap<VerminType, Int> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var count: MutableMap<VerminType, Int> = mutableMapOf()
+    ) : TrackerData()
 
     enum class VerminType(val order: Int, val vermin: String, val pattern: Pattern) {
         FLY(1, "§aFlies", flyPattern),
@@ -98,7 +91,7 @@ object VerminTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         checkVacuum()
     }
 

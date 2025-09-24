@@ -9,9 +9,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.PowderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -99,7 +97,7 @@ object PowderTracker {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (!isEnabled()) return
         calculateResourceHour(gemstoneInfo)
         calculateResourceHour(mithrilInfo)
@@ -144,24 +142,12 @@ object PowderTracker {
             trackerConfig = { config.perTrackerConfig }
         ) { formatDisplay(drawDisplay(it)) }
 
-    class Data : TrackerData() {
-
-        override fun resetData() {
-            rewards.clear()
-            totalChestPicked = 0
-            totalHardStoneCompacted = 0
-        }
-
-        @Expose
-        var totalChestPicked = 0
-
-        @Expose
-        var totalHardStoneCompacted = 0
-
+    data class Data(
+        @Expose var totalChestPicked: Long = 0,
+        @Expose var totalHardStoneCompacted: Long = 0,
         // TODO remove this field and transform this into a ItemProfitTracker
-        @Expose
-        var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf()
-    }
+        @Expose var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf(),
+    ) : TrackerData()
 
     init {
         tracker.initRenderer({ config.position }) { shouldShowDisplay() }
@@ -228,7 +214,7 @@ object PowderTracker {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         config.textFormat.afterChange {
             tracker.update()
         }
@@ -295,7 +281,7 @@ object PowderTracker {
         }
     }
 
-    private fun formatDisplay(map: List<Searchable>) = buildList<Searchable> {
+    private fun formatDisplay(map: List<Searchable>) = buildList {
         if (map.isEmpty()) return@buildList
 
         addSearchString("§b§lPowder Tracker")
@@ -426,11 +412,11 @@ object PowderTracker {
     }
 
     private fun calculateChest(data: Data) {
-        chestInfo.estimated = data.totalChestPicked.toLong()
+        chestInfo.estimated = data.totalChestPicked
     }
 
     private fun calculateHardStone(data: Data) {
-        hardStoneInfo.estimated = data.totalHardStoneCompacted.toLong()
+        hardStoneInfo.estimated = data.totalHardStoneCompacted
     }
 
     private fun convert(roughCount: Long): Gem {

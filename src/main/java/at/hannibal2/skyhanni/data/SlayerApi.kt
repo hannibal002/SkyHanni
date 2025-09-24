@@ -12,9 +12,8 @@ import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -49,22 +48,12 @@ object SlayerApi {
 
     fun getItemNameAndPrice(internalName: NeuInternalName, amount: Int): Pair<String, Double> =
         nameCache.getOrPut(internalName to amount) {
-            val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
-            val displayName = internalName.repoItemName
-
             val price = internalName.getPrice()
             val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
             val maxPrice = npcPrice.coerceAtLeast(price)
             val totalPrice = maxPrice * amount
 
-            val format = totalPrice.shortFormat()
-
-            if (internalName == NeuInternalName.SKYBLOCK_COIN) {
-                "§6$format coins" to totalPrice
-            } else {
-                val priceFormat = " §7(§6$format coins§7)"
-                "$amountFormat$displayName$priceFormat" to totalPrice
-            }
+            internalName.getPriceName(amount, pricePer = maxPrice) to totalPrice
         }
 
     @HandleEvent
