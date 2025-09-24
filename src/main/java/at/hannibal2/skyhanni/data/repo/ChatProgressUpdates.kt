@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -25,10 +26,10 @@ class ChatProgressUpdates {
     private var startOfFirst: SimpleTimeMark? = null
     private var title: String? = null
 
-    private val currentlyRunning get() = currentStep != null
+    private var currentlyRunning = false
     private var chatId: Int? = null
 
-    private var previousSteps = mutableListOf<String>()
+    private val previousSteps = mutableListOf<String>()
 
     private var startOfCurrent: SimpleTimeMark? = null
     private var currentStep: String? = null
@@ -97,7 +98,7 @@ class ChatProgressUpdates {
 
         currentStep?.let {
             val format = startOfCurrent?.format() ?: error("start of current is null")
-            previousSteps.add("$it $innerProgress$format")
+            previousSteps.add("§8- §f$it $innerProgress$format")
         }
         innerProgress = ""
         if (!SkyBlockUtils.debug) return
@@ -105,6 +106,7 @@ class ChatProgressUpdates {
         val time = SimpleTimeMark.now().toLocalDateTime()
         println("$time: $nextStep")
         currentStep = nextStep
+        currentlyRunning = true
 
         if (phase == Phase.END) {
             if (!currentlyRunning) {
@@ -112,6 +114,7 @@ class ChatProgressUpdates {
             }
             update()
             currentStep = null
+            currentlyRunning = false
             startOfCurrent = null
             previousSteps.clear()
         } else {
@@ -123,9 +126,10 @@ class ChatProgressUpdates {
     private fun SimpleTimeMark.format(): String {
         val duration = passedSince()
         val color = when {
-            duration < 100.milliseconds -> "§8"
-            duration < 10.seconds -> "§b"
-            else -> "§c"
+            duration < 100.milliseconds -> "§7"
+            duration < 5.seconds -> "§b"
+            duration < 1.minutes -> "§c"
+            else -> "§4"
         }
 
         val format = duration.format(showMilliSeconds = true)
@@ -146,7 +150,8 @@ class ChatProgressUpdates {
         }
 
         val hover = mutableListOf<String>()
-        hover.add(title)
+        hover.add("§e$title")
+        hover.add("§8SkyHanni Debug Log")
         hover.add("")
         hover.addAll(previousSteps)
 
@@ -155,15 +160,15 @@ class ChatProgressUpdates {
             val currentLine = "$currentStep $innerProgress$currentTime"
             hover.add(currentLine)
             hover.add("")
-            hover.add("running for: $totalTime")
+            hover.add("§7Running for: $totalTime")
             currentLine
         } else {
             hover.add("")
-            hover.add("done after: $totalTime")
+            hover.add("§aDone after: $totalTime")
             "$currentStep $totalTime"
         }
 
-        val delayedSending = DelayedSending(text, hover.joinToString("\n"))
+        val delayedSending = DelayedSending("§e[Debug-Log] §f$text §7(hover for more info)", hover.joinToString("\n"))
         if (MinecraftCompat.localPlayerOrNull != null) {
             delayedSending.send(chatId)
         } else {

@@ -184,6 +184,7 @@ object ErrorManager {
 
     data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
 
+    @Suppress("ReturnCount")
     private fun logError(
         originalThrowable: Throwable,
         message: String,
