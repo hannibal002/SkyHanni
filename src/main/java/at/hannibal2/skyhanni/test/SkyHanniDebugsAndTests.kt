@@ -131,7 +131,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("shtest command") {
             asyncTest(args)
         }
     }

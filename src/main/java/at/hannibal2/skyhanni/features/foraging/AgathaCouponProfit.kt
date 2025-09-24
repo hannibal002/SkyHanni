@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -94,8 +95,7 @@ object AgathaCouponProfit {
             add("§7Sell price: §6${price.shortFormat()}")
             add("§7Total cost: §6${totalCost.shortFormat()}")
             for ((requiredName, amount) in requiredItems) {
-                val itemPrice = requiredName.getPriceOrNull()?.times(amount) ?: continue
-                add(" §8x$amount ${requiredName.repoItemName}: §7(§6${itemPrice.shortFormat()}§7)")
+                add(requiredName.getPriceName(amount))
             }
             add("")
             add("§7Profit per sell: §6${profit.shortFormat()}")

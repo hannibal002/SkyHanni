@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -114,9 +115,7 @@ object CraftableItemList {
             add("")
             add("§7Craft cost: §6${totalPrice.shortFormat()}")
             for ((item, amount) in neededItems) {
-                val name = item.repoItemName
-                val price = item.getPrice() * amount
-                add(" §8x${amount.addSeparators()} $name §7(§6${price.shortFormat()}§7)")
+                add(" ${item.getPriceName(amount)}")
             }
             add("")
             add("§7You have enough materials")

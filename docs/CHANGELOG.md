@@ -98,6 +98,7 @@
     + Tracks the amount of coins you have put towards the daily 15 billion trade limit.
     + Coins in excess of the integer limit on an individual order do not count towards the daily limit.
     + Resets at midnight UTC.
++ Added a keybind to fill your inventory with the hovered item from Sacks. - nopo (https://github.com/hannibal002/SkyHanni/pull/4697)
 
 #### Hoppity
 
@@ -138,6 +139,7 @@
     + Repeats until the pest cooldown ends or the wardrobe is opened.
 + Added option to set custom sounds for the Pest Cooldown Warning. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4509)
 + Updated Garden Money-Per-Hour display on pet change. - Stuflo19 (https://github.com/hannibal002/SkyHanni/pull/4648)
++ Added Pest Shard drops to Pest Profit Tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4705)
 
 #### Slayer
 
@@ -202,6 +204,8 @@
 + Added more edge-case detection to Repo Management. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4574)
 + Added Session Time and Reset on World Change toggle to Crown of Avarice Tracker. - Tryp0xd (https://github.com/hannibal002/SkyHanni/pull/4603)
     + Session Time now pauses after 2 minutes AFK instead of resetting.
++ Added Iris Shaders compatibility for  1.21.8. - Microcontrollers (https://github.com/hannibal002/SkyHanni/pull/4701)
+    + World-rendered features now display when shaders are enabled on 1.21.8.
 
 #### Foraging
 
@@ -247,6 +251,7 @@
 #### GUI
 
 + Made Reforge Helper also searchable as Reforge Overlay in the config. - Luna (https://github.com/hannibal002/SkyHanni/pull/4524)
++ Added credits for Discord Rich Presence images. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/4715)
 
 ### Fixes
 
@@ -264,6 +269,11 @@
 + Prevented incorrect Slayer spawn costs from being added to the Profit Tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4597)
 + Fixed Blaze T4 spawn costs being ignored in Slayer Profit Tracker. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4625)
 + Fixed Sven Slayer not working with Damage Indicator. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4653)
++ Fixed Dragon Profit Display failing to handle rare drops. - Stuflo19 (https://github.com/hannibal002/SkyHanni/pull/4688)
++ Fixed missing toggles for many various Damage Indicator-related features. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4691)
+    + Includes: Magma Boss (Crimson Isle) phase, Bacte (Rift) phase, Zombie Slayer Boom, Blaze Slayer Helion Shield name, Spider Slayer phase.
+    + These options are disabled by default. If you use Damage Indicator, please re-enable them.
++ Fixed mob names being incorrectly detected for some mobs without types. - Luna (https://github.com/hannibal002/SkyHanni/pull/4687)
 
 #### Rift
 
@@ -277,6 +287,7 @@
 + Fixed Puff not showing in Crux Talisman Display on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4506)
 + Fixed Wilted Berberis Helper occasionally not removing old waypoints. - Luna (https://github.com/hannibal002/SkyHanni/pull/4535)
 + Fixed Sun Gecko Helper always showing no active modifiers on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4682)
++ Fixed Sun Gecko Helper showing the wrong combo timer if you don't have the Combo Mania accessory. - Luna (https://github.com/hannibal002/SkyHanni/pull/4709)
 
 #### Crimson Isle
 
@@ -331,6 +342,11 @@
 + Fixed Dungeon Races Guide breaking when using abilities or gaining Bits mid-race. - Luna (https://github.com/hannibal002/SkyHanni/pull/4619)
 + Fixed trackers showing incorrect pet names. - nopo (https://github.com/hannibal002/SkyHanni/pull/4662)
 + Fixed shwords not checking color correctly. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4683)
++ Fixed arrows rendering incorrectly in the config on 1.21.8. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4684)
++ Fixed config options on modern versions not having colored text. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4684)
++ Fixed Open Wiki keybinds not working in Dye Compendium. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4711)
++ Fixed the /viewrecipe command failing for some items. - AfkUserMC (https://github.com/hannibal002/SkyHanni/pull/4690)
++ Fixed Total Powder/Forest Whispers resetting upon opening the SkyBlock Menu on mining/foraging islands. - Luna (https://github.com/hannibal002/SkyHanni/pull/4708)
 
 #### Chat
 
@@ -377,6 +393,8 @@
 + Fixed some chocolate factory options not respecting the global toggle. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4628)
 + Fixed brewing stand overlay labelling air on modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4644)
 + Fixed hunting box value being capped at integer limit. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4645)
++ Fixed shard fusions not being tracked correctly in Attribute Shard features and Item Pickup Log. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4706)
++ Fixed some profit trackers double-counting shard gains. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4706)
 
 #### Fishing
 
@@ -414,12 +432,19 @@
 
 + Fixed some reforges not detected in Estimated Item Value and Reforge Overlay. - Luna (https://github.com/hannibal002/SkyHanni/pull/4524)
 + Fixed SkyHanni User Luck in SB Menu. - nopo (https://github.com/hannibal002/SkyHanni/pull/4672)
++ Fixed GUI Editor rendering the open inventory incorrectly on 1.21.8. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4713)
++ Fixed lag with Discord IPC. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4595)
 
 #### Garden
 
 + Fixed Garden Visitor detection not working with Rainbow Rune again. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4681)
     + Unlike the last fix, this time it actually works.
 + Fixed typo in Composter Overlay. - aphased (https://github.com/hannibal002/SkyHanni/pull/4677)
++ Fixed Composter Garden display items sometimes failing to load. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4707)
+
+#### Event
+
++ Fixed colored hitboxes for Baby Zombies in Zombie Shootout being too small on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4710)
 
 ### Technical Details
 
@@ -596,6 +621,20 @@
 + Cleaned up miscellaneous functions in ChatUtils. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4574)
 + Moved isAprilFoolsDay into TimeUtils. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4560)
 + Removed the Ghost Position feature from Graph Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4599)
++ Added `AttributeShardsData.getActiveLevel()` to query the level of an attribute the player has. - Luna (https://github.com/hannibal002/SkyHanni/pull/4531)
+    + Takes the Bazaar product ID of the shard as an argument.
+    + Returns 0 if the player has the attribute disabled, otherwise the actual level.
++ Added a default 10-second watchdog to any launched coroutine. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4595)
+    + Can be overridden per call, or set to "INFINITE" to disable the watchdog process.
++ Added coroutine name to error stack traces. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4714)
++ Added getTablistEndTime, which better estimates when a tablist timer ends, to TimeUtils. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4678)
++ Added in-game logging for repo loading. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4716)
++ Bumped moulconfig and preprocessor. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4684)
++ Cleaned up InventoryDetector. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4712)
++ Hide Armor now uses the stored entity in EntityRenderDispatcherHook like every other feature. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4696)
++ Made `Resettable` an interface instead of an abstract class. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4487)
++ Replaced `TrackerData` with `Resettable`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4487)
+    + Trackers should now use data classes that extend Resettable.
 
 ## Version 4.0.0
 

@@ -62,7 +62,7 @@ object PestSpawnTimer {
      */
 
     private val pestCooldownPattern by patternGroup.pattern(
-        "cooldown",
+        "cooldowntime",
         "\\sCooldown: §r§.(?:§.)?(?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
     )
 
