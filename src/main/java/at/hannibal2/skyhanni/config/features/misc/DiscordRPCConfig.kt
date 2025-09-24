@@ -44,7 +44,7 @@ class DiscordRPCConfig {
         PriorityEntry.SLAYER,
         PriorityEntry.STACKING_ENCHANT,
         PriorityEntry.DUNGEONS,
-        PriorityEntry.AFK
+        PriorityEntry.AFK,
     )
 
     enum class PriorityEntry(private val displayName: String) {
@@ -61,7 +61,7 @@ class DiscordRPCConfig {
     @Expose
     @ConfigOption(
         name = "Dynamic Fallback",
-        desc = "What to show when none of your \"Dynamic Priority\" statuses are active."
+        desc = "What to show when none of your \"Dynamic Priority\" statuses are active.",
     )
     @ConfigEditorDropdown
     val auto: Property<LineEntry> = Property.of(LineEntry.NOTHING)
@@ -99,7 +99,7 @@ class DiscordRPCConfig {
         name = "Credits",
         desc = "Rich presence assets were created by\n" +
             "Hypixel Pack HQ (packshq.com) for the old images\n" +
-            "and @unfamiliartunes (unfamiliartunes.straw.page) for the new images"
+            "and @unfamiliartunes (unfamiliartunes.straw.page) for the new images",
     )
     @ConfigEditorInfoText
     val credits = ""

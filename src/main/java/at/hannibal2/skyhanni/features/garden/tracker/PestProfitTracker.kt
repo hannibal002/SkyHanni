@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
@@ -93,6 +94,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
+    private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
     private val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
     private var adjustmentMap: Map<PestType, Map<NeuInternalName, Int>> = mapOf()
 
@@ -197,6 +199,12 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             cropType.addCollectionCounter(CropCollectionType.PEST_RNG, primitiveStack.amount.toLong() * amount.toLong())
             // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onShardGain(event: ShardGainEvent) {
+        if (event.shardInternalName != PEST_SHARD) return
+        addItem(PestType.UNKNOWN, PEST_SHARD, event.amount, command = false)
     }
 
     private fun SkyHanniChatEvent.checkSprayChats() {
