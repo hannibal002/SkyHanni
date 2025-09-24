@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.config
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
 import at.hannibal2.skyhanni.features.garden.pests.PestType
@@ -66,7 +65,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     { BucketData() },
     { it.garden.pestProfitTracker },
     { drawDisplay(it) },
-    trackerConfig = { config.perTrackerConfig },
+    trackerConfig = { SkyHanniMod.feature.garden.pests.pestProfitTracker.perTrackerConfig },
     customUptimeControl = true
 ) {
     val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTracker
