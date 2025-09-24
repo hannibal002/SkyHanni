@@ -154,10 +154,12 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         if (isEmpty()) return@buildList
         if (inventoryOpen) {
             buildDisplayModeView()
-            if (getDisplayMode() == DisplayMode.SESSION && getData()?.isCurrent(DisplayMode.SESSION) == true) {
-                add(buildSessionCreateButton())
-            } else {
-                add(Renderable.horizontal(buildSessionRestoreButton(), buildSessionDeleteButton(), spacing = 5))
+            if (getDisplayMode() == DisplayMode.SESSION) {
+                if (getData()?.isCurrent(DisplayMode.SESSION) == true) {
+                    add(buildSessionCreateButton())
+                } else {
+                    add(Renderable.horizontal(buildSessionRestoreButton(), buildSessionDeleteButton(), spacing = 5))
+                }
             }
         }
     }
