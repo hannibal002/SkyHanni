@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -469,12 +467,6 @@ enum class HotfData(
                 whispersCurrent = whispersTotal
             }
         }
-
-        @HandleEvent
-        override fun onInventoryClose(event: InventoryCloseEvent) = super.onInventoryClose(event)
-
-        @HandleEvent(onlyOnSkyblock = true)
-        override fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) = super.onInventoryFullyOpened(event)
 
         @HandleEvent(onlyOnSkyblock = true)
         override fun onChat(event: SkyHanniChatEvent) = super.onChat(event)

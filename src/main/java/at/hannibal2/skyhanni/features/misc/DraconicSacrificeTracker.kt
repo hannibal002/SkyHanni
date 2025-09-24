@@ -64,12 +64,10 @@ object DraconicSacrificeTracker {
     private val altarArea = AxisAlignedBB(-601.0, 4.0, -282.0, -586.0, 15.0, -269.0)
     private val ESSENCE_DRAGON = "ESSENCE_DRAGON".toInternalName()
 
-    class Data : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
-        override fun resetItems() {
-            sacrificedItemsMap.clear()
-            itemsSacrificed = 0
-        }
-
+    data class Data(
+        @Expose var itemsSacrificed: Long = 0L,
+        @Expose var sacrificedItemsMap: MutableMap<String, Long> = mutableMapOf(),
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / itemsSacrificed
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -88,12 +86,6 @@ object DraconicSacrificeTracker {
                 "§7You got §6$essences essence §7that way.",
             )
         }
-
-        @Expose
-        var itemsSacrificed = 0L
-
-        @Expose
-        var sacrificedItemsMap: MutableMap<String, Long> = mutableMapOf()
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {

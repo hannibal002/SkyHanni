@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.Stopwatch
 import com.google.gson.annotations.Expose
 import kotlin.reflect.KClass
@@ -9,11 +10,16 @@ import kotlin.time.Duration.Companion.seconds
 
 abstract class TrackerData<T : SessionUptime>(
     private val uptimeClass: KClass<T>
-) {
+) : Resettable {
     @Expose
     private val sessionUptime: MutableMap<SessionUptime, Stopwatch> = mutableMapOf()
 
     private var migrated = false
+
+    override fun reset() {
+        super.reset()
+        sessionUptime.values.forEach { it.reset() }
+    }
 
     private var activeSession: SessionUptime? = null
 
@@ -69,13 +75,6 @@ abstract class TrackerData<T : SessionUptime>(
         return uptime
     }
 
-    fun reset() {
-        for (session in sessionUptime.entries) {
-            sessionUptime[session.key]?.reset()
-        }
-        resetData()
-    }
-
     private fun migrateData() {
         when (uptimeClass) {
             SessionUptime.Normal::class -> {
@@ -99,7 +98,5 @@ abstract class TrackerData<T : SessionUptime>(
             sessionUptime.remove(entry.key)
         }
     }
-
-    protected abstract fun resetData()
 }
 

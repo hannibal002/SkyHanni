@@ -17,6 +17,8 @@ import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.config
+import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
@@ -49,7 +51,14 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object PestProfitTracker {
+object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTracker.BucketData>(
+    "Pest Profit Tracker",
+    { BucketData() },
+    { it.garden.pestProfitTracker },
+    { drawDisplay(it) },
+    trackerConfig = { config.perTrackerConfig },
+    customUptimeControl = true
+) {
     val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTracker
 
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
@@ -80,24 +89,13 @@ object PestProfitTracker {
 
     val DUNG_ITEM = "DUNG".toInternalName()
     private val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
-    val tracker = SkyHanniBucketedItemTracker(
-        "Pest Profit Tracker",
-        { BucketData() },
-        { it.garden.pestProfitTracker },
-        { drawDisplay(it) },
-        trackerConfig = { config.perTrackerConfig },
-        customUptimeControl = true
-    )
     private var adjustmentMap: Map<PestType, Map<NeuInternalName, Int>> = mapOf()
 
-    class BucketData : BucketedItemTrackerData<PestType, SessionUptime.Garden>(PestType::class, SessionUptime.Garden::class) {
-        override fun resetItems() {
-            @Suppress("DEPRECATION")
-            totalPestsKills = 0L
-            pestKills.clear()
-            spraysUsed.clear()
-        }
-
+    data class BucketData(
+        @Expose private var totalPestsKills: Long = 0L,
+        @Expose var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java),
+        @Expose var spraysUsed: MutableMap<SprayType, Long> = EnumMap(SprayType::class.java),
+    ) : BucketedItemTrackerData<PestType, SessionUptime.Garden>(PestType::class, SessionUptime.Garden::class) {
         override fun getDescription(bucket: PestType?, timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / getTotalPestCount()
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -123,28 +121,17 @@ object PestProfitTracker {
             return "Pest"
         }
 
-        @Suppress("DEPRECATION")
         fun getTotalPestCount(): Long =
             if (selectedBucket != null) pestKills[selectedBucket] ?: 0L
             else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
-
-        @Expose
-        @Deprecated("Use pestKills instead")
-        var totalPestsKills = 0L
-
-        @Expose
-        var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java)
-
-        @Expose
-        var spraysUsed: MutableMap<SprayType, Long> = EnumMap(SprayType::class.java)
     }
 
-    private fun SprayType.addSprayUsed() = tracker.modify { it.spraysUsed.addOrPut(this, 1) }
+    private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemAdd(event: ItemAddEvent) {
         if (config.enabled && event.source == ItemAddManager.Source.COMMAND) {
-            with(tracker) { event.addItemFromEvent() }
+            event.addItemFromEvent()
         }
     }
 
@@ -166,7 +153,7 @@ object PestProfitTracker {
 
             if (config.hideChat) blockedReason = "pest_drop"
 
-            tracker.addItem(pest, internalName, amount, command = false)
+            addItem(pest, internalName, amount, command = false)
 
             // Field Mice drop 6 separate items, but we only want to count the kill once
             if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
@@ -185,7 +172,7 @@ object PestProfitTracker {
 
             // Happens here so that the amount is fixed independently of tracker being enabled
 
-            tracker.addItem(pest, internalName, amount, command = false)
+            addItem(pest, internalName, amount, command = false)
             // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
     }
@@ -205,7 +192,7 @@ object PestProfitTracker {
         adjustmentMap.takeIf { it.isNotEmpty() }?.get(pestType)?.get(internalName) ?: this
 
     private fun addKill(type: PestType) {
-        tracker.modify {
+        modify {
             it.pestKills.addOrPut(type, 1)
         }
         lastPestKillTimes[type] = SimpleTimeMark.now()
@@ -213,9 +200,9 @@ object PestProfitTracker {
 
     private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
         addSearchString("§e§lPest Profit Tracker")
-        tracker.addBucketSelector(this, bucketData, "Pest Type")
+        addBucketSelector(this, bucketData, "Pest Type")
 
-        var profit = tracker.drawItems(bucketData, { true }, this)
+        var profit = drawItems(bucketData, { true }, this)
 
         val selectedBucket = bucketData.selectedBucket
         val pestCount = selectedBucket?.let { bucketData.pestKills[it] } ?: bucketData.getTotalPestCount()
@@ -268,13 +255,13 @@ object PestProfitTracker {
         }
 
         val duration = bucketData.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, bucketData.getTotalPestCount(), "kill", duration, "Kills"))
+        addAll(addTotalProfit(profit, bucketData.getTotalPestCount(), "kill", duration, "Kills"))
 
-        tracker.addPriceFromButton(this)
+        addPriceFromButton(this)
     }
 
     init {
-        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
+        initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -295,13 +282,13 @@ object PestProfitTracker {
         // Get a list of all that have been killed in the last 2 seconds, it will
         // want to be the most recent one that was killed.
         val pest = lastPestKillTimes.minByOrNull { it.value }?.key ?: return
-        tracker.addCoins(pest, coins.roundToInt(), command = false)
+        addCoins(pest, coins.roundToInt(), command = false)
     }
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.GARDEN) {
-            tracker.firstUpdate()
+            firstUpdate()
         }
     }
 
@@ -310,7 +297,7 @@ object PestProfitTracker {
         event.register("shresetpestprofittracker") {
             description = "Resets the Pest Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            callback { resetCommand() }
         }
     }
 
