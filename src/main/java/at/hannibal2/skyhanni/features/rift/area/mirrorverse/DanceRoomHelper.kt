@@ -44,9 +44,7 @@ object DanceRoomHelper {
             addString("§cError fetching Dance Room Instructions!")
             Renderable.optionalLink(
                 "§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo §c(Click to update now)",
-                onLeftClick = {
-                    SkyHanniRepoManager::updateRepo
-                }
+                onLeftClick = { SkyHanniRepoManager.updateRepo("click on chat after dance doom error") },
             ).let { add(it) }
         }
     }
@@ -67,6 +65,7 @@ object DanceRoomHelper {
                 val countdown = countdown?.let { "${color.countdown.formatColor()}$it" }.orEmpty()
                 "${now.formatColor()} $formattedLine $countdown"
             }
+
             index + 1 == lineIndex -> "${next.formatColor()} $formattedLine"
             lineIndex in (index + 2..index + config.lineToShow) -> "${later.formatColor()} $formattedLine"
             else -> null
