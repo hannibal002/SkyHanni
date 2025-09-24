@@ -56,7 +56,7 @@ object PestSpawnSound {
     }
 
     private fun playPlumberTheme(soundName: String) {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("pest spawn sound") {
             val noteE = createSound(soundName, 0.890899f)
             val noteC = createSound(soundName, 0.707107f)
             val noteG = createSound(soundName, 1.059463f)
