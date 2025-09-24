@@ -193,14 +193,14 @@ object MoongladeBeacon {
     private val acceptablePitchMargin = 50.milliseconds
 
     private val colorMinigameInventory = InventoryDetector(
-        openInventory = openInventory@{
+        onOpenInventory = openInventory@{
             if (!solverEnabled()) return@openInventory
             currentServerTicks = 0
             checkPants()
             normalTuning = BeaconTuneData()
             enchantedTuning = BeaconTuneData(isEnchanted = true)
         },
-        closeInventory = closeInventory@{
+        onCloseInventory = closeInventory@{
             if (!solverEnabled()) return@closeInventory
             normalTuning.reset()
             enchantedTuning.reset()
@@ -351,7 +351,7 @@ object MoongladeBeacon {
         OURS,
     }
 
-    private open class NullableDataPair<T>(initRef: T? = null, initOurs: T? = null) : Resettable() {
+    private open class NullableDataPair<T>(initRef: T? = null, initOurs: T? = null) : Resettable {
         open operator fun get(target: BeaconPieceTarget): T? = backing[target]
         operator fun set(target: BeaconPieceTarget, value: T?) = backing.set(target, value)
         private val backing = DataPairBacking(initRef, initOurs)
@@ -365,7 +365,7 @@ object MoongladeBeacon {
                 BeaconPieceTarget.OURS to backing.ours,
             )
 
-        private class DataPairBacking<T>(var reference: T?, var ours: T?) : Resettable() {
+        private class DataPairBacking<T>(var reference: T?, var ours: T?) : Resettable {
             operator fun get(target: BeaconPieceTarget): T? = when (target) {
                 BeaconPieceTarget.REFERENCE -> reference
                 BeaconPieceTarget.OURS -> ours
@@ -414,7 +414,7 @@ object MoongladeBeacon {
 
     private data class BeaconTuneData(
         val isEnchanted: Boolean = false,
-    ) : Resettable() {
+    ) : Resettable {
         private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"
         private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
         private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0

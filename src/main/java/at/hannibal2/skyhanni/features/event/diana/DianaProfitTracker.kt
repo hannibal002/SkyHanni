@@ -65,15 +65,9 @@ object DianaProfitTracker {
         trackerConfig = { config.perTrackerConfig }
     )
 
-    class Data : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
-
-        override fun resetItems() {
-            burrowsDug = 0
-        }
-
-        @Expose
-        var burrowsDug: Long = 0
-
+    data class Data(
+        @Expose var burrowsDug: Long = 0
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / burrowsDug
             val perBurrow = percentage.coerceAtMost(1.0).formatPercentage()

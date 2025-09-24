@@ -8,9 +8,17 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class TimedTrackerConfig {
     @Expose
-    @ConfigOption(name = "Reset Session on Game Start", desc = "Reset session display mode when opening the game.")
+    @ConfigOption(name = "New Session on Game Start", desc = "Create new session display mode when opening the game.")
     @ConfigEditorBoolean
     var resetSession: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Sessions to Keep",
+        desc = "If there are more than these many year entries, delete the oldest. Set to 0 to never delete."
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
+    var session: Int = 5
 
     @Expose
     @ConfigOption(

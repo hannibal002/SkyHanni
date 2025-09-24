@@ -113,7 +113,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
 
     override fun loadFromZip(zipFile: File, logger: RepoLogger): Boolean {
         val success = super.loadFromZip(zipFile, logger)
-        if (flushJob == null) flushJob = SkyHanniMod.launchIOCoroutine { saveToDisk(diskRoot) }
+        if (flushJob == null) flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk") { saveToDisk(diskRoot) }
         return success
     }
 
