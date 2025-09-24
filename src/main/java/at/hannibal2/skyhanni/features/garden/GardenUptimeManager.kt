@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenUptimeManager {
     private val config get() = GardenApi.config.trackerUptimeSettings
-    private val trackerSet = setOf(ArmorDropTracker.tracker, DicerRngDropTracker.tracker, PestProfitTracker.tracker)
+    private val trackerSet: Set<SkyHanniTracker<*, *>> = setOf(ArmorDropTracker.tracker, DicerRngDropTracker.tracker, PestProfitTracker)
     private val afkTracker = Stopwatch()
 
     @HandleEvent
