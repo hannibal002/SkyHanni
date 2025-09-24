@@ -181,7 +181,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             resetRepositoryLocation()
         }
 
-        SkyHanniMod.launchIOCoroutine("$commonName updateRepo", timeout = 20.seconds) {
+        SkyHanniMod.launchIOCoroutine("$commonName updateRepo", timeout = 2.minutes) {
             if (!fetchAndUnpackRepo(command = true, forceReset = forceReset).canContinue) {
                 logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
                 return@launchIOCoroutine
@@ -457,7 +457,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         // the MemoryRepoFileSystem for the event, and writing to disk after the event.
         repoFileSystem = repoFileSystem.transitionAfterReload()
 
-        progress.update("done with newInstance")
         if (answerMessage.isNotEmpty() && !loadingError) {
             progress.end(answerMessage)
             logger.logToChat("§a$answerMessage")

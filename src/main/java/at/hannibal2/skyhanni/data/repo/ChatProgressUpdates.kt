@@ -112,9 +112,9 @@ class ChatProgressUpdates {
             if (!currentlyRunning) {
                 error("trying to end an not running chat: $nextStep")
             }
+            currentlyRunning = false
             update()
             currentStep = null
-            currentlyRunning = false
             startOfCurrent = null
             previousSteps.clear()
         } else {
