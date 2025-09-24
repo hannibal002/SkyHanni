@@ -94,7 +94,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
 
     fun isInventoryOpen() = inventoryOpen
 
-    fun resetCommand() = ChatUtils.clickableChat(
+    open fun resetCommand() = ChatUtils.clickableChat(
         "Are you sure you want to reset your total $name? Click here to confirm.",
         onClick = {
             reset(DisplayMode.TOTAL, "Reset total $name!")

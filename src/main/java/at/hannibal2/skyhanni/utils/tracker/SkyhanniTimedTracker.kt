@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedGenericIndi
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.weekTextFormatter
@@ -91,6 +92,25 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         super.pauseSessionUptime()
         activeStopwatches.forEach { it.getActiveStopwatch()?.pause(true) }
         activeStopwatches.clear()
+    }
+
+    fun resetCommand(displayMode: DisplayMode?, string: String?) = ChatUtils.clickableChat(
+        "Are you sure you want to reset your $name? Click here to confirm.",
+        onClick = {
+            reset(displayMode, string)
+        },
+        "§eClick to confirm.",
+        oneTimeClick = true,
+    )
+
+    private fun reset(displayMode: DisplayMode? = null, string: String? = null) {
+        when {
+            displayMode != null && string != null -> getData()?.reset(displayMode, string)
+            displayMode != null -> getData()?.reset(displayMode)
+            else -> getData()?.reset()
+        }
+        ChatUtils.chat("Reset $name!")
+        update()
     }
 
     private fun getData(): TimedTrackerData<Data, *>? = ProfileStorageData.profileSpecific?.getData()

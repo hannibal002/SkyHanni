@@ -18,8 +18,16 @@ import java.util.EnumMap
 open class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
     private val createNewSession: () -> Data,
 ) {
-    fun resetData() {
+    fun reset() {
         sessions.clear()
+    }
+
+    fun reset(displayMode: DisplayMode) {
+        sessions[displayMode]?.clear()
+    }
+
+    fun reset(displayMode: DisplayMode, string: String) {
+        getData(displayMode, string)?.reset()
     }
 
     fun getEntries(displayMode: DisplayMode): MutableMap<String, Data>? {
