@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.GardenBpsTrackerConfig.GardenUptimeDisplayText
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -36,13 +35,9 @@ object GardenBpsTracker {
         trackerConfig = { config.perTrackerConfig }
     )
 
-    class TimedData : TimedTrackerData<Data, SessionUptime.Garden>(SessionUptime.Garden::class, { Data() })
+    class TimedData : TimedTrackerData<Data, SessionUptime.Garden>({ Data() })
 
     class Data : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class) {
-        override fun resetData() {
-            blocksBroken = 0
-        }
-
         @Expose
         var blocksBroken: Int = 0
     }
@@ -69,7 +64,7 @@ object GardenBpsTracker {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         config.uptimeDisplayText.afterChange {
             tracker.update()
         }

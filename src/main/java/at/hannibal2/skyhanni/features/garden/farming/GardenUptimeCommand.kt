@@ -31,7 +31,7 @@ object GardenUptimeCommand {
         for (num in 0..<dayAmount) {
 
             val day = date.minusDays(num.toLong())
-            val entry = storage?.getEntry(SkyHanniTracker.DisplayMode.DAY, day)
+            val entry = storage?.getData(SkyHanniTracker.DisplayMode.DAY, day.toString())
             val uptime = entry?.getTotalUptime() ?: 0.seconds
 
             val dayString = if (day == LocalDate.now()) "Today" else day.toString()
