@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class CrystalHighlighterColorConfig : Resettable() {
+class CrystalHighlighterColorConfig : Resettable {
     @Expose
     @ConfigOption(name = "Amber", desc = "§7Default: §#§c§b§6§4§0§0§/#CB6400")
     @ConfigEditorColour

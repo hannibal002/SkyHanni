@@ -382,7 +382,7 @@ object SkyHanniConfigSearchResetCommand {
             description = "Searches or resets config elements §c(warning, dangerous!)"
             category = CommandCategory.DEVELOPER_DEBUG
             legacyCallbackArgs {
-                SkyHanniMod.launchCoroutine {
+                SkyHanniMod.launchCoroutine("shconfig command") {
                     ChatUtils.chat(runCommand(it))
                 }
                 lastCommand = it

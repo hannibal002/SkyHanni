@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -34,6 +35,7 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import java.io.File
 import java.util.TreeMap
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.floor
 //#if MC > 1.21
 //$$ import net.minecraft.registry.Registries
@@ -46,6 +48,7 @@ import kotlin.math.floor
 //$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 //#else
 import net.minecraft.nbt.NBTTagString
+
 //#endif
 
 // Most functions are taken from NotEnoughUpdates
@@ -73,7 +76,9 @@ object EnoughUpdatesManager {
     /**
      * Called by the Neu Repo Manager when the NEU repo is reloaded.
      */
-    suspend fun reloadItemsFromRepo() = loadingMutex.withLock {
+    suspend fun reloadItemsFromRepo(progress: ChatProgressUpdates) = loadingMutex.withLock {
+        progress.update("call reloadItemsFromRepo")
+        progress.update("clearing caches and maps")
         itemStackCache.clear()
         displayNameCache.clear()
         itemMap.clear()
@@ -81,31 +86,41 @@ object EnoughUpdatesManager {
         recipesMap.clear()
 
         val tempItemMap = TreeMap<String, JsonObject>()
-        loadItemMap(tempItemMap)
+        loadItemMap(progress, tempItemMap)
 
+        progress.update("call synchronized itemMap")
         synchronized(itemMap) {
             itemMap.clear()
             itemMap.putAll(tempItemMap)
+            progress.update("putAll tempItemMap")
         }
     }
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
-    private suspend fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) = coroutineScope {
+    private suspend fun loadItemMap(progress: ChatProgressUpdates, tempItemMap: TreeMap<String, JsonObject>) = coroutineScope {
+        progress.update("call loadItemMap")
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
-        fileSystem.list("items").mapNotNullAsync { name ->
+        val list = fileSystem.list("items")
+        progress.innerProgress(0, list.size)
+        val done = AtomicInteger(0)
+        val async = list.mapNotNullAsync { name ->
             try {
                 val internalName = name.removeSuffix(".json")
-                val parsed = parseItem(
+                val item = parseItem(
                     internalName = internalName,
                     json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
-                ) ?: return@mapNotNullAsync null
+                )
+                progress.innerProgress(done.incrementAndGet(), list.size)
+                val parsed = item ?: return@mapNotNullAsync null
                 internalName to parsed
             } catch (e: Exception) {
+                progress.update("Failed to parse item: $name")
                 ErrorManager.logErrorWithData(e, "Failed to parse item: $name")
                 null
             }
-        }.forEach { (internalName, item) ->
+        }
+        async.forEach { (internalName, item) ->
             tempItemMap[internalName] = item
         }
     }
