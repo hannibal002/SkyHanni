@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.yearToLocalDate
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
@@ -69,13 +70,15 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
-    protected val textInput = SearchTextInput()
+    val textInput = SearchTextInput()
     private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
+    // things needed for inherited interfaces
+    var scrollValue = ScrollValue()
 
     @SkyHanniModule
     companion object {
         internal val universalTracker get() = SkyHanniMod.feature.misc.tracker
-        internal val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
+        private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
         private val unpausedTrackers: MutableSet<SkyHanniTracker<*, *>> = mutableSetOf()
 
         @HandleEvent
@@ -281,7 +284,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         )
     }
 
-    protected open fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
+    open fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
         SharedTracker(
             mapOf(
                 DisplayMode.TOTAL to ps.getTotal(),
@@ -302,7 +305,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         }
     }
 
-    protected fun getDisplayMode() = displayMode ?: run {
+    fun getDisplayMode() = displayMode ?: run {
         val newValue = config.defaultDisplayMode.get().mode ?: storedTrackers[name] ?: DisplayMode.TOTAL
         displayMode = newValue
         newValue
