@@ -63,7 +63,6 @@ object SkillApi {
     // TODO find out whats going on here
     /**
      * REGEX-TEST:  Farming 35: §r§a12.4%
-     * REGEX-TEST:  §r§aFarming 35: §r§a12.4%
      */
     private val skillTabPattern by patternGroup.pattern(
         "skill.tab",
