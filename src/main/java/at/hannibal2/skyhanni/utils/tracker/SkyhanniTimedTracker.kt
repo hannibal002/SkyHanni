@@ -28,14 +28,14 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
     createNewSession: () -> Data,
     private var storage: (ProfileSpecificStorage) -> TimedTrackerData<Data, *>,
     drawDisplay: (Data) -> List<Searchable>,
-    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
+    extraDisplayModes: Set<DisplayMode> = emptySet(),
     customUptimeControl: Boolean = false,
     trackerConfig: () -> Type
 ) : SkyHanniTracker<Data, Type>(
     name,
     createNewSession,
     { throw UnsupportedOperationException("getStorage not used") },
-    extraDisplayModes,
+    extraDisplayModes = emptyMap(), // not used here
     drawDisplay = drawDisplay,
     trackerConfig = trackerConfig,
     customUptimeControl = customUptimeControl
@@ -49,7 +49,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         DisplayMode.WEEK,
         DisplayMode.MONTH,
         DisplayMode.YEAR,
-    ) + extraDisplayModes.keys
+    ) + extraDisplayModes
     private val config: TrackerGenericConfig
         get() = if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
     private val activeStopwatches = mutableSetOf<Data>()
