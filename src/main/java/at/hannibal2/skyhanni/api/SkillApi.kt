@@ -66,19 +66,24 @@ object SkillApi {
      */
     private val skillTabPattern by patternGroup.pattern(
         "skill.tab",
-        " (?<type>\\w+)(?: (?<level>\\d+))?: §r§a(?<progress>[0-9.]+)%",
+        " §r§a(?<type>\\w+)(?: (?<level>\\d+))?: §r§a(?<progress>[0-9.]+)%",
     )
 
-    // TODO add regex tests
+    /**
+     * REGEX-TEST:  §r§aFarming 60: §r§c§lMAX
+     */
     private val maxSkillTabPattern by patternGroup.pattern(
         "skill.tab.max",
-        " (?<type>\\w+) (?<level>\\d+): §r§c§lMAX",
+        " §r§a(?<type>\\w+) (?<level>\\d+): §r§c§lMAX",
     )
 
-    // TODO add regex tests
+    /**
+     * REGEX-TEST:  §r§aMining 14: §r§e22,922§r§6/§r§e75k
+     * REGEX-TEST:  §r§aCombat 49: §r§e7,678§r§6/§r§e4M
+     */
     private val skillTabNoPercentPattern by patternGroup.pattern(
         "skill.tab.nopercent",
-        " §r§a(?<type>\\w+)(?: (?<level>\\d+))?: §r§e(?<current>[0-9,.]+)§r§6/§r§e(?<needed>[0-9kmb]+)",
+        " §r§a(?<type>\\w+)(?: (?<level>\\d+))?: §r§e(?<current>[0-9,.]+)§r§6/§r§e(?<needed>[\\d,.]+[kMB]?+)",
     )
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
@@ -269,12 +274,13 @@ object SkillApi {
         var isPercentPatternFound = false
         var tablistLevel: Int? = null
 
-        for (line in TabListData.getTabList()) {
+        line@ for (line in TabListData.getTabList()) {
             skillTabPattern.matchMatcher(line) {
                 if (group("type") == skillType.displayName) {
                     tablistLevel = group("level").toInt()
                     isPercentPatternFound = true
                     if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = null
+                    break@line
                 }
             }
 
@@ -282,6 +288,7 @@ object SkillApi {
                 if (group("type") == skillType.displayName) {
                     tablistLevel = group("level").toInt()
                     if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = null
+                    break@line
                 }
             }
 
@@ -291,11 +298,12 @@ object SkillApi {
                     current = group("current").formatLong()
                     needed = group("needed").formatLong()
                     isPercentPatternFound = false
-                    return@matchMatcher
+                    break@line
                 }
             }
-            xpPercentage = matcher.group("progress").formatDouble()
         }
+
+        xpPercentage = matcher.group("progress").formatDouble()
 
         val existingLevel = getSkillInfo(skillType) ?: SkillInfo()
         val level = tablistLevel ?: return
