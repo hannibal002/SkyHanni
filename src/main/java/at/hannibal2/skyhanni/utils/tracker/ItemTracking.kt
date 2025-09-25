@@ -48,7 +48,7 @@ interface ItemTracking<Data : ItemTrackerData<*>, ConfigType : GenericIndividual
 
     private val config: ItemTrackerGenericConfig
         get() =
-        if (tracker.trackerSpecificConfig.useUniversalConfig) universalTracker else tracker.trackerSpecificConfig.trackerConfig
+            if (tracker.trackerSpecificConfig.useUniversalConfig) universalTracker else tracker.trackerSpecificConfig.trackerConfig
 
     private val itemTrackerConfig: ItemTrackerGenericConfig.ItemTrackerConfig get() = config.itemTracker
 
