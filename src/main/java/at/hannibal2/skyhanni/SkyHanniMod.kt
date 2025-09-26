@@ -215,8 +215,9 @@ object SkyHanniMod {
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
                     e,
-                    e.message ?: "Asynchronous exception caught",
+                    e.message ?: "Asynchronous exception caught in $name",
                     "coroutine name" to name,
+                    "coroutine timeout" to timeout,
                 )
             }
         }
@@ -226,7 +227,7 @@ object SkyHanniMod {
                 delay(timeout)
                 if (mainJob.isActive) {
                     ErrorManager.logErrorStateWithData(
-                        "Coroutine timed out",
+                        "Coroutine $$name timed out",
                         "The coroutine '$name' took longer than the specified timeout of $timeout",
                         "timeout" to timeout,
                         "coroutine name" to name,
