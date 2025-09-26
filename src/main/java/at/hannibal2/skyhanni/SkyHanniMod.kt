@@ -78,7 +78,6 @@ object SkyHanniMod {
             SkyHanniRepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
-            SkyHanniRepoManager.progress.end("Error reading repo data: ${e.message}")
         }
         InitFinishedEvent.post()
     }
@@ -227,7 +226,7 @@ object SkyHanniMod {
                 delay(timeout)
                 if (mainJob.isActive) {
                     ErrorManager.logErrorStateWithData(
-                        "Coroutine $$name timed out",
+                        "Coroutine $name timed out",
                         "The coroutine '$name' took longer than the specified timeout of $timeout",
                         "timeout" to timeout,
                         "coroutine name" to name,

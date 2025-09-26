@@ -14,6 +14,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.ZipFile
 import kotlin.sequences.forEach
 import kotlin.time.Duration.Companion.minutes
@@ -23,7 +24,7 @@ sealed interface RepoFileSystem {
     fun readAllBytes(path: String): ByteArray
     fun write(path: String, data: ByteArray)
     fun list(path: String): List<String>
-    suspend fun transitionAfterReload(): RepoFileSystem = this
+    suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem = this
 
     /**
      * Deletes everything under [path].
@@ -39,6 +40,7 @@ sealed interface RepoFileSystem {
     }
 
     fun loadFromZip(
+        progress: ChatProgressUpdates,
         zipFile: File,
         logger: RepoLogger,
     ): Boolean = runCatching {
@@ -112,28 +114,47 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         it.startsWith("$path/") && it.removePrefix("$path/").endsWith(".json")
     }.map { it.removePrefix("$path/") }
 
-    override fun loadFromZip(zipFile: File, logger: RepoLogger): Boolean {
-        println("loadFromZip")
-        val success = super.loadFromZip(zipFile, logger)
-        if (flushJob == null) flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk", timeout = 2.minutes) { saveToDisk(diskRoot) }
+    override fun loadFromZip(progress: ChatProgressUpdates, zipFile: File, logger: RepoLogger): Boolean {
+        progress.update("loadFromZip start")
+        val success = super.loadFromZip(progress, zipFile, logger)
+        if (flushJob == null) {
+            progress.update("start new launchIOCoroutine task")
+            flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk", timeout = 2.minutes) {
+                val asyncProgress = ChatProgressUpdates()
+                asyncProgress.start("repo file saveToDisk")
+                saveToDisk(asyncProgress, diskRoot)
+                asyncProgress.end("done saving file")
+            }
+        }
+        progress.update("loadFromZip end")
         return success
     }
 
     override fun dispose() = storage.clear()
 
-    override suspend fun transitionAfterReload(): RepoFileSystem {
+    override suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem {
+        progress.update("transitionAfterReload start")
         runBlocking { flushJob?.join() }
         dispose()
+        progress.update("transitionAfterReload end")
         return DiskRepoFileSystem(diskRoot)
     }
 
-    private fun saveToDisk(root: File) {
+    private fun saveToDisk(progress: ChatProgressUpdates, root: File) {
+        progress.update("saveToDisk start")
         val base = root.toPath()
+        progress.update("createDirectoriesFor")
         base.createDirectoriesFor(storage.keys)
-        storage.entries.parallelStream().forEach { (relativePath, bytes) ->
+        progress.update("parallelStream forEach resolve write")
+        val stream = storage.entries.parallelStream()
+        val done = AtomicInteger(0)
+        progress.innerProgress(0, stream.count().toInt())
+        stream.forEach { (relativePath, bytes) ->
             val out = base.resolve(relativePath)
             Files.write(out, bytes)
+            progress.innerProgress(done.incrementAndGet(), stream.count().toInt())
         }
+        progress.update("saveToDisk end")
     }
 
     private fun Path.createDirectoriesFor(relativePaths: Set<String>) = relativePaths.mapNotNull { p ->
