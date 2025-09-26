@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.hover
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -36,6 +37,9 @@ class ChatProgressUpdates {
     private var innerProgress = ""
 
     private var delayedSending: DelayedSending? = null
+
+    private var innerProgressMax = 0
+    private val innerProgressCount = AtomicInteger(0)
 
     class DelayedSending(val text: String, val hover: String) {
         fun send(chatId: Int) {
@@ -69,7 +73,17 @@ class ChatProgressUpdates {
         }
     }
 
-    fun innerProgress(min: Int, max: Int) {
+    fun innerProgressStart(max: Int) {
+        innerProgress(0, max)
+        innerProgressMax = max
+        innerProgressCount.set(0)
+    }
+
+    fun innerProgressStep() {
+        innerProgress(innerProgressCount.incrementAndGet(), innerProgressMax)
+    }
+
+    private fun innerProgress(min: Int, max: Int) {
         val percentage = ((min.toDouble() / max.toDouble()) * 100).roundTo(2)
         this.innerProgress = "($percentage% ${min.addSeparators()}/${max.addSeparators()}) "
     }

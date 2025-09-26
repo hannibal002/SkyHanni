@@ -14,7 +14,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.ZipFile
 import kotlin.sequences.forEach
 import kotlin.time.Duration.Companion.minutes
@@ -44,8 +43,13 @@ sealed interface RepoFileSystem {
         zipFile: File,
         logger: RepoLogger,
     ): Boolean = runCatching {
+        progress.update("call loadFromZip")
         ZipFile(zipFile.absolutePath).use { zip ->
-            zip.entries().asSequence().filter { !it.isDirectory }.forEach { entry ->
+            progress.update("zipFile entries for each")
+            val sequence = zip.entries().asSequence().filter { !it.isDirectory }
+            progress.innerProgressStart(sequence.count())
+            sequence.forEach { entry ->
+                progress.innerProgressStep()
                 val relative = entry.name.substringAfter('/', "").takeIf { it.isNotBlank() }
                     ?: return@forEach
 
@@ -115,7 +119,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
     }.map { it.removePrefix("$path/") }
 
     override fun loadFromZip(progress: ChatProgressUpdates, zipFile: File, logger: RepoLogger): Boolean {
-        progress.update("loadFromZip start")
+        progress.update("call repo file system loadFromZip")
         val success = super.loadFromZip(progress, zipFile, logger)
         if (flushJob == null) {
             progress.update("start new launchIOCoroutine task")
@@ -135,6 +139,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
     override suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem {
         progress.update("transitionAfterReload start")
         runBlocking { flushJob?.join() }
+        progress.update("call dispose")
         dispose()
         progress.update("transitionAfterReload end")
         return DiskRepoFileSystem(diskRoot)
@@ -147,12 +152,11 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         base.createDirectoriesFor(storage.keys)
         progress.update("parallelStream forEach resolve write")
         val stream = storage.entries.parallelStream()
-        val done = AtomicInteger(0)
-        progress.innerProgress(0, stream.count().toInt())
+        progress.innerProgressStart(stream.count().toInt())
         stream.forEach { (relativePath, bytes) ->
             val out = base.resolve(relativePath)
             Files.write(out, bytes)
-            progress.innerProgress(done.incrementAndGet(), stream.count().toInt())
+            progress.innerProgressStep()
         }
         progress.update("saveToDisk end")
     }

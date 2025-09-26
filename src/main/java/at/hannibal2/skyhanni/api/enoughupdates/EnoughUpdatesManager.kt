@@ -35,7 +35,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import java.io.File
 import java.util.TreeMap
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.floor
 //#if MC > 1.21
 //$$ import net.minecraft.registry.Registries
@@ -102,8 +101,7 @@ object EnoughUpdatesManager {
         progress.update("call loadItemMap")
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
         val list = fileSystem.list("items")
-        progress.innerProgress(0, list.size)
-        val done = AtomicInteger(0)
+        progress.innerProgressStart(list.size)
         val async = list.mapNotNullAsync { name ->
             try {
                 val internalName = name.removeSuffix(".json")
@@ -111,7 +109,7 @@ object EnoughUpdatesManager {
                     internalName = internalName,
                     json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
                 )
-                progress.innerProgress(done.incrementAndGet(), list.size)
+                progress.innerProgressStep()
                 val parsed = item ?: return@mapNotNullAsync null
                 internalName to parsed
             } catch (e: Exception) {
