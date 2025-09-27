@@ -57,13 +57,13 @@ object DianaProfitTracker {
         { Data() },
         { it.diana.timedProfitTracker },
         extraDisplayModes = setOf(
-            SkyHanniTracker.DisplayMode.MAYOR
+            DisplayMode.MAYOR
         ),
         drawDisplay = { drawDisplay(it) },
         trackerConfig = { config.perTrackerConfig }
     )
 
-    class TimedData : TimedTrackerData<Data, SessionUptime.Normal>({ Data() })
+    class TimedData : TimedTrackerData<Data>({ Data() })
 
     data class Data(
         @Expose var burrowsDug: Long = 0
@@ -197,7 +197,7 @@ object DianaProfitTracker {
         migrationMapping.forEach { (old, new) ->
             event.move(70, "#profile.diana.$old", "#profile.diana.$new")
         }
-        val timedTrackerData: TimedTrackerData<Data, SessionUptime.Normal> = TimedTrackerData { Data() }
+        val timedTrackerData: TimedTrackerData<Data> = TimedTrackerData { Data() }
 
         event.transform(108, "#profile.diana.profitTracker") { entry ->
             timedTrackerData.createEntry(DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<Data>(entry))

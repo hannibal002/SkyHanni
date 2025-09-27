@@ -69,7 +69,7 @@ object MythologicalCreatureTracker {
         drawDisplay = { drawDisplay(it) }
     )
 
-    class TimedData : TimedTrackerData<Data, SessionUptime.Normal>({ Data() })
+    class TimedData : TimedTrackerData<Data>({ Data() })
 
     data class Data(
         @Expose var creaturesSinceLastInquisitor: Int = 0,
@@ -151,7 +151,7 @@ object MythologicalCreatureTracker {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        val timedTrackerData: TimedTrackerData<Data, SessionUptime.Normal> = TimedTrackerData { Data() }
+        val timedTrackerData: TimedTrackerData<Data> = TimedTrackerData { Data() }
 
         event.transform(108, "#profile.diana.mythologicalMobTracker") { entry ->
             timedTrackerData.createEntry(DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<Data>(entry))
