@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedGenericIndividualConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedIndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -27,8 +28,7 @@ class DianaProfitTrackerConfig {
         desc = ""
     )
     @Accordion
-    val perTrackerConfig: TimedGenericIndividualConfig<ItemTrackerGenericConfig> =
-        TimedGenericIndividualConfig { ItemTrackerGenericConfig() }
+    val perTrackerConfig: TimedIndividualItemTrackerConfig = TimedIndividualItemTrackerConfig()
 
     @Expose
     @ConfigLink(owner = DianaProfitTrackerConfig::class, field = "enabled")
