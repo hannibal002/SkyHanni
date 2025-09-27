@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -20,10 +21,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyhanniTimedTracker
+import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
@@ -46,15 +50,16 @@ object ArmorDropTracker {
 
     private var hasArmor = false
 
-    val tracker = SkyHanniTracker(
+    val tracker = SkyhanniTimedTracker(
         "Armor Drop Tracker",
         { Data() },
         { it.garden.armorDropTracker },
         trackerConfig = { config.perTrackerConfig },
-        customUptimeControl = true
-    ) {
-        drawDisplay(it)
-    }
+        customUptimeControl = true,
+        drawDisplay = { drawDisplay(it) }
+    )
+
+    class TimeData : TimedTrackerData<Data>({ Data() })
 
     data class Data(
         @Expose
@@ -176,6 +181,12 @@ object ArmorDropTracker {
         }
         event.move(87, "garden.farmingArmorDrop.pos", "garden.armorDropTracker.position")
         event.move(88, "garden.farmingArmorDrop", "garden.armorDropTracker")
+
+        event.transform(109, "#profile.garden.armorDropTracker") { entry ->
+            val timedTrackerData: TimedTrackerData<Data> = TimedTrackerData { Data() }
+            timedTrackerData.createEntry(SkyHanniTracker.DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<Data>(entry))
+            ConfigManager.gson.toJsonTree(timedTrackerData)
+        }
     }
 
     @HandleEvent

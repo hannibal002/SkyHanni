@@ -467,7 +467,7 @@ class ProfileSpecificStorage(
         var savedCropAccessory: CropAccessory? = CropAccessory.NONE
 
         @Expose
-        var dicerDropTracker: DicerRngDropTracker.Data = DicerRngDropTracker.Data()
+        var dicerDropTracker: DicerRngDropTracker.TimeData = DicerRngDropTracker.TimeData()
 
         @Expose
         var informedAboutLowMatter: SimpleTimeMark = farPast()
@@ -482,7 +482,7 @@ class ProfileSpecificStorage(
         var nextSixthVisitorArrival: SimpleTimeMark = farPast()
 
         @Expose
-        var armorDropTracker: ArmorDropTracker.Data = ArmorDropTracker.Data()
+        var armorDropTracker: ArmorDropTracker.TimeData = ArmorDropTracker.TimeData()
 
         @Expose
         var composterUpgrades: MutableMap<ComposterUpgrade, Int> = enumMapOf()
@@ -634,7 +634,7 @@ class ProfileSpecificStorage(
         var customGoalMilestone: MutableMap<CropType, Int> = enumMapOf()
 
         @Expose
-        var pestProfitTracker: PestProfitTracker.BucketData = PestProfitTracker.BucketData()
+        var pestProfitTracker: PestProfitTracker.TimeData = PestProfitTracker.TimeData()
 
         @Expose
         var activeVinyl: VinylType? = null

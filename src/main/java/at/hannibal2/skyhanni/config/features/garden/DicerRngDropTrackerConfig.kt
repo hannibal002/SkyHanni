@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.garden.GardenIndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedGardenIndividualTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -35,7 +35,7 @@ class DicerRngDropTrackerConfig {
         desc = ""
     )
     @Accordion
-    val perTrackerConfig: GardenIndividualTrackerConfig = GardenIndividualTrackerConfig()
+    val perTrackerConfig: TimedGardenIndividualTrackerConfig = TimedGardenIndividualTrackerConfig()
 
     @Expose
     @ConfigLink(owner = DicerRngDropTrackerConfig::class, field = "enabled")

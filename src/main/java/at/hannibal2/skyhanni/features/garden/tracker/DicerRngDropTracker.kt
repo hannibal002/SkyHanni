@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -31,23 +32,25 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyhanniTimedTracker
+import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import java.util.regex.Pattern
 
 @SkyHanniModule
 object DicerRngDropTracker {
-
     private val config get() = GardenApi.config.dicerRngDropTracker
-    val tracker = SkyHanniTracker(
+    val tracker = SkyhanniTimedTracker(
         "Dicer RNG Drop Tracker",
         { Data() },
         { it.garden.dicerDropTracker },
         trackerConfig = { config.perTrackerConfig },
-        customUptimeControl = true
-    ) {
-        drawDisplay(it)
-    }
+        customUptimeControl = true,
+        drawDisplay = { drawDisplay(it) }
+    )
+
+    class TimeData : TimedTrackerData<Data>({ Data() })
 
     data class Data(
         @Expose var drops: MutableMap<CropType, MutableMap<DropRarity, Int>> = mutableMapOf()
@@ -199,6 +202,12 @@ object DicerRngDropTracker {
         event.move(87, "garden.dicerCounters.pos", "garden.dicerCounters.position")
         event.move(87, "garden.dicerCounters.display", "garden.dicerCounters.enabled")
         event.move(88, "garden.dicerCounters", "garden.dicerRngDropTracker")
+
+        event.transform(109, "#profile.garden.dicerDropTracker") { entry ->
+            val timedTrackerData: TimedTrackerData<Data> = TimedTrackerData { Data() }
+            timedTrackerData.createEntry(SkyHanniTracker.DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<Data>(entry))
+            ConfigManager.gson.toJsonTree(timedTrackerData)
+        }
     }
 
     @HandleEvent
