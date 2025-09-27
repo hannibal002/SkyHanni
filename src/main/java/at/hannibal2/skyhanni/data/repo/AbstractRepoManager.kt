@@ -223,7 +223,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun initRepo() {
         val progress = ChatProgressUpdates()
         progress.start("auto loading $commonName repo on init")
-        progress.start("init $commonName repo")
         shouldManuallyReload = true
         val loaded = AtomicBoolean(false)
         val job = SkyHanniMod.launchIOCoroutine("$commonName repo init", timeout = 2.minutes) {
@@ -276,7 +275,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         return FetchUnpackResult.SWITCHED_TO_BACKUP
     }.onFailure { e ->
         logger.logNonDestructiveError("Failed to switch to backup repo: ${e.message}")
-        progress.update("Failed to switch to backup repo: ${e.message}")
+        progress.update("reason:")
+        progress.update(e.message ?: "no reason")
+        progress.end("Failed to switch to backup repo")
     }.getOrDefault(FetchUnpackResult.FAILED)
 
     open fun reportExtraStatusInfo(): Unit = Unit
@@ -471,7 +472,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         progress.update("call eventCtor.newInstance")
         eventCtor.newInstance(this).post { error ->
-            progress.update("Error while posting repo reload event")
+            if (loadingError) return@post
+            progress.update("Error while posting repo reload event: ${error.message}")
             logger.logErrorWithData(error, "Error while posting repo reload event")
             loadingError = true
         }

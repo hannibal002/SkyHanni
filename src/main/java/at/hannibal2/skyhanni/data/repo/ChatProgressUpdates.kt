@@ -65,6 +65,7 @@ class ChatProgressUpdates {
             if (!SkyBlockUtils.debug) return
             if (event.isMod(2)) {
                 for (update in updates) {
+                    update.testDelayedSending()
                     if (update.currentlyRunning) {
                         update.update()
                     }
@@ -156,13 +157,6 @@ class ChatProgressUpdates {
         val chatId = chatId ?: error("chatId is null: $currentStep")
         val totalTime = startOfFirst?.format() ?: error("startOfFirst is null: $currentStep")
 
-        delayedSending?.let {
-            if (MinecraftCompat.localPlayerOrNull != null) {
-                it.send(chatId)
-                delayedSending = null
-            }
-        }
-
         val hover = mutableListOf<String>()
         hover.add("§e$title")
         hover.add("§8SkyHanni Debug Log")
@@ -187,6 +181,16 @@ class ChatProgressUpdates {
             delayedSending.send(chatId)
         } else {
             this.delayedSending = delayedSending
+        }
+    }
+
+    private fun testDelayedSending() {
+        val chatId = chatId ?: error("chatId is null: $currentStep")
+        delayedSending?.let {
+            if (MinecraftCompat.localPlayerOrNull != null) {
+                it.send(chatId)
+                delayedSending = null
+            }
         }
     }
 
