@@ -236,7 +236,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
         job.invokeOnCompletion {
             if (!loaded.get()) {
-                progress.update("reached timeout")
+                progress.end("reached timeout")
             }
         }
     }
@@ -284,7 +284,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private suspend fun isRepeatErrorOrFixed(progress: ChatProgressUpdates): Boolean {
         progress.update("call isRepeatErrorOrFixed")
-        if (latestError.passedSince() < 5.minutes || !config.repoAutoUpdate) return true
+        if (latestError.passedSince() < 5.minutes || !config.repoAutoUpdate) {
+            progress.end("is repeat error or auto update disabled")
+            return true
+        }
         latestError = SimpleTimeMark.now()
 
         val comparison = getCommitComparison(silentError = false)
@@ -425,6 +428,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("call loadFromZip")
         // Actually unpack the repo zip file into our local 'file system'
         if (!repoFileSystem.loadFromZip(progress, repoZipFile, logger)) {
+            progress.update("Failed to unpack the downloaded zip file.")
             logger.logNonDestructiveError("Failed to unpack the downloaded zip file.")
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
             else FetchUnpackResult.FAILED

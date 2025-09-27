@@ -75,7 +75,9 @@ class ChatProgressUpdates {
     }
 
     fun innerProgressStart(max: Int) {
-        innerProgress(0, max)
+        if (max > 0) {
+            innerProgress(0, max)
+        }
         innerProgressMax = max
         innerProgressCount.set(0)
     }
@@ -116,12 +118,12 @@ class ChatProgressUpdates {
             previousSteps.add("§8- §f$it $innerProgress$format")
         }
         innerProgress = ""
-        if (!SkyBlockUtils.debug) return
 
         val time = SimpleTimeMark.now().toLocalDateTime()
-        println("$time: $nextStep")
         currentStep = nextStep
         currentlyRunning = true
+        if (!SkyBlockUtils.debug) return
+        println("$time: $nextStep")
 
         if (phase == Phase.END) {
             if (!currentlyRunning) {

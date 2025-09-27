@@ -45,7 +45,7 @@ sealed interface RepoFileSystem {
     ): Boolean = runCatching {
         progress.update("call loadFromZip")
         ZipFile(zipFile.absolutePath).use { zip ->
-            progress.update("zipFile entries for each")
+            progress.update("zipFile entries forEach")
             val sequence = zip.entries().asSequence().filter { !it.isDirectory }
             progress.innerProgressStart(sequence.count())
             sequence.forEach { entry ->
@@ -65,9 +65,11 @@ sealed interface RepoFileSystem {
                 val data = zip.getInputStream(entry).readBytes()
                 write(relative, data)
             }
+            progress.update("done with forEach")
         }
         true
     }.getOrElse {
+        progress.update("Failed to load repo from zip file: ${zipFile.absolutePath}")
         logger.logNonDestructiveError("Failed to load repo from zip file: ${zipFile.absolutePath}")
         false
     }
