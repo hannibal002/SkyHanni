@@ -23,7 +23,7 @@ import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("SpreadOperator", "TooManyFunctions")
-class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualConfig<*>>(
+open class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualConfig<*>>(
     name: String,
     createNewSession: () -> Data,
     private var storage: (ProfileSpecificStorage) -> TimedTrackerData<Data>,
