@@ -44,7 +44,7 @@ object CropCollectionTracker {
         trackerConfig = { config.perTrackerConfig },
     )
 
-    class TimedData : TimedTrackerData<Data, SessionUptime.Garden>({ Data() })
+    class TimedData : TimedTrackerData<Data>({ Data() })
 
     data class Data(
         @Expose val cropCollection: MutableMap<CropType, CropCollectionApi.CropCollection> = EnumMap(CropType::class.java)
