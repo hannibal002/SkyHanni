@@ -176,13 +176,7 @@ class ProfileSpecificStorage(
         var timedProfitTracker: DianaProfitTracker.TimedData = DianaProfitTracker.TimedData()
 
         @Expose
-        var profitTrackerPerElection: MutableMap<Int, DianaProfitTracker.Data> = mutableMapOf()
-
-        @Expose
-        var mythologicalMobTracker: MythologicalCreatureTracker.Data = MythologicalCreatureTracker.Data()
-
-        @Expose
-        var mythologicalMobTrackerPerElection: MutableMap<Int, MythologicalCreatureTracker.Data> = mutableMapOf()
+        var timedMythologicalMobTracker: MythologicalCreatureTracker.TimedData = MythologicalCreatureTracker.TimedData()
     }
 
     // -- winter

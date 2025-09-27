@@ -2,9 +2,10 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -13,15 +14,17 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
+import at.hannibal2.skyhanni.utils.tracker.SkyhanniTimedTracker
+import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import java.util.regex.Pattern
@@ -57,17 +60,16 @@ object MythologicalCreatureTracker {
         ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!",
     )
 
-    private val tracker = SkyHanniTracker(
-        "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
-        extraDisplayModes = mapOf(
-            SkyHanniTracker.DisplayMode.MAYOR to {
-                it.diana.mythologicalMobTrackerPerElection.getOrPut(
-                    SkyBlockTime.now().getElectionYear(), ::Data,
-                )
-            },
-        ),
-        trackerConfig = { config.perTrackerConfig }
-    ) { drawDisplay(it) }
+    private val tracker = SkyhanniTimedTracker(
+        "Mythological Creature Tracker",
+        { Data() },
+        { it.diana.timedMythologicalMobTracker },
+        extraDisplayModes = setOf(DisplayMode.MAYOR),
+        trackerConfig = { config.perTrackerConfig },
+        drawDisplay = { drawDisplay(it) }
+    )
+
+    class TimedData : TimedTrackerData<Data, SessionUptime.Normal>({ Data() })
 
     data class Data(
         @Expose var creaturesSinceLastInquisitor: Int = 0,
@@ -144,6 +146,26 @@ object MythologicalCreatureTracker {
             description = "Resets the Mythological Creature Tracker"
             category = CommandCategory.USERS_RESET
             callback { tracker.resetCommand() }
+        }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val timedTrackerData: TimedTrackerData<Data, SessionUptime.Normal> = TimedTrackerData { Data() }
+
+        event.transform(108, "#profile.diana.mythologicalMobTracker") { entry ->
+            timedTrackerData.createEntry(DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<Data>(entry))
+            entry
+        }
+        event.transform(108, "#profile.diana.mythologicalMobTrackerPerElection") { entry ->
+            val mayors = ConfigManager.gson.fromJson<MutableMap<String, Data>>(entry)
+            mayors.entries.forEach {
+                timedTrackerData.createEntry(DisplayMode.MAYOR, it.key, it.value)
+            }
+            entry
+        }
+        event.add(108, "#profile.diana.timedMythologicalMobTracker") {
+            ConfigManager.gson.toJsonTree(timedTrackerData)
         }
     }
 }

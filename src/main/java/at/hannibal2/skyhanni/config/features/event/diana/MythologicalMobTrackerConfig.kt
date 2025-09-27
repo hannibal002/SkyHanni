@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedIndividualTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -37,5 +37,5 @@ class MythologicalMobTrackerConfig {
         desc = ""
     )
     @Accordion
-    val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
+    val perTrackerConfig: TimedIndividualTrackerConfig = TimedIndividualTrackerConfig()
 }
