@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTimedItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
 import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import com.google.gson.annotations.Expose
