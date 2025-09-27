@@ -278,6 +278,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         getData()?.getOrPutEntry(DisplayMode.SESSION, string)
         getData()?.cleanEntry(timedConfig, DisplayMode.SESSION)
         sessionEditTime = SimpleTimeMark.now()
+        update()
     }
 
     private fun deleteSession() {

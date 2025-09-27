@@ -2,13 +2,9 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.features.misc.tracker.TimedTrackerConfig
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.TimeUtils.dayToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
-import at.hannibal2.skyhanni.utils.TimeUtils.monthToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.weekFormatter
-import at.hannibal2.skyhanni.utils.TimeUtils.weekToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.yearFormatter
-import at.hannibal2.skyhanni.utils.TimeUtils.yearToLocalDate
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
 import com.google.gson.annotations.Expose
 import java.time.LocalDate
@@ -196,7 +192,7 @@ open class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
             DisplayMode.MONTH -> config.months
             DisplayMode.YEAR -> config.years
             DisplayMode.SESSION -> config.session
-            else -> 5
+            else -> config.others
         }
 
         sessions[displayMode]?.let { map ->
@@ -208,15 +204,11 @@ open class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
     fun cleanEntries(map: MutableMap<String, Data>, keepAmount: Int, displayMode: DisplayMode) {
         if (keepAmount <= 0) return
 
-        val keysSorted = map.keys.sortedBy {
-            when (displayMode) {
-                DisplayMode.DAY -> it.dayToLocalDate()
-                DisplayMode.WEEK -> it.weekToLocalDate()
-                DisplayMode.MONTH -> it.monthToLocalDate()
-                DisplayMode.YEAR -> it.yearToLocalDate()
-                else -> null
+        val keysSorted = map.keys.sortedWith(
+            compareBy {
+                displayMode.toValue(it)
             }
-        }
+        )
 
         val toRemove = keysSorted.dropLast(keepAmount)
         if (toRemove.isEmpty()) return
