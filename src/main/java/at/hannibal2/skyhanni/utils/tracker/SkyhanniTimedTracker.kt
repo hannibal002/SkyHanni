@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualConfig<*>>(
     name: String,
     createNewSession: () -> Data,
-    private var storage: (ProfileSpecificStorage) -> TimedTrackerData<Data, *>,
+    private var storage: (ProfileSpecificStorage) -> TimedTrackerData<Data>,
     drawDisplay: (Data) -> List<Searchable>,
     extraDisplayModes: Set<DisplayMode> = emptySet(),
     customUptimeControl: Boolean = false,
@@ -114,7 +114,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         update()
     }
 
-    private fun getData(): TimedTrackerData<Data, *>? = ProfileStorageData.profileSpecific?.getData()
+    private fun getData(): TimedTrackerData<Data>? = ProfileStorageData.profileSpecific?.getData()
     private fun getOrPutCurrentData(displayMode: DisplayMode = getDisplayMode()): Data? = getData()?.getOrPutCurrentData(displayMode)
     private fun getOrPutCurrentName(displayMode: DisplayMode = getDisplayMode()): String? = getData()?.getOrPutCurrentName(displayMode)
     private fun getPrevNext(displayMode: DisplayMode, string: String): Pair<String?, String?> =
