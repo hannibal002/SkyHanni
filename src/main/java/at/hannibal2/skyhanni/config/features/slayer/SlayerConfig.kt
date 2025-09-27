@@ -160,4 +160,21 @@ class SlayerConfig {
     @ConfigOption(name = "Slayer Cocoon Notification Sound", desc = "Sends note.pling when Slayer Boss is cocooned.")
     @ConfigEditorBoolean
     var cocoonDing: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Hide Purple Slayer Boss Particles", desc = "Hides the Purple particles used on Slayer Spawn Particles")
+    @SearchTag("Hider Spell Potion Witch")
+    @ConfigEditorBoolean
+    var purpleParticleHider: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Hide White Slayer Boss Particles", desc = "Hides the White particles used on Slayer Spawn Particles")
+    @SearchTag("Enchant Hider")
+    @ConfigEditorBoolean
+    var whiteParticleHider: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Hide Damage Splashes Near Slayer Boss", desc = "Hides Damage Splashes Near Slayer Boss")
+    @ConfigEditorBoolean
+    var damageSplashHider: Boolean = false
 }
