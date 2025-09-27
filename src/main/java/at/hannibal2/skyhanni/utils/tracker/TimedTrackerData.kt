@@ -11,7 +11,7 @@ import java.time.LocalDate
 import java.util.EnumMap
 
 @Suppress("TooManyFunctions")
-open class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
+open class TimedTrackerData<Data : TrackerData<*>>(
     private val createNewSession: () -> Data,
 ) {
     fun reset() {
