@@ -200,5 +200,9 @@ object SeaCreatureTracker {
     }
 
     private fun isEnabled() =
-        SkyBlockUtils.inSkyBlock && !FishingApi.hasTreasureHook && !FishingApi.wearingTrophyArmor && !KuudraApi.inKuudra
+        SkyBlockUtils.inSkyBlock &&
+        !FishingApi.hasTreasureHook &&
+        !FishingApi.wearingTrophyArmor &&
+        SkyBlockUtils.graphArea != "Tomb Floodway" &&
+        !KuudraApi.inKuudra
 }
