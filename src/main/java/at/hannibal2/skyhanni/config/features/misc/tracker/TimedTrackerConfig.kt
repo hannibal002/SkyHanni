@@ -52,6 +52,14 @@ class TimedTrackerConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
     var years: Int = 0
 
+    @Expose
+    @ConfigOption(
+        name = "Other",
+        desc = "Amount to keep of other modes not listed above."
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
+    var others: Int = 10
+
     private val config get() = SkyHanniMod.feature.misc.tracker.timedTracker
 
     fun syncSettings() {
