@@ -16,7 +16,7 @@ object HideSlayerSpawnParticles {
         if (event.type == EnumParticleTypes.ENCHANTMENT_TABLE && config.whiteParticleHider) {
             event.cancel()
         }
-        if ((event.type == EnumParticleTypes.SPELL_WITCH || event.type == EnumParticleTypes.SPELL_MOB ) && config.purpleParticleHider) {
+        if ((event.type == EnumParticleTypes.SPELL_WITCH || event.type == EnumParticleTypes.SPELL_MOB) && config.purpleParticleHider) {
             event.cancel()
         }
     }
