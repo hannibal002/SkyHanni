@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 abstract class SkyHanniTimedBucketedItemTracker<E : Enum<E>, Data : BucketedItemTrackerData<E, *>>(
     name: String,
     createNewSession: () -> Data,
-    getStorage: (ProfileSpecificStorage) -> TimedTrackerData<Data, *>,
+    getStorage: (ProfileSpecificStorage) -> TimedTrackerData<Data>,
     extraDisplayModes: Set<DisplayMode> = emptySet(),
     trackerConfig: () -> TimedGenericIndividualConfig<ItemTrackerGenericConfig>,
     customUptimeControl: Boolean = false,

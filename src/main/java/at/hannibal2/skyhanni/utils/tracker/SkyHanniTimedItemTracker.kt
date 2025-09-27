@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 open class SkyHanniTimedItemTracker<Data : ItemTrackerData<*>>(
     name: String,
     createNewSession: () -> Data,
-    getStorage: (ProfileSpecificStorage) -> TimedTrackerData<Data, *>,
+    getStorage: (ProfileSpecificStorage) -> TimedTrackerData<Data>,
     extraDisplayModes: Set<DisplayMode> = emptySet(),
     trackerConfig: () -> TimedGenericIndividualConfig<ItemTrackerGenericConfig>,
     customUptimeControl: Boolean = false,
