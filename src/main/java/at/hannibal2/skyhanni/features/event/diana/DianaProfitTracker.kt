@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -22,17 +22,20 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTimedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
+import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import com.google.gson.annotations.Expose
+import java.util.EnumMap
 
 @SkyHanniModule
 object DianaProfitTracker {
@@ -50,20 +53,18 @@ object DianaProfitTracker {
         "§6§lWow! §r§eYou dug out §r§6(?<coins>.*) coins§r§e!",
     )
 
-    private val tracker = SkyHanniItemTracker(
+    private val tracker = SkyHanniTimedItemTracker<Data>(
         "Diana Profit Tracker",
         { Data() },
-        { it.diana.profitTracker },
-        extraDisplayModes = mapOf(
-            SkyHanniTracker.DisplayMode.MAYOR to {
-                it.diana.profitTrackerPerElection.getOrPut(
-                    SkyBlockTime.now().getElectionYear(), ::Data,
-                )
-            },
+        { it.diana.timedProfitTracker },
+        extraDisplayModes = setOf(
+            SkyHanniTracker.DisplayMode.MAYOR
         ),
         drawDisplay = { drawDisplay(it) },
         trackerConfig = { config.perTrackerConfig }
     )
+
+    class TimedData : TimedTrackerData<Data, SessionUptime.Normal>({ Data() })
 
     data class Data(
         @Expose var burrowsDug: Long = 0
@@ -160,7 +161,7 @@ object DianaProfitTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) },
+            condition = { config.enabled },//&& (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) },
             onRender = {
                 if (DianaApi.hasSpadeInHand()) tracker.firstUpdate()
                 tracker.renderDisplay(config.position)
@@ -196,6 +197,22 @@ object DianaProfitTracker {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         migrationMapping.forEach { (old, new) ->
             event.move(70, "#profile.diana.$old", "#profile.diana.$new")
+        }
+        val timedTrackerData: TimedTrackerData<Data, SessionUptime.Normal> = TimedTrackerData { Data() }
+
+        event.transform(108, "#profile.diana.profitTracker") { entry ->
+            timedTrackerData.createEntry(DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<Data>(entry))
+            entry
+        }
+        event.transform(108, "#profile.diana.profitTrackerPerElection") { entry ->
+            val mayors = ConfigManager.gson.fromJson<MutableMap<String, Data>>(entry)
+            mayors.entries.forEach {
+                timedTrackerData.createEntry(DisplayMode.MAYOR, it.key, it.value)
+            }
+            entry
+        }
+        event.add(108, "#profile.diana.timedProfitTracker") {
+            ConfigManager.gson.toJsonTree(timedTrackerData)
         }
     }
 }

@@ -173,7 +173,7 @@ class ProfileSpecificStorage(
 
     class DianaStorage {
         @Expose
-        var profitTracker: DianaProfitTracker.Data = DianaProfitTracker.Data()
+        var timedProfitTracker: DianaProfitTracker.TimedData = DianaProfitTracker.TimedData()
 
         @Expose
         var profitTrackerPerElection: MutableMap<Int, DianaProfitTracker.Data> = mutableMapOf()
