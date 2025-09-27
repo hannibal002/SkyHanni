@@ -122,6 +122,7 @@ object DeepCavernsGuide {
         show = true
         parkourHelper?.reset()
         if (parkourHelper == null) {
+            // TODO add generic repo outdated error logic here
             ChatUtils.clickableChat(
                 "DeepCavernsParkour missing in SkyHanni Repo! Try /shupdaterepo to fix it!",
                 onClick = {
