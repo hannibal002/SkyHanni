@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -34,15 +35,13 @@ object ForagingTrackerLegacy {
         }
     }
 
-    class BucketData : BucketedItemTrackerData<TreeType>(TreeType::class) {
-        override fun resetItems() {
-            treesCut = enumMapOf()
-            wholeTreesCut = enumMapOf()
-            hotfExperience = enumMapOf()
-            foragingExperience = enumMapOf()
-            forestWhispers = enumMapOf()
-        }
-
+    data class BucketData(
+        @Expose var treesCut: MutableMap<TreeType, Long> = enumMapOf(),
+        @Expose var wholeTreesCut: MutableMap<TreeType, Double> = enumMapOf(),
+        @Expose var hotfExperience: MutableMap<TreeType, Long> = enumMapOf(),
+        @Expose var foragingExperience: MutableMap<TreeType, Long> = enumMapOf(),
+        @Expose var forestWhispers: MutableMap<TreeType, Long> = enumMapOf(),
+    ) : BucketedItemTrackerData<TreeType>(TreeType::class) {
         override fun getDescription(bucket: TreeType?, timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
                 selectedBucket?.let {
@@ -57,33 +56,21 @@ object ForagingTrackerLegacy {
             )
         }
 
-        override fun getCoinName(bucket: TreeType?, item: TrackedItem) = "<no coins>"
-        override fun getCoinDescription(bucket: TreeType?, item: TrackedItem): List<String> = listOf("<no coins>")
-
-        override fun TreeType.isBucketSelectable() = true
-
-        override fun bucketName(): String {
-            return "tree"
+        override fun getCoinName(bucket: TreeType?, item: TrackedItem) = "§6Coins"
+        override fun getCoinDescription(bucket: TreeType?, item: TrackedItem): List<String> {
+            val mobKillCoinsFormat = item.totalAmount.shortFormat()
+            return listOf(
+                "§7Cutting trees gives you coins.",
+                "§7You got §6$mobKillCoinsFormat coins §7that way.",
+            )
         }
+        override fun TreeType.isBucketSelectable() = true
+        override fun bucketName(): String = "tree"
 
-        @Expose
-        var treesCut: MutableMap<TreeType, Long> = enumMapOf()
         fun getTreeCount(): Long = selectedBucket?.let { treesCut[it] } ?: treesCut.values.sum()
-
-        @Expose
-        var wholeTreesCut: MutableMap<TreeType, Double> = enumMapOf()
         fun getWholeTreeCount(): Double = selectedBucket?.let { wholeTreesCut[it] } ?: wholeTreesCut.values.sum()
-
-        @Expose
-        var hotfExperience: MutableMap<TreeType, Long> = enumMapOf()
         fun getHotfExperience(): Long = selectedBucket?.let { hotfExperience[it] } ?: hotfExperience.values.sum()
-
-        @Expose
-        var foragingExperience: MutableMap<TreeType, Long> = enumMapOf()
         fun getForagingExperience(): Long = selectedBucket?.let { foragingExperience[it] } ?: foragingExperience.values.sum()
-
-        @Expose
-        var forestWhispers: MutableMap<TreeType, Long> = enumMapOf()
         fun getForestWhispers(): Long = selectedBucket?.let { forestWhispers[it] } ?: forestWhispers.values.sum()
     }
 
