@@ -4,4 +4,5 @@ net.minecraft.client.network.AbstractClientPlayerEntity getSkin() getSkinTexture
 net.minecraft.client.render.WorldRenderer capturedFrustum frustum
 
 net.minecraft.entity.Entity getEntityWorld() getWorld()
+net.minecraft.entity.Entity getEntityPos() getPos()
 
