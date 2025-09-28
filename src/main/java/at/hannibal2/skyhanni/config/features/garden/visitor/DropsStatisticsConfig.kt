@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedGardenIndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -33,10 +35,7 @@ class DropsStatisticsConfig {
             DropsStatisticsTextEntry.COPPER,
             DropsStatisticsTextEntry.FARMING_EXP,
             DropsStatisticsTextEntry.COINS_SPENT,
-            DropsStatisticsTextEntry.OVERGROWN_GRASS,
-            DropsStatisticsTextEntry.GREEN_BANDANA,
-            DropsStatisticsTextEntry.DEDICATION_IV,
-            DropsStatisticsTextEntry.COPPER_DYE
+            DropsStatisticsTextEntry.PROFIT_LIST
         )
     )
 
@@ -59,22 +58,11 @@ class DropsStatisticsConfig {
         BITS("§b4.2k Bits"),
         MITHRIL_POWDER("§220k Mithril Powder"),
         GEMSTONE_POWDER("§d18k Gemstone Powder"),
-
-        // VisitorReward items
-        // Todo: Make these names actually in sync with the VisitorReward enum entries
-        FLOWERING_BOUQUET("§b23 §9Flowering Bouquet"),
-        OVERGROWN_GRASS("§b4 §9Overgrown Grass"),
-        GREEN_BANDANA("§b2 §5Green Bandana"),
-        DEDICATION_IV("§b1 §9Dedication IV"),
-        MUSIC_RUNE_I("§b6 §b◆ Music Rune I"),
-        SPACE_HELMET("§b1 §cSpace Helmet"),
-        CULTIVATING_I("§b1 §9Cultivating I"),
-        REPLENISH_I("§b1 §9Replenish I"),
-        DELICATE("§b1 §9Delicate V"),
-        COPPER_DYE("§b1 §8Copper Dye"),
-        JUNGLE_KEY("§b1 §5Jungle Key"),
-        FRUIT_BOWL("§b1 §9Fruit Bowl"),
-        HARVEST_HARBINGER("§b1 §9Harvest Harbinger V"),
+        // TODO reformat this
+        PROFIT_LIST("""§b23 §9Flowering Bouquet     §6180k
+                      |§b1 §cSpace Helmet           §6400m
+                      |§b1 §9Dedication IV          §644m
+        """.trimMargin())
         ;
 
         override fun toString() = displayName
@@ -102,6 +90,14 @@ class DropsStatisticsConfig {
     @ConfigOption(name = "Only on Barn Plot", desc = "Only show the overlay while on the Barn plot.")
     @ConfigEditorBoolean
     val onlyOnBarn: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(
+        name = "Tracker Settings",
+        desc = ""
+    )
+    @Accordion
+    val perTrackerConfig: TimedGardenIndividualItemTrackerConfig = TimedGardenIndividualItemTrackerConfig()
 
     @Expose
     @ConfigLink(owner = DropsStatisticsConfig::class, field = "enabled")

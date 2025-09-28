@@ -363,15 +363,12 @@ object GardenVisitorFeatures {
     @HandleEvent
     fun onVisitorRefused(event: VisitorRefusedEvent) {
         update()
-        GardenApi.storage?.visitorDrops?.let { it.deniedVisitors += 1 }
-        GardenVisitorDropStatistics.saveAndUpdate()
     }
 
     @HandleEvent
     fun onVisitorAccepted(event: VisitorAcceptedEvent) {
-        VisitorAcceptEvent(event.visitor).post()
+        VisitorAcceptEvent(event.visitor, lastFullPrice).post()
         update()
-        GardenApi.storage?.visitorDrops?.let { it.coinsSpent += round(lastFullPrice).toLong() }
     }
 
     @HandleEvent

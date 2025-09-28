@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.features.garden.tracker.CropCollectionTracker
 import at.hannibal2.skyhanni.features.garden.tracker.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
+import at.hannibal2.skyhanni.features.garden.tracker.VisitorDropTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
@@ -500,45 +501,7 @@ class ProfileSpecificStorage(
         var uniqueVisitors: Int = 0
 
         @Expose
-        var visitorDrops: VisitorDrops = VisitorDrops()
-
-        // Todo: Move to a SkyhanniTracker (preferably bucketed by rarity)
-        class VisitorDrops : Resettable {
-            @Expose
-            var acceptedVisitors: Int = 0
-
-            @Expose
-            var deniedVisitors: Int = 0
-
-            fun getTotalVisitors() = acceptedVisitors + deniedVisitors
-
-            @Expose
-            var acceptedRarities: MutableMap<LorenzRarity, Long> = enumMapOf()
-
-            @Expose
-            var copper: Int = 0
-
-            @Expose
-            var farmingExp: Long = 0
-
-            @Expose
-            var gardenExp: Int = 0
-
-            @Expose
-            var coinsSpent: Long = 0
-
-            @Expose
-            var bits: Long = 0
-
-            @Expose
-            var mithrilPowder: Long = 0
-
-            @Expose
-            var gemstonePowder: Long = 0
-
-            @Expose
-            var rewardsCount: MutableMap<VisitorReward, Int> = enumMapOf()
-        }
+        var visitorDropTracker: VisitorDropTracker.TimeData = VisitorDropTracker.TimeData()
 
         @Expose
         var plotIcon: PlotIcon = PlotIcon()
