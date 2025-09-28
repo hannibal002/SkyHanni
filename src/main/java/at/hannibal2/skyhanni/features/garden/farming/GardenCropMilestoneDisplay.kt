@@ -281,6 +281,14 @@ object GardenCropMilestoneDisplay {
     }
 
     private fun addMushroomCowData() {
+        if (GardenApi.getGardenLevel(overflow = false) < 9) {
+            mushroomCowPerkDisplay = listOf(
+                Renderable.text("§6Mooshroom Cow Perk"),
+                Renderable.text("§cMushroom crop not unlocked!"),
+            )
+            return
+        }
+
         val mushroom = CropType.MUSHROOM
         val allowOverflow = overflowConfig.cropMilestoneDisplay
         if (mushroom.isMaxed(allowOverflow)) {
