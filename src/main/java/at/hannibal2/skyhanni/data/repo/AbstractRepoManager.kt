@@ -457,7 +457,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("done with prepCleanRepoFileSystem")
     }
 
-    fun reloadLocalRepo(progress: ChatProgressUpdates, answerMessage: String = "$commonName r loaded from local files successfully.") {
+    fun reloadLocalRepo(progress: ChatProgressUpdates, answerMessage: String = "$commonName repo loaded from local files successfully.") {
         progress.update("call reloadLocalRepo")
         shouldManuallyReload = true
         SkyHanniMod.launchIOCoroutine("$commonName reloadLocalRepo", timeout = 2.minutes) {

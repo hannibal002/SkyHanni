@@ -15,7 +15,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.ZipFile
-import kotlin.sequences.forEach
 import kotlin.time.Duration.Companion.minutes
 
 sealed interface RepoFileSystem {
@@ -45,25 +44,30 @@ sealed interface RepoFileSystem {
     ): Boolean = runCatching {
         progress.update("call loadFromZip")
         ZipFile(zipFile.absolutePath).use { zip ->
-            progress.update("zipFile entries forEach")
-            val sequence = zip.entries().asSequence().filter { !it.isDirectory }
-            progress.innerProgressStart(sequence.count())
-            sequence.forEach { entry ->
+            progress.update("zipFile entries collect")
+            val entries = zip.entries().asSequence()
+                .filterNot { it.isDirectory }
+                .toList()
+            progress.innerProgressStart(entries.size)
+            for (entry in entries) {
                 progress.innerProgressStep()
-                val relative = entry.name.substringAfter('/', "").takeIf { it.isNotBlank() }
-                    ?: return@forEach
+                val relative = entry.name.substringAfter('/', entry.name)
+                if (relative.isBlank()) continue
 
                 if (this@RepoFileSystem is DiskRepoFileSystem) {
-                    // Security: ensure the file is within the root directory
                     val outPath = root.toPath().resolve(relative).normalize()
-                    if (!outPath.startsWith(root.toPath())) throw RuntimeException(
-                        "SkyHanni detected an invalid zip file. This is a potential security risk, " +
-                            "please report this on the SkyHanni discord.",
-                    )
+                    if (!outPath.startsWith(root.toPath())) {
+                        throw RuntimeException(
+                            "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+                                "please report this on the SkyHanni discord."
+                        )
+                    }
                 }
 
-                val data = zip.getInputStream(entry).readBytes()
-                write(relative, data)
+                zip.getInputStream(entry).use { input ->
+                    val data = input.readBytes()
+                    write(relative, data)
+                }
             }
             progress.update("done with forEach")
         }
@@ -153,9 +157,9 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         progress.update("createDirectoriesFor")
         base.createDirectoriesFor(storage.keys)
         progress.update("parallelStream forEach resolve write")
-        val stream = storage.entries.parallelStream()
-        progress.innerProgressStart(stream.count().toInt())
-        stream.forEach { (relativePath, bytes) ->
+        val entries = storage.entries.toList()
+        progress.innerProgressStart(entries.size)
+        entries.parallelStream().forEach { (relativePath, bytes) ->
             val out = base.resolve(relativePath)
             Files.write(out, bytes)
             progress.innerProgressStep()

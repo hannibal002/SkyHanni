@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.repo
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -98,7 +99,7 @@ class ChatProgressUpdates {
     }
 
     fun update(nextStep: String) {
-        statusUpdate(nextStep, Phase.MIDDLE)
+        statusUpdate(nextStep, Phase.UPDATE)
     }
 
     fun end(nextStep: String) {
@@ -108,12 +109,24 @@ class ChatProgressUpdates {
     private fun statusUpdate(nextStep: String, phase: Phase) {
         if (phase == Phase.START) {
             if (currentlyRunning) {
-                error("trying to start an already running chat: $nextStep")
+                ErrorManager.skyHanniError(
+                    "trying to start an already running chat",
+                    "next step" to nextStep,
+                    "last step" to currentStep?.lastOrNull(),
+                )
             }
             currentlyRunning = true
             startOfFirst = SimpleTimeMark.now()
             chatId = ChatUtils.getUniqueMessageId()
             title = nextStep
+        }
+        if (phase == Phase.UPDATE) {
+            if (!currentlyRunning) {
+                ErrorManager.skyHanniError(
+                    "trying to update an not running chat",
+                    "next step" to nextStep,
+                )
+            }
         }
 
         currentStep?.let {
@@ -129,7 +142,11 @@ class ChatProgressUpdates {
 
         if (phase == Phase.END) {
             if (!currentlyRunning) {
-                error("trying to end an not running chat: $nextStep")
+                ErrorManager.skyHanniError(
+                    "trying to end an not running chat",
+                    "next step" to nextStep,
+                    "last step" to currentStep?.lastOrNull(),
+                )
             }
             currentlyRunning = false
             update()
@@ -199,7 +216,7 @@ class ChatProgressUpdates {
 
     private enum class Phase {
         START,
-        MIDDLE,
+        UPDATE,
         END,
     }
 }
