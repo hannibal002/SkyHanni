@@ -42,7 +42,7 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
         timesAdded: Int = 1,
         removalRunner: (NeuInternalName) -> Unit? = { removeItem(internalName) },
     ) = apply {
-        if (!command) { timesGained + timesAdded }
+        if (!command) { timesGained += timesAdded }
         totalAmount += amount
         lastTimeUpdated = SimpleTimeMark.now()
         if (command && totalAmount <= 0) { removalRunner(internalName) }

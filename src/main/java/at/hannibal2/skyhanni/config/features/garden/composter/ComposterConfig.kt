@@ -23,6 +23,11 @@ class ComposterConfig {
     var overlay: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Profit Tracker", desc = "")
+    @Accordion
+    var profitTracker: ComposterProfitTrackerConfig = ComposterProfitTrackerConfig()
+
+    @Expose
     @ConfigOption(
         name = "Change Price Source",
         desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC."

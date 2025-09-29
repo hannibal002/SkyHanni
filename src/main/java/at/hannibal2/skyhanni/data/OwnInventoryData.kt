@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.skyhanni.events.entity.ItemRemoveInInventoryEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -83,6 +84,9 @@ object OwnInventoryData {
         for ((internalName, amount) in map) {
             calculateDifference(internalName, amount)
         }
+        (itemAmounts.keys - map.keys).forEach { removed ->
+            removeItem(removed, -itemAmounts.getValue(removed))
+        }
         itemAmounts = map
     }
 
@@ -106,6 +110,8 @@ object OwnInventoryData {
         val diff = newAmount - oldAmount
         if (diff > 0) {
             addItem(internalName, diff)
+        } else if (diff < 0) {
+            removeItem(internalName, diff)
         }
     }
 
@@ -200,5 +206,20 @@ object OwnInventoryData {
         if (internalName.startsWith("MAP-")) return
 
         ItemAddInInventoryEvent(internalName, add).post()
+    }
+
+    // This will post for moving around inventory items
+    // and should only be used in cases where clicking on an item removes it, like composter
+    private fun removeItem(internalName: NeuInternalName, remove: Int) {
+        if (SkyBlockUtils.lastWorldSwitch.passedSince() < 3.seconds) return
+
+        ignoredItemsUntil.removeIf { it.blockedUntil.isInPast() }
+        if (ignoredItemsUntil.any { it.condition(internalName) }) {
+            return
+        }
+
+        if (internalName.startsWith("MAP-")) return
+
+        ItemRemoveInInventoryEvent(internalName, remove).post()
     }
 }

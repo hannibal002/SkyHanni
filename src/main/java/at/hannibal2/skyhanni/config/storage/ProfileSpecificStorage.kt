@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboard
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
+import at.hannibal2.skyhanni.features.garden.tracker.ComposterProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.CropCollectionTracker
 import at.hannibal2.skyhanni.features.garden.tracker.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
@@ -495,6 +496,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var composterCurrentFuelItem: NeuInternalName? = NONE
+
+        @Expose
+        var composterProfitTracker: ComposterProfitTracker.TimeData = ComposterProfitTracker.TimeData()
 
         @Expose
         var uniqueVisitors: Int = 0

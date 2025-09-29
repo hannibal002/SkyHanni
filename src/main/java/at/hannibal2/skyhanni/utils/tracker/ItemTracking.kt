@@ -296,10 +296,10 @@ interface ItemTracking<Data : ItemTrackerData<*>, ConfigType : GenericIndividual
         return listOf(profitRenderable.toSearchable(), profitPerHourRenderable.toSearchable())
     }
 
-    private fun shouldShowProfitPerHour() =
+    fun shouldShowProfitPerHour() =
         itemTrackerConfig.profitPerHour.get() && !(tracker.getDisplayMode() == DisplayMode.TOTAL && config.onlyShowSession.get())
 
-    private fun profitPerHourRenderable(profit: Double, duration: Duration): Renderable {
+    fun profitPerHourRenderable(profit: Double, duration: Duration): Renderable {
         if (duration == 0.seconds) return Renderable.empty()
         val profitPerHour = profit / duration.inPartialHours
         val profitPerHourFormat = profitPerHour.roundTo(0).addSeparators()

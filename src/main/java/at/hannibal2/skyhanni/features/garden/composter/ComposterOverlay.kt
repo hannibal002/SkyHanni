@@ -70,16 +70,16 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComposterOverlay {
 
-    private var organicMatterFactors: Map<NeuInternalName, Double> = emptyMap()
-    private var fuelFactors: Map<NeuInternalName, Double> = emptyMap()
-    private var organicMatter: Map<NeuInternalName, Double> = emptyMap()
+    var organicMatterFactors: Map<NeuInternalName, Double> = emptyMap()
+    var fuelFactors: Map<NeuInternalName, Double> = emptyMap()
+    var organicMatter: Map<NeuInternalName, Double> = emptyMap()
 
     private val config get() = GardenApi.config.composters
     private var organicMatterDisplay: Renderable? = null
     private var fuelExtraDisplay: Renderable? = null
 
     private var currentTimeType = TimeType.HOUR
-    private val composterInventory = InventoryDetector { name -> name == "Composter" }
+    val composterInventory = InventoryDetector { name -> name == "Composter" }
     private val composterUpgradesInventory = InventoryDetector { name -> name == "Composter Upgrades" }
     private var extraComposterUpgrade: ComposterUpgrade? = null
         set(value) {
