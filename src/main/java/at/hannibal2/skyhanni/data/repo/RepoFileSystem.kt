@@ -16,6 +16,7 @@ import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.ZipFile
 import kotlin.sequences.forEach
+import kotlin.time.Duration.Companion.minutes
 
 sealed interface RepoFileSystem {
     fun exists(path: String): Boolean
@@ -43,9 +44,7 @@ sealed interface RepoFileSystem {
     ): Boolean = runCatching {
         ZipFile(zipFile.absolutePath).use { zip ->
             zip.entries().asSequence().filter { !it.isDirectory }.forEach { entry ->
-                val relative = entry.name
-                    .substringAfter('/', "")
-                    .takeIf { it.isNotBlank() }
+                val relative = entry.name.substringAfter('/', "").takeIf { it.isNotBlank() }
                     ?: return@forEach
 
                 if (this@RepoFileSystem is DiskRepoFileSystem) {
@@ -53,7 +52,7 @@ sealed interface RepoFileSystem {
                     val outPath = root.toPath().resolve(relative).normalize()
                     if (!outPath.startsWith(root.toPath())) throw RuntimeException(
                         "SkyHanni detected an invalid zip file. This is a potential security risk, " +
-                            "please report this on the SkyHanni discord."
+                            "please report this on the SkyHanni discord.",
                     )
                 }
 
@@ -84,9 +83,11 @@ class DiskRepoFileSystem(val root: File) : RepoFileSystem {
         f.parentFile.mkdirs()
         f.writeBytes(data)
     }
+
     override fun deleteRecursively(path: String) {
         File(root, path).deleteRecursively()
     }
+
     override fun list(path: String) = root.resolve(path).listFiles { file ->
         file.exists() && file.extension == "json"
     }?.mapNotNull { it.name }?.toList().orEmpty()
@@ -101,17 +102,20 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
     override fun write(path: String, data: ByteArray) {
         storage[path] = data
     }
+
     override fun deleteRecursively(path: String) {
         if (path.isEmpty()) storage.clear()
         else storage.keys.removeIf { it == path || it.startsWith("$path/") }
     }
+
     override fun list(path: String) = storage.keys.filter {
         it.startsWith("$path/") && it.removePrefix("$path/").endsWith(".json")
     }.map { it.removePrefix("$path/") }
 
     override fun loadFromZip(zipFile: File, logger: RepoLogger): Boolean {
+        println("loadFromZip")
         val success = super.loadFromZip(zipFile, logger)
-        if (flushJob == null) flushJob = SkyHanniMod.launchIOCoroutine { saveToDisk(diskRoot) }
+        if (flushJob == null) flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk", timeout = 2.minutes) { saveToDisk(diskRoot) }
         return success
     }
 

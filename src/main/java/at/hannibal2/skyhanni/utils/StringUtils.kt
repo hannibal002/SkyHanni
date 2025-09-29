@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -203,12 +204,13 @@ object StringUtils {
 
     //#if FORGE
     fun String.splitLines(width: Int): String = ForgeFontRenderer(Minecraft.getMinecraft().fontRendererObj).splitText(
+        this.asStructuredText(),
         //#else
         //$$ fun String.splitLines(width: Int): String = splitText(
+        //$$ this,
         //#endif
-        this,
         width,
-    ).joinToString("\n") { it.removePrefix("§r") }
+    ).joinToString("\n") { it.toString().removePrefix("§r") }
 
     //#if MC > 1.21
     //$$ private fun splitText(text: String, width: Int): List<String> {

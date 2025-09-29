@@ -4,8 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
@@ -25,7 +24,6 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -38,15 +36,9 @@ object SeaCreatureTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData() {
-
-        override fun reset() {
-            amount.clear()
-        }
-
-        @Expose
-        var amount: MutableMap<String, Int> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var amount: MutableMap<String, Int> = mutableMapOf()
+    ) : Resettable
 
     @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
@@ -79,7 +71,7 @@ object SeaCreatureTracker {
     }
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         needMigration = true
     }
 
@@ -144,7 +136,7 @@ object SeaCreatureTracker {
         }
 
         if (tracker.isInventoryOpen()) {
-            addButton<String>(
+            addButton(
                 label = "Category",
                 current = currentCategory,
                 getName = { it.allLettersFirstUppercase() + " §7(" + amounts[it] + ")" },
@@ -175,7 +167,7 @@ object SeaCreatureTracker {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.showPercentage) {
             tracker.update()
         }

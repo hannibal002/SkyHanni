@@ -40,13 +40,11 @@ object ExcavatorProfitTracker {
         { it.mining.fossilExcavatorProfitTracker },
     ) { drawDisplay(it) }
 
-    class Data : ItemTrackerData() {
-        override fun resetItems() {
-            timesExcavated = 0
-            glacitePowderGained = 0
-            fossilDustGained = 0
-        }
-
+    data class Data(
+        @Expose var timesExcavated: Long = 0L,
+        @Expose var glacitePowderGained: Long = 0L,
+        @Expose var fossilDustGained: Long = 0L,
+    ) : ItemTrackerData() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / timesExcavated
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -55,23 +53,8 @@ object ExcavatorProfitTracker {
                 "§7Your drop rate: §c$dropRate.",
             )
         }
-
         override fun getCoinName(item: TrackedItem) = "<no coins>"
-
-        override fun getCoinDescription(item: TrackedItem): List<String> {
-            return listOf(
-                "<no coins>",
-            )
-        }
-
-        @Expose
-        var timesExcavated = 0L
-
-        @Expose
-        var glacitePowderGained = 0L
-
-        @Expose
-        var fossilDustGained = 0L
+        override fun getCoinDescription(item: TrackedItem) = listOf("<no coins>")
     }
 
     private val scrapItem get() = FossilExcavatorApi.scrapItem
@@ -218,11 +201,9 @@ object ExcavatorProfitTracker {
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled) return false
         if (!isEnabled()) return false
-        val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
+        if (Minecraft.getMinecraft().currentScreen !is GuiChest) return true
         // Only show in excavation menu
-        if (inChest && !FossilExcavatorApi.inExcavatorMenu) return false
-
-        return true
+        return FossilExcavatorApi.inExcavatorMenu
     }
 
     @HandleEvent
