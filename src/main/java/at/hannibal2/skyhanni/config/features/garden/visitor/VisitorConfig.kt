@@ -31,7 +31,7 @@ class VisitorConfig {
     val rewardWarning: RewardWarningConfig = RewardWarningConfig()
 
     @Expose
-    @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")
+    @ConfigOption(name = "Visitor Drops Tracker", desc = "")
     @Accordion
     val dropsStatistics: DropsStatisticsConfig = DropsStatisticsConfig()
 
