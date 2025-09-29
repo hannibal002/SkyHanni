@@ -159,13 +159,14 @@ object IslandGraphs {
         "Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center",
     )
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<IslandGraphSettingsJson>("misc/IslandGraphSettings")
         ignoredIslandTypes = data.ignoredIslandTypes
-        println("ignoredIslandTypes: $ignoredIslandTypes")
 
-        loadIsland(SkyBlockUtils.currentIsland)
+        if (SkyBlockUtils.inSkyBlock) {
+            loadIsland(SkyBlockUtils.currentIsland)
+        }
     }
 
     @HandleEvent
@@ -272,11 +273,13 @@ object IslandGraphs {
                 }
             } catch (e: Error) {
                 currentIslandGraph = null
-                ErrorManager.logErrorWithData(
-                    e,
-                    "failed to load graph data for island $islandName",
-                    "island name" to islandName,
-                )
+                if (SkyBlockUtils.debug) {
+                    ErrorManager.logErrorWithData(
+                        e,
+                        "failed to load graph data for island $islandName",
+                        "island name" to islandName,
+                    )
+                }
             }
         }
     }

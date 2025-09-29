@@ -472,15 +472,19 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private suspend fun reloadRepository(progress: ChatProgressUpdates, answerMessage: String = "") = repoMutex.withLock {
         progress.update("reloadRepository")
-        if (!shouldManuallyReload) return
+        if (!shouldManuallyReload) {
+            progress.end("should not manually reload")
+            return
+        }
         loadingError = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
         progress.update("extraReloadCoroutineWork")
         extraReloadCoroutineWork(progress)
 
-        progress.update("eventCtor.newInstance")
-        eventCtor.newInstance(this).post { error ->
+        val event = eventCtor.newInstance(this)
+        progress.update("posting events: ${event.javaClass.simpleName}")
+        event.post { error ->
             if (loadingError) return@post
             progress.update("Error while posting repo reload event: ${error.message}")
             logger.logErrorWithData(error, "Error while posting repo reload event")
