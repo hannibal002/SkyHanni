@@ -119,11 +119,12 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST:  §a✌ §7(§a11§7/20)
+     * WRAPPED-REGEX-TEST: " §a✌ §7(§a11§7/20)"
+     * WRAPPED-REGEX-TEST: " §a✌ §7(§e1/1§7)"
      */
     private val scoreboardVisitingAmountPattern by patternGroup.pattern(
         "scoreboard.visiting.amount",
-        "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
+        "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)(?:§.)?/(?<maxamount>\\d+)(?:§.)?\\)",
     )
     private val guestPattern by patternGroup.pattern(
         "guesting.scoreboard",
