@@ -154,7 +154,6 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
     fun onChat(event: SkyHanniChatEvent) {
         if (!GardenApi.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
-        if (lastAccept.passedSince() > 1.seconds) return
 
         val message = event.message.removeColor().trim()
 
