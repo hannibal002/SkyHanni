@@ -77,6 +77,8 @@ class ChatProgressUpdates {
     fun innerProgressStart(max: Int) {
         if (max > 0) {
             innerProgress(0, max)
+        } else {
+            update("inner progress with max=$max!")
         }
         innerProgressMax = max
         innerProgressCount.set(0)
@@ -108,6 +110,7 @@ class ChatProgressUpdates {
             if (currentlyRunning) {
                 error("trying to start an already running chat: $nextStep")
             }
+            currentlyRunning = true
             startOfFirst = SimpleTimeMark.now()
             chatId = ChatUtils.getUniqueMessageId()
             title = nextStep
@@ -121,9 +124,7 @@ class ChatProgressUpdates {
 
         val time = SimpleTimeMark.now().toLocalDateTime()
         currentStep = nextStep
-        currentlyRunning = true
         startOfCurrent = SimpleTimeMark.now()
-        if (!SkyBlockUtils.debug) return
         println("$time: $nextStep")
 
         if (phase == Phase.END) {
@@ -179,7 +180,7 @@ class ChatProgressUpdates {
         }
 
         val delayedSending = DelayedSending("§e[Debug-Log] §f$text §7(hover for more info)", hover.joinToString("\n"))
-        if (MinecraftCompat.localPlayerOrNull != null) {
+        if (SkyBlockUtils.debug) {
             delayedSending.send(chatId)
         } else {
             this.delayedSending = delayedSending

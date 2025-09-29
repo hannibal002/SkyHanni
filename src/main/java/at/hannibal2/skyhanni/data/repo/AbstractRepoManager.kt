@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.getJson
 import at.hannibal2.skyhanni.utils.system.LazyVar
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.mojang.brigadier.arguments.BoolArgumentType
@@ -244,6 +245,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     // Code taken + adapted from NotEnoughUpdates
     private fun switchToBackupRepo(progress: ChatProgressUpdates): FetchUnpackResult = runCatching {
         progress.update("call switchToBackupRepo")
+        if (PlatformUtils.isDevEnvironment) {
+            progress.end("Can not use backup repo in dev env.")
+            return@runCatching FetchUnpackResult.FAILED
+        }
+
         if (backupRepoResourcePath == null) {
             progress.update("No backup repo resource path provided, cannot switch to backup repo.")
             logger.warn("No backup repo resource path provided, cannot switch to backup repo.")
