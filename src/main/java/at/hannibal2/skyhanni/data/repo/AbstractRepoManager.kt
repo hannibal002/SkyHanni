@@ -275,8 +275,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         return FetchUnpackResult.SWITCHED_TO_BACKUP
     }.onFailure { e ->
         logger.logNonDestructiveError("Failed to switch to backup repo: ${e.message}")
-        progress.update("reason:")
-        progress.update(e.message ?: "no reason")
+        progress.update("reason: ${e.message ?: "no reason"}")
         progress.end("Failed to switch to backup repo")
     }.getOrDefault(FetchUnpackResult.FAILED)
 
@@ -489,7 +488,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         progress.update("transitionAfterReload done")
         if (answerMessage.isNotEmpty() && !loadingError) {
-            progress.end(answerMessage)
+            progress.end("answerMessage: $answerMessage")
             logger.logToChat("§a$answerMessage")
         } else if (loadingError) {
             progress.end("Error with the $commonShortName repo detected")

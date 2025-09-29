@@ -122,6 +122,7 @@ class ChatProgressUpdates {
         val time = SimpleTimeMark.now().toLocalDateTime()
         currentStep = nextStep
         currentlyRunning = true
+        startOfCurrent = SimpleTimeMark.now()
         if (!SkyBlockUtils.debug) return
         println("$time: $nextStep")
 
@@ -135,7 +136,6 @@ class ChatProgressUpdates {
             startOfCurrent = null
             previousSteps.clear()
         } else {
-            startOfCurrent = SimpleTimeMark.now()
             update()
         }
     }
