@@ -182,16 +182,15 @@ class ChatProgressUpdates {
         hover.add("§8SkyHanni Debug Log")
         hover.add("")
         hover.addAll(previousSteps)
+        val currentTime = startOfCurrent?.format() ?: error("startOfCurrent is null")
+        val currentLine = "§8- §f$currentStep $innerProgress$currentTime"
+        hover.add(currentLine)
+        hover.add("")
 
         val text = if (currentlyRunning) {
-            val currentTime = startOfCurrent?.format() ?: error("startOfCurrent is null")
-            val currentLine = "$currentStep $innerProgress$currentTime"
-            hover.add(currentLine)
-            hover.add("")
             hover.add("§7Running for: $totalTime")
             currentLine
         } else {
-            hover.add("")
             hover.add("§aDone after: $totalTime")
             "$currentStep $totalTime"
         }

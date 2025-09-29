@@ -130,10 +130,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         if (flushJob == null) {
             progress.update("start new launchIOCoroutine task")
             flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk", timeout = 2.minutes) {
-                val asyncProgress = ChatProgressUpdates()
-                asyncProgress.start("repo file saveToDisk")
-                saveToDisk(asyncProgress, diskRoot)
-                asyncProgress.end("done saving file")
+                saveToDisk(diskRoot)
             }
         }
         progress.update("loadFromZip end")
@@ -151,8 +148,10 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         return DiskRepoFileSystem(diskRoot)
     }
 
-    private fun saveToDisk(progress: ChatProgressUpdates, root: File) {
+    private fun saveToDisk(root: File) {
+        val progress = ChatProgressUpdates()
         progress.update("saveToDisk start")
+
         val base = root.toPath()
         progress.update("createDirectoriesFor")
         base.createDirectoriesFor(storage.keys)
@@ -160,11 +159,12 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         val entries = storage.entries.toList()
         progress.innerProgressStart(entries.size)
         entries.parallelStream().forEach { (relativePath, bytes) ->
+            progress.innerProgressStep()
             val out = base.resolve(relativePath)
             Files.write(out, bytes)
-            progress.innerProgressStep()
         }
-        progress.update("saveToDisk end")
+
+        progress.end("saveToDisk end")
     }
 
     private fun Path.createDirectoriesFor(relativePaths: Set<String>) = relativePaths.mapNotNull { p ->
