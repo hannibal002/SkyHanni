@@ -140,7 +140,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
     override fun dispose() = storage.clear()
 
     override suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem {
-        progress.update("transitionAfterReload")
+        progress.update("waiting on flushJob")
         runBlocking { flushJob?.join() }
         progress.update("dispose")
         dispose()
@@ -150,7 +150,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
 
     private fun saveToDisk(root: File) {
         val progress = ChatProgressUpdates()
-        progress.update("saveToDisk start")
+        progress.start("saveToDisk start")
 
         val base = root.toPath()
         progress.update("createDirectoriesFor")
