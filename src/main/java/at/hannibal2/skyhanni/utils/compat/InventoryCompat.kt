@@ -74,8 +74,6 @@ object InventoryCompat {
     fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int, mode: Int) {
         windowId ?: return
         if (slot < 0) return
-        val controller = Minecraft.getMinecraft().playerController ?: return
-        val player = Minecraft.getMinecraft().thePlayer ?: return
         val gui = Minecraft.getMinecraft().currentScreen
         //#if FORGE
         if (gui is GuiContainer) {
