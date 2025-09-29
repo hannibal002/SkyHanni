@@ -76,7 +76,7 @@ object EnoughUpdatesManager {
      * Called by the Neu Repo Manager when the NEU repo is reloaded.
      */
     suspend fun reloadItemsFromRepo(progress: ChatProgressUpdates) = loadingMutex.withLock {
-        progress.update("call reloadItemsFromRepo")
+        progress.update("reloadItemsFromRepo")
         progress.update("clearing caches and maps")
         itemStackCache.clear()
         displayNameCache.clear()
@@ -87,7 +87,7 @@ object EnoughUpdatesManager {
         val tempItemMap = TreeMap<String, JsonObject>()
         loadItemMap(progress, tempItemMap)
 
-        progress.update("call synchronized itemMap")
+        progress.update("synchronized itemMap")
         synchronized(itemMap) {
             itemMap.clear()
             itemMap.putAll(tempItemMap)
@@ -98,7 +98,7 @@ object EnoughUpdatesManager {
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
     private suspend fun loadItemMap(progress: ChatProgressUpdates, tempItemMap: TreeMap<String, JsonObject>) = coroutineScope {
-        progress.update("call loadItemMap")
+        progress.update("loadItemMap")
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
         val list = fileSystem.list("items")
         progress.innerProgressStart(list.size)

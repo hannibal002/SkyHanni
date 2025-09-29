@@ -42,7 +42,7 @@ sealed interface RepoFileSystem {
         zipFile: File,
         logger: RepoLogger,
     ): Boolean = runCatching {
-        progress.update("call loadFromZip")
+        progress.update("loadFromZip")
         ZipFile(zipFile.absolutePath).use { zip ->
             progress.update("zipFile entries collect")
             val entries = zip.entries().asSequence()
@@ -125,7 +125,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
     }.map { it.removePrefix("$path/") }
 
     override fun loadFromZip(progress: ChatProgressUpdates, zipFile: File, logger: RepoLogger): Boolean {
-        progress.update("call repo file system loadFromZip")
+        progress.update("repo file system loadFromZip")
         val success = super.loadFromZip(progress, zipFile, logger)
         if (flushJob == null) {
             progress.update("start new launchIOCoroutine task")
@@ -140,9 +140,9 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
     override fun dispose() = storage.clear()
 
     override suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem {
-        progress.update("transitionAfterReload start")
+        progress.update("transitionAfterReload")
         runBlocking { flushJob?.join() }
-        progress.update("call dispose")
+        progress.update("dispose")
         dispose()
         progress.update("transitionAfterReload end")
         return DiskRepoFileSystem(diskRoot)

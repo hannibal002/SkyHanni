@@ -244,7 +244,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     // Code taken + adapted from NotEnoughUpdates
     private fun switchToBackupRepo(progress: ChatProgressUpdates): FetchUnpackResult = runCatching {
-        progress.update("call switchToBackupRepo")
+        progress.update("switchToBackupRepo")
         if (PlatformUtils.isDevEnvironment) {
             progress.end("Can not use backup repo in dev env.")
             return@runCatching FetchUnpackResult.FAILED
@@ -264,7 +264,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 logger.throwError("Failed to find backup resource '$backupRepoResourcePath'")
             }
 
-        progress.update("call prepCleanRepoFileSystem")
+        progress.update("prepCleanRepoFileSystem")
         prepCleanRepoFileSystem(progress)
 
         Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -288,7 +288,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     open fun reportExtraStatusInfo(): Unit = Unit
 
     private suspend fun isRepeatErrorOrFixed(progress: ChatProgressUpdates): Boolean {
-        progress.update("call isRepeatErrorOrFixed")
+        progress.update("isRepeatErrorOrFixed")
         if (latestError.passedSince() < 5.minutes || !config.repoAutoUpdate) {
             progress.end("is repeat error or auto update disabled")
             return true
@@ -316,7 +316,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     suspend fun displayRepoStatus(progress: ChatProgressUpdates, joinEvent: Boolean, command: Boolean = false) {
-        progress.update("call displayRepoStatus for $commonName")
+        progress.update("displayRepoStatus for $commonName")
         if (joinEvent) return onJoinStatusError(progress)
 
         val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
@@ -335,13 +335,13 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         logger.logToChat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):", color = "§e")
         for (constant in unsuccessfulConstants) logger.logToChat("   - §7$constant", color = "§e")
 
-        progress.update("call reportExtraStatusInfo")
+        progress.update("reportExtraStatusInfo")
         reportExtraStatusInfo()
         progress.update("done with displayRepoStatus")
     }
 
     private suspend fun onJoinStatusError(progress: ChatProgressUpdates) {
-        progress.update("call onJoinStatusError")
+        progress.update("onJoinStatusError")
         if (unsuccessfulConstants.isEmpty() || isRepeatErrorOrFixed(progress)) return
         // Last sanity check, we want to make sure repo is up to date before displaying
         val text = buildList {
@@ -398,7 +398,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         forceReset: Boolean = false,
         switchToBackupOnFail: Boolean = true,
     ): FetchUnpackResult = repoMutex.withLock {
-        progress.update("call fetchAndUnpackRepo")
+        progress.update("fetchAndUnpackRepo")
         val comparison = getCommitComparison(silentError) ?: run {
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
             else FetchUnpackResult.FAILED
@@ -416,10 +416,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             } else if (forceReset) comparison.reportForceRebuild()
         }
 
-        progress.update("call prepCleanRepoFileSystem")
+        progress.update("prepCleanRepoFileSystem")
         prepCleanRepoFileSystem(progress)
 
-        progress.update("call downloadCommitZipToFile")
+        progress.update("downloadCommitZipToFile")
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
             progress.update("Failed to download the repo zip file from GitHub.")
             logger.logNonDestructiveError("Failed to download the repo zip file from GitHub.")
@@ -430,7 +430,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             }
         }
 
-        progress.update("call loadFromZip")
+        progress.update("loadFromZip")
         // Actually unpack the repo zip file into our local 'file system'
         if (!repoFileSystem.loadFromZip(progress, repoZipFile, logger)) {
             progress.update("Failed to unpack the downloaded zip file.")
@@ -458,7 +458,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     fun reloadLocalRepo(progress: ChatProgressUpdates, answerMessage: String = "$commonName repo loaded from local files successfully.") {
-        progress.update("call reloadLocalRepo")
+        progress.update("reloadLocalRepo")
         shouldManuallyReload = true
         SkyHanniMod.launchIOCoroutine("$commonName reloadLocalRepo", timeout = 2.minutes) {
             reloadRepository(progress, answerMessage)
@@ -471,15 +471,15 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     open suspend fun extraReloadCoroutineWork(progress: ChatProgressUpdates) = Unit
 
     private suspend fun reloadRepository(progress: ChatProgressUpdates, answerMessage: String = "") = repoMutex.withLock {
-        progress.update("call reloadRepository")
+        progress.update("reloadRepository")
         if (!shouldManuallyReload) return
         loadingError = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
-        progress.update("call extraReloadCoroutineWork")
+        progress.update("extraReloadCoroutineWork")
         extraReloadCoroutineWork(progress)
 
-        progress.update("call eventCtor.newInstance")
+        progress.update("eventCtor.newInstance")
         eventCtor.newInstance(this).post { error ->
             if (loadingError) return@post
             progress.update("Error while posting repo reload event: ${error.message}")
