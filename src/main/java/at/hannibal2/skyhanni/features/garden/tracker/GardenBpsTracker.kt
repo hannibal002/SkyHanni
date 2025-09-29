@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyhanniTimedTracker
+import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.seconds
@@ -34,6 +35,8 @@ object GardenBpsTracker {
         customUptimeControl = true,
         trackerConfig = { config.perTrackerConfig }
     )
+
+    class TimedData : TimedTrackerData<Data, SessionUptime.Garden>(SessionUptime.Garden::class, { Data() })
 
     class Data : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class) {
         override fun resetData() {
