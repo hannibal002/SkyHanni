@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -59,10 +60,7 @@ class DropsStatisticsConfig {
         MITHRIL_POWDER("§220k Mithril Powder"),
         GEMSTONE_POWDER("§d18k Gemstone Powder"),
         // TODO reformat this
-        PROFIT_LIST("""§b23 §9Flowering Bouquet     §6180k
-                      |§b1 §cSpace Helmet           §6400m
-                      |§b1 §9Dedication IV          §644m
-        """.trimMargin())
+        PROFIT_LIST("Dropped Item List")
         ;
 
         override fun toString() = displayName
@@ -78,18 +76,30 @@ class DropsStatisticsConfig {
     val displayNumbersFirst: Property<Boolean> = Property.of(true)
 
     @Expose
-    @ConfigOption(
-        name = "Display Icons",
-        desc = "Replace the drop names with icons.\n" +
-            "§eNote: Will not update the preview above!"
-    )
-    @ConfigEditorBoolean
-    val displayIcons: Property<Boolean> = Property.of(false)
-
-    @Expose
     @ConfigOption(name = "Only on Barn Plot", desc = "Only show the overlay while on the Barn plot.")
     @ConfigEditorBoolean
     val onlyOnBarn: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(name = "Copper In Profit Calculations", desc = "Include Copper Profit in Total Profit. Set the coins per copper below.")
+    @ConfigEditorBoolean
+    val includeCopper: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(name = "Coins Per Copper", desc = "Set the amount of coins each copper is worth.")
+    @ConfigEditorSlider(minValue = 1000f, maxValue = 10000f, minStep = 250f)
+    val coinsPerCopper: Property<Int> = Property.of(5000)
+
+    @Expose
+    @ConfigOption(name = "Bits In Profit Calculations", desc = "Include Bits Profit in Total Profit. Set the coins per bit below.")
+    @ConfigEditorBoolean
+    val includeBits: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(name = "Bits Per Copper", desc = "Set the amount of bits each copper is worth.")
+    @ConfigEditorSlider(minValue = 0f, maxValue = 2000f, minStep = 100f)
+    val coinsPerBit: Property<Int> = Property.of(1000)
+
 
     @Expose
     @ConfigOption(

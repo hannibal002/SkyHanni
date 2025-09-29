@@ -1,10 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.CropType.MELON
-import at.hannibal2.skyhanni.features.garden.CropType.MUSHROOM
-import at.hannibal2.skyhanni.features.garden.CropType.WHEAT
-import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 enum class VisitorRarity(val displayName: String) {

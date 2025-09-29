@@ -13,15 +13,15 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.addItemFromEvent
 import at.hannibal2.skyhanni.features.garden.tracker.VisitorDropTracker.drawDisplay
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorRarity
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -170,7 +169,7 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
         acceptPattern.matchMatcher(message) {
             val rarity = VisitorRarity.getByNameOrNull(group("rarity")) ?: return@matchMatcher
             lastVisitorRarity = rarity
-            modify{ it.visitorsAccepted[rarity] = (it.visitorsAccepted[rarity] ?: 0) + 1 }
+            modify { it.visitorsAccepted[rarity] = (it.visitorsAccepted[rarity] ?: 0) + 1 }
         }
     }
 
@@ -179,6 +178,11 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
         if (config.enabled.get() && event.source == ItemAddManager.Source.COMMAND) {
             event.addItemFromEvent()
         }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onWorldChange(event: WorldChangeEvent) {
+        update()
     }
 
     private fun getRarityFromVisitorName(name: String): VisitorRarity? {
@@ -234,7 +238,7 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
 
         fun getVisitorsAccepted(bucket: VisitorRarity? = selectedBucket, includeLegacy: Boolean = false): Long {
             val fromBucketData = if (bucket != null) visitorsAccepted[bucket] ?: 0L
-            else visitorsRejected.entries.sumOf { it.value }
+            else visitorsAccepted.entries.sumOf { it.value }
 
             return if (includeLegacy && bucket != null) fromBucketData + (legacyVisitorRarity[bucket] ?: 0) else fromBucketData
         }
@@ -276,7 +280,7 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
         val displayMap: MutableMap<DropsStatisticsTextEntry, Searchable> = mutableMapOf()
         val selectedBucket = bucketData.selectedBucket
         val itemList = mutableListOf<Searchable>()
-        val profit = drawItems(bucketData, { true }, itemList)
+        var profit = drawItems(bucketData, { true }, itemList)
 
         displayMap[DropsStatisticsTextEntry.TITLE] = Renderable.text("§e§lVisitor Statistics").toSearchable()
         displayMap[DropsStatisticsTextEntry.PROFIT_LIST] = Renderable.placeholder(0).toSearchable()
@@ -315,8 +319,10 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
         displayMap[DropsStatisticsTextEntry.DENIED] =
             Renderable.text(format(bucketData.getVisitorsRejected(), "Denied", "§c", "")).toSearchable()
 
+        val copperFormat = format(bucketData.getCopper(), "Copper", "§c", "")
+        val copperCoinFormat = format(bucketData.getCopper() * config.coinsPerCopper.get())
         displayMap[DropsStatisticsTextEntry.COPPER] =
-            Renderable.text(format(bucketData.getCopper(), "Copper", "§c", "")).toSearchable()
+            Renderable.text("$copperFormat ${if (config.includeCopper.get()) "§6$copperCoinFormat" else ""}").toSearchable()
 
         displayMap[DropsStatisticsTextEntry.FARMING_EXP] =
             Renderable.text(format(bucketData.getFarmingXp(), "Farming EXP", "§3", "§7")).toSearchable()
@@ -327,14 +333,23 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
         displayMap[DropsStatisticsTextEntry.COINS_SPENT] =
             Renderable.text(format(bucketData.getCoinsSpent(), "Coins Spent", "§6", "")).toSearchable()
 
+        val bitsFormat = format(bucketData.getBits(), "Bits", "§b", "§b")
+        val bitsCoinFormat = format(bucketData.getBits() * config.coinsPerBit.get())
         displayMap[DropsStatisticsTextEntry.BITS] =
-            Renderable.text(format(bucketData.getBits(), "Bits", "§b", "§b")).toSearchable()
+            Renderable.text("$bitsFormat ${if (config.includeBits.get()) "§6$bitsCoinFormat" else ""}").toSearchable()
 
         displayMap[DropsStatisticsTextEntry.MITHRIL_POWDER] =
             Renderable.text(format(bucketData.getMithrilPowder(), "Mithril Powder", "§2", "§2")).toSearchable()
 
         displayMap[DropsStatisticsTextEntry.GEMSTONE_POWDER] =
             Renderable.text(format(bucketData.getGemstonePowder(), "Gemstone Powder", "§d", "§d")).toSearchable()
+
+        profit -= bucketData.getCoinsSpent()
+
+        val coinsPerCopper = config.coinsPerCopper.get()
+        if (config.includeCopper.get()) profit += coinsPerCopper * bucketData.getCopper()
+        val coinsPerBit = config.coinsPerBit.get()
+        if (config.includeBits.get()) profit += coinsPerBit * bucketData.getCopper()
 
         return formatDisplay(displayMap, bucketData, profit)
     }
@@ -396,6 +411,23 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
     )
 
     @HandleEvent
+    fun onConfigLoad() {
+        ConditionalUtils.onToggle(
+            with(config) {
+                textFormat
+                displayNumbersFirst
+                includeBits
+                includeCopper
+                coinsPerBit
+                coinsPerCopper
+            }
+        ) {
+            update()
+        }
+    }
+
+    @Suppress("LongMethod")
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val originalPrefix = "garden.visitorDropsStatistics."
         val newPrefix = "garden.visitors.dropsStatistics."
@@ -437,7 +469,7 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
             itemData.entries.forEach { itemEntry ->
                 val internalName = itemEntry.key.internalName
                 val amount = itemEntry.value
-                bucketData.addItem(VisitorRarity.UNKNOWN, internalName, amount, false)
+                bucketData.addItem(VisitorRarity.UNKNOWN, internalName, amount, false, amount)
             }
             entry
         }
@@ -499,5 +531,31 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
             timeData.createEntry(DisplayMode.TOTAL, "total", bucketData)
             ConfigManager.gson.toJsonTree(timeData)
         }
+        // Add profit list to text entries if user had any rewards listed previously
+        event.transform(110, "garden.visitors.dropsStatistics.textFormat") { entry ->
+            val textFormat = ConfigManager.gson.fromJson<MutableList<String>>(entry)
+            val oldEnums = listOf(
+                "FLOWERING_BOUQUET",
+                "OVERGROWN_GRASS",
+                "GREEN_BANDANA",
+                "DEDICATION_IV",
+                "MUSIC_RUNE_I",
+                "SPACE_HELMET",
+                "CULTIVATING_I",
+                "REPLENISH_I",
+                "DELICATE",
+                "COPPER_DYE",
+                "JUNGLE_KEY",
+                "FRUIT_BOWL",
+                "HARVEST_HARBINGER"
+            )
+
+            val index = textFormat.indexOfFirst { it in oldEnums }
+            if (index != -1) {
+                textFormat[index] = "PROFIT_LIST"
+            }
+            ConfigManager.gson.toJsonTree(textFormat)
+        }
+        if (event.oldVersion <= 110) config.perTrackerConfig.syncSettings()
     }
 }

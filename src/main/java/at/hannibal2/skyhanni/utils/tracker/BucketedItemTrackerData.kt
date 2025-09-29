@@ -25,10 +25,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
     final override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) =
         throw UnsupportedOperationException("Use addItem(bucket, internalName, amount) instead")
 
-    fun addItem(bucket: E, internalName: NeuInternalName, stackSize: Int, command: Boolean) {
+    fun addItem(bucket: E, internalName: NeuInternalName, stackSize: Int, command: Boolean, timesAdded: Int = 1,) {
         val bucketMap = bucketedItems.getOrPut(bucket) { HashMap() }
         val item = bucketMap.getOrPut(internalName) { TrackedItem() }
-        item.processAdd(internalName, stackSize, command) {
+        item.processAdd(internalName, stackSize, command, timesAdded) {
             removeItem(bucket, internalName)
         }
     }
