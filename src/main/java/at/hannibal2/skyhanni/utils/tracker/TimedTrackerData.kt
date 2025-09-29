@@ -14,7 +14,7 @@ import java.time.LocalDate
 import java.util.EnumMap
 import kotlin.reflect.KClass
 
-class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
+open class TimedTrackerData<Data : TrackerData<T>, T : SessionUptime>(
     session: KClass<T>,
     private val createNewSession: () -> Data,
 ) : TrackerData<T>(session) {
