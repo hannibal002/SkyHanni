@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiChest
@@ -71,10 +72,13 @@ object InventoryCompat {
 
     fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int, mode: Int) {
         windowId ?: return
-        val controller = Minecraft.getMinecraft().playerController ?: return
-        val player = Minecraft.getMinecraft().thePlayer ?: return
         //#if FORGE
-        controller.windowClick(windowId, slot, mouseButton, mode, player)
+        val gui = Minecraft.getMinecraft().currentScreen
+        if (gui is GuiContainer) {
+            val accessor = gui as AccessorGuiContainer
+            val slotObj = if (slot >= 0) gui.inventorySlots.getSlot(slot) else null
+            accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, mode)
+        }
         //#else
         //$$ controller.clickSlot(windowId, slot, mouseButton, SlotActionType.entries[mode], player)
         //#endif
