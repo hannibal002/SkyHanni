@@ -220,7 +220,7 @@ object IslandGraphs {
             return
         }
 
-        // TODO custom behaviour for mineshaft, catacombs, rift?
+        // TODO custom behaviour for mineshaft or catacombs, private island, or garden
 
         if (newIsland in ignoredIslandTypes) return
 
