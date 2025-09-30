@@ -137,7 +137,9 @@ object PacketTest {
             }
         } else {
             val id = try {
-                packet.getEntityId()
+                val field = packet.javaClass.getDeclaredField("entityId")
+                field.makeAccessible()
+                field.get(packet)
             } catch (e: NoSuchFieldException) {
                 null
             } ?: return

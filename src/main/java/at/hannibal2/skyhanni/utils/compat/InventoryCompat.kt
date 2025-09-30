@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiChest
@@ -14,6 +15,7 @@ import kotlin.contracts.contract
 //#if FABRIC
 //$$ import net.minecraft.screen.slot.SlotActionType
 //$$ import at.hannibal2.skyhanni.compat.ReiCompat
+//$$ import net.minecraft.client.gui.screen.ingame.HandledScreen
 //#endif
 
 fun EntityPlayerSP.getItemOnCursor(): ItemStack? {
@@ -76,6 +78,26 @@ object InventoryCompat {
         controller.windowClick(windowId, slotId, mouseButton, mode, player)
         //#else
         //$$ controller.clickSlot(windowId, slotId, mouseButton, SlotActionType.entries[mode], player)
+        //#endif
+    }
+
+    // Not meant to be called directly, prefer `InventoryUtils.mouseClickSlot()`.
+    fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: Int) {
+        if (slot < 0) return
+        val gui = Minecraft.getMinecraft().currentScreen
+        //#if FORGE
+        if (gui is GuiContainer) {
+            val accessor = gui as AccessorGuiContainer
+            val slotObj = gui.inventorySlots.getSlot(slot)
+            accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, mode)
+        }
+        //#else
+        //$$ if (gui is HandledScreen<*>) {
+        //$$     val accessor = gui as AccessorHandledScreen
+        //$$     val slotObj = gui.screenHandler.getSlot(slot)
+        //$$     val actionType = SlotActionType.entries[mode]
+        //$$     accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, actionType)
+        //$$ }
         //#endif
     }
 

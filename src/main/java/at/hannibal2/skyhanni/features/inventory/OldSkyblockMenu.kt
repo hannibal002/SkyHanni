@@ -29,13 +29,13 @@ import kotlin.reflect.KFunction
 @SkyHanniModule
 object OldSkyblockMenu {
     private val skyblockMenu = InventoryDetector(
-        openInventory = { openInvEvent ->
+        onOpenInventory = { openInvEvent ->
             SkyBlockButton.entries.forEach {
                 val invItem = openInvEvent.inventoryItems[it.slot] ?: return@forEach
                 it.disabled = !invItem.isStainedGlassPane()
             }
         },
-        closeInventory = { _ ->
+        onCloseInventory = { _ ->
             // Reset all buttons to enabled when the menu is closed
             SkyBlockButton.entries.forEach { it.disabled = false }
         },
@@ -50,7 +50,7 @@ object OldSkyblockMenu {
         if (!isEnabled()) return
 
         val sbButton = slotMap[event.slot]?.takeIf { !it.disabled } ?: return
-        val isAlreadySbButton = event.originalItem.displayName.endsWith(sbButton.displayName)
+        val isAlreadySbButton = event.originalItem?.displayName?.endsWith(sbButton.displayName) == true
         if (isAlreadySbButton) return
 
         event.replace(sbButton.item)
@@ -181,7 +181,7 @@ object OldSkyblockMenu {
                 }
             }
             return baseItem.apply {
-                if (extraItemBuilding != null) extraItemBuilding(this)
+                extraItemBuilding?.let { it(this) }
             }
         }
     }

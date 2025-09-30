@@ -200,6 +200,18 @@ object InventoryUtils {
         )
     }
 
+    fun mouseClickSlot(
+        slotId: Int,
+        mouseButton: Int = 0,
+        mode: ClickType = ClickType.NORMAL
+    ) {
+        InventoryCompat.mouseClickInventorySlot(
+            slotId,
+            mouseButton,
+            mode.id,
+        )
+    }
+
     fun GuiContainer.slots(): List<Slot> {
         return InventoryCompat.containerSlots(this)
     }

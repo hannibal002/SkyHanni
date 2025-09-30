@@ -301,6 +301,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Tracks the amount of coins you have put towards the daily 15 billion trade limit.
     + Coins in excess of the integer limit on an individual order do not count towards the daily limit.
     + Resets at midnight UTC.
++ Added a keybind to fill your inventory with the hovered item from Sacks. - nopo (https://github.com/hannibal002/SkyHanni/pull/4697)
 
 </details>
 <details open><summary>
@@ -565,6 +566,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Sends time to kill a slayer in chat.
 + Added Slayer Time messages. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4518)
     + Sends time to complete (Spawn & Kill) a slayer quest in chat.
++ Added Title/Sound when a Slayer is cocooned. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4569)
 
 </details>
 <details open><summary>
@@ -876,6 +878,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to mute Vacuum in the Garden. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/4051)
 + Added Pest Trap tab widgets to Tab Widget Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
 + Added warnings for Pest Traps being full or out of bait. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
++ Added keybind to release all pests in a Pest Trap. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4675)
 
 </details>
 <details open><summary>
@@ -1116,6 +1119,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 </summary>
 
 + Added customizable keybinds to easily repeat and confirm fusions. - Luna (https://github.com/hannibal002/SkyHanni/pull/4440)
++ Added Prevent Huntrap Misclick. - Roboo (https://github.com/hannibal002/SkyHanni/pull/4533)
+    + Empty traps in the Hunting Toolkit are now unclickable.
++ Added Hideonleaf Finder in Galatea. - Motte + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4615)
+    + Shows a route to the nearest Hideonleaf spawn; toggle via keybind.
 
 </details>
 <details open><summary>
@@ -1325,6 +1332,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Customizable trigger permissions for party commands.
 + Added Prevent command early execution. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3377)
 + Added /shping to show your ping in chat. - nopo (https://github.com/hannibal002/SkyHanni/pull/4478)
++ Added tab complete for /call. - nopo (https://github.com/hannibal002/SkyHanni/pull/4632)
++ Added tab complete to the /show command. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4605)
++ Added /shmodlist command. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4583)
+    + Modern equivalent of NEU's /neustats modlist.
 
 </details>
 <details open><summary>
@@ -1749,6 +1760,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows which pets are cheapest to unlock the next taming level.
 + Added Frozen Treasure highlighter for the Glacial Caves. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4393)
 + Added Glowing Mushroom highlighter for the Glowing Mushroom Cave. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4392)
++ Fixed Hypixel 1.21 double-click bug when right-clicking a block with Blaze Daggers or Fishing Rods. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4466)
 
 </details>
 <details open><summary>

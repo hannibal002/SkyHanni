@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -67,7 +68,7 @@ object TunnelsMaps {
 
     private val config get() = SkyHanniMod.feature.mining.tunnelMaps
 
-    private var graph: Graph = Graph(emptyList())
+    private var graph: Graph = Graph()
     private lateinit var campfire: GraphNode
 
     private var goalReached = false
@@ -399,7 +400,7 @@ object TunnelsMaps {
         if (!isEnabled()) return
         if (checkGoalReached()) return
         val prevClosest = closestNode
-        closestNode = graph.minBy { it.position.distanceSqToPlayer() }
+        closestNode = graph.getNearestNode()
         val closest = closestNode ?: return
         val goal = goal ?: return
         if (closest == prevClosest && goal == prevGoal) return

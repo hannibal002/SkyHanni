@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -134,7 +133,7 @@ object VisitorListener {
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!VisitorApi.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return
-        InventoryUtils.clickSlot(29, mouseButton = 0, mode = ClickType.NORMAL)
+        InventoryUtils.mouseClickSlot(29)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

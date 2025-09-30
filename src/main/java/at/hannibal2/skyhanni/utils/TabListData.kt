@@ -68,7 +68,7 @@ object TabListData {
             debugCache = null
             return
         }
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("tab list toggle debug") {
             val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
             debugCache = clipboard.lines()
             ChatUtils.chat("Enabled tab list debug with your clipboard.")

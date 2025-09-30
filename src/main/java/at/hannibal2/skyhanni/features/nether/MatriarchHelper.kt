@@ -40,7 +40,7 @@ object MatriarchHelper {
     private const val EXIT_LABEL = "Heavy Pearls"
     private const val AREA_NAME = "Belly of the Beast"
 
-    private val exitNodeLazy = { IslandGraphs.currentIslandGraph?.getName(EXIT_LABEL)?.firstOrNull()?.also { exitNode == it } }
+    private val exitNodeLazy = { IslandGraphs.currentIslandGraph?.getNodesWithName(EXIT_LABEL)?.firstOrNull()?.also { exitNode == it } }
     private var exitNode: GraphNode? = null
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
