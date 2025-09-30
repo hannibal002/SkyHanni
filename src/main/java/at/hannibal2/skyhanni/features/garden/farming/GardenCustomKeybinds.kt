@@ -3,10 +3,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -19,7 +17,6 @@ import net.minecraft.client.settings.KeyBinding
 import org.lwjgl.input.Keyboard
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenCustomKeybinds {
@@ -29,8 +26,6 @@ object GardenCustomKeybinds {
 
     private var map: Map<KeyBinding, Int> = emptyMap()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
-    private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
-    private var isDuplicate = false
 
     @JvmStatic
     fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
@@ -66,17 +61,6 @@ object GardenCustomKeybinds {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-        if (!isDuplicate || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
-        ChatUtils.chatAndOpenConfig(
-            "Duplicate Custom Keybinds aren't allowed!",
-            GardenApi.config::keyBind,
-        )
-        lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
-    }
-
-    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         with(config) {
             ConditionalUtils.onToggle(attack, useItem, left, right, forward, back, jump, sneak) {
@@ -104,21 +88,13 @@ object GardenCustomKeybinds {
                 }
             }
         }
-        calculateDuplicates()
-        lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
         KeyBinding.unPressAllKeys()
-    }
-
-    private fun calculateDuplicates() {
-        isDuplicate = map.values
-            .filter { it != Keyboard.KEY_NONE }
-            .let { values -> values.size != values.toSet().size }
     }
 
     private fun isEnabled() = GardenApi.inGarden() && config.enabled && !(GardenApi.onBarnPlot && config.excludeBarn)
 
     private fun isActive(): Boolean =
-        isEnabled() && GardenApi.toolInHand != null && !isDuplicate && !hasGuiOpen() && lastWindowOpenTime.passedSince() > 300.milliseconds
+        isEnabled() && GardenApi.toolInHand != null && !hasGuiOpen() && lastWindowOpenTime.passedSince() > 300.milliseconds
 
     private fun hasGuiOpen() = Minecraft.getMinecraft().currentScreen != null
 
