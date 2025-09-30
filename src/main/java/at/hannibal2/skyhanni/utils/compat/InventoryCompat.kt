@@ -69,13 +69,13 @@ object InventoryCompat {
     }
 
     // Not meant to be called directly, prefer `InventoryUtils.clickSlot()`.
-    fun clickInventorySlot(windowId: Int, slotId: Int, button: Int, mode: Int) {
+    fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: Int) {
         val controller = Minecraft.getMinecraft().playerController ?: return
         val player = Minecraft.getMinecraft().thePlayer ?: return
         //#if FORGE
-        controller.windowClick(windowId, slotId, button, mode, player)
+        controller.windowClick(windowId, slotId, mouseButton, mode, player)
         //#else
-        //$$ controller.clickSlot(windowId, slotId, button, SlotActionType.entries[mode], player)
+        //$$ controller.clickSlot(windowId, slotId, mouseButton, SlotActionType.entries[mode], player)
         //#endif
     }
 

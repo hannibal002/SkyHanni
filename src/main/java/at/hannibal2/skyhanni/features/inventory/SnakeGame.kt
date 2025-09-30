@@ -49,7 +49,7 @@ object SnakeGame {
             if (!key.isKeyHeld()) continue
             event.cancel()
 
-            InventoryUtils.clickSlot(slot, chest.inventorySlots.windowId, button = 2, mode = ClickType.MIDDLE)
+            InventoryUtils.clickSlot(slot, chest.inventorySlots.windowId, mouseButton = 2, mode = ClickType.MIDDLE)
 
             lastClick = SimpleTimeMark.now()
             break

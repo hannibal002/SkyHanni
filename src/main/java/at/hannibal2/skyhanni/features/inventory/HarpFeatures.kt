@@ -79,7 +79,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, button = 2, mode = ClickType.MIDDLE)
+            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, mouseButton = 2, mode = ClickType.MIDDLE)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -223,7 +223,7 @@ object HarpFeatures {
         indexOfFirst.takeIf { it != -1 }?.let {
             val clickType = event.clickType ?: return
             event.cancel()
-            InventoryUtils.clickSlot(it, event.container.windowId, button = event.clickedButton, mode = clickType)
+            InventoryUtils.clickSlot(it, event.container.windowId, mouseButton = event.clickedButton, mode = clickType)
         }
     }
 

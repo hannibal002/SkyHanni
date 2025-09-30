@@ -28,12 +28,12 @@ object FusionKeybinds {
         when (InventoryUtils.openInventoryName()) {
             "Fusion Box" -> {
                 if (!config.repeatFusionKeybind.isKeyHeld() || config.confirmFusionKeybind.isKeyHeld()) return
-                InventoryUtils.clickSlot(47, button = 2, mode = ClickType.MIDDLE)
+                InventoryUtils.clickSlot(47, mouseButton = 2, mode = ClickType.MIDDLE)
             }
 
             "Confirm Fusion" -> {
                 if (!config.confirmFusionKeybind.isKeyHeld() || config.repeatFusionKeybind.isKeyHeld()) return
-                InventoryUtils.clickSlot(33, button = 2, mode = ClickType.MIDDLE)
+                InventoryUtils.clickSlot(33, mouseButton = 2, mode = ClickType.MIDDLE)
             }
         }
     }

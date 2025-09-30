@@ -105,7 +105,7 @@ object InventoryUtils {
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
-            clickSlot(slotNumber, container.windowId, button = 0, mode = ClickType.SHIFT)
+            clickSlot(slotNumber, container.windowId, mouseButton = 0, mode = ClickType.SHIFT)
             this.cancel()
         }
     }
@@ -189,13 +189,13 @@ object InventoryUtils {
     fun clickSlot(
         slotId: Int,
         windowId: Int = InventoryCompat.getWindowId(),
-        button: Int = 0,
+        mouseButton: Int = 0,
         mode: ClickType = ClickType.NORMAL
     ) {
         InventoryCompat.clickInventorySlot(
             windowId,
             slotId,
-            button,
+            mouseButton,
             mode.id,
         )
     }

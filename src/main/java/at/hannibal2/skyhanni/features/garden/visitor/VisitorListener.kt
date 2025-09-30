@@ -134,7 +134,7 @@ object VisitorListener {
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!VisitorApi.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return
-        InventoryUtils.clickSlot(29, button = 0, mode = ClickType.NORMAL)
+        InventoryUtils.clickSlot(29, mouseButton = 0, mode = ClickType.NORMAL)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
