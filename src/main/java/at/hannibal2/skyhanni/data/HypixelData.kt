@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -427,8 +428,11 @@ object HypixelData {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
                 SkyHanniMod.launchIOCoroutine("hypixel join repo update") {
-                    SkyHanniRepoManager.displayRepoStatus(true)
-                    EnoughUpdatesRepoManager.displayRepoStatus(true)
+                    val progress = ChatProgressUpdates()
+                    progress.start("hypixel join repo update check")
+                    SkyHanniRepoManager.displayRepoStatus(progress, joinEvent = true)
+                    EnoughUpdatesRepoManager.displayRepoStatus(progress, joinEvent = true)
+                    progress.end("done with checking both repos")
                 }
             }
 

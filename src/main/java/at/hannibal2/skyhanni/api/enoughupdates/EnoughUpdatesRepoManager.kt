@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.dev.NeuRepositoryConfig
 import at.hannibal2.skyhanni.data.repo.AbstractRepoManager
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -31,5 +32,5 @@ object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>(
     fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
 
     override fun reportExtraStatusInfo() = EnoughUpdatesManager.reportItemStatus()
-    override suspend fun extraReloadCoroutineWork() = EnoughUpdatesManager.reloadItemsFromRepo(progress)
+    override suspend fun extraReloadCoroutineWork(progress: ChatProgressUpdates) = EnoughUpdatesManager.reloadItemsFromRepo(progress)
 }
