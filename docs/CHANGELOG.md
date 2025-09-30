@@ -347,6 +347,8 @@
 + Fixed Open Wiki keybinds not working in Dye Compendium. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4711)
 + Fixed the /viewrecipe command failing for some items. - AfkUserMC (https://github.com/hannibal002/SkyHanni/pull/4690)
 + Fixed Total Powder/Forest Whispers resetting upon opening the SkyBlock Menu on mining/foraging islands. - Luna (https://github.com/hannibal002/SkyHanni/pull/4708)
++ Fixed guest count detection on Private Island/Garden at max guests. - Luna (https://github.com/hannibal002/SkyHanni/pull/4727)
++ Fixed incorrect text in Diana Title, Changelog Viewer, Garden Visitors, and Minister Preview. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4719)
 
 #### Chat
 
@@ -360,6 +362,7 @@
 + Fixed Slayer books showing both Hypixel and SkyHanni messages. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4521)
 + Fixed Pet Drop Rarity on messages without Magic Find or Farming Fortune. - Luna (https://github.com/hannibal002/SkyHanni/pull/4566)
 + Fixed some tab-completion features working outside SkyBlock. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4654)
++ Fixed new error chat messages messages around coroutine. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4720)
 
 #### Inventory
 
@@ -434,6 +437,7 @@
 + Fixed SkyHanni User Luck in SB Menu. - nopo (https://github.com/hannibal002/SkyHanni/pull/4672)
 + Fixed GUI Editor rendering the open inventory incorrectly on 1.21.8. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4713)
 + Fixed lag with Discord IPC. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4595)
++ Fixed Skill detection not working when Show Percentages is off in /tab. - Twarug (https://github.com/hannibal002/SkyHanni/pull/4718)
 
 #### Garden
 
@@ -441,6 +445,7 @@
     + Unlike the last fix, this time it actually works.
 + Fixed typo in Composter Overlay. - aphased (https://github.com/hannibal002/SkyHanni/pull/4677)
 + Fixed Composter Garden display items sometimes failing to load. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4707)
++ Fixed Visitors not marked as accepted when using Accept Hotkey. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4728)
 
 #### Event
 

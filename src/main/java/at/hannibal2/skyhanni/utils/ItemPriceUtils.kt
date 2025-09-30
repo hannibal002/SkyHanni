@@ -158,7 +158,7 @@ object ItemPriceUtils {
         if (lastLowestBinRefresh.passedSince() < 2.minutes) return
         lastLowestBinRefresh = SimpleTimeMark.now()
 
-        SkyHanniMod.launchIOCoroutine("neu lowest bin item price fetch") {
+        SkyHanniMod.launchIOCoroutine("neu lowest bin item price fetch", timeout = 1.minutes) {
             val (_, data) = ApiUtils.getTypedJsonResponse<JsonObject>(lbinStatic).assertSuccessWithData() ?: return@launchIOCoroutine
             lowestBins = ConfigManager.gson.fromJson<Map<NeuInternalName, Long>>(data)
         }
@@ -204,7 +204,7 @@ object ItemPriceUtils {
             description = "Test fetching Moulberry's lowest bin data."
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback {
-                SkyHanniMod.launchIOCoroutine("shfetchmoulblbins command") {
+                SkyHanniMod.launchIOCoroutine("shfetchmoulblbins command", timeout = 1.minutes) {
                     val timeNow = SimpleTimeMark.now()
                     val (_, fetchedLowestBins) = ApiUtils.getJsonResponse(lbinStatic).assertSuccessWithData()
                         ?: ErrorManager.skyHanniError("Failed to fetch Moulberry's lowest bin data!")
