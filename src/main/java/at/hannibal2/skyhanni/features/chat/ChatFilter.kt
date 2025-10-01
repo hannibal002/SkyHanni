@@ -98,7 +98,7 @@ object ChatFilter {
         "§eWelcome to §r§aHypixel SkyBlock§r§e!",
     )
 
-    // Guild EXP
+    // Guild & Event EXP
     /**
      * REGEX-TEST: §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
      * REGEX-TEST: §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
