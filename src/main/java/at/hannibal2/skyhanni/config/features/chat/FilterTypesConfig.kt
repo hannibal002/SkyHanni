@@ -64,7 +64,7 @@ class FilterTypesConfig {
     var welcome: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Guild EXP", desc = "Hide Guild EXP messages.")
+    @ConfigOption(name = "Guild/Event EXP", desc = "Hide Guild and Event EXP messages.")
     @ConfigEditorBoolean
     @FeatureToggle
     var guildExp: Boolean = false
