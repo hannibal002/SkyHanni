@@ -42,9 +42,9 @@
         ]
     },
     "depends": {
-        "fabric-api": ">=0.133.8+1.21.9",
+        "fabric-api": ">=0.133.14+1.21.9",
         "fabric-language-kotlin": ">=1.13.2+kotlin.2.1.20",
-        "minecraft": ">1.21.8"
+        "minecraft": "1.21.9"
     },
     "contact": {
         "homepage": "https://modrinth.com/mod/skyhanni",
