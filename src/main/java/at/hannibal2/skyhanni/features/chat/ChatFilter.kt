@@ -102,9 +102,10 @@ object ChatFilter {
     /**
      * REGEX-TEST: §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
      * REGEX-TEST: §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
+     * REGEX-TEST: §aYou earned §r§510 Event EXP §r§afrom playing SkyBlock!
      */
     private val guildExpPatterns = listOf(
-        "§aYou earned §r§2.* GEXP (§r§a\\+ §r§.* Event EXP )?§r§afrom playing SkyBlock!".toPattern(),
+        "§aYou earned §r§[0-9a-f]\\d+ (?:GEXP|Event EXP) (?:§r§a\\+ §r§[0-9a-f]\\d+ Event EXP )?§r§afrom playing SkyBlock!".toPattern(),
     )
 
     // Kill Combo
