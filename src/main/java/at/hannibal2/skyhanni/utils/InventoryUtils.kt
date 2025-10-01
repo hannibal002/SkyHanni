@@ -50,6 +50,15 @@ object InventoryUtils {
             .filter { it.inventory !is InventoryPlayer }
     }
 
+    fun getItemsInOpenInventory(): List<Slot> {
+        return getItemsInOpenInventoryWithNull().filter { it.stack.isNotEmpty() }
+    }
+
+    fun getItemsInOpenInventoryWithNull(): List<Slot> {
+        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return emptyList()
+        return guiInventory.slots()
+    }
+
     fun getItemIdsInOpenChest(): Set<NeuInternalName> {
         return getItemsInOpenChest().mapNotNull { it.stack?.getInternalNameOrNull() }.toSet()
     }
@@ -170,6 +179,10 @@ object InventoryUtils {
     }
 
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
+
+    fun getItemAtSlotNumber(slotNumber: Int): ItemStack? = getSlotAtNumber(slotNumber)?.stack
+
+    fun getSlotAtNumber(slotNumber: Int): Slot? = getItemsInOpenInventory().find { it.slotNumber == slotNumber }
 
     fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 
