@@ -398,6 +398,7 @@
 + Fixed hunting box value being capped at integer limit. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4645)
 + Fixed shard fusions not being tracked correctly in Attribute Shard features and Item Pickup Log. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4706)
 + Fixed some profit trackers double-counting shard gains. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4706)
++ Fixed enchanting table click prevention, wardrobe hotkeys and some other click-related features. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4730)
 
 #### Fishing
 

@@ -70,8 +70,18 @@ object InventoryCompat {
         //#endif
     }
 
-
     fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int, mode: Int) {
+        windowId ?: return
+        val controller = Minecraft.getMinecraft().playerController ?: return
+        val player = Minecraft.getMinecraft().thePlayer ?: return
+        //#if FORGE
+        controller.windowClick(windowId, slot, mouseButton, mode, player)
+        //#else
+        //$$ controller.clickSlot(windowId, slot, mouseButton, SlotActionType.entries[mode], player)
+        //#endif
+    }
+
+    fun mouseClickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int, mode: Int) {
         windowId ?: return
         if (slot < 0) return
         val gui = Minecraft.getMinecraft().currentScreen
