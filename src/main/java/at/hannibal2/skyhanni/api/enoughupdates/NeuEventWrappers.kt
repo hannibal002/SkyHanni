@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.api.enoughupdates
 
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -72,7 +73,8 @@ object NeuEventWrappers {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: RepositoryReloadEvent) {
-        EnoughUpdatesRepoManager.progress.start("listened on RepositoryReloadEvent: NEU repo")
-        EnoughUpdatesRepoManager.reloadLocalRepo()
+        val progress = ChatProgressUpdates()
+        progress.start("Reloading NEU Repo bc sh repo reloaded")
+        EnoughUpdatesRepoManager.reloadLocalRepo(progress)
     }
 }
