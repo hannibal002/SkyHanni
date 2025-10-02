@@ -39,9 +39,9 @@ object UbikReminder {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (nextRemindTime.isInPast()) return
+        if (nextRemindTime.isInFuture()) return
         if (config.ubikReminder) {
-            ChatUtils.chat("§aUbik's cube is ready in the rift!")
+            ChatUtils.chat("§aUbik's Cube is ready in the Rift!")
         }
         nextRemindTime = SimpleTimeMark.farPast()
     }
