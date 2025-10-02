@@ -112,6 +112,7 @@ abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedI
         itemRemover: (NeuInternalName, String) -> Unit,
         itemHider: (NeuInternalName, Boolean) -> Unit,
         getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String>,
+        positiveAmountsOnly: Boolean,
     ): Double = super.drawItems(
         data = data,
         filter = filter,
@@ -136,5 +137,6 @@ abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedI
             if (internalName == SKYBLOCK_COIN) data.getCoinDescription(selectedBucket, item)
             else data.getDescription(selectedBucket, item.timesGained)
         },
+        positiveAmountsOnly = positiveAmountsOnly,
     )
 }
