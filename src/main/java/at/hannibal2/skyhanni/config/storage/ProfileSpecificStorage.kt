@@ -79,6 +79,7 @@ import java.time.LocalDate
 import java.util.EnumMap
 import java.util.UUID
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 // put everything under its respective feature, the order of the features is the same as in the folder structure
 class ProfileSpecificStorage(
@@ -563,6 +564,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var composterEmptyTime: SimpleTimeMark = farPast()
+
+        @Expose
+        var composterProfitTrackerTimeLeft: Duration = 0.seconds
 
         @Expose
         var lastComposterEmptyWarningTime: SimpleTimeMark = farPast()

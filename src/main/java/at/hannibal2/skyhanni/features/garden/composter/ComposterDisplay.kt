@@ -72,6 +72,7 @@ object ComposterDisplay {
 
         if (tabListData.isNotEmpty()) {
             composterEmptyTime = ComposterApi.estimateEmptyTimeFromTab()
+            GardenApi.storage?.composterEmptyTime = composterEmptyTime?.fromNow() ?: SimpleTimeMark.farPast()
             updateDisplay()
             sendNotify()
         }
@@ -94,7 +95,6 @@ object ComposterDisplay {
 
     private fun composterEmptyTime(emptyTime: Duration?): Renderable {
         return if (emptyTime != null) {
-            GardenApi.storage?.composterEmptyTime = emptyTime.fromNow()
             val format = emptyTime.format()
             Renderable.horizontal {
                 addItemStack(bucket)

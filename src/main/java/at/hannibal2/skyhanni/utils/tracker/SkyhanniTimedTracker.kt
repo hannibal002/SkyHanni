@@ -52,7 +52,7 @@ open class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndivi
     ) + extraDisplayModes
     private val config: TrackerGenericConfig
         get() = if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
-    private val activeStopwatches = mutableSetOf<Data>()
+    val activeStopwatches = mutableSetOf<Data>()
 
     @SkyHanniModule
     companion object {

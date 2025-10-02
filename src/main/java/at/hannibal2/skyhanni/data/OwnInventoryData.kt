@@ -90,7 +90,7 @@ object OwnInventoryData {
         itemAmounts = map
     }
 
-    private fun getCurrentItems(): MutableMap<NeuInternalName, Int> {
+    fun getCurrentItems(): MutableMap<NeuInternalName, Int> {
         val map = mutableMapOf<NeuInternalName, Int>()
         for (itemStack in InventoryUtils.getItemsInOwnInventory()) {
             val internalName = itemStack.getInternalNameOrNull() ?: continue
@@ -208,8 +208,6 @@ object OwnInventoryData {
         ItemAddInInventoryEvent(internalName, add).post()
     }
 
-    // This will post for moving around inventory items
-    // and should only be used in cases where clicking on an item removes it, like composter
     private fun removeItem(internalName: NeuInternalName, remove: Int) {
         if (SkyBlockUtils.lastWorldSwitch.passedSince() < 3.seconds) return
 

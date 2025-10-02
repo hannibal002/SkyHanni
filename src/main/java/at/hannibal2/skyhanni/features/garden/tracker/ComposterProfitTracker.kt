@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.garden.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
-import at.hannibal2.skyhanni.events.entity.ItemRemoveInInventoryEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay.composterInventory
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay.fuelFactors
@@ -20,16 +21,14 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.primitives.empty
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
@@ -37,6 +36,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTimedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
+import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -62,87 +62,147 @@ object ComposterProfitTracker {
     )
 
     /**
-     * REGEX-TEST: §aInserted §r§2190,000 Fuel §r§afrom your sacks!
+     * REGEX-TEST: §aInserted §r§2256 §r§aOrganic Matter from your sacks!
      */
     private val organicSackInsertPattern by patternGroup.pattern(
         "organicsackinsert",
-        "&aInserted &2(?<amount>[\\d,]+) &aOrganic Matter from your sacks!"
+        "§aInserted §r§2(?<amount>[\\d,]+) §r§aOrganic Matter from your sacks!"
     )
 
-    private val COMPOST = "Compost".toInternalName()
+    /**
+     * REGEX-TEST: §aPicked up 64 Compost!
+     */
+    private val compostPickUpPattern by patternGroup.pattern(
+        "compostpickup",
+        "§aPicked up (?<amount>\\d+) Compost!"
+    )
+
+    val storage get() = GardenApi.storage
+
     private var lastFuelSackInsert: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastOrganicSackInsert: SimpleTimeMark = SimpleTimeMark.farPast()
     private var fuelAmount: Int? = null
     private var organicAmount: Int? = null
+    private var inventorySnapshot: Map<NeuInternalName, Int>? = null
+    private var paused = false
 
     // Check for inserts from sack
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
         organicSackInsertPattern.matchMatcher(event.message) {
-            organicAmount = group("amount").replace(",", "").toIntOrNull() ?: return
+            organicAmount = group("amount").formatInt()
             lastOrganicSackInsert = SimpleTimeMark.now()
         }
         fuelSackInsertPattern.matchMatcher(event.message) {
-            fuelAmount = group("amount").replace(",", "").toIntOrNull() ?: return
+            fuelAmount = group("amount").formatInt()
             lastFuelSackInsert = SimpleTimeMark.now()
         }
-    }
-
-    // Check for compost gained - compost can only be added to inventory from composter menu
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onItemAdd(event: ItemAddInInventoryEvent) {
-        if (!composterInventory.isInside() || event.internalName != COMPOST) return
-        tracker.modify { it.compostGained += event.amount }
+        // check for compost pickup
+        compostPickUpPattern.matchMatcher(event.message) {
+            val amount = group("amount").formatInt()
+            tracker.modify { it.compostGained += amount }
+        }
     }
 
     // check for items inserted into composter using the "insert from inventory" button
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onItemRemoved(event: ItemRemoveInInventoryEvent) {
-        if (!(composterInventory.isInside() || InventoryUtils.openInventoryName().startsWith("Insert Crops"))) return
-        if (event.internalName !in organicMatter.keys + fuelFactors.keys) return
-        tracker.addItem(event.internalName, -event.amount, false)
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (event.inventoryName.startsWith("Insert Crops") || event.inventoryName.startsWith("Insert Fuel")) {
+            inventorySnapshot = OwnInventoryData.getCurrentItems()
+        }
     }
 
     // check for items inserted by clicking on them
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!composterInventory.isInside()) return
-        // only detect clicks in player inventory
-        if (event.slotId > 35 || event.slotId < 0) return
-        val item = event.item?.getInternalNameOrNull() ?: return
-        if (item !in organicMatter.keys + fuelFactors.keys) return
-        // composter will refuse items if full with no warning message
-        validateSlotClick(event.item, event.slotId)
+        // player inventory slots
+        if (event.slotId >= 54 && composterInventory.isInside()) {
+            val item = event.item?.getInternalNameOrNull() ?: return
+            val primitiveItem = NeuItems.getPrimitiveMultiplier(item).internalName
+            if (primitiveItem !in organicMatter.keys + fuelFactors.keys) return
+            // composter will refuse items if full with no warning message
+            validateSlotClick(event.item, event.slotId)
+            return
+        }
+        if (event.slotId == 11 && InventoryUtils.openInventoryName().startsWith("Insert ")) {
+            compareInventory()
+        }
     }
 
+    // check for items inserted via sacks
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSackChange(event: SackChangeEvent) {
         if (lastFuelSackInsert.passedSince() > 30.seconds && lastOrganicSackInsert.passedSince() > 30.seconds) return
         for (item in event.sackChanges) {
             if (item.internalName in organicMatter.keys + fuelFactors.keys) {
                 if (item.delta > 0) continue
-                tracker.addItem(item.internalName, item.delta, false)
+                addItem(item.internalName, item.delta)
             }
         }
         lastFuelSackInsert = SimpleTimeMark.farPast()
         lastOrganicSackInsert = SimpleTimeMark.farPast()
     }
 
+    // handle uptime, uptime should only run when composter is active
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (storage?.composterEmptyTime?.isInPast() == true && !paused) {
+            paused = true
+            tracker.pauseSessionUptime()
+            tracker.activeStopwatches.forEach { it.getActiveStopwatch()?.add(storage?.composterProfitTrackerTimeLeft ?: 0.seconds) }
+            storage?.composterProfitTrackerTimeLeft = 0.seconds
+        } else if (storage?.composterEmptyTime?.isInFuture() == true) {
+            paused = false
+            tracker.startSessionUptime()
+            // add extra time if offline
+            val emptyTime = storage?.composterEmptyTime?.timeUntil()
+            val timeLeft = storage?.composterProfitTrackerTimeLeft
+            if (emptyTime != null && timeLeft != null) {
+                val diff = (timeLeft - emptyTime).inWholeSeconds
+                if (diff > 10) {
+                    tracker.activeStopwatches.forEach { it.getActiveStopwatch()?.add(diff.seconds) }
+                }
+            }
+            storage?.composterEmptyTime?.timeUntil()?.let { storage?.composterProfitTrackerTimeLeft = it }
+        }
+    }
+
+    // check inventory diff after clicking "insert from inventory" button
+    private fun compareInventory() {
+        val oldInventory = inventorySnapshot ?: return
+        DelayedRun.runDelayed(.5.seconds) {
+            val newInventory = OwnInventoryData.getCurrentItems()
+            for (item in oldInventory.keys) {
+                val primitiveItem = NeuItems.getPrimitiveMultiplier(item).internalName
+                if (primitiveItem !in organicMatter.keys + fuelFactors.keys) continue
+                val diff = oldInventory[item]?.minus((newInventory[item] ?: 0)) ?: continue
+                if (diff > 0) addItem(item, -diff)
+            }
+            inventorySnapshot = null
+        }
+    }
+
+    // make sure items clicked on were actually added
     private fun validateSlotClick(item: ItemStack, slotId: Int) {
         DelayedRun.runDelayed(.5.seconds) {
             val itemName = item.getInternalNameOrNull() ?: return@runDelayed
             val amount = item.stackSize
-            val newItem = InventoryUtils.getSlotAtIndex(slotId)?.stack
+            val newItem = InventoryUtils.getItemAtSlotNumber(slotId)
             if (newItem == item) return@runDelayed
             if (newItem?.getInternalNameOrNull() != itemName) {
-                tracker.addItem(itemName, amount, false)
+                addItem(itemName, amount)
             } else {
                 val diff = amount - newItem.stackSize
-                if (diff > 0) return@runDelayed
-                tracker.addItem(itemName, diff, false)
+                if (diff <= 0) return@runDelayed
+                addItem(itemName, -diff)
             }
 
         }
+    }
+
+    private fun addItem(item: NeuInternalName, amount: Int) {
+        tracker.addItem(item, abs(amount), false)
+
     }
 
     class TimeData : TimedTrackerData<Data>({ Data() })
@@ -171,18 +231,13 @@ object ComposterProfitTracker {
         addSearchString("§e§lComposter Profit Tracker")
         val compostAmount = data.compostGained
         val compostProfit = compostAmount * "COMPOST".toInternalName().getPrice()
-        addSearchString("§eCompost Earned: ${compostAmount.addSeparators()} ${compostProfit.formatCoin()}")
+        addSearchString("§eCompost Collected: §7${compostAmount.addSeparators()} ${compostProfit.formatCoin()}")
         addSearchString("§eItems Spent:")
-        var profit = tracker.drawItems(data, { true }, this)
-        profit += compostProfit
-
-        addSearchString("Total Profit: ${profit.formatCoin()}")
+        val itemCost = tracker.drawItems(data, { true }, this)
+        val profit = compostProfit - itemCost
 
         val duration = data.getTotalUptime()
-        val profitPerHourRenderable =
-            if (tracker.shouldShowProfitPerHour()) tracker.profitPerHourRenderable(profit, duration) else Renderable.empty()
-
-        add(profitPerHourRenderable.toSearchable())
+        addAll(tracker.addTotalProfit(profit, itemCost.toLong(), "coin spent", duration, "Coins spent"))
 
         addPriceFromButton(this)
     }
