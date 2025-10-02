@@ -142,26 +142,19 @@ object InquisitorWaypointShare {
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
     fun onChat(event: SkyHanniChatEvent) {
-        ChatUtils.debug("InquisitorWaypointShare: onChat")
-        if (!isEnabled()) {
-            ChatUtils.debug("InquisitorWaypointShare: not enabled")
-            return
-        }
+        if (!isEnabled()) return
         val message = event.message
 
         if (inquisitorFoundChatPattern.matches(message)) {
-            ChatUtils.debug("InquisitorWaypointShare: inquis found")
             checkInquisFound()
         }
 
         inquisitorCoordsPattern.matchMatchers(message) {
-            ChatUtils.debug("InquisitorWaypointShare: inquis from chat")
             if (!detectFromChat()) return@matchMatchers
             event.blockedReason = "inquisitor_waypoint"
         }
 
         diedPattern.matchMatcher(message) {
-            ChatUtils.debug("InquisitorWaypointShare: inquis died")
             if (block()) return
             val rawName = group("playerName")
             val name = rawName.cleanPlayerName()
@@ -173,8 +166,6 @@ object InquisitorWaypointShare {
     }
 
     private fun foundInquisitor(inquisId: Int) {
-        ChatUtils.debug("InquisitorWaypointShare: foundInquisitor")
-
         lastShareTime = SimpleTimeMark.farPast()
         inquisitor = inquisId
 
