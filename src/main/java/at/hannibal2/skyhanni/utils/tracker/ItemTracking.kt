@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.Companion.universalTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
+import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.time.Duration
@@ -124,6 +125,7 @@ interface ItemTracking<Data : ItemTrackerData<*>, ConfigType : GenericIndividual
             if (internalName == SKYBLOCK_COIN) data.getCoinDescription(item)
             else data.getDescription(item.timesGained)
         },
+        positiveAmountsOnly: Boolean = false
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<NeuInternalName, Long>()
@@ -150,7 +152,8 @@ interface ItemTracking<Data : ItemTrackerData<*>, ConfigType : GenericIndividual
             val itemProfit = dataItems[internalName] ?: error("Item not found for $internalName")
 
             val amount = itemProfit.totalAmount
-            val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
+            var displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
+            if (positiveAmountsOnly) displayAmount = abs(displayAmount)
 
             val cleanName = internalName.getCleanName(dataItems, getCoinName)
 

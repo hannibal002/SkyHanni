@@ -177,7 +177,7 @@ object ComposterProfitTracker {
                 val primitiveItem = NeuItems.getPrimitiveMultiplier(item).internalName
                 if (primitiveItem !in organicMatter.keys + fuelFactors.keys) continue
                 val diff = oldInventory[item]?.minus((newInventory[item] ?: 0)) ?: continue
-                if (diff > 0) addItem(item, -diff)
+                if (diff > 0) addItem(item, diff)
             }
             inventorySnapshot = null
         }
@@ -195,14 +195,15 @@ object ComposterProfitTracker {
             } else {
                 val diff = amount - newItem.stackSize
                 if (diff <= 0) return@runDelayed
-                addItem(itemName, -diff)
+                addItem(itemName, diff)
             }
 
         }
     }
 
     private fun addItem(item: NeuInternalName, amount: Int) {
-        tracker.addItem(item, abs(amount), false)
+        // make sure amount added is negative
+        tracker.addItem(item, -abs(amount), false)
         val price = item.getPrice() * abs(amount)
         GardenProfitTracker.tracker.modify { it.composterCoinsSpent += price.toLong() }
     }
@@ -235,8 +236,8 @@ object ComposterProfitTracker {
         val compostProfit = compostAmount * "COMPOST".toInternalName().getPrice()
         addSearchString("§eCompost Collected: §7${compostAmount.addSeparators()} ${compostProfit.formatCoin()}")
         addSearchString("§eItems Spent:")
-        val itemCost = tracker.drawItems(data, { true }, this)
-        val profit = compostProfit - itemCost
+        val itemCost = tracker.drawItems(data, { true }, this, positiveAmountsOnly = true)
+        val profit = compostProfit + itemCost
 
         val duration = data.getTotalUptime()
         addAll(tracker.addTotalProfit(profit, itemCost.toLong(), "coin spent", duration, "Coins spent"))
