@@ -3,20 +3,21 @@ package at.hannibal2.skyhanni.features.garden.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.GardenProfitTrackerConfig.GardenProfitTextEntry
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.tracker.GardenProfitTracker.config
 import at.hannibal2.skyhanni.features.garden.tracker.GardenProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTimedBucketedItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import com.google.gson.annotations.Expose
 
@@ -38,6 +40,8 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
     customUptimeControl = true
 ) {
     val config get() = GardenApi.config.profitTracker
+    val BITS = "bit".toInternalName()
+    val COPPER = "copper".toInternalName()
 
     @HandleEvent
     fun onCropGain(event: CropCollectionAddEvent) {
@@ -51,9 +55,10 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
     data class BucketData(
         // these only apply to one bucket so no need to make them bucketed
         @Expose var visitorCoinsSpent: Long = 0L,
-        @Expose var visitorCopper: Long = 0L,
-        @Expose var visitorBits: Long = 0L,
         @Expose var composterCoinsSpent: Long = 0L,
+        @Expose var sprayCoinsSpent: Long = 0L,
+        @Expose var cropCoins: MutableMap<CropType, Long> = mutableMapOf(),
+        @Expose var blocksBroken: Long = 0L
     ) : BucketedItemTrackerData<GardenTrackerTypes, SessionUptime.Garden>(GardenTrackerTypes::class, SessionUptime.Garden::class) {
         override fun getDescription(bucket: GardenTrackerTypes?, timesGained: Long): List<String> {
             return listOf(
@@ -79,7 +84,10 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
                 if (bucket in config.profitTypes.get()) {
                     bucket.items.entries.distinctBy { it.key }
                         .forEach { (key, value) ->
-                            acc.merge(key, value, ::mergeBuckets)
+                            // we'll add bountiful coins to the crop coins amount
+                            if (key != SKYBLOCK_COIN || bucket != GardenTrackerTypes.BREAKING_CROPS) {
+                                acc.merge(key, value, ::mergeBuckets)
+                            }
                         }
                 }
                 acc
@@ -88,6 +96,12 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
         override fun GardenTrackerTypes.isBucketSelectable(): Boolean = this in GardenTrackerTypes.entries
 
         override fun bucketName(): String = "Type"
+
+        override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>): Double = when(internalName) {
+            BITS -> config.coinsPerBit.get().toDouble()
+            COPPER -> config.coinsPerCopper.get().toDouble()
+            else -> super.getCustomPricePer(internalName, tracker)
+        }
     }
 
     private fun drawDisplay(bucketData: BucketData): List<Searchable> {
@@ -97,34 +111,33 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
         var profit = drawItems(bucketData, { true }, itemList)
 
         displayMap[GardenProfitTextEntry.TITLE] = Renderable.text("§e§lGarden Profit Tracker").toSearchable()
+        var cropProfit = bucketData.cropCoins.sumAllValues().toLong()
+        if (bucketData.selectedBucket == null) {
+            cropProfit += (bucketData.getBucketedItems(GardenTrackerTypes.BREAKING_CROPS)[SKYBLOCK_COIN]?.totalAmount ?: 0L)
+        }
+        displayMap[GardenProfitTextEntry.CROP_DROPS] = Renderable.text("§7Crop Profit: ${cropProfit.formatCoin()}").toSearchable()
+
         displayMap[GardenProfitTextEntry.PROFIT_LIST] = Renderable.empty().toSearchable()
 
-        val copper = bucketData.visitorCopper
-        val copperCoins = GardenApi.config.visitors.dropsStatistics.coinsPerCopper.get() * copper
-
-        displayMap[GardenProfitTextEntry.COPPER] =
-            Renderable.text("§cCopper: ${copper.addSeparators()} ${copperCoins.formatCoin()}").toSearchable()
-
-        val bits = bucketData.visitorBits
-        val bitsCoins = GardenApi.config.visitors.dropsStatistics.coinsPerBit.get() * bits
-
-        displayMap[GardenProfitTextEntry.BITS] =
-            Renderable.text("§bBits: ${bits.addSeparators()} ${bitsCoins.formatCoin()}").toSearchable()
-
-        displayMap[GardenProfitTextEntry.VISITOR_SPENT] =
-            Renderable.text("§7Visitor Coins Spent: §6${bucketData.visitorCoinsSpent}").toSearchable()
-
-        displayMap[GardenProfitTextEntry.COMPOSTER_SPENT] =
-            Renderable.text("§7Composter Coins Spent: §6${bucketData.composterCoinsSpent}").toSearchable()
-
+        var cropsSpent = 0L
         if (selectedBucket in setOf(null, GardenTrackerTypes.VISITORS)) {
-            profit += bitsCoins + copperCoins - bucketData.visitorCoinsSpent
+            cropsSpent += bucketData.visitorCoinsSpent
         }
-
         if (selectedBucket in setOf(null, GardenTrackerTypes.COMPOSTER)) {
-            profit -= bucketData.composterCoinsSpent
+            cropsSpent += bucketData.composterCoinsSpent
         }
 
+        if (selectedBucket in setOf(null, GardenTrackerTypes.VISITORS, GardenTrackerTypes.COMPOSTER)) {
+            displayMap[GardenProfitTextEntry.CROPS_SPENT] = Renderable.text("§7Crops Spent: ${cropsSpent.formatCoin()}").toSearchable()
+        }
+
+        val uptime = bucketData.getTotalUptime().inWholeSeconds
+        if (uptime != 0L) {
+            val bps = bucketData.blocksBroken.toDouble() / uptime
+            displayMap[GardenProfitTextEntry.BPS] = Renderable.text("§7Blocks/Second: §e${bps.roundTo(2)}").toSearchable()
+        }
+
+        profit += cropsSpent
         return formatDisplay(displayMap, bucketData, profit)
     }
 
@@ -135,14 +148,6 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
     ): List<Searchable> {
         val newList = mutableListOf<Searchable>()
         val filteredMap: MutableMap<GardenProfitTextEntry, Searchable> = displayMap.toMutableMap()
-        val visitorDisplaySet = setOf(GardenProfitTextEntry.COPPER, GardenProfitTextEntry.BITS, GardenProfitTextEntry.VISITOR_SPENT)
-        val composterDisplaySet = setOf(GardenProfitTextEntry.COMPOSTER_SPENT)
-        when (data.selectedBucket) {
-            null -> {}
-            GardenTrackerTypes.COMPOSTER -> visitorDisplaySet.forEach { filteredMap.remove(it) }
-            GardenTrackerTypes.VISITORS -> composterDisplaySet.forEach { filteredMap.remove(it) }
-            else -> (visitorDisplaySet + composterDisplaySet).forEach { filteredMap.remove(it) }
-        }
         addBucketSelector(newList, data, "Profit Type")
 
         val sortedList = config.textFormat.get().mapNotNull { key -> filteredMap[key]?.let { key to it } }
@@ -172,11 +177,22 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
 
     fun importData() {
         val profileStorage = ProfileStorageData.profileSpecific?.garden
+        val profitTracker = profileStorage?.gardenProfitTracker
         val pestStorage = profileStorage?.pestProfitTracker
         for (displayMode in DisplayMode.entries) {
             val entries = pestStorage?.getEntries(displayMode) ?: continue
-            for (entry in entries) {
-                entry
+            for ((string, data) in entries) {
+                val items = data.flattenBucketsItems()
+                for (item in items) {
+                    val profitEntry = profitTracker?.getOrPutEntry(displayMode, string)
+                    profitEntry?.value?.addItem(
+                        GardenTrackerTypes.PESTS,
+                        item.key,
+                        item.value.totalAmount,
+                        false,
+                        item.value.timesGained
+                    )
+                }
             }
         }
 

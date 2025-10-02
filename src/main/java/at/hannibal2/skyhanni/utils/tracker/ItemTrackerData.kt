@@ -21,7 +21,7 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
         items.clear()
     }
 
-    open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
+    open fun addItem(internalName: NeuInternalName, amount: Long, command: Boolean) {
         val item = items.getOrPut(internalName) { TrackedItem() }
         item.processAdd(internalName, amount, command)
     }
@@ -37,9 +37,9 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
 
     fun TrackedItem.processAdd(
         internalName: NeuInternalName,
-        amount: Int,
+        amount: Long,
         command: Boolean,
-        timesAdded: Int = 1,
+        timesAdded: Long = 1,
         removalRunner: (NeuInternalName) -> Unit? = { removeItem(internalName) },
     ) = apply {
         if (!command) { timesGained += timesAdded }

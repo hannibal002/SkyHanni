@@ -22,10 +22,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
 
     abstract fun getCoinDescription(bucket: E?, item: TrackedItem): List<String>
 
-    final override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) =
+    final override fun addItem(internalName: NeuInternalName, amount: Long, command: Boolean) =
         throw UnsupportedOperationException("Use addItem(bucket, internalName, amount) instead")
 
-    fun addItem(bucket: E, internalName: NeuInternalName, stackSize: Int, command: Boolean, timesAdded: Int = 1,) {
+    fun addItem(bucket: E, internalName: NeuInternalName, stackSize: Long, command: Boolean, timesAdded: Long = 1,) {
         val bucketMap = bucketedItems.getOrPut(bucket) { HashMap() }
         val item = bucketMap.getOrPut(internalName) { TrackedItem() }
         item.processAdd(internalName, stackSize, command, timesAdded) {
@@ -83,7 +83,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
     protected val E.items get() = bucketedItems[this] ?: mutableMapOf()
     val selectedBucketItems get() = selectedBucket?.items ?: flattenBucketsItems()
 
-    protected open fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> =
+    open fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> =
         buckets.distinct().fold(mutableMapOf()) { acc, bucket ->
             bucket.items.entries.distinctBy { it.key }
                 .forEach { (key, value) ->

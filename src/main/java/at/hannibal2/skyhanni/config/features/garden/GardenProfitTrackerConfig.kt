@@ -13,6 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -53,17 +54,32 @@ class GardenProfitTrackerConfig {
     )
 
     enum class GardenProfitTextEntry(private val displayName: String) {
-        TITLE("§e§lGarden Profit Tracker"),
-        PROFIT_LIST("Item List"),
-        COPPER("§cCopper: 62,072 §6298.8m"),
-        BITS("§bBits: 4.2k §642m"),
-        VISITOR_SPENT("§7Visitor Coins Spent: §c-782k"),
-        COMPOSTER_SPENT("§7Composter Coins Spent: §c-782k")
+        TITLE("§6§lGarden Profit Tracker"),
+        CROP_DROPS("§7Crop Drops: §650.2m"),
+        PROFIT_LIST("§eItem Drops:\n[Item List]"),
+        CROPS_SPENT("§7Crops Spent: §c-20.2m"),
+        BPS("§7Blocks Per Second: §")
     }
 
-    @ConfigOption(name = "Visitor Price Options", desc = "Set coins per copper and bit in Visitor Profit Tracker Settings")
-    @ConfigEditorButton(buttonText = "OPEN")
-    val visitorButton: Runnable = Runnable { SkyHanniMod.feature.garden.visitors.dropsStatistics::coinsPerCopper }
+    @Expose
+    @ConfigOption(name = "Copper In Profit Calculations", desc = "Include Copper Profit in Total Profit. Set the coins per copper below.")
+    @ConfigEditorBoolean
+    val includeCopper: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(name = "Coins Per Copper", desc = "Set the amount of coins each copper is worth.")
+    @ConfigEditorSlider(minValue = 1000f, maxValue = 10000f, minStep = 250f)
+    val coinsPerCopper: Property<Int> = Property.of(5000)
+
+    @Expose
+    @ConfigOption(name = "Bits In Profit Calculations", desc = "Include Bits Profit in Total Profit. Set the coins per bit below.")
+    @ConfigEditorBoolean
+    val includeBits: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(name = "Bits Per Copper", desc = "Set the amount of bits each copper is worth.")
+    @ConfigEditorSlider(minValue = 0f, maxValue = 2000f, minStep = 100f)
+    val coinsPerBit: Property<Int> = Property.of(1000)
 
     @Expose
     @ConfigOption(
