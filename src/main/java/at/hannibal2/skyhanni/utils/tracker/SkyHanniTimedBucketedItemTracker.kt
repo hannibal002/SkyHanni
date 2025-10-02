@@ -64,7 +64,7 @@ abstract class SkyHanniTimedBucketedItemTracker<E : Enum<E>, Data : BucketedItem
     final override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean) =
         throw UnsupportedOperationException("Use addItem(bucket, internalName, amount, command, message) instead")
 
-    fun addItem(bucket: E, internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {
+    open fun addItem(bucket: E, internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {
         modify {
             it.addItem(bucket, internalName, amount, command)
         }

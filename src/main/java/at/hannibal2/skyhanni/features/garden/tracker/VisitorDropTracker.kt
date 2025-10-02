@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -118,10 +119,16 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
     )
 
     private val patternStorageAccessorMap: Map<Pattern, (Int, VisitorRarity) -> Unit> = mapOf(
-        copperPattern to { amount, rarity -> modify { it.copper[rarity] = (it.copper[rarity] ?: 0) + amount } },
+        copperPattern to { amount, rarity ->
+            modify { it.copper[rarity] = (it.copper[rarity] ?: 0) + amount }
+            GardenProfitTracker.modify { it.visitorCopper += amount }
+        },
         farmingExpPattern to { amount, rarity -> modify { it.farmingXp[rarity] = (it.farmingXp[rarity] ?: 0) + amount } },
         gardenExpPattern to { amount, rarity -> modify { it.gardenXp[rarity] = (it.gardenXp[rarity] ?: 0) + amount } },
-        bitsPattern to { amount, rarity -> modify { it.bits[rarity] = (it.bits[rarity] ?: 0) + amount } },
+        bitsPattern to { amount, rarity ->
+            modify { it.bits[rarity] = (it.bits[rarity] ?: 0) + amount }
+            GardenProfitTracker.modify { it.visitorBits += amount }
+        },
         mithrilPowderPattern to { amount, rarity -> modify { it.mithrilPowder[rarity] = (it.mithrilPowder[rarity] ?: 0) + amount } },
         gemstonePowderPattern to { amount, rarity -> modify { it.gemstonePowder[rarity] = (it.gemstonePowder[rarity] ?: 0) + amount } },
     )
@@ -141,7 +148,9 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
         for (internalName in event.visitor.allRewards) {
             addItem(rarity, internalName, 1, false)
         }
-        modify { it.coinsSpent[rarity] = (it.coinsSpent[rarity] ?: 0) + round(event.price).toLong() }
+        val price = round(event.price).toLong()
+        modify { it.coinsSpent[rarity] = (it.coinsSpent[rarity] ?: 0) + price }
+        GardenProfitTracker.modify { it.visitorCoinsSpent += price }
     }
 
     @HandleEvent
@@ -183,6 +192,11 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWorldChange(event: WorldChangeEvent) {
         update()
+    }
+
+    override fun addItem(bucket: VisitorRarity, internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean) {
+        super.addItem(bucket, internalName, amount, command, message)
+        GardenProfitTracker.addItem(GardenTrackerTypes.VISITORS, internalName, amount, command)
     }
 
     private fun getRarityFromVisitorName(name: String): VisitorRarity? {
@@ -374,7 +388,7 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
         val duration = data.getTotalUptime()
         newList.addAll(addTotalProfit(profit, data.getTotalVisitorCount(), "visitor", duration, "Visitors"))
 
-        PestProfitTracker.addPriceFromButton(newList)
+        addPriceFromButton(newList)
 
         return newList
     }

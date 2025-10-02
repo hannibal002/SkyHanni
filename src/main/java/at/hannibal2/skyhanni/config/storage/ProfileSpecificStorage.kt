@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.features.garden.tracker.ComposterProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.CropCollectionTracker
 import at.hannibal2.skyhanni.features.garden.tracker.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
+import at.hannibal2.skyhanni.features.garden.tracker.GardenProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.VisitorDropTracker
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
@@ -449,6 +450,10 @@ class ProfileSpecificStorage(
         @Expose
         var toolCounterData: MutableMap<String, Long> = HashMap()
 
+        // have to store both counters for wheat tools to calculate seed drops
+        @Expose
+        var wheatCultivatingCounterData: MutableMap<String, Long> = HashMap()
+
         @Expose
         var cropUpgrades: MutableMap<CropType, Int> = enumMapOf()
 
@@ -614,6 +619,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var cropCollectionTracker: CropCollectionTracker.TimedData = CropCollectionTracker.TimedData()
+
+        @Expose
+        var gardenProfitTracker: GardenProfitTracker.TimeData = GardenProfitTracker.TimeData()
     }
 
     // - gui

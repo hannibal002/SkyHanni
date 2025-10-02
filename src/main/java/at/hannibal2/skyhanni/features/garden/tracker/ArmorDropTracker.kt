@@ -16,8 +16,10 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -94,6 +96,8 @@ object ArmorDropTracker {
         tracker.modify {
             it.drops.addOrPut(drop, 1)
         }
+        val internalName = drop.name.removeColor().toInternalName()
+        GardenProfitTracker.addItem(GardenTrackerTypes.BREAKING_CROPS, internalName, 1, false)
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {

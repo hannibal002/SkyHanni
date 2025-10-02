@@ -96,6 +96,7 @@ object DicerRngDropTracker {
             val drop = group("drop")
 
             val internalName = NeuInternalName.fromItemNameOrNull(itemType) ?: return@matchMatcher
+            GardenProfitTracker.addItem(GardenTrackerTypes.BREAKING_CROPS, internalName, amount.toInt(), false)
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return@matchMatcher

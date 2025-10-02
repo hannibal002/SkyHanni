@@ -66,7 +66,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
 
     abstract fun bucketName(): String
 
-    private val buckets: Array<E> = clazz.java.enumConstants
+    protected val buckets: Array<E> = clazz.java.enumConstants
     val selectableBuckets: List<E> = buckets.filter { it.isBucketSelectable() }
 
     private val scrollValues: Map<E?, ScrollValue> = buckets.associateWith { ScrollValue() } + (null to ScrollValue())
@@ -80,10 +80,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
 
     fun getBucketedItems(bucket: E) = bucketedItems[bucket] ?: flattenBucketsItems()
 
-    private val E.items get() = bucketedItems[this] ?: mutableMapOf()
+    protected val E.items get() = bucketedItems[this] ?: mutableMapOf()
     val selectedBucketItems get() = selectedBucket?.items ?: flattenBucketsItems()
 
-    private fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> =
+    protected open fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> =
         buckets.distinct().fold(mutableMapOf()) { acc, bucket ->
             bucket.items.entries.distinctBy { it.key }
                 .forEach { (key, value) ->
@@ -92,7 +92,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
             acc
         }
 
-    private fun mergeBuckets(existing: TrackedItem, new: TrackedItem): TrackedItem = existing.copy(
+    protected fun mergeBuckets(existing: TrackedItem, new: TrackedItem): TrackedItem = existing.copy(
         hidden = false,
         totalAmount = existing.totalAmount + new.totalAmount,
         timesGained = existing.timesGained + new.timesGained,

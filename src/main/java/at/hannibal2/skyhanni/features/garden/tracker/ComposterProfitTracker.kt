@@ -101,6 +101,7 @@ object ComposterProfitTracker {
         compostPickUpPattern.matchMatcher(event.message) {
             val amount = group("amount").formatInt()
             tracker.modify { it.compostGained += amount }
+            GardenProfitTracker.addItem(GardenTrackerTypes.COMPOSTER, "COMPOST".toInternalName(), amount, false)
         }
     }
 
@@ -202,7 +203,8 @@ object ComposterProfitTracker {
 
     private fun addItem(item: NeuInternalName, amount: Int) {
         tracker.addItem(item, abs(amount), false)
-
+        val price = item.getPrice() * abs(amount)
+        GardenProfitTracker.tracker.modify { it.composterCoinsSpent += price.toLong() }
     }
 
     class TimeData : TimedTrackerData<Data>({ Data() })
