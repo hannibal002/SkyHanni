@@ -14,6 +14,7 @@ runs:
             uses: gradle/actions/setup-gradle@v4
 
         -   name: Enable preprocessor
+            shell: bash
             run: |
                 mkdir -p .gradle
                 echo skyhanni.multi-version=compile > .gradle/private.properties
