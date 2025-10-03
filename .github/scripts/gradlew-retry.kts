@@ -45,7 +45,7 @@ for (i in 1..maxAttempts) {
     } else if (retryableErrorRegex.containsMatchIn(output)) {
         val backoffTime = (i * 1000).milliseconds
         println("   detected retryable error; retrying in ${backoffTime.inWholeSeconds} seconds...")
-        Thread.sleep(backoffTime.toJavaDuration())
+        Thread.sleep(backoffTime.inWholeMilliseconds)
     } else {
         println("   non-retryable failure; aborting.")
         exitProcess(proc.exitValue())
