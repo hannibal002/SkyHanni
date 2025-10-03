@@ -569,7 +569,7 @@ object DamageIndicatorManager {
         return ""
     }
 
-    private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String {//
+    private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String {
         var found = false
         for (shield in HellionShield.entries) {
             entity.getNameTagWith(3, shield.name)?.let { armorStand ->
