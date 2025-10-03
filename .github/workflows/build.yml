@@ -25,23 +25,26 @@ jobs:
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: ./.github/actions/setup-normal-workspace
+
             -   name: Enable preprocessor
                 run: |
                     mkdir -p .gradle
                     echo skyhanni.multi-version=compile > .gradle/private.properties
 
+            -   name: Cache build output
+                uses: actions/cache@v4
+                with:
+                    path: |
+                        ~/.gradle/caches
+                        ~/.gradle/wrapper
+                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                    restore-keys: |
+                        ${{ runner.os }}-gradle-
+
             -   name: Build with Gradle w/ retry
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: 1.8.9:build --stacktrace -PskipDetekt=true
-
-            -   name: Upload build cache
-                uses: actions/upload-artifact@v4
-                with:
-                    name: "Build Cache"
-                    path: .gradle
-                    retention-days: 1
-                    overwrite: true
+                    gradle-command: 1.8.9:build --no-daemon --stacktrace -PskipDetekt=true
 
             -   name: Upload 1.8.9 build
                 uses: actions/upload-artifact@v4
@@ -61,24 +64,27 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   name: Download build cache
-                uses: actions/upload-artifact@v4
+            -   uses: ./.github/actions/setup-normal-workspace
+
+            -   name: Enable preprocessor
+                run: |
+                    mkdir -p .gradle
+                    echo skyhanni.multi-version=compile > .gradle/private.properties
+
+            -   name: Cache build output
+                uses: actions/cache@v4
                 with:
-                    name: "Build Cache"
-                    path: .gradle
+                    path: |
+                        ~/.gradle/caches
+                        ~/.gradle/wrapper
+                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                    restore-keys: |
+                        ${{ runner.os }}-gradle-
 
             -   name: Build with Gradle w/ retry
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: 1.21.5:build --stacktrace -PskipDetekt=true
-
-            -   name: Upload build cache
-                uses: actions/upload-artifact@v4
-                with:
-                    name: "Build Cache"
-                    path: .gradle
-                    retention-days: 1
-                    overwrite: true
+                    gradle-command: 1.21.5:build --no-daemon --stacktrace -PskipDetekt=true
 
             -   name: Upload 1.21.5 build
                 uses: actions/upload-artifact@v4
@@ -98,24 +104,28 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   name: Download build cache
-                uses: actions/upload-artifact@v4
+            -   uses: ./.github/actions/setup-normal-workspace
+
+            -   name: Enable preprocessor
+                run: |
+                    mkdir -p .gradle
+                    echo skyhanni.multi-version=compile > .gradle/private.properties
+
+            -   name: Cache build output
+                uses: actions/cache@v4
                 with:
-                    name: "Build Cache"
-                    path: .gradle
+                    path: |
+                        ~/.gradle/caches
+                        ~/.gradle/wrapper
+                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                    restore-keys: |
+                        ${{ runner.os }}-gradle-
+
 
             -   name: Build with Gradle w/ retry
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: 1.21.7:build --stacktrace -PskipDetekt=true
-
-            -   name: Upload build cache
-                uses: actions/upload-artifact@v4
-                with:
-                    name: "Build Cache"
-                    path: .gradle
-                    retention-days: 1
-                    overwrite: true
+                    gradle-command: 1.21.7:build --no-daemon --stacktrace -PskipDetekt=true
 
             -   name: Upload 1.21.7 build
                 uses: actions/upload-artifact@v4
@@ -124,7 +134,3 @@ jobs:
                     name: "1.21.7 Development Build"
                     path: build/libs/*.jar
 
-            -   name: Delete build cache
-                uses: geekyeggo/delete-artifact@v5
-                with:
-                    name: "Build Cache"
