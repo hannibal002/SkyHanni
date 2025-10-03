@@ -24,7 +24,8 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: ./.github/actions/setup-normal-workspace
+            -   name: Setup workspace
+                uses: ./.github/actions/setup-normal-workspace
 
             -   name: Enable preprocessor
                 run: |
@@ -64,7 +65,8 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: ./.github/actions/setup-normal-workspace
+            -   name: Setup workspace
+                uses: ./.github/actions/setup-normal-workspace
 
             -   name: Enable preprocessor
                 run: |
@@ -104,7 +106,8 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: ./.github/actions/setup-normal-workspace
+            -   name: Setup workspace
+                uses: ./.github/actions/setup-normal-workspace
 
             -   name: Enable preprocessor
                 run: |
