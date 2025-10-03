@@ -206,16 +206,16 @@ Make sure such pull requests have a good explanation in the **What** section.
     - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can
       check `versions/[target version]/build/reports/detekt/` for a comprehensive list of issues.
     - **There are valid reasons to deviate from the norm**
-        - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline.xml` file,
+        - If you have such a case, either use `@Suppress("RuleName")`, or re-build the `baseline.xml` file,
           using `./gradlew detektBaselineMain`.
-          After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `version/1.8.9` folder, rename the file
-          to
-          `baseline.xml` replacing the old one.
+          After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `versions/1.8.9` folder
+          to `baseline.xml`, replacing the old one.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
-    - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
+    - Mods that have reached their end of life (RIP SBA, Dulkir and Soopy).
     - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
+    - If we already have the feature too and you are simply improving or extending it.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
@@ -404,77 +404,44 @@ We use the [auto update library](https://github.com/nea89o/libautoupdate) from n
 While not directly part of the Minecraft mod, it is useful to know that we have
 a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
 
-## 1.21 / Modern version development
+## Modern version development
 
-### TLDR
+### Guidelines
 
-How to make it work:
+All new pull requests are expected to work on both 1.8.9 as well as any modern versions we currently support (currently 1.21.5 and above,
+with a few exceptions)—obviously within reason, e.g. a feature that can only ever be used on 1.21-exclusive islands does not need to work on
+1.8.9, but you still need to make sure the mod compiles and works fine on 1.8.9 with your addition.
 
-1. Go to `.gradle/`.
-2. Create a text file `private.properties`.
-3. Write `skyhanni.multi-version=compile` into the file.
-4. Reload Gradle.
-5. Go into newly Created Run Config `Minecraft Client (:1.21.5)`.
-6. Change the java version from `8` to `21 Temurin`.
+Features that are only available on newer versions should go into the folder of the lowest supported version, e.g. `versions/1.21.5/`.
+Occasionally, you may need to put part of the code into the main `src/` folder for compatibility reasons, e.g. for configuration.
+
+For simple cases that do not require usage of preprocessor directives (explained below), it is generally preferred to perform a runtime
+version check using `PlatformUtils.IS_LEGACY` (true on 1.8.9, false on all other versions). For configuration, `@OnlyLegacy` and
+`@OnlyModern` annotations can be used.
+
+### How to make it work in IntelliJ
+
+1. Reload Gradle.
+2. Go into the appropriate run configuration, e.g. `Minecraft Client (:1.21.5)`.
+3. Change the Java version from `8` to `21 Temurin`.
 
 ### Technical Explanation
 
 You might have noticed that while the SkyHanni source code is found in `src/`, the actual tasks for compiling, building and running the mod
-are located in a subproject called `1.8.9`. This is because SkyHanni is preparing for the eventual fall of 1.8.9 (via the foraging update or
-otherwise).
+are located in a subproject called `1.8.9`. This is because SkyHanni aims to support both 1.8.9 for players who still prefer that version,
+as well as 1.21.x, which is required for the new foraging island and likely more islands in the future.
 
 To do so (while not disrupting regular development) we use [preprocessor](https://github.com/Deftu/RM-Preprocessor). Preprocessor
 automatically transforms code based on mappings as well as comment directives to create multiple variants of your source code for
 different Minecraft versions.
 
 Note also that the only targets we consider are 1.8.9 and 1.21 (or whatever the latest version we may target). The other versions are only
-there
-to make mappings translate more easily (more on that later).
-
-### Goals
-
-It is the explicit goal of this operation to passively generate a 1.21 version of SH using preprocessor. To this end, contributors are
-encouraged to add mappings and preprocessing directives to their features to make them compile on 1.21. *However*, this is considered a very
-low priority. Due to the confusing nature (and the slower initial setup time due to decompiling four versions of Minecraft), this feature
-is disabled by default. Similarly, it is up to each contributor to decide if they want to learn how to use preprocessor mappings and
-directives. An explicit non-goal is to maintain two SH versions continuously; instead, we only want to make the eventual transition to 1.21
-a task
-that can be slowly worked on over a long span of time.
-
-### Set Up
-
-The modern version variants can be set using `skyhanni.multi-version` in `.gradle/private.properties` to three levels.
-You will have to create this file yourself, for example if you want to set it to compile the file should
-contain `skyhanni.multi-version=compile`
-
-`off` completely disables any preprocessor action or alternative versions. There will be only one project (although still at the `:1.8.9`
-subproject path), and alternative version sources will not be generated (although old generated sources **will not be deleted**). To make
-setting up a dev environment as fast and discernible as possible, this is the default option.
-
-`preprocess-only` adds the `preprocessCode` task as well as all the version subprojects. Compiling or running newer versions is not
-possible, but the `preprocessCode` task can be run manually to inspect the generated source code. This mode is what should most often be
-used when making alterations to the mappings or modifying preprocessor directives. Note that while this setting generally ignores any failed
-renaming attempts, if something is so badly mangled that it cannot even guess a name for a function, it will still break the build. Those
-situations should be rare, however. (In the entire SH codebase prior to me introducing this system I only found <10 such cases). You can
-specifically compile 1.8.9 using `./gradlew :1.8.9:build`. This does not affect the regular execution of the client which will only compile
-1.8.9.
-
-`compile` enables compilation for the `:1.21` subproject. This means that a `build` or `assemble` task will try (and fail) to compile a
-1.21 (as well as 1.8.9) JAR. This mode may be useful for someone seeking out issues to fix, but is generally not useful in day to day
-operations since the compile task will never succeed and will block things like hotswap compilations (via <kbd>CTRL+F9</kbd>) from
-completing.
+there to make mappings translate more easily (more on that later).
 
 ### Compiling and Testing
 
 To compile the mod, simply run `./gradlew build` (without a version number), and the preprocessor will generate the necessary files for each
-version up to 1.21. By default, only a few files will be compiled, these files can be found in the `versions/<version>/buildpaths.txt` file.
-If you want to compile more files, you can add them to this file or if you want to compile all files you can temporarily remove the file.
-
-> ⚠️ **Notice:** For this to work you **Must** have the `skyhanni.multi-version` set too `compile` in your `.gradle/private.properties`
-> file.
-
-If you want to run 1.21 simply run the `Minecraft Client 1.21` configuration in intellij. This will compile the 1.21 version and run it.
-Again, this will only use the files specified in `versions/<version>/buildpaths.txt`.
+version.
 
 You may notice some `//#if TODO` comments in the code, these are preprocessor comments that we are using to signify that we need to make
 this functionality work again on 1.21.
@@ -482,15 +449,14 @@ this functionality work again on 1.21.
 ### Improving mappings
 
 The different project versions are set up in such a way that each version depends on a slightly older version from which it is then adapted.
-There are two main versions (1.8.9 and 1.21), but there are also a few bridge versions. These exist to make remapping easier since automatic
-name mappings between 1.8.9 and 1.21 do not really exist. This is the current layout for our remaps: First, we remap to 1.16 which is a big
-jump from 1.8.9, but still has a lot of the old rendering code and is still on Forge. We jump to 1.16 because it is a version with Fabric
-and
+There are two main versions (1.8.9 and 1.21.x), but there are also a few bridge versions. These exist to make remapping easier since automatic
+name mappings between 1.8.9 and 1.21.x do not really exist. This is the current layout for our remaps: First, we remap to 1.16 which is a big
+jump from 1.8.9, but still has a lot of the old rendering code and is still on Forge. We jump to 1.16 because it is a version with Fabric and
 also has Fabric intermediary mappings available. We also can't really jump to an earlier version since 1.14 and 1.15 have a really poor
 Fabric API. Despite the preprocessor's best efforts, this version will likely have the most manual mapping changes. Note that we
 actually have two projects on 1.16. There is the Forge project, which is the one we remap to first. Then we remap to the corresponding
 Fabric/Yarn mappings. This is because remapping between Searge and Yarn is very inconsistent unless it is done on one and the same version.
-Finally, we remap from 1.16 to 1.21. This is a fairly small change, especially since Fabric intermediary mappings make different names
+Finally, we remap from 1.16 to 1.21.x. This is a fairly small change, especially since Fabric intermediary mappings make different names
 between versions very rare. The only real changes that need to be done in this jump are behavioural ones.
 
 The preprocessor does some built-in remapping (changing names), based on obfuscated names, but sometimes the automatic matching fails. If it

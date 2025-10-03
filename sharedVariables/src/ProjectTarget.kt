@@ -82,7 +82,7 @@ enum class ProjectTarget(
     val projectPath get() = ":$projectName"
 
     companion object {
-        fun activeVersions() = values().filter { MultiVersionStage.activeState.shouldCreateProject(it) }
+        fun activeVersions() = values()
 
         fun findByMcVersion(mcVersion: String): ProjectTarget? {
             return values().find { it.minecraftVersion.versionName == mcVersion }

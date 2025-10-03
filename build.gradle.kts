@@ -1,5 +1,4 @@
 import at.skyhanni.sharedvariables.MinecraftVersion
-import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
@@ -427,21 +426,6 @@ tasks.assemble.get().dependsOn(tasks.remapJar)
 tasks.withType(KotlinCompile::class) {
     compilerOptions {
         jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.javaLanguageVersion.versionString()))
-    }
-}
-
-if (!MultiVersionStage.activeState.shouldCompile(target)) {
-    tasks.withType<JavaCompile> {
-        onlyIf { false }
-    }
-    tasks.withType<KotlinCompile> {
-        onlyIf { false }
-    }
-    tasks.withType<AbstractArchiveTask> {
-        onlyIf { false }
-    }
-    tasks.withType<ProcessResources> {
-        onlyIf { false }
     }
 }
 
