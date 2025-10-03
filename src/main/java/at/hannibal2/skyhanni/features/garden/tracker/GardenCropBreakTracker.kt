@@ -74,7 +74,7 @@ object GardenCropBreakTracker {
 
         val fortune = storage?.latestTrueFarmingFortune?.get(event.crop) ?: return
         val amount = ((weightedRandomRound((fortune % 100).toInt()) + floor(fortune / 100) + 1) * event.crop.baseDrops).toInt()
-        bountifulCoins += amount * .2
+        if (itemHasBountiful) bountifulCoins += amount * .2
         addToCropMap(event.crop, amount)
 
     }
@@ -99,7 +99,7 @@ object GardenCropBreakTracker {
         }
 
         addToCropMap(crop, addedCounter.toInt())
-        bountifulCoins += addedCounter * .2
+        if (itemHasBountiful) bountifulCoins += addedCounter * .2
         counterData?.set(uuid, counter)
 
         // handle seeds
@@ -115,7 +115,7 @@ object GardenCropBreakTracker {
 
             val seedDiff = addedCult - addedCounter
             seedAmount += seedDiff.toInt()
-            bountifulCoins += seedDiff * .2
+            if (itemHasBountiful) bountifulCoins += seedDiff * .2
 
             storage?.wheatCultivatingCounterData?.set(uuid, cultCounter)
         }
