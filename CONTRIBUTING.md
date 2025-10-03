@@ -208,8 +208,8 @@ Make sure such pull requests have a good explanation in the **What** section.
     - **There are valid reasons to deviate from the norm**
         - If you have such a case, either use `@Suppress("RuleName")`, or re-build the `baseline.xml` file,
           using `./gradlew detektBaselineMain`.
-          After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `versions/1.8.9` folder
-          to `baseline.xml`, replacing the old one.
+          After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `versions/1.8.9` folder, rename the
+          file to `baseline.xml`, replacing the old one.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
     - Mods that have reached their end of life (RIP SBA, Dulkir and Soopy).
