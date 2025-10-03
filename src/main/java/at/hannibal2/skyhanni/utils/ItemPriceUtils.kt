@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getRecipes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
@@ -182,7 +183,11 @@ object ItemPriceUtils {
     }
 
     fun Number.formatCoin(gray: Boolean = false): String {
-        val color = if (gray) "§7" else "§6"
+        val color = when {
+            gray -> "§7"
+            this.toDouble() < 0 -> "§c"
+            else -> "§6"
+        }
         return color + shortFormat()
     }
 
