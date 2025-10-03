@@ -112,7 +112,8 @@ abstract class SkyHanniTimedBucketedItemTracker<E : Enum<E>, Data : BucketedItem
         itemRemover: (NeuInternalName, String) -> Unit,
         itemHider: (NeuInternalName, Boolean) -> Unit,
         getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String>,
-        positiveAmountsOnly: Boolean
+        positiveAmountsOnly: Boolean,
+        sorter: (MutableMap<NeuInternalName, Long>) -> Map<NeuInternalName, Long>
     ): Double = super.drawItems(
         data = data,
         filter = filter,
@@ -138,5 +139,6 @@ abstract class SkyHanniTimedBucketedItemTracker<E : Enum<E>, Data : BucketedItem
             else data.getDescription(selectedBucket, item.timesGained)
         },
         positiveAmountsOnly = positiveAmountsOnly,
+        sorter = sorter,
     )
 }

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.GardenProfitTrackerConfig.GardenProfitTextEntry
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.tracker.GardenProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -23,6 +25,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -55,6 +59,18 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
     val TRUFFLE = "REFINED_DARK_CACAO_TRUFFLE".toInternalName()
     val REPELLENT = "PEST_REPELLENT".toInternalName()
     val REPELLENT_MAX = "PEST_REPELLENT_MAX".toInternalName()
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(
+            config.profitTypes,
+            config.textFormat,
+            config.coinsPerBit,
+            config.coinsPerCopper
+        ) {
+            update()
+        }
+    }
 
     @HandleEvent
     fun onCropGain(event: CropCollectionAddEvent) {
@@ -94,7 +110,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
             )
         }
 
-        override fun getCoinName(bucket: GardenTrackerTypes?, item: TrackedItem) = when(bucket) {
+        override fun getCoinName(bucket: GardenTrackerTypes?, item: TrackedItem) = when (bucket) {
             GardenTrackerTypes.PESTS -> "§6Pest Kill Coins"
             GardenTrackerTypes.BREAKING_CROPS -> "§6Bountiful Coins"
             else -> "§6Dropped Coins"
@@ -128,7 +144,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
         override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>): Double {
             // bz prices for base crops are wildly inaccurate and prone to manipulation
             val npcSellItems = CropType.entries.map { it.internalName }.toSet()
-            return when(internalName) {
+            return when (internalName) {
                 BITS -> config.coinsPerBit.get().toDouble()
                 COPPER -> config.coinsPerCopper.get().toDouble()
                 in npcSellItems -> internalName.getNpcPrice()
@@ -136,7 +152,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
             }
         }
 
-        fun getCropProfit() = excludeFromTotal.sumOf{ name ->
+        fun getCropProfit() = excludeFromTotal.sumOf { name ->
             (bucketedItems[GardenTrackerTypes.BREAKING_CROPS]?.get(name)?.totalAmount ?: 0) * getCustomPricePer(name, GardenProfitTracker)
         }
 
@@ -222,7 +238,9 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
                 val isConsumable = data.selectedBucket == GardenTrackerTypes.CONSUMABLES
                 val text = if (isConsumable) "§eItems Consumed:" else "§eItems Dropped:"
                 newList.addSearchString(text)
-                drawItems(data, { true }, newList, positiveAmountsOnly = isConsumable)
+                val sorter: (MutableMap<NeuInternalName, Long>) -> Map<NeuInternalName, Long> =
+                    { if (isConsumable) it.sorted() else it.sortedDesc() }
+                drawItems(data, { true }, newList, positiveAmountsOnly = isConsumable, sorter = sorter)
             } else {
                 newList.add(line.second)
             }
@@ -239,6 +257,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
 
     fun shouldShowDisplay(): Boolean = GardenApi.inGarden() && config.enabled
 
+    @Suppress("LoopWithTooManyJumpStatements")
     private fun importData() {
         val profileStorage = ProfileStorageData.profileSpecific?.garden
         if (profileStorage?.hasImportedProfits == true) {
@@ -295,7 +314,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
             addItems(
                 composterEntries,
                 GardenTrackerTypes.COMPOSTER
-            ) {dataAny ->
+            ) { dataAny ->
                 val data = dataAny as ComposterProfitTracker.Data
                 listOf(Triple("COMPOST".toInternalName(), data.compostGained, data.compostGained))
             }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import com.google.gson.annotations.Expose
 import kotlin.reflect.KClass
 
+@Suppress("TooManyFunctions")
 abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KClass<E>, session: KClass<T>) : ItemTrackerData<T>(session) {
 
     final override fun getDescription(timesGained: Long): List<String> =

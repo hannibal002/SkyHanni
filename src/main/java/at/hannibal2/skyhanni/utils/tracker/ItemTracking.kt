@@ -125,7 +125,8 @@ interface ItemTracking<Data : ItemTrackerData<*>, ConfigType : GenericIndividual
             if (internalName == SKYBLOCK_COIN) data.getCoinDescription(item)
             else data.getDescription(item.timesGained)
         },
-        positiveAmountsOnly: Boolean = false
+        positiveAmountsOnly: Boolean = false,
+        sorter: (MutableMap<NeuInternalName, Long>) -> Map<NeuInternalName, Long> = { it.sortedDesc() }
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<NeuInternalName, Long>()
@@ -148,7 +149,7 @@ interface ItemTracking<Data : ItemTrackerData<*>, ConfigType : GenericIndividual
 
         val table = mutableMapOf<List<Renderable>, String>()
 
-        for ((internalName, price) in items.sortedDesc()) {
+        for ((internalName, price) in sorter(items)) {
             val itemProfit = dataItems[internalName] ?: error("Item not found for $internalName")
 
             val amount = itemProfit.totalAmount
