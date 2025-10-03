@@ -136,4 +136,3 @@ jobs:
                 with:
                     name: "1.21.7 Development Build"
                     path: build/libs/*.jar
-
