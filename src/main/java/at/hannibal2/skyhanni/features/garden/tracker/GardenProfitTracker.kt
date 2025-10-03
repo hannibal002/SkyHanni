@@ -199,7 +199,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
             cropsSpent += bucketData.getConsumableCost()
             // crops spent will already display total cost of consumable, so avoid duplication
             displayMap[GardenProfitTextEntry.ITEM_PROFIT] = Renderable.empty().toSearchable()
-            itemProfit = 0.0
+            if (selectedBucket != null) itemProfit = 0.0
         }
 
         if (selectedBucket in setOf(null, GardenTrackerTypes.VISITORS, GardenTrackerTypes.COMPOSTER, GardenTrackerTypes.CONSUMABLES)) {
