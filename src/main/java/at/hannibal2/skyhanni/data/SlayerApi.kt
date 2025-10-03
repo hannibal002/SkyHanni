@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
@@ -187,10 +188,12 @@ object SlayerApi {
         val slayerData = getCurrentData()
         if (slayerData.currentStateRaw == newState) return
         slayerData.type = type
-        slayerData.currentStateRaw = newState
 
         val old = slayerData.currentStateRaw ?: "no slayer"
+        slayerData.currentStateRaw = newState
         val state = detectState(old, newState)
+        if (slayerData.currentState == state) return
+        ChatUtils.chat("${slayerData.currentState} -> $state")
         slayerData.currentState = state
         SlayerStateChangeEvent(state).post()
 
@@ -210,7 +213,7 @@ object SlayerApi {
     }
 
     private fun detectState(old: String, new: String): ActiveQuestState = when {
-        !old.inGrind() && new.inGrind() -> ActiveQuestState.GRINDING
+        new.inGrind() -> ActiveQuestState.GRINDING
         new.inBoss() -> ActiveQuestState.BOSS_FIGHT
         old.inBoss() && new.noSlayer() -> ActiveQuestState.FAILED
         new.bossSlain() -> ActiveQuestState.SLAIN
