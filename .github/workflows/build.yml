@@ -14,9 +14,15 @@ on:
     workflow_dispatch:
 permissions: write-all
 jobs:
-    build_1_8_9:
-        name: "Build 1.8.9"
+    build_and_test:
+        name: "Build and test"
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                version:
+                    - "1.8.9"
+                    - "1.21.5"
+                    - "1.21.7"
         steps:
             -   name: Check out code
                 uses: actions/checkout@v4
@@ -30,89 +36,24 @@ jobs:
             -   name: Build with Gradle w/ retry
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: 1.8.9:build --no-daemon --stacktrace -PskipDetekt=true
+                    gradle-command: ${{ matrix.version }}:build --no-daemon --stacktrace -PskipDetekt=true
 
             -   name: Upload JAR
                 uses: actions/upload-artifact@v4
                 if: ${{ !cancelled() }}
                 with:
-                    name: "1.8.9 Development Build"
+                    name: "${{ matrix.version }} Development Build"
                     path: build/libs/*.jar
-
-    test_1_8_9:
-        name: "Test 1.8.9"
-        runs-on: ubuntu-latest
-        needs: build_1_8_9
-        steps:
-            -   name: Check out code
-                uses: actions/checkout@v4
-                with:
-                    ref: ${{ github.event.pull_request.head.ref }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
-
-            -   name: Set up workspace
-                uses: ./.github/actions/setup-normal-workspace
 
             -   name: Test with Gradle w/ retry
                 uses: ./.github/actions/gradle-retry
+                if: ${{ matrix.version == '1.8.9' }}
                 with:
-                    gradle-command: 1.8.9:test --no-daemon
+                    gradle-command: ${{ matrix.version }}:test --no-daemon
 
             -   name: Upload test report
                 uses: actions/upload-artifact@v4
-                if: ${{ !cancelled() }}
+                if: ${{ matrix.version == '1.8.9' && !cancelled() }}
                 with:
                     name: "Test Results"
                     path: versions/1.8.9/build/reports/tests/test/
-
-    build_1_21_5:
-        name: "Build 1.21.5"
-        runs-on: ubuntu-latest
-        needs: build_1_8_9
-        steps:
-            -   name: Check out code
-                uses: actions/checkout@v4
-                with:
-                    ref: ${{ github.event.pull_request.head.ref }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
-
-            -   name: Set up workspace
-                uses: ./.github/actions/setup-normal-workspace
-
-            -   name: Build with Gradle w/ retry
-                uses: ./.github/actions/gradle-retry
-                with:
-                    gradle-command: 1.21.5:build --no-daemon --stacktrace -PskipDetekt=true
-
-            -   name: Upload JAR
-                uses: actions/upload-artifact@v4
-                if: ${{ !cancelled() }}
-                with:
-                    name: "1.21.5 Development Build"
-                    path: build/libs/*.jar
-
-    build_1_21_7:
-        name: "Build 1.21.7"
-        runs-on: ubuntu-latest
-        needs: build_1_21_5
-        steps:
-            -   name: Check out code
-                uses: actions/checkout@v4
-                with:
-                    ref: ${{ github.event.pull_request.head.ref }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
-
-            -   name: Set up workspace
-                uses: ./.github/actions/setup-normal-workspace
-
-            -   name: Build with Gradle w/ retry
-                uses: ./.github/actions/gradle-retry
-                with:
-                    gradle-command: 1.21.7:build --no-daemon --stacktrace -PskipDetekt=true
-
-            -   name: Upload JAR
-                uses: actions/upload-artifact@v4
-                if: ${{ !cancelled() }}
-                with:
-                    name: "1.21.7 Development Build"
-                    path: build/libs/*.jar
