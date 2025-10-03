@@ -15,8 +15,8 @@ on:
 permissions: write-all
 jobs:
     build_1_8_9:
-        runs-on: ubuntu-latest
         name: "Build 1.8.9"
+        runs-on: ubuntu-latest
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
@@ -51,8 +51,9 @@ jobs:
                     path: build/libs/*.jar
 
     build_1_21_5:
-        runs-on: ubuntu-latest
         name: "Build 1.21.5"
+        runs-on: ubuntu-latest
+        needs: build_1_8_9
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
@@ -87,8 +88,9 @@ jobs:
                     path: build/libs/*.jar
 
     build_1_21_7:
-        runs-on: ubuntu-latest
         name: "Build 1.21.7"
+        runs-on: ubuntu-latest
+        needs: build_1_21_5
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
