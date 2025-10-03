@@ -26,6 +26,10 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
         item.processAdd(internalName, amount, command)
     }
 
+    open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
+        addItem(internalName, amount.toLong(), command)
+    }
+
     open fun removeItem(internalName: NeuInternalName) {
         items.remove(internalName)
     }

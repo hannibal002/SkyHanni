@@ -44,6 +44,10 @@ abstract class TrackerData<T : SessionUptime>(
     }
 
     fun getSessionMap() = sessionUptime.toMap()
+    fun setSessionMap(map: Map<SessionUptime, Stopwatch>) {
+        sessionUptime.clear()
+        sessionUptime.putAll(map)
+    }
 
     fun getActiveStopwatch(): Stopwatch? {
         val active = activeSession

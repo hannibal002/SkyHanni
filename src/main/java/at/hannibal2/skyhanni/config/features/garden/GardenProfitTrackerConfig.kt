@@ -1,17 +1,12 @@
 package at.hannibal2.skyhanni.config.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.garden.GardenProfitTrackerConfig.GardenProfitTextEntry
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig.TrackerSync.config
 import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedGardenIndividualItemTrackerConfig
 import at.hannibal2.skyhanni.features.garden.tracker.GardenTrackerTypes
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -48,17 +43,28 @@ class GardenProfitTrackerConfig {
     val textFormat: Property<MutableList<GardenProfitTextEntry>> = Property.of(
         mutableListOf(
             GardenProfitTextEntry.TITLE,
-
-            GardenProfitTextEntry.PROFIT_LIST
+            GardenProfitTextEntry.PROFIT_LIST,
+            GardenProfitTextEntry.ITEM_PROFIT,
+            GardenProfitTextEntry.CROP_DROPS,
+            GardenProfitTextEntry.COINS_SPENT,
+            GardenProfitTextEntry.SPACER,
+            GardenProfitTextEntry.BPS
         )
     )
 
     enum class GardenProfitTextEntry(private val displayName: String) {
         TITLE("§6§lGarden Profit Tracker"),
-        CROP_DROPS("§7Crop Drops: §650.2m"),
-        PROFIT_LIST("§eItem Drops:\n[Item List]"),
-        CROPS_SPENT("§7Crops Spent: §c-20.2m"),
-        BPS("§7Blocks Per Second: §")
+        CROP_DROPS("§7Crop NPC Profit: §650.2m"),
+        PROFIT_LIST("Item Profit List"),
+        ITEM_PROFIT("§eItem Drop Profit: §672.8m"),
+        COINS_SPENT("§7Crops Spent: §c-20.2m"),
+        TOTAL_PROFIT("§eTotal Profit: §6802.2m"),
+        PROFIT_PER_HOUR("§eProfit Per Hour: §622.2m"),
+        BPS("§7Blocks Per Second: §"),
+        SPACER(""),
+        SPACER_2("")
+        ;
+        override fun toString(): String = displayName
     }
 
     @Expose

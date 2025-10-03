@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
@@ -17,7 +19,8 @@ enum class CropType(
     val farmingItem: FarmingItemType,
     val replenish: Boolean = false,
     val enchantName: String = cropName.lowercase(),
-    val eliteLbName: String = simpleName
+    val eliteLbName: String = simpleName,
+    val internalName: NeuInternalName = cropName.toInternalName()
 ) {
 
     WHEAT(
@@ -35,7 +38,7 @@ enum class CropType(
     NETHER_WART(
         "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
         { ItemStack(Items.nether_wart) }, "wart", FarmingItemType.NETHER_WART, replenish = true,
-        enchantName = "warts", eliteLbName = "netherwart"
+        enchantName = "warts", eliteLbName = "netherwart", internalName = "nether_stalk".toInternalName()
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
@@ -48,7 +51,7 @@ enum class CropType(
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
         { DyeCompat.BROWN.createStack() }, "cocoa",
-        FarmingItemType.COCOA_BEANS, replenish = true, enchantName = "coco"
+        FarmingItemType.COCOA_BEANS, replenish = true, enchantName = "coco", internalName = "ink_sack-3".toInternalName()
     ),
     SUGAR_CANE(
         "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
@@ -61,7 +64,7 @@ enum class CropType(
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
         { ItemStack(Blocks.red_mushroom_block) }, "mushroom", FarmingItemType.MUSHROOM,
-        enchantName = "mushrooms"
+        enchantName = "mushrooms", internalName = "red_mushroom".toInternalName() // choice of red over brown is entirely arbitrary
     ),
     ;
 

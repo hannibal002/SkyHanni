@@ -621,6 +621,9 @@ class ProfileSpecificStorage(
         var cropCollectionTracker: CropCollectionTracker.TimedData = CropCollectionTracker.TimedData()
 
         @Expose
+        var hasImportedProfits: Boolean = false
+
+        @Expose
         var gardenProfitTracker: GardenProfitTracker.TimeData = GardenProfitTracker.TimeData()
     }
 

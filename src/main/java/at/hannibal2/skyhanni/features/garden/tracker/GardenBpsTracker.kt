@@ -39,7 +39,7 @@ object GardenBpsTracker {
 
     class Data : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class) {
         @Expose
-        var blocksBroken: Int = 0
+        var blocksBroken: Long = 0
     }
 
     @HandleEvent

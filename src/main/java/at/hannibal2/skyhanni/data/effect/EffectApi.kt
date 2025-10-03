@@ -133,6 +133,7 @@ object EffectApi {
                 NonGodPotEffect.HOT_CHOCOLATE,
                 EffectDurationChangeType.ADD,
                 durationAdded,
+                true
             ).post()
         }
         godPotConsumePattern.matchMatcher(event.message) {
@@ -201,10 +202,15 @@ object EffectApi {
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
             }
+            "§7You consumed a §r§6Refined Dark Cacao Truffle §r§7and gained §r§6+30§r§6☘ Global Fortune §r§7for §r§a60m§r§7!" -> {
+                effect = NonGodPotEffect.REFINED_DARK_CACAO_TRUFFLE
+                changeType = EffectDurationChangeType.SET
+                duration = 1.hours
+            }
             else -> return
         }
 
-        EffectDurationChangeEvent(effect, changeType, duration).post()
+        EffectDurationChangeEvent(effect, changeType, duration, true).post()
     }
 
     @HandleEvent(onlyOnSkyblock = true)

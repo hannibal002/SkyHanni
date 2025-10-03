@@ -7,7 +7,8 @@ import kotlin.time.Duration
 class EffectDurationChangeEvent(
     val effect: NonGodPotEffect,
     val durationChangeType: EffectDurationChangeType,
-    val duration: Duration? = null
+    val duration: Duration? = null,
+    val justConsumed: Boolean = false
 ) : SkyHanniEvent()
 
 enum class EffectDurationChangeType {

@@ -27,6 +27,8 @@ enum class NonGodPotEffect(
 
     DOUCE_PLUIE_DE_STINKY_CHEESE("§eDouce Pluie de Stinky Cheese I"),
 
+    REFINED_DARK_CACAO_TRUFFLE("§6Refined Dark Cacao Truffle"),
+
     HARVEST_HARBINGER("§6Harvest Harbinger V"),
 
     PEST_REPELLENT("§6Pest Repellent I§r"),

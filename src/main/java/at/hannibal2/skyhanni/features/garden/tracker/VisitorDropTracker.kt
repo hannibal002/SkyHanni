@@ -121,13 +121,13 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
     private val patternStorageAccessorMap: Map<Pattern, (Int, VisitorRarity) -> Unit> = mapOf(
         copperPattern to { amount, rarity ->
             modify { it.copper[rarity] = (it.copper[rarity] ?: 0) + amount }
-            GardenProfitTracker.modify { it.visitorCopper += amount }
+            GardenProfitTracker.addItem(GardenTrackerTypes.VISITORS, GardenProfitTracker.COPPER, amount, false)
         },
         farmingExpPattern to { amount, rarity -> modify { it.farmingXp[rarity] = (it.farmingXp[rarity] ?: 0) + amount } },
         gardenExpPattern to { amount, rarity -> modify { it.gardenXp[rarity] = (it.gardenXp[rarity] ?: 0) + amount } },
         bitsPattern to { amount, rarity ->
             modify { it.bits[rarity] = (it.bits[rarity] ?: 0) + amount }
-            GardenProfitTracker.modify { it.visitorBits += amount }
+            GardenProfitTracker.addItem(GardenTrackerTypes.VISITORS, GardenProfitTracker.BITS, amount, false)
         },
         mithrilPowderPattern to { amount, rarity -> modify { it.mithrilPowder[rarity] = (it.mithrilPowder[rarity] ?: 0) + amount } },
         gemstonePowderPattern to { amount, rarity -> modify { it.gemstonePowder[rarity] = (it.gemstonePowder[rarity] ?: 0) + amount } },
