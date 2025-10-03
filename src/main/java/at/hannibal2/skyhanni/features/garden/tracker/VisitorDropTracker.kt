@@ -150,7 +150,7 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
         }
         val price = round(event.price).toLong()
         modify { it.coinsSpent[rarity] = (it.coinsSpent[rarity] ?: 0) + price }
-        GardenProfitTracker.modify { it.visitorCoinsSpent += price }
+        GardenProfitTracker.modify { it.visitorCoinsSpent -= price }
     }
 
     @HandleEvent

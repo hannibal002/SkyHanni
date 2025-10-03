@@ -205,7 +205,7 @@ object ComposterProfitTracker {
         // make sure amount added is negative
         tracker.addItem(item, -abs(amount), false)
         val price = item.getPrice() * abs(amount)
-        GardenProfitTracker.tracker.modify { it.composterCoinsSpent += price.toLong() }
+        GardenProfitTracker.tracker.modify { it.composterCoinsSpent -= price.toLong() }
     }
 
     class TimeData : TimedTrackerData<Data>({ Data() })
