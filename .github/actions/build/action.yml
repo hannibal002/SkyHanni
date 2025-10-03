@@ -1,0 +1,22 @@
+name: "Build"
+inputs:
+    mc_version:
+        description: "Minecraft version to build for"
+        required: true
+runs:
+    using: composite
+    steps:
+        -   name: Set up workspace
+            uses: ./.github/actions/setup-normal-workspace
+
+        -   name: Build with Gradle w/ retry
+            uses: ./.github/actions/gradle-retry
+            with:
+                gradle-command: ${{ inputs.mc_version }}:build --no-daemon --stacktrace -PskipDetekt=true
+
+        -   name: Upload JAR
+            uses: actions/upload-artifact@v4
+            if: ${{ !cancelled() }}
+            with:
+                name: "${{ inputs.mc_version }} Development Build"
+                path: build/libs/*.jar
