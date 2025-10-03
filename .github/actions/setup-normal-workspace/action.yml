@@ -1,4 +1,4 @@
-name: "Set up Java & Gradle and prepare the build"
+name: "Set up Java and Gradle"
 
 runs:
     using: composite
@@ -16,9 +16,3 @@ runs:
                 cache-read-only: false
                 cache-overwrite-existing: true
                 cache-cleanup: always
-
-        -   name: Enable preprocessor
-            shell: bash
-            run: |
-                mkdir -p .gradle
-                echo skyhanni.multi-version=compile > .gradle/private.properties
