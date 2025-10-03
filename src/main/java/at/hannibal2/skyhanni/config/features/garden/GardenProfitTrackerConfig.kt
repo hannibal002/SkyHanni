@@ -44,10 +44,13 @@ class GardenProfitTrackerConfig {
         mutableListOf(
             GardenProfitTextEntry.TITLE,
             GardenProfitTextEntry.PROFIT_LIST,
-            GardenProfitTextEntry.ITEM_PROFIT,
-            GardenProfitTextEntry.CROP_DROPS,
-            GardenProfitTextEntry.COINS_SPENT,
             GardenProfitTextEntry.SPACER,
+            GardenProfitTextEntry.CROP_DROPS,
+            GardenProfitTextEntry.ITEM_PROFIT,
+            GardenProfitTextEntry.COINS_SPENT,
+            GardenProfitTextEntry.SPACER_2,
+            GardenProfitTextEntry.TOTAL_PROFIT,
+            GardenProfitTextEntry.PROFIT_PER_HOUR,
             GardenProfitTextEntry.BPS
         )
     )
