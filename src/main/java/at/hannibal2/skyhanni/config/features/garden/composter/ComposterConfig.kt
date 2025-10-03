@@ -25,7 +25,7 @@ class ComposterConfig {
     @Expose
     @ConfigOption(name = "Profit Tracker", desc = "")
     @Accordion
-    var profitTracker: ComposterProfitTrackerConfig = ComposterProfitTrackerConfig()
+    val profitTracker: ComposterProfitTrackerConfig = ComposterProfitTrackerConfig()
 
     @Expose
     @ConfigOption(
