@@ -14,40 +14,9 @@ on:
     workflow_dispatch:
 permissions: write-all
 jobs:
-    build:
+    build_1_8_9:
         runs-on: ubuntu-latest
-        name: "Build and test"
-        steps:
-            -   name: Checkout code
-                uses: actions/checkout@v4
-                with:
-                    ref: ${{ github.event.pull_request.head.ref }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
-
-            -   uses: ./.github/actions/setup-normal-workspace
-            -   name: Build with Gradle w/retry
-                uses: ./.github/actions/gradle-retry
-                with:
-                    gradle-command: assemble -x test --stacktrace -PskipDetekt=true
-            -   uses: actions/upload-artifact@v4
-                name: Upload development build
-                with:
-                    name: "Development Build"
-                    path: build/libs/*.jar
-            -   name: Test with Gradle w/retry
-                uses: ./.github/actions/gradle-retry
-                with:
-                    gradle-command: test
-            -   uses: actions/upload-artifact@v4
-                name: "Upload test report"
-                if: ${{ !cancelled() }}
-                with:
-                    name: "Test Results"
-                    path: versions/1.8.9/build/reports/tests/test/
-
-    preprocess:
-        runs-on: ubuntu-latest
-        name: "Build multi version"
+        name: "Build 1.8.9"
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
@@ -60,28 +29,100 @@ jobs:
                 run: |
                     mkdir -p .gradle
                     echo skyhanni.multi-version=compile > .gradle/private.properties
-            -   name: Build with Gradle w/retry
+
+            -   name: Build with Gradle w/ retry
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: build --stacktrace -PskipDetekt=true
+                    gradle-command: 1.8.9:build --stacktrace -PskipDetekt=true
 
-            -   name: Add label if build fails
-                if: ${{ failure() && github.event_name == 'pull_request_target' && github.event.pull_request.state == 'open' }}
-                uses: actions-ecosystem/action-add-labels@v1
+            -   name: Upload build cache
+                uses: actions/upload-artifact@v4
                 with:
-                    github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Fails Multi-Version'
+                    name: "Build Cache"
+                    path: .gradle
+                    retention-days: 1
+                    overwrite: true
 
-            -   name: Remove label if build passes
-                if: ${{ success() && github.event_name == 'pull_request_target' && github.event.pull_request.state == 'open' }}
-                uses: actions-ecosystem/action-remove-labels@v1
-                with:
-                    github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Fails Multi-Version'
-
-            -   name: Upload multi-version build
+            -   name: Upload 1.8.9 build
                 uses: actions/upload-artifact@v4
                 if: ${{ !cancelled() }}
                 with:
-                    name: "Multi-version Development Build"
+                    name: "1.8.9 Development Build"
                     path: build/libs/*.jar
+
+    build_1_21_5:
+        runs-on: ubuntu-latest
+        name: "Build 1.21.5"
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
+                with:
+                    ref: ${{ github.event.pull_request.head.ref }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+            -   name: Download build cache
+                uses: actions/upload-artifact@v4
+                with:
+                    name: "Build Cache"
+                    path: .gradle
+
+            -   name: Build with Gradle w/ retry
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: 1.21.5:build --stacktrace -PskipDetekt=true
+
+            -   name: Upload build cache
+                uses: actions/upload-artifact@v4
+                with:
+                    name: "Build Cache"
+                    path: .gradle
+                    retention-days: 1
+                    overwrite: true
+
+            -   name: Upload 1.21.5 build
+                uses: actions/upload-artifact@v4
+                if: ${{ !cancelled() }}
+                with:
+                    name: "1.21.5 Development Build"
+                    path: build/libs/*.jar
+
+    build_1_21_7:
+        runs-on: ubuntu-latest
+        name: "Build 1.21.7"
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
+                with:
+                    ref: ${{ github.event.pull_request.head.ref }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+            -   name: Download build cache
+                uses: actions/upload-artifact@v4
+                with:
+                    name: "Build Cache"
+                    path: .gradle
+
+            -   name: Build with Gradle w/ retry
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: 1.21.7:build --stacktrace -PskipDetekt=true
+
+            -   name: Upload build cache
+                uses: actions/upload-artifact@v4
+                with:
+                    name: "Build Cache"
+                    path: .gradle
+                    retention-days: 1
+                    overwrite: true
+
+            -   name: Upload 1.21.7 build
+                uses: actions/upload-artifact@v4
+                if: ${{ !cancelled() }}
+                with:
+                    name: "1.21.7 Development Build"
+                    path: build/libs/*.jar
+
+            -   name: Delete build cache
+                uses: geekyeggo/delete-artifact@v5
+                with:
+                    name: "Build Cache"
