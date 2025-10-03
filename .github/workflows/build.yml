@@ -14,7 +14,7 @@ on:
     workflow_dispatch:
 permissions: write-all
 jobs:
-    build_1_8_9:
+    build-1.8.9:
         name: "Build 1.8.9"
         runs-on: ubuntu-latest
         steps:
@@ -29,10 +29,10 @@ jobs:
                 with:
                     mc_version: "1.8.9"
 
-    test_1_8_9:
+    test-1.8.9:
         name: "Test 1.8.9"
         runs-on: ubuntu-latest
-        needs: build_1_8_9
+        needs: build-1.8.9
         steps:
             -   name: Check out code
                 uses: actions/checkout@v4
@@ -55,10 +55,10 @@ jobs:
                     name: "Test Results"
                     path: versions/1.8.9/build/reports/tests/test/
 
-    build_1_21_5:
+    build-1.21.5:
         name: "Build 1.21.5"
         runs-on: ubuntu-latest
-        needs: build_1_8_9
+        needs: build-1.8.9
         steps:
             -   name: Check out code
                 uses: actions/checkout@v4
@@ -71,10 +71,10 @@ jobs:
                 with:
                     mc_version: "1.21.5"
 
-    build_1_21_7:
+    build-1.21.7:
         name: "Build 1.21.7"
         runs-on: ubuntu-latest
-        needs: build_1_21_5
+        needs: build-1.21.5
         steps:
             -   name: Check out code
                 uses: actions/checkout@v4
