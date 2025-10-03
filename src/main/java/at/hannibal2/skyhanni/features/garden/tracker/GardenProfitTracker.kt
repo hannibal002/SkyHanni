@@ -156,7 +156,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
         val displayMap: MutableMap<GardenProfitTextEntry, Searchable> = mutableMapOf()
         val selectedBucket = bucketData.selectedBucket
         val itemList = mutableListOf<Searchable>()
-        val itemProfit = drawItems(bucketData, { true }, itemList)
+        var itemProfit = drawItems(bucketData, { true }, itemList)
 
         displayMap[GardenProfitTextEntry.TITLE] = Renderable.text("§6§lGarden Profit Tracker").toSearchable()
 
@@ -183,6 +183,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
             cropsSpent += bucketData.getConsumableCost()
             // crops spent will already display total cost of consumable, so avoid duplication
             displayMap[GardenProfitTextEntry.ITEM_PROFIT] = Renderable.empty().toSearchable()
+            itemProfit = 0.0
         }
 
         if (selectedBucket in setOf(null, GardenTrackerTypes.VISITORS, GardenTrackerTypes.COMPOSTER, GardenTrackerTypes.CONSUMABLES)) {
