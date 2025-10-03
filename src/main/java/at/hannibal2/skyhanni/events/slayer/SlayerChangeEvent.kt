@@ -15,5 +15,5 @@ class SlayerProgressChangeEvent(val oldProgress: String, val newProgress: String
 
 /**
  * When the current state of the active quest changes: start, failed, slain
-  */
-class SlayerStateChangeEvent(val state: ActiveQuestState): SkyHanniEvent()
+ */
+class SlayerStateChangeEvent(val state: ActiveQuestState) : SkyHanniEvent()
