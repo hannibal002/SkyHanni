@@ -12,19 +12,12 @@ runs:
 
         -   name: Set up Gradle
             uses: gradle/actions/setup-gradle@v4
+            with:
+                cache-read-only: false
+                cache-overwrite-existing: true
 
         -   name: Enable preprocessor
             shell: bash
             run: |
                 mkdir -p .gradle
                 echo skyhanni.multi-version=compile > .gradle/private.properties
-
-        -   name: Set up build cache
-            uses: actions/cache@v4
-            with:
-                path: |
-                    ~/.gradle/caches
-                    ~/.gradle/wrapper
-                key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-                restore-keys: |
-                    ${{ runner.os }}-gradle-
