@@ -102,7 +102,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
         @Expose var blocksBroken: Long = 0L
     ) : BucketedItemTrackerData<GardenTrackerTypes, SessionUptime.Garden>(GardenTrackerTypes::class, SessionUptime.Garden::class) {
         private val excludeFromTotal: Set<NeuInternalName> =
-            CropType.entries.map { it.cropName.toInternalName() }.toSet() + "Seeds".toInternalName() + SKYBLOCK_COIN
+            CropType.entries.map { it.internalName }.toSet() + "Seeds".toInternalName() + SKYBLOCK_COIN
 
         override fun getDescription(bucket: GardenTrackerTypes?, timesGained: Long): List<String> {
             return listOf(
