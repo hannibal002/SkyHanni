@@ -15,6 +15,7 @@ runs:
             with:
                 cache-read-only: false
                 cache-overwrite-existing: true
+                cache-cleanup: always
 
         -   name: Enable preprocessor
             shell: bash
