@@ -1,4 +1,4 @@
-name: 'Setup Java, Gradle and check out the source code'
+name: 'Set up Java, Gradle, and check out the source code'
 
 runs:
     using: composite
@@ -9,5 +9,27 @@ runs:
                 distribution: 'temurin'
                 java-version: 21
                 cache: gradle
-        -   name: Setup gradle
+
+        -   name: Set up Gradle
             uses: gradle/actions/setup-gradle@v4
+
+        -   name: Check out code
+            uses: actions/checkout@v4
+            with:
+                ref: ${{ github.event.pull_request.head.ref }}
+                repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+        -   name: Enable preprocessor
+            run: |
+                mkdir -p .gradle
+                echo skyhanni.multi-version=compile > .gradle/private.properties
+
+        -   name: Set up build cache
+            uses: actions/cache@v4
+            with:
+                path: |
+                    ~/.gradle/caches
+                    ~/.gradle/wrapper
+                key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                restore-keys: |
+                    ${{ runner.os }}-gradle-

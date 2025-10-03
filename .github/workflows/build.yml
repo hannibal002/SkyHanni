@@ -18,29 +18,8 @@ jobs:
         name: "Build 1.8.9"
         runs-on: ubuntu-latest
         steps:
-            -   name: Checkout code
-                uses: actions/checkout@v4
-                with:
-                    ref: ${{ github.event.pull_request.head.ref }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
-
-            -   name: Setup workspace
+            -   name: Set up workspace
                 uses: ./.github/actions/setup-normal-workspace
-
-            -   name: Enable preprocessor
-                run: |
-                    mkdir -p .gradle
-                    echo skyhanni.multi-version=compile > .gradle/private.properties
-
-            -   name: Cache build output
-                uses: actions/cache@v4
-                with:
-                    path: |
-                        ~/.gradle/caches
-                        ~/.gradle/wrapper
-                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-                    restore-keys: |
-                        ${{ runner.os }}-gradle-
 
             -   name: Build with Gradle w/ retry
                 uses: ./.github/actions/gradle-retry
@@ -59,29 +38,8 @@ jobs:
         runs-on: ubuntu-latest
         needs: build_1_8_9
         steps:
-            -   name: Checkout code
-                uses: actions/checkout@v4
-                with:
-                    ref: ${{ github.event.pull_request.head.ref }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
-
-            -   name: Setup workspace
+            -   name: Set up workspace
                 uses: ./.github/actions/setup-normal-workspace
-
-            -   name: Enable preprocessor
-                run: |
-                    mkdir -p .gradle
-                    echo skyhanni.multi-version=compile > .gradle/private.properties
-
-            -   name: Cache build output
-                uses: actions/cache@v4
-                with:
-                    path: |
-                        ~/.gradle/caches
-                        ~/.gradle/wrapper
-                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-                    restore-keys: |
-                        ${{ runner.os }}-gradle-
 
             -   name: Build with Gradle w/ retry
                 uses: ./.github/actions/gradle-retry
@@ -100,30 +58,8 @@ jobs:
         runs-on: ubuntu-latest
         needs: build_1_21_5
         steps:
-            -   name: Checkout code
-                uses: actions/checkout@v4
-                with:
-                    ref: ${{ github.event.pull_request.head.ref }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
-
-            -   name: Setup workspace
+            -   name: Set up workspace
                 uses: ./.github/actions/setup-normal-workspace
-
-            -   name: Enable preprocessor
-                run: |
-                    mkdir -p .gradle
-                    echo skyhanni.multi-version=compile > .gradle/private.properties
-
-            -   name: Cache build output
-                uses: actions/cache@v4
-                with:
-                    path: |
-                        ~/.gradle/caches
-                        ~/.gradle/wrapper
-                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-                    restore-keys: |
-                        ${{ runner.os }}-gradle-
-
 
             -   name: Build with Gradle w/ retry
                 uses: ./.github/actions/gradle-retry
