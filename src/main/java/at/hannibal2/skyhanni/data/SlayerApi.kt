@@ -188,14 +188,10 @@ object SlayerApi {
         val lines = getSlayerLines()
 
         val slayerType = lines.getOrNull(1)
-        ChatUtils.debug("slayerType: $slayerType")
         val type = slayerType?.let { Type.getByName(it) }
-        ChatUtils.debug("type: ${type?.name}")
 
         val slayerProgress = lines.getOrNull(2) ?: "no slayer"
-        ChatUtils.debug("slayerProgress: $slayerProgress")
         val newState = slayerProgress.removeColor()
-        ChatUtils.debug("newState: $newState")
 
         val slayerData = getCurrentData()
         if (slayerData.currentStateRaw == newState) return
