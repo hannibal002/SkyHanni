@@ -213,13 +213,14 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
         var cropProfit = 0L
 
         fun includeCropProfit() =
-            bucketData.selectedBucket == null &&
-            !config.includeHarvestedCrops.get() &&
-            GardenTrackerTypes.BREAKING_CROPS in config.profitTypes.get()
+                bucketData.selectedBucket == null &&
+                !config.includeHarvestedCrops.get() &&
+                GardenTrackerTypes.BREAKING_CROPS in config.profitTypes.get()
 
         if (includeCropProfit()) {
             cropProfit = bucketData.getCropProfit().toLong()
-            displayMap[GardenProfitTextEntry.CROP_DROPS] = Renderable.text("§eHarvested Crop Profit: ${cropProfit.formatCoin()}").toSearchable()
+            displayMap[GardenProfitTextEntry.CROP_DROPS] =
+                Renderable.text("§eHarvested Crop Profit: ${cropProfit.formatCoin()}").toSearchable()
         }
         displayMap[GardenProfitTextEntry.SPACER] = Renderable.text("").toSearchable()
         displayMap[GardenProfitTextEntry.SPACER_2] = Renderable.text("").toSearchable()

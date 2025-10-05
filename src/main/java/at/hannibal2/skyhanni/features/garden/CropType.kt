@@ -42,7 +42,7 @@ enum class CropType(
     NETHER_WART(
         "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
         { ItemStack(Items.nether_wart) }, "wart", FarmingItemType.NETHER_WART,
-        "MUTANT_NETHER_STALK".toInternalName(), replenish = true,        enchantName = "warts", eliteLbName = "netherwart",
+        "MUTANT_NETHER_STALK".toInternalName(), replenish = true, enchantName = "warts", eliteLbName = "netherwart",
         internalName = "nether_stalk".toInternalName()
     ),
     PUMPKIN(
