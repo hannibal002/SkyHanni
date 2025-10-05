@@ -213,7 +213,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
         var cropProfit = 0L
 
         fun includeCropProfit() =
-                bucketData.selectedBucket == null &&
+            bucketData.selectedBucket == null &&
                 !config.includeHarvestedCrops.get() &&
                 GardenTrackerTypes.BREAKING_CROPS in config.profitTypes.get()
 
