@@ -323,6 +323,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
 
     private fun onBarn() = GardenApi.onBarnPlot
 
+    //This is really scuffed. Not going to improve it.
     @Suppress("LoopWithTooManyJumpStatements")
     private fun importData() {
         val profileStorage = ProfileStorageData.profileSpecific?.garden
@@ -436,7 +437,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
     @HandleEvent
     fun onCommand(event: CommandRegistrationEvent) {
         event.register("shimportgardenprofits") {
-            description = "Imports profits from other trackers to the garden profit tracker."
+            description = "Imports profits from other trackers to the garden profit tracker. May cause issues."
             category = CommandCategory.DEVELOPER_TEST
             callback { importData() }
         }

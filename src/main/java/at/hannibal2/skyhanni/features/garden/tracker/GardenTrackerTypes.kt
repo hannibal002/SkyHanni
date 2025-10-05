@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.tracker
 
 enum class GardenTrackerTypes(val displayName: String) {
-    BREAKING_CROPS("Breaking Crops"),
+    BREAKING_CROPS("Harvested Crops"),
     PESTS("Pests"),
     COMPOSTER("Composter"),
     VISITORS("Visitors"),

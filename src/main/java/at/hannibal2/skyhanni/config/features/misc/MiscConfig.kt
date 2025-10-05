@@ -393,7 +393,7 @@ class MiscConfig {
     @ConfigOption(name = "Red Negative Coins", desc = "Show negative coins as red in Skyhanni Displays.")
     @ConfigEditorBoolean
     @FeatureToggle
-    val redNegativeCoins: Boolean = true
+    var redNegativeCoins: Boolean = true
 
     @Expose
     @ConfigOption(
