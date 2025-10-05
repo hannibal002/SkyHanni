@@ -390,6 +390,12 @@ class MiscConfig {
     val replaceRomanNumerals: Property<Boolean> = Property.of(false)
 
     @Expose
+    @ConfigOption(name = "Red Negative Coins", desc = "Show negative coins as red in Skyhanni Displays.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    val redNegativeCoins: Boolean = true
+
+    @Expose
     @ConfigOption(
         name = "Charge Bottle Notification",
         desc = "Send a message when your charge bottle (thunder in a bottle, storm in a bottle, hurricane in a bottle) is fully charged.",

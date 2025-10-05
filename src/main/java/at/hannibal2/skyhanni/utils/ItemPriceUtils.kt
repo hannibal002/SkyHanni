@@ -177,17 +177,30 @@ object ItemPriceUtils {
         return "${getNumberedName(amount)} ${price.formatCoinWithBrackets()}"
     }
 
-    fun Number.formatCoinWithBrackets(gray: Boolean = false): String {
-        return "§7(" + formatCoin(gray) + "§7)"
+    fun Number.formatCoinWithBrackets(gray: Boolean = false, longFormat: Boolean = false): String {
+        return "§7(" + formatCoin(gray, longFormat) + "§7)"
     }
 
-    fun Number.formatCoin(gray: Boolean = false): String {
-        val color = when {
+    fun Number.formatCoin(gray: Boolean = false, longFormat: Boolean = false): String {
+        return if (longFormat) longCoinFormat(gray) else shortCoinFormat(gray)
+    }
+
+    fun Number.longCoinFormat(gray: Boolean = false): String {
+        val color = getColor(gray)
+        return color + addSeparators() + "§6 coins"
+    }
+
+    fun Number.shortCoinFormat(gray: Boolean = false): String {
+        val color = getColor(gray)
+        return color + shortFormat()
+    }
+
+    private fun Number.getColor(gray: Boolean = false): String {
+        return when {
             gray -> "§7"
-            this.toDouble() < 0 -> "§c"
+            toDouble() < 0 && SkyHanniMod.feature.misc.redNegativeCoins -> "§c"
             else -> "§6"
         }
-        return color + shortFormat()
     }
 
     @HandleEvent

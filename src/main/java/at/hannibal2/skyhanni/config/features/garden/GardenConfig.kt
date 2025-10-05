@@ -37,7 +37,7 @@ class GardenConfig {
     val eliteFarmersLeaderboards: EliteFarmersLeaderboardsConfig = EliteFarmersLeaderboardsConfig()
 
     @Expose
-    @ConfigOption(name = "Profit Tracker", desc = "")
+    @ConfigOption(name = "Garden Profit Tracker", desc = "")
     @Accordion
     val profitTracker: GardenProfitTrackerConfig = GardenProfitTrackerConfig()
 
