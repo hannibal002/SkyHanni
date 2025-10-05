@@ -323,7 +323,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
 
     private fun onBarn() = GardenApi.onBarnPlot
 
-    //This is really scuffed. Not going to improve it.
+    // This is really scuffed. Not going to improve it.
     @Suppress("LoopWithTooManyJumpStatements")
     private fun importData() {
         val profileStorage = ProfileStorageData.profileSpecific?.garden
