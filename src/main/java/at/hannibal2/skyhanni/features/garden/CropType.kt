@@ -21,7 +21,7 @@ enum class CropType(
     val replenish: Boolean = false,
     val enchantName: String = cropName.lowercase(),
     val eliteLbName: String = simpleName,
-    val internalName: NeuInternalName = cropName.toInternalName(),
+    val internalName: NeuInternalName = cropName.replace(" ", "_").toInternalName(),
     val compactedName: NeuInternalName = "Enchanted_${internalName.asString()}".toInternalName()
 ) {
 
@@ -32,7 +32,7 @@ enum class CropType(
     CARROT(
         "Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0,
         { ItemStack(Items.carrot) }, "carrot", FarmingItemType.CARROT, "ENCHANTED_GOLDEN_CARROT".toInternalName(),
-        replenish = true
+        internalName = "CARROT_ITEM".toInternalName(), replenish = true
     ),
     POTATO(
         "Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0,
