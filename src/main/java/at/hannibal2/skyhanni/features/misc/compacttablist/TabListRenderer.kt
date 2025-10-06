@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
@@ -32,6 +33,7 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
+        if (GlobalRender.renderDisabled) return
         if (event.type != RenderLayer.PLAYER_LIST) return
         if (!config.enabled.get()) return
         event.cancel()
@@ -46,6 +48,7 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (GlobalRender.renderDisabled) return
         if (!config.enabled.get()) return
         if (!config.toggleTab) return
         if (Minecraft.getMinecraft().currentScreen != null) return
@@ -119,7 +122,7 @@ object TabListRenderer {
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     headerY.toFloat(),
-                    0xFFFFFF,
+                    -1,
                 )
                 headerY += 8 + 1
             }
@@ -134,7 +137,7 @@ object TabListRenderer {
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     footerY.toFloat(),
-                    -0x1,
+                    -1,
                 )
                 footerY += LINE_HEIGHT
             }
@@ -199,14 +202,14 @@ object TabListRenderer {
                         text,
                         middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
                         middleY.toFloat(),
-                        0xFFFFFF,
+                        -1,
                     )
                 } else {
                     GuiRenderUtils.drawString(
                         text,
                         middleX.toFloat(),
                         middleY.toFloat(),
-                        0xFFFFFF,
+                        -1,
                     )
                 }
                 middleY += LINE_HEIGHT

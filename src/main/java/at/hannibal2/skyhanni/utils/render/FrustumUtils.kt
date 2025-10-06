@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.culling.Frustum
 import net.minecraft.util.AxisAlignedBB
@@ -33,7 +32,7 @@ object FrustumUtils {
      */
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        val pos = RenderUtils.exactLocation(Minecraft.getMinecraft().renderViewEntity, event.partialTicks)
+        val pos = WorldRenderUtils.exactLocation(Minecraft.getMinecraft().renderViewEntity, event.partialTicks)
         frustum = Frustum().also { it.setPosition(pos.x, pos.y, pos.z) }
     }
     //#endif

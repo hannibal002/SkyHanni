@@ -4,11 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
+import at.hannibal2.skyhanni.events.pets.PetChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -19,8 +21,8 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
@@ -30,19 +32,19 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.moveEntryToTop
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.line
-import kotlinx.coroutines.launch
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object CropMoneyDisplay {
@@ -59,13 +61,18 @@ object CropMoneyDisplay {
     private var moneyPerHour: Map<NeuInternalName, CropMoneyData> = mutableMapOf()
     private val extraMoneyPerHour: ExtraMoneyData = ExtraMoneyData(0.0, 0.0, 0.0)
 
-    private val BOX_OF_SEEDS by lazy { "BOX_OF_SEEDS".toInternalName().getItemStack() }
+    private val BOX_OF_SEEDS by AutoUpdatingItemStack("BOX_OF_SEEDS")
     private val SEEDS = "SEEDS".toInternalName()
     private val ENCHANTED_SEEDS = "ENCHANTED_SEEDS".toInternalName()
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = null
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onPetChange(event: PetChangeEvent) {
+        update()
     }
 
     @HandleEvent
@@ -142,8 +149,8 @@ object CropMoneyDisplay {
 
     private fun buildDisplayBody(): Renderable {
         GardenApi.getCurrentlyFarmedCrop()?.let {
-            val reforgeName = InventoryUtils.getItemInHand()?.getReforgeName()
-            toolHasBountiful?.put(it, reforgeName == "bountiful")
+            val reforge = InventoryUtils.getItemInHand()?.getReforgeModifier()
+            toolHasBountiful?.put(it, reforge == "bountiful")
 
             if (GardenApi.mushroomCowPet && it != CropType.MUSHROOM && config.mooshroom) {
                 val redMushroom = "ENCHANTED_RED_MUSHROOM".toInternalName()
@@ -178,7 +185,7 @@ object CropMoneyDisplay {
                 val bazaarData = internalName.getBazaarData()
                 val price =
                     if (SkyBlockUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160
-                    else (bazaarData.instantBuyPrice + bazaarData.sellOfferPrice) / 320
+                    else (bazaarData.instantSellPrice + bazaarData.instantBuyPrice) / 320
                 extraMoneyPerHour.dicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
             }
 
@@ -195,9 +202,9 @@ object CropMoneyDisplay {
                 ChatUtils.debug(message)
                 ready = false
                 loaded = false
-                return Renderable.string("§eStill Loading...")
+                return Renderable.text("§eStill Loading...")
             }
-            return Renderable.string("§cFarm crops to add them to this list!")
+            return Renderable.text("§cFarm crops to add them to this list!")
         }
         val cropList = createDescendingCropList(moneyPerHour)
         return Renderable.vertical {
@@ -238,7 +245,7 @@ object CropMoneyDisplay {
         val isCurrent = crop == GardenApi.getCurrentlyFarmedCrop()
         if (number > config.showOnlyBest && (!config.showCurrent || !isCurrent)) return null
 
-        return line {
+        return Renderable.horizontal {
             if (!config.compact) {
                 addString("§7$number# ")
             }
@@ -319,8 +326,8 @@ object CropMoneyDisplay {
         val bazaarData = internalName.getBazaarData() ?: return null
 
         val npcCoins = internalName.getNpcPrice() * cropsPerHour
-        val sellOfferCoins = bazaarData.sellOfferPrice * cropsPerHour
-        val instantSellCoins = bazaarData.instantBuyPrice * cropsPerHour
+        val sellOfferCoins = bazaarData.instantBuyPrice * cropsPerHour
+        val instantSellCoins = bazaarData.instantSellPrice * cropsPerHour
         val bountifulCoins = if (toolHasBountiful?.get(crop) == true && config.bountiful) speedPerHour * 0.2 else 0.0
 
         return CropMoneyData(
@@ -352,7 +359,7 @@ object CropMoneyDisplay {
         if (loaded) return
         loaded = true
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine("garden crop money display init") {
             val map = mutableMapOf<NeuInternalName, Int>()
             for ((rawInternalName, _) in NeuItems.allNeuRepoItems()) {
                 if (rawInternalName == "ENCHANTED_PAPER") continue
@@ -396,9 +403,6 @@ object CropMoneyDisplay {
         event.move(3, "garden.moneyPerHourDicer", "garden.moneyPerHours.dicer")
         event.move(3, "garden.moneyPerHourHideTitle", "garden.moneyPerHours.hideTitle")
         event.move(3, "garden.moneyPerHourPos", "garden.moneyPerHours.pos")
-        event.transform(11, "garden.moneyPerHours.customFormat") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, CustomFormatEntry::class.java)
-        }
     }
 
     private fun CropMoneyData.toPrices(): List<Double> {

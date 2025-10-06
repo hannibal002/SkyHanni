@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -26,6 +27,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -68,7 +70,7 @@ object CraftableItemList {
         } else {
             buildList<Renderable> {
                 val items = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
-                add(Renderable.string("§e§lCraftable Items §7(${items.size})"))
+                addString("§e§lCraftable Items §7(${items.size})")
                 add(items.buildSearchableScrollable(height = 250, textInput, velocity = 20.0))
             }
         }
@@ -113,9 +115,7 @@ object CraftableItemList {
             add("")
             add("§7Craft cost: §6${totalPrice.shortFormat()}")
             for ((item, amount) in neededItems) {
-                val name = item.repoItemName
-                val price = item.getPrice() * amount
-                add(" §8x${amount.addSeparators()} $name §7(§6${price.shortFormat()}§7)")
+                add(" ${item.getPriceName(amount)}")
             }
             add("")
             add("§7You have enough materials")

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -11,21 +12,22 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import com.google.gson.JsonPrimitive
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.util.EnumParticleTypes
-import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.12
 //$$ import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
 //#endif
@@ -126,15 +128,15 @@ object PestParticleWaypoint {
         }
         val waypoint = guessPosition ?: return
         val distance = waypoint.distance(event.exactPlayerEyeLocation())
-        val color: Color
+        val color: ChromaColour
         if (isGuessPlotMiddle && config.differentiatePlotMiddle) {
-            color = LorenzColor.YELLOW.toColor()
+            color = LorenzColor.YELLOW.toChromaColor()
             event.drawDynamicText(waypoint, " §r§e(plot middle)", 1.0, (-0.1 - distance / (12 * 1.7)).toFloat())
         } else {
-            color = LorenzColor.RED.toColor()
+            color = LorenzColor.RED.toChromaColor()
         }
 
-        event.drawWaypointFilled(waypoint, color, beacon = true)
+        event.drawWaypointFilled(waypoint, color.toColor(), beacon = true)
         event.drawDynamicText(waypoint, "§aPest Guess", 1.3)
         if (config.drawLine) {
             event.drawLineToEye(
@@ -159,6 +161,13 @@ object PestParticleWaypoint {
     @HandleEvent(PestUpdateEvent::class)
     fun onPestUpdate() {
         if (PestApi.scoreboardPests == 0) reset()
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(104, "garden.pests.pestWaypoint.enabled") {
+            JsonPrimitive(true)
+        }
     }
 
     private fun isEnabled() = config.enabled

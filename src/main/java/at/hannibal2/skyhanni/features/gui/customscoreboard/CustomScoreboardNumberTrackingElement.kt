@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 interface CustomScoreboardNumberTrackingElement {
     var previousAmount: Long
@@ -28,8 +27,7 @@ interface CustomScoreboardNumberTrackingElement {
         } else {
             " §7($numberColor${formatNumber(changeAmount)}§7)$numberColor"
         }
-
-        currentJob = SkyHanniMod.coroutineScope.launch {
+        currentJob = SkyHanniMod.launchCoroutine("custom scoreboard number show temporary change") {
             delay(durationMillis)
             temporaryChangeDisplay = null
             currentJob = null

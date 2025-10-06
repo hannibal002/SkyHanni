@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.config.storage.Resettable
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.SlayerApi
@@ -24,14 +26,14 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNull
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
-open class SkyHanniTracker<Data : TrackerData>(
+open class SkyHanniTracker<Data : Resettable>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
@@ -91,7 +93,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
-        if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
+        if (!currentlyOpen && config.hideOutsideInventory && this is SkyHanniItemTracker) {
             return
         }
         if (RenderData.outsideInventory) {
@@ -108,7 +110,7 @@ open class SkyHanniTracker<Data : TrackerData>(
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
                 if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
-                else buildFinalDisplay(VerticalContainerRenderable(searchables.toRenderable()))
+                else buildFinalDisplay(Renderable.vertical(searchables.toRenderable()))
             }.orEmpty()
             dirty = false
         }
@@ -196,19 +198,25 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    fun initRenderer(position: () -> Position, inventory: InventoryDetector = RenderDisplayHelper.NO_INVENTORY, condition: () -> Boolean) {
+    fun initRenderer(
+        position: () -> Position,
+        inventory: InventoryDetector = RenderDisplayHelper.NO_INVENTORY,
+        onlyOnIsland: IslandType? = null,
+        condition: () -> Boolean,
+    ) {
         RenderDisplayHelper(
             inventory,
             outsideInventory = true,
             inOwnInventory = true,
             condition = condition,
+            onlyOnIsland = onlyOnIsland,
             onRender = {
                 renderDisplay(position())
             },
         )
     }
 
-    inner class SharedTracker<Data : TrackerData>(
+    inner class SharedTracker<Data : Resettable>(
         private val entries: Map<DisplayMode, Data>,
     ) {
 
@@ -244,7 +252,7 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     fun addPriceFromButton(lists: MutableList<Searchable>) {
         if (isInventoryOpen()) {
-            lists.addButton<ItemPriceSource>(
+            lists.addButton(
                 label = "Price Source",
                 current = config.priceSource,
                 getName = { it.sellName },

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // This entire file was taken from SkyblockAddons code, ported to SkyHanni
 
-import at.hannibal2.skyhanni.SkyHanniMod.coroutineScope
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.feature
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -11,19 +11,14 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -34,7 +29,10 @@ import dev.cbyrne.kdiscordipc.core.event.impl.DisconnectedEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ErrorEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ReadyEvent
 import dev.cbyrne.kdiscordipc.data.activity.Activity
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -45,40 +43,32 @@ object DiscordRPCManager {
     val config get() = feature.gui.discordRPC
 
     private var client: KDiscordIPC? = null
-    private var startTimestamp: Long = 0
+    private var startTimestamp: SimpleTimeMark = SimpleTimeMark.farPast()
     private var started = false
     private var nextUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
-
-    var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
+    private var presenceJob: Job? = null
 
     private var debugError = false
     private var debugStatusMessage = "nothing"
 
-    fun start(fromCommand: Boolean = false) {
-        coroutineScope.launch {
-            try {
-                if (isConnected()) return@launch
-
-                updateDebugStatus("Starting...")
-                startTimestamp = System.currentTimeMillis()
-                client = KDiscordIPC(APPLICATION_ID.toString())
-                setup(fromCommand)
-            } catch (e: Throwable) {
-                updateDebugStatus("Unexpected error: ${e.message}", error = true)
-                ErrorManager.logErrorWithData(e, "Discord RPC has thrown an unexpected error while trying to start")
-
-            }
+    suspend fun start(fromCommand: Boolean = false) {
+        if (isConnected()) return
+        updateDebugStatus("Starting...")
+        startTimestamp = SimpleTimeMark.now()
+        client = KDiscordIPC(APPLICATION_ID.toString())
+        try {
+            setup(fromCommand)
+        } catch (e: Throwable) {
+            updateDebugStatus("Unexpected error: ${e.message}", error = true)
+            ErrorManager.logErrorWithData(e, "Discord RPC has thrown an unexpected error while trying to start")
         }
     }
 
     private fun stop() {
-        coroutineScope.launch {
-            if (isConnected()) {
-                updateDebugStatus("Stopped")
-                client?.disconnect()
-                started = false
-            }
-        }
+        if (!isConnected()) return
+        updateDebugStatus("Stopped")
+        client?.disconnect()
+        started = false
     }
 
     private suspend fun setup(fromCommand: Boolean) {
@@ -87,9 +77,9 @@ object DiscordRPCManager {
             client?.on<DisconnectedEvent> { onIPCDisconnect() }
             client?.on<ErrorEvent> { onError(data) }
             client?.connect()
+            setupPresenceJob()
             updateDebugStatus("Successfully started")
             if (!fromCommand) return
-
             // confirm that /shrpcstart worked
             ChatUtils.chat("Successfully started Rich Presence!", prefixColor = "§a")
         } catch (e: Exception) {
@@ -113,22 +103,21 @@ object DiscordRPCManager {
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
         ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
-            if (isConnected()) {
-                coroutineScope.launch {
-                    updatePresence()
-                }
-            }
+            if (isConnected()) setupPresenceJob()
+            else presenceJob?.cancel()
         }
         config.enabled.whenChanged { _, new ->
-            if (!new) {
-                stop()
-            }
+            if (!new) stop()
         }
     }
 
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
+    private fun setupPresenceJob() {
+        presenceJob = SkyHanniMod.launchNoScopeCoroutine("discord rpc updatePresence", timeout = Duration.INFINITE) {
+            while (isConnected()) {
+                updatePresence()
+                delay(5.seconds)
+            }
+        }
     }
 
     private suspend fun updatePresence() {
@@ -158,7 +147,7 @@ object DiscordRPCManager {
                 details = getStatusByConfigId(config.firstLine.get()).getDisplayString(),
                 state = getStatusByConfigId(config.secondLine.get()).getDisplayString(),
                 timestamps = Activity.Timestamps(
-                    start = startTimestamp,
+                    start = startTimestamp.toMillis(),
                     end = null
                 ),
                 assets = Activity.Assets(
@@ -176,13 +165,10 @@ object DiscordRPCManager {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isConnected()) return
-        if (event.repeatSeconds(5)) {
-            coroutineScope.launch {
-                updatePresence()
-            }
-        }
+    fun onSecondPassed() {
+        if (!isConnected()) return presenceJob?.cancel() ?: Unit
+        else if (presenceJob?.isActive == true) return
+        setupPresenceJob()
     }
 
     private fun onIPCDisconnect() {
@@ -208,7 +194,7 @@ object DiscordRPCManager {
         if (SkyBlockUtils.inSkyBlock) {
             // todo discord rpc doesnt connect on 1.21
             //#if TODO
-            start()
+            SkyHanniMod.launchNoScopeCoroutine("discord rpc start", timeout = INFINITE) { start() }
             //#endif
             started = true
         }
@@ -219,9 +205,7 @@ object DiscordRPCManager {
         if (nextUpdate.isInFuture()) return
         // wait 5 seconds to check if the new world is skyblock or not before stopping the function
         nextUpdate = DelayedRun.runDelayed(5.seconds) {
-            if (!SkyBlockUtils.inSkyBlock) {
-                stop()
-            }
+            if (!SkyBlockUtils.inSkyBlock) stop()
         }
     }
 
@@ -243,7 +227,7 @@ object DiscordRPCManager {
 
         ChatUtils.chat("Attempting to start Discord Rich Presence...")
         try {
-            start(true)
+            SkyHanniMod.launchCoroutine("discord rpc manual start") { start(true) }
             updateDebugStatus("Successfully started")
         } catch (e: Exception) {
             updateDebugStatus("Unable to start: ${e.message}", error = true)
@@ -285,19 +269,6 @@ object DiscordRPCManager {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(11, "misc.discordRPC.firstLine") { element ->
-            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
-        }
-        event.transform(11, "misc.discordRPC.secondLine") { element ->
-            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
-        }
-        event.transform(11, "misc.discordRPC.auto") { element ->
-            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
-        }
-        event.transform(11, "misc.discordRPC.autoPriority") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, PriorityEntry::class.java)
-        }
-
         event.move(31, "misc.discordRPC", "gui.discordRPC")
     }
 

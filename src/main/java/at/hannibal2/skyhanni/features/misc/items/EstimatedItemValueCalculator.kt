@@ -4,12 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
-import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
@@ -46,19 +44,23 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFreeWill
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRodParts
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSilexCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getTransmissionTunerCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getWetBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfWar
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasBookOfStats
@@ -67,6 +69,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasEtherwarp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
@@ -84,7 +87,7 @@ object EstimatedItemValueCalculator {
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
     var starChange = 0
-        get() = if (SkyHanniDebugsAndTests.enabled) field else 0
+        get() = if (SkyBlockUtils.debug) field else 0
 
     private val additionalCostFunctions = listOf(
         ::addReforgeStone,
@@ -101,12 +104,14 @@ object EstimatedItemValueCalculator {
         ::addEnrichment,
         ::addDivanPowderCoating,
         ::addMithrilInfusion,
+        ::addFreeWill,
 
         // counted
         ::addCrimsonPrestige,
         ::addStars, // crimson, dungeon
         ::addMasterStars,
         ::addHotPotatoBooks,
+        ::addWetBook,
         ::addFarmingForDummies,
         ::addSilex,
         ::addTransmissionTuners,
@@ -124,6 +129,7 @@ object EstimatedItemValueCalculator {
         ::addAbilityScrolls,
         ::addBoosters,
         ::addDrillUpgrades,
+        ::addRodUpgrades,
         ::addGemstoneSlotUnlockCost,
         ::addGemstones,
         ::addEnchantments,
@@ -144,11 +150,13 @@ object EstimatedItemValueCalculator {
     private val ART_OF_WAR = "THE_ART_OF_WAR".toInternalName()
     private val BOOK_OF_STATS = "BOOK_OF_STATS".toInternalName()
     private val ART_OF_PEACE = "THE_ART_OF_PEACE".toInternalName()
+    private val WET_BOOK = "WET_BOOK".toInternalName()
     private val POLARVOID_BOOK = "POLARVOID_BOOK".toInternalName()
     private val POCKET_SACK_IN_A_SACK = "POCKET_SACK_IN_A_SACK".toInternalName()
     private val BOOKWORM_BOOK = "BOOKWORM_BOOK".toInternalName()
     private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
     private val MITHRIL_INFUSION = "MITHRIL_INFUSION".toInternalName()
+    private val FREE_WILL = "FREE_WILL".toInternalName()
 
     fun getTotalPrice(stack: ItemStack, ignoreBasePrice: Boolean = false): Double? {
         val (totalPrice, basePrice) = calculate(stack, mutableListOf())
@@ -160,17 +168,20 @@ object EstimatedItemValueCalculator {
 
     fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
         val basePrice = addBaseItem(stack, list)
-        val totalPrice = additionalCostFunctions.fold(basePrice) { total, function -> total + function(stack, list) }
+        // The value of enchantments will already be added in ::addEnchantments, so set to 0 to avoid double counting
+        val foldValue = if (stack.getItemId() == "ENCHANTED_BOOK") 0.0
+        else basePrice
+        val totalPrice = additionalCostFunctions.fold(foldValue) { total, function -> total + function(stack, list) }
         return totalPrice to basePrice
     }
 
     private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
-        val rawReforgeName = stack.getReforgeName() ?: return 0.0
+        val rawReforgeName = stack.getReforgeModifier() ?: return 0.0
 
-        val reforge = ReforgeApi.onlyPowerStoneReforge.firstOrNull {
-            rawReforgeName == it.lowercaseName || rawReforgeName == it.reforgeStone?.asString()?.lowercase()
+        val reforge = ReforgeApi.reforgeStones.firstOrNull {
+            rawReforgeName == it.nbtModifier
         } ?: return 0.0
         val internalName = reforge.reforgeStone ?: return 0.0
         val reforgeStonePrice = internalName.getPrice()
@@ -253,6 +264,11 @@ object EstimatedItemValueCalculator {
     private fun addMithrilInfusion(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.getMithrilInfusion()) return 0.0
         return list.formatHaving("Mithril Infusion", MITHRIL_INFUSION)
+    }
+
+    private fun addFreeWill(stack: ItemStack, list: MutableList<String>): Double {
+        if (!stack.getFreeWill()) return 0.0
+        return list.formatHaving("Free Will", FREE_WILL)
     }
 
     private fun addArtOfWar(stack: ItemStack, list: MutableList<String>): Double {
@@ -349,6 +365,14 @@ object EstimatedItemValueCalculator {
         }
 
         return totalPrice
+    }
+
+    private fun addWetBook(stack: ItemStack, list: MutableList<String>): Double {
+        val count = stack.getWetBookCount() ?: return 0.0
+
+        val price = WET_BOOK.getPrice() * count
+        list.add(formatProgress("Wet Book", count, max = 5, price))
+        return price
     }
 
     private fun addFarmingForDummies(stack: ItemStack, list: MutableList<String>): Double {
@@ -559,6 +583,17 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
+    private fun addRodUpgrades(stack: ItemStack, list: MutableList<String>): Double {
+        val rodUpgrades = stack.getRodParts()
+
+        val (totalPrice, names) = getTotalAndNames(rodUpgrades)
+        if (names.isNotEmpty()) {
+            list.add("§7Rod upgrades: " + totalPrice.formatCoin())
+            list += names
+        }
+        return totalPrice
+    }
+
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0
 
@@ -657,7 +692,14 @@ object EstimatedItemValueCalculator {
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
-            if (rawName in DiscordRPCManager.stackingEnchants.keys) level = 1
+            if (rawName in EstimatedItemValue.stackingEnchants.keys) level = 1
+
+            data.endcapEnchants?.get(rawName)?.let { endcapData ->
+                if (rawLevel > endcapData.requiredLevel) {
+                    level = endcapData.requiredLevel
+                    items[endcapData.endcapItem] = 1
+                }
+            }
 
             val enchantmentName = "$rawName;$level".toInternalName()
 

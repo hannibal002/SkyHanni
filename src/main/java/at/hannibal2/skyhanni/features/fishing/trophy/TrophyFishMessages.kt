@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -67,24 +66,19 @@ object TrophyFishMessages {
             if (config.playSound) SoundUtils.playBeepSound()
         }
 
-        val original = event.chatComponent
-        var edited = original
+        val edited = if (config.enabled) {
+            val designFormat = when (config.design) {
+                DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
+                else "§7$amount${amount.ordinal()} §r$displayRarity $displayName"
 
-        if (config.enabled) {
-            edited = (
-                "§6♔ §6§lTROPHY FISH! " + when (config.design) {
-                    DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
-                    else "§7$amount${amount.ordinal()} §r$displayRarity $displayName"
-
-                    DesignFormat.STYLE_2 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
-                    else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
-                }
-                ).asComponent()
-        }
+                DesignFormat.STYLE_2 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
+                else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
+            }
+            "§6♔ §6§lTROPHY FISH! $designFormat".asComponent()
+        } else event.chatComponent
 
         if (config.totalAmount) {
             val total = trophyFishCounts.sumAllValues()
-
             edited.appendComponent((" §7(${total.addSeparators()}${total.ordinal()} total)").asComponent())
         }
 
@@ -98,11 +92,8 @@ object TrophyFishMessages {
             }
         }
 
-        event.chatComponent = edited
-
-        if (config.duplicateHider) {
-            event.chatLineId = (internalName + rarity).hashCode()
-        }
+        if (config.duplicateHider) event.chatLineId = (internalName + rarity).hashCode()
+        event.replaceComponent(edited, "TROPHY_FISH")
     }
 
     private fun sendTitle(displayName: String, displayRarity: String?, amount: Int) {
@@ -127,9 +118,5 @@ object TrophyFishMessages {
         event.move(2, "fishing.trophyFishDuplicateHider", "fishing.trophyFishing.chatMessages.duplicateHider")
         event.move(2, "fishing.trophyFishBronzeHider", "fishing.trophyFishing.chatMessages.bronzeHider")
         event.move(2, "fishing.trophyFishSilverHider", "fishing.trophyFishing.chatMessages.silverHider")
-
-        event.transform(15, "fishing.trophyFishing.chatMessages.design") { element ->
-            ConfigUtils.migrateIntToEnum(element, DesignFormat::class.java)
-        }
     }
 }

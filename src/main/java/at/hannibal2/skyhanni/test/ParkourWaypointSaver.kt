@@ -5,17 +5,19 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -51,7 +53,7 @@ object ParkourWaypointSaver {
             }
 
             config.saveKey -> {
-                val newLocation = LorenzVec.getBlockBelowPlayer()
+                val newLocation = LocationUtils.getBlockBelowPlayer()
                 if (locations.isNotEmpty() && newLocation == locations.last()) return
                 locations.add(newLocation)
                 update()
@@ -66,12 +68,20 @@ object ParkourWaypointSaver {
      */
 
     private fun loadClipboard() {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("parkour waypoint load clipboard") {
             val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
-            locations = clipboard.split("\n").map { line ->
-                val raw = line.replace("\"", "").replace(",", "")
-                raw.split(":").map { it.toDouble() }.toLorenzVec()
-            }.toMutableList()
+            try {
+                locations = clipboard.split("\n").map { line ->
+                    val raw = line.replace("\"", "").replace(",", "")
+                    raw.split(":").map { it.toDouble() }.toLorenzVec()
+                }.toMutableList()
+            } catch (e: NumberFormatException) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "Failed to load parkour waypoint data from clipboard.",
+                    "clipboard" to clipboard,
+                )
+            }
             update()
         }
     }
@@ -106,7 +116,8 @@ object ParkourWaypointSaver {
         } else {
             for (location in locations) {
                 val aabb = location.boundingToOffset(1.0, 1.0, 1.0).expandBlock()
-                event.drawFilledBoundingBox(aabb, LorenzColor.GREEN.toColor(), 1f)
+                // TODO add chroma color support via config
+                event.drawFilledBoundingBox(aabb, LorenzColor.GREEN.toChromaColor(), 1f)
             }
         }
     }

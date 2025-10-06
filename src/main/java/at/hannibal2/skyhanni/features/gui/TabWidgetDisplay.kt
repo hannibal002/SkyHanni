@@ -36,7 +36,7 @@ enum class TabWidgetDisplay(
     TIMERS(null, TabWidget.TIMERS),
     FIRE_SALE(null, TabWidget.FIRE_SALE),
     RAIN("Park Rain", TabWidget.RAIN),
-    PEST_TRAPS("Pest Traps", TabWidget.PEST_TRAPS),
+    PEST_TRAPS("Pest Traps", TabWidget.PEST_TRAPS, TabWidget.FULL_TRAPS, TabWidget.NO_BAIT),
     FULL_PROFILE_WIDGET(
         "Profile Widget",
         TabWidget.PROFILE,
@@ -52,6 +52,8 @@ enum class TabWidgetDisplay(
     SHARD_TRAPS("Shard Traps", TabWidget.SHARD_TRAPS),
     FOREST_WHISPERS("Forest Whispers", TabWidget.FOREST_WHISPERS),
     AGATHA_CONTEST("Agatha's Contest", TabWidget.AGATHA_CONTEST),
+    COMMISSIONS("Mining Commissions", TabWidget.COMMISSIONS),
+    SLAYER("Slayer", TabWidget.SLAYER),
     ;
 
     val position get() = config.displayPositions[ordinal]
@@ -70,7 +72,7 @@ enum class TabWidgetDisplay(
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
             if (config.displayPositions.isEmpty()) return
-            config.display.forEach { widget ->
+            config.display.get().forEach { widget ->
                 widget.position.renderStrings(
                     widget.widgets.flatMap { subWidget ->
                         subWidget.lines

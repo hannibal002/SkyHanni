@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.ViewRecipeCommand
-import at.hannibal2.skyhanni.features.garden.fortuneguide.CarrolynTable
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
@@ -30,7 +29,6 @@ object TabComplete {
         CollectionTracker.handleTabComplete(command)?.let { return it }
         PartyCommands.customTabComplete(command)?.let { return it }
         ViewRecipeCommand.customTabComplete(command)?.let { return it }
-        CarrolynTable.customTabComplete(command)?.let { return it }
 
         return null
     }

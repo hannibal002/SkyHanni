@@ -34,9 +34,11 @@ object HighlightMissingRepoItems {
         if (NeuItems.allInternalNames.isEmpty()) return
         for (slot in slots) {
             val internalName = slot.stack?.getInternalNameOrNull() ?: continue
+            val asString = internalName.asString()
+            if (asString.startsWith("BUILDER_")) continue // Skip builder items as we filter them out of allInternalNames
 
-            if (NeuItems.ignoreItemsFilter.match(internalName.asString())) continue
-            if (NeuItems.allInternalNames[internalName.asString()] != null) continue
+            if (NeuItems.ignoreItemsFilter.match(asString)) continue
+            if (NeuItems.allInternalNames[asString] != null) continue
 
             slot.highlight(LorenzColor.RED)
         }

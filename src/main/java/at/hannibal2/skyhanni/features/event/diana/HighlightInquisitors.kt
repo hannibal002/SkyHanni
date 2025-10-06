@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 
 @SkyHanniModule
 object HighlightInquisitors {
@@ -18,7 +18,7 @@ object HighlightInquisitors {
 
         val inquisitor = event.inquisitorEntity
 
-        val color = config.color.toSpecialColorInt()
+        val color = config.color.toColor()
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(inquisitor, color) { config.highlightInquisitors }
     }
 }

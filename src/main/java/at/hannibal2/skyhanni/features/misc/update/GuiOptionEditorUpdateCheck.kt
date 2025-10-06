@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.update
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
@@ -20,7 +21,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val fr = context.minecraft.defaultFontRenderer
 
         context.pushMatrix()
-        context.translate(x.toFloat() + 10, y.toFloat(), 1F)
+        context.translate(x.toFloat() + 10, y.toFloat())
         val adjustedWidth = width - 20
         val nextVersion = UpdateManager.getNextVersion()
 
@@ -42,7 +43,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
         if (UpdateManager.updateState == UpdateManager.UpdateState.DOWNLOADED) {
             context.drawStringCenteredScaledMaxWidth(
-                "§aThe update will be installed after your next restart.",
+                "§aThe update will be installed after your next restart.".asStructuredText(),
                 fr,
                 widthRemaining / 2F,
                 40F,
@@ -52,11 +53,13 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             )
         }
 
-        context.scale(2F, 2F, 1F)
+        context.scale(2F, 2F)
         val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
+        val versionText = "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" +
+            if (nextVersion != null && !sameVersion) "➜ §a$nextVersion" else ""
+
         context.drawStringCenteredScaledMaxWidth(
-            "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" +
-                if (nextVersion != null && !sameVersion) "➜ §a$nextVersion" else "",
+            versionText.asStructuredText(),
             fr,
             widthRemaining / 4F,
             10F,

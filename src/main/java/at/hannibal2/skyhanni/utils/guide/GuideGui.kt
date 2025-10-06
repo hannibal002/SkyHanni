@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.item.ItemStack
 
 abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniBaseScreen() {
@@ -91,7 +92,7 @@ abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
             renderHorizontalTabs()
             renderVerticalTabs()
 
-            Renderable.string(
+            Renderable.text(
                 "§7SkyHanni ",
                 horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,

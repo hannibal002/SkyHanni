@@ -240,9 +240,13 @@ object QuiverApi {
                     val type = group("type")
                     val amount = group("amount").formatInt()
                     val currentArrowType = getArrowByNameOrNull(type) ?: run {
+                        if (arrows.isEmpty()) {
+                            ErrorManager.skyHanniError("Quiver arrows list is empty! Type /shupdaterepo to try to fix it.")
+                        }
                         ErrorManager.logErrorWithData(
                             UnknownArrowType("Unknown arrow type: $type"),
                             "Unknown arrow type: $type",
+                            "arrows" to arrows,
                             "line" to line,
                         )
                         return

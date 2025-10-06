@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -29,7 +30,9 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -48,40 +51,25 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
-import at.hannibal2.skyhanni.utils.renderables.DragNDrop
-import at.hannibal2.skyhanni.utils.renderables.Droppable
+import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import kotlinx.coroutines.launch
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 //#if FORGE
 import net.minecraftforge.common.MinecraftForge
 //#endif
 import java.io.File
-import java.time.LocalDate
-import java.time.Month
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -93,8 +81,6 @@ object SkyHanniDebugsAndTests {
 
     @Suppress("MemberVisibilityCanBePrivate")
     var displayList = emptyList<Renderable>()
-
-    var globalRender = true
 
     var a = 1.0
     var b = 60.0
@@ -114,28 +100,13 @@ object SkyHanniDebugsAndTests {
         LorenzDebug.log(text)
     }
 
-    private var previousApril = false
-
-    val isAprilFoolsDay: Boolean
-        get() {
-            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
-            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
-            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
-            val result = (!never && (always || itsTime))
-            previousApril = result
-            return result
-        }
-
-    @Deprecated(message = "use SkyBlockUtils", ReplaceWith("SkyBlockUtils.debug"))
-    val enabled get() = SkyBlockUtils.debug
-
     private var testLocation: LorenzVec? = null
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
-            event.drawDynamicText(it, "Test", 1.5)
+            event.drawDynamicText(it, "Debug Test", 1.5)
         }
     }
 
@@ -161,7 +132,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine("shtest command") {
             asyncTest(args)
         }
     }
@@ -169,6 +140,11 @@ object SkyHanniDebugsAndTests {
     @Suppress("UNUSED_PARAMETER")
     private fun asyncTest(args: Array<String>) {
         ChatUtils.chat("§fTest successful!")
+
+        val progress = ChatProgressUpdates()
+        progress.start("a")
+        progress.update("b")
+        progress.end("c")
     }
 
     private fun findNull(obj: Any, path: String) {
@@ -354,8 +330,7 @@ object SkyHanniDebugsAndTests {
     @HandleEvent(GuiKeyPressEvent::class)
     fun onKeybind() {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
-        val focussedSlot = slotUnderCursor() ?: return
-        val stack = focussedSlot.stack ?: return
+        val stack = stackUnderCursor() ?: return
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)
@@ -427,11 +402,22 @@ object SkyHanniDebugsAndTests {
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
         val data = internalName.getBazaarData() ?: return
+        val instantSellPrice = data.instantSellPrice
         val instantBuyPrice = data.instantBuyPrice
-        val sellOfferPrice = data.sellOfferPrice
 
+        event.toolTip.add("§7BZ instantSellPrice: ${instantSellPrice.addSeparators()}")
         event.toolTip.add("§7BZ instantBuyPrice: ${instantBuyPrice.addSeparators()}")
-        event.toolTip.add("§7BZ sellOfferPrice: ${sellOfferPrice.addSeparators()}")
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onShowBinPrice(event: ToolTipEvent) {
+        if (!debugConfig.showBinPrice) return
+        val internalName = event.itemStack.getInternalNameOrNull() ?: return
+        if (!internalName.isAuctionHouseItem()) return
+
+        val binPrice = internalName.getPrice()
+
+        event.toolTip.add("§7Bin Price: ${binPrice.addSeparators()}")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -453,22 +439,19 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    @Suppress("ConstantConditionIf")
     fun onRenderOverlay() {
-        if (false) {
-            itemRenderDebug()
-        }
-
         if (MinecraftCompat.showDebugHud) {
             if (debugConfig.currentAreaDebug) {
-                config.debugLocationPos.renderString(
-                    "Current Area: ${HypixelData.skyBlockArea}",
-                    posLabel = "SkyBlock Area (Debug)",
-                )
+                val renderables = buildList {
+                    addString("Current Area: ${HypixelData.skyBlockArea}")
+                    addString("Graph Area: ${SkyBlockUtils.graphArea}")
+                }
+
+                config.debugLocationPos.renderRenderables(renderables, posLabel = "SkyBlock Area (Debug)")
             }
 
-            if (debugConfig.raytracedOreblock) {
-                BlockUtils.getBlockLookingAt(50.0)?.let { pos ->
+            if (debugConfig.rayTracedOreBlock) {
+                BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
                             "Looking at: ${ore.name} (${pos.toCleanString()})",
@@ -486,76 +469,6 @@ object SkyHanniDebugsAndTests {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
         config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
-    }
-
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    @Suppress("ConstantConditionIf")
-    fun onBackgroundDraw() {
-        if (false) {
-            dragAbleTest()
-        }
-    }
-
-    private fun dragAbleTest() {
-        val bone = ItemStack(Items.bone, 1).toDragItem()
-        val leaf = ItemStack(BlockCompat.getAllLogs().first(), 1).toDragItem()
-
-        config.debugItemPos.renderRenderables(
-            listOf(
-                DragNDrop.draggable(StringRenderable("A Bone"), { bone }),
-                Renderable.placeholder(0, 30),
-                DragNDrop.draggable(StringRenderable("A Leaf"), { leaf }),
-                Renderable.placeholder(0, 30),
-                DragNDrop.droppable(
-                    StringRenderable("Feed Dog"),
-                    object : Droppable {
-                        override fun handle(drop: Any?) {
-                            val unit = drop as ItemStack
-                            if (unit.item == Items.bone) {
-                                LorenzDebug.chatAndLog("Oh, a bone!")
-                            } else {
-                                LorenzDebug.chatAndLog("Disgusting that is not a bone!")
-                            }
-                        }
-
-                        override fun validTarget(item: Any?) = item is ItemStack
-
-                    },
-                ),
-            ),
-            posLabel = "Item Debug",
-        )
-    }
-
-    private fun itemRenderDebug() {
-        val scale = 0.1
-        val renderables = listOf(
-            ItemStack(Blocks.glass_pane), ItemStack(Items.diamond_sword), ItemStack(Items.skull),
-            ItemStack(Blocks.melon_block),
-        ).map { item ->
-            generateSequence(scale) { it + 0.1 }.take(25).map {
-                Renderable.itemStack(item, it, xSpacing = 0).renderBounds()
-            }.toList()
-        }.editCopy {
-            this.add(
-                0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { StringRenderable(it.roundTo(1).toString()) }.toList(),
-            )
-        }
-        config.debugItemPos.renderRenderables(
-            listOf(
-                Renderable.table(renderables),
-                HorizontalContainerRenderable(
-                    listOf(
-                        StringRenderable("Test:").renderBounds(),
-                        Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
-                    ),
-                    1,
-                    RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
-                ),
-            ),
-            posLabel = "Item Debug",
-        )
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -599,6 +512,7 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+        event.move(103, "dev.debug.raytracedOreblock", "dev.debug.rayTracedOreBlock")
     }
 
     @Suppress("LongMethod")
@@ -694,18 +608,6 @@ object SkyHanniDebugsAndTests {
                     ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
                 } else {
                     ChatUtils.chat("§eYou are not in Skyblock.")
-                }
-            }
-        }
-        event.registerBrigadier("shrendertoggle") {
-            description = "Disables/enables the rendering of all skyhanni guis."
-            category = CommandCategory.USERS_BUG_FIX
-            callback {
-                globalRender = !globalRender
-                if (globalRender) {
-                    ChatUtils.chat("§aEnabled global renderer!")
-                } else {
-                    ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
                 }
             }
         }

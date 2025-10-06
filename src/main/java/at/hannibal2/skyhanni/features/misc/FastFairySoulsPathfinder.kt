@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -127,7 +128,7 @@ object FastFairySoulsPathfinder {
             if (disabled) return
             if (route.isEmpty()) {
                 val message = "§e[SkyHanni] Found all §5$found Fairy Souls §ein ${SkyBlockUtils.currentIsland.displayName}!"
-                IslandGraphs.overrideChatMessage(message)
+                NavigationFeedback.sendPathFindMessage(message)
                 allFound("found last soul of ${SkyBlockUtils.currentIsland}")
             } else {
                 pathTo(route.first())
@@ -239,7 +240,7 @@ object FastFairySoulsPathfinder {
             return
         }
         val foundSouls = foundSoulsOnCurrentIsland()
-        val allSouls = getTargetNodes(graph.nodes)
+        val allSouls = getTargetNodes(graph)
         val missingSouls = allSouls.filter { it.position !in foundSouls }
 
         if (missingSouls.isEmpty()) {
@@ -262,7 +263,7 @@ object FastFairySoulsPathfinder {
         calculatingStart = SimpleTimeMark.now()
         "§e[SkyHanni] Calculating Fairy Soul route §b0s".asComponent().send(calculatingMessageId)
 
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("fairy souls pathfind") {
             val route = NavigationUtils.getRoute(missingSouls, maxIterations = 300, neighborhoodSize = 50).toMutableList()
             val duration = calculatingStart.passedSince()
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()

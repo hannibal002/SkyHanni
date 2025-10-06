@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
+import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,6 +24,7 @@ import net.minecraftforge.client.MinecraftForgeClient
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13
 import org.lwjgl.opengl.GL30
+import java.awt.Color
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 
@@ -211,7 +213,7 @@ object EntityOutlineRenderer {
     }
 
     @JvmStatic
-    fun getCustomOutlineColor(entity: Entity?): Int? {
+    fun getCustomOutlineColor(entity: Entity?): Color? {
         if (entityRenderCache.xrayCache?.containsKey(entity) == true) {
             return entityRenderCache.xrayCache!![entity]
         }
@@ -310,10 +312,11 @@ object EntityOutlineRenderer {
             )
     // Only render if renderManager would render and the world is loaded at the entity
 
-    private fun outlineColor(color: Int) {
-        BUF_FLOAT_4.put(0, (color shr 16 and 255).toFloat() / 255f)
-        BUF_FLOAT_4.put(1, (color shr 8 and 255).toFloat() / 255f)
-        BUF_FLOAT_4.put(2, (color and 255).toFloat() / 255f)
+    private fun outlineColor(color: Color) {
+        val colorInt = color.rgb
+        BUF_FLOAT_4.put(0, (colorInt shr 16 and 255).toFloat() / 255f)
+        BUF_FLOAT_4.put(1, (colorInt shr 8 and 255).toFloat() / 255f)
+        BUF_FLOAT_4.put(2, (colorInt and 255).toFloat() / 255f)
         BUF_FLOAT_4.put(3, 1f)
         GL11.glTexEnv(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_COLOR, BUF_FLOAT_4)
     }
@@ -364,6 +367,7 @@ object EntityOutlineRenderer {
      */
     @HandleEvent
     fun onTick() {
+        if (GlobalRender.renderDisabled) return
         if (!isEnabled()) return
 
         val renderGlobal = try {
@@ -405,8 +409,8 @@ object EntityOutlineRenderer {
     }
 
     private class CachedInfo(
-        var xrayCache: HashMap<Entity, Int>?,
-        var noXrayCache: HashMap<Entity, Int>?,
+        var xrayCache: HashMap<Entity, Color>?,
+        var noXrayCache: HashMap<Entity, Color>?,
         var noOutlineCache: HashSet<Entity>?,
     )
 }

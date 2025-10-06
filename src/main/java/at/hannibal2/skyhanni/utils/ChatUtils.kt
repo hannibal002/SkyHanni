@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
@@ -58,8 +57,7 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean = false,
     ) {
-        val debug = SkyHanniDebugsAndTests.enabled
-        if (debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
+        if (SkyBlockUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             consoleLog("[Debug] $message")
         }
     }
@@ -103,7 +101,7 @@ object ChatUtils {
         }
     }
 
-    private val messagesThatAreOnlySentOnce = mutableListOf<String>()
+    private val messagesThatAreOnlySentOnce = mutableSetOf<String>()
 
     private fun internalChat(
         message: String,
@@ -112,19 +110,11 @@ object ChatUtils {
         messageId: Int? = null,
     ): Boolean {
         val text = message.asComponent()
-        if (onlySendOnce) {
-            if (message in messagesThatAreOnlySentOnce) {
-                return false
-            }
-            messagesThatAreOnlySentOnce.add(message)
-        }
-
+        if (onlySendOnce && !messagesThatAreOnlySentOnce.add(message)) return false
         return if (replaceSameMessage || messageId != null) {
-            text.send(messageId ?: getUniqueMessageIdForString(message))
+            text.send(messageId ?: message.getUniqueMessageIdForString())
             chat(text, false)
-        } else {
-            chat(text)
-        }
+        } else chat(text)
     }
 
     fun chat(message: IChatComponent, send: Boolean = true): Boolean {
@@ -169,18 +159,16 @@ object ChatUtils {
             this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = hover.asComponent()
         }
-        if (replaceSameMessage) {
-            text.send(getUniqueMessageIdForString(rawText))
-        } else {
-            chat(text)
-        }
+
+        if (replaceSameMessage) text.send(rawText.getUniqueMessageIdForString())
+        else chat(text)
     }
 
     /**
      * Sends the message in chat.
      * Show the lines when on hover.
      * Offer option to click on the chat message to copy the lines to clipboard.
-     * Sseful for quick debug infos
+     * Useful for quick debug infos
      */
     fun clickToClipboard(message: String, lines: List<String>) {
         val text = lines.joinToString("\n") { "§7$it" }
@@ -194,10 +182,8 @@ object ChatUtils {
     }
 
     private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
-
-    // TODO kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
-    private fun getUniqueMessageIdForString(string: String): Int {
-        return uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    private fun String.getUniqueMessageIdForString() = uniqueMessageIdStorage.getOrPut(this) {
+        getUniqueMessageId()
     }
 
     private var lastUniqueMessageId = 123242
@@ -251,14 +237,17 @@ object ChatUtils {
         autoOpen: Boolean = false,
         prefix: Boolean = true,
         prefixColor: String = "§e",
+        replaceSameMessage: Boolean = false,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(
-            TextHelper.text(msgPrefix + message) {
-                this.url = url
-                this.hover = "$prefixColor$hover".asComponent()
-            },
-        )
+        val text = TextHelper.text(msgPrefix + message) {
+            this.url = url
+            this.hover = "$prefixColor$hover".asComponent()
+        }
+
+        if (replaceSameMessage) text.send(message.getUniqueMessageIdForString())
+        else chat(text)
+
         if (autoOpen) OSUtils.openBrowser(url)
     }
 
@@ -415,8 +404,10 @@ object ChatUtils {
         action: () -> Unit,
         oneTimeClick: Boolean = false,
     ) {
+        val hint = if (SkyHanniMod.feature.chat.hideClickableHint) "" else
+            "\n§e[CLICK to $actionName or disable this feature]"
         clickableChat(
-            "$message\n§e[CLICK to $actionName or disable this feature]",
+            "$message$hint",
             onClick = {
                 if (KeyboardManager.isShiftKeyDown() || KeyboardManager.isModifierKeyDown()) {
                     option.jumpToEditor()

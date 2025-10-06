@@ -8,27 +8,23 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.ModVersion
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Job
 import net.minecraft.client.Minecraft
 import java.util.NavigableMap
 import java.util.TreeMap
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object ChangelogViewer {
-
-    private val dispatcher = Dispatchers.IO
-
     internal val cache: NavigableMap<ModVersion, Map<String, List<String>>> = TreeMap()
 
     internal var openTime = SimpleTimeMark.farPast()
@@ -37,6 +33,7 @@ object ChangelogViewer {
     internal lateinit var endVersion: ModVersion
 
     internal var shouldMakeNewList = false
+    private var fetchJob: Job? = null
 
     internal var shouldShowBeta = SkyHanniMod.isBetaVersion
     internal var showTechnicalDetails = false
@@ -59,10 +56,13 @@ object ChangelogViewer {
         }
         startVersion = currentVersion
         endVersion = targetVersion
-        if (!cache.containsKeys(startVersion, endVersion)) {
-            SkyHanniMod.coroutineScope.launch { getChangelog() }
-        }
+        if (!cache.containsKeys(startVersion, endVersion)) setupFetchJob()
         openChangelog()
+    }
+
+    private fun setupFetchJob() {
+        if (fetchJob?.isActive == true) return
+        fetchJob = SkyHanniMod.launchIOCoroutine("changelog viewer fetch data", timeout = 1.minutes) { getChangelog() }
     }
 
     private fun openChangelog() {
@@ -70,29 +70,23 @@ object ChangelogViewer {
     }
 
     private suspend fun getChangelog() {
-        try {
-            val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
-            val data = mutableListOf<ChangelogJson>()
-            var pageNumber = 1
-            while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
-                val jsonObject = withContext(dispatcher) {
-                    ApiUtils.getJSONResponseAsElement(
-                        url + pageNumber, apiName = "github",
-                    )
-                }
-                val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
-                data.addAll(page)
-                pageNumber++
-            }
-            val neededData = data.filter {
-                val sub = ModVersion.fromString(it.tagName)
-                sub.isInBetween(startVersion, endVersion)
-            }
-            neededData.forEach { entry ->
-                cache[ModVersion.fromString(entry.tagName)] = formatData(formatSttring(getBasic(entry.body)))
-            }
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(e, "Changelog Loading Failed")
+        val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
+        val data = mutableListOf<ChangelogJson>()
+        var pageNumber = 1
+        while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
+            val pagedUrl = "$url$pageNumber"
+            val (_, jsonObject) = ApiUtils.getJsonResponse(pagedUrl, apiName = "github").assertSuccessWithData()
+                ?: ErrorManager.skyHanniError("Changelog Loading Failed")
+            val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
+            data.addAll(page)
+            pageNumber++
+        }
+        val neededData = data.filter {
+            val sub = ModVersion.fromString(it.tagName)
+            sub.isInBetween(startVersion, endVersion)
+        }
+        neededData.forEach { entry ->
+            cache[ModVersion.fromString(entry.tagName)] = formatData(formatString(getBasic(entry.body)))
         }
     }
 
@@ -118,7 +112,7 @@ object ChangelogViewer {
             }
     }
 
-    private fun formatSttring(basic: String): String = basic.replace("\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
+    private fun formatString(basic: String): String = basic.replace("\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
         fun String.help(s: String): String =
             toRegex().find(basic.subSequence(0, it.range.first).reversed())?.groups?.get(s)?.value?.reversed().orEmpty()
 
@@ -132,20 +126,20 @@ object ChangelogViewer {
         .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
         .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for sub points
         .replace("\n[+\\-*][^+\\-*]".toRegex(), "\n§a") // Formatting for points
-        .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b§l$1") // Color contributors
+        .replace("(- [^-\r\n]*(?:\r\n|$))".toRegex(), "§b§l$1") // Color contributors
         .replace("\\[(.+?)\\]\\(.+?\\)".toRegex(), "$1") // Random Links
         .replace("`", "\"") // Fix Code Blocks to look better
         .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerComplex("shchangelog") {
+        event.registerComplex<CommandContext>("shchangelog") {
             description = "Shows the specified changelog. No arguments shows the latest changelog."
             category = CommandCategory.USERS_ACTIVE
             //#if TODO
             context = { CommandContext() }
             //#endif
-            specifiers = listOf<CommandArgument<CommandContext>>(
+            specifiers = listOf(
                 CommandArgument(
                     documentation = "<version> - Shows the changelog of the versions until this, " +
                         "or only that version if no since is specified.",

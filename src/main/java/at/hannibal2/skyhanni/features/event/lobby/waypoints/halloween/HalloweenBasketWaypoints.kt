@@ -21,9 +21,9 @@ import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -127,7 +127,7 @@ object HalloweenBasketWaypoints {
         if (scoreboardTitlePattern.matches(ScoreboardData.objectiveTitle.removeColor())) {
             inHub = true
         }
-        event.full.forEach {
+        event.new.forEach {
             if (halloweenEventPattern.matches(it)) {
                 halloweenMatches = true
             } else if (scoreboardBasketPattern.matches(it)) {
@@ -139,7 +139,7 @@ object HalloweenBasketWaypoints {
         if (isActive != newIsActive && newIsActive) {
             IslandGraphs.loadLobby("MAIN_LOBBY")
 
-            val nodeList = IslandGraphs.currentIslandGraph?.nodes?.filter { it.hasTag(GraphNodeTag.HALLOWEEN_BASKET) }.orEmpty()
+            val nodeList = IslandGraphs.currentIslandGraph?.getNodesWithTags(GraphNodeTag.HALLOWEEN_BASKET).orEmpty()
             basketList.clear()
             nodeList.forEach { node ->
                 basketList.add(EventWaypoint(position = node.position, isFound = false))
@@ -169,9 +169,7 @@ object HalloweenBasketWaypoints {
     }
 
     private fun getClosest(nodeList: List<GraphNode>? = null): EventWaypoint? {
-        val nodes = nodeList ?: IslandGraphs.currentIslandGraph?.nodes?.filter {
-            it.hasTag(GraphNodeTag.HALLOWEEN_BASKET)
-        }.orEmpty()
+        val nodes = nodeList ?: IslandGraphs.currentIslandGraph?.getNodesWithTags(GraphNodeTag.HALLOWEEN_BASKET).orEmpty()
 
         val unFoundBaskets = basketList.filter { !it.isFound }.map { it.position }
         val unFoundNodes = nodes.filter { it.position in unFoundBaskets }

@@ -15,8 +15,6 @@ import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_50
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateLevelXP
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateSkillLevel
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevelExact
@@ -64,23 +62,29 @@ object SkillApi {
 
     // TODO find out whats going on here
     /**
-     * REGEX-TEST: Farming 35: §r§a12.4%
+     * REGEX-TEST:  Farming 35: §r§a12.4%
      */
     private val skillTabPattern by patternGroup.pattern(
         "skill.tab",
-        " (?<type>\\w+)(?: (?<level>\\d+))?: §r§a(?<progress>[0-9.]+)%",
+        " (?:§r§a)?(?<type>\\w+)(?: (?<level>\\d+))?: §r§a(?<progress>[0-9.]+)%",
     )
 
-    // TODO add regex tests
+    /**
+     * REGEX-TEST:  §r§aFarming 60: §r§c§lMAX
+     * REGEX-TEST:  Mining 60: §r§c§lMAX
+     */
     private val maxSkillTabPattern by patternGroup.pattern(
         "skill.tab.max",
-        " (?<type>\\w+) (?<level>\\d+): §r§c§lMAX",
+        " (?:§r§a)?(?<type>\\w+) (?<level>\\d+): §r§c§lMAX",
     )
 
-    // TODO add regex tests
+    /**
+     * REGEX-TEST:  §r§aMining 14: §r§e22,922§r§6/§r§e75k
+     * REGEX-TEST:  §r§aCombat 49: §r§e7,678§r§6/§r§e4M
+     */
     private val skillTabNoPercentPattern by patternGroup.pattern(
         "skill.tab.nopercent",
-        " §r§a(?<type>\\w+)(?: (?<level>\\d+))?: §r§e(?<current>[0-9,.]+)§r§6/§r§e(?<needed>[0-9kmb]+)",
+        " (?:§r§a)?(?<type>\\w+)(?: (?<level>\\d+))?: §r§e(?<current>[0-9,.]+)§r§6/§r§e(?<needed>[\\d,.]+[kMB]?+)",
     )
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
@@ -150,7 +154,7 @@ object SkillApi {
 
     @HandleEvent
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.readConstant<NeuSkillLevelJson>("leveling")
+        val data = event.getConstant<NeuSkillLevelJson>("leveling")
 
         levelArray = data.levelingXP
         levelingMap = levelArray.withIndex().associate { (index, xp) -> (index + 1) to xp }
@@ -187,7 +191,7 @@ object SkillApi {
     private fun onUpdateMax(progress: String, skill: SkillType, skillInfo: SkillInfo, skillLevel: Int) {
         val totalXP = progress.formatLong()
         val cap = skill.maxLevel
-        val maxXP = if (cap == 50) XP_NEEDED_FOR_50 else XP_NEEDED_FOR_60
+        val maxXP = xpRequiredForLevel(cap)
         val currentXP = totalXP - maxXP
         val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = calculateSkillLevel(totalXP, cap)
 
@@ -271,12 +275,13 @@ object SkillApi {
         var isPercentPatternFound = false
         var tablistLevel: Int? = null
 
-        for (line in TabListData.getTabList()) {
+        line@ for (line in TabListData.getTabList()) {
             skillTabPattern.matchMatcher(line) {
                 if (group("type") == skillType.displayName) {
                     tablistLevel = group("level").toInt()
                     isPercentPatternFound = true
                     if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = null
+                    break@line
                 }
             }
 
@@ -284,6 +289,7 @@ object SkillApi {
                 if (group("type") == skillType.displayName) {
                     tablistLevel = group("level").toInt()
                     if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = null
+                    break@line
                 }
             }
 
@@ -293,11 +299,12 @@ object SkillApi {
                     current = group("current").formatLong()
                     needed = group("needed").formatLong()
                     isPercentPatternFound = false
-                    return@matchMatcher
+                    break@line
                 }
             }
-            xpPercentage = matcher.group("progress").formatDouble()
         }
+
+        xpPercentage = matcher.group("progress").formatDouble()
 
         val existingLevel = getSkillInfo(skillType) ?: SkillInfo()
         val level = tablistLevel ?: return
@@ -325,11 +332,7 @@ object SkillApi {
     private fun updateSkillInfo(existingLevel: SkillInfo, level: Int, currentXP: Long, maxXP: Long, totalXP: Long, gained: String) {
         val cap = activeSkill?.maxLevel
         val add = cap?.takeIf { level >= it }?.let {
-            when (it) {
-                50 -> XP_NEEDED_FOR_50
-                60 -> XP_NEEDED_FOR_60
-                else -> 0
-            }
+            xpRequiredForLevel(it)
         } ?: 0
 
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) =

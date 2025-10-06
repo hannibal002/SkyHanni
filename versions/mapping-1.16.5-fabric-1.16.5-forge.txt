@@ -39,8 +39,6 @@ net.minecraft.item.ItemStack net.minecraft.world.item.ItemsStack
 net.minecraft.item.ItemStack getEnchantments() getEnchantmentTags()
 net.minecraft.item.ItemStack getName() getDisplayName()
 
-net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket net.minecraft.network.protocol.game.ClientboundAddPlayerPacket
-
 net.minecraft.screen.ScreenHandler net.minecraft.world.inventory.AbstractContainerMenu
 
 net.minecraft.screen.ScreenHandler getSlot() getSlot()
@@ -57,6 +55,7 @@ net.minecraft.server.network.ServerPlayerEntity net.minecraft.server.level.Serve
 
 net.minecraft.text.MutableText net.minecraft.network.chat.MutableComponent
 net.minecraft.text.Style net.minecraft.network.chat.Style
+net.minecraft.text.Text at.hannibal2.skyhanni.utils.compat.Text
 
 net.minecraft.text.MutableText setStyle() setStyle()
 

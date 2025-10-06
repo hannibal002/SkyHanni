@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
-import java.awt.Color
+import io.github.notenoughupdates.moulconfig.ChromaColour
 
 @SkyHanniModule
 object LineToMobHandler {
 
     data class LineSettings(
-        val color: Color,
+        val color: ChromaColour,
         val width: Int,
         val depth: Boolean,
         val condition: () -> Boolean,
@@ -20,7 +20,7 @@ object LineToMobHandler {
 
     private val lines = mutableMapOf<Mob, LineSettings>()
 
-    fun register(mob: Mob, color: Color, width: Int, depth: Boolean, condition: () -> Boolean) =
+    fun register(mob: Mob, color: ChromaColour, width: Int, depth: Boolean, condition: () -> Boolean) =
         register(mob, LineSettings(color, width, depth, condition))
 
     fun register(mob: Mob, settings: LineSettings) {

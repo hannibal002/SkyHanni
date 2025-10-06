@@ -48,6 +48,7 @@ object CrystalNucleusApi {
     private val FORTUNE_IV_BOOK_ITEM = "FORTUNE;4".toInternalName()
     val EPIC_BAL_ITEM = "BAL;3".toInternalName()
     val LEGENDARY_BAL_ITEM = "BAL;4".toInternalName()
+    val BAL_SHARD_ITEM = "ATTRIBUTE_SHARD_DEEP_TECHNIQUE;1".toInternalName()
     private val PRECURSOR_APPARATUS_ITEM = "PRECURSOR_APPARATUS".toInternalName()
     val JUNGLE_KEY_ITEM = "JUNGLE_KEY".toInternalName()
     private val ROBOT_PARTS_ITEMS = listOf(
@@ -59,6 +60,7 @@ object CrystalNucleusApi {
         "SYNTHETIC_HEART",
     ).map { it.toInternalName() }
 
+    // Fallback to the inventory based system in case of changed chat message
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
@@ -128,8 +130,16 @@ object CrystalNucleusApi {
         if (itemName.contains(" Powder")) return null
         // Books are not directly added to the loot map, but are checked for later.
         if (itemName.startsWith("§fEnchanted")) {
-            unCheckedBooks += amount
-            return null
+            val bookType = ItemUtils.readBookType(itemName)
+            return when (bookType) {
+                "Lapidary I" -> LAPIDARY_I_BOOK_ITEM to 1
+                "Fortune IV" -> FORTUNE_IV_BOOK_ITEM to 1
+                // Fallback to inventory based system
+                else -> {
+                    unCheckedBooks += amount
+                    null
+                }
+            }
         }
         val item = fromItemNameOrNull(itemName) ?: return null
         return Pair(item, amount)

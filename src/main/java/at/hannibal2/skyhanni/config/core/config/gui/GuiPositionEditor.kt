@@ -33,8 +33,8 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
@@ -61,8 +61,11 @@ class GuiPositionEditor(
         // Items aren't drawn due to a bug in neu rendering
         drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
-            val accessor = oldScreen as AccessorGuiContainer
+            //#if MC > 1.21.5
+            //$$ oldScreen.drawBackground(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
+            //#endif
             //#if MC < 1.21
+            val accessor = oldScreen as AccessorGuiContainer
             accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
             //#else
             //$$ oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
@@ -115,7 +118,7 @@ class GuiPositionEditor(
     }
 
     private fun renderHover(text: List<String>) {
-        RenderableTooltips.setTooltipForRender(text.map { Renderable.string(it) })
+        RenderableTooltips.setTooltipForRender(text.map(StringRenderable::from))
     }
 
     private fun renderRectangles(): Int {

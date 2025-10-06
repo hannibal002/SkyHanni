@@ -29,7 +29,7 @@ object TestChatCommand {
             return
         }
 
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("test chat command") {
             val mutArgs = args.toMutableList()
             val multiLines = mutArgs.remove("-lines")
             val isComplex = mutArgs.remove("-complex")
@@ -78,7 +78,7 @@ object TestChatCommand {
         val event = SkyHanniChatEvent(message, componentText)
         event.post()
 
-        if (event.blockedReason != "") {
+        if (event.blockedReason != null) {
             if (!isHidden) ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
             return
         }

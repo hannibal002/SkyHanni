@@ -31,17 +31,17 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 //#if MC > 1.21
-//$$ import net.minecraft.entity.attribute.EntityAttributes
-//$$ import net.minecraft.entity.player.PlayerInventory
 //$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+//$$ import net.minecraft.entity.attribute.EntityAttributes
+//$$ import net.minecraft.entity.EquipmentSlot
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
-
 //#endif
 
 @SkyHanniModule
 object EntityUtils {
 
+    // TODO remove this relatively heavy call everywhere
     @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.hasNameTagWith(
         y: Int,
@@ -171,11 +171,12 @@ object EntityUtils {
     //#else
     //$$ fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
     //$$     if (this !is PlayerEntity) return null
-    //$$     val list = mutableListOf<ItemStack?>()
-    //$$     for (equipmentSlot in PlayerInventory.EQUIPMENT_SLOTS.values) {
-    //$$         list.add(inventory.equipment.get(equipmentSlot).orNull())
-    //$$     }
-    //$$     return list.normalizeAsArray()
+    //$$     return buildList {
+    //$$         add(inventory.equipment.get(EquipmentSlot.FEET).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.LEGS).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.CHEST).orNull())
+    //$$         add(inventory.equipment.get(EquipmentSlot.HEAD).orNull())
+    //$$     }.normalizeAsArray()
     //$$ }
     //#endif
 
@@ -203,12 +204,12 @@ object EntityUtils {
     }?.asSequence()?.filterNotNull().orEmpty()
     //#else
     //$$ fun getAllTileEntities(): Sequence<BlockEntity> {
-    //$$     if (!MinecraftCompat.localWorldExists) return emptySequence()
-    //$$     val blockEntityTickers = MinecraftCompat.localWorld.blockEntityTickers.let {
+    //$$     val world = MinecraftCompat.localWorldOrNull ?: return emptySequence()
+    //$$     val blockEntityTickers = world.blockEntityTickers.let {
     //$$         if (MinecraftClient.getInstance().isOnThread) it else it.toMutableList()
     //$$     }.asSequence().filterNotNull()
     //$$
-    //$$     return blockEntityTickers.map { MinecraftCompat.localWorld.getBlockEntity(it.pos) }.filterNotNull()
+    //$$     return blockEntityTickers.mapNotNull { invoker -> invoker.pos?.let { world.getBlockEntity(it) } }
     //$$ }
     //#endif
 
@@ -216,10 +217,10 @@ object EntityUtils {
         list.keepOnlyIn(getEntities<T>())
     }
 
-    fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5): Boolean {
+    fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5, ignoreFrustum: Boolean = false): Boolean {
         if (isDead) return false
         // TODO add cache that only updates e.g. 10 times a second
-        if (!FrustumUtils.isVisible(entityBoundingBox)) return false
+        if (!ignoreFrustum && !FrustumUtils.isVisible(entityBoundingBox)) return false
         return getLorenzVec().up(vecYOffset).canBeSeen(viewDistance)
     }
 
@@ -236,6 +237,6 @@ object EntityUtils {
         //#if MC < 1.21
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
     //#else
-    //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
+    //$$ get() = this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH).toInt()
     //#endif
 }

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.features.fishing.FishingConfig
 import at.hannibal2.skyhanni.config.features.foraging.ForagingConfig
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig
 import at.hannibal2.skyhanni.config.features.gui.GuiConfig
+import at.hannibal2.skyhanni.config.features.hunting.HuntingConfig
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig
 import at.hannibal2.skyhanni.config.features.mining.MiningConfig
 import at.hannibal2.skyhanni.config.features.misc.MiscConfig
@@ -19,12 +20,14 @@ import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
 import at.hannibal2.skyhanni.config.storage.Storage
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
+import at.hannibal2.skyhanni.utils.TimeUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
+import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory
 
@@ -39,15 +42,15 @@ class Features : Config() {
     }
 
     override fun alignCategory(category: ProcessedCategory, isSelected: Boolean): HorizontalAlign {
-        if (SkyHanniDebugsAndTests.isAprilFoolsDay) return HorizontalAlign.RIGHT
+        if (TimeUtils.isAprilFoolsDay) return HorizontalAlign.RIGHT
         return super.alignCategory(category, isSelected)
     }
 
     override fun getSocials(): List<Social> {
         return listOf(
-            Social.forLink("Discord", discord, "https://discord.com/invite/skyhanni-997079228510117908"),
-            Social.forLink("GitHub", github, "https://github.com/hannibal002/SkyHanni"),
-            Social.forLink("Patreon", patreon, "https://www.patreon.com/hannibal2"),
+            Social.forLink("Discord".asStructuredText(), discord, "https://discord.com/invite/skyhanni-997079228510117908"),
+            Social.forLink("GitHub".asStructuredText(), github, "https://github.com/hannibal002/SkyHanni"),
+            Social.forLink("Patreon".asStructuredText(), patreon, "https://www.patreon.com/hannibal2"),
         )
     }
 
@@ -55,9 +58,9 @@ class Features : Config() {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "close-gui")
     }
 
-    override fun getTitle(): String {
-        val modName = if (SkyHanniDebugsAndTests.isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
-        return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89"
+    override fun getTitle(): StructuredText {
+        val modName = if (TimeUtils.isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
+        return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89".asStructuredText()
     }
 
     /*
@@ -100,6 +103,10 @@ class Features : Config() {
     @Expose
     @Category(name = "Foraging", desc = "Features that help you cut down trees.")
     var foraging: ForagingConfig = ForagingConfig()
+
+    @Expose
+    @Category(name = "Hunting", desc = "Features that help you hunt mobs for their shards.")
+    var hunting: HuntingConfig = HuntingConfig()
 
     // Combat like
     @Expose

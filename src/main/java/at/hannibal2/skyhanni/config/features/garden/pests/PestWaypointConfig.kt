@@ -10,12 +10,12 @@ class PestWaypointConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show a waypoint of the next pest when using a vacuum." +
+        desc = "Show a waypoint of the next pest when using a vacuum. " +
             "Uses the particles and math to detect the location from everywhere in the garden.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    var enabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Hide Particles", desc = "Hide the particles of the ability.")

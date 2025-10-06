@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import com.google.gson.JsonObject
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard
@@ -505,7 +504,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         }
 
         if (KeyboardManager.isPastingKeysDown()) {
-            SkyHanniMod.coroutineScope.launch {
+            SkyHanniMod.launchCoroutine("visual word pasting") {
                 val clipboard = OSUtils.readFromClipboard().orEmpty()
                 for (char in clipboard) {
                     if (currentText.length < maxTextLength && !Character.isISOControl(char)) {
@@ -599,7 +598,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
     }
 
     private fun drawUnmodifiedString(str: String, x: Float, y: Float) {
-        GuiRenderUtils.drawString("§§$str", x, y)
+        ModifyVisualWords.changeWords = false
+        GuiRenderUtils.drawString(str, x, y)
+        ModifyVisualWords.changeWords = true
     }
 
     private fun drawUnmodifiedString(str: String, x: Int, y: Int) {
@@ -607,7 +608,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
     }
 
     private fun drawUnmodifiedStringCentered(str: String?, x: Int, y: Int) {
-        GuiRenderUtils.drawStringCentered("§§$str", x, y)
+        ModifyVisualWords.changeWords = false
+        GuiRenderUtils.drawStringCentered(str ?: "null", x, y)
+        ModifyVisualWords.changeWords = true
     }
 
     private fun drawUnmodifiedStringCentered(str: String?, x: Float, y: Float) {

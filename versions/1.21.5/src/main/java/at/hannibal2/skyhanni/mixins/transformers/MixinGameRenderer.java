@@ -27,7 +27,11 @@ public class MixinGameRenderer {
        if (MinecraftCompat.INSTANCE.getLocalPlayerExists()) new RenderingTickEvent(context, false).post();
    }
 
+    //#if MC < 1.21.6
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V"))
+    //#else
+    //$$ @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", shift = At.Shift.AFTER))
+    //#endif
     private void onRenderTail(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext context) {
         GuiEditManager.renderLast(context);
     }

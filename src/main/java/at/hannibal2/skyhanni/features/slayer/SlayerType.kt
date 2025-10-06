@@ -11,18 +11,21 @@ enum class SlayerType(
     val rngName: String,
     val clazz: Class<*>,
     val miniBossType: SlayerMiniBossType? = null,
+    val otherNames: List<String> = listOf(),
 ) {
     REVENANT(
         "Revenant Horror",
         "revenant",
         EntityZombie::class.java,
         SlayerMiniBossType.REVENANT,
+        listOf("Atoned Horror"),
     ),
     TARANTULA(
         "Tarantula Broodfather",
         "tarantula",
         EntitySpider::class.java,
         SlayerMiniBossType.TARANTULA,
+        listOf("Conjoined Brood"),
     ),
     SVEN(
         "Sven Packmaster",
@@ -50,13 +53,19 @@ enum class SlayerType(
     ;
 
     companion object {
-        fun getByName(name: String): SlayerType? = entries.firstOrNull { name.contains(it.displayName) }
+        fun getByName(name: String): SlayerType? = entries.firstOrNull { slayer ->
+            name.contains(slayer.displayName) || slayer.otherNames.any { name.contains(it) }
+        }
+
+        fun getByClassName(name: String): SlayerType? = entries.firstOrNull {
+            it.clazz.simpleName.removePrefix("Entity").equals(name, ignoreCase = true)
+        }
     }
 }
 
 enum class SlayerMiniBossType(vararg names: String) {
     REVENANT("Revenant Sycophant", "Revenant Champion", "Deformed Revenant", "Atoned Champion", "Atoned Revenant"),
-    TARANTULA("Tarantula Vermin", "Tarantula Beast", "Mutant Tarantula"),
+    TARANTULA("Tarantula Vermin", "Tarantula Beast", "Mutant Tarantula", "Primordial Jockey", "Primordial Viscount"),
     SVEN("Pack Enforcer", "Sven Follower", "Sven Alpha"),
     VOIDLING("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac"),
     INFERNAL("Flare Demon", "Kindleheart Demon", "Burningsoul Demon"),

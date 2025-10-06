@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig
-import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig.ChatMessageFormatEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -11,7 +9,6 @@ import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -27,28 +24,27 @@ object PestSpawn {
     private val patternGroup = RepoPattern.group("garden.pests.spawn")
 
     /**
-     * REGEX-TEST: §6§lGROSS! §7A §2Pest §7has appeared in §aPlot §7- §b4§7!
+     * REGEX-TEST: §6§lGROSS! §7A §2ൠ Pest §7has appeared in §aPlot §7- §bS 4§7!
      */
     private val onePestPattern by patternGroup.pattern(
         "one",
-        "§6§l.*! §7A §2Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!",
+        "§6§l.*! §7A §2ൠ Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!",
     )
 
     /**
-     * REGEX-TEST: §6§lEWW! §22 Pests §7have spawned in §aPlot §7- §b2§7!
-     * REGEX-TEST: §6§lYUCK! §23 Pests §7have spawned in §aPlot §7- §bR1§7!
+     * REGEX-TEST: §6§lYUCK! §24 §2ൠ Pest §7have spawned in §aPlot §7- §b14§7!
      */
     private val multiplePestsSpawn by patternGroup.pattern(
         "multiple",
-        "§6§l.*! §2(?<amount>\\d) Pests §7have spawned in §aPlot §7- §b(?<plot>.*)§7!",
+        "§6§l.*! §2(?<amount>\\d) §2ൠ Pests? §7have spawned in §aPlot §7- §b(?<plot>.*)§7!",
     )
 
     /**
-     * REGEX-TEST: §6§lGROSS! §7While you were offline, §2Pests §7spawned in §aPlots §r§b12§r§7, §r§b9§r§7, §r§b5§r§7, §r§b11§r§7 and §r§b3§r§r§7!
+     * REGEX-TEST: §6§lGROSS! §7While you were offline, §2ൠ §2Pest §7spawned in §aPlots §r§b12§r§7, §r§b9§r§7, §r§b5§r§7, §r§b11§r§7 and §r§b3§r§r§7!
      */
     private val offlinePestsSpawn by patternGroup.pattern(
         "offline",
-        "§6§l.*! §7While you were offline, §2Pests §7spawned in §aPlots (?<plots>.*)!",
+        "§6§l.*! §7While you were offline, §2ൠ §2Pests? §7spawned in §aPlots (?<plots>.*)!",
     )
     private var plotNames = mutableListOf<String>()
 
@@ -110,13 +106,6 @@ object PestSpawn {
                 },
                 "§eClick to run /plottp $plotName!",
             )
-        }
-    }
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(15, "garden.pests.pestSpawn.chatMessageFormat") { element ->
-            ConfigUtils.migrateIntToEnum(element, ChatMessageFormatEntry::class.java)
         }
     }
 }

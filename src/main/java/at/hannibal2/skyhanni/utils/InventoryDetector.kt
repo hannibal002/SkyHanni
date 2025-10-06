@@ -12,18 +12,22 @@ import java.util.regex.Pattern
  * The InventoryDetector tracks whether an inventory is open and provides
  * an inventory open consumer and a isInside function to handle inventory check logic.
  *
- * @property openInventory A callback triggered when the given inventory is detected to be open. Contains the name of the inventory. Optional.
+ * @property onOpenInventory A callback triggered when the given inventory is detected to be open. Optional.
+ * @property onCloseInventory A callback triggered when the inventory is closed. Optional.
  * @property checkInventoryName Define what inventory name or names we are looking for.
  */
 class InventoryDetector(
-    val openInventory: (String) -> Unit = {},
+    val onOpenInventory: (InventoryFullyOpenedEvent) -> Unit = {},
+    val onCloseInventory: (InventoryCloseEvent) -> Unit = {},
     val checkInventoryName: (String) -> Boolean,
 ) {
     constructor(
         pattern: Pattern,
-        openInventory: (String) -> Unit = {},
+        onOpenInventory: (InventoryFullyOpenedEvent) -> Unit = {},
+        onCloseInventory: (InventoryCloseEvent) -> Unit = {},
     ) : this(
-        openInventory,
+        onOpenInventory,
+        onCloseInventory,
         checkInventoryName = { name -> pattern.matches(name) }
     )
 
@@ -44,18 +48,21 @@ class InventoryDetector(
 
         @HandleEvent(priority = HandleEvent.HIGHEST)
         fun onInventoryClose(event: InventoryCloseEvent) {
-            detectors.forEach { it.inInventory = false }
+            detectors.forEach {
+                it.inInventory = false
+                it.onCloseInventory(event)
+            }
         }
 
         @HandleEvent(priority = HandleEvent.HIGHEST)
         fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-            detectors.forEach { it.updateInventoryState(event.inventoryName) }
+            detectors.forEach { it.updateInventoryState(event) }
         }
     }
 
-    private fun updateInventoryState(inventoryName: String) {
+    private fun updateInventoryState(event: InventoryFullyOpenedEvent) {
         inInventory = try {
-            checkInventoryName(inventoryName)
+            checkInventoryName(event.inventoryName)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Failed checking inventory state")
             false
@@ -63,7 +70,7 @@ class InventoryDetector(
 
         if (inInventory) {
             try {
-                openInventory(inventoryName)
+                onOpenInventory(event)
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(e, "Failed to run inventory open in InventoryDetector")
             }

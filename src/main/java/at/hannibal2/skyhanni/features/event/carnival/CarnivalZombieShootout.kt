@@ -24,10 +24,13 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -50,7 +53,7 @@ object CarnivalZombieShootout {
     private data class ShootoutLamp(var pos: LorenzVec, var time: SimpleTimeMark)
     private data class ShootoutZombie(val entity: EntityZombie, val type: ZombieType)
 
-    private var content = HorizontalContainerRenderable(listOf())
+    private var content = Renderable.empty()
     private var drawZombies = listOf<ShootoutZombie>()
     private val zombieTimes = mutableMapOf<ShootoutZombie, SimpleTimeMark>()
     private var maxType = ZombieType.LEATHER
@@ -132,8 +135,13 @@ object CarnivalZombieShootout {
             val entity = EntityUtils.getEntityByID(zombie.entityId) ?: continue
             val isSmall = (entity as? EntityZombie)?.isChild ?: false
 
-            val boundingBox = if (isSmall) entity.entityBoundingBox.expand(0.0, -0.4, 0.0).offset(0.0, -0.4, 0.0)
-            else entity.entityBoundingBox
+            val boundingBox = entity.entityBoundingBox.let {
+                if (PlatformUtils.IS_LEGACY && isSmall) {
+                    it.expand(0.0, -0.4, 0.0).offset(0.0, -0.4, 0.0)
+                } else {
+                    it
+                }
+            }
 
             drawHitbox(
                 boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
@@ -213,7 +221,7 @@ object CarnivalZombieShootout {
         if (config.lampTimer) {
             content = lamp?.let {
                 updateContent(it.time)
-            } ?: HorizontalContainerRenderable(listOf())
+            } ?: Renderable.empty()
         }
     }
 
@@ -235,16 +243,14 @@ object CarnivalZombieShootout {
         }
     }
 
-    private fun updateContent(time: SimpleTimeMark): HorizontalContainerRenderable {
+    private fun updateContent(time: SimpleTimeMark): Renderable {
         val lamp = ItemStack(Blocks.redstone_lamp)
         val timer = 6.seconds - time.passedSince()
         val prefix = determinePrefix(timer, 6.seconds, 4.seconds, 2.seconds)
 
-        return HorizontalContainerRenderable(
-            listOf(
-                ItemStackRenderable(lamp),
-                StringRenderable("§6Disappears in $prefix$timer"),
-            ),
+        return Renderable.horizontal(
+            Renderable.item(lamp),
+            Renderable.text("§6Disappears in $prefix$timer"),
             spacing = 1,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         )

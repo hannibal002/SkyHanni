@@ -13,7 +13,11 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class FlowstateHelperConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows stats for the Flowstate enchantment on Mining Tools.")
+    @ConfigOption(
+        name = "Enabled",
+        desc = "Shows stats for the Flowstate enchantment on Mining Tools. " +
+            "§eMight not work at all due to Hypixel not sending sound data anymore.",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
@@ -33,6 +37,11 @@ class FlowstateHelperConfig {
     @SearchTag("autohide")
     @ConfigEditorSlider(minValue = -1f, maxValue = 30f, minStep = 1f)
     var autoHide: Int = 10
+
+    @Expose
+    @ConfigOption(name = "Personal Best Message", desc = "Sends a message when you beat your flowstate record.")
+    @ConfigEditorBoolean
+    var personalBestMessage: Boolean = true
 
     @Expose
     @ConfigLink(owner = FlowstateHelperConfig::class, field = "enabled")

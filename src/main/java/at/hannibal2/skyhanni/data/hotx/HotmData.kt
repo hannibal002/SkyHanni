@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -112,7 +110,7 @@ enum class HotmData(
         140,
         { level -> (level + 1.0).pow(2.3) },
         { level -> mapOf(HotmReward.MINING_SPEED to 50.0 + (level * 5.0)) },
-        HotmApi.PowderType.GEMSTONE
+        HotmApi.PowderType.GEMSTONE,
     ),
     MOLE(
         "Mole",
@@ -425,7 +423,10 @@ enum class HotmData(
     companion object : HotxHandler<HotmData, HotmReward, SkymallPerk>(entries) {
 
         override val name: String = "HotM"
-        override val rotatingPerkClazz = SkymallPerk::class
+        override val rotatingPerks = SkymallPerk.entries
+        override val rotatingPerkEntry: HotmData = SKY_MALL
+        override var currentRotPerk = HotmApi.skymall
+        override val applicableIslandType = IslandTypeTags.MINING
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
@@ -447,9 +448,15 @@ enum class HotmData(
             "(?:§.)*§(?<color>.)Level (?<level>\\d+).*",
         )
 
+        /**
+         * REGEX-TEST: §7§cRequires Mining Speed
+         * REGEX-TEST: §7§cRequires Tier 10
+         * REGEX-TEST: §5Mountain§c!
+         * REGEX-TEST: §7§eClick to unlock!
+         */
         override val notUnlockedPattern by patternGroup.pattern(
             "perk.notunlocked",
-            "(?:§.)*Requires.*|.*Mountain!|(?:§.)*Click to unlock!|",
+            "(?:§.)*Requires.*|.*Mountain(?:§.)*!|(?:§.)*Click to unlock!",
         )
 
         /**
@@ -605,12 +612,6 @@ enum class HotmData(
             }
         }
 
-        @HandleEvent
-        override fun onInventoryClose(event: InventoryCloseEvent) = super.onInventoryClose(event)
-
-        @HandleEvent(onlyOnSkyblock = true)
-        override fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) = super.onInventoryFullyOpened(event)
-
         override fun extraInventoryHandling() {
             abilities.filter { it.isUnlocked }.forEach {
                 it.rawLevel = if (CORE_OF_THE_MOUNTAIN.rawLevel >= 1) 2 else 1
@@ -627,11 +628,6 @@ enum class HotmData(
                     type.setAmount(amount, postEvent = true)
                 }
             }
-        }
-
-        override fun setRotatingPerk(newRotatingPerk: SkymallPerk?) {
-            HotmApi.skymall = newRotatingPerk
-            ChatUtils.debug("setting skymall to ${HotmApi.skymall}")
         }
 
         @HandleEvent(onlyOnSkyblock = true)
@@ -659,8 +655,6 @@ enum class HotmData(
                 }
             }
         }
-
-        override val rotatingPerkEntry: HotmData = SKY_MALL
 
         @HandleEvent
         fun onIslandChange(event: IslandChangeEvent) {
