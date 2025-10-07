@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.tracker.GardenProfitTracker
+import at.hannibal2.skyhanni.features.garden.tracker.GardenTrackerTypes
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemBlink
@@ -34,9 +36,10 @@ object GardenBurrowingSporesNotifier {
         val selected = config.burrowingSporesNotificationType
         val titleEnabled = selected in titleSet
         val blinkEnabled = selected in blinkSet
-        if (!titleEnabled && !blinkEnabled) return
         if (!sporeDropMessage.matches(event.message)) return
 
+        GardenProfitTracker.addItem(GardenTrackerTypes.BREAKING_CROPS, BURROWING_SPORES, 1, false)
+        if (!titleEnabled && !blinkEnabled) return
         if (titleEnabled) TitleManager.sendTitle("§9Burrowing Spores!")
         if (blinkEnabled) ItemBlink.setBlink(BURROWING_SPORES.getItemStackOrNull(), 5_000)
     }
