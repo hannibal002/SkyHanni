@@ -35,8 +35,7 @@ object CFShortcut {
             "§7Click here to run",
             "§e/chocolatefactory",
             "",
-            "§7Ctrl + Click",
-            "§7to open config"
+            "§7Ctrl + Click to open config"
         )
     }
 
