@@ -63,12 +63,11 @@ class FilterTypesConfig {
     @FeatureToggle
     var welcome: Boolean = false
 
-    //TODO rename to guildEventExp
     @Expose
     @ConfigOption(name = "Guild/Event EXP", desc = "Hide Guild and Event EXP messages.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var guildExp: Boolean = false
+    var guildEventExp: Boolean = false
 
     @Expose
     @ConfigOption(name = "Friend Join/Left", desc = "Hide friend join/left messages.")
