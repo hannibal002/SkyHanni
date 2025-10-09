@@ -43,7 +43,7 @@ object SeaCreatureTracker {
     }
 
     data class Data(
-        @Expose var amount: MutableMap<String, Int> = mutableMapOf()
+        @Expose var amount: MutableMap<String, Int> = mutableMapOf(),
     ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
 
     @HandleEvent
@@ -191,9 +191,18 @@ object SeaCreatureTracker {
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled) return false
         if (!isEnabled()) return false
+        if (!disabledArea()) return false
         if (!FishingApi.isFishing(checkRodInHand = false)) return false
 
         return true
+    }
+
+    // TODO add repo support for graph area names
+    private fun disabledArea() = when {
+        KuudraApi.inKuudra -> true
+        SkyBlockUtils.graphArea == "Tomb Floodway" -> true
+
+        else -> false
     }
 
     @HandleEvent
@@ -205,6 +214,7 @@ object SeaCreatureTracker {
         }
     }
 
-    private fun isEnabled() =
-        SkyBlockUtils.inSkyBlock && !FishingApi.hasTreasureHook && !FishingApi.wearingTrophyArmor && !KuudraApi.inKuudra
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock &&
+        !FishingApi.hasTreasureHook &&
+        !FishingApi.wearingTrophyArmor
 }

@@ -138,7 +138,7 @@ object VisitorListener {
         val inventory = event.guiContainer as? AccessorGuiContainer ?: return
         inventory as GuiContainer
         val slot = inventory.slots()[29]
-        InventoryCompat.clickInventorySlot(slot.slotIndex, mouseButton = 0, mode = 0)
+        InventoryCompat.mouseClickInventorySlot(slot.slotIndex, mouseButton = 0, mode = 0)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
