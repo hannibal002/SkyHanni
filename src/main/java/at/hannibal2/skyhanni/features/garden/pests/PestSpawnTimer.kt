@@ -96,9 +96,7 @@ object PestSpawnTimer {
             if (time == null) return
             pestCooldownEndTime = if (config.customCooldown.get()) {
                 lastPestSpawnTime + config.customCooldownTime.get().seconds
-            } else {
-                time
-            }
+            } else time
 
             if (pestSpawned) {
                 hasWarned = false
@@ -127,8 +125,8 @@ object PestSpawnTimer {
         lastPestSpawnTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onRenderOverlay() {
         if (!shouldRender) return
         config.position.renderRenderables(display, posLabel = "Pest Spawn Timer")
     }
@@ -145,8 +143,8 @@ object PestSpawnTimer {
         lastCropBrokenTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         update()
         if (shouldRepeatWarning) {
@@ -181,8 +179,8 @@ object PestSpawnTimer {
         shouldRender = shouldRender()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onIslandChange(event: IslandChangeEvent) {
+    @HandleEvent(IslandChangeEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onIslandChange() {
         shouldRepeatWarning = false
         longestCropBrokenTime = lastCropBrokenTime.passedSince()
     }
@@ -236,9 +234,8 @@ object PestSpawnTimer {
         return formatDisplay(lineMap)
     }
 
-    private fun formatDisplay(lineMap: Map<PestTimerTextEntry, Renderable>): List<Renderable> {
-        return config.pestDisplay.mapNotNull { lineMap[it] }
-    }
+    private fun formatDisplay(lineMap: Map<PestTimerTextEntry, Renderable>): List<Renderable> =
+        config.pestDisplay.mapNotNull { lineMap[it] }
 
     private fun update() {
         display = drawDisplay()
