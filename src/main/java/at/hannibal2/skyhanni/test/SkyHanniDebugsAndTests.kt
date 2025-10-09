@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -139,6 +140,11 @@ object SkyHanniDebugsAndTests {
     @Suppress("UNUSED_PARAMETER")
     private fun asyncTest(args: Array<String>) {
         ChatUtils.chat("§fTest successful!")
+
+        val progress = ChatProgressUpdates()
+        progress.start("a")
+        progress.update("b")
+        progress.end("c")
     }
 
     private fun findNull(obj: Any, path: String) {
