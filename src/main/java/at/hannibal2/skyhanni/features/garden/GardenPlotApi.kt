@@ -409,7 +409,6 @@ object GardenPlotApi {
 
     @HandleEvent
     fun onPlotChange(event: PlotChangeEvent) {
-        ChatUtils.debug("Current Plot: " + event.plot?.name)
         DelayedRun.runDelayed(3.seconds) {
             TabWidget.forceUpdateWidget(TabWidget.PESTS)
         }
