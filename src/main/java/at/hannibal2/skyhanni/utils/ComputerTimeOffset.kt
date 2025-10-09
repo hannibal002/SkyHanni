@@ -18,6 +18,7 @@ import java.net.InetAddress
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -49,11 +50,11 @@ object ComputerTimeOffset {
     enum class State(val duration: Duration) {
         NORMAL(1.seconds),
         SLOW(10.seconds),
-        TOTALLY_OFF(Duration.INFINITE),
+        TOTALLY_OFF(INFINITE),
     }
 
     init {
-        SkyHanniMod.launchIOCoroutine("computer time offset init", timeout = 5.minutes) {
+        SkyHanniMod.launchIOCoroutine("computer time offset init", timeout = INFINITE) {
             while (state != State.TOTALLY_OFF) {
                 delay(state.duration)
                 detectTimeChange()

@@ -36,7 +36,7 @@ object GardenUptimeCommand {
 
             val dayString = if (day == LocalDate.now()) "Today" else day.toString()
 
-            val outputString = "    §e$dayString:    §b$${uptime.format()}"
+            val outputString = "    §e$dayString:    §b${uptime.format()}"
 
             totalUptime += uptime
             commandString += outputString
