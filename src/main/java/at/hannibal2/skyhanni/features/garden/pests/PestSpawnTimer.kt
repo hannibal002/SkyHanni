@@ -185,9 +185,8 @@ object PestSpawnTimer {
         longestCropBrokenTime = lastCropBrokenTime.passedSince()
     }
 
-    @HandleEvent
-    fun onConfigChange(event: ConfigLoadEvent) {
-        ChatUtils.debug("Config load event")
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         config.customCooldown.onToggle {
             setCustomCooldown()
         }
