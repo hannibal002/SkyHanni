@@ -24,7 +24,7 @@ class GardenProfitTrackerConfig {
     @Expose
     @ConfigOption(name = "Show when:", desc = "When to show this display.")
     @ConfigEditorDraggableList
-    var showWhen: MutableList<ShowWhen> = mutableListOf(ShowWhen.ALWAYS)
+    val showWhen: MutableList<ShowWhen> = mutableListOf(ShowWhen.ALWAYS)
 
     enum class ShowWhen(val displayName: String) {
         FARMING("Farming"),
