@@ -33,6 +33,9 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Showing the composter data while outside the inventory
+ */
 @SkyHanniModule
 object ComposterDisplay {
 
