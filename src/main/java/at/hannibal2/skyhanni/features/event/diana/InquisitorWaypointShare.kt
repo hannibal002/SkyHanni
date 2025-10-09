@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -19,24 +18,19 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-//#if MC < 1.21
-import net.minecraft.network.play.server.S02PacketChat
-//#else
-//$$ import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket
-//#endif
+import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Matcher
-import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -44,44 +38,24 @@ object InquisitorWaypointShare {
 
     private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
 
-    private val patternGroup = RepoPattern.group("diana.waypoints")
+    private val patternGroup = RepoPattern.group("diana.waypoints.inquisitor")
 
     /**
-     * REGEX-TEST: §9Party §8> User Name§f: §rx: 2.3, y: 4.5, z: 6.7
-     */
-    private val partyOnlyCoordsPattern by patternGroup.pattern(
-        "party.onlycoords",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)",
-    )
-
-    // Support for https://www.chattriggers.com/modules/v/inquisitorchecker
-    /**
-     * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 3
+     * REGEX-TEST: §9Party §8> User Name§f: §rx: 2.3, y: 4.5, z: -6.7
+     * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 -3
+     * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
+     * REGEX-TEST: §9Party §8> §6[MVP§0++§6] scaryron§f: §rx: -67, y: 75, z: 116 | Minos Inquisitor spawned at [ ⏣ Mountain ]!
      */
     @Suppress("MaxLineLength")
-    private val partyInquisitorCheckerPattern by patternGroup.pattern(
-        "party.inquisitorchecker",
+    private val inquisitorCoordsPattern by patternGroup.list(
+        "coords",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+).*",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)",
     )
 
     /**
-     * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
+     * REGEX-TEST: §9Party §8> User Name§f: §rInquisitor dead!
      */
-    @Suppress("MaxLineLength")
-    private val odinPattern by patternGroup.pattern(
-        "party.odin",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) I dug up an inquisitor come over here!",
-    )
-
-    /**
-     * REGEX-TEST: §9Party §8> §6[MVP§0++§6] scaryron§f: §rx: -67, y: 75, z: 116 | Minos Inquisitor spawned at [ ⏣ Mountain ]!
-     */
-    @Suppress("MaxLineLength")
-    private val volcaddonsPattern by patternGroup.pattern(
-        "party.volc",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) \\| Minos Inquisitor spawned at (?<area>.*)!",
-    )
-
     private val diedPattern by patternGroup.pattern(
         "died",
         "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!",
@@ -91,16 +65,19 @@ object InquisitorWaypointShare {
      * REGEX-TEST: §c§lUh oh! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
      */
     private val inquisitorFoundChatPattern by patternGroup.pattern(
-        "inquisitor.dug",
+        "dug",
         ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!",
     )
 
     private var inquisitor = -1
     private var lastInquisitor = -1
     private var lastShareTime = SimpleTimeMark.farPast()
-    private var inquisitorsNearby = emptyList<EntityOtherPlayerMP>()
 
-    var waypoints = mapOf<String, SharedInquisitor>()
+    private val inquisitorsNearby = ConcurrentHashMap<Int, EntityOtherPlayerMP>()
+
+    private val _waypoints = ConcurrentHashMap<String, SharedInquisitor>()
+    val waypoints: Map<String, SharedInquisitor>
+        get() = _waypoints
 
     class SharedInquisitor(
         val fromPlayer: String,
@@ -114,16 +91,16 @@ object InquisitorWaypointShare {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
-            inquisitorsNearby = inquisitorsNearby.editCopy { removeIf { it.isDead } }
+            inquisitorsNearby.removeIf { it.value.isDead }
         }
 
-        waypoints = waypoints.editCopy { values.removeIf { it.spawnTime.passedSince() > 75.seconds } }
+        _waypoints.removeIf { it.value.spawnTime.passedSince() > 75.seconds }
     }
 
     @HandleEvent
     fun onWorldChange() {
-        waypoints = emptyMap()
-        inquisitorsNearby = emptyList()
+        _waypoints.clear()
+        inquisitorsNearby.clear()
     }
 
     private val inquisitorTime = mutableListOf<SimpleTimeMark>()
@@ -131,7 +108,7 @@ object InquisitorWaypointShare {
     @HandleEvent
     fun onInquisitorFound(event: InquisitorFoundEvent) {
         val inquisitor = event.inquisitorEntity
-        inquisitorsNearby = inquisitorsNearby.editCopy { add(inquisitor) }
+        inquisitorsNearby[inquisitor.entityId] = inquisitor
         GriffinBurrowHelper.update()
 
         lastInquisitor = inquisitor.entityId
@@ -152,13 +129,26 @@ object InquisitorWaypointShare {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message
 
         if (inquisitorFoundChatPattern.matches(message)) {
             checkInquisFound()
+        }
+
+        inquisitorCoordsPattern.matchMatchers(message) {
+            if (!detectFromChat()) return@matchMatchers
+            event.blockedReason = "inquisitor_waypoint"
+        }
+
+        diedPattern.matchMatcher(message) {
+            if (block()) return
+            val rawName = group("playerName")
+            val name = rawName.cleanPlayerName()
+            _waypoints.remove(name)
+            GriffinBurrowHelper.update()
         }
     }
 
@@ -192,9 +182,7 @@ object InquisitorWaypointShare {
         if (entityId == inquisitor) {
             sendDeath()
         }
-        inquisitorsNearby.find { it.entityId == entityId }?.let {
-            inquisitorsNearby = inquisitorsNearby.editCopy { remove(it) }
-        }
+        inquisitorsNearby.remove(entityId)
     }
 
     @HandleEvent
@@ -241,48 +229,6 @@ object InquisitorWaypointShare {
         HypixelCommands.partyChat("x: $x, y: $y, z: $z ")
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW, receiveCancelled = true)
-    fun onFirstChatEvent(event: PacketReceivedEvent) {
-        if (!isEnabled()) return
-        val packet = event.packet
-        //#if MC < 1.21
-        if (packet !is S02PacketChat) return
-        val messageComponent = packet.chatComponent
-        //#else
-        //$$ if (packet !is ChatMessageS2CPacket) return
-        //$$ val messageComponent = packet.unsignedContent
-        //#endif
-
-        val message = messageComponent.formattedText.stripHypixelMessage()
-        //#if MC < 1.16
-        if (packet.type.toInt() != 0) return
-        //#endif
-
-        if (partyInquisitorCheckerPattern.isDetected(message)) {
-            event.cancel()
-        }
-        if (odinPattern.isDetected(message)) {
-            event.cancel()
-        }
-        if (partyOnlyCoordsPattern.isDetected(message)) {
-            event.cancel()
-        }
-        if (volcaddonsPattern.isDetected(message)) {
-            event.cancel()
-        }
-        diedPattern.matchMatcher(message) {
-            if (block()) return
-            val rawName = group("playerName")
-            val name = rawName.cleanPlayerName()
-            waypoints = waypoints.editCopy { remove(name) }
-            GriffinBurrowHelper.update()
-        }
-    }
-
-    private fun Pattern.isDetected(message: String): Boolean = matchMatcher(message) {
-        detectFromChat()
-    } ?: false
-
     private fun Matcher.block(): Boolean = !hasGroup("party") && !config.globalChat
 
     private fun Matcher.detectFromChat(): Boolean {
@@ -303,7 +249,7 @@ object InquisitorWaypointShare {
             }
         }
         val inquis = SharedInquisitor(name, displayName, location, SimpleTimeMark.now())
-        waypoints = waypoints.editCopy { this[name] = inquis }
+        _waypoints[name] = inquis
         GriffinBurrowHelper.update()
         return true
     }
@@ -312,7 +258,7 @@ object InquisitorWaypointShare {
 
     fun maybeRemove(inquis: SharedInquisitor) {
         if (inquisitorsNearby.isEmpty()) {
-            waypoints = waypoints.editCopy { remove(inquis.fromPlayer) }
+            _waypoints.remove(inquis.fromPlayer)
             GriffinBurrowHelper.update()
             ChatUtils.chat("Inquisitor from ${inquis.displayName} §enot found, deleting.")
         }
