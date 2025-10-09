@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
@@ -72,11 +73,9 @@ object InquisitorWaypointShare {
     private var lastInquisitor = -1
     private var lastShareTime = SimpleTimeMark.farPast()
 
-    private val inquisitorsNearby = mutableListOf<EntityOtherPlayerMP>()
-    private val inquisitorsNearbyLock = Any()
+    private val inquisitorsNearby = ConcurrentHashMap<Int, EntityOtherPlayerMP>()
 
-    private val _waypoints = mutableMapOf<String, SharedInquisitor>()
-    private val waypointsLock = Any()
+    private val _waypoints = ConcurrentHashMap<String, SharedInquisitor>()
     val waypoints: Map<String, SharedInquisitor>
         get() = _waypoints
 
@@ -92,24 +91,16 @@ object InquisitorWaypointShare {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
-            synchronized(inquisitorsNearbyLock) {
-                inquisitorsNearby.removeIf { it.isDead }
-            }
+            inquisitorsNearby.removeIf { it.value.isDead }
         }
 
-        synchronized(waypointsLock) {
-            _waypoints.removeIf { it.value.spawnTime.passedSince() > 75.seconds }
-        }
+        _waypoints.removeIf { it.value.spawnTime.passedSince() > 75.seconds }
     }
 
     @HandleEvent
     fun onWorldChange() {
-        synchronized(waypointsLock) {
-            _waypoints.clear()
-        }
-        synchronized(inquisitorsNearbyLock) {
-            inquisitorsNearby.clear()
-        }
+        _waypoints.clear()
+        inquisitorsNearby.clear()
     }
 
     private val inquisitorTime = mutableListOf<SimpleTimeMark>()
@@ -117,9 +108,7 @@ object InquisitorWaypointShare {
     @HandleEvent
     fun onInquisitorFound(event: InquisitorFoundEvent) {
         val inquisitor = event.inquisitorEntity
-        synchronized(inquisitorsNearbyLock) {
-            inquisitorsNearby.add(inquisitor)
-        }
+        inquisitorsNearby[inquisitor.entityId] = inquisitor
         GriffinBurrowHelper.update()
 
         lastInquisitor = inquisitor.entityId
@@ -158,9 +147,7 @@ object InquisitorWaypointShare {
             if (block()) return
             val rawName = group("playerName")
             val name = rawName.cleanPlayerName()
-            synchronized(waypointsLock) {
-                _waypoints.remove(name)
-            }
+            _waypoints.remove(name)
             GriffinBurrowHelper.update()
         }
     }
@@ -195,11 +182,7 @@ object InquisitorWaypointShare {
         if (entityId == inquisitor) {
             sendDeath()
         }
-        synchronized(inquisitorsNearbyLock) {
-            inquisitorsNearby.find { it.entityId == entityId }?.let {
-                inquisitorsNearby.remove(it)
-            }
-        }
+        inquisitorsNearby.remove(entityId)
     }
 
     @HandleEvent
@@ -266,9 +249,7 @@ object InquisitorWaypointShare {
             }
         }
         val inquis = SharedInquisitor(name, displayName, location, SimpleTimeMark.now())
-        synchronized(waypointsLock) {
-            _waypoints[name] = inquis
-        }
+        _waypoints[name] = inquis
         GriffinBurrowHelper.update()
         return true
     }
@@ -277,9 +258,7 @@ object InquisitorWaypointShare {
 
     fun maybeRemove(inquis: SharedInquisitor) {
         if (inquisitorsNearby.isEmpty()) {
-            synchronized(waypointsLock) {
-                _waypoints.remove(inquis.fromPlayer)
-            }
+            _waypoints.remove(inquis.fromPlayer)
             GriffinBurrowHelper.update()
             ChatUtils.chat("Inquisitor from ${inquis.displayName} §enot found, deleting.")
         }
