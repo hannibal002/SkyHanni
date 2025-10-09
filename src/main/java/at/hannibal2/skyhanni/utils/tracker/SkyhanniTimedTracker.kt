@@ -151,7 +151,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
             )
         }
         add(searchBox)
-        add(buildSessionUptime(getOrPutCurrentData()))
+        if (showSessionUptime()) add(buildSessionUptime(getOrPutCurrentData()))
         if (isEmpty()) return@buildList
         if (inventoryOpen) {
             buildDisplayModeView()
