@@ -707,7 +707,7 @@ object ChatFilter {
         event.move(3, "chat.hypixelHub", "chat.filterType.hypixelHub")
         event.move(3, "chat.empty", "chat.filterType.empty")
         event.move(3, "chat.warping", "chat.filterType.warping")
-        event.move(3, "chat.guildExp", "chat.filterType.guildEventExp")
+        event.move(3, "chat.guildExp", "chat.filterType.guildExp")
         event.move(3, "chat.friendJoinLeft", "chat.filterType.friendJoinLeft")
         event.move(3, "chat.winterGift", "chat.filterType.winterGift")
         event.move(3, "chat.powderMining", "chat.filterType.powderMining")
