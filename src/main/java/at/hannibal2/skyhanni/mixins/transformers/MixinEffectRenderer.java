@@ -34,10 +34,10 @@ public class MixinEffectRenderer {
     @Inject(method = "addBlockDestroyEffects", at = @At("HEAD"), cancellable = true)
     private void onAddBlockDestroyEffects(BlockPos pos, IBlockState state, CallbackInfo ci) {
     //#endif
-        BlockBreakParticleConfig config = SkyHanniMod.feature.misc.particleHiders.getBlockBreakParticleConfig();
+        BlockBreakParticleConfig config = SkyHanniMod.feature.misc.particleHiders.getBlockBreakParticle();
 
-        if (config.hideBlockBreakParticles) {
-            if (config.hideBlockBreakParticlesGarden) {
+        if (config.hide) {
+            if (config.onlyInGarden) {
                 if (IslandType.GARDEN.isCurrent()) {
                     ci.cancel();
                 }
@@ -54,10 +54,10 @@ public class MixinEffectRenderer {
     @Inject(method = "addBlockHitEffects*", at = @At("HEAD"), cancellable = true)
     private void onAddBlockHitEffects(BlockPos pos, EnumFacing side, CallbackInfo ci) {
     //#endif
-        BlockBreakParticleConfig config = SkyHanniMod.feature.misc.particleHiders.getBlockBreakParticleConfig();
+        BlockBreakParticleConfig config = SkyHanniMod.feature.misc.particleHiders.getBlockBreakParticle();
 
-        if (config.hideBlockBreakParticles) {
-            if (config.hideBlockBreakParticlesGarden) {
+        if (config.hide) {
+            if (config.onlyInGarden) {
                 if (IslandType.GARDEN.isCurrent()) {
                     ci.cancel();
                 }
@@ -66,6 +66,5 @@ public class MixinEffectRenderer {
             }
         }
     }
-
 
 }

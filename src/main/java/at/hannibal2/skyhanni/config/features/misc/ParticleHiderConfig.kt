@@ -10,7 +10,7 @@ class ParticleHiderConfig {
     @Expose
     @ConfigOption(name = "Block Break Particle", desc = "")
     @Accordion
-    val blockBreakParticleConfig: BlockBreakParticleConfig = BlockBreakParticleConfig()
+    val blockBreakParticle: BlockBreakParticleConfig = BlockBreakParticleConfig()
 
     @JvmField
     @Expose

@@ -12,12 +12,12 @@ class BlockBreakParticleConfig {
     @ConfigOption(name = "Block Break Particles", desc = "Hide Block Break particles.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideBlockBreakParticles: Boolean = false
+    var hide: Boolean = false
 
     @JvmField
     @Expose
-    @ConfigOption(name = "Only on garden", desc = "Hide Block Break particles only on garden")
+    @ConfigOption(name = "Only on Garden", desc = "Hide Block Break particles only on garden.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideBlockBreakParticlesGarden: Boolean = false
+    var onlyInGarden: Boolean = false
 }
