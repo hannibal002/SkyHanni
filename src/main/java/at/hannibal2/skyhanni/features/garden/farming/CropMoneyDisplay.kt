@@ -250,7 +250,7 @@ object CropMoneyDisplay {
 
         return Renderable.horizontal {
             if (!config.compact) {
-                addString("§7$number# ")
+                addString("§7#$number ")
             }
 
             if (isSeeds(internalName)) {
