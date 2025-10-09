@@ -41,6 +41,7 @@ object DanceRoomHelper {
 
     private val emptyInstructionsDisplay by lazy {
         buildList {
+            // TODO add generic repo outdated error logic here
             addString("§cError fetching Dance Room Instructions!")
             Renderable.optionalLink(
                 "§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo §c(Click to update now)",

@@ -205,12 +205,14 @@ object StringUtils {
     //#if FORGE
     fun String.splitLines(width: Int): String = ForgeFontRenderer(Minecraft.getMinecraft().fontRendererObj).splitText(
         this.asStructuredText(),
-        //#else
-        //$$ fun String.splitLines(width: Int): String = splitText(
-        //$$ this,
-        //#endif
         width,
-    ).joinToString("\n") { it.toString().removePrefix("§r") }
+    ).joinToString("\n") { it.text.removePrefix("§r") }
+    //#else
+    //$$ fun String.splitLines(width: Int): String = splitText(
+    //$$ this,
+    //$$ width,
+    //$$ ).joinToString("\n") { it.toString().removePrefix("§r") }
+    //#endif
 
     //#if MC > 1.21
     //$$ private fun splitText(text: String, width: Int): List<String> {
