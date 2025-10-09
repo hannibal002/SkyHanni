@@ -26,16 +26,16 @@ import kotlin.time.Duration.Companion.seconds
 class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualConfig<*>>(
     name: String,
     createNewSession: () -> Data,
-    private var storage: (ProfileSpecificStorage) -> TimedTrackerData<Data, *>,
+    private var storage: (ProfileSpecificStorage) -> TimedTrackerData<Data>,
     drawDisplay: (Data) -> List<Searchable>,
-    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
+    extraDisplayModes: Set<DisplayMode> = emptySet(),
     customUptimeControl: Boolean = false,
     trackerConfig: () -> Type
 ) : SkyHanniTracker<Data, Type>(
     name,
     createNewSession,
     { throw UnsupportedOperationException("getStorage not used") },
-    extraDisplayModes,
+    extraDisplayModes = emptyMap(), // not used here
     drawDisplay = drawDisplay,
     trackerConfig = trackerConfig,
     customUptimeControl = customUptimeControl
@@ -49,7 +49,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         DisplayMode.WEEK,
         DisplayMode.MONTH,
         DisplayMode.YEAR,
-    ) + extraDisplayModes.keys
+    ) + extraDisplayModes
     private val config: TrackerGenericConfig
         get() = if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
     private val activeStopwatches = mutableSetOf<Data>()
@@ -114,7 +114,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         update()
     }
 
-    private fun getData(): TimedTrackerData<Data, *>? = ProfileStorageData.profileSpecific?.getData()
+    private fun getData(): TimedTrackerData<Data>? = ProfileStorageData.profileSpecific?.getData()
     private fun getOrPutCurrentData(displayMode: DisplayMode = getDisplayMode()): Data? = getData()?.getOrPutCurrentData(displayMode)
     private fun getOrPutCurrentName(displayMode: DisplayMode = getDisplayMode()): String? = getData()?.getOrPutCurrentName(displayMode)
     private fun getPrevNext(displayMode: DisplayMode, string: String): Pair<String?, String?> =
@@ -151,7 +151,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
             )
         }
         add(searchBox)
-        add(buildSessionUptime(getOrPutCurrentData()))
+        if (showSessionUptime()) add(buildSessionUptime(getOrPutCurrentData()))
         if (isEmpty()) return@buildList
         if (inventoryOpen) {
             buildDisplayModeView()
@@ -278,6 +278,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         getData()?.getOrPutEntry(DisplayMode.SESSION, string)
         getData()?.cleanEntry(timedConfig, DisplayMode.SESSION)
         sessionEditTime = SimpleTimeMark.now()
+        update()
     }
 
     private fun deleteSession() {

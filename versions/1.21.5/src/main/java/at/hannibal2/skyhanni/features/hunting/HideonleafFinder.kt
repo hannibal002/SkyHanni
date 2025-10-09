@@ -27,7 +27,9 @@ object HideonleafFinder {
         if (navigating) return
 
         val route = route?.takeIfNotEmpty() ?: run {
-            calculateRoute().also { route = it } ?: error("Current island graph is null and there is a mistake")
+            calculateRoute().also { route = it } ?:
+            // TODO add generic repo outdated error logic here
+            error("Current island graph is null and there is a mistake")
         }
 
         val goal = route.removeFirstOrNull() ?: error("No hideonleaf route found in galatea!")

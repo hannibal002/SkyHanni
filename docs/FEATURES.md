@@ -301,6 +301,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Tracks the amount of coins you have put towards the daily 15 billion trade limit.
     + Coins in excess of the integer limit on an individual order do not count towards the daily limit.
     + Resets at midnight UTC.
++ Added a keybind to fill your inventory with the hovered item from Sacks. - nopo (https://github.com/hannibal002/SkyHanni/pull/4697)
 
 </details>
 <details open><summary>

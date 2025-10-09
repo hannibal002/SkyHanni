@@ -45,7 +45,6 @@ object PreventEarlyCommands {
         if (command == "locraw") return // Ignore locraw commands
         lastCommand = command
 
-        ChatUtils.debug("Setting last command to $command")
         commandExecuted = SimpleTimeMark.now()
     }
 
