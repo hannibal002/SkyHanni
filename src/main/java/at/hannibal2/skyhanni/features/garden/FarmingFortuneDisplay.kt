@@ -59,6 +59,7 @@ object FarmingFortuneDisplay {
         "tablist.universal",
         " Farming Fortune: §r§6☘(?<fortune>\\d+)",
     )
+
     @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific",
@@ -97,7 +98,7 @@ object FarmingFortuneDisplay {
      */
     private val pestFortuneBuffPattern by patternGroup.pattern(
         "pestfortunebuff",
-        " Bonus: §r§.(?<inactive>§lINACTIVE)?(?:\\+(?<fortune>\\d+)☘ §r§b(?<time>.*))?.*"
+        " Bonus: §r§.(?<inactive>§lINACTIVE)?(?:\\+(?<fortune>\\d+)☘ §r§b(?<time>.*))?.*",
     )
 
     private var display = emptyList<Renderable>()
@@ -132,48 +133,57 @@ object FarmingFortuneDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        val widget = event.widget
         if (event.isWidget(TabWidget.STATS)) {
-            universalTabFortunePattern.firstMatcher(event.widget.lines) {
-                val fortune = group("fortune").toDouble()
-                foundTabUniversalFortune = true
-                if (fortune != tabFortuneUniversal) {
-                    tabFortuneUniversal = fortune
-                    update()
-                }
-            }
-            cropSpecificTabFortunePattern.firstMatcher(event.widget.lines) {
-                val crop = CropType.getByName(group("crop"))
-                val cropFortune = group("fortune").toDouble()
-
-                currentCrop = crop
-                foundTabCropFortune = true
-                if (cropFortune != tabFortuneCrop) {
-                    tabFortuneCrop = cropFortune
-                    update()
-                }
-                if (GardenApi.cropInHand == crop) {
-                    latestFF?.put(crop, getCurrentFarmingFortune())
-                }
-            }
+            checkStats(widget)
         } else if (event.isWidget(TabWidget.PESTS)) {
-            pestFortuneBuffPattern.firstMatcher(event.widget.lines) {
-                val inactive = groupOrNull("inactive")
-                val time = groupOrNull("time")?.let { getTablistEndTime(it, pestBonusExpireTime) }
-                val fortune = groupOrNull("fortune")?.toIntOrNull()
+            checkPests(widget)
+        }
+    }
 
-                if (inactive != null) {
-                    pestBonusExpireTime = SimpleTimeMark.farPast()
-                    pestBonusFortune = 0
-                    if (!hasWarnedPestBonus) {
-                        pestBuffExpireWarning()
-                    }
-                } else if (time != null && fortune != null) {
-                    hasWarnedPestBonus = false
-                    pestBonusFortune = fortune
-                    pestBonusExpireTime = time
+    private fun checkPests(widget: TabWidget) {
+        pestFortuneBuffPattern.firstMatcher(widget.lines) {
+            val inactive = groupOrNull("inactive")
+            val time = groupOrNull("time")?.let { getTablistEndTime(it, pestBonusExpireTime) }
+            val fortune = groupOrNull("fortune")?.toIntOrNull()
 
+            if (inactive != null) {
+                pestBonusExpireTime = SimpleTimeMark.farPast()
+                pestBonusFortune = 0
+                if (!hasWarnedPestBonus) {
+                    pestBuffExpireWarning()
                 }
+            } else if (time != null && fortune != null) {
+                hasWarnedPestBonus = false
+                pestBonusFortune = fortune
+                pestBonusExpireTime = time
+
+            }
+            update()
+        }
+    }
+
+    private fun checkStats(widget: TabWidget) {
+        universalTabFortunePattern.firstMatcher(widget.lines) {
+            val fortune = group("fortune").toDouble()
+            foundTabUniversalFortune = true
+            if (fortune != tabFortuneUniversal) {
+                tabFortuneUniversal = fortune
                 update()
+            }
+        }
+        cropSpecificTabFortunePattern.firstMatcher(widget.lines) {
+            val crop = CropType.getByName(group("crop"))
+            val cropFortune = group("fortune").toDouble()
+
+            currentCrop = crop
+            foundTabCropFortune = true
+            if (cropFortune != tabFortuneCrop) {
+                tabFortuneCrop = cropFortune
+                update()
+            }
+            if (GardenApi.cropInHand == crop) {
+                latestFF?.put(crop, getCurrentFarmingFortune())
             }
         }
     }
@@ -192,11 +202,12 @@ object FarmingFortuneDisplay {
     }
 
     private fun pestBuffExpireWarning() {
-        if (config.bonusFortuneChat) ChatUtils.clickableChat(
-            "§cPest fortune buff has expired!",
-            onClick = { HypixelCommands.teleportToPlot("barn") },
-            hover = "§cClick to teleport to barn!"
-        )
+        if (config.bonusFortuneChat)
+            ChatUtils.clickableChat(
+                "§cPest fortune buff has expired!",
+                onClick = { HypixelCommands.teleportToPlot("barn") },
+                hover = "§cClick to teleport to barn!",
+            )
         if (config.bonusFortuneTitle) {
             TitleManager.sendTitle("§cPest Fortune Buff Has Expired!", duration = 3.seconds)
             playUserSound()
