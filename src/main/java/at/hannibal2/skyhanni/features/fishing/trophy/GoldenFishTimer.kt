@@ -104,11 +104,11 @@ object GoldenFishTimer {
     private var lastFishEntity = SimpleTimeMark.farPast()
     private var lastChatMessage = SimpleTimeMark.farPast()
 
-    private var lastGoldenFishTime = ServerTimeMark.FAR_PAST
+    private var lastGoldenFishTime = ServerTimeMark.farPast()
 
-    private var lastRodThrowTime = ServerTimeMark.FAR_PAST
-    private var goldenFishDespawnTimer = ServerTimeMark.FAR_FUTURE
-    private var timePossibleSpawn = ServerTimeMark.FAR_FUTURE
+    private var lastRodThrowTime = ServerTimeMark.farPast()
+    private var goldenFishDespawnTimer = ServerTimeMark.farFuture()
+    private var timePossibleSpawn = ServerTimeMark.farFuture()
 
     private val isFishing get() = FishingApi.isFishing() || lastRodThrowTime.passedSince() < maxRodTime
     private var hasLavaRodInInventory = false
@@ -292,8 +292,8 @@ object GoldenFishTimer {
         if (!isActive()) return
 
         if (lastRodThrowTime.passedSince() > maxRodTime) {
-            timePossibleSpawn = ServerTimeMark.FAR_FUTURE
-            lastRodThrowTime = ServerTimeMark.FAR_PAST
+            timePossibleSpawn = ServerTimeMark.farFuture()
+            lastRodThrowTime = ServerTimeMark.farPast()
         }
         if (!lastRodThrowTime.isFarPast() && (lastRodThrowTime + maxRodTime).timeUntil() < config.throwRodWarningTime.seconds) {
             rodWarning()
@@ -345,10 +345,10 @@ object GoldenFishTimer {
     fun onWorldChange() {
         lastChatMessage = SimpleTimeMark.farPast()
         lastFishEntity = SimpleTimeMark.farPast()
-        lastGoldenFishTime = ServerTimeMark.FAR_PAST
+        lastGoldenFishTime = ServerTimeMark.farPast()
         possibleGoldenFishEntity = null
-        lastRodThrowTime = ServerTimeMark.FAR_PAST
-        timePossibleSpawn = ServerTimeMark.FAR_FUTURE
+        lastRodThrowTime = ServerTimeMark.farPast()
+        timePossibleSpawn = ServerTimeMark.farFuture()
         interactions = 0
         display = null
         removeGoldenFish()
@@ -391,7 +391,7 @@ object GoldenFishTimer {
     }
 
     private fun removeGoldenFish() {
-        goldenFishDespawnTimer = ServerTimeMark.FAR_FUTURE
+        goldenFishDespawnTimer = ServerTimeMark.farFuture()
         confirmedGoldenFishEntity?.let {
             confirmedGoldenFishEntity = null
             RenderLivingEntityHelper.removeEntityColor(it)

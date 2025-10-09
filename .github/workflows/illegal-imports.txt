@@ -13,5 +13,6 @@ at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.util.Utils
 at/hannibal2/skyhanni/ java.util.function.Supplier
 at/hannibal2/skyhanni/ com.mojang.realmsclient.
 at/hannibal2/skyhanni/ com.ibm.icu.
-# Here because SkyHanniDebugsAndTests references way to much stuff and this way we keep the internal dependencies lower
+at/hannibal2/skyhanni/ io.netty.util.internal.
+# Here because SkyHanniDebugsAndTests references way too much stuff and this way we keep the internal dependencies lower
 at/hannibal2/skyhanni/ at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
