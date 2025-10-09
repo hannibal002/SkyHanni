@@ -105,7 +105,7 @@ object ChatFilter {
      * REGEX-TEST: §aYou earned §r§510 Event EXP §r§afrom playing SkyBlock!
      */
     @Suppress("MaxLineLength")
-    private val guildExpPatterns = listOf(
+    private val guildEventExpPatterns = listOf(
         "§aYou earned §r§[0-9a-f][\\d,]+ (?:GEXP|Event EXP) (?:§r§a\\+ §r§[0-9a-f][\\d,]+ Event EXP )?§r§afrom playing SkyBlock!".toPattern(),
     )
 
@@ -502,7 +502,7 @@ object ChatFilter {
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
-        "guild_exp" to guildExpPatterns,
+        "guild_event_exp" to guildEventExpPatterns,
         "kill_combo" to killComboPatterns,
         "slayer" to slayerPatterns,
         "slayer_drop" to slayerDropPatterns,
@@ -585,7 +585,7 @@ object ChatFilter {
         config.empty && StringUtils.isEmpty(message) -> "empty"
         config.warping && message.isPresent("warping") -> "warping"
         config.welcome && message.isPresent("welcome") -> "welcome"
-        config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
+        config.guildEventExp && message.isPresent("guild_event_exp") -> "guild_event_exp"
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
@@ -707,7 +707,7 @@ object ChatFilter {
         event.move(3, "chat.hypixelHub", "chat.filterType.hypixelHub")
         event.move(3, "chat.empty", "chat.filterType.empty")
         event.move(3, "chat.warping", "chat.filterType.warping")
-        event.move(3, "chat.guildExp", "chat.filterType.guildExp")
+        event.move(3, "chat.guildExp", "chat.filterType.guildEventExp")
         event.move(3, "chat.friendJoinLeft", "chat.filterType.friendJoinLeft")
         event.move(3, "chat.winterGift", "chat.filterType.winterGift")
         event.move(3, "chat.powderMining", "chat.filterType.powderMining")
@@ -724,5 +724,6 @@ object ChatFilter {
         }
         event.move(61, "chat.filterType.powderMiningFilter", "chat.filterType.powderMining")
         event.move(61, "chat.filterType.gemstoneFilterConfig", "chat.filterType.powderMining.gemstone")
+        event.move(107, "chat.filterType.guildExp", "chat.filterType.guildEventExp")
     }
 }
