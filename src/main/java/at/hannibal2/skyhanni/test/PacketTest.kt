@@ -136,13 +136,7 @@ object PacketTest {
                 entityMap.getOrDefault(it, mutableListOf()).add(packet)
             }
         } else {
-            val id = try {
-                val field = packet.javaClass.getDeclaredField("entityId")
-                field.makeAccessible()
-                field.get(packet)
-            } catch (e: NoSuchFieldException) {
-                null
-            } ?: return
+            val id = packet.getEntityId() ?: return
             entityMap.getOrDefault(id, mutableListOf()).add(packet)
         }
     }
@@ -301,26 +295,35 @@ object PacketTest {
         return null
     }
 
-    private fun Packet<*>.getEntityId() = when (this) {
-        is S1CPacketEntityMetadata -> entityId
-        is S20PacketEntityProperties -> entityId
-        is S04PacketEntityEquipment -> entityID
-        is S12PacketEntityVelocity -> entityID
-        is S1BPacketEntityAttach -> entityId
-        is S0BPacketAnimation -> entityID
-        is S18PacketEntityTeleport -> entityId
-        is S1DPacketEntityEffect -> entityId
-        is S0CPacketSpawnPlayer -> entityID
-        //#if MC < 1.21
-        is S0FPacketSpawnMob -> entityID
-        is S0EPacketSpawnObject -> entityID
-        is S19PacketEntityHeadLook -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
-        //#endif
-        is S19PacketEntityStatus -> javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
-        /* is S14PacketEntity.S15PacketEntityRelMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
-        is S14PacketEntity.S16PacketEntityLook -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
-        is S14PacketEntity.S17PacketEntityLookMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int */
-        else -> null
+    private fun Packet<*>.getEntityId() = try {
+        when (this) {
+            is S1CPacketEntityMetadata -> entityId
+            is S20PacketEntityProperties -> entityId
+            is S04PacketEntityEquipment -> entityID
+            is S12PacketEntityVelocity -> entityID
+            is S1BPacketEntityAttach -> entityId
+            is S0BPacketAnimation -> entityID
+            is S18PacketEntityTeleport -> entityId
+            is S1DPacketEntityEffect -> entityId
+            is S0CPacketSpawnPlayer -> entityID
+            //#if MC < 1.21
+            is S0FPacketSpawnMob -> entityID
+            is S0EPacketSpawnObject -> entityID
+            is S19PacketEntityHeadLook ->
+                javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
+            //#endif
+            is S19PacketEntityStatus ->
+                javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
+            /* is S14PacketEntity.S15PacketEntityRelMove ->
+                packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
+            is S14PacketEntity.S16PacketEntityLook ->
+                packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
+            is S14PacketEntity.S17PacketEntityLookMove ->
+                packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int */
+            else -> null
+        }
+    } catch (e: NoSuchFieldException) {
+        null
     }
 
     @HandleEvent

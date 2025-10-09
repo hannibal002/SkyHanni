@@ -220,7 +220,7 @@ object ElectionApi {
         }
         lastUpdate = SimpleTimeMark.now()
 
-        SkyHanniMod.launchIOCoroutine("election api fetch") {
+        SkyHanniMod.launchIOCoroutine("election api fetch", timeout = 1.minutes) {
             val (_, jsonObject) = ApiUtils.getJsonResponse(hypixelElectionApiStatic).assertSuccessWithData() ?: return@launchIOCoroutine
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launchIOCoroutine
