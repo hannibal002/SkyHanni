@@ -22,11 +22,11 @@ object UbikReminder {
     private val patternGroup = RepoPattern.group("rift.ubik")
 
     /**
-     * REGEX-TEST: ROUND 2 (FINAL):
+     * REGEX-TEST: §6§lROUND 7 §r§6(§r§lFINAL§r§6)§r§l: §r§eYou chose §r§c§lSTEAL §r§eand gained §r§55,000 Motes§r§e!
      */
     private val ubikRoundPattern by patternGroup.pattern(
         "reminder",
-        "ROUND [1-9] \\(FINAL\\):",
+        "§6§lROUND [5-9] §r§6\\(§r§lFINAL§r§6\\)§r§l: §r§eYou chose .*",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
