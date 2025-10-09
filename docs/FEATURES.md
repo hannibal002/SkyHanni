@@ -567,6 +567,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Slayer Time messages. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4518)
     + Sends time to complete (Spawn & Kill) a slayer quest in chat.
 + Added Title/Sound when a Slayer is cocooned. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4569)
++ Added Active Boss Transparency. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4744)
+    + Reduces transparency of other mobs while fighting a Slayer boss.
 
 </details>
 <details open><summary>
