@@ -291,10 +291,10 @@ class MobFinder {
         else -> null
     }
 
-    private fun tryAddEntitySkeleton(mob: Mob) = when (mob.name) {
-        "ⓆⓊⒶⓏⒾⒾ " -> {
+    private fun tryAddEntitySkeleton(mob: Mob): EntityResult? {
+        if (mob.name.contains("ⓆⓊⒶⓏⒾⒾ")) {
             val entity = mob.baseEntity
-            when {
+            return when {
                 entity.hasBossHealth(10_000_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_4)
                 entity.hasBossHealth(5_000_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_3)
                 entity.hasBossHealth(1_750_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_2)
@@ -302,12 +302,13 @@ class MobFinder {
                 else -> null
             }
         }
+        return when (mob.name) {
+            "Bladesoul" -> {
+                EntityResult(bossType = BossType.NETHER_BLADESOUL)
+            }
 
-        "Bladesoul" -> {
-            EntityResult(bossType = BossType.NETHER_BLADESOUL)
+            else -> null
         }
-
-        else -> null
     }
 
     private fun tryAddEntityOtherPlayerMP(mob: Mob) = when (mob.name) {
@@ -385,7 +386,7 @@ class MobFinder {
         else -> null
     }
 
-    private fun tryAddEntityPigZombie(mob: Mob) = if (mob.name == "ⓉⓎⓅⒽⓄⒺⓊⓈ") {
+    private fun tryAddEntityPigZombie(mob: Mob) = if (mob.name.contains("ⓉⓎⓅⒽⓄⒺⓊⓈ")) {
         val entity = mob.baseEntity
         when {
             entity.hasBossHealth(10_000_000) -> EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_4)

@@ -89,7 +89,7 @@ class BazaarConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var craftMaterialsFromBazaar: Boolean = false
+    var craftMaterialsFromBazaar: Boolean = true
 
     @Expose
     @ConfigLink(owner = BazaarConfig::class, field = "craftMaterialsFromBazaar")
