@@ -139,7 +139,7 @@ object HypixelData {
      */
     private val scoreboardTitlePattern by patternGroup.pattern(
         "scoreboard.title",
-        "SK[YI]BLOCK(?: CO-OP| GUEST)?",
+        "SK[YI]BLOCK(?: CO-OP| GUEST)?(?: ♲)?",
     )
 
     /**
