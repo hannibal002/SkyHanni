@@ -32,6 +32,7 @@
 + Added Pest Trap tab widgets to Tab Widget Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
 + Added warnings for Pest Traps being full or out of bait. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
 + Added keybind to release all pests in a Pest Trap. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4675)
++ Added warning when Pesthunter Phillip's Bonus Farming Fortune buff expires. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4679)
 
 #### Commands
 
@@ -127,6 +128,8 @@
 + Added Slayer Time messages. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4518)
     + Sends time to complete (Spawn & Kill) a slayer quest in chat.
 + Added Title/Sound when a Slayer is cocooned. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4569)
++ Added Active Boss Transparency. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4744)
+    + Reduces transparency of other mobs while fighting a Slayer boss.
 
 ### Improvements
 
@@ -140,6 +143,9 @@
 + Added option to set custom sounds for the Pest Cooldown Warning. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4509)
 + Updated Garden Money-Per-Hour display on pet change. - Stuflo19 (https://github.com/hannibal002/SkyHanni/pull/4648)
 + Added Pest Shard drops to Pest Profit Tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4705)
++ Added option in Pest Spawn Timer to set custom pest cooldown after spawning. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4592)
+    + Works with Pest Cooldown Warning.
++ Added Pesthunter Phillip's Bonus Farming Fortune line to the Farming Fortune Display. - Chiss (https://github.com/hannibal002/SkyHanni/pull/4679)
 
 #### Slayer
 
@@ -149,6 +155,7 @@
     + Show the info that you need to kill the hatchlings during tarantula slayer tier 5 fight.
 + Made many Slayer features, Shuriken/Twilight indicators, and Bacte phase display independent of Damage Indicator. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4622)
     + Allows Bacte phase, Eman Slayer blaze timer, Slayer time-to-kill, and Vampire Slayer steak display to show without boss name/health visible.
++ Improved Slayer quest detection: uses the Tab List widget when Hypixel omits them from the Scoreboard (common in The Park). - Luna (https://github.com/hannibal002/SkyHanni/pull/4746)
 
 #### Inventory
 
@@ -169,6 +176,7 @@
 + Made estimated item value calculate the value of enchantments that have used an endcap item. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4635)
 + Added the wet book price to estimated item value. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4642)
 + Added color options for sold, expired, and underbid Auction items. - brooke-gill (https://github.com/hannibal002/SkyHanni/pull/4646)
++ Added Ctrl+Click shortcut in Hoppity Chocolate Factory in SkyBlock Menu to open config. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4750)
 
 #### Farming
 
@@ -218,6 +226,7 @@
 + Added compact display mode for Golden Fish timer. - appable (https://github.com/hannibal002/SkyHanni/pull/3696)
 + Improved bait detection accuracy. - ninjaguardian (https://github.com/hannibal002/SkyHanni/pull/4379)
 + Allowed trophy fish display to show while wearing Ember Armor. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4064)
++ Sea Creature Tracker now hides while in the Tomb Floodway. - Luna (https://github.com/hannibal002/SkyHanni/pull/4722)
 
 #### Rift
 
@@ -240,6 +249,8 @@
 + Added option to hide Clickable Chat Hints. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4609)
     + Hides the 'Click to x' chat line in SkyHanni messages. The message remains clickable and shows info on hover.
 + Fixed some unnecessary error messages in chat. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4593)
++ Added Event EXP to Guild EXP Chat Filter. - AfkUserMC (https://github.com/hannibal002/SkyHanni/pull/4733)
+    + Renamed filter from "Guild EXP" to "Guild/Event EXP".
 
 #### Mining
 
@@ -252,6 +263,15 @@
 
 + Made Reforge Helper also searchable as Reforge Overlay in the config. - Luna (https://github.com/hannibal002/SkyHanni/pull/4524)
 + Added credits for Discord Rich Presence images. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/4715)
++ Changed negative-formatted coins in SkyHanni GUIs to red. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4738)
+
+#### Combat
+
++ Added Ghost Shards to Ghost Profit Tracker. - nopo (https://github.com/hannibal002/SkyHanni/pull/4740)
+
+#### Event
+
++ Improved Inquisitor Waypoint detection to handle any text after coordinates in chat. - Luna (https://github.com/hannibal002/SkyHanni/pull/4736)
 
 ### Fixes
 
@@ -288,6 +308,7 @@
 + Fixed Wilted Berberis Helper occasionally not removing old waypoints. - Luna (https://github.com/hannibal002/SkyHanni/pull/4535)
 + Fixed Sun Gecko Helper always showing no active modifiers on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4682)
 + Fixed Sun Gecko Helper showing the wrong combo timer if you don't have the Combo Mania accessory. - Luna (https://github.com/hannibal002/SkyHanni/pull/4709)
++ Fixed Ubik Reminder not working. - nopo & Luna (https://github.com/hannibal002/SkyHanni/pull/4735)
 
 #### Crimson Isle
 
@@ -349,6 +370,7 @@
 + Fixed Total Powder/Forest Whispers resetting upon opening the SkyBlock Menu on mining/foraging islands. - Luna (https://github.com/hannibal002/SkyHanni/pull/4708)
 + Fixed guest count detection on Private Island/Garden at max guests. - Luna (https://github.com/hannibal002/SkyHanni/pull/4727)
 + Fixed incorrect text in Diana Title, Changelog Viewer, Garden Visitors, and Minister Preview. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4719)
++ Fixed Custom Scoreboard empty lines showing as blank in the config. - juna (https://github.com/hannibal002/SkyHanni/pull/4747)
 
 #### Chat
 
@@ -439,6 +461,8 @@
 + Fixed GUI Editor rendering the open inventory incorrectly on 1.21.8. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4713)
 + Fixed lag with Discord IPC. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4595)
 + Fixed Skill detection not working when Show Percentages is off in /tab. - Twarug (https://github.com/hannibal002/SkyHanni/pull/4718)
++ Fixed Custom Scoreboard not showing the second objective line for item amounts >1k. - juna (https://github.com/hannibal002/SkyHanni/pull/4749)
++ Fixed Non-God Pot Display not detecting Pest Repellent consumption. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4739)
 
 #### Garden
 
@@ -447,10 +471,17 @@
 + Fixed typo in Composter Overlay. - aphased (https://github.com/hannibal002/SkyHanni/pull/4677)
 + Fixed Composter Garden display items sometimes failing to load. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4707)
 + Fixed Visitors not marked as accepted when using Accept Hotkey. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4728)
++ Fixed Crop Money Display number-sign placement (was `1#`, now `#1`). - Luna (https://github.com/hannibal002/SkyHanni/pull/4745)
 
 #### Event
 
 + Fixed colored hitboxes for Baby Zombies in Zombie Shootout being too small on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4710)
++ Fixed Inquisitor Waypoint Sharing not working on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4736)
+
+#### Combat
+
++ Fixed Blaze Slayer Demons not showing with Damage Indicator. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4741)
++ Fixed Blaze Slayer Hellion Shields sometimes not working. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4741)
 
 ### Technical Details
 
@@ -641,6 +672,10 @@
 + Made `Resettable` an interface instead of an abstract class. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4487)
 + Replaced `TrackerData` with `Resettable`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4487)
     + Trackers should now use data classes that extend Resettable.
++ Changed the interface of `ServerTimeMark` to match `SimpleTimeMark`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4689)
++ Optimized `SimpleTimeMark` to avoid recomputing `farPast` and `farFuture`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4689)
++ Replaced Netty internal `ConcurrentSet` usage with `ConcurrentHashMap`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4751)
++ Slayer API cleanup. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4743)
 
 ## Version 4.0.0
 
