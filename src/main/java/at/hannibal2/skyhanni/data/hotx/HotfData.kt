@@ -95,10 +95,10 @@ enum class HotfData(
     DAILY_WISHES(
         "Daily Wishes", 100,
         { level -> 200.0 + (level * 18.0) },
-        {
-            level -> mapOf(
-            HotfReward.BONUS_WHISPERS_DAILY_FIG to level * 200.0,
-            HotfReward.BONUS_WHISPERS_DAILY_MANGROVE to level * 200.0,
+        { level ->
+            mapOf(
+                HotfReward.BONUS_WHISPERS_DAILY_FIG to level * 200.0,
+                HotfReward.BONUS_WHISPERS_DAILY_MANGROVE to level * 200.0,
             )
         },
     ),
