@@ -199,8 +199,8 @@ object SeaCreatureTracker {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ExcludedSeaCreatureAreasJson>("ExcludedSeaCreatureAreas")
-        excludedIslands = data.excludedIslands?.toSet() ?: emptySet()
-        excludedGraphAreas = data.excludedGraphAreas?.toSet() ?: emptySet()
+        excludedIslands = data.excludedIslands?.toSet().orEmpty()
+        excludedGraphAreas = data.excludedGraphAreas?.toSet().orEmpty()
     }
 
     private fun inDisabledArea() = when {
