@@ -136,6 +136,7 @@ object HypixelData {
      * REGEX-TEST: SKYBLOCK
      * REGEX-TEST: SKYBLOCK GUEST
      * REGEX-TEST: SKYBLOCK CO-OP
+     * REGEX-TEST: SKYBLOCK ♲
      */
     private val scoreboardTitlePattern by patternGroup.pattern(
         "scoreboard.title",
