@@ -28,15 +28,15 @@ object HuntingBoxValue {
     private var display = emptyList<Renderable>()
 
     private var totalShards = 0
-    private var totalInstantSell = 0.0
-    private var totalInstantBuy = 0.0
+    private var totalInstantSell = 0L
+    private var totalInstantBuy = 0L
 
     fun processInventory(slots: List<Slot>) {
         if (!config.huntingBoxValue) return
 
         totalShards = 0
-        totalInstantSell = 0.0
-        totalInstantBuy = 0.0
+        totalInstantSell = 0
+        totalInstantBuy = 0
 
         val table = mutableListOf<DisplayTableEntry>()
 
@@ -80,27 +80,27 @@ object HuntingBoxValue {
 
         val pricePerInstantSell = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
         val totalPriceInstantSell = pricePerInstantSell * amountOwned
-        totalInstantSell += totalPriceInstantSell
+        totalInstantSell += totalPriceInstantSell.toLong()
 
         val pricePerInstantBuy = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
         val totalPriceInstantBuy = pricePerInstantBuy * amountOwned
-        totalInstantBuy += totalPriceInstantBuy
+        totalInstantBuy += totalPriceInstantBuy.toLong()
 
         val hover = buildList {
             add(internalName.repoItemName)
             add("")
-            add("§7Price per Instant Sell: §6${pricePerInstantSell.toInt().addSeparators()}")
-            add("§7Price per Instant Buy: §6${pricePerInstantBuy.toInt().addSeparators()}")
+            add("§7Price per Instant Sell: §6${pricePerInstantSell.addSeparators()}")
+            add("§7Price per Instant Buy: §6${pricePerInstantBuy.addSeparators()}")
             add("")
             add("§7Amount Owned: §a$amountOwned")
-            add("§7Total Price Instant Sell: §6${totalPriceInstantSell.toLong().addSeparators()}")
-            add("§7Total Price Instant Buy: §6${totalPriceInstantBuy.toLong().addSeparators()}")
+            add("§7Total Price Instant Sell: §6${totalPriceInstantSell.addSeparators()}")
+            add("§7Total Price Instant Buy: §6${totalPriceInstantBuy.addSeparators()}")
         }
 
         table.add(
             DisplayTableEntry(
                 "${internalName.repoItemName} §8x$amountOwned",
-                "§6${totalPriceInstantSell.toLong().addSeparators()}",
+                "§6${totalPriceInstantSell.addSeparators()}",
                 totalPriceInstantSell,
                 internalName,
                 hover,

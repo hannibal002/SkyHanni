@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.entity.EntityLivingBase
 
 @SkyHanniModule
-object HideIrrelevantMobsInSlayer {
+object HideIrrelevantMobsInSlayerArea {
 
     private val config get() = SlayerApi.config
 

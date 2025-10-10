@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.graph.GraphEditor.distanceToPlayer
+import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -195,7 +195,7 @@ object GraphNodeEditor {
 
     private fun drawNodeNames(): List<Searchable> = buildList {
         for ((node, distance: Double) in GraphEditor.nodes.map {
-            it to distanceToPlayer(it.position)
+            it to it.distanceSqToPlayer()
         }.sortedBy { it.second }) {
             if (node.tags.isNotEmpty()) {
                 if (!node.tags.any { it in tagsToShow }) continue
