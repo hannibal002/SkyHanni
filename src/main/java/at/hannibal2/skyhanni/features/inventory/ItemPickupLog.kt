@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.item.ShardGainEvent
+import at.hannibal2.skyhanni.events.item.ShardEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -134,7 +134,7 @@ object ItemPickupLog {
     }
 
     @HandleEvent
-    fun onShardGain(event: ShardGainEvent) {
+    fun onShardGain(event: ShardEvent) {
         if (!isEnabled() || !config.shards) return
 
         val itemStack = event.shardInternalName.getItemStack()

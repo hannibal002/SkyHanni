@@ -16,6 +16,11 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 class SlayerConfig {
 
     @Expose
+    @ConfigOption(name = "Zombie", desc = "")
+    @Accordion
+    val zombie: ZombieConfig = ZombieConfig()
+
+    @Expose
     @ConfigOption(name = "Spider", desc = "")
     @Accordion
     val spider: SpiderConfig = SpiderConfig()
@@ -54,6 +59,11 @@ class SlayerConfig {
     @ConfigOption(name = "Boss Spawn Warning", desc = "")
     @Accordion
     val slayerBossWarning: SlayerBossWarningConfig = SlayerBossWarningConfig()
+
+    @Expose
+    @ConfigOption(name = "Active Boss Transparency", desc = "")
+    @Accordion
+    val activeBossTransparency: ActiveBossTransparencyConfig = ActiveBossTransparencyConfig()
 
     @Expose
     @ConfigOption(

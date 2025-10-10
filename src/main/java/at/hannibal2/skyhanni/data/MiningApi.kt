@@ -30,9 +30,10 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.countBy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.netty.util.internal.ConcurrentSet
 import net.minecraft.init.Blocks
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
@@ -115,7 +116,7 @@ object MiningApi {
     }
 
     // normal mining
-    private val recentClickedBlocks = ConcurrentSet<Pair<LorenzVec, SimpleTimeMark>>()
+    private val recentClickedBlocks = ConcurrentHashMap<LorenzVec, SimpleTimeMark>()
     private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, LorenzVec>>()
 
     private var lastClickedPos: LorenzVec? = null
@@ -248,7 +249,7 @@ object MiningApi {
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (OreBlock.getByStateOrNull(event.getBlockState) == null) return
         val now = SimpleTimeMark.now()
-        recentClickedBlocks += event.position to now
+        recentClickedBlocks[event.position] = now
         lastClickedPos = event.position
         lastClicked = now
     }
@@ -312,7 +313,7 @@ object MiningApi {
             if (event.soundName != "random.orb") {
                 if (event.pitch != 0.7936508f) return
                 val pos = event.location.roundToBlock()
-                if (recentClickedBlocks.none { it.first == pos }) return
+                if (!recentClickedBlocks.containsKey(pos)) return
                 waitingForInitSound = false
                 waitingForEffMinerBlock = true
                 initBlockPos = event.location.roundToBlock()
@@ -387,7 +388,7 @@ object MiningApi {
         if (currentAreaOreBlocks.isEmpty()) return
 
         // if somehow you take more than 10 seconds to mine a single block, congrats
-        recentClickedBlocks.removeIf { it.second.passedSince() >= 10.seconds }
+        recentClickedBlocks.removeIf { it.value.passedSince() >= 10.seconds }
         surroundingMinedBlocks.removeIf { it.first.time.passedSince() >= 5.seconds }
 
         if (!waitingForInitSound && lastInitSound.passedSince() > 200.milliseconds) {
@@ -437,7 +438,7 @@ object MiningApi {
         lastOreMinedTime = SimpleTimeMark.now()
 
         surroundingMinedBlocks.clear()
-        recentClickedBlocks.removeIf { it.second.passedSince() >= originalBlock.time.passedSince() }
+        recentClickedBlocks.removeIf { it.value.passedSince() >= originalBlock.time.passedSince() }
         lastClickedPos = null
     }
 
@@ -508,7 +509,7 @@ object MiningApi {
             add("pickobulusWaitingForSound: $pickobulusWaitingForSound")
             add("pickobulusWaitingForBlock: $pickobulusWaitingForBlock")
             add("")
-            add("recentlyClickedBlocks: ${recentClickedBlocks.joinToString { "(${it.first.toCleanString()}" }}")
+            add("recentlyClickedBlocks: ${recentClickedBlocks.keys.joinToString { "(${it.toCleanString()})" }}")
         }
     }
 
