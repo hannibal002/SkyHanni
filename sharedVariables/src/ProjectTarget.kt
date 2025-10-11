@@ -61,19 +61,18 @@ enum class ProjectTarget(
         modMenuVersion = "15.0.0-beta.3",
         isModern = true,
         modrinthInfo = ModrinthInfo.FABRIC_1_21_7,
-        linkTo = "MODERN_12109",
+        linkTo = "MODERN_12110",
     ),
-    MODERN_12109(
-        "1.21.9",
-        MinecraftVersion.MC12109,
-        yarn("1.21.9+build.1"),
+    MODERN_12110(
+        "1.21.10",
+        MinecraftVersion.MC12110,
+        yarn("1.21.10+build.2"),
         MappingStyle.YARN,
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.17.2",
-        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.133.14+1.21.9",
-        // TODO update modmenu when available
-        modMenuVersion = null,
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.135.0+1.21.10",
+        modMenuVersion = "16.0.0-rc.1",
         isModern = true,
-//         modrinthInfo = ModrinthInfo.FABRIC_1_21_9,
+        modrinthInfo = ModrinthInfo.FABRIC_1_21_10,
         linkTo = null,
     ),
     ;
