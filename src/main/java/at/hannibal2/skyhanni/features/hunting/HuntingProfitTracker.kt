@@ -40,12 +40,10 @@ object HuntingProfitTracker {
         { it.hunting.huntingProfitTracker },
     ) { drawDisplay(it) }
 
-    class Data : ItemTrackerData() {
-
-        override fun resetItems() {
-            totalCatchAmount = 0
-            totalShardAmount = 0
-        }
+    data class Data(
+        @Expose var totalCatchAmount: Long = 0,
+        @Expose var totalShardAmount: Long = 0
+    ) : ItemTrackerData() {
 
         override fun getDescription(item: TrackedItem): List<String> {
             val timesCaught = item.timesCaught
@@ -59,17 +57,11 @@ object HuntingProfitTracker {
             )
         }
 
-        override fun getDescription(timesCaught: Long) = listOf<String>()
+        override fun getDescription(timesGained: Long) = listOf<String>()
 
         override fun getCoinName(item: TrackedItem) = ""
 
         override fun getCoinDescription(item: TrackedItem) = listOf<String>()
-
-        @Expose
-        var totalCatchAmount = 0L
-
-        @Expose
-        var totalShardAmount = 0L
     }
 
     private val toolInternalNames = setOf(
@@ -135,20 +127,22 @@ object HuntingProfitTracker {
         )
     }
 
-//    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
-//        if (!isAllowedItem(internalName)) {
-//            ChatUtils.debug("Ignored non-hunting item pickup: $internalName'")
-//            return
-//        }
-//
-//        tracker.addItem(internalName, amount, command)
-//    }
-
     @HandleEvent
     fun onShardGainEvent(event: ShardGainEvent) {
-        if (event.amount <= 0 || !event.caught) return
+        if (event.amount <= 0) return
         addShard(event.amount)
         tracker.addItem(event.shardInternalName, event.amount, command = false)
+    }
+
+    @HandleEvent
+    fun onItemChange(event: ItemInHandChangeEvent) {
+        val isTool = isHuntingTool(event.newItem.getItemStackOrNull())
+        if (isTool != hasHeldTool) {
+            if (!isTool) {
+                lastToolHeldTime = SimpleTimeMark.now()
+            }
+            hasHeldTool = isTool
+        }
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock
@@ -179,17 +173,6 @@ object HuntingProfitTracker {
             description = "Resets the Hunting Profit Tracker"
             category = CommandCategory.USERS_RESET
             callback { tracker.resetCommand() }
-        }
-    }
-
-    @HandleEvent
-    fun onItemChange(event: ItemInHandChangeEvent) {
-        val isTool = isHuntingTool(event.newItem.getItemStackOrNull())
-        if (isTool != hasHeldTool) {
-            if (!isTool) {
-                lastToolHeldTime = SimpleTimeMark.now()
-            }
-            hasHeldTool = isTool
         }
     }
 }
