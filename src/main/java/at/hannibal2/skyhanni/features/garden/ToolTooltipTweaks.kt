@@ -25,12 +25,12 @@ object ToolTooltipTweaks {
     private val config get() = GardenApi.config.tooltipTweak
 
     /**
-     * REGEX-TEST: §7Farming Fortune: §a+88.5 §9(+8)
-     * REGEX-TEST: §7Farming Fortune: §a+73 §9(+30) §d(+8)
+     * REGEX-TEST: §7Farming Fortune: §6+88.5 §9(+8)
+     * REGEX-TEST: §7Farming Fortune: §6+73 §9(+30) §d(+8)
      */
     private val farmingFortunePattern by RepoPattern.pattern(
         "garden.tooltip.farmingfortune",
-        "§7Farming Fortune: §a",
+        "§7Farming Fortune: §6",
     )
 
     private val counterStartLine = setOf("§6Logarithmic Counter", "§6Collection Analysis")
@@ -93,13 +93,13 @@ object ToolTooltipTweaks {
 
                 val fortuneLine = when (config.cropTooltipFortune) {
                     CropTooltipFortuneEntry.DEFAULT ->
-                        "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
+                        "§7Farming Fortune: §6+${displayedFortune.formatStat()}$ffdString$reforgeString"
 
                     CropTooltipFortuneEntry.SHOW ->
-                        "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
+                        "§7Farming Fortune: §6+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
 
                     else ->
-                        "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
+                        "§7Farming Fortune: §6+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
                 }
                 iterator.set(fortuneLine)
 
