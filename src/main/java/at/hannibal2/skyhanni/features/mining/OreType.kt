@@ -192,12 +192,22 @@ enum class OreType(
     val internalName: NeuInternalName = internalName.toInternalName()
 
     fun isGemstone(): Boolean = this in gemstones
+    fun isLowTierGemstone(): Boolean = this in lowTierGemstones
+    fun isHighTierGemstone(): Boolean = this in highTierGemstones
 
     companion object {
 
         private val gemstones = setOf(
             RUBY, AMBER, AMETHYST, JADE,
             SAPPHIRE, TOPAZ, JASPER, OPAL,
+            AQUAMARINE, CITRINE, ONYX, PERIDOT,
+        )
+
+        private val lowTierGemstones = setOf(
+            RUBY, AMBER, AMETHYST, JADE, SAPPHIRE,
+        )
+
+        private val highTierGemstones = setOf(
             AQUAMARINE, CITRINE, ONYX, PERIDOT,
         )
 
