@@ -20,6 +20,7 @@ fun onGameMessage(message: Text, actionBar: Boolean, original: Operation<Void>) 
     }
     val (result, cancel) = ChatManager.onChatReceive(message)
     result?.let {
+        ClientReceiveMessageEvents.ALLOW_GAME.invoker().allowReceiveGameMessage(message, actionBar)
         original.call(it, actionBar)
         return
     }
@@ -34,5 +35,5 @@ fun onGameMessage(message: Text, actionBar: Boolean, original: Operation<Void>) 
         ClientReceiveMessageEvents.GAME_CANCELED.invoker().onReceiveGameMessageCanceled(message, actionBar)
         return
     }
-    original.call(message, actionBar);
+    original.call(message, actionBar)
 }
