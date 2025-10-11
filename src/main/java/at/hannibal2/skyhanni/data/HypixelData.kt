@@ -68,8 +68,7 @@ object HypixelData {
      * REGEX-TEST: §b§lArea: §r§7Private Island
      * REGEX-TEST: §b§lDungeon: §r§7Catacombs
      */
-    @Suppress("UnusedPrivateProperty")
-    private val islandNamePattern by patternGroup.pattern(
+    val islandNamePattern by patternGroup.pattern(
         "islandname",
         "(?:§.)*(?:Area|Dungeon): (?:§.)*(?<island>.*)",
     )
