@@ -20,6 +20,9 @@ fun onGameMessage(message: Text, actionBar: Boolean, original: Operation<Void>) 
     }
     val (result, cancel) = ChatManager.onChatReceive(message)
     result?.let {
+        // Will send both the unmodified and modified message into the Fabric Pipeline
+        // This sadly isn't preventable without switching fully to Fabric Chat Events
+        // (which needs an event for cancelling and an event for modifying, which isn't a feasible split up with this code base size)
         ClientReceiveMessageEvents.ALLOW_GAME.invoker().allowReceiveGameMessage(message, actionBar)
         original.call(it, actionBar)
         return
