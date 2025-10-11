@@ -367,6 +367,14 @@ enum class TabWidget(
         // language=RegExp
         "§9§lStarborn Temple:",
     ),
+    PITY(
+        // language=RegExp
+        "§d§lPity:",
+    ),
+    PICKAXE_COOLDOWN(
+        // language=RegExp
+        "§9§lPickaxe Ability:",
+    ),
     ;
 
     /** The pattern for the first line of the widget*/
