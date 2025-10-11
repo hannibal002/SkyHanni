@@ -99,7 +99,7 @@ object MineshaftPityDisplay {
     private val group = RepoPattern.group("mineshaft.pity")
 
 
-    /*
+    /**
      * REGEX-TEST:  Glacite Mineshafts: 124/2,000
      */
     private val tabPityPattern by group.pattern(
@@ -203,10 +203,10 @@ object MineshaftPityDisplay {
         return tablistPity
 
         // use old code if hypixel ever fixes it
-        val counter = MAX_COUNTER
+        /* val counter = MAX_COUNTER
         if (minedBlocks.isEmpty()) return counter
         val difference = minedBlocks.sumOf { it.pityBlock.getPity() }
-        return (counter - difference).toInt().coerceAtLeast(0)
+        return (counter - difference).toInt().coerceAtLeast(0) */
     }
 
     // if the chance is 1/1500, it will return 1500
