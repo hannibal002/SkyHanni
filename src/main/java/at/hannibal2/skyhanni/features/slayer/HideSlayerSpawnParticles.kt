@@ -14,6 +14,7 @@ object HideSlayerSpawnParticles {
     private var isGrinding = false
 
     @HandleEvent(onlyOnSkyblock = true)
+    @Suppress("MaxLineLength")
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!SlayerApi.hasActiveQuest() && !isGrinding) return
 
