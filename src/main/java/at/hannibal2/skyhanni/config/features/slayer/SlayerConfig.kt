@@ -168,7 +168,7 @@ class SlayerConfig {
     var cocoonDing: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Hide Slayer Spawn Particles", desc = "Hides the Spawn Particles used by Slayers")
+    @ConfigOption(name = "Hide Slayer Spawn Particles", desc = "Hides the Spawn Particles used by Slayers.")
     @SearchTag("Enchant Spell Potion Witch Hider")
     @ConfigEditorDropdown
     var slayerParticle: SlayerSpawnParticlestoHide = SlayerSpawnParticlestoHide.NONE
@@ -181,7 +181,7 @@ class SlayerConfig {
         override fun toString() = displayName
     }
     @Expose
-    @ConfigOption(name = "Hide Damage Splashes Near Slayer Boss", desc = "Hides Damage Splashes Near Slayer Boss")
+    @ConfigOption(name = "Hide Damage Splashes Near Slayer Boss", desc = "Hides Damage Splashes Near Slayer Boss.")
     @ConfigEditorBoolean
     var damageSplashHider: Boolean = false
 }
