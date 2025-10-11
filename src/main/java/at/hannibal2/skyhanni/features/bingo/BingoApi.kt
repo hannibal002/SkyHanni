@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.time.LocalTime
@@ -43,7 +44,7 @@ object BingoApi {
 
     private val titleDetectionPattern by RepoPattern.pattern(
         "bingo.detection.scoreboardtitle",
-        "§e§lSKYBLOCK §.Ⓑ"
+        "SKYBLOCK Ⓑ"
     )
 
     @HandleEvent
@@ -84,10 +85,9 @@ object BingoApi {
     }
 
     fun getRankFromScoreboard(text: String): Int? {
-        val title = HypixelData.getScoreboardTitle() ?: ""
         return if (detectionPattern.matches(text)) getRank(text)
-        else if (titleDetectionPattern.matches(title)) {
-            getRank(title)
+        else if (titleDetectionPattern.matches(HypixelData.getScoreboardTitle()?.removeColor())) {
+            getRank(HypixelData.getScoreboardTitle().orEmpty())
         } else null
     }
 
