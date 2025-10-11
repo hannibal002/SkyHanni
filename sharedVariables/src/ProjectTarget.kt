@@ -49,10 +49,10 @@ enum class ProjectTarget(
         modMenuVersion = "14.0.0-rc.2",
         isModern = true,
         modrinthInfo = ModrinthInfo.FABRIC_1_21_5,
-        linkTo = "MODERN_12107",
+        linkTo = "MODERN_12108",
     ),
-    MODERN_12107(
-        "1.21.7",
+    MODERN_12108(
+        "1.21.8",
         MinecraftVersion.MC12108,
         yarn("1.21.8+build.1"),
         MappingStyle.YARN,
