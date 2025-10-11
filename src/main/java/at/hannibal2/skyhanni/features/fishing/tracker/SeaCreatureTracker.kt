@@ -198,7 +198,7 @@ object SeaCreatureTracker {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ExcludedSeaCreatureAreasJson>("ExcludedSeaCreatureAreas")
+        val data = event.getConstant<ExcludedSeaCreatureAreasJson>("fishing/ExcludedSeaCreatureAreas")
         excludedIslands = data.excludedIslands?.toSet().orEmpty()
         excludedGraphAreas = data.excludedGraphAreas?.toSet().orEmpty()
     }
