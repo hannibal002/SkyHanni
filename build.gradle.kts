@@ -240,8 +240,9 @@ dependencies {
     if (target == ProjectTarget.MAIN) {
         shadowModImpl(libs.moulconfig)
     } else if (target.isModern) {
-        shadowModImpl("org.notenoughupdates.moulconfig:modern-${target.minecraftVersion.versionName}:${libs.versions.moulconfig.get()}")
-        include("org.notenoughupdates.moulconfig:modern-${target.minecraftVersion.versionName}:${libs.versions.moulconfig.get()}")
+        val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
+        shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
+        include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
     }
     @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {

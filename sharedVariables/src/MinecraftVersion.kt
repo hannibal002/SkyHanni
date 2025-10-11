@@ -5,11 +5,12 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 enum class MinecraftVersion(
     val versionName: String,
     val javaVersion: Int,
+    val moulconfigMinecraftVersionOverride: String? = null,
 ) {
     MC189("1.8.9", 8),
     MC11605("1.16.5", 8),
     MC12105("1.21.5", 21),
-    MC12107("1.21.7", 21),
+    MC12108("1.21.8", 21, moulconfigMinecraftVersionOverride = "1.21.7"),
     ;
 
     val javaLanguageVersion = JavaLanguageVersion.of(javaVersion)
