@@ -31,6 +31,10 @@ class InventoryConfig {
     val bazaar: BazaarConfig = BazaarConfig()
 
     @Expose
+    @Category(name = "Keyboard Control", desc = "Lets you control different menus with keyboard")
+    val keyboardControl: KeyboardControlConfig = KeyboardControlConfig()
+
+    @Expose
     @Category(name = "Experimentation Table", desc = "QOL features for the Experimentation Table.")
     val experimentationTable: ExperimentationTableConfig = ExperimentationTableConfig()
 

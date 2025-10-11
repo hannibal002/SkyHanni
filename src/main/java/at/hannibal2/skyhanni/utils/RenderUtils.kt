@@ -124,12 +124,12 @@ object RenderUtils {
         GlStateManager.enableLighting()
     }
 
-    fun Slot.drawBorder(color: LorenzColor) {
-        drawBorder(color.toColor())
+    fun Slot.drawBorder(color: LorenzColor, thickness: Int = 1) {
+        drawBorder(color.toColor(), thickness)
     }
 
-    fun Slot.drawBorder(color: Color) {
-        drawBorder(color, xDisplayPosition, yDisplayPosition)
+    fun Slot.drawBorder(color: Color, thickness: Int = 1) {
+        drawBorder(color, xDisplayPosition, yDisplayPosition, thickness)
     }
 
     fun RenderGuiItemOverlayEvent.drawBorder(color: LorenzColor) {
@@ -140,7 +140,7 @@ object RenderUtils {
         drawBorder(color, x, y)
     }
 
-    fun drawBorder(color: Color, x: Int, y: Int) {
+    fun drawBorder(color: Color, x: Int, y: Int, thickness: Int = 1) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
         DrawContextUtils.pushMatrix()
@@ -150,10 +150,10 @@ object RenderUtils {
         //$$ val zLevel = 50f
         //#endif
         DrawContextUtils.translate(0f, 0f, 110 + zLevel)
-        GuiRenderUtils.drawRect(x, y, x + 1, y + 16, color.rgb)
-        GuiRenderUtils.drawRect(x, y, x + 16, y + 1, color.rgb)
-        GuiRenderUtils.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
-        GuiRenderUtils.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
+        GuiRenderUtils.drawRect(x, y, x + thickness, y + 16, color.rgb)
+        GuiRenderUtils.drawRect(x, y, x + 16, y + thickness, color.rgb)
+        GuiRenderUtils.drawRect(x, y + (16 - thickness), x + 16, y + 16, color.rgb)
+        GuiRenderUtils.drawRect(x + (16 - thickness), y, x + 16, y + 16, color.rgb)
         DrawContextUtils.popMatrix()
         GlStateManager.enableDepth()
         GlStateManager.enableLighting()
