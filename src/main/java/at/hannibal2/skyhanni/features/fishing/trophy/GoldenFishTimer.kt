@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.ServerTimeMark
+import at.hannibal2.skyhanni.utils.ServerTimeMark.Companion.fromServerNow
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -158,12 +159,12 @@ object GoldenFishTimer {
             return
         }
         if (interactPattern.matches(event.message)) {
-            goldenFishDespawnTimer = ServerTimeMark.now() + DESPAWN_TIME
+            goldenFishDespawnTimer = DESPAWN_TIME.fromServerNow()
             interactions++
             return
         }
         if (weakPattern.matches(event.message)) {
-            goldenFishDespawnTimer = ServerTimeMark.now() + DESPAWN_TIME
+            goldenFishDespawnTimer = DESPAWN_TIME.fromServerNow()
             val entity = confirmedGoldenFishEntity ?: return
             if (config.highlight) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
@@ -419,7 +420,7 @@ object GoldenFishTimer {
         ChatUtils.debug("Found Golden Fish!")
         confirmedGoldenFishEntity = possibleGoldenFishEntity
         possibleGoldenFishEntity = null
-        goldenFishDespawnTimer = ServerTimeMark.now() + DESPAWN_TIME
+        goldenFishDespawnTimer = DESPAWN_TIME.fromServerNow()
     }
 
     private fun Duration.formatTime(): String {
