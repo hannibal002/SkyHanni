@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DiscontinuedMinecraftVersionsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DiscontinuedMinecraftVersion
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DiscontinuedMinecraftVersionsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -250,7 +250,7 @@ object UpdateManager {
                     "§cPlaying on a discontinued version is not recommended and may lead to issues.",
                     "§cPlease update to a newer Minecraft version.",
                 ) + extraInfo,
-                Duration.INFINITE
+                Duration.INFINITE,
             )
 
             NotificationManager.queueNotification(notification)
