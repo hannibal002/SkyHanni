@@ -9,6 +9,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
@@ -167,17 +168,18 @@ class SlayerConfig {
     var cocoonDing: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Hide Purple Slayer Boss Particles", desc = "Hides the Purple particles used on Slayer Spawn Particles")
-    @SearchTag("Hider Spell Potion Witch")
-    @ConfigEditorBoolean
-    var purpleParticleHider: Boolean = false
+    @ConfigOption(name = "Hide Slayer Spawn Particles", desc = "Hides the Spawn Particles used by Slayers")
+    @SearchTag("Enchant Spell Potion Witch Hider")
+    @ConfigEditorDropdown
+    var slayerParticle: SlayerSpawnParticlestoHide = SlayerSpawnParticlestoHide.NONE
 
-    @Expose
-    @ConfigOption(name = "Hide White Slayer Boss Particles", desc = "Hides the White particles used on Slayer Spawn Particles")
-    @SearchTag("Enchant Hider")
-    @ConfigEditorBoolean
-    var whiteParticleHider: Boolean = false
+    enum class SlayerSpawnParticlestoHide(private val displayName: String) {
+        NONE("None"),
+        PURPLE("Only Purple"),
+        BOTH("Both");
 
+        override fun toString() = displayName
+    }
     @Expose
     @ConfigOption(name = "Hide Damage Splashes Near Slayer Boss", desc = "Hides Damage Splashes Near Slayer Boss")
     @ConfigEditorBoolean
