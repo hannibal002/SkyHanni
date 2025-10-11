@@ -242,7 +242,7 @@ object UpdateManager {
         if (hasWarned) return
 
         if (PlatformUtils.MC_VERSION in discontinuedVersions) {
-            val extraInfo = discontinuedVersions[PlatformUtils.MC_VERSION]?.extraInfo ?: listOf()
+            val extraInfo = discontinuedVersions[PlatformUtils.MC_VERSION]?.extraInfo.orEmpty()
 
             val notification = SkyHanniNotification(
                 listOf(
