@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.Executor
 import kotlin.time.Duration
 
+// TODO add names for runs
 object DelayedRun {
 
     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()

@@ -32,7 +32,7 @@ object StereoHarmonyDiscReplacer {
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
         if (event.slot !in 11..15 && event.slot !in 20..24) return
 
-        val internalName = event.originalItem.getInternalNameOrNull() ?: return
+        val internalName = event.originalItem?.getInternalNameOrNull() ?: return
         val vinylType = VinylType.getByInternalNameOrNull(internalName) ?: return
         val cropType = PestType.getByVinylOrNull(vinylType)?.crop ?: return
         val isActiveVinyl = StereoHarmonyDisplay.activeVinyl == vinylType

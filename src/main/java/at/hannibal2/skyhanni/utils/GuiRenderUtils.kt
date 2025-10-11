@@ -418,16 +418,22 @@ object GuiRenderUtils {
         rotationDegrees: Vec3? = null,
     ) {
         val item = checkBlinkItem()
-        val isSkull = rescaleSkulls && item.isSkull()
+        val isItemSkull = rescaleSkulls && item.isSkull()
 
         val rotX = ((rotationDegrees?.xCoord ?: 0.0) % 360).toFloat()
         val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()
         val rotZ = ((rotationDegrees?.zCoord ?: 0.0) % 360).toFloat()
 
-        val baseScale = if (isSkull) SKULL_SCALE else 1f
-        val finalScale = (baseScale * scaleMultiplier).toFloat()
+        //#if MC > 1.21.6
+        //$$ MinecraftClient.getInstance().itemModelManager.clearAndUpdate(itemRenderStateButCool, item, ItemDisplayContext.FIXED, MinecraftCompat.localWorld, MinecraftCompat.localPlayer, 0)
+        //$$ val baseItemScale = if (isItemSkull || itemRenderStateButCool.isSideLit) SKULL_SCALE else 1f
+        //#else
+        val baseItemScale = if (isItemSkull) SKULL_SCALE else 1f
+        //#endif
 
-        val (translateX, translateY) = if (isSkull) {
+        val finalItemScale = (baseItemScale * scaleMultiplier).toFloat()
+
+        val (translateX, translateY) = if (isItemSkull) {
             val skullDiff = ((scaleMultiplier) * 2.5f).toFloat()
             x - skullDiff to y - skullDiff
         } else x to y
@@ -443,7 +449,7 @@ object GuiRenderUtils {
         //#if MC < 1.21.6
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(translateX, translateY, zT)
-            DrawContextUtils.scale(finalScale, finalScale, zS)
+            DrawContextUtils.scale(finalItemScale, finalItemScale, zS)
 
             //#if MC < 1.21
             val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
@@ -510,38 +516,26 @@ object GuiRenderUtils {
         //$$ val matrices2D = DrawContextUtils.drawContext.matrices
         //$$
         //$$ // And similarly, we need to extract the scaling from the GUI editor as well, since we're building our own stack.
-        //$$ val scaleX = sqrt(matrices2D.m00() * matrices2D.m00() + matrices2D.m01() * matrices2D.m01())
-        //$$ val scaleY = sqrt(matrices2D.m10() * matrices2D.m10() + matrices2D.m11() * matrices2D.m11())
-        //$$ val guiScale = (scaleX + scaleY) * 0.5f
-        //$$ val totalScale = guiScale * finalScale
+        //$$ val guiScaleX = sqrt(matrices2D.m00() * matrices2D.m00() + matrices2D.m01() * matrices2D.m01())
+        //$$ val guiScaleY = sqrt(matrices2D.m10() * matrices2D.m10() + matrices2D.m11() * matrices2D.m11())
+        //$$ val totalItemScale = ((guiScaleX + guiScaleY) * 0.5f) * finalItemScale
         //$$
-        //$$ MinecraftClient.getInstance().itemModelManager.clearAndUpdate(itemRenderStateButCool, item, ItemDisplayContext.FIXED, MinecraftCompat.localWorld, MinecraftCompat.localPlayer, 0)
+        //$$ if (rotationDegrees != null || (totalItemScale > 1 && itemRenderStateButCool.isSideLit)) {
+        //$$     val adjX = matrices2D.m20 + (x * guiScaleX) - (totalItemScale * 1.8f)
+        //$$     val adjY = matrices2D.m21 + (y * guiScaleY) - (totalItemScale * 1.8f)
         //$$
-        //$$ if (rotationDegrees != null || (totalScale > 1 && itemRenderStateButCool.isSideLit)) {
-        //$$     val actualScale = ((5f / 4f) * scaleMultiplier).toFloat()
-        //$$     val translateOffset = 2f * actualScale
-        //$$
-        //$$     val (xTranslation, yTranslation) = (x - translateOffset) to (y - translateOffset)
-        //$$
-        //$$     item.customRenderOnScreen(matrices2D.m20, matrices2D.m21, xTranslation, yTranslation, guiScale, actualScale, rotX, rotY, rotZ)
+        //$$     item.customRenderOnScreen(adjX, adjY, totalItemScale, rotX, rotY, rotZ)
         //$$ } else {
-        //$$     item.normalRenderOnScreen(translateX, translateY, finalScale)
+        //$$     item.normalRenderOnScreen(translateX, translateY, finalItemScale)
         //$$ }
         //#endif
     }
 
     //#if MC > 1.21.6
     //$$ private fun ItemStack.customRenderOnScreen(
-    //$$     preTranslateX: Float, preTranslateY: Float, xTranslation: Float, yTranslation: Float, guiScale: Float, actualScale: Float,
+    //$$     x: Float, y: Float, finalItemScale: Float,
     //$$     rotX: Float, rotY: Float, rotZ: Float,
     //$$ ) {
-    //$$     val (hx, hy, hz) = listOf(8f, 8f, 8f)
-    //$$     val (zT, zS) = listOf(-1100f, 1f)
-    //$$
-    //$$     // We need scales to calc real translations
-    //$$     val screenX = preTranslateX + xTranslation * guiScale
-    //$$     val screenY = preTranslateY + yTranslation * guiScale
-    //$$
     //$$     val client = MinecraftClient.getInstance()
     //$$     val consumers = client.bufferBuilders.entityVertexConsumers
     //$$     val window = client.window
@@ -558,19 +552,20 @@ object GuiRenderUtils {
     //$$     // We have to use our own MatrixStack, because the DrawContext matrices are a 2D matrix now
     //$$     val matrices = MatrixStack()
     //$$     matrices.push()
-    //$$     matrices.translate(screenX, screenY, zT)
-    //$$     val finalScale = actualScale * guiScale
+    //$$     // TODO -1100f comes from projectionMatrix above, needs changing
+    //$$     matrices.translate(x, y, -1100f)
     //$$
     //$$     // Because by default the item is rendered flipped in all directions (what the fuck, Mojang?),
     //$$     // we need to translate all three ways before rendering the item, so we can flip it, and still
     //$$     // have it 'end' in the right position.
-    //$$     val itemSize = 16f * finalScale
+    //$$     val itemSize = 16f * finalItemScale
     //$$     matrices.translate(itemSize, itemSize, 0f)
     //$$     // These scales being negative is what does the "flipping back to normal viewing"
-    //$$     matrices.scale(-finalScale, -finalScale, -zS)
+    //$$     matrices.scale(-finalItemScale, -finalItemScale, -1f)
     //$$
     //$$     // Since we want to rotate the item around its center point, we translate half in, in each direction
-    //$$     matrices.translate(hx, hy, hz)
+    //$$     // Matrices are pre-scaled, so we use the raw 8f values
+    //$$     matrices.translate(8f, 8f, 8f)
     //$$
     //$$     // 'planned' rotations are done now.
     //$$     if (rotX != 0f) matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))

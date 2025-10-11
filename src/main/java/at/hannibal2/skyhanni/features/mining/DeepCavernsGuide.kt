@@ -122,10 +122,11 @@ object DeepCavernsGuide {
         show = true
         parkourHelper?.reset()
         if (parkourHelper == null) {
+            // TODO add generic repo outdated error logic here
             ChatUtils.clickableChat(
                 "DeepCavernsParkour missing in SkyHanni Repo! Try /shupdaterepo to fix it!",
                 onClick = {
-                    SkyHanniRepoManager.updateRepo()
+                    SkyHanniRepoManager.updateRepo("click on chat after deep caverns parkour error")
                 },
                 "§eClick to update the repo!",
                 prefixColor = "§c",
@@ -167,7 +168,7 @@ object DeepCavernsGuide {
         parkourHelper?.render(event)
     }
 
-    fun isEnabled() = IslandType.DEEP_CAVERNS.isCurrent() && config.enabled
+    private fun isEnabled() = IslandType.DEEP_CAVERNS.isCurrent() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

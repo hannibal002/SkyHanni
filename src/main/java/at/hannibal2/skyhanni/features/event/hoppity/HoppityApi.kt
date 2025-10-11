@@ -139,7 +139,7 @@ object HoppityApi {
         var lastProfit: String = "",
         var lastMeal: HoppityEggType? = null,
         var lastDuplicateAmount: Long? = null,
-    ) : Resettable()
+    ) : Resettable
 
     val hoppityRarities = LorenzRarity.entries.filter { it <= DIVINE }
     private val hoppityDataSet = HoppityStateDataSet()

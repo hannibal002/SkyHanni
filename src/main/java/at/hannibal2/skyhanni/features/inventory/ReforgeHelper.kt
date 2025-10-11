@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
@@ -117,9 +117,9 @@ object ReforgeHelper {
             reforgeToSearch = null
         }
         itemToReforge = newItem
-        val newReforgeName = itemToReforge?.getReforgeName().orEmpty()
-        if (newReforgeName == currentReforge?.lowercaseName) return
-        currentReforge = ReforgeApi.reforgeList.firstOrNull { it.lowercaseName == newReforgeName }
+        val newReforgeName = itemToReforge?.getReforgeModifier().orEmpty()
+        if (newReforgeName == currentReforge?.nbtModifier) return
+        currentReforge = ReforgeApi.reforges.firstOrNull { it.nbtModifier == newReforgeName }
         updateDisplay()
     }
 
@@ -235,7 +235,7 @@ object ReforgeHelper {
         val itemRarity = item.getItemRarityOrNull() ?: return@buildList
 
         val rawReforgeList =
-            if (!isInHexReforgeMenu && config.reforgeStonesOnlyHex) ReforgeApi.nonePowerStoneReforge else ReforgeApi.reforgeList
+            if (!isInHexReforgeMenu && config.reforgeStonesOnlyHex) ReforgeApi.basicReforges else ReforgeApi.reforges
         val reforgeList = rawReforgeList.filter { it.isValid(itemType, internalName) }
 
         val statTypes = reforgeList.mapNotNull { it.stats[itemRarity]?.keys }.flatten().toSet()
@@ -314,7 +314,7 @@ object ReforgeHelper {
     }
 
     private fun getReforgeEffect(reforge: ReforgeApi.Reforge?, rarity: LorenzRarity) =
-        reforge?.extraProperty?.get(rarity)?.let {
+        reforge?.reforgeAbility?.get(rarity)?.let {
             Renderable.wrappedText(
                 it,
                 190,

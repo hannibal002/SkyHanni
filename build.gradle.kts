@@ -182,7 +182,10 @@ dependencies {
     }
 
     // Discord RPC client
-    shadowImpl("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
+    shadowImpl("com.github.caoimhebyrne:KDiscordIPC:0.2.3") {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+    }
     compileOnly(libs.jbAnnotations)
 
     headlessLwjgl(libs.headlessLwjgl)

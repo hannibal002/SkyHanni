@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.BingoSession
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.time.LocalTime
@@ -38,6 +40,11 @@ object BingoApi {
     private val detectionPattern by RepoPattern.pattern(
         "bingo.detection.scoreboard",
         " §.Ⓑ §.Bingo"
+    )
+
+    private val titleDetectionPattern by RepoPattern.pattern(
+        "bingo.detection.scoreboardtitle",
+        "SKYBLOCK Ⓑ"
     )
 
     @HandleEvent
@@ -77,7 +84,12 @@ object BingoApi {
         data = event.getConstant<BingoJson>("Bingo").bingoTips
     }
 
-    fun getRankFromScoreboard(text: String) = if (detectionPattern.matches(text)) getRank(text) else null
+    fun getRankFromScoreboard(text: String): Int? {
+        return if (detectionPattern.matches(text)) getRank(text)
+        else if (titleDetectionPattern.matches(HypixelData.getScoreboardTitle()?.removeColor())) {
+            getRank(HypixelData.getScoreboardTitle().orEmpty())
+        } else null
+    }
 
     fun getIconFromScoreboard(text: String) = getRankFromScoreboard(text)?.let { getIcon(it) }
 

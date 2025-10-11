@@ -517,30 +517,27 @@ object ItemUtils {
 
     private fun ItemStack.updateCategoryAndRarity() {
         val data = cachedData
-        if (data.itemRarityLastCheck.passedSince() < 1.seconds) return
+        if (data.itemRarityLastCheck.passedSince() < 10.seconds) return
         data.itemRarityLastCheck = SimpleTimeMark.now()
-
-        val currentLore = getLore()
-        if (data.lastLore == currentLore) return
-        data.lastLore = currentLore
-
-        val (rarity, category) = if (getInternalName() != NeuInternalName.NONE) {
-            this.readItemCategoryAndRarity()
-        } else null to null
-        data.itemRarity = rarity
-        data.itemCategory = category
+        val internalName = getInternalName()
+        if (internalName == NeuInternalName.NONE) {
+            data.itemRarity = null
+            data.itemCategory = null
+            return
+        }
+        val pair = this.readItemCategoryAndRarity()
+        data.itemRarity = pair.first
+        data.itemCategory = pair.second
     }
 
     fun ItemStack.getItemCategoryOrNull(): ItemCategory? {
-        val data = cachedData
         this.updateCategoryAndRarity()
-        return data.itemCategory
+        return cachedData.itemCategory
     }
 
     fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
-        val data = cachedData
         this.updateCategoryAndRarity()
-        return data.itemRarity
+        return cachedData.itemRarity
     }
 
     // Taken from NEU
@@ -590,6 +587,20 @@ object ItemUtils {
 
         val itemName = color + matcher.group("name").trim()
         return makePair(input, itemName, matcher)
+    }
+
+    /**
+     * REGEX-TEST: §fEnchanted Book (Lapidary I)
+     * REGEX-TEST: §fEnchanted Book (Ice Cold I§r§f)
+     */
+    private val enchantedBookPattern by RepoPattern.pattern(
+        "item.enchantedbook",
+        "§fEnchanted Book \\((?<item>.+)\\)"
+    )
+    fun readBookType(input: String): String? {
+        return enchantedBookPattern.matchMatcher(input) {
+            group("item").removeColor()
+        }
     }
 
     private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {
@@ -795,7 +806,7 @@ object ItemUtils {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("shtestitem") {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }
@@ -908,8 +919,9 @@ object ItemUtils {
     }
 
     // These two are matching right now, but we keep them separate for future-proofing
-    val resetCommand get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
-    else EnoughUpdatesRepoManager.updateCommand
+    val resetCommand
+        get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
+        else EnoughUpdatesRepoManager.updateCommand
 
     private fun showRepoWarning(item: String) {
         val text = listOf(
@@ -939,7 +951,7 @@ object ItemUtils {
     }
 
     fun NeuInternalName.getNumberedName(amount: Number): String {
-        val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
+        val prefix = if (amount.toDouble() == 1.0) "" else "§8${amount.addSeparators()}x "
         return "$prefix§r$repoItemName"
     }
 

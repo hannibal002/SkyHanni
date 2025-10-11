@@ -29,9 +29,9 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun isInFuture() = timeUntil().isPositive()
 
-    fun isFarPast() = millis == 0L
+    fun isFarPast() = millis == FAR_PAST_MS
 
-    fun isFarFuture() = millis == Long.MAX_VALUE
+    fun isFarFuture() = millis == FAR_FUTURE_MS
 
     fun takeIfInitialized() = if (isFarPast() || isFarFuture()) null else this
 
@@ -45,13 +45,14 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         else -> Instant.ofEpochMilli(millis).toString()
     }
 
-    fun formattedDate(pattern: String): String {
-        val newPattern = if (SkyHanniMod.feature.gui.timeFormat24h) {
-            pattern.replace("h", "H").replace("a", "")
-        } else {
-            pattern
-        }
+    private fun String.applyTimeFormat(): String {
+        return if (SkyHanniMod.feature.gui.timeFormat24h) {
+            replace("h", "H").replace("a", "")
+        } else this
+    }
 
+    fun formattedDate(pattern: String): String {
+        val newPattern = pattern.applyTimeFormat()
         val instant = Instant.ofEpochMilli(millis)
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
         val formatter = DateTimeFormatter.ofPattern(newPattern.trim())
@@ -70,10 +71,16 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
         fun now() = SimpleTimeMark(System.currentTimeMillis())
 
+        private const val FAR_PAST_MS = 0L
+        private const val FAR_FUTURE_MS = Long.MAX_VALUE
+
+        private val FAR_PAST = SimpleTimeMark(FAR_PAST_MS)
+        private val FAR_FUTURE = SimpleTimeMark(FAR_FUTURE_MS)
+
         @JvmStatic
         @JvmName("farPast")
-        fun farPast() = SimpleTimeMark(0)
-        fun farFuture() = SimpleTimeMark(Long.MAX_VALUE)
+        fun farPast() = FAR_PAST
+        fun farFuture() = FAR_FUTURE
 
         fun Duration.fromNow() = now() + this
 

@@ -19,7 +19,7 @@ class RareDropMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Enchanted Book Name",
-        desc = "Modifies Book messages to show only book name and color relative to rarity."
+        desc = "Shows what enchantment the dropped enchanted book is."
     )
     @ConfigEditorBoolean
     @FeatureToggle

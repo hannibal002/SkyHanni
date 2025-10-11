@@ -16,6 +16,11 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 class SlayerConfig {
 
     @Expose
+    @ConfigOption(name = "Zombie", desc = "")
+    @Accordion
+    val zombie: ZombieConfig = ZombieConfig()
+
+    @Expose
     @ConfigOption(name = "Spider", desc = "")
     @Accordion
     val spider: SpiderConfig = SpiderConfig()
@@ -54,6 +59,11 @@ class SlayerConfig {
     @ConfigOption(name = "Boss Spawn Warning", desc = "")
     @Accordion
     val slayerBossWarning: SlayerBossWarningConfig = SlayerBossWarningConfig()
+
+    @Expose
+    @ConfigOption(name = "Active Boss Transparency", desc = "")
+    @Accordion
+    val activeBossTransparency: ActiveBossTransparencyConfig = ActiveBossTransparencyConfig()
 
     @Expose
     @ConfigOption(
@@ -145,4 +155,14 @@ class SlayerConfig {
     @ConfigOption(name = "Compact Time Messages", desc = "Shorter Time to Kill and Quest Complete messages.")
     @ConfigEditorBoolean
     var compactTimeMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer Cocoon Title", desc = "Send title when Slayer Boss is cocooned.")
+    @ConfigEditorBoolean
+    var cocoonTitle: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer Cocoon Notification Sound", desc = "Sends note.pling when Slayer Boss is cocooned.")
+    @ConfigEditorBoolean
+    var cocoonDing: Boolean = false
 }

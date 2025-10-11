@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -81,14 +82,10 @@ object WoodenButtonsHelper {
         if (!showButtons()) return
         val graph = IslandGraphs.currentIslandGraph ?: return
 
-        val closestNode = graph.nodes
-            .filter { it.hasTag(GraphNodeTag.RIFT_BUTTONS_QUEST) }
-            .filter { node ->
-                val spotName = "${node.name}:${node.position}"
-                val buttonsAtSpot = buttonLocations[spotName] ?: return@filter false
-                buttonsAtSpot.any { !hitButtons.contains(it) }
-            }
-            .minByOrNull { it.position.distanceToPlayer() }
+        val closestNode = graph.getNearestNode { node ->
+            node.hasTag(GraphNodeTag.RIFT_BUTTONS_QUEST) &&
+                buttonLocations["${node.name}:${node.position}"]?.any { !hitButtons.contains(it) } == true
+        }
 
         if (closestNode != currentSpot) {
             currentSpot = closestNode

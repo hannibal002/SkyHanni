@@ -52,6 +52,10 @@ enum class TabWidgetDisplay(
     SHARD_TRAPS("Shard Traps", TabWidget.SHARD_TRAPS),
     FOREST_WHISPERS("Forest Whispers", TabWidget.FOREST_WHISPERS),
     AGATHA_CONTEST("Agatha's Contest", TabWidget.AGATHA_CONTEST),
+    COMMISSIONS("Mining Commissions", TabWidget.COMMISSIONS),
+    SLAYER("Slayer", TabWidget.SLAYER),
+    PITY("Pity", TabWidget.PITY),
+    PICKAXE_COOLDOWN("Pickaxe Cooldown", TabWidget.PICKAXE_COOLDOWN),
     ;
 
     val position get() = config.displayPositions[ordinal]

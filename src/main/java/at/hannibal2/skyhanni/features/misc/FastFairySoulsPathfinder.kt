@@ -240,7 +240,7 @@ object FastFairySoulsPathfinder {
             return
         }
         val foundSouls = foundSoulsOnCurrentIsland()
-        val allSouls = getTargetNodes(graph.nodes)
+        val allSouls = getTargetNodes(graph)
         val missingSouls = allSouls.filter { it.position !in foundSouls }
 
         if (missingSouls.isEmpty()) {
@@ -263,7 +263,7 @@ object FastFairySoulsPathfinder {
         calculatingStart = SimpleTimeMark.now()
         "§e[SkyHanni] Calculating Fairy Soul route §b0s".asComponent().send(calculatingMessageId)
 
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("fairy souls pathfind") {
             val route = NavigationUtils.getRoute(missingSouls, maxIterations = 300, neighborhoodSize = 50).toMutableList()
             val duration = calculatingStart.passedSince()
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()

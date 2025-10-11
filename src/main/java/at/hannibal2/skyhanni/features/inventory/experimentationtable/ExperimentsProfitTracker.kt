@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -60,15 +59,13 @@ object ExperimentsProfitTracker {
     // Warn once per session about tracking XP bottle usage
     private var warnedAboutTracking = false
 
-    class Data : ItemTrackerData() {
-        override fun resetItems() {
-            experimentsDone = 0L
-            xpGained = 0L
-            bitCost = 0L
-            startCost = 0L
-            timeWasted = enumMapOf()
-        }
-
+    data class Data(
+        @Expose var experimentsDone: Long = 0L,
+        @Expose var xpGained: Long = 0L,
+        @Expose var bitCost: Long = 0L,
+        @Expose var startCost: Long = 0L,
+        @Expose var timeWasted: MutableMap<ExperimentationTableApi.ExperimentationTaskType, Duration> = enumMapOf(),
+    ) : ItemTrackerData() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / experimentsDone
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -79,23 +76,7 @@ object ExperimentsProfitTracker {
         }
 
         override fun getCoinName(item: TrackedItem) = ""
-
         override fun getCoinDescription(item: TrackedItem) = listOf<String>()
-
-        @Expose
-        var experimentsDone = 0L
-
-        @Expose
-        var xpGained = 0L
-
-        @Expose
-        var bitCost = 0L
-
-        @Expose
-        var startCost = 0L
-
-        @Expose
-        var timeWasted: MutableMap<ExperimentationTableApi.ExperimentationTaskType, Duration> = enumMapOf()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -257,7 +238,7 @@ object ExperimentsProfitTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onIslandChange(event: IslandChangeEvent) {
+    fun onIslandChange() {
         tracker.firstUpdate()
     }
 

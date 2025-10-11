@@ -61,8 +61,11 @@ class GuiPositionEditor(
         // Items aren't drawn due to a bug in neu rendering
         drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
-            val accessor = oldScreen as AccessorGuiContainer
+            //#if MC > 1.21.5
+            //$$ oldScreen.drawBackground(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
+            //#endif
             //#if MC < 1.21
+            val accessor = oldScreen as AccessorGuiContainer
             accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
             //#else
             //$$ oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)

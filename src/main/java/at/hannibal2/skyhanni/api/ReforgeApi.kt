@@ -24,17 +24,17 @@ import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object ReforgeApi {
-    var reforgeList: List<Reforge> = emptyList()
+    var reforges: List<Reforge> = emptyList()
         private set(value) {
             field = value
-            nonePowerStoneReforge = value.filterNot { it.isReforgeStone }
-            onlyPowerStoneReforge = value.filter { it.isReforgeStone }
+            basicReforges = value.filterNot { it.isReforgeStone }
+            reforgeStones = value.filter { it.isReforgeStone }
         }
 
-    var nonePowerStoneReforge: List<Reforge> = emptyList()
+    var basicReforges: List<Reforge> = emptyList()
         private set
 
-    var onlyPowerStoneReforge: List<Reforge> = emptyList()
+    var reforgeStones: List<Reforge> = emptyList()
         private set
 
     enum class ReforgeType {
@@ -58,11 +58,12 @@ object ReforgeApi {
 
     class Reforge(
         val name: String,
+        val nbtModifier: String,
         val type: ReforgeType,
         val stats: Map<LorenzRarity, SkyblockStatList>,
         val reforgeStone: NeuInternalName? = null,
         val specialItems: List<NeuInternalName>? = null,
-        val extraProperty: Map<LorenzRarity, String> = emptyMap(),
+        val reforgeAbility: Map<LorenzRarity, String> = emptyMap(),
         val costs: Map<LorenzRarity, Long>? = null,
     ) {
 
@@ -70,9 +71,8 @@ object ReforgeApi {
 
         val rawReforgeStoneName = reforgeStone?.itemNameWithoutColor
 
-        val lowercaseName = name.lowercase().replace('-', '_')
-
-        fun isValid(itemStack: ItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
+        fun isValid(itemStack: ItemStack) =
+            isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
 
         fun isValid(itemCategory: ItemCategory?, internalName: NeuInternalName) = when (type) {
             ReforgeType.SWORD -> itemCategory in setOf(
@@ -80,6 +80,7 @@ object ReforgeApi {
                 ItemCategory.GAUNTLET,
                 ItemCategory.LONGSWORD,
             )
+
             ReforgeType.BOW -> itemCategory in setOf(ItemCategory.BOW, ItemCategory.SHORT_BOW)
             ReforgeType.ARMOR -> itemCategory in setOf(
                 ItemCategory.HELMET,
@@ -88,6 +89,7 @@ object ReforgeApi {
                 ItemCategory.LEGGINGS,
                 ItemCategory.BOOTS,
             )
+
             ReforgeType.HELMET -> itemCategory == ItemCategory.HELMET
             ReforgeType.CHESTPLATE -> itemCategory == ItemCategory.CHESTPLATE
             ReforgeType.EQUIPMENT -> itemCategory in setOf(
@@ -97,6 +99,7 @@ object ReforgeApi {
                 ItemCategory.GLOVES,
                 ItemCategory.BRACELET,
             )
+
             ReforgeType.CLOAK -> itemCategory == ItemCategory.CLOAK
             ReforgeType.BELT -> itemCategory == ItemCategory.BELT
             ReforgeType.AXE -> itemCategory == ItemCategory.AXE
@@ -110,6 +113,7 @@ object ReforgeApi {
                 ItemCategory.LONGSWORD,
                 ItemCategory.FISHING_ROD,
             )
+
             ReforgeType.VACUUM -> itemCategory == ItemCategory.VACUUM
             ReforgeType.SPECIAL_ITEMS -> specialItems?.contains(internalName) ?: false
         }
@@ -125,7 +129,7 @@ object ReforgeApi {
             if (stats != other.stats) return false
             if (reforgeStone != other.reforgeStone) return false
             if (specialItems != other.specialItems) return false
-            if (extraProperty != other.extraProperty) return false
+            if (reforgeAbility != other.reforgeAbility) return false
 
             return true
         }
@@ -136,7 +140,7 @@ object ReforgeApi {
             result = 31 * result + stats.hashCode()
             result = 31 * result + (reforgeStone?.hashCode() ?: 0)
             result = 31 * result + (specialItems?.hashCode() ?: 0)
-            result = 31 * result + extraProperty.hashCode()
+            result = 31 * result + reforgeAbility.hashCode()
             return result
         }
 
@@ -147,7 +151,7 @@ object ReforgeApi {
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val reforgeStoneData = event.getConstant<Map<String, NeuReforgeJson>>("reforgestones", gson = reforgeGson).values
         val reforgeData = event.getConstant<Map<String, NeuReforgeJson>>("reforges", gson = reforgeGson).values
-        reforgeList = (reforgeStoneData + reforgeData).map(::mapReforge)
+        reforges = (reforgeStoneData + reforgeData).map { it.mapReforge() }
     }
 
     private val reforgeGson: Gson = BaseGsonBuilder.gson()
@@ -188,16 +192,14 @@ object ReforgeApi {
             },
         ).create()
 
-    private fun mapReforge(it: NeuReforgeJson): Reforge {
-        val type = it.itemType
-        return Reforge(
-            name = it.reforgeName,
-            type = EnumUtils.enumValueOf<ReforgeType>(type.first),
-            stats = it.reforgeStats.orEmpty(),
-            reforgeStone = it.internalName,
-            specialItems = type.second.takeIf { it.isNotEmpty() },
-            extraProperty = it.reforgeAbility,
-            costs = it.reforgeCosts,
-        )
-    }
+    private fun NeuReforgeJson.mapReforge() = Reforge(
+        name = reforgeName,
+        nbtModifier = nbtModifier,
+        type = EnumUtils.enumValueOf<ReforgeType>(itemType.first),
+        stats = reforgeStats.orEmpty(),
+        reforgeStone = internalName,
+        specialItems = itemType.second.takeIf { it.isNotEmpty() },
+        reforgeAbility = reforgeAbility,
+        costs = reforgeCosts,
+    )
 }
