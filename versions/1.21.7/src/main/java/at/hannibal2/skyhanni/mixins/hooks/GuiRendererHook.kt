@@ -59,7 +59,7 @@ object GuiRendererHook {
             //#if MC < 1.21.9
             val glyphColor = state.instance().style().color
             //#else
-            //$$ val drawnGlyph = state.renderable as DrawnGlyph
+            //$$ val drawnGlyph = state.renderable as? DrawnGlyph ?: return original.call(state)
             //$$ val glyphColor = drawnGlyph.style.color
             //#endif
             if (glyphColor != null && glyphColor.name == "chroma") {

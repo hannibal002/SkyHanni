@@ -16,16 +16,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#if MC > 1.21.7
 //$$ import net.minecraft.client.render.state.CameraRenderState;
 //$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-//$$ import org.spongepowered.asm.mixin.Shadow;
 //#endif
 
 @Mixin(EntityRenderDispatcher.class)
 public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRenderState> {
-
-    //#if MC > 1.21.7
-    //$$ @Shadow
-    //$$ public Entity targetedEntity;
-    //#endif
 
     //#if MC < 1.21.9
     @Inject(method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;render(Lnet/minecraft/client/render/entity/state/EntityRenderState;DDDLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V"), cancellable = true)
@@ -35,10 +29,12 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
                 ci.cancel();
             }
         }
+        EntityRenderDispatcherHookKt.setEntity(entity);
         //#else
         //$$ @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
         //$$ public void onRenderPre(S renderState, CameraRenderState cameraRenderState, double d, double e, double f, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, CallbackInfo ci) {
-        //$$     Entity entity = this.targetedEntity;
+        //$$     EntityRenderDispatcherHookKt.setEntity(renderState);
+        //$$     Entity entity = EntityRenderDispatcherHookKt.getEntity();
         //$$     if (entity instanceof LivingEntity livingEntity) {
         //$$         // TODO confirm these are the right values for position
         //$$         if (new SkyHanniRenderEntityEvent.Pre<>(livingEntity, d, e, f).post()) {
@@ -46,7 +42,6 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
         //$$         }
         //$$     }
         //#endif
-        EntityRenderDispatcherHookKt.setEntity(entity);
     }
 
     //#if MC < 1.21.9
@@ -58,7 +53,7 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
         //#else
         //$$ @Inject(method = "render", at = @At(value = "RETURN"))
         //$$ public void onRenderPost(S renderState, CameraRenderState cameraRenderState, double d, double e, double f, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, CallbackInfo ci) {
-        //$$     Entity entity = this.targetedEntity;
+        //$$     Entity entity = EntityRenderDispatcherHookKt.getEntity();
         //$$     if (entity instanceof LivingEntity livingEntity) {
         //$$         // TODO confirm these are the right values for position
         //$$         new SkyHanniRenderEntityEvent.Post<>(livingEntity, d, e, f).post();

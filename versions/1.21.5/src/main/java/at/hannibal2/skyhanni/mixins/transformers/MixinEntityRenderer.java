@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 //$$ import net.minecraft.client.render.state.CameraRenderState;
 //$$ import net.minecraft.entity.Entity;
+//$$ import at.hannibal2.skyhanni.mixins.hooks.EntityRenderStateStore;
 //#endif
 
 @Mixin(EntityRenderer.class)
@@ -67,8 +68,11 @@ public class MixinEntityRenderer {
     //$$     }
     //$$     return glowColor;
     //$$ }
+    //$$
+    //$$ @Inject(method = "updateRenderState", at = @At("TAIL"))
+    //$$ public void setEntity(Entity entity, EntityRenderState state, float tickProgress, CallbackInfo ci) {
+    //$$     ((EntityRenderStateStore) state).skyhanni$setEntity(entity);
+    //$$ }
     //#endif
-
-
 
 }
