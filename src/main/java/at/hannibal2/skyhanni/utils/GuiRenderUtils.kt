@@ -426,7 +426,11 @@ object GuiRenderUtils {
 
         //#if MC > 1.21.6
         //$$ MinecraftClient.getInstance().itemModelManager.clearAndUpdate(itemRenderStateButCool, item, ItemDisplayContext.FIXED, MinecraftCompat.localWorld, MinecraftCompat.localPlayer, 0)
+        //#if MC < 1.21.9
         //$$ val baseItemScale = if (isItemSkull || itemRenderStateButCool.isSideLit) SKULL_SCALE else 1f
+        //#else
+        //$$ val baseItemScale = if (isItemSkull) SKULL_SCALE else 1f
+        //#endif
         //#else
         val baseItemScale = if (isItemSkull) SKULL_SCALE else 1f
         //#endif
@@ -521,16 +525,21 @@ object GuiRenderUtils {
         //$$ val totalItemScale = ((guiScaleX + guiScaleY) * 0.5f) * finalItemScale
         //$$
         //$$ if (rotationDegrees != null || (totalItemScale > 1 && itemRenderStateButCool.isSideLit)) {
+        //#if MC < 1.21.9
         //$$     val adjX = matrices2D.m20 + (x * guiScaleX) - (totalItemScale * 1.8f)
         //$$     val adjY = matrices2D.m21 + (y * guiScaleY) - (totalItemScale * 1.8f)
         //$$
         //$$     item.customRenderOnScreen(adjX, adjY, totalItemScale, rotX, rotY, rotZ)
+        //#else
+        //$$     item.normalRenderOnScreen(translateX, translateY, finalItemScale)
+        //#endif
         //$$ } else {
         //$$     item.normalRenderOnScreen(translateX, translateY, finalItemScale)
         //$$ }
         //#endif
     }
 
+    //$$ // TODO: On 1.21.10+ it is completely broken
     //#if MC > 1.21.6
     //$$ private fun ItemStack.customRenderOnScreen(
     //$$     x: Float, y: Float, finalItemScale: Float,
