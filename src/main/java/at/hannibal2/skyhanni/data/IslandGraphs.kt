@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandGraphSettingsJson
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
@@ -48,8 +49,6 @@ import kotlin.time.Duration.Companion.milliseconds
  * TODO
  * benefits of every island graphs:
  * global:
- * 	NEU's fairy souls
- * 	slayer area (not all there yet)
  * 	NEU's NPC's (auto acitvate when searching via neu)
  * 	races (end, park, winter, dungeon hub)
  * 	jump pads between servers
@@ -64,7 +63,6 @@ import kotlin.time.Duration.Companion.milliseconds
  * rift:
  * 	eyes
  * 	big quests
- * 	montezuma souls
  * 	blood effigies
  * 	avoid area around enderman
  * spider:
@@ -74,7 +72,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * 	commssion areas
  * 	events: raffle, goblin slayer, donpieresso
  * deep
- * 	path to the bottom (Rhys NPC)
+ * 	path to the bottom (Rhys NPC) (replace in DeepCavernsGuide.kt)
  * end
  * 	golem spawn
  * 	dragon death spot
@@ -147,6 +145,7 @@ object IslandGraphs {
     private var fastestPath: Graph? = null
     private var condition: () -> Boolean = { true }
     private var inGlaciteTunnels: Boolean? = null
+    private var ignoredIslandTypes = setOf<IslandType>()
 
     private val patternGroup = RepoPattern.group("data.island.navigation")
 
@@ -160,9 +159,14 @@ object IslandGraphs {
         "Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center",
     )
 
-    @HandleEvent(RepositoryReloadEvent::class, onlyOnSkyblock = true)
-    fun onRepoReload() {
-        loadIsland(SkyBlockUtils.currentIsland)
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<IslandGraphSettingsJson>("misc/IslandGraphSettings")
+        ignoredIslandTypes = data.ignoredIslandTypes
+
+        if (SkyBlockUtils.inSkyBlock) {
+            loadIsland(SkyBlockUtils.currentIsland)
+        }
     }
 
     @HandleEvent
@@ -211,14 +215,16 @@ object IslandGraphs {
     }
 
     private fun loadIsland(newIsland: IslandType) {
-        // island graphs doesn't support private island and garden
-        if (IslandTypeTags.PERSONAL_ISLAND.inAny()) return
-
         if (newIsland == IslandType.DWARVEN_MINES) {
             loadDwarvenMines()
-        } else {
-            reloadFromJson(newIsland.name)
+            return
         }
+
+        // TODO custom behaviour for mineshaft or catacombs, private island, or garden
+
+        if (newIsland in ignoredIslandTypes) return
+
+        reloadFromJson(newIsland.name)
     }
 
     @HandleEvent
@@ -258,7 +264,7 @@ object IslandGraphs {
     private fun reloadFromJson(islandName: String) {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
-        SkyHanniMod.launchCoroutine("reload island graphs") {
+        SkyHanniMod.launchCoroutine("load island graph data for $islandName") {
             try {
                 val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
                 IslandAreas.display = null
@@ -267,11 +273,13 @@ object IslandGraphs {
                 }
             } catch (e: Error) {
                 currentIslandGraph = null
-                ErrorManager.logErrorWithData(
-                    e,
-                    "failed to load graph data for island $islandName",
-                    "island name" to islandName,
-                )
+                if (SkyBlockUtils.debug) {
+                    ErrorManager.logErrorWithData(
+                        e,
+                        "failed to load graph data for island $islandName",
+                        "island name" to islandName,
+                    )
+                }
             }
         }
     }

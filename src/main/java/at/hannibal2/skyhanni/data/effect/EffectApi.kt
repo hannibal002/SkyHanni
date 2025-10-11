@@ -125,6 +125,7 @@ object EffectApi {
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
     // Todo : cleanup and add support for poison candy I, and add support for splash / other formats
+    // TODO: Move these to repo
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         hotChocolateMixinConsumePattern.matchMatcher(event.message) {
@@ -176,12 +177,12 @@ object EffectApi {
                 changeType = EffectDurationChangeType.SET
                 duration = 25.minutes
             }
-            "§a§lYUM! §r§2Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
+            "§a§lYUM! §r§2ൠ Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
                 effect = NonGodPotEffect.PEST_REPELLENT
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
             }
-            "§a§lYUM! §r§2Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
+            "§a§lYUM! §r§2ൠ Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
                 effect = NonGodPotEffect.PEST_REPELLENT_MAX
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours

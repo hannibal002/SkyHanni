@@ -47,6 +47,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -142,6 +143,13 @@ object DamageIndicatorManager {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
+        if (SkyBlockUtils.debug) {
+            list.removeIf { it.decayAt.isInPast() }
+            for (highlight in list) {
+                event.drawDynamicText(highlight.location, highlight.text, 1.5, seeThroughBlocks = false)
+            }
+        }
+
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
 
@@ -171,7 +179,7 @@ object DamageIndicatorManager {
                 BossType.END_ENDSTONE_PROTECTOR -> 3.0
                 BossType.SLAYER_SPIDER_5_1 -> 2.0
 
-                else -> 0.0
+                else -> 1.0
             }
 
             if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0, vecYOffset = vecYOffset)) continue
@@ -356,18 +364,27 @@ object DamageIndicatorManager {
         return color.getChatColor() + format
     }
 
+    val list = mutableListOf<Highlight>()
+
+    class Highlight(val location: LorenzVec, val text: String, val decayAt: SimpleTimeMark)
+
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn) {
+        val mob = event.mob
+
+        if (SkyBlockUtils.debug) {
+            list.add(Highlight(mob.baseEntity.getLorenzVec(), "${mob.name} - ${mob.mobType}", 5.seconds.fromNow()))
+        }
         if (!isEnabled()) return
         try {
-            val d = grabData(event.mob) ?: return
+            val d = grabData(mob) ?: return
             data[d.entity.uniqueID] = d
             update(d)
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
                 e, "Error checking damage indicator entity",
-                "mob" to event.mob,
-                "mobInfo" to CopyNearbyEntitiesCommand.getMobInfo(event.mob),
+                "mob" to mob,
+                "mobInfo" to CopyNearbyEntitiesCommand.getMobInfo(mob),
             )
             return
         }
@@ -572,8 +589,7 @@ object DamageIndicatorManager {
     private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String {
         var found = false
         for (shield in HellionShield.entries) {
-            val armorStand = entity.getNameTagWith(3, shield.name)
-            if (armorStand != null) {
+            entity.getNameTagWith(3, shield.name)?.let { armorStand ->
                 val number = armorStand.name.split(" ♨")[1].substring(0, 1)
                 entity.setHellionShield(shield)
                 if (SlayerApi.config.blazes.hellion.coloredMobs) {

@@ -35,7 +35,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import java.io.File
 import java.util.TreeMap
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.floor
 //#if MC > 1.21
 //$$ import net.minecraft.registry.Registries
@@ -77,7 +76,7 @@ object EnoughUpdatesManager {
      * Called by the Neu Repo Manager when the NEU repo is reloaded.
      */
     suspend fun reloadItemsFromRepo(progress: ChatProgressUpdates) = loadingMutex.withLock {
-        progress.update("call reloadItemsFromRepo")
+        progress.update("reloadItemsFromRepo")
         progress.update("clearing caches and maps")
         itemStackCache.clear()
         displayNameCache.clear()
@@ -88,7 +87,7 @@ object EnoughUpdatesManager {
         val tempItemMap = TreeMap<String, JsonObject>()
         loadItemMap(progress, tempItemMap)
 
-        progress.update("call synchronized itemMap")
+        progress.update("synchronized itemMap")
         synchronized(itemMap) {
             itemMap.clear()
             itemMap.putAll(tempItemMap)
@@ -99,11 +98,10 @@ object EnoughUpdatesManager {
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
     private suspend fun loadItemMap(progress: ChatProgressUpdates, tempItemMap: TreeMap<String, JsonObject>) = coroutineScope {
-        progress.update("call loadItemMap")
+        progress.update("loadItemMap")
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
         val list = fileSystem.list("items")
-        progress.innerProgress(0, list.size)
-        val done = AtomicInteger(0)
+        progress.innerProgressStart(list.size)
         val async = list.mapNotNullAsync { name ->
             try {
                 val internalName = name.removeSuffix(".json")
@@ -111,7 +109,7 @@ object EnoughUpdatesManager {
                     internalName = internalName,
                     json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
                 )
-                progress.innerProgress(done.incrementAndGet(), list.size)
+                progress.innerProgressStep()
                 val parsed = item ?: return@mapNotNullAsync null
                 internalName to parsed
             } catch (e: Exception) {
