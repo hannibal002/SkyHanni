@@ -41,15 +41,15 @@ object HuntingProfitTracker {
     ) { drawDisplay(it) }
 
     data class Data(
-        @Expose var totalCatchAmount: Long = 0,
-        @Expose var totalShardAmount: Long = 0
+        @Expose var totalMobsCaught: Long = 0,
+        @Expose var totalShardsGained: Long = 0
     ) : ItemTrackerData() {
 
         override fun getDescription(item: TrackedItem): List<String> {
             val timesCaught = item.timesCaught
-            val itemsCaught = item.totalAmount
+            val shardsGained = item.totalAmount
 
-            val shardRate = (itemsCaught.toDouble() / timesCaught.toDouble()).roundTo(2)
+            val shardRate = (if (timesCaught != 0L) shardsGained.toDouble() / timesCaught else 0.0).roundTo(2)
 
             return listOf(
                 "§7Caught §e${timesCaught.addSeparators()} §7times.",
@@ -65,8 +65,10 @@ object HuntingProfitTracker {
     }
 
     private val toolInternalNames = setOf(
+        // Black Holes
         "SMALL_POCKET_BLACK_HOLE".toInternalName(),
         "MEDIUM_POCKET_BLACK_HOLE".toInternalName(),
+        // Hunting Axes
         "VENATOR_GENESIS".toInternalName(),
         "SILVA_DOMINUS".toInternalName(),
         "CURSUS_FERAE".toInternalName(),
@@ -81,7 +83,7 @@ object HuntingProfitTracker {
 
         val profit = tracker.drawItems(data, { true }, this)
 
-        val caughtCount = data.totalCatchAmount
+        val caughtCount = data.totalMobsCaught
         add(
             Renderable.hoverTips(
                 "§7Mobs caught: §e${caughtCount.addSeparators()}",
@@ -89,7 +91,7 @@ object HuntingProfitTracker {
             ).toSearchable(),
         )
 
-        val shardCount = data.totalShardAmount
+        val shardCount = data.totalShardsGained
         add(
             Renderable.hoverTips(
                 "§7Shards collected: §e${shardCount.addSeparators()}",
@@ -97,15 +99,15 @@ object HuntingProfitTracker {
             ).toSearchable(),
         )
 
-        add(tracker.addTotalProfit(profit, data.totalCatchAmount, "shard"))
+        add(tracker.addTotalProfit(profit, data.totalMobsCaught, "shard"))
 
         tracker.addPriceFromButton(this)
     }
 
     private fun addShard(amount: Int) {
         tracker.modify {
-            it.totalCatchAmount++
-            it.totalShardAmount += amount
+            it.totalMobsCaught++
+            it.totalShardsGained += amount
         }
         lastHuntTime = SimpleTimeMark.now()
     }
@@ -113,14 +115,11 @@ object HuntingProfitTracker {
     private val isRecentPickup: Boolean
         get() = config.showWhenPickup && lastHuntTime.passedSince() < 10.seconds
 
-    private val shouldShow: Boolean
-        get() = isRecentPickup // || HuntingApi.isHunting(checkRodInHand = false)
-
     init {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() && config.enabled && (shouldShow || heldItemEnabled()) },
+            condition = { isEnabled() && config.enabled && (isRecentPickup || heldItemEnabled()) },
             onRender = {
                 tracker.renderDisplay(config.position)
             },
@@ -138,16 +137,14 @@ object HuntingProfitTracker {
     fun onItemChange(event: ItemInHandChangeEvent) {
         val isTool = isHuntingTool(event.newItem.getItemStackOrNull())
         if (isTool != hasHeldTool) {
-            if (!isTool) {
-                lastToolHeldTime = SimpleTimeMark.now()
-            }
             hasHeldTool = isTool
+            if (!isTool) lastToolHeldTime = SimpleTimeMark.now()
         }
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
-    private fun heldItemEnabled() = (isHoldingTool() || lastToolHeldTime.passedSince() < 10.seconds)
+    private fun heldItemEnabled() = isHoldingTool() || lastToolHeldTime.passedSince() < 10.seconds
 
     private fun isHoldingTool() = isHuntingTool(InventoryUtils.getItemInHand())
 
@@ -159,12 +156,12 @@ object HuntingProfitTracker {
 
         // Check if the item is one of the general hunting tool categories
         if (itemCategoryOrNull == ItemCategory.FISHING_NET ||
-            itemCategoryOrNull == ItemCategory.LASSO ||
-            itemCategoryOrNull == ItemCategory.AXE
+            itemCategoryOrNull == ItemCategory.LASSO
         ) return true
 
         // Check if the item’s internal name is in the set of specific hunting tools
-        return toolInternalNames.contains(itemStack?.getInternalNameOrNull())
+        val internalName = itemStack?.getInternalNameOrNull() ?: return false
+        return internalName in toolInternalNames
     }
 
     @HandleEvent
