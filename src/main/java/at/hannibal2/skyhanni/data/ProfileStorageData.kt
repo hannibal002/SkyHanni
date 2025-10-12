@@ -18,10 +18,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TabListData
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -126,7 +124,7 @@ object ProfileStorageData {
 
         if (noTabListTime.passedSince() < 3.seconds) return
         noTabListTime = SimpleTimeMark.now()
-        val foundSkyBlockTabList = TabListData.getTabList().any { HypixelData.islandNamePattern.matches(it) }
+        val foundSkyBlockTabList = TabWidget.AREA.isActive
         if (foundSkyBlockTabList) {
             ChatUtils.clickableChat(
                 "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +

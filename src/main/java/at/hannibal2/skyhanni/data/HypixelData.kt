@@ -65,15 +65,6 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST: §b§lArea: §r§7Private Island
-     * REGEX-TEST: §b§lDungeon: §r§7Catacombs
-     */
-    val islandNamePattern by patternGroup.pattern(
-        "islandname",
-        "(?:§.)*(?:Area|Dungeon): (?:§.)*(?<island>.*)",
-    )
-
-    /**
      * REGEX-TEST: §711/15/24 §8m19CJ
      * REGEX-TEST: §711/15/24 §8m1F
      */
