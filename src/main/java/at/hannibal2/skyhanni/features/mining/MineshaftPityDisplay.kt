@@ -269,7 +269,7 @@ object MineshaftPityDisplay {
 
         val renderables = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
         val renderableList = mutableListOf<Renderable>()
-        if (!everFoundPityWidget) {
+        if (!everFoundPityWidget && isWidgetOnMain) {
             renderableList.add(Renderable.text("§cPity Tab Widget Missing"))
             renderableList.add(Renderable.text("§cDo /tab and enable the pity widget"))
             renderableList.add(Renderable.text("§cRight click the widget > Click \"Shown Pity\" > Click Glacite Tunnels and enable"))
