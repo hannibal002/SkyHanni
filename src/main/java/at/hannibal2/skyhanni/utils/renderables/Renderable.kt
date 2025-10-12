@@ -1279,6 +1279,7 @@ interface Renderable {
                     val newOffsetY = (mouseOffsetY + playerY - mouse.second - 1.62 * entityScale).toFloat()
                     newOffsetX to newOffsetY
                 } else eyesX to eyesY
+                DrawContextUtils.pushMatrix()
                 DrawContextUtils.translate(0f, 0f, 100f)
                 //#if MC < 1.21
                 drawEntityOnScreen(
@@ -1290,22 +1291,20 @@ interface Renderable {
                     player,
                 )
                 //#else
-                //$$ DrawContextUtils.translate(-35f, -125f, 0f)
                 //$$ drawEntity(
                 //$$     DrawContextUtils.drawContext,
-                //$$     playerX,
-                //$$     playerY,
-                //$$     playerX + width,
-                //$$     playerY + height,
+                //$$     padding,
+                //$$     padding,
+                //$$     padding + width,
+                //$$     padding + height,
                 //$$     entityScale,
                 //$$     0.0625f,
-                //$$     -mouseXRelativeToPlayer + if (followMouse) 70f else 0f,
-                //$$     -mouseYRelativeToPlayer + if (followMouse) 195f else 0f,
+                //$$     if (followMouse) mouse.first - mouseOffsetX.toFloat() else eyesX,
+                //$$     if (followMouse) mouse.second - mouseOffsetY.toFloat() else eyesY,
                 //$$     player
                 //$$ )
-                //$$ DrawContextUtils.translate(35f, 125f, 0f)
                 //#endif
-                DrawContextUtils.translate(0f, 0f, -100f)
+                DrawContextUtils.popMatrix()
             }
         }
     }
