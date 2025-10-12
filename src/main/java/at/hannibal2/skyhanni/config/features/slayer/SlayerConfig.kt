@@ -171,9 +171,9 @@ class SlayerConfig {
     @ConfigOption(name = "Spawn Particles", desc = "Hides the Spawn Particles used by Slayers.")
     @SearchTag("Enchant Spell Potion Witch Hider")
     @ConfigEditorDropdown
-    var slayerParticle: SlayerSpawnParticlestoHide = SlayerSpawnParticlestoHide.NONE
+    var slayerParticle: SlayerSpawnParticlesToHide = SlayerSpawnParticlesToHide.NONE
 
-    enum class SlayerSpawnParticlestoHide(private val displayName: String) {
+    enum class SlayerSpawnParticlesToHide(private val displayName: String) {
         NONE("None"),
         PURPLE("Only Purple"),
         BOTH("Both");
