@@ -158,17 +158,17 @@ class SlayerConfig {
     var compactTimeMessage: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Slayer Cocoon Title", desc = "Send title when Slayer Boss is cocooned.")
+    @ConfigOption(name = "Cocoon Title", desc = "Send title when Slayer Boss is cocooned.")
     @ConfigEditorBoolean
     var cocoonTitle: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Slayer Cocoon Notification Sound", desc = "Sends note.pling when Slayer Boss is cocooned.")
+    @ConfigOption(name = "Cocoon Sound", desc = "Sends note.pling when Slayer Boss is cocooned.")
     @ConfigEditorBoolean
     var cocoonDing: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Hide Slayer Spawn Particles", desc = "Hides the Spawn Particles used by Slayers.")
+    @ConfigOption(name = "Spawn Particles", desc = "Hides the Spawn Particles used by Slayers.")
     @SearchTag("Enchant Spell Potion Witch Hider")
     @ConfigEditorDropdown
     var slayerParticle: SlayerSpawnParticlestoHide = SlayerSpawnParticlestoHide.NONE
@@ -181,7 +181,7 @@ class SlayerConfig {
         override fun toString() = displayName
     }
     @Expose
-    @ConfigOption(name = "Hide Damage Splashes Near Slayer Boss", desc = "Hides Damage Splashes Near Slayer Boss.")
+    @ConfigOption(name = "Nearby Damage Splashes", desc = "Hides Damage Splashes Near Slayer Boss.")
     @ConfigEditorBoolean
     var damageSplashHider: Boolean = false
 }
