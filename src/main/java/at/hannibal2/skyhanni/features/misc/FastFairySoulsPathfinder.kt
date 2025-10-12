@@ -101,16 +101,16 @@ object FastFairySoulsPathfinder {
 
             val inAir = PlayerUtils.inAir()
             if (inAir) {
-                val abovePlayer = LocationUtils.playerLocation().up(10)
+                val abovePlayer = playerLocation.up(10)
                 val aboveNearest = allSouls.minBy { it.distanceSq(abovePlayer) }
-                if (aboveNearest.distanceToPlayer() < 10) return aboveNearest
+                if (aboveNearest.distance(abovePlayer) < 10) return aboveNearest
             }
 
-            ErrorManager.logErrorStateWithData(
-                "unknown fairy soul",
-                "user clicked a fairy soul while far away from known fairy souls",
-                "nearest loc" to nearest,
-                "player loc" to LocationUtils.playerLocation(),
+            IslandGraphs.reportLocation(
+                playerLocation,
+                userFacingReason = "unknown fairy soul",
+                technicalInfo = "user clicked a fairy soul while far away from known fairy souls",
+                "nearest soul" to nearest,
                 "distance" to nearest.distanceToPlayer().roundTo(1),
                 "inAir" to inAir,
             )

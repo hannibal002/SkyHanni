@@ -670,24 +670,20 @@ object IslandGraphs {
             playerPosition,
             reasonForReport = "Manual reported graph location error",
             userReason = args.joinToString(" "),
-            ignoreCache = true,
-            betaOnly = false,
         )
     }
 
     fun reportLocation(
         location: LorenzVec,
         userFacingReason: String,
-        additionalInternalInfo: String? = null,
-        ignoreCache: Boolean = false,
-        betaOnly: Boolean = false,
+        technicalInfo: String? = null,
+        vararg extraData: Pair<String, Any?>,
     ) {
         sendReportLocation(
             location,
             reasonForReport = "Automatic graph location error: $userFacingReason",
-            additionalInternalInfo = additionalInternalInfo,
-            ignoreCache = ignoreCache,
-            betaOnly = betaOnly,
+            technicalInfo = technicalInfo,
+            extraData = extraData,
         )
     }
 
@@ -695,41 +691,39 @@ object IslandGraphs {
         location: LorenzVec,
         reasonForReport: String,
         userReason: String? = null,
-        additionalInternalInfo: String? = null,
-        ignoreCache: Boolean,
-        betaOnly: Boolean,
+        technicalInfo: String? = null,
+        vararg extraData: Pair<String, Any?>,
     ) {
         val graphArea = SkyBlockUtils.graphArea
         val scoreboardArea = SkyBlockUtils.scoreboardArea ?: "unknown"
 
-        val extraData = mutableMapOf<String, Any>()
+        val data = mutableMapOf<String, Any?>()
         userReason?.let {
-            extraData["reason provided by user"] = it
+            data["reason provided by user"] = it
         }
-        additionalInternalInfo?.let {
-            extraData["internal info"] = it
+        technicalInfo?.let {
+            data["technical info"] = it
         }
+        data.putAll(extraData.toMap())
         val island = SkyBlockUtils.currentIsland.name
-        extraData["island"] = island
-        extraData["location"] = with(location.roundTo(1)) { "/shtestwaypoint $x $y $z pathfind" }
+        data["island"] = island
+        data["location"] = with(location.roundTo(1)) { "/shtestwaypoint $x $y $z pathfind" }
         if (graphArea != scoreboardArea) {
-            extraData["area graph"] = graphArea.orEmpty()
-            extraData["area scoreboard"] = scoreboardArea
+            data["area graph"] = graphArea.orEmpty()
+            data["area scoreboard"] = scoreboardArea
         }
 
         SkyHanniRepoManager.localRepoCommit.let { (hash, time) ->
-            extraData["repo update time"] = time?.toString() ?: "none"
-            extraData["repo update age"] = time?.passedSince() ?: "unknown"
-            extraData["repo update hash"] = hash ?: "none"
+            data["repo update time"] = time?.toString() ?: "none"
+            data["repo update age"] = time?.passedSince() ?: "unknown"
+            data["repo update hash"] = hash ?: "none"
         }
 
         ErrorManager.logErrorStateWithData(
             reasonForReport,
             "",
             noStackTrace = true,
-            extraData = extraData.map { it.key to it.value }.normalizeAsArray(),
-            ignoreErrorCache = ignoreCache,
-            betaOnly = betaOnly,
+            extraData = data.map { it.key to it.value }.normalizeAsArray(),
         )
     }
 

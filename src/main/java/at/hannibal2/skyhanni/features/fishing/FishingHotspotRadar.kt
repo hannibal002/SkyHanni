@@ -107,9 +107,7 @@ object FishingHotspotRadar {
         IslandGraphs.reportLocation(
             location,
             userFacingReason = "Found no path to fishing hotspot",
-            additionalInternalInfo = "no node with tag 'fishing hotspot' found near the radar hotspot target",
-            ignoreCache = true,
-            betaOnly = true,
+            technicalInfo = "no node with tag 'fishing hotspot' found near the radar hotspot target",
         )
     }
 
