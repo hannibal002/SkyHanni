@@ -87,7 +87,8 @@ object WhispersPerHotfPerk {
                 if (perk.rawLevel == perk.maxLevel) {
                     "§7Whispers spent: §e${maxWhispersNeeded.addSeparators()} §7(§aMax level§7)"
                 } else {
-                    "§7Whispers spent: §e${currentWhispersSpent.addSeparators()}§7/§e${maxWhispersNeeded.addSeparators()}§7 (§e$percentage%§7)"
+                    "§7Whispers spent: " +
+                        "§e${currentWhispersSpent.addSeparators()}§7/§e${maxWhispersNeeded.addSeparators()}§7 (§e$percentage%§7)"
                 }
             }
         }
