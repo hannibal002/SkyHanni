@@ -4,14 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -64,17 +66,7 @@ object HuntingProfitTracker {
         override fun getCoinDescription(item: TrackedItem) = listOf<String>()
     }
 
-    private val toolInternalNames = setOf(
-        // Black Holes
-        "SMALL_POCKET_BLACK_HOLE".toInternalName(),
-        "MEDIUM_POCKET_BLACK_HOLE".toInternalName(),
-        // Hunting Axes
-        "VENATOR_GENESIS".toInternalName(),
-        "SILVA_DOMINUS".toInternalName(),
-        "CURSUS_FERAE".toInternalName(),
-        "APEX_PRAEDATOR".toInternalName(),
-        "NEX_TITANIUM".toInternalName()
-    )
+    private var huntingTools = listOf<NeuInternalName>()
 
     private val ItemTrackerData.TrackedItem.timesCaught get() = timesGained
 
@@ -161,7 +153,13 @@ object HuntingProfitTracker {
 
         // Check if the item’s internal name is in the set of specific hunting tools
         val internalName = itemStack?.getInternalNameOrNull() ?: return false
-        return internalName in toolInternalNames
+        return internalName in huntingTools
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ItemsJson>("Items")
+        huntingTools = data.huntingBlackholes + data.huntingAxes
     }
 
     @HandleEvent
