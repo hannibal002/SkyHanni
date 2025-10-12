@@ -75,16 +75,19 @@ fun Renderable.Companion.fakePlayer(
         //$$ val translationX = peeked.m20().toInt()
         //$$ val translationY = peeked.m21().toInt()
         //$$ val averageScale = (peeked.m00() + peeked.m11()) / 2
+        //$$ val adjustedPadding = (padding * averageScale).toInt()
+        //$$ val adjustedWidth = (width * averageScale).toInt()
+        //$$ val adjustedHeight = (height * averageScale).toInt()
         //$$ drawEntityWithoutScissor(
         //$$     DrawContextUtils.drawContext,
-        //$$     padding + translationX,
-        //$$     padding + translationY,
-        //$$     padding + width + translationX,
-        //$$     padding + height + translationY,
+        //$$     adjustedPadding + translationX,
+        //$$     adjustedPadding + translationY,
+        //$$     adjustedPadding + adjustedWidth + translationX,
+        //$$     adjustedPadding + adjustedHeight + translationY,
         //$$     (entityScale * averageScale).toInt(),
         //$$     0.0625f * averageScale,
-        //$$     if (followMouse) mouse.first - mouseOffsetX.toFloat() + translationX else eyesX,
-        //$$     if (followMouse) mouse.second - mouseOffsetY.toFloat() + translationY else eyesY,
+        //$$     if (followMouse) (mouse.first - mouseOffsetX.toFloat()) * averageScale + translationX else eyesX,
+        //$$     if (followMouse) (mouse.second - mouseOffsetY.toFloat()) * averageScale + translationY else eyesY,
         //$$     player,
         //$$ )
         //#endif
