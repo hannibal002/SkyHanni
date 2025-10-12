@@ -159,7 +159,10 @@ object HuntingProfitTracker {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
-        huntingTools = data.huntingBlackholes + data.huntingAxes
+        huntingTools = buildList {
+            data.huntingBlackholes?.let { addAll(it) }
+            data.huntingAxes?.let { addAll(it) }
+        }
     }
 
     @HandleEvent

@@ -17,8 +17,8 @@ data class ItemsJson(
     @Expose @SerializedName("compact_names") val compactNames: Map<String, String>,
     @Expose @SerializedName("renamed_enchantments") val renamedEnchantments: Map<String, String>,
     @Expose @SerializedName("shard_name_overrides") val shardNameOverrides: Map<String, String>,
-    @Expose @SerializedName("hunting_blackholes") val huntingBlackholes: List<NeuInternalName>,
-    @Expose @SerializedName("hunting_axes") val huntingAxes: List<NeuInternalName>,
+    @Expose @SerializedName("hunting_blackholes") val huntingBlackholes: List<NeuInternalName>?,
+    @Expose @SerializedName("hunting_axes") val huntingAxes: List<NeuInternalName>?,
 )
 
 data class ItemValueCalculationDataJson(
