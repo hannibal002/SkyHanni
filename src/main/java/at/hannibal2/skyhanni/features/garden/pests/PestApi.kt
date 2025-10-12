@@ -3,11 +3,12 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
@@ -187,14 +188,12 @@ object PestApi {
                 ChatUtils.userError("Open Plot Management Menu to load plot names and pest locations!")
                 return
             }
-            if (event.unknownAmount) {
-                plot.isPestCountInaccurate = true
-            } else {
-                plot.pests += event.amountPests
-                plot.isPestCountInaccurate = false
-            }
+            plot.isPestCountInaccurate = event.amountPests?.let {
+                plot.pests += it
+                false
+            } ?: true
         }
-        if (!event.unknownAmount) scoreboardPests += event.amountPests
+        event.amountPests?.let { scoreboardPests += it }
         updatePests()
     }
 
@@ -215,24 +214,24 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (line in event.tabList) {
-            infectedPlotsTablistPattern.matchMatcher(line) {
-                val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
-                if (plotList.sorted() == getInfestedPlots().map { it.id }.sorted()) return
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.PESTS)) return
 
-                for (plot in GardenPlotApi.plots) {
-                    if (plotList.contains(plot.id)) {
-                        if (!plot.isPestCountInaccurate && plot.pests == 0) {
-                            plot.isPestCountInaccurate = true
-                        }
-                    } else {
-                        plot.pests = 0
-                        plot.isPestCountInaccurate = false
+        infectedPlotsTablistPattern.firstMatcher(event.widget.lines) {
+            val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
+            if (plotList.sorted() == getInfestedPlots().map { it.id }.sorted()) return
+
+            for (plot in GardenPlotApi.plots) {
+                if (plotList.contains(plot.id)) {
+                    if (!plot.isPestCountInaccurate && plot.pests == 0) {
+                        plot.isPestCountInaccurate = true
                     }
+                } else {
+                    plot.pests = 0
+                    plot.isPestCountInaccurate = false
                 }
-                updatePests()
             }
+            updatePests()
         }
     }
 
