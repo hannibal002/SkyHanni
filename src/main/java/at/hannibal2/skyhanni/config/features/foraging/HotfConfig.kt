@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.foraging
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.foraging.WhispersPerHotfPerk.WhispersSpentDesign
+import at.hannibal2.skyhanni.data.hotx.CurrencyPerHotxPerk.CurrencySpentDesign
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -50,7 +50,7 @@ class HotfConfig {
     @Expose
     @ConfigOption(name = "Whispers Spent Design", desc = "Change the design of the whispers spent display.")
     @ConfigEditorDropdown
-    var whispersSpentDesign: WhispersSpentDesign = WhispersSpentDesign.NUMBER_AND_PERCENTAGE
+    var whispersSpentDesign: CurrencySpentDesign = CurrencySpentDesign.NUMBER_AND_PERCENTAGE
 
     @Expose
     @ConfigOption(
