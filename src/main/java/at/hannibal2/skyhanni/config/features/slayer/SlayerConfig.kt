@@ -5,14 +5,16 @@ import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig
 import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig
 import at.hannibal2.skyhanni.config.features.slayer.spider.SpiderConfig
 import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireConfig
+import at.hannibal2.skyhanni.features.slayer.HideSlayerSpawnParticles.SpawnParticles
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class SlayerConfig {
 
@@ -158,30 +160,22 @@ class SlayerConfig {
     var compactTimeMessage: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Cocoon Title", desc = "Send title when Slayer Boss is cocooned.")
+    @ConfigOption(name = "Slayer Cocoon Title", desc = "Send title when Slayer Boss is cocooned.")
     @ConfigEditorBoolean
     var cocoonTitle: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Cocoon Sound", desc = "Sends note.pling when Slayer Boss is cocooned.")
+    @ConfigOption(name = "Slayer Cocoon Notification Sound", desc = "Sends note.pling when Slayer Boss is cocooned.")
     @ConfigEditorBoolean
     var cocoonDing: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Spawn Particles", desc = "Hides the Spawn Particles used by Slayers.")
-    @SearchTag("Enchant Spell Potion Witch Hider")
-    @ConfigEditorDropdown
-    var slayerParticle: SlayerSpawnParticlesToHide = SlayerSpawnParticlesToHide.NONE
+    @ConfigOption(name = "Spawn Particles", desc = "Spawn Particles To Hide")
+    @ConfigEditorDraggableList
+    val spawnParticleHider: Property<MutableList<SpawnParticles>> = Property.of(mutableListOf())
 
-    enum class SlayerSpawnParticlesToHide(private val displayName: String) {
-        NONE("None"),
-        PURPLE("Only Purple"),
-        BOTH("Both");
-
-        override fun toString() = displayName
-    }
     @Expose
-    @ConfigOption(name = "Nearby Damage Splashes", desc = "Hides Damage Splashes Near Slayer Boss.")
+    @ConfigOption(name = "Hide Damage Splashes Near Slayer Boss", desc = "Hides Damage Splashes Near Slayer Boss.")
     @ConfigEditorBoolean
     var damageSplashHider: Boolean = false
 }
