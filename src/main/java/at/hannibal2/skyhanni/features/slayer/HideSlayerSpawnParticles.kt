@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.util.EnumParticleTypes as ParticleType
 import kotlin.time.Duration.Companion.seconds
+import net.minecraft.util.EnumParticleTypes as ParticleType
 
 @SkyHanniModule
 object HideSlayerSpawnParticles {
