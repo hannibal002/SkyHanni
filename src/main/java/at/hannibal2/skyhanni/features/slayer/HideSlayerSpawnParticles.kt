@@ -15,10 +15,10 @@ import net.minecraft.util.EnumParticleTypes as ParticleType
 @SkyHanniModule
 object HideSlayerSpawnParticles {
     private val config get() = SlayerApi.config
+    @Suppress("VarCouldBeVal")
     private var mobRecentDeaths = mutableListOf<Pair<LorenzVec, SimpleTimeMark>>()
 
     @HandleEvent(onlyOnSkyblock = true)
-    @Suppress("MaxLineLength")
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!SlayerApi.hasActiveQuest() || !SlayerApi.isInCorrectArea) return
         val distance = event.location.distanceToNearestDeadMob() ?: return
@@ -28,7 +28,6 @@ object HideSlayerSpawnParticles {
                 event.cancel()
             }
         }
-
     }
 
     enum class SpawnParticles(private val displayName: String, val particle: ParticleType) {
@@ -49,7 +48,6 @@ object HideSlayerSpawnParticles {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
         val iterator = mobRecentDeaths.iterator()
-
         while (iterator.hasNext()) {
             val element = iterator.next()
             if (element.second.passedSince() > 3.seconds) {
@@ -58,7 +56,6 @@ object HideSlayerSpawnParticles {
         }
 
     }
-
 
     private fun LorenzVec.distanceToNearestDeadMob() = mobRecentDeaths.minOfOrNull { it.first.distanceSq(this) }
 }
