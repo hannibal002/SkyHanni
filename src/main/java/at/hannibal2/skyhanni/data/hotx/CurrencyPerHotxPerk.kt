@@ -54,7 +54,7 @@ abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val 
     private fun handleCurrencySpent(currencySpentDesign: CurrencySpentDesign, perk: HotxData<*>): String {
         val currentAmountSpent = perk.calculateTotalCost(perk.rawLevel)
         val maxCurrencyNeeded = perk.totalCostMaxLevel
-        val percentage = (currentAmountSpent  * 100.0 / maxCurrencyNeeded).roundTo(2)
+        val percentage = (currentAmountSpent * 100.0 / maxCurrencyNeeded).roundTo(2)
         val isMaxLevel = perk.rawLevel == perk.maxLevel
         val label = "§7$displayText spent:"
 
@@ -68,8 +68,8 @@ abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val 
             when (currencySpentDesign) {
                 CurrencySpentDesign.NUMBER -> "$label §e${currentAmountSpent.addSeparators()}§7 / §e${maxCurrencyNeeded.addSeparators()}"
                 CurrencySpentDesign.PERCENTAGE -> "$label §e$percentage%§7 of max"
-                CurrencySpentDesign.NUMBER_AND_PERCENTAGE -> "$label " +
-                    "§e${currentAmountSpent.addSeparators()}§7/§e${maxCurrencyNeeded.addSeparators()}§7 (§e$percentage%§7)"
+                CurrencySpentDesign.NUMBER_AND_PERCENTAGE ->
+                    "$label §e${currentAmountSpent.addSeparators()}§7/§e${maxCurrencyNeeded.addSeparators()}§7 (§e$percentage%§7)"
             }
         }
     }
