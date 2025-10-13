@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.util.EnumParticleTypes as ParticleType
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -31,10 +31,10 @@ object HideSlayerSpawnParticles {
 
     }
 
-    enum class SpawnParticles(private val displayName: String, val particle: EnumParticleTypes) {
-        ENCHANT_TABLE("White", EnumParticleTypes.ENCHANTMENT_TABLE),
-        SPELL_WITCH("Purple", EnumParticleTypes.SPELL_WITCH),
-        SPELL_MOB("Slayer Specific", EnumParticleTypes.SPELL_MOB);
+    enum class SpawnParticles(private val displayName: String, val particle: ParticleType) {
+        ENCHANT_TABLE("White", ParticleType.ENCHANTMENT_TABLE),
+        SPELL_WITCH("Purple", ParticleType.SPELL_WITCH),
+        SPELL_MOB("Slayer Specific", ParticleType.SPELL_MOB);
 
         override fun toString() = displayName
     }
