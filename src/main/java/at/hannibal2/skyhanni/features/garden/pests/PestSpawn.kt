@@ -49,7 +49,7 @@ object PestSpawn {
     /**
      * WRAPPED-REGEX-TEST: "  §r§e§lCLICK HERE §eto teleport to the plot!"
      */
-    private val clickToTpPattern by patternGroup.pattern(
+    private val clickToTPPattern by patternGroup.pattern(
         "teleport",
         "\\s*§r§e§lCLICK HERE §eto teleport to the plot!",
     )
@@ -60,19 +60,19 @@ object PestSpawn {
         var blocked = false
 
         onePestPattern.matchMatcher(message) {
-            pestSpawn(1, listOf(group("plot")))
+            spawn(1, listOf(group("plot")))
             blocked = true
         }
         multiplePestsPattern.matchMatcher(message) {
-            pestSpawn(group("amount").toInt(), listOf(group("plot")))
+            spawn(group("amount").toInt(), listOf(group("plot")))
             blocked = true
         }
         offlinePestsPattern.matchMatcher(message) {
-            pestSpawn(null, group("plots").removeColor().split(", ", " and ").toList())
+            spawn(null, group("plots").removeColor().split(", ", " and ").toList())
             // blocked = true
         }
 
-        clickToTpPattern.matchMatcher(message) {
+        clickToTPPattern.matchMatcher(message) {
             if (lastPestSpawnTime.passedSince() < 1.seconds) {
                 blocked = true
             }
@@ -83,10 +83,10 @@ object PestSpawn {
         }
     }
 
-    private fun pestSpawn(amount: Int?, plotNames: List<String>) {
+    private fun spawn(amount: Int?, plotNames: List<String>) {
         PestSpawnEvent(amount, plotNames).post()
 
-        if (amount == null) return // todo make this work with offline pest spawn messages
+        if (amount == null) return // TODO make this work with offline pest spawn messages
         val plotName = plotNames.firstOrNull() ?: error("first plot name is null")
         val pestName = StringUtils.pluralize(amount, "Pest")
         val message = "§e$amount §a$pestName Spawned in §b$plotName§a!"
