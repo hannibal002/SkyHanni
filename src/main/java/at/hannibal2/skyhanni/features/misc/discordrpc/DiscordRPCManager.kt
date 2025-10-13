@@ -67,7 +67,10 @@ object DiscordRPCManager {
     private fun stop() {
         if (!isConnected()) return
         updateDebugStatus("Stopped")
+        // todo discord rpc doesnt connect on 1.21
+        //#if TODO
         client?.disconnect()
+        //#endif
         started = false
     }
 
@@ -215,6 +218,9 @@ object DiscordRPCManager {
     }
 
     private fun startCommand() {
+        // todo discord rpc doesnt connect on 1.21
+        //#if TODO
+
         if (!isEnabled()) {
             ChatUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
             return
@@ -236,6 +242,9 @@ object DiscordRPCManager {
                 "Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer.",
             )
         }
+        //#else
+        //$$ ChatUtils.chat("§cDiscord RPC does not work in 1.21 yet :(")
+        //#endif
     }
 
     private fun updateDebugStatus(message: String, error: Boolean = false) {
