@@ -109,7 +109,7 @@ object PestApi {
     /**
      * REGEX-TEST:  Plots: §r§b4§r§f, §r§b12§r§f, §r§b13§r§f, §r§b18§r§f, §r§b20
      */
-    private val infectedPlotsTablistPattern by patternGroup.pattern(
+    private val infestedPlotsTabListPattern by patternGroup.pattern(
         "tablist.infectedplots",
         "\\sPlots: (?<plots>.*)",
     )
@@ -217,12 +217,14 @@ object PestApi {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
-        infectedPlotsTablistPattern.firstMatcher(event.widget.lines) {
-            val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
-            if (plotList.sorted() == getInfestedPlots().map { it.id }.sorted()) return
+        infestedPlotsTabListPattern.firstMatcher(event.widget.lines) {
+            val tabListPlots = group("plots").removeColor().split(", ").map { it.toInt() }.toSet()
+            val apiPlots = getInfestedPlots().map { it.id }.toSet()
+
+            if (tabListPlots == apiPlots) return
 
             for (plot in GardenPlotApi.plots) {
-                if (plotList.contains(plot.id)) {
+                if (plot.id in tabListPlots) {
                     if (!plot.isPestCountInaccurate && plot.pests == 0) {
                         plot.isPestCountInaccurate = true
                     }
