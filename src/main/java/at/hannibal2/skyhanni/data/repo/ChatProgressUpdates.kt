@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -8,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -24,12 +26,11 @@ import kotlin.time.Duration.Companion.seconds
  * This class allows to log actions and their duration of long, async tasks in chat.
  * Ideally for repo reload.
  */
-class ChatProgressUpdates {
+class ChatProgressUpdates private constructor(val category: ChatProgressCategory, private val chatId: Int) {
     private var startOfFirst: SimpleTimeMark? = null
     private var title: String? = null
 
     private var currentlyRunning = false
-    private var chatId: Int? = null
 
     private val previousSteps = mutableListOf<String>()
 
@@ -56,24 +57,85 @@ class ChatProgressUpdates {
         updates.add(this)
     }
 
+    class ChatProgressCategory(val categoryName: String) {
+        val updates = mutableListOf<ChatProgressUpdates>()
+        var enabled = false
+
+        fun start(label: String): ChatProgressUpdates {
+            val chatId = ChatUtils.getUniqueMessageId()
+            val progress = ChatProgressUpdates(this, chatId)
+            progress.start("$categoryName $label")
+            updates.add(progress)
+            return progress
+        }
+
+        fun toggle() {
+            enabled = !enabled
+            if (enabled) {
+                for (update in updates) {
+                    update.update()
+                    // TODO make it work, ty
+                }
+            } else {
+                ChatUtils.deleteChatMessage(updates.map { it.chatId }.toSet())
+            }
+        }
+
+        fun getStatus(): String {
+            val state = if (enabled) "§aenabled" else "§cdisabled"
+            return "category $categoryName: $state"
+        }
+    }
+
     @SkyHanniModule
     companion object {
 
+        val commandMessageId = ChatUtils.getUniqueMessageId()
+
+        private val categories = mutableListOf<ChatProgressCategory>()
+
+        fun category(categoryName: String): ChatProgressCategory {
+            val category = ChatProgressCategory(categoryName)
+            categories.add(category)
+            return category
+        }
+
         private val updates = mutableListOf<ChatProgressUpdates>()
+
+        @HandleEvent
+        fun onCommandRegistration(event: CommandRegistrationEvent) {
+            event.registerBrigadier("shdebugprogress") {
+                description = "Toggling chat progress updates"
+                category = CommandCategory.DEVELOPER_DEBUG
+                argCallback("category", BrigadierArguments.greedyString(), categories.map { it.categoryName }) { name ->
+                    val category = categories.find { it.categoryName.equals(name, ignoreCase = true) }
+                    if (category == null) {
+                        ChatUtils.userError("no category name found '$name'")
+                        return@argCallback
+                    }
+                    category.toggle()
+                    ChatUtils.chat(category.getStatus())
+                }
+                simpleCallback {
+                    val lines = categories.joinToString("\n") { it.getStatus() }
+                    ChatUtils.chat(lines, messageId = commandMessageId)
+                }
+            }
+        }
 
         @HandleEvent(onlyOnSkyblock = true)
         fun onTick(event: SkyHanniTickEvent) {
-            if (!SkyBlockUtils.debug) return
-            if (event.isMod(2)) {
-                for (update in updates) {
-                    update.testDelayedSending()
-                    if (update.currentlyRunning) {
-                        update.update()
-                    }
+            if (!event.isMod(2)) return
+            for (update in updates.filter { it.isEnabled() }) {
+                update.testDelayedSending()
+                if (update.currentlyRunning) {
+                    update.update()
                 }
             }
         }
     }
+
+    private fun isEnabled() = category.enabled
 
     fun innerProgressStart(max: Int) {
         if (max > 0) {
@@ -94,7 +156,7 @@ class ChatProgressUpdates {
         this.innerProgress = "($percentage% ${min.addSeparators()}/${max.addSeparators()}) "
     }
 
-    fun start(nextStep: String) {
+    private fun start(nextStep: String) {
         statusUpdate(nextStep, Phase.START)
     }
 
@@ -117,7 +179,6 @@ class ChatProgressUpdates {
             }
             currentlyRunning = true
             startOfFirst = SimpleTimeMark.now()
-            chatId = ChatUtils.getUniqueMessageId()
             title = nextStep
         }
         if (phase == Phase.UPDATE) {
@@ -174,7 +235,6 @@ class ChatProgressUpdates {
     private fun update() {
         val title = title ?: error("currentStep is null")
         val currentStep = currentStep ?: error("currentStep is null")
-        val chatId = chatId ?: error("chatId is null: $currentStep")
         val totalTime = startOfFirst?.format() ?: error("startOfFirst is null: $currentStep")
 
         val hover = mutableListOf<String>()
@@ -196,7 +256,7 @@ class ChatProgressUpdates {
         }
 
         val delayedSending = DelayedSending("§e[Debug-Log] §f$text §7(hover for more info)", hover.joinToString("\n"))
-        if (SkyBlockUtils.debug) {
+        if (isEnabled()) {
             delayedSending.send(chatId)
         } else {
             this.delayedSending = delayedSending
@@ -204,7 +264,6 @@ class ChatProgressUpdates {
     }
 
     private fun testDelayedSending() {
-        val chatId = chatId ?: error("chatId is null: $currentStep")
         delayedSending?.let {
             if (MinecraftCompat.localPlayerOrNull != null) {
                 it.send(chatId)
@@ -219,3 +278,4 @@ class ChatProgressUpdates {
         END,
     }
 }
+

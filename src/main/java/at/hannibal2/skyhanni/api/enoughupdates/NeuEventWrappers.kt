@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
@@ -73,8 +74,7 @@ object NeuEventWrappers {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: RepositoryReloadEvent) {
-        val progress = ChatProgressUpdates()
-        progress.start("Reloading NEU Repo bc sh repo reloaded")
+        val progress = EnoughUpdatesRepoManager.progressCategory.start("Reloading bc Sh Repo reloaded")
         EnoughUpdatesRepoManager.reloadLocalRepo(progress)
     }
 }
