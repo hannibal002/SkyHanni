@@ -666,10 +666,12 @@ object IslandGraphs {
             return
         }
 
+        val userReportedReason = args.joinToString(" ")
         sendReportLocation(
             playerPosition,
-            reasonForReport = "Manual reported graph location error",
-            userReason = args.joinToString(" "),
+            reasonForReport = userReportedReason,
+            technicalInfo = "Manual reported graph location error via /shreportlocation",
+            "reason provided by user" to userReportedReason,
         )
     }
 
@@ -681,8 +683,8 @@ object IslandGraphs {
     ) {
         sendReportLocation(
             location,
-            reasonForReport = "Automatic graph location error: $userFacingReason",
-            technicalInfo = technicalInfo,
+            reasonForReport = userFacingReason,
+            technicalInfo = "Automatic graph location error: $technicalInfo",
             extraData = extraData,
         )
     }
@@ -690,7 +692,6 @@ object IslandGraphs {
     private fun sendReportLocation(
         location: LorenzVec,
         reasonForReport: String,
-        userReason: String? = null,
         technicalInfo: String? = null,
         vararg extraData: Pair<String, Any?>,
     ) {
@@ -698,16 +699,15 @@ object IslandGraphs {
         val scoreboardArea = SkyBlockUtils.scoreboardArea ?: "unknown"
 
         val data = mutableMapOf<String, Any?>()
-        userReason?.let {
-            data["reason provided by user"] = it
-        }
         technicalInfo?.let {
             data["technical info"] = it
         }
         data.putAll(extraData.toMap())
         val island = SkyBlockUtils.currentIsland.name
+
+        data["generic data"] = "below"
         data["island"] = island
-        data["location"] = with(location.roundTo(1)) { "/shtestwaypoint $x $y $z pathfind" }
+        data["reported location"] = with(location.roundTo(1)) { "/shtestwaypoint $x $y $z pathfind" }
         if (graphArea != scoreboardArea) {
             data["area graph"] = graphArea.orEmpty()
             data["area scoreboard"] = scoreboardArea
