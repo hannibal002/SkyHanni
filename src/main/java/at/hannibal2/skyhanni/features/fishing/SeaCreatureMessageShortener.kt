@@ -22,7 +22,7 @@ object SeaCreatureMessageShortener {
         if (config.shortenFishingMessage) {
             val name = event.seaCreature.displayName
             val aOrAn = StringUtils.optionalAn(name.removeColor())
-            edited = "§9You caught $aOrAn ${name}§9!"
+            edited = "§9You caught $aOrAn $name§9!"
         }
 
         if (config.compactDoubleHook && event.doubleHook) {
