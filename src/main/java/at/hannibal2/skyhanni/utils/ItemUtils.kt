@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
@@ -308,16 +309,25 @@ object ItemUtils {
 
     fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
 
-    // Checks for the enchantment glint as part of the minecraft enchantments
+    // Checks for the enchantment glint as part of the Minecraft enchantments
     fun ItemStack.isEnchanted(): Boolean =
         //#if MC < 1.21
         isItemEnchanted
     //#else
-    //$$ hasEnchantments() || this.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE) == true
+    //$$ hasGlint()
     //#endif
 
-    // Checks for hypixel enchantments in the attributes
-    fun ItemStack.hasHypixelEnchantments() = getHypixelEnchantments()?.isNotEmpty() ?: false
+    // Checks for Hypixel enchantments in the attributes
+    fun ItemStack.hasHypixelEnchantments(): Boolean =
+        getHypixelEnchantments()?.isNotEmpty() ?: false
+
+    fun ItemStack.addEnchantGlint(): ItemStack = apply {
+        //#if MC < 1.21
+        addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
+        //#else
+        //$$ set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true)
+        //#endif
+    }
 
     fun ItemStack.removeEnchants(): ItemStack = apply {
         //#if MC < 1.21
