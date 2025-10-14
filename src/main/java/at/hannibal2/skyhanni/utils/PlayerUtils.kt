@@ -46,7 +46,7 @@ object PlayerUtils {
         //#if MC < 1.21
         val speed = MinecraftCompat.localPlayer.capabilities.walkSpeed.toDouble()
         //#else
-        //$$ val speed = MinecraftCompat.localPlayer.getAttributeValue(EntityAttributes.MOVEMENT_SPEED)
+        //$$ val speed = MinecraftCompat.localPlayer.getAttributeBaseValue(EntityAttributes.MOVEMENT_SPEED)
         //#endif
 
         // Round to avoid floating point inaccuracies (in-game precision is at most 2 decimals anyway)
