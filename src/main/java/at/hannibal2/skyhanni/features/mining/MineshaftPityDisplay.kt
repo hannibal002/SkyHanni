@@ -9,8 +9,12 @@ import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotmReward
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledFeaturesJson
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
@@ -19,11 +23,14 @@ import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -36,6 +43,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
@@ -87,6 +95,17 @@ object MineshaftPityDisplay {
     private var display = listOf<Renderable>()
 
     private const val MAX_COUNTER = 2000
+
+    private val group = RepoPattern.group("mineshaft.pity")
+
+
+    /**
+     * REGEX-TEST:  Glacite Mineshafts: 124/2,000
+     */
+    private val tabPityPattern by group.pattern(
+        "tablist",
+        " Glacite Mineshafts: (?<pity>[\\d,]+)/2,000",
+    )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
@@ -163,11 +182,31 @@ object MineshaftPityDisplay {
         update()
     }
 
+    private var tablistPity = MAX_COUNTER
+    private var everFoundPityWidget = false
+    private var isWidgetOnMain = true
+
+    @HandleEvent
+    fun onPityWidget(event: WidgetUpdateEvent) {
+        if (!isDisplayEnabled()) return
+        if (!event.isWidget(TabWidget.PITY)) return
+        for (line in event.lines) {
+            val cleanLine = line.removeColor()
+            tabPityPattern.matchMatcher(cleanLine) {
+                everFoundPityWidget = true
+                tablistPity = MAX_COUNTER - group("pity").formatInt()
+            }
+        }
+    }
+
     private fun calculateCounter(): Int {
-        val counter = MAX_COUNTER
+        return tablistPity
+
+        // use old code if hypixel ever fixes it
+        /* val counter = MAX_COUNTER
         if (minedBlocks.isEmpty()) return counter
         val difference = minedBlocks.sumOf { it.pityBlock.getPity() }
-        return (counter - difference).toInt().coerceAtLeast(0)
+        return (counter - difference).toInt().coerceAtLeast(0) */
     }
 
     // if the chance is 1/1500, it will return 1500
@@ -228,9 +267,17 @@ object MineshaftPityDisplay {
             MineshaftPityLine.MINESHAFTS_SESSION to Renderable.text("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
         )
 
+        val renderables = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
+        val renderableList = mutableListOf<Renderable>()
+        if (!everFoundPityWidget && isWidgetOnMain) {
+            renderableList.add(Renderable.text("§cPity Tab Widget Missing"))
+            renderableList.add(Renderable.text("§cDo /tab and enable the pity widget"))
+            renderableList.add(Renderable.text("§cRight click the widget > Click \"Shown Pity\" > Click Glacite Tunnels and enable"))
+        }
+        renderableList.addAll(renderables)
         display = listOf(
             Renderable.vertical(
-                config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] },
+                renderableList,
                 spacing = 2,
             ),
         )
@@ -281,6 +328,13 @@ object MineshaftPityDisplay {
         if (event.newIsland == IslandType.MINESHAFT || event.oldIsland == IslandType.MINESHAFT) {
             resetCounter()
         }
+        everFoundPityWidget = false
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val constant = event.getConstant<DisabledFeaturesJson>("DisabledFeatures")
+        isWidgetOnMain = constant.features?.get("mineshaft_pity") ?: true
     }
 
     private fun isDisplayEnabled() = (MiningApi.inGlacialTunnels() || MiningApi.inDwarvenBaseCamp()) && config.enabled
@@ -317,11 +371,17 @@ object MineshaftPityDisplay {
             2,
             ColoredBlockCompat.LIGHT_BLUE.createWoolStack(),
         ),
-
+        // cant rename enum because config explodes
         GEMSTONE(
-            "Gemstone",
-            OreType.entries.filter { it.isGemstone() },
-            4,
+            "Low Tier Gemstone",
+            OreType.entries.filter { it.isLowTierGemstone() },
+            8,
+            ColoredBlockCompat.RED.createGlassStack(),
+        ),
+        HIGH_TIER_GEMSTONE(
+            "High Tier Gemstone",
+            OreType.entries.filter { it.isHighTierGemstone() },
+            10,
             ColoredBlockCompat.BLUE.createGlassStack(),
         ),
         GLACITE(
