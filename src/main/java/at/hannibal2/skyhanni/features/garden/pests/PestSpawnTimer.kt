@@ -105,7 +105,7 @@ object PestSpawnTimer {
         }
     }
 
-    @HandleEvent(PestSpawnEvent::class, onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(PestSpawnEvent::class)
     fun onPestSpawn() {
         shouldRepeatWarning = false
         val spawnTime = lastPestSpawnTime.passedSince()
@@ -131,7 +131,7 @@ object PestSpawnTimer {
         config.position.renderRenderables(display, posLabel = "Pest Spawn Timer")
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent
     fun onCropBreak(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK) return
         val timeDiff = lastCropBrokenTime.passedSince()
