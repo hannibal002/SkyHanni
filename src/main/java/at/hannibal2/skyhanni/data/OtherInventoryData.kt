@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
@@ -25,12 +24,15 @@ object OtherInventoryData {
     private var acceptItems = false
     private var lateEvent: InventoryUpdatedEvent? = null
 
+    val currentInventoryName: String
+        get() = currentInventory?.title ?: ""
+
     @HandleEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
         close()
     }
 
-    fun close(title: String = InventoryUtils.openInventoryName(), reopenSameName: Boolean = false) {
+    fun close(title: String = currentInventoryName, reopenSameName: Boolean = false) {
         InventoryCloseEvent(title, reopenSameName).post()
         currentInventory = null
     }
