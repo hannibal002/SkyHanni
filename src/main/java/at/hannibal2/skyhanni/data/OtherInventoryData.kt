@@ -27,7 +27,7 @@ object OtherInventoryData {
     private var lateEvent: InventoryUpdatedEvent? = null
 
     val currentInventoryName: String
-        get() = currentInventory?.title ?: ""
+        get() = currentInventory?.title.orEmpty()
 
     @HandleEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
