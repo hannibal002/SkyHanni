@@ -87,8 +87,13 @@ object UpdateManager {
     fun checkUpdate(forceDownload: Boolean = false, forcedUpdateStream: UpdateStream = config.updateStream.get()) {
         var updateStream = forcedUpdateStream
         if (updateState != UpdateState.NONE) {
-            logger.log("Trying to perform update check while another update is already in progress")
-            return
+            if (updateState == UpdateState.AVAILABLE && forceDownload) {
+                updateState = UpdateState.NONE
+                logger.log("Resetting update state to force download")
+            } else {
+                logger.log("Trying to perform update check while another update is already in progress")
+                return
+            }
         }
         logger.log("Starting update check")
         val currentStream = config.updateStream.get()
