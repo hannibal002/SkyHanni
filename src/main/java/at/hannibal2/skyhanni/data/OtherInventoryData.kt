@@ -13,7 +13,9 @@ import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
 //#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 //$$ import at.hannibal2.skyhanni.test.command.ErrorManager
+//$$ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket
 //$$ import net.minecraft.screen.ScreenHandlerType
 //#endif
 
@@ -31,6 +33,15 @@ object OtherInventoryData {
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
         close()
     }
+
+    //#if MC > 1.21
+    //$$ @HandleEvent
+    //$$ fun onPacketSent(event: PacketSentEvent) {
+    //$$     if (event.packet is CloseHandledScreenC2SPacket) {
+    //$$         close()
+    //$$     }
+    //$$ }
+    //#endif
 
     fun close(title: String = currentInventoryName, reopenSameName: Boolean = false) {
         InventoryCloseEvent(title, reopenSameName).post()
