@@ -184,7 +184,6 @@ object MineshaftPityDisplay {
 
     private var tablistPity = MAX_COUNTER
     private var everFoundPityWidget = false
-    private var isWidgetOnMain = true
 
     @HandleEvent
     fun onPityWidget(event: WidgetUpdateEvent) {
@@ -269,7 +268,7 @@ object MineshaftPityDisplay {
 
         val renderables = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
         val renderableList = mutableListOf<Renderable>()
-        if (!everFoundPityWidget && isWidgetOnMain) {
+        if (!everFoundPityWidget) {
             renderableList.add(Renderable.text("§cPity Tab Widget Missing"))
             renderableList.add(Renderable.text("§cDo /tab and enable the pity widget"))
             renderableList.add(Renderable.text("§cRight click the widget > Click \"Shown Pity\" > Click Glacite Tunnels and enable"))
@@ -329,12 +328,6 @@ object MineshaftPityDisplay {
             resetCounter()
         }
         everFoundPityWidget = false
-    }
-
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val constant = event.getConstant<DisabledFeaturesJson>("DisabledFeatures")
-        isWidgetOnMain = constant.features?.get("mineshaft_pity") ?: true
     }
 
     private fun isDisplayEnabled() = (MiningApi.inGlacialTunnels() || MiningApi.inDwarvenBaseCamp()) && config.enabled
