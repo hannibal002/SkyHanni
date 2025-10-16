@@ -136,7 +136,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 val progress = ChatProgressUpdates()
                 progress.start("Reloading the local $commonName repo via /$reloadCommand")
                 reloadLocalRepo(progress)
-                progress.end("done with /$reloadCommand")
             }
         }
     }
