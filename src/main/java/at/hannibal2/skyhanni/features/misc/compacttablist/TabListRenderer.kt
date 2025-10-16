@@ -179,7 +179,7 @@ object TabListRenderer {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
                         val texture = playerInfo.locationSkin
-                        //#if MC > 1.21.7
+                        //#if MC > 1.21.8
                         //$$ .id()
                         //#endif
                         //#if MC < 1.21

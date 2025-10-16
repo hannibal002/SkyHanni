@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import java.util.UUID
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import com.google.common.collect.ImmutableMultimap
 //$$ import com.mojang.authlib.properties.PropertyMap
 //#endif

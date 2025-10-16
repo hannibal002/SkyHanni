@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiScreen
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
 //#endif
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import net.minecraft.client.gui.Click
 //$$ import net.minecraft.client.input.CharInput
 //$$ import net.minecraft.client.input.KeyInput

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import net.minecraft.entity.Entity
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import net.minecraft.client.render.entity.state.EntityRenderState
 //#endif
 

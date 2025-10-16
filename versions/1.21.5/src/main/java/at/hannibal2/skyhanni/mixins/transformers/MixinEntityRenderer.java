@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -50,7 +50,7 @@ public class MixinEntityRenderer {
         }
     }
 
-    //#if MC > 1.21.7
+    //#if MC > 1.21.8
     //$$ @WrapOperation(method = "updateRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"))
     //$$ public boolean shouldAlsoGlow(MinecraftClient instance, Entity entity, Operation<Boolean> original) {
     //$$     Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);

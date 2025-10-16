@@ -22,7 +22,7 @@ import org.lwjgl.input.Mouse
 //#else
 //$$ import net.minecraft.client.util.InputUtil
 //#endif
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import net.minecraft.client.input.KeyInput
 //#endif
 

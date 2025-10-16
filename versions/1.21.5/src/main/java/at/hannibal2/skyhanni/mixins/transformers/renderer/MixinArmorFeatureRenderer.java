@@ -11,7 +11,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 //$$ import net.minecraft.client.render.entity.state.BipedEntityRenderState;
 //#endif

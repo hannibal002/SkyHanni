@@ -79,7 +79,7 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.component.type.ProfileComponent
 //$$ import net.minecraft.registry.Registries
 //#endif
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import com.google.common.collect.ImmutableMultimap
 //$$ import com.mojang.authlib.properties.PropertyMap
 //#endif

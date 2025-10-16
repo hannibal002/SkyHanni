@@ -25,7 +25,7 @@ import net.minecraft.util.Identifier
 //$$ import org.joml.Matrix4f
 //$$ import org.joml.Vector4f
 //#endif
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import org.joml.Vector3f
 //#endif
 

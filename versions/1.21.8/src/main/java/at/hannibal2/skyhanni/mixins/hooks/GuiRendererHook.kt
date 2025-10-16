@@ -15,7 +15,7 @@ import com.mojang.blaze3d.systems.RenderPass
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.render.state.GlyphGuiElementRenderState
 import net.minecraft.client.gui.render.state.SimpleGuiElementRenderState
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import net.minecraft.client.font.BakedGlyphImpl.DrawnGlyph
 //#endif
 

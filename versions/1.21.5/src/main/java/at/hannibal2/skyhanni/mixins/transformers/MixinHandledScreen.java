@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import net.minecraft.client.gui.Click;
 //$$ import net.minecraft.client.input.KeyInput;
 //#endif

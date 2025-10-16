@@ -13,7 +13,7 @@ import net.minecraft.client.util.SkinTextures;
 import net.minecraft.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import org.spongepowered.asm.mixin.injection.ModifyArg;
 //#endif
 

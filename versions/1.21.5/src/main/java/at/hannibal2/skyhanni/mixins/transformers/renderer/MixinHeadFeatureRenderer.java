@@ -10,7 +10,7 @@ import net.minecraft.client.render.entity.feature.HeadFeatureRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 //#endif
 

@@ -19,7 +19,7 @@ import net.minecraft.client.render.RenderLayer.MultiPhase
 //$$ import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
 //$$ import org.joml.Vector4f
 //#endif
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import org.joml.Vector3f
 //#endif
 

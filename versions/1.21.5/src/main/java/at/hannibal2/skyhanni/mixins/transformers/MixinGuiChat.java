@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import net.minecraft.client.gui.Click;
 //#endif
 

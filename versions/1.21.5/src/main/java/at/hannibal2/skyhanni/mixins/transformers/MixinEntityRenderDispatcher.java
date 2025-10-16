@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//#if MC > 1.21.7
+//#if MC > 1.21.8
 //$$ import net.minecraft.client.render.state.CameraRenderState;
 //$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 //#endif
