@@ -59,7 +59,7 @@ enum class TabWidget(
     ),
     PROFILE(
         // language=RegExp
-        "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*",
+        "(?:§.)+Profile: §r§.(?<profile>[\\w\\s]+[^ §]).*",
     ),
     SB_LEVEL(
         // language=RegExp
@@ -366,6 +366,14 @@ enum class TabWidget(
     STARBORN_TEMPLE(
         // language=RegExp
         "§9§lStarborn Temple:",
+    ),
+    PITY(
+        // language=RegExp
+        "§d§lPity:",
+    ),
+    PICKAXE_COOLDOWN(
+        // language=RegExp
+        "§9§lPickaxe Ability:",
     ),
     ;
 

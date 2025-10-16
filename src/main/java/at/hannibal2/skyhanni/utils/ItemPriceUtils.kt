@@ -182,7 +182,11 @@ object ItemPriceUtils {
     }
 
     fun Number.formatCoin(gray: Boolean = false): String {
-        val color = if (gray) "§7" else "§6"
+        val color = when {
+            gray -> "§7"
+            this.toDouble() < 0 -> "§c"
+            else -> "§6"
+        }
         return color + shortFormat()
     }
 

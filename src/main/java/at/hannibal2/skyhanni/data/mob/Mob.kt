@@ -88,6 +88,8 @@ class Mob(
 
     val owner: MobUtils.OwnerShip?
 
+    val ownerNameOrEmpty: String get() = owner?.ownerName.orEmpty()
+
     companion object {
 
         fun Entity?.belongsToPlayer(): Boolean = this?.mob.belongsToPlayer()
