@@ -15,6 +15,7 @@ import net.minecraft.util.EnumParticleTypes as ParticleType
 @SkyHanniModule
 object HideSlayerSpawnParticles {
     private val config get() = SlayerApi.config
+
     @Suppress("VarCouldBeVal")
     private var mobRecentDeaths = mutableListOf<Pair<LorenzVec, SimpleTimeMark>>()
 
@@ -23,19 +24,33 @@ object HideSlayerSpawnParticles {
         if (!SlayerApi.hasActiveQuest() || !SlayerApi.isInCorrectArea) return
         val distance = event.location.distanceToNearestDeadMob() ?: return
         if (distance < 5) {
+
             ChatUtils.debug(config.spawnParticleHider.get().toString())
-            if (config.spawnParticleHider.get().any { it.particle == event.type }) {
+            if (shouldHide(event.type)) {
                 event.cancel()
             }
         }
     }
 
-    enum class SpawnParticles(private val displayName: String, val particle: ParticleType) {
-        ENCHANT_TABLE("White", ParticleType.ENCHANTMENT_TABLE),
-        SPELL_WITCH("Purple", ParticleType.SPELL_WITCH),
-        SPELL_MOB("Slayer Specific", ParticleType.SPELL_MOB);
+    enum class SpawnParticles(private val displayName: String) {
+        ENCHANT_TABLE("White"),
+        SPELL_WITCH("Purple"),
+        SPELL_MOB("Slayer Specific");
 
         override fun toString() = displayName
+    }
+
+    @Suppress("MaxLineLength")
+    private fun shouldHide(particle: ParticleType): Boolean {
+        if (config.spawnParticleHider.get().contains(SpawnParticles.ENCHANT_TABLE) && particle.particleID == ParticleType.ENCHANTMENT_TABLE.particleID
+        ) {
+            return true
+        }
+        if (config.spawnParticleHider.get().contains(SpawnParticles.SPELL_WITCH) && particle.particleID == ParticleType.SPELL_WITCH.particleID
+        ) {
+            return true
+        }
+        return config.spawnParticleHider.get().contains(SpawnParticles.SPELL_MOB) && particle.particleID == ParticleType.SPELL_MOB.particleID
     }
 
     @HandleEvent(onlyOnSkyblock = true)
