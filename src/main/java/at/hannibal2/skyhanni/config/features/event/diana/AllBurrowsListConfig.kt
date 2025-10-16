@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.event.diana
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -11,6 +12,7 @@ class AllBurrowsListConfig {
         desc = "Save the location of every found burrow in a locally stored list."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var save: Boolean = true
 
     @Expose
