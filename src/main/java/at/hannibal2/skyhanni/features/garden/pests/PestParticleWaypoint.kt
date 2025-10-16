@@ -33,7 +33,6 @@ object PestParticleWaypoint {
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
 
     private val bezierFitter = ParticlePathBezierFitter(3)
-    private const val FIREWORK_ID = 76
 
     private var lastPestTrackerUse = SimpleTimeMark.farPast()
     private var lastParticle = SimpleTimeMark.farPast()
