@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.utils.render
 
-import com.mojang.blaze3d.textures.GpuTexture
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.OutlineVertexConsumerProvider
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.render.VertexConsumerProvider
-//#if MC > 1.21.6
+//#if MC < 1.21.6
+import com.mojang.blaze3d.textures.GpuTexture
+//#else
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import com.mojang.blaze3d.textures.GpuTextureView
 //#endif

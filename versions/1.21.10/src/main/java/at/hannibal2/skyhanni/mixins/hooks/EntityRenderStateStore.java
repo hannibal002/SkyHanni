@@ -6,4 +6,7 @@ public interface EntityRenderStateStore {
 
     void skyhanni$setEntity(Entity entity);
     Entity skyhanni$getEntity();
+
+    void skyhanni$setUsingCustomOutline();
+    boolean skyhanni$isUsingCustomOutline();
 }

@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+//$$ import com.llamalad7.mixinextras.sugar.Local;
 //$$ import net.minecraft.client.MinecraftClient;
 //$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 //$$ import net.minecraft.client.render.state.CameraRenderState;
@@ -52,11 +53,12 @@ public class MixinEntityRenderer {
 
     //#if MC > 1.21.8
     //$$ @WrapOperation(method = "updateRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"))
-    //$$ public boolean shouldAlsoGlow(MinecraftClient instance, Entity entity, Operation<Boolean> original) {
+    //$$ public boolean shouldAlsoGlow(MinecraftClient instance, Entity entity, Operation<Boolean> original, @Local(argsOnly = true) EntityRenderState state) {
     //$$     Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
     //$$     if (glowColor == null) {
     //$$         return original.call(instance, entity);
     //$$     }
+    //$$     ((EntityRenderStateStore) state).skyhanni$setUsingCustomOutline();
     //$$     return true;
     //$$ }
     //$$

@@ -12,6 +12,9 @@ public class MixinEntityRenderState implements EntityRenderStateStore {
     @Unique
     Entity skyhanni$savedEntity = null;
 
+    @Unique
+    boolean skyhanni$usingCustomOutline = false;
+
     @Override
     public void skyhanni$setEntity(Entity entity) {
         skyhanni$savedEntity = entity;
@@ -21,4 +24,15 @@ public class MixinEntityRenderState implements EntityRenderStateStore {
     public Entity skyhanni$getEntity() {
         return skyhanni$savedEntity;
     }
+
+    @Override
+    public void skyhanni$setUsingCustomOutline() {
+        skyhanni$usingCustomOutline = true;
+    }
+
+    @Override
+    public boolean skyhanni$isUsingCustomOutline() {
+        return skyhanni$usingCustomOutline;
+    }
+
 }
