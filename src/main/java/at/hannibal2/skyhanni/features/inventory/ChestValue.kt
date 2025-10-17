@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.data.IslandType
@@ -276,5 +277,5 @@ object ChestValue {
         val tips: List<String>,
     )
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.CHEST_VALUE.isSelected()) && config.enabled
 }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
@@ -360,7 +361,7 @@ object ItemPickupLog {
 
     private fun worldChangeCooldown(): Boolean = SkyBlockUtils.lastWorldSwitch.passedSince() > 2.seconds
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.ITEM_PICKUP_LOG.isSelected()) && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

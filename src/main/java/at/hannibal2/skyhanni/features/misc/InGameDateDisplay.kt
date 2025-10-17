@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -82,8 +83,8 @@ object InGameDateDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.position.renderString(display, posLabel = "In-game Date Display")
+        config.position.renderString(display, posLabel = "In-Game Date Display")
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
+    fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.IN_GAME_DATE_DISPLAY.isSelected()) && config.enabled
 }

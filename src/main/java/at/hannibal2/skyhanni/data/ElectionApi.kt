@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.ElectionCandidate.Companion.getMayorFromPerk
 import at.hannibal2.skyhanni.data.ElectionCandidate.Companion.setAssumeMayorJson
 import at.hannibal2.skyhanni.data.Perk.Companion.getPerkFromName
@@ -124,14 +125,14 @@ object ElectionApi {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!SkyBlockUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MAYOR_OVERLAY.isSelected()) return
         if (event.repeatSeconds(2)) {
             checkHypixelApi()
             getTimeTillNextMayor()
         }
 
         @Suppress("InSkyBlockEarlyReturn")
-        if (!SkyBlockUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.MAYOR_OVERLAY.isSelected()) return
         if (!ElectionCandidate.JERRY.isActive()) return
         if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast()) {
             jerryExtraMayor = null to SimpleTimeMark.farPast()

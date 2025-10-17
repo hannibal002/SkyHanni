@@ -38,7 +38,8 @@ class StereoHarmonyConfig {
     @Expose
     @ConfigOption(name = "Replace Menu Icons", desc = "Show pest crops instead of music discs in the selector menu.")
     @ConfigEditorBoolean
-    var replaceMenuIcons: Boolean = true
+    @FeatureToggle
+    var replaceMenuIcons: Boolean = false
 
     @Expose
     @ConfigLink(owner = StereoHarmonyConfig::class, field = "displayEnabled")

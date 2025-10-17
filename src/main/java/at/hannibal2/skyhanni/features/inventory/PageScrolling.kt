@@ -52,7 +52,7 @@ object PageScrolling {
 
     // these checks are to prevent cheat-like behaviour, where the player could scroll through the inventory without any delay
     // currentlyScrollable is the primary check, to see if the player is currently able to scroll,
-    // with cooldown beeing a fallback to still allow for scrolling if currentlyScrollable is stuck
+    // with cooldown being a fallback to still allow for scrolling if currentlyScrollable is stuck
     private var currentlyScrollable = false
     private var cooldown = SimpleTimeMark.farPast()
 
