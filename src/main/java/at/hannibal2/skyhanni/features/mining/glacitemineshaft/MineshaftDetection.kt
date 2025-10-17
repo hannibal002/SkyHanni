@@ -138,7 +138,7 @@ object MineshaftDetection {
         AQUA_C(LorenzColor.DARK_BLUE, "Aquamarine Crystal"),
         CITR_1(LorenzColor.YELLOW, "Citrine 1"),
         CITR_2(LorenzColor.YELLOW, "Citrine 2"),
-        CITR_C(LorenzColor.YELLOW, "Citrine Crytsal"),
+        CITR_C(LorenzColor.YELLOW, "Citrine Crystal"),
         PERI_1(LorenzColor.DARK_GREEN, "Peridot 1"),
         PERI_2(LorenzColor.DARK_GREEN, "Peridot 2"),
         PERI_C(LorenzColor.DARK_GREEN, "Peridot Crystal"),
