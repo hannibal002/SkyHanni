@@ -16,9 +16,13 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object DianaApi {
 
-    private val spade = "ANCESTRAL_SPADE".toInternalName()
+    private val ancestralSpade = "ANCESTRAL_SPADE".toInternalName()
+    private val archaicSpade = "ARCHAIC_SPADE".toInternalName()
+    private val deificSpade = "DEIFIC_SPADE".toInternalName()
 
-    fun hasSpadeInHand() = InventoryUtils.itemInHandId == spade
+    private val spades = setOf(ancestralSpade, archaicSpade, deificSpade)
+
+    fun hasSpadeInHand() = InventoryUtils.itemInHandId in spades
 
     private fun isRitualActive() = Perk.MYTHOLOGICAL_RITUAL.isActive ||
         Perk.PERKPOCALYPSE.isActive
@@ -27,7 +31,7 @@ object DianaApi {
 
     fun isDoingDiana() = IslandType.HUB.isCurrent() && isRitualActive() && hasSpadeInInventory()
 
-    val ItemStack.isDianaSpade get() = getInternalName() == spade
+    val ItemStack.isDianaSpade get() = getInternalName() in spades
 
     private fun hasSpadeInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isDianaSpade }
 
