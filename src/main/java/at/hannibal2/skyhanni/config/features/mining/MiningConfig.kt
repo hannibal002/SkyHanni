@@ -140,13 +140,6 @@ class MiningConfig {
     var crystalHollowsNamesInCore: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Private Island Ability Block", desc = "Block the mining ability when on private island.")
-    @SearchTag("Pickaxe Pickobulus")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var privateIslandNoPickaxeAbility: Boolean = true
-
-    @Expose
     @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlight golden goblins you have spawned in green.")
     @ConfigEditorBoolean
     @FeatureToggle
