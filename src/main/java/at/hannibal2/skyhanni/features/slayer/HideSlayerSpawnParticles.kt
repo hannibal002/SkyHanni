@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import kotlin.time.Duration.Companion.seconds
-import net.minecraft.util.EnumParticleTypes as ParticleType
 
 @SkyHanniModule
 object HideSlayerSpawnParticles {
@@ -26,32 +25,40 @@ object HideSlayerSpawnParticles {
         if (distance < 5) {
 
             ChatUtils.debug(config.spawnParticleHider.get().toString())
-            if (shouldHide(event.type)) {
+            if (config.spawnParticleHider.get().any { it.particle.check(event) }) {
                 event.cancel()
             }
         }
     }
 
-    enum class SpawnParticles(private val displayName: String) {
-        ENCHANT_TABLE("White"),
-        SPELL_WITCH("Purple"),
-        SPELL_MOB("Slayer Specific");
+    enum class SpawnParticles(private val displayName: String, val particle: FakeParticleType) {
+        ENCHANT_TABLE("White", FakeParticleType.ENCHANT),
+        SPELL_WITCH("Purple", FakeParticleType.WITCH),
+        SPELL_MOB("Slayer Specific", FakeParticleType.SPECIFIC);
 
         override fun toString() = displayName
     }
 
-    @Suppress("MaxLineLength")
-    private fun shouldHide(particle: ParticleType): Boolean {
-        if (config.spawnParticleHider.get().contains(SpawnParticles.ENCHANT_TABLE) && particle.particleID == ParticleType.ENCHANTMENT_TABLE.particleID
-        ) {
-            return true
-        }
-        if (config.spawnParticleHider.get().contains(SpawnParticles.SPELL_WITCH) && particle.particleID == ParticleType.SPELL_WITCH.particleID
-        ) {
-            return true
-        }
-        return config.spawnParticleHider.get().contains(SpawnParticles.SPELL_MOB) && particle.particleID == ParticleType.SPELL_MOB.particleID
+    // TODO This is literally just copied from GriffinBurrowParticleFinder, should be ParticleUtils in the future
+    enum class FakeParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
+        ENCHANT(
+            {
+                type == net.minecraft.util.EnumParticleTypes.ENCHANTMENT_TABLE
+            },
+        ),
+        WITCH(
+            {
+                type == net.minecraft.util.EnumParticleTypes.SPELL_WITCH
+            },
+        ),
+        SPECIFIC(
+            {
+                type == net.minecraft.util.EnumParticleTypes.SPELL_MOB
+            },
+        )
+
     }
+
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
