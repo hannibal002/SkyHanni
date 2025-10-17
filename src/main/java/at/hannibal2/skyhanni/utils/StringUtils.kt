@@ -50,6 +50,7 @@ object StringUtils {
     fun String.removeResets(): String = resetPattern.matcher(this).replaceAll("")
     fun String.removeSFormattingCode(): String = sFormattingPattern.matcher(this).replaceAll("")
     fun String.removeNonAsciiNonColorCode(): String = asciiWithColorCodePattern.matcher(this).replaceAll("")
+    fun String.removeFormattingCodes(): String = minecraftColorCodesPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
         return this.lowercase(Locale.getDefault())

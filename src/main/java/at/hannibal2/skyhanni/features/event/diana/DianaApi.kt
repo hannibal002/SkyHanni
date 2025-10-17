@@ -4,23 +4,22 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MythologicalCreatureType
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object DianaApi {
 
-    private val ancestralSpade = "ANCESTRAL_SPADE".toInternalName()
-    private val archaicSpade = "ARCHAIC_SPADE".toInternalName()
-    private val deificSpade = "DEIFIC_SPADE".toInternalName()
-
-    private val spades = setOf(ancestralSpade, archaicSpade, deificSpade)
+    private var spades = emptySet<NeuInternalName>()
 
     fun hasSpadeInHand() = InventoryUtils.itemInHandId in spades
 
@@ -35,10 +34,29 @@ object DianaApi {
 
     private fun hasSpadeInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isDianaSpade }
 
+    var mythologicalCreatures = emptyMap<String, MythologicalCreatureType>()
+        private set
+
+    fun getCreatureByTrackerName(name: String) = mythologicalCreatures.firstNotNullOfOrNull { (_, creature) ->
+        if (creature.trackerId == name) creature else null
+    }
+
+    var sphinxQuestions = emptyMap<String, String>()
+        private set
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<EntityOtherPlayerMP>) {
         if (event.entity.name == "Minos Inquisitor") {
             InquisitorFoundEvent(event.entity).post()
         }
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val dianaJson = event.getConstant<DianaJson>("Diana")
+
+        mythologicalCreatures = dianaJson.mythologicalCreatures
+        sphinxQuestions = dianaJson.sphinxQuestions
+        spades = dianaJson.spadeTypes.toSet()
     }
 }
