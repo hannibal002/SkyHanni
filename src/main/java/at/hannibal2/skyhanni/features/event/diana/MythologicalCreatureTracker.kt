@@ -37,9 +37,13 @@ object MythologicalCreatureTracker {
 
     private val patternGroup = RepoPattern.group("event.diana.mythological.tracker")
 
+    /**
+     * REGEX-TEST: §c§lUh oh! §r§eYou dug out a §r§2Gaia Construct§r§e!
+     * REGEX-TEST: §c§lOi! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
+     */
     private val genericMythologicalSpawnPattern by patternGroup.pattern(
         "generic",
-        ".* §r§eYou dug out a (?:§[a-f0-9r])*(?<creatureType>[a-z\\s]+)§r§e!",
+        ".* §r§eYou dug out a (?:§[a-f0-9r])*(?<creatureType>[\\w\\s]+)§r§e!",
     )
 
     private val tracker = SkyHanniTracker(
@@ -172,9 +176,14 @@ object MythologicalCreatureTracker {
     private fun fixData(jsonElement: JsonElement): JsonElement {
         println(jsonElement)
         val jsonObject = jsonElement.asJsonObject
-        jsonObject.add("since", ConfigManager.gson.toJsonTree(mapOf(
-            "MINOS_INQUISITOR" to jsonObject.get("creaturesSinceLastInquisitor").asInt
-        )))
+        jsonObject.add(
+            "since",
+            ConfigManager.gson.toJsonTree(
+                mapOf(
+                    "MINOS_INQUISITOR" to jsonObject.get("creaturesSinceLastInquisitor").asInt
+                )
+            )
+        )
         jsonObject.remove("creaturesSinceLastInquisitor")
         return jsonElement
     }
