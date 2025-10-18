@@ -35,7 +35,7 @@ object GardenBpsTracker {
         trackerConfig = { config.perTrackerConfig }
     )
 
-    class TimedData : TimedTrackerData<Data, SessionUptime.Garden>({ Data() })
+    class TimedData : TimedTrackerData<Data>({ Data() })
 
     class Data : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class) {
         @Expose
