@@ -13,8 +13,7 @@ class MineshaftPityDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Enable Display",
-        desc = "Enable the Mineshaft Pity Display. " +
-            "§eMight not work at all due to Hypixel not sending sound data anymore.",
+        desc = "Enable the Mineshaft Pity Display."
     )
     @ConfigEditorBoolean
     @FeatureToggle

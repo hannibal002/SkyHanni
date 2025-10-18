@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
@@ -18,7 +20,9 @@ object SeaCreatureMessageShortener {
         var edited = original
 
         if (config.shortenFishingMessage) {
-            edited = "§9You caught a ${event.seaCreature.displayName}§9!"
+            val name = event.seaCreature.displayName
+            val aOrAn = StringUtils.optionalAn(name.removeColor())
+            edited = "§9You caught $aOrAn $name§9!"
         }
 
         if (config.compactDoubleHook && event.doubleHook) {
