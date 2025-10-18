@@ -6,12 +6,10 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
-import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-
 //#if FABRIC
 //$$ import net.minecraft.screen.slot.SlotActionType
 //$$ import at.hannibal2.skyhanni.compat.ReiCompat
@@ -57,18 +55,6 @@ val GuiChest.container: Container
 //#endif
 
 object InventoryCompat {
-
-    // TODO add cache that persists until the next gui/window open/close packet is sent/received
-    fun getOpenChestName(): String {
-        val currentScreen = Minecraft.getMinecraft().currentScreen
-        //#if MC < 1.16
-        if (currentScreen !is GuiChest) return ""
-        val value = currentScreen.inventorySlots as ContainerChest
-        return value.lowerChestInventory?.displayName?.unformattedText.orEmpty()
-        //#else
-        //$$ return currentScreen?.title.formattedTextCompat()
-        //#endif
-    }
 
     fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int, mode: Int) {
         windowId ?: return
