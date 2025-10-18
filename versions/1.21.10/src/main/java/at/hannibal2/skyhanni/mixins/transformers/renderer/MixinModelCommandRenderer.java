@@ -26,7 +26,7 @@ public class MixinModelCommandRenderer {
     }
 
     @WrapOperation(method = "render(Lnet/minecraft/client/render/command/OrderedRenderCommandQueueImpl$ModelCommand;Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/render/OutlineVertexConsumerProvider;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/OutlineVertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;"))
-    private VertexConsumer getSkyHanniOutlineBuffer2(OutlineVertexConsumerProvider outlineConsumer, RenderLayer layer, Operation<VertexConsumer> original, @Local(argsOnly = true) OrderedRenderCommandQueueImpl.ModelCommand<?> model) {
+    private VertexConsumer getSkyHanniOutlineBuffer(OutlineVertexConsumerProvider outlineConsumer, RenderLayer layer, Operation<VertexConsumer> original, @Local(argsOnly = true) OrderedRenderCommandQueueImpl.ModelCommand<?> model) {
         if (model.state() instanceof EntityRenderStateStore currentState && currentState.skyhanni$isUsingCustomOutline()) {
             return original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), layer);
         } else {
