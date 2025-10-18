@@ -98,13 +98,15 @@ object ChatFilter {
         "§eWelcome to §r§aHypixel SkyBlock§r§e!",
     )
 
-    // Guild EXP
+    // Guild & Event EXP
     /**
      * REGEX-TEST: §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
      * REGEX-TEST: §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
+     * REGEX-TEST: §aYou earned §r§510 Event EXP §r§afrom playing SkyBlock!
      */
-    private val guildExpPatterns = listOf(
-        "§aYou earned §r§2.* GEXP (§r§a\\+ §r§.* Event EXP )?§r§afrom playing SkyBlock!".toPattern(),
+    @Suppress("MaxLineLength")
+    private val guildEventExpPatterns = listOf(
+        "§aYou earned §r§[0-9a-f][\\d,]+ (?:GEXP|Event EXP) (?:§r§a\\+ §r§[0-9a-f][\\d,]+ Event EXP )?§r§afrom playing SkyBlock!".toPattern(),
     )
 
     // Kill Combo
@@ -500,7 +502,7 @@ object ChatFilter {
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
-        "guild_exp" to guildExpPatterns,
+        "guild_event_exp" to guildEventExpPatterns,
         "kill_combo" to killComboPatterns,
         "slayer" to slayerPatterns,
         "slayer_drop" to slayerDropPatterns,
@@ -583,7 +585,7 @@ object ChatFilter {
         config.empty && StringUtils.isEmpty(message) -> "empty"
         config.warping && message.isPresent("warping") -> "warping"
         config.welcome && message.isPresent("welcome") -> "welcome"
-        config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
+        config.guildEventExp && message.isPresent("guild_event_exp") -> "guild_event_exp"
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
@@ -722,5 +724,6 @@ object ChatFilter {
         }
         event.move(61, "chat.filterType.powderMiningFilter", "chat.filterType.powderMining")
         event.move(61, "chat.filterType.gemstoneFilterConfig", "chat.filterType.powderMining.gemstone")
+        event.move(107, "chat.filterType.guildExp", "chat.filterType.guildEventExp")
     }
 }

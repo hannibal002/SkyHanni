@@ -60,7 +60,7 @@ object HypixelBazaarFetcher {
     fun onTick() {
         if (!canFetch()) return
         if (ApiUtils.isBazaarDisabled()) return
-        SkyHanniMod.launchIOCoroutine("bazaar api fetch") {
+        SkyHanniMod.launchIOCoroutine("bazaar api fetch", timeout = 1.minutes) {
             fetchAndProcessBazaarData()
         }
     }

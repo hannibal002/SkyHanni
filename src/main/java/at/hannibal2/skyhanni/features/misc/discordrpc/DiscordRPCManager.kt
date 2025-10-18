@@ -32,6 +32,7 @@ import dev.cbyrne.kdiscordipc.data.activity.Activity
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -193,7 +194,7 @@ object DiscordRPCManager {
         if (SkyBlockUtils.inSkyBlock) {
             // todo discord rpc doesnt connect on 1.21
             //#if TODO
-            SkyHanniMod.launchNoScopeCoroutine("discord rpc start") { start() }
+            SkyHanniMod.launchNoScopeCoroutine("discord rpc start", timeout = INFINITE) { start() }
             //#endif
             started = true
         }
