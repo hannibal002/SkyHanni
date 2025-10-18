@@ -127,8 +127,9 @@ object ProfileStorageData {
         val foundSkyBlockTabList = TabWidget.AREA.isActive
         if (foundSkyBlockTabList) {
             ChatUtils.clickableChat(
-                "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
-                    "This is needed for the mod to function! And therefore this warning cannot be disabled",
+                "§cCan not read profile name from tab list! Open /widget, enable the Profile Widget, " +
+                    "and give it high enough priority so that it is visible in tab list. " +
+                    "This is needed for the mod to function and therefore this warning cannot be disabled!",
                 onClick = {
                     HypixelCommands.widget()
                 },
