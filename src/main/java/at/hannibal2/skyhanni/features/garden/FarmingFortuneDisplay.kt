@@ -73,7 +73,7 @@ object FarmingFortuneDisplay {
     @Suppress("MaxLineLength")
     private val tooltipFortunePattern by patternGroup.pattern(
         "tooltip.new",
-        "^§7Farming Fortune: §a\\+(?<display>[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?<reforge>\\d+)\\))?(?: §d\\(\\+(?<gemstone>\\d+)\\))?\$",
+        "^§7Farming Fortune: §6\\+(?<display>[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?<reforge>\\d+)\\))?(?: §d\\(\\+(?<gemstone>\\d+)\\))?\$",
     )
     private val armorAbilityPattern by patternGroup.pattern(
         "armorability",

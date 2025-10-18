@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DialogUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -41,7 +42,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
@@ -402,7 +402,7 @@ object GardenNextJacobContest {
         for (crop in contest.crops) {
             val isBoosted = crop == contest.boostedCrop
             val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest").apply {
-                if (isBoosted) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
+                if (isBoosted) addEnchantGlint()
             }
             val stack = Renderable.item(cropStack, 1.0)
             if (config.additionalBoostedHighlight && isBoosted) {

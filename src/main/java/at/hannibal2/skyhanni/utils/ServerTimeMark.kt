@@ -55,6 +55,7 @@ value class ServerTimeMark private constructor(val ticks: Long) : Comparable<Ser
         fun farPast() = FAR_PAST
         fun farFuture() = FAR_FUTURE
 
+        fun Duration.fromServerNow() = now() + this
     }
 
 }

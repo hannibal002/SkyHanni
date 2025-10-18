@@ -14,7 +14,7 @@ class AreaPathfinderConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "While in your invenotry, show all areas of the island. Click on an area to display the path to this area."
+        desc = "While in your inventory, show all areas of the island. Click on an area to display the path to this area."
     )
     @ConfigEditorBoolean
     @FeatureToggle

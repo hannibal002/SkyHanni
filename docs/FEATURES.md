@@ -1763,6 +1763,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Frozen Treasure highlighter for the Glacial Caves. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4393)
 + Added Glowing Mushroom highlighter for the Glowing Mushroom Cave. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4392)
 + Fixed Hypixel 1.21 double-click bug when right-clicking a block with Blaze Daggers or Fishing Rods. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4466)
++ Added Block-Breaking Particle Hider. - ThatOneDevil (https://github.com/hannibal002/SkyHanni/pull/4673)
+    + An option in Particle Hider to disable block-breaking particles.
+    + Extra option for Garden only.
 
 </details>
 <details open><summary>
