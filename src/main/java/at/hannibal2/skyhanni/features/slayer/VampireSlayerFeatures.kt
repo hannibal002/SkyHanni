@@ -74,7 +74,7 @@ object VampireSlayerFeatures {
     private val KILLER_SPRING_TEXTURE by lazy { SkullTextureHolder.getTexture("KILLER_SPRING") }
 
     private var nextClawSend = 0L
-    private var lastWitherSpawnSound = ServerTimeMark.FAR_PAST
+    private var lastWitherSpawnSound = ServerTimeMark.farPast()
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
