@@ -46,5 +46,5 @@ object SlayerBossSpawnSoon {
         lastCompletion = completion
     }
 
-    fun isEnabled() = config.enabled && SlayerApi.hasActiveSlayerQuest()
+    fun isEnabled() = config.enabled && SlayerApi.hasActiveQuest()
 }
