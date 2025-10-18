@@ -28,6 +28,7 @@ class TimiteConfig {
     @Expose
     @ConfigOption(name = "Timite Tracker", desc = "Tracks collected Timite ores and shows mote profit.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var tracker: Boolean = false
 
     @Expose
