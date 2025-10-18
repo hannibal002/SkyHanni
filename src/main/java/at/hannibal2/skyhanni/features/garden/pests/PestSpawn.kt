@@ -34,7 +34,7 @@ object PestSpawn {
     /**
      * REGEX-TEST: §6§lYUCK! §24 §2ൠ Pest §7have spawned in §aPlot §7- §b14§7!
      */
-    private val multiplePestsSpawn by patternGroup.pattern(
+    private val multiplePestsPattern by patternGroup.pattern(
         "multiple",
         "§6§l.*! §2(?<amount>\\d) §2ൠ Pests? §7have spawned in §aPlot §7- §b(?<plot>.*)§7!",
     )
@@ -42,40 +42,37 @@ object PestSpawn {
     /**
      * REGEX-TEST: §6§lGROSS! §7While you were offline, §2ൠ §2Pest §7spawned in §aPlots §r§b12§r§7, §r§b9§r§7, §r§b5§r§7, §r§b11§r§7 and §r§b3§r§r§7!
      */
-    private val offlinePestsSpawn by patternGroup.pattern(
+    private val offlinePestsPattern by patternGroup.pattern(
         "offline",
         "§6§l.*! §7While you were offline, §2ൠ §2Pests? §7spawned in §aPlots (?<plots>.*)!",
     )
-    private var plotNames = mutableListOf<String>()
+    /**
+     * WRAPPED-REGEX-TEST: "  §r§e§lCLICK HERE §eto teleport to the plot!"
+     */
+    private val clickToTPPattern by patternGroup.pattern(
+        "teleport",
+        "\\s*§r§e§lCLICK HERE §eto teleport to the plot!",
+    )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
         val message = event.message
         var blocked = false
 
-        plotNames.clear()
-
         onePestPattern.matchMatcher(message) {
-            val plotName = group("plot")
-            plotNames.add(plotName)
-            pestSpawn(1, plotNames, false)
+            spawn(1, listOf(group("plot")))
             blocked = true
         }
-        multiplePestsSpawn.matchMatcher(message) {
-            val plotName = group("plot")
-            plotNames.add(plotName)
-            val amount = group("amount").toInt()
-            pestSpawn(amount, plotNames, false)
+        multiplePestsPattern.matchMatcher(message) {
+            spawn(group("amount").toInt(), listOf(group("plot")))
             blocked = true
         }
-        offlinePestsSpawn.matchMatcher(message) {
-            val plots = group("plots")
-            plotNames = plots.removeColor().split(", ", " and ").toMutableList()
-            pestSpawn(0, plotNames, true)
+        offlinePestsPattern.matchMatcher(message) {
+            spawn(null, group("plots").removeColor().split(", ", " and ").toList())
             // blocked = true
         }
 
-        if (event.message == "  §r§e§lCLICK HERE §eto teleport to the plot!") {
+        clickToTPPattern.matchMatcher(message) {
             if (lastPestSpawnTime.passedSince() < 1.seconds) {
                 blocked = true
             }
@@ -86,10 +83,10 @@ object PestSpawn {
         }
     }
 
-    private fun pestSpawn(amount: Int, plotNames: List<String>, unknownAmount: Boolean) {
-        PestSpawnEvent(amount, plotNames, unknownAmount).post()
+    private fun spawn(amount: Int?, plotNames: List<String>) {
+        PestSpawnEvent(amount, plotNames).post()
 
-        if (unknownAmount) return // todo make this work with offline pest spawn messages
+        if (amount == null) return // TODO make this work with offline pest spawn messages
         val plotName = plotNames.firstOrNull() ?: error("first plot name is null")
         val pestName = StringUtils.pluralize(amount, "Pest")
         val message = "§e$amount §a$pestName Spawned in §b$plotName§a!"

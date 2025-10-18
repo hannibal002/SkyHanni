@@ -7,6 +7,9 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.block.state.IBlockState
 import net.minecraft.item.ItemStack
 
+/**
+ * When the player clicks on a block that is linked to a CropType while in the garden.
+ */
 class CropClickEvent(
     val position: LorenzVec,
     val crop: CropType,
