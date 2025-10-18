@@ -14,7 +14,7 @@ net.minecraft.client.network.ClientPlayerEntity sendChatMessage() chat()
 net.minecraft.client.network.ClientPlayerEntity setExperience() setExperienceValues()
 
 net.minecraft.client.network.ClientPlayerInteractionManager currentBreakingPos currentBlock
-net.minecraft.client.network.ClientPlayerInteractionManager isBreakingBlock() getIsHittingBlock()
+net.minecraft.client.network.ClientPlayerInteractionManager isBreakingBlock() isDestroying()
 
 net.minecraft.client.option.KeyBinding net.minecraft.client.KeyMapping
 net.minecraft.client.option.Perspective net.minecraft.client.CameraType

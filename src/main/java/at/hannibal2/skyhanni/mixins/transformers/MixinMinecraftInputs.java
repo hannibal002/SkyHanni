@@ -11,11 +11,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 //#if MC > 1.21
 //$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //#endif
-
 
 @Mixin(Minecraft.class)
 public class MixinMinecraftInputs {
@@ -58,9 +56,9 @@ public class MixinMinecraftInputs {
         if (MinecraftInputHook.shouldCancelMouseLeftClick(this.objectMouseOver))
             //#if MC < 1.21
             ci.cancel();
-            //#else
-            //$$ cir.setReturnValue(false);
-            //#endif
+        //#else
+        //$$ cir.setReturnValue(false);
+        //#endif
     }
 
     @ModifyVariable(
@@ -71,9 +69,9 @@ public class MixinMinecraftInputs {
     public boolean handleBlockClick(boolean isLeftClick) {
         if (isLeftClick && this.leftClickCounter <= 0) {
             if (MinecraftInputHook.shouldCancelContinuedBlockBreak(
-                    this.objectMouseOver,
-                    ((AccessorPlayerControllerMP) this.playerController).skyhanni_getCurrentBlock()
-                )) return false;
+                this.objectMouseOver,
+                ((AccessorPlayerControllerMP) this.playerController).skyhanni_getCurrentBlock()
+            )) return false;
         }
         return isLeftClick;
     }

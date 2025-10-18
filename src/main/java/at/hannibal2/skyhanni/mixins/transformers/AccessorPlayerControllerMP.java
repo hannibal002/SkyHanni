@@ -6,9 +6,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 
-@Mixin(
-    PlayerControllerMP.class
-)
+@Mixin(PlayerControllerMP.class)
 public interface AccessorPlayerControllerMP {
     @Accessor("currentBlock")
     BlockPos skyhanni_getCurrentBlock();
