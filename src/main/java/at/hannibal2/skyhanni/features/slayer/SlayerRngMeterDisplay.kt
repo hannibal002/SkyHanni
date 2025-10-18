@@ -165,7 +165,7 @@ object SlayerRngMeterDisplay {
         }
     }
 
-    private fun getCurrentSlayer() = SlayerApi.latestSlayerCategory.removeWordsAtEnd(1).removeColor()
+    private fun getCurrentSlayer() = SlayerApi.latestCategory.removeWordsAtEnd(1).removeColor()
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -237,14 +237,14 @@ object SlayerRngMeterDisplay {
         text,
         tips = listOf("§eClick to open RNG Meter Inventory."),
         onLeftClick = {
-            HypixelCommands.showRng("slayer", SlayerApi.activeSlayer?.rngName)
+            HypixelCommands.showRng("slayer", SlayerApi.activeType?.rngName)
         },
     )
 
     fun drawDisplay(): String {
         val storage = getStorage() ?: return ""
 
-        if (SlayerApi.latestSlayerCategory.let { it.endsWith(" I") || it.endsWith(" II") }) {
+        if (SlayerApi.latestCategory.let { it.endsWith(" I") || it.endsWith(" II") }) {
             return ""
         }
 
@@ -282,7 +282,7 @@ object SlayerRngMeterDisplay {
     private fun shouldShowDisplay(): Boolean {
         if (!isEnabled()) return false
         if (!SlayerApi.isInCorrectArea) return false
-        if (!SlayerApi.hasActiveSlayerQuest()) return false
+        if (!SlayerApi.hasActiveQuest()) return false
 
         return true
     }

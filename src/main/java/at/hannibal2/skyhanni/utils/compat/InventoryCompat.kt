@@ -1,19 +1,19 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
-import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-
 //#if FABRIC
 //$$ import net.minecraft.screen.slot.SlotActionType
 //$$ import at.hannibal2.skyhanni.compat.ReiCompat
+//$$ import net.minecraft.client.gui.screen.ingame.HandledScreen
 //#endif
 
 fun EntityPlayerSP.getItemOnCursor(): ItemStack? {
@@ -56,19 +56,6 @@ val GuiChest.container: Container
 
 object InventoryCompat {
 
-    // TODO add cache that persists until the next gui/window open/close packet is sent/received
-    fun getOpenChestName(): String {
-        val currentScreen = Minecraft.getMinecraft().currentScreen
-        //#if MC < 1.16
-        if (currentScreen !is GuiChest) return ""
-        val value = currentScreen.inventorySlots as ContainerChest
-        return value.lowerChestInventory?.displayName?.unformattedText.orEmpty()
-        //#else
-        //$$ return currentScreen?.title.formattedTextCompat()
-        //#endif
-    }
-
-
     fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int, mode: Int) {
         windowId ?: return
         val controller = Minecraft.getMinecraft().playerController ?: return
@@ -77,6 +64,26 @@ object InventoryCompat {
         controller.windowClick(windowId, slot, mouseButton, mode, player)
         //#else
         //$$ controller.clickSlot(windowId, slot, mouseButton, SlotActionType.entries[mode], player)
+        //#endif
+    }
+
+    fun mouseClickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int, mode: Int) {
+        windowId ?: return
+        if (slot < 0) return
+        val gui = Minecraft.getMinecraft().currentScreen
+        //#if FORGE
+        if (gui is GuiContainer) {
+            val accessor = gui as AccessorGuiContainer
+            val slotObj = gui.inventorySlots.getSlot(slot)
+            accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, mode)
+        }
+        //#else
+        //$$ if (gui is HandledScreen<*>) {
+        //$$ val accessor = gui as AccessorHandledScreen
+        //$$ val slotObj = gui.screenHandler.getSlot(slot)
+        //$$ val actionType = SlotActionType.entries[mode]
+        //$$ accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, actionType)
+        //$$ }
         //#endif
     }
 
