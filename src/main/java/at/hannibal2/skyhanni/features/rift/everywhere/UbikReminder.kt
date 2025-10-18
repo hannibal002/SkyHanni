@@ -18,15 +18,15 @@ object UbikReminder {
 
     private val config get() = RiftApi.config.area.mountaintop
 
-    private var nextRemindTime = SimpleTimeMark.farPast()
+    private var nextRemindTime = SimpleTimeMark.farFuture()
     private val patternGroup = RepoPattern.group("rift.ubik")
 
     /**
-     * REGEX-TEST: ROUND 2 (FINAL):
+     * REGEX-TEST: §6§lROUND 7 §r§6(§r§lFINAL§r§6)§r§l: §r§eYou chose §r§c§lSTEAL §r§eand gained §r§55,000 Motes§r§e!
      */
     private val ubikRoundPattern by patternGroup.pattern(
         "reminder",
-        "ROUND [1-9] \\(FINAL\\):",
+        "§6§lROUND [5-9] §r§6\\(§r§lFINAL§r§6\\)§r§l: §r§eYou chose .*",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
@@ -39,10 +39,10 @@ object UbikReminder {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (nextRemindTime.isInPast()) return
+        if (nextRemindTime.isInFuture()) return
         if (config.ubikReminder) {
-            ChatUtils.chat("§aUbik's cube is ready in the rift!")
+            ChatUtils.chat("§aUbik's Cube is ready in the Rift!")
         }
-        nextRemindTime = SimpleTimeMark.farPast()
+        nextRemindTime = SimpleTimeMark.farFuture()
     }
 }

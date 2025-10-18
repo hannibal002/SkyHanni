@@ -15,7 +15,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.ZipFile
-import kotlin.sequences.forEach
 import kotlin.time.Duration.Companion.minutes
 
 sealed interface RepoFileSystem {
@@ -23,7 +22,7 @@ sealed interface RepoFileSystem {
     fun readAllBytes(path: String): ByteArray
     fun write(path: String, data: ByteArray)
     fun list(path: String): List<String>
-    suspend fun transitionAfterReload(): RepoFileSystem = this
+    suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem = this
 
     /**
      * Deletes everything under [path].
@@ -39,29 +38,42 @@ sealed interface RepoFileSystem {
     }
 
     fun loadFromZip(
+        progress: ChatProgressUpdates,
         zipFile: File,
         logger: RepoLogger,
     ): Boolean = runCatching {
+        progress.update("loadFromZip")
         ZipFile(zipFile.absolutePath).use { zip ->
-            zip.entries().asSequence().filter { !it.isDirectory }.forEach { entry ->
-                val relative = entry.name.substringAfter('/', "").takeIf { it.isNotBlank() }
-                    ?: return@forEach
+            progress.update("zipFile entries collect")
+            val entries = zip.entries().asSequence()
+                .filterNot { it.isDirectory }
+                .toList()
+            progress.innerProgressStart(entries.size)
+            for (entry in entries) {
+                progress.innerProgressStep()
+                val relative = entry.name.substringAfter('/', entry.name)
+                if (relative.isBlank()) continue
 
                 if (this@RepoFileSystem is DiskRepoFileSystem) {
-                    // Security: ensure the file is within the root directory
                     val outPath = root.toPath().resolve(relative).normalize()
-                    if (!outPath.startsWith(root.toPath())) throw RuntimeException(
-                        "SkyHanni detected an invalid zip file. This is a potential security risk, " +
-                            "please report this on the SkyHanni discord.",
-                    )
+                    if (!outPath.startsWith(root.toPath())) {
+                        throw RuntimeException(
+                            "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+                                "please report this on the SkyHanni discord."
+                        )
+                    }
                 }
 
-                val data = zip.getInputStream(entry).readBytes()
-                write(relative, data)
+                zip.getInputStream(entry).use { input ->
+                    val data = input.readBytes()
+                    write(relative, data)
+                }
             }
+            progress.update("done with forEach")
         }
         true
     }.getOrElse {
+        progress.update("Failed to load repo from zip file: ${zipFile.absolutePath}")
         logger.logNonDestructiveError("Failed to load repo from zip file: ${zipFile.absolutePath}")
         false
     }
@@ -112,28 +124,47 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         it.startsWith("$path/") && it.removePrefix("$path/").endsWith(".json")
     }.map { it.removePrefix("$path/") }
 
-    override fun loadFromZip(zipFile: File, logger: RepoLogger): Boolean {
-        println("loadFromZip")
-        val success = super.loadFromZip(zipFile, logger)
-        if (flushJob == null) flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk", timeout = 2.minutes) { saveToDisk(diskRoot) }
+    override fun loadFromZip(progress: ChatProgressUpdates, zipFile: File, logger: RepoLogger): Boolean {
+        progress.update("repo file system loadFromZip")
+        val success = super.loadFromZip(progress, zipFile, logger)
+        if (flushJob == null) {
+            progress.update("start new launchIOCoroutine task")
+            flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk", timeout = 2.minutes) {
+                saveToDisk(diskRoot)
+            }
+        }
+        progress.update("loadFromZip end")
         return success
     }
 
     override fun dispose() = storage.clear()
 
-    override suspend fun transitionAfterReload(): RepoFileSystem {
+    override suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem {
+        progress.update("waiting on flushJob")
         runBlocking { flushJob?.join() }
+        progress.update("dispose")
         dispose()
+        progress.update("transitionAfterReload end")
         return DiskRepoFileSystem(diskRoot)
     }
 
     private fun saveToDisk(root: File) {
+        val progress = ChatProgressUpdates()
+        progress.start("saveToDisk start")
+
         val base = root.toPath()
+        progress.update("createDirectoriesFor")
         base.createDirectoriesFor(storage.keys)
-        storage.entries.parallelStream().forEach { (relativePath, bytes) ->
+        progress.update("parallelStream forEach resolve write")
+        val entries = storage.entries.toList()
+        progress.innerProgressStart(entries.size)
+        entries.parallelStream().forEach { (relativePath, bytes) ->
+            progress.innerProgressStep()
             val out = base.resolve(relativePath)
             Files.write(out, bytes)
         }
+
+        progress.end("saveToDisk end")
     }
 
     private fun Path.createDirectoriesFor(relativePaths: Set<String>) = relativePaths.mapNotNull { p ->

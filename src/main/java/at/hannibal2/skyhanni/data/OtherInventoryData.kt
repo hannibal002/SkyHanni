@@ -7,14 +7,15 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
 //#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 //$$ import at.hannibal2.skyhanni.test.command.ErrorManager
+//$$ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket
 //$$ import net.minecraft.screen.ScreenHandlerType
 //#endif
 
@@ -25,12 +26,24 @@ object OtherInventoryData {
     private var acceptItems = false
     private var lateEvent: InventoryUpdatedEvent? = null
 
+    val currentInventoryName: String
+        get() = currentInventory?.title.orEmpty()
+
     @HandleEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
         close()
     }
 
-    fun close(title: String = InventoryUtils.openInventoryName(), reopenSameName: Boolean = false) {
+    //#if MC > 1.21
+    //$$ @HandleEvent
+    //$$ fun onPacketSent(event: PacketSentEvent) {
+    //$$     if (event.packet is CloseHandledScreenC2SPacket) {
+    //$$         close()
+    //$$     }
+    //$$ }
+    //#endif
+
+    fun close(title: String = currentInventoryName, reopenSameName: Boolean = false) {
         InventoryCloseEvent(title, reopenSameName).post()
         currentInventory = null
     }
