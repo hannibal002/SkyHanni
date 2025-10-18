@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
@@ -21,7 +23,6 @@ import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -153,14 +154,16 @@ object SlayerApi {
         // wait with sending SlayerChangeEvent until profile is detected
         if (ProfileStorageData.profileSpecific == null) return
 
-        val slayerQuest = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest").orEmpty()
+        val lines = getSlayerLines()
+
+        val slayerQuest = lines.getOrNull(1).orEmpty()
         if (slayerQuest != latestCategory) {
             val old = latestCategory
             latestCategory = slayerQuest
             SlayerChangeEvent(old, latestCategory).post()
         }
 
-        val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2).orEmpty()
+        val slayerProgress = lines.getOrNull(2).orEmpty()
         if (latestProgress != slayerProgress) {
             SlayerProgressChangeEvent(latestProgress, slayerProgress).post()
             latestProgress = slayerProgress
@@ -177,12 +180,16 @@ object SlayerApi {
         }
     }
 
-    @HandleEvent
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        val slayerType = event.new.nextAfter("Slayer Quest")
+    private fun getSlayerLines(): List<String> =
+        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }.ifEmpty { TabWidget.SLAYER.lines }.map { it.trim() }
+
+    private fun updateSlayerState() {
+        val lines = getSlayerLines()
+
+        val slayerType = lines.getOrNull(1)
         val type = slayerType?.let { Type.getByName(it) }
 
-        val slayerProgress = event.new.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
+        val slayerProgress = lines.getOrNull(2) ?: "no slayer"
         val newState = slayerProgress.removeColor()
 
         val slayerData = getCurrentData()
@@ -193,10 +200,20 @@ object SlayerApi {
         slayerData.currentStateRaw = newState
         val state = detectState(old, newState)
         if (slayerData.currentState == state) return
-        ChatUtils.chat("${slayerData.currentState} -> $state")
+        ChatUtils.debug("${slayerData.currentState} -> $state")
         slayerData.currentState = state
         SlayerStateChangeEvent(state).post()
+    }
 
+    @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true)
+    fun onScoreboardChange() {
+        updateSlayerState()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.SLAYER)) return
+        updateSlayerState()
     }
 
     private fun String.inGrind() = contains("Combat") || contains("Kills")
