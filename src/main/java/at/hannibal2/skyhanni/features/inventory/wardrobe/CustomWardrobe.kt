@@ -230,7 +230,7 @@ object CustomWardrobe {
         }
 
         for (armorIndex in 0 until 4) {
-            val stack = slot.armor[armorIndex]?.copy()
+            val stack = slot.armor.getOrNull(armorIndex)?.copy()
             var renderable = Renderable.placeholder(containerWidth, hoverableSizes[armorIndex])
             if (stack != null) {
                 val toolTip = getToolTip(stack, slot, armorIndex)
