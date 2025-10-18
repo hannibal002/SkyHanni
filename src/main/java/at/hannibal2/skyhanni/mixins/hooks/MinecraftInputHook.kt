@@ -102,7 +102,7 @@ object MinecraftInputHook {
         blockHitResult: MovingObjectPosition?,
         currentBlockPos: BlockPos
     ): Boolean {
-        if (blockHitResult == null) return false
+        if (blockHitResult == null || blockHitResult.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return false
 
         val position = blockHitResult.blockPos
 
