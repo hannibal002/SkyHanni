@@ -200,6 +200,8 @@ object CarryTracker {
         ChatUtils.chat("Set carry price for $carryType §eto §6${price.shortFormat()} coins.")
     }
 
+    fun isCustomer(customerName: String): Boolean = getCustomerOrNull(customerName) != null
+
     private fun getCustomerOrNull(customerName: String): Customer? = customers.find {
         it.name.equals(customerName, ignoreCase = true)
     }

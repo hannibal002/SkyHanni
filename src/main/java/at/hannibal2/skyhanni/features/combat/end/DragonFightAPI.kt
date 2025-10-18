@@ -50,7 +50,7 @@ object DragonFightAPI {
      */
     private val scoreboardYourDamagePattern by group.pattern(
         "scoreboard.your-damage",
-        "Your Damage: (?<damage>.*)",
+        "Your Damage: (?<damage>[\\d.,]+)",
     )
 
     private val nestAreaPattern by group.pattern("area.nest", "Dragon's Nest")

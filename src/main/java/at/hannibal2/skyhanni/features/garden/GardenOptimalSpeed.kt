@@ -19,11 +19,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -39,10 +41,6 @@ object GardenOptimalSpeed {
     private val config get() = GardenApi.config.optimalSpeeds
 
     private val configCustomSpeed get() = config.customSpeed
-    private var sneakingSince = SimpleTimeMark.farFuture()
-    private var sneakingTime = 0.seconds
-    private val sneaking get() = MinecraftCompat.localPlayer.isSneaking
-    private val sneakingPersistent get() = sneakingSince.passedSince() > 5.seconds
     private val rancherBoots = "RANCHERS_BOOTS".toInternalName()
 
     /**
@@ -56,8 +54,11 @@ object GardenOptimalSpeed {
      * and some features need the actual value of the Speed stat instead,
      * we can always just have two separate variables, like walkSpeed and speedStat.
      * But since this change is confined to Garden-specific code, it's fine the way it is for now.
+     *
+     * We round down because Garden optimal speed is generally a lower bound,
+     * meaning going over is preferred to going under.
      */
-    private var currentSpeed = 100
+    private val currentSpeed: Int by RecalculatingValue(1.ticks) { PlayerUtils.getWalkSpeed().toInt() }
 
     private var optimalSpeed: Int? = null
     private var lastWarnTime = SimpleTimeMark.farPast()
@@ -65,19 +66,6 @@ object GardenOptimalSpeed {
     private var lastCrop: CropType? = null
     private var display = listOf<Renderable>()
     private var lastToolSwitch = SimpleTimeMark.farPast()
-
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick() {
-        currentSpeed = PlayerUtils.getWalkSpeed()
-
-        if (sneaking && !sneakingSince.isInPast()) {
-            sneakingSince = SimpleTimeMark.now()
-            currentSpeed = (currentSpeed * 0.3).toInt()
-        } else if (!sneaking && sneakingSince.isInPast()) {
-            sneakingTime = 0.seconds
-            sneakingSince = SimpleTimeMark.farFuture()
-        }
-    }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiScreenOpen(event: GuiScreenOpenEvent) {
@@ -166,18 +154,15 @@ object GardenOptimalSpeed {
 
         var text = "Optimal Speed: §f$speed"
         if (speed != currentSpeed) {
-            text += " (§eCurrent: §f$currentSpeed"
-            if (sneaking) text += " §7[Sneaking]"
-            text += "§f)"
+            text += " (§eCurrent: §f$currentSpeed§f)"
         }
 
         val recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
-        val recentlyStartedSneaking = sneaking && !sneakingPersistent
 
-        val colorCode = if (recentlySwitchedTool || recentlyStartedSneaking) "7" else if (speed != currentSpeed) "c" else "a"
+        val colorCode = if (recentlySwitchedTool) "7" else if (speed != currentSpeed) "c" else "a"
 
         if (config.showOnHUD) config.pos.renderString("§$colorCode$text", posLabel = "Garden Optimal Speed")
-        if (speed != currentSpeed && !recentlySwitchedTool && !recentlyStartedSneaking) warn(speed)
+        if (speed != currentSpeed && !recentlySwitchedTool) warn(speed)
     }
 
     private fun warn(optimalSpeed: Int) {
