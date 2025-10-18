@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -61,7 +62,7 @@ object InventoryUtils {
             .filter { it.inventory is InventoryPlayer && it.stack.isNotEmpty() }
     }
 
-    fun openInventoryName(): String = InventoryCompat.getOpenChestName()
+    fun openInventoryName(): String = OtherInventoryData.currentInventoryName
 
     fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
 
