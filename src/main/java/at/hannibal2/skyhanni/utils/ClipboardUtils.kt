@@ -86,9 +86,9 @@ object ClipboardUtils {
     //$$     var shouldRetry = false
     //$$     val clipboard = net.minecraft.client.util.Clipboard().getClipboard(
     //#if MC < 1.21.9
-    //$$         0,
+    //$$     0,
     //#else
-    //$$ MinecraftClient.getInstance().window,
+    //$$     MinecraftClient.getInstance().window,
     //#endif
     //$$     ) { _, _ ->
     //$$         shouldRetry = true

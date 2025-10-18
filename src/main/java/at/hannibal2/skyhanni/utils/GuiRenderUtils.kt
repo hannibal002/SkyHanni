@@ -595,10 +595,10 @@ object GuiRenderUtils {
     //$$     itemRenderStateButCool.render(matrices, consumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV)
     //$$     consumers.draw()
     //#else
-    //$$    val dispatcher = client.gameRenderer.entityRenderDispatcher
-    //$$    val consumers = dispatcher.queue
-    //$$    itemRenderStateButCool.render(matrices, consumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, 0)
-    //$$    dispatcher.render()
+    //$$     val dispatcher = client.gameRenderer.entityRenderDispatcher
+    //$$     val consumers = dispatcher.queue
+    //$$     itemRenderStateButCool.render(matrices, consumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, 0)
+    //$$     dispatcher.render()
     //#endif
     //$$     matrices.pop()
     //$$     RenderSystem.teardownOverlayColor()
