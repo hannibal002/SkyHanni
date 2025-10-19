@@ -602,7 +602,7 @@ object HideNotClickableItems {
         return result
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.items
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -611,5 +611,6 @@ object HideNotClickableItems {
         event.move(3, "inventory.hideNotClickableOpacity", "inventory.hideNotClickable.opacity")
         event.move(3, "inventory.notClickableItemsBypass", "inventory.hideNotClickable.itemsBypass")
         event.move(3, "inventory.hideNotClickableItemsGreenLine", "inventory.hideNotClickable.itemsGreenLine")
+        event.move(108, "inventory.hideNotClickable.items", "inventory.hideNotClickable.enabled")
     }
 }
