@@ -14,7 +14,7 @@ object SkyBlockUtils {
     private val DebugConfig get() = config.debug
 
     val onHypixel get() = (
-            DebugConfig.alwaysOnHypixel ||
+        DebugConfig.alwaysOnHypixel ||
             DebugConfig.alwaysOnSkyblock ||
             HypixelData.connectedToHypixel && MinecraftCompat.localPlayerExists
         )
@@ -23,7 +23,7 @@ object SkyBlockUtils {
 
     val inSkyBlock get() = (
         DebugConfig.alwaysOnSkyblock ||
-        onHypixel && HypixelData.skyBlock
+            onHypixel && HypixelData.skyBlock
         )
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
