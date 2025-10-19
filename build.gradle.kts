@@ -219,8 +219,8 @@ dependencies {
         }
     }
 
-    if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
-    else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+    //if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
+    //else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     // Brigadier comes bundled with more recent versions of Minecraft
     if (target.minecraftVersion == MinecraftVersion.MC189) {
@@ -288,7 +288,7 @@ afterEvaluate {
         if (target == ProjectTarget.MAIN) {
             programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
         } else if (target.isModern) {
-            programArgs("--quickPlayMultiplayer", "hypixel.net")
+            //programArgs("--quickPlayMultiplayer", "hypixel.net")
         }
     }
     tasks.named("kspKotlin", KspTaskJvm::class) {
