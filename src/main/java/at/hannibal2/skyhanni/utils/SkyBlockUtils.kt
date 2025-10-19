@@ -14,9 +14,9 @@ object SkyBlockUtils {
     private val DebugConfig get() = config.debug
 
     val onHypixel get() = (
-        DebugConfig.alwaysOnHypixel ||
-        DebugConfig.alwaysOnSkyblock ||
-        HypixelData.connectedToHypixel && MinecraftCompat.localPlayerExists
+            DebugConfig.alwaysOnHypixel ||
+            DebugConfig.alwaysOnSkyblock ||
+            HypixelData.connectedToHypixel && MinecraftCompat.localPlayerExists
         )
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
