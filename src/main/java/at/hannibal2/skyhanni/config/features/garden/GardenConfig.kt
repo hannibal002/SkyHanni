@@ -132,6 +132,11 @@ class GardenConfig {
     val plotMenuHighlighting: PlotMenuHighlightingConfig = PlotMenuHighlightingConfig()
 
     @Expose
+    @ConfigOption(name = "Plot Display", desc = "")
+    @Accordion
+    val plotDisplay: PlotDisplayConfig = PlotDisplayConfig()
+
+    @Expose
     @ConfigOption(name = "Garden Plot Icon", desc = "")
     @Accordion
     val plotIcon: PlotIconConfig = PlotIconConfig()

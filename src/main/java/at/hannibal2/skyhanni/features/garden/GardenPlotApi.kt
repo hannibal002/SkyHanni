@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -118,6 +119,17 @@ object GardenPlotApi {
     }
 
     class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+
+    enum class PlotStatusType(private val displayName: String, val highlightColor: LorenzColor) {
+        PESTS("§cPests", LorenzColor.RED),
+        SPRAYS("§6Sprays", LorenzColor.GOLD),
+        LOCKED("§7Locked", LorenzColor.DARK_GRAY),
+        CURRENT("§aCurrent plot", LorenzColor.GREEN),
+        PASTING("§ePasting", LorenzColor.YELLOW),
+        ;
+
+        override fun toString() = displayName
+    }
 
     private var currentPlot: Plot? = null
 
@@ -424,6 +436,19 @@ object GardenPlotApi {
     }
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
+
+    fun Plot.getPlotStatuses(): List<PlotStatusType> {
+        return buildList {
+            if (pests >= 1 || isPestCountInaccurate) add(PlotStatusType.PESTS)
+            if (currentSpray != null) add(PlotStatusType.SPRAYS)
+            if (locked) add(PlotStatusType.LOCKED)
+            if (this@getPlotStatuses == getCurrentPlot()) add(PlotStatusType.CURRENT)
+            if (isBeingPasted) add(PlotStatusType.PASTING)
+        }
+    }
+
+    fun List<PlotStatusType>.getLowestIndexStatus(enabled: MutableList<PlotStatusType>): PlotStatusType? =
+        enabled.firstOrNull { it in this }
 
     fun SkyHanniRenderWorldEvent.renderPlot(
         plot: Plot,
