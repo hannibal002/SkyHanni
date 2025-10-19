@@ -387,6 +387,7 @@
 + Fixed SkyHanni occasionally incorrectly reporting that extra information wasn't found in the tab list. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4762)
 + Fixed unnecessary Fairy Soul Helper error message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4766)
 + Fixed Skyblock detection on stranded and bingo. - nopo (https://github.com/hannibal002/SkyHanni/pull/4789)
++ Fixed config wipe. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4793)
 
 #### Chat
 
