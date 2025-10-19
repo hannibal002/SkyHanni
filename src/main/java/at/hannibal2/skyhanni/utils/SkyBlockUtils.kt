@@ -10,11 +10,16 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 object SkyBlockUtils {
 
+    private val config get() = SkyHanniMod.feature.dev
+    private val DebugConfig get() = config.debug
+
     val onHypixel get() = HypixelData.connectedToHypixel && MinecraftCompat.localPlayerExists
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
-    val inSkyBlock get() = onHypixel && HypixelData.skyBlock
+    val inSkyBlock get() = (DebugConfig.alwaysOnSkyblock ||
+        onHypixel && HypixelData.skyBlock
+        )
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 

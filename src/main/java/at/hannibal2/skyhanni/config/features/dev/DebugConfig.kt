@@ -19,6 +19,11 @@ class DebugConfig {
     var enabled: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Always On SkyBlock", desc = "Assumes that you are on SkyBlock")
+    @ConfigEditorBoolean
+    var alwaysOnSkyblock: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "Command Logging",
         desc = "Logs stack trace information into the console when a command gets sent to Hypixel. (by any mod or the player)",
