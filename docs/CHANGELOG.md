@@ -60,6 +60,7 @@
 + Added Block-Breaking Particle Hider. - ThatOneDevil (https://github.com/hannibal002/SkyHanni/pull/4673)
     + An option in Particle Hider to disable block-breaking particles.
     + Extra option for Garden only.
++ Added 1.21.10 support. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4596)
 
 #### Dungeons
 
@@ -218,6 +219,8 @@
 + Added Iris Shaders compatibility for  1.21.8. - Microcontrollers (https://github.com/hannibal002/SkyHanni/pull/4701)
     + World-rendered features now display when shaders are enabled on 1.21.8.
 + Added Pity and Pickaxe Cooldown Widgets to Tab Widget display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4756)
++ Clarified profile name widget warning. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4784)
++ Made more options configurable through /shdefaultoptions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4779)
 
 #### Foraging
 
@@ -263,6 +266,7 @@
 + Added detection of Nucleus Run Enchanted Books from chat messages. - formicacidgd (https://github.com/hannibal002/SkyHanni/pull/4565)
 + Added Bal Shard to Crystal Nucleus Profit Tracker. - Luna (https://github.com/hannibal002/SkyHanni/pull/4660)
 + Added option to hide Ordered Waypoint name. - Trendt (https://github.com/hannibal002/SkyHanni/pull/4676)
++ Updated the mod to handle Hypixel's new Mineshaft types. - Luna (https://github.com/hannibal002/SkyHanni/pull/4781)
 
 #### GUI
 
@@ -382,6 +386,7 @@
 + Fixed SkyHanni conflicting with other mods when modifying chat messages on modern. - juna (https://github.com/hannibal002/SkyHanni/pull/4761)
 + Fixed SkyHanni occasionally incorrectly reporting that extra information wasn't found in the tab list. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4762)
 + Fixed unnecessary Fairy Soul Helper error message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4766)
++ Fixed Skyblock detection on stranded and bingo. - nopo (https://github.com/hannibal002/SkyHanni/pull/4789)
 
 #### Chat
 
@@ -432,6 +437,8 @@
 + Fixed shard fusions not being tracked correctly in Attribute Shard features and Item Pickup Log. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4706)
 + Fixed some profit trackers double-counting shard gains. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4706)
 + Fixed enchanting table click prevention, wardrobe hotkeys and some other click-related features. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4730)
++ Fixed custom wardrobe not working at all on 1.21.8. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4763)
++ Fixed wardrobe spacing options not working properly on 1.21.5. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4763)
 
 #### Fishing
 
@@ -455,11 +462,13 @@
 + Fixed multiple menus and features throwing an error when encountering melons. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4639)
 + Prevented use of vacuums when a previous vacuum line is still being traced out. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4612)
 + Fixed issue in pest particle waypoints. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4649)
++ Fixed blocks being broken without releasing the mouse not being detected. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4787)
 
 #### Foraging
 
 + Fixed Compact Tree Gifts not working after Hypixel update. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4561)
 + Fixed pitch calculation in Moonglade Beacon Solver. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4482)
++ Fixed hideonleaf highlighter not working with Skyblocker installed. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4596)
 
 #### Mining
 
@@ -494,6 +503,7 @@
 
 + Fixed colored hitboxes for Baby Zombies in Zombie Shootout being too small on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4710)
 + Fixed Inquisitor Waypoint Sharing not working on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4736)
++ Fixed Jerry highlighing and line to Jerrry not working. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4786)
 
 #### Combat
 
@@ -700,6 +710,20 @@
 + Made reloading repo work again. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4777)
 + No longer use a hard-coded string and instead use Tab Widget information for checks. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4762)
 + Removed special handling for sneaking in Garden Optimal Speed. - Luna (https://github.com/hannibal002/SkyHanni/pull/4771)
++ Added `ItemStack.addEnchantGlint()`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4775)
+    + On 1.21, this now uses `ENCHANTMENT_GLINT_OVERRIDE` instead of a fake enchantment.
++ Added a renderable test for fake players. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4763)
++ Made it so enforced values could have a minimum mod version they start working for. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4778)
++ Made the 1.21.7 step 1.21.8 instead. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4759)
++ Renamed `MineshaftDetection.MineshaftTypes` to `MineshaftDetection.MineshaftType`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4781)
++ Support preprocessing to snapshots and pre-releases. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4596)
+
+### Removed Features
+
++ Removed Private Island Ability Block. - Luna (https://github.com/hannibal002/SkyHanni/pull/4782)
+    + Hypixel now prevents you from using pickaxe abilities on your Private Island.
++ Removed support for Minecraft 1.21.7. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4759)
+    + Use 1.21.8 Instead.
 
 ## Version 4.0.0
 
