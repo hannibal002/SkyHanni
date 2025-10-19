@@ -19,7 +19,12 @@ class DebugConfig {
     var enabled: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Always On SkyBlock", desc = "Assumes that you are on SkyBlock")
+    @ConfigOption(name = "Always On Hypixel", desc = "Always assumes that you are on Hypixel.")
+    @ConfigEditorBoolean
+    var alwaysOnHypixel: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Always On SkyBlock", desc = "Always assumes that you are on SkyBlock.")
     @ConfigEditorBoolean
     var alwaysOnSkyblock: Boolean = false
 

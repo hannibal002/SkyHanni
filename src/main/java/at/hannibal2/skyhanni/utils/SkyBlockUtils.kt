@@ -13,11 +13,16 @@ object SkyBlockUtils {
     private val config get() = SkyHanniMod.feature.dev
     private val DebugConfig get() = config.debug
 
-    val onHypixel get() = HypixelData.connectedToHypixel && MinecraftCompat.localPlayerExists
+    val onHypixel get() = (
+        DebugConfig.alwaysOnHypixel ||
+        DebugConfig.alwaysOnSkyblock ||
+        HypixelData.connectedToHypixel && MinecraftCompat.localPlayerExists
+        )
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
-    val inSkyBlock get() = (DebugConfig.alwaysOnSkyblock ||
+    val inSkyBlock get() = (
+        DebugConfig.alwaysOnSkyblock ||
         onHypixel && HypixelData.skyBlock
         )
 
