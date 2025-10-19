@@ -182,11 +182,6 @@ object MineshaftDetection {
         for ((key, value) in originalElement.asJsonObject.entrySet()) {
             val fixedEnumValue = transformMineshaftTypeEnum(key)
             for (newKey in fixedEnumValue) {
-                val enumValue = enumValues<MineshaftType>().find { it.name == newKey }
-                if (enumValue == null) {
-                    ChatUtils.debug("Could not find mineshaft type enum value for key $newKey")
-                    continue
-                }
                 newObj.add(newKey, value)
             }
         }
