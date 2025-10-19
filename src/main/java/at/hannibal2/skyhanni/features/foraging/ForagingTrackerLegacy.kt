@@ -113,33 +113,19 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST: §2Forest Essence §8x4
-     * REGEX-TEST: §2Forest Essence §8x6
-     * REGEX-TEST: §2Forest Essence §8x12
-     * REGEX-TEST: §2Forest Essence §8x16
-     * REGEX-TEST: §2Forest Whispers §8x40
-     * REGEX-TEST: §2Forest Whispers §8x60
-     * REGEX-TEST: §2Forest Whispers §8x100
-     * REGEX-TEST: §2Forest Whispers §8x160
-     * REGEX-TEST: §3Foraging Experience §8x1,000
-     * REGEX-TEST: §3Foraging Experience §8x2,000
-     * REGEX-TEST: §3Foraging Experience §8x2,500
-     * REGEX-TEST: §3Foraging Experience §8x5,000
-     * REGEX-TEST: §3Foraging Experience §8x8,000
+     * REGEX-TEST: §2Forest Essence§r§8 x4
+     * REGEX-TEST: §2Forest Essence§r§8 x12
+     * REGEX-TEST: §2Forest Whispers §r§8x40
+     * REGEX-TEST: §2Forest Whispers §r§8x100
+     * REGEX-TEST: §3Foraging Experience §r§8x1,000
      * REGEX-TEST: §aHOTF Experience §8x10
-     * REGEX-TEST: §aHOTF Experience §8x30
-     * REGEX-TEST: §aHOTF Experience §8x50
-     * REGEX-TEST: §aHOTF Experience §8x80
-     * REGEX-TEST: §aTender Wood §8x0-2
-     * REGEX-TEST: §aTender Wood §8x0-3
-     * REGEX-TEST: §aTender Wood §8x0-5
-     * REGEX-TEST: §aTender Wood §8x0-9
+     * REGEX-TEST: §aTender Wood §r§8x0-2
      * REGEX-TEST: §aVinesap §8x0-3
      * REGEX-TEST: §6Signal Enhancer §8(§a0.4%§8)
      */
     val hoverRewardPattern by patternGroup.pattern(
         "hover-reward",
-        "(?:§.)*(?<item>.*) (?:§.)*§8x?(?:(?<amount>[\\d,-]+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))"
+        "(?:§.)*(?<item>[^§]+)\\s*(?:§.)*\\s*(?:§.)*§8\\s*x?(?:(?:0-)?(?<amount>\\d+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))"
     )
 
     /**
