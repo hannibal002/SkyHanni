@@ -103,7 +103,7 @@ object PestApi {
     )
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!",
+        "§4§lൠ §cThis plot has §2(?<amount>\\d) §2ൠ Pests?§c!"
     )
 
     /**
@@ -253,7 +253,7 @@ object PestApi {
             if (pest == PestType.FIELD_MOUSE && item != DUNG_ITEM) return
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
-            PestKillEvent.post()
+            GardenPlotApi.getCurrentPlot()?.let { PestKillEvent(it, pest).post() }
         }
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
