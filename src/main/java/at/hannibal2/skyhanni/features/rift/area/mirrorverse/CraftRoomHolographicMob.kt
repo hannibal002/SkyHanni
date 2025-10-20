@@ -67,10 +67,10 @@ object CraftRoomHolographicMob {
 
             val mob = entityToHolographicEntity[theMob::class.java] ?: continue
 
-            val instance = mob.instance(holographicMobPos, -theMob.rotationYaw, -theMob.renderYawOffset)
+            val instance = mob.instance(holographicMobPos, -theMob.rotationYaw)
 
             instance.isChild = theMob.isChild
-            instance.moveTo(mirroredPos, theMob.rotationYaw)
+            instance.moveTo(mirroredPos, -theMob.rotationYaw)
 
             newMap[instance] = displayString
         }
