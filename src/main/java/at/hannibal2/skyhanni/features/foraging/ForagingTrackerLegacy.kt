@@ -123,9 +123,10 @@ object ForagingTrackerLegacy {
      * REGEX-TEST: §aVinesap §8x0-3
      * REGEX-TEST: §6Signal Enhancer §8(§a0.4%§8)
      */
+    @Suppress("MaxLineLength")
     val hoverRewardPattern by patternGroup.pattern(
         "hover-reward",
-        "(?:§.)*(?<item>[^§]+)\\s*(?:§.)*\\s*(?:§.)*§8\\s*x?(?:(?:0-)?(?<amount>[\\d,]+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))"
+        "(?:§.)*(?<item>[^§\\s](?:[^§]*[^§\\s])?)(?:§.)*\\s*(?:§.)*§8\\s*x?(?:(?:0-)?(?<amount>[\\d,]+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))"
     )
 
     /**
