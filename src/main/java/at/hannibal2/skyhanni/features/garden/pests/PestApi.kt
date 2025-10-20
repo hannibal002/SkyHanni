@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -60,6 +61,9 @@ object PestApi {
             storage?.scoreboardPests = value
         }
 
+    private var gardenPestTypes = mutableMapOf<GardenPlotApi.Plot, List<PestType>>()
+    private var lastCheckedPlot = 0
+
     private var lastPestKillTime = SimpleTimeMark.farPast()
     var lastPestSpawnTime = SimpleTimeMark.farPast()
     var lastTimeVacuumHeld = SimpleTimeMark.farPast()
@@ -103,7 +107,7 @@ object PestApi {
     )
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!",
+        "§4§lൠ §cThis plot has §2(?<amount>\\d) §2ൠ Pests?§c!",
     )
 
     /**
@@ -253,6 +257,7 @@ object PestApi {
             if (pest == PestType.FIELD_MOUSE && item != DUNG_ITEM) return
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
+            GardenPlotApi.getCurrentPlot()?.let { gardenPestTypes.removeFromPlot(it, pest) }
             PestKillEvent.post()
         }
         if (noPestsChatPattern.matches(event.message)) {
@@ -288,6 +293,29 @@ object PestApi {
         }
     }
 
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onMobSpawned(event: MobEvent.Spawn.SkyblockMob) {
+        val type = PestType.getByNameOrNull(event.mob.name) ?: return
+        val plot = GardenPlotApi.plots.find { it.box.isVecInside(event.mob.centerCords.toVec3()) } ?: return
+        if (lastCheckedPlot != plot.id) gardenPestTypes[plot] = listOf()
+        if (plot.pests >= 1 && !plot.isPestCountInaccurate && (gardenPestTypes.get(plot)?.size ?: 0) == plot.pests) return
+
+        gardenPestTypes.addToPlot(plot, type)
+        lastCheckedPlot = plot.id
+    }
+
+    private fun MutableMap<GardenPlotApi.Plot, List<PestType>>.addToPlot(plot: GardenPlotApi.Plot, pestType: PestType) {
+        this[plot] = this.getOrDefault(plot, emptyList()) + pestType
+    }
+
+    private fun MutableMap<GardenPlotApi.Plot, List<PestType>>.removeFromPlot(plot: GardenPlotApi.Plot, pestType: PestType) {
+        val currentList = this[plot].orEmpty()
+        val indexToRemove = currentList.indexOfFirst { it == pestType }
+        if (indexToRemove != -1) {
+            this[plot] = currentList.filterIndexed { index, _ -> index != indexToRemove }
+        }
+    }
+
     private fun getPlotsWithAccuratePests() = GardenPlotApi.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }
 
     private fun getPlotsWithInaccuratePests() = GardenPlotApi.plots.filter { it.isPestCountInaccurate }
@@ -301,6 +329,8 @@ object PestApi {
     fun isNearPestTrap() = EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>().any {
         it.distanceToPlayer() < 10 && pestTrapPattern.matches(it.displayName.formattedText)
     }
+
+    fun GardenPlotApi.Plot.getPestTypesInPlot() = gardenPestTypes.getOrDefault(this, listOf())
 
     private fun removePests(removedPests: Int) {
         if (removedPests < 1) return
