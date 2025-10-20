@@ -61,7 +61,7 @@ object PestApi {
             storage?.scoreboardPests = value
         }
 
-    private var gardenPestTypes = mutableMapOf<GardenPlotApi.Plot, List<PestType>>()
+    private val gardenPestTypes = mutableMapOf<GardenPlotApi.Plot, List<PestType>>()
     private var lastCheckedPlot = 0
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
@@ -105,6 +105,10 @@ object PestApi {
         "scoreboard.plot.nopests",
         "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
     )
+
+    /**
+     * REGEX-TEST: §4§lൠ §cThis plot has §22 §2ൠ Pests§c!
+     */
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
         "§4§lൠ §cThis plot has §2(?<amount>\\d) §2ൠ Pests?§c!",
