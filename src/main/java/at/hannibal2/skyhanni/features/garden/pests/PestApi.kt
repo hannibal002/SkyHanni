@@ -294,7 +294,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onMobSpawned(event: MobEvent.Spawn.SkyblockMob) {
+    fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
         val type = PestType.getByNameOrNull(event.mob.name) ?: return
         val plot = GardenPlotApi.plots.find { it.box.isVecInside(event.mob.centerCords.toVec3()) } ?: return
         if (lastCheckedPlot != plot.id) gardenPestTypes[plot] = listOf()

@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotApi.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
-import at.hannibal2.skyhanni.features.garden.pests.PestTypesApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.getPestTypesInPlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -97,7 +97,7 @@ object GardenPlotDisplay {
     }
 
     private fun createPestIcon(plot: GardenPlotApi.Plot): Renderable {
-        val pests = PestTypesApi.pests.getOrDefault(plot, listOf())
+        val pests = plot.getPestTypesInPlot()
 
         if (pests.isEmpty()) {
             return Renderable.doubleLayered(
