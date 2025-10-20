@@ -67,10 +67,11 @@ object CraftRoomHolographicMob {
 
             val mob = entityToHolographicEntity[theMob::class.java] ?: continue
 
-            val instance = mob.instance(holographicMobPos, -theMob.rotationYaw)
+            // we currently don't rotate the body so head rotations looked very weird
+            val instance = mob.instance(holographicMobPos, 0f)
 
             instance.isChild = theMob.isChild
-            instance.moveTo(mirroredPos, -theMob.rotationYaw)
+            instance.moveTo(mirroredPos, 0f)
 
             newMap[instance] = displayString
         }
