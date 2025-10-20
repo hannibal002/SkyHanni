@@ -125,7 +125,7 @@ object ForagingTrackerLegacy {
      */
     val hoverRewardPattern by patternGroup.pattern(
         "hover-reward",
-        "(?:§.)*(?<item>[^§]+)\\s*(?:§.)*\\s*(?:§.)*§8\\s*x?(?:(?:0-)?(?<amount>\\d+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))"
+        "(?:§.)*(?<item>[^§]+)\\s*(?:§.)*\\s*(?:§.)*§8\\s*x?(?:(?:0-)?(?<amount>[\\d,]+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))"
     )
 
     /**
