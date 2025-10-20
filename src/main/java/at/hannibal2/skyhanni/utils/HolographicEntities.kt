@@ -57,10 +57,13 @@ object HolographicEntities {
         val entity: T,
         var position: LorenzVec,
         var yaw: Float,
+        var bodyYaw: Float = entity.renderYawOffset,
+        var scale: Float = 1F
     ) {
         var isChild: Boolean = false
         var lastPosition: LorenzVec = position
         var lastYaw: Float = yaw
+        var lastBodyYaw: Float = bodyYaw
         val createdAt = SimpleTimeMark.now()
 
         val monotonicProgress get() = createdAt.passedSince().inWholeTicks
@@ -87,6 +90,10 @@ object HolographicEntities {
         fun interpolatedYaw(partialTicks: Float): Float {
             return interpolateRotation(lastYaw, yaw, partialTicks)
         }
+
+        fun interpolatedBodyYaw(partialTicks: Float): Float {
+            return interpolateRotation(lastBodyYaw, bodyYaw, partialTicks)
+        }
     }
 
     /**
@@ -97,8 +104,8 @@ object HolographicEntities {
      * world handling.
      */
     class HolographicBase<T : EntityLivingBase> internal constructor(private val entity: T) {
-        fun instance(position: LorenzVec, yaw: Float): HolographicEntity<T> {
-            return HolographicEntity(entity, position, yaw)
+        fun instance(position: LorenzVec, yaw: Float, bodyYaw: Float = yaw, scale: Float = 1f): HolographicEntity<T> {
+            return HolographicEntity(entity, position, yaw, bodyYaw, scale)
         }
     }
 
@@ -176,8 +183,8 @@ object HolographicEntities {
         GlStateManager.enableRescaleNormal()
         GlStateManager.scale(-1f, -1f, 1f)
         GlStateManager.translate(0F, -1.5078125f, 0f)
-        val limbSwing = 0F
-        val limbSwingAmount = 0F
+        val limbSwing = entity.limbSwing
+        val limbSwingAmount = entity.limbSwingAmount
         val ageInTicks = 1_000_000.toFloat()
         val netHeadYaw = holographicEntity.interpolatedYaw(partialTicks)
         val headPitch = 0F
@@ -190,6 +197,7 @@ object HolographicEntities {
         GlStateManager.alphaFunc(GL11.GL_GREATER, 1 / 255F)
 
         GlStateManager.enableTexture2D()
+        GlStateManager.rotate(-holographicEntity.interpolatedBodyYaw(partialTicks), 0f, 1f, 0f)
         renderer.mainModel.isChild = holographicEntity.isChild
         renderer.mainModel.setRotationAngles(
             limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entity,

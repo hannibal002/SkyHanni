@@ -11,8 +11,9 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -33,39 +34,27 @@ object CraftRoomHolographicMob {
         -108.0, 58.0, -106.0,
         -117.0, 51.0, -128.0,
     )
-    private var entitiesList = listOf<HolographicEntities.HolographicEntity<out EntityLivingBase>>()
     private val entityToHolographicEntity = mapOf(
         EntityZombie::class.java to HolographicEntities.zombie,
         EntitySlime::class.java to HolographicEntities.slime,
         EntityCaveSpider::class.java to HolographicEntities.caveSpider,
     )
 
-    @HandleEvent
-    fun onTick() {
-        if (!isEnabled()) return
-        for (entity in entitiesList) {
-            entity.moveTo(entity.position.up(.1), (entity.yaw + 5) % 360)
-        }
-    }
-
-    @HandleEvent
-    fun onWorldChange() {
-        entitiesList = emptyList()
-    }
+    private var hologramMap: MutableMap<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?> = mutableMapOf()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onTick() {
         if (!isEnabled()) return
-
+        val newMap: MutableMap<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?> = mutableMapOf()
         for (theMob in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(25.0)) {
             if (theMob is EntityPlayer) continue
 
             val mobPos = theMob.getLorenzVec()
-            if (!craftRoomArea.isInside(mobPos)) continue
+            val lastTickMobPos = LorenzVec(theMob.lastTickPosX, theMob.lastTickPosY, theMob.lastTickPosZ) // used to interpolate movement
+            if (!craftRoomArea.isInside(mobPos) || !craftRoomArea.isInside(lastTickMobPos)) continue
+            val holographicMobPos = getMirroredPos(lastTickMobPos)
+            val mirroredPos = getMirroredPos(mobPos)
 
-            val wallZ = -116.5
-            val dist = abs(mobPos.z - wallZ)
-            val holographicMobPos = mobPos.add(z = dist * 2)
             val displayString = buildString {
                 val mobName = theMob.displayName.formattedText
                 if (config.showName) {
@@ -78,17 +67,27 @@ object CraftRoomHolographicMob {
 
             val mob = entityToHolographicEntity[theMob::class.java] ?: continue
 
-            val instance = mob.instance(holographicMobPos, -theMob.rotationYaw)
+            val instance = mob.instance(holographicMobPos, -theMob.rotationYaw, -theMob.renderYawOffset)
 
             instance.isChild = theMob.isChild
+            instance.moveTo(mirroredPos, theMob.rotationYaw)
 
-            event.renderHolographicEntity(instance)
+            newMap[instance] = displayString
+        }
+        hologramMap = newMap
+    }
 
-            if (displayString.isNotEmpty()) {
-                event.drawString(holographicMobPos.add(y = theMob.eyeHeight + .5), displayString)
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        if (!isEnabled()) return
+        for (entity in hologramMap.entries) {
+            val mob = entity.key
+            val string = entity.value
+            event.renderHolographicEntity(mob)
+
+            if (string != null) {
+                event.drawString(mob.position.add(y = mob.entity.eyeHeight + .5), string)
             }
-
-            entitiesList = entitiesList.editCopy { add(instance) }
         }
     }
 
@@ -103,5 +102,11 @@ object CraftRoomHolographicMob {
         }
     }
 
-    private fun isEnabled() = RiftApi.inRift() && config.enabled
+    private fun getMirroredPos(pos: LorenzVec): LorenzVec {
+        val wallZ = -116.5
+        val dist = abs(pos.z - wallZ)
+        return pos.add(z = dist * 2)
+    }
+
+    private fun isEnabled() = RiftApi.inRift() && config.enabled && craftRoomArea.isInside(playerLocation())
 }
