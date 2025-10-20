@@ -81,6 +81,45 @@ object RenderableInventory {
     }
 
     fun Renderable.Companion.fakeInventory(
+        items: List<Renderable?>,
+        maxRowSize: Int,
+        scale: Double = 1.0,
+        horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+        verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+    ): VerticalContainerRenderable {
+        val uvList = createUvList(items.size, maxRowSize)
+        var index = 0
+        val emptySlot = Renderable.placeholder(
+            (16 * scale).toInt(),
+            (16 * scale).toInt(),
+        )
+
+        val finalList = uvList.map { uvRow ->
+            uvRow.map { uv ->
+                val uvArray = uv.getUvCoords()
+                drawInsideFixedSizedImage(
+                    if (uv == SlotsUv.CENTER) items.getOrNull(index++) ?: emptySlot else Renderable.empty(),
+                    inventoryTextures,
+                    (uv.width() * scale).toInt(),
+                    (uv.height() * scale).toInt(),
+                    padding = scale.toInt(),
+                    uMin = uvArray[0],
+                    uMax = uvArray[1],
+                    vMin = uvArray[2],
+                    vMax = uvArray[3],
+                )
+            }
+        }
+
+        return vertical(
+            finalList.map { horizontal(it, 0) },
+            0,
+            horizontalAlign = horizontalAlign,
+            verticalAlign = verticalAlign,
+        )
+    }
+
+    fun Renderable.Companion.fakeInventory(
         items: List<ItemStack?>,
         maxRowSize: Int,
         scale: Double,

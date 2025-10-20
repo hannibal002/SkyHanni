@@ -31,6 +31,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.init.Blocks
+import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
 import kotlin.math.floor
@@ -174,6 +176,9 @@ object GardenPlotApi {
 
         @Expose
         var uncleared: Boolean,
+
+        @Expose
+        var icon: ItemStack
     )
 
     data class SprayData(
@@ -193,6 +198,7 @@ object GardenPlotApi {
             isPestCountInaccurate = false,
             locked = true,
             uncleared = false,
+            icon = ItemStack(Blocks.bedrock)
         )
     }
 
@@ -242,6 +248,12 @@ object GardenPlotApi {
         get() = this.getData()?.locked ?: false
         set(value) {
             this.getData()?.locked = value
+        }
+
+    var Plot.icon: ItemStack
+        get() = this.getData()?.icon ?: ItemStack(Blocks.bedrock)
+        set(value) {
+            this.getData()?.icon = value
         }
 
     fun Plot.markExpiredSprayAsNotified() {
@@ -367,6 +379,7 @@ object GardenPlotApi {
             }
             plot.locked = false
             plot.isBeingPasted = false
+            plot.icon = itemStack
             for (line in lore) {
                 if (line.contains("§7Cost:")) plot.locked = true
                 if (line.contains("§7Pasting in progress:")) plot.isBeingPasted = true
