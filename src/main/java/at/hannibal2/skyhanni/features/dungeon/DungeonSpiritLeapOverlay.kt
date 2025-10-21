@@ -91,7 +91,7 @@ object DungeonSpiritLeapOverlay {
         if (!isEnabled() ||
             !config.spiritLeapKeybindConfig.enableKeybind ||
             InventoryUtils.openInventoryName().removeColor() !in validInventoryNames
-            ) {
+        ) {
             return
         }
         val index = getKeybindIndex(event.keyCode)
