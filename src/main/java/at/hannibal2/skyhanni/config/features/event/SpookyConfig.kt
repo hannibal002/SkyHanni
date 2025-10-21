@@ -11,4 +11,10 @@ class SpookyConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var spookyChestAlert: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Compact Message", desc = "Only show the name of the chest.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var compactSpookyChest: Boolean = false
 }

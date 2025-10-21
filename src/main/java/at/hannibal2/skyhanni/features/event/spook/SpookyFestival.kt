@@ -19,14 +19,18 @@ object SpookyFestival {
      */
     private val chestMessagePattern by patternGroup.pattern(
         "chat.chest",
-        "§[6c]§l(?:SPOOKY|PARTY)! §r§7A §r§(?<color>[6c])(?<chest>Trick or Treat Chest|Party Chest) §r§7has appeared!",
+        "§[6c]§l(?<type>SPOOKY|PARTY)! §r§7A §r§(?<color>[6c])(?<chest>Trick or Treat Chest|Party Chest) §r§7has appeared!",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         if (config.spookyChestAlert) {
             chestMessagePattern.matchMatcher(event.message) {
-                TitleManager.sendTitle("§l§${group("color")}${group("chest").uppercase()}!")
+                TitleManager.sendTitle("§l§${group("color")}" + if (config.compactSpookyChest) {
+                    "${group("type")} CHEST"
+                } else {
+                    "${group("chest").uppercase()}!"
+                })
             }
         }
     }
