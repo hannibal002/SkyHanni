@@ -26,11 +26,13 @@ object SpookyFestival {
     fun onChat(event: SkyHanniChatEvent) {
         if (config.spookyChestAlert) {
             chestMessagePattern.matchMatcher(event.message) {
-                TitleManager.sendTitle("§l§${group("color")}" + if (config.compactSpookyChest) {
-                    "${group("type")} CHEST"
-                } else {
-                    "${group("chest").uppercase()}!"
-                })
+                TitleManager.sendTitle(
+                    "§l§${group("color")}" + if (config.compactSpookyChest) {
+                        "${group("type")} CHEST"
+                    } else {
+                        "${group("chest").uppercase()}!"
+                    }
+                )
             }
         }
     }
