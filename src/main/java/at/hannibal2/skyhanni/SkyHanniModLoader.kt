@@ -20,7 +20,7 @@ class SkyHanniModLoader {
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
         HotswapSupport.load()
-        SkyHanniMod.preInit()
+        SkyHanniMod.preInit(event?.modConfigurationDirectory)
         loadedClasses.clear()
     }
 

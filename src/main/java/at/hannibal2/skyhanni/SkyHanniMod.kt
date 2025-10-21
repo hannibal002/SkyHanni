@@ -50,6 +50,7 @@ import net.minecraft.client.gui.GuiScreen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -57,12 +58,16 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SkyHanniMod {
 
-    fun preInit() {
+    fun preInit(configDirectory: File?) {
         PlatformUtils.checkIfNeuIsLoaded()
 
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
+
+        if (configDirectory != null) {
+            ConfigManager.configDirectory = File(configDirectory, "skyhanni")
+        }
 
         PreInitFinishedEvent.post()
     }
