@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.SkyHanniMod.modules
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.loader.api.FabricLoader;
 
 class SkyHanniModLoader : ModInitializer {
 
     override fun onInitialize() {
-        SkyHanniMod.preInit()
+        SkyHanniMod.preInit(FabricLoader.getInstance().getConfigDir().toFile())
         SkyHanniMod.init()
         loadedClasses.clear()
     }
