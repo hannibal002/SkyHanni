@@ -19,7 +19,7 @@ object SpookyFestival {
      */
     private val chestMessagePattern by patternGroup.pattern(
         "chat.chest",
-        "§r§[6c]§l(?:SPOOKY|PARTY)! §r§7A §r§(?<color>[6c])(?<chest>Trick or Treat Chest|Party Chest) §r§7has appeared!§r§7",
+        "§[6c]§l(?:SPOOKY|PARTY)! §r§7A §r§(?<color>[6c])(?<chest>Trick or Treat Chest|Party Chest) §r§7has appeared!",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
