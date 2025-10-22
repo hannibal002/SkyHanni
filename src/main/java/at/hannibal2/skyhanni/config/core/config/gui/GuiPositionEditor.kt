@@ -35,9 +35,13 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
+import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.jvm.javaField
 
 class GuiPositionEditor(
     private val positions: List<Position>,
@@ -114,6 +118,7 @@ class GuiPositionEditor(
             "",
             "§eRight-Click to open associated config options!",
             "§eUse Scroll-Wheel to resize!",
+            "§eMiddle-Click to reset to default position!",
         )
     }
 
@@ -194,6 +199,25 @@ class GuiPositionEditor(
             if (!isHovered) continue
             if (mouseButton == 1) {
                 position.jumpToConfigOptions()
+                break
+            }
+            if (mouseButton == 2) {
+                val field = position.linkField ?: return
+                val clazz = field.declaringClass.kotlin
+                val instance = clazz.createInstance()
+
+                val defaultPosition = clazz.declaredMemberProperties
+                    .firstNotNullOfOrNull { property ->
+                        property.javaField
+                            ?.getAnnotation(ConfigLink::class.java)
+                            ?.takeIf { it.field == field.name }
+                            ?.let { property.getter.call(instance) as? Position }
+                    } ?: return
+
+                with(position) {
+                    moveTo(defaultPosition.x, defaultPosition.y)
+                    scale = defaultPosition.scale
+                }
                 break
             }
             if (!position.clicked && mouseButton == 0) {
