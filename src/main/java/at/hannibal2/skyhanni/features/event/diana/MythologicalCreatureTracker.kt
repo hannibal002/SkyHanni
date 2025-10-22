@@ -42,7 +42,7 @@ object MythologicalCreatureTracker {
      * REGEX-TEST: §c§lOi! §r§eYou dug out §r§2Siamese Lynxes§r§e!
      */
     private val genericMythologicalSpawnPattern by patternGroup.pattern(
-        "generic_spawn",
+        "generic-spawn",
         "§c§l(?:Oh|Uh oh|Yikes|Oi|Good Grief)! §r§eYou dug out (?:a )?(?:§[a-f0-9r])*(?<creatureType>[\\w\\s]+)§r§e!",
     )
 
