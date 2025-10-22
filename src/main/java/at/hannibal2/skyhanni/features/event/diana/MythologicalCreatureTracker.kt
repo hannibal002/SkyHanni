@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -85,8 +84,7 @@ object MythologicalCreatureTracker {
             }
             if (config.hideChat) event.blockedReason = "mythological_creature_dug"
         } else {
-            // TODO: testing :3
-            ChatUtils.userError("UNKNOWN DIANA CREATURE!!!!! $creatureMatch!!!")
+            throw IllegalStateException("Unknown mythological creature $creatureMatch")
         }
     }
 
