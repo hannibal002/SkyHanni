@@ -15,6 +15,8 @@ data class MythologicalCreatureType(
     @Expose val name: String,
     @Expose val rare: Boolean?
 ) {
-    val cleanName = name.removeFormattingCodes()
-    val trackerId = cleanName.replace(" ", "_").uppercase()
+    val cleanName
+        get() = name.removeFormattingCodes()
+    val trackerId
+        get() = cleanName.replace(" ", "_").uppercase()
 }

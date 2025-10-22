@@ -40,10 +40,11 @@ object MythologicalCreatureTracker {
     /**
      * REGEX-TEST: §c§lUh oh! §r§eYou dug out a §r§2Gaia Construct§r§e!
      * REGEX-TEST: §c§lOi! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
+     * REGEX-TEST: §c§lOi! §r§eYou dug out §r§2Siamese Lynxes§r§e!
      */
     private val genericMythologicalSpawnPattern by patternGroup.pattern(
-        "generic",
-        ".* §r§eYou dug out a (?:§[a-f0-9r])*(?<creatureType>[\\w\\s]+)§r§e!",
+        "genericSpawn",
+        "§c§l(?:Oh|Uh Oh|Yikes|Oi|Good Grief)! §r§eYou dug out (?:a )?(?:§[a-f0-9r])*(?<creatureType>[\\w\\s]+)§r§e!",
     )
 
     private val tracker = SkyHanniTracker(
@@ -113,7 +114,7 @@ object MythologicalCreatureTracker {
             val creature = DianaApi.getCreatureByTrackerName(creatureTrackerId)
             if (creature == null || creature.rare != true) continue
 
-            addSearchString("§7- §e${creature.cleanName}: §e${since.addSeparators()} ")
+            addSearchString("§7- §e${creature.name}§7: §e${since.addSeparators()} ")
         }
 
     }
