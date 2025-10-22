@@ -49,6 +49,7 @@ class GuiPositionEditor(
     private val oldScreen: GuiContainer? = null,
 ) : SkyhanniBaseScreen() {
 
+    private val config get() = SkyHanniMod.feature.gui
     private var grabbedX = 0
     private var grabbedY = 0
     private var clickedPos = -1
@@ -142,20 +143,14 @@ class GuiPositionEditor(
                 grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
                 grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
             }
+
+            val isHovering = position.isHovered() && !alreadyHadHover
+
             val x = position.getAbsX()
             val y = position.getAbsY()
 
             elementWidth = position.getDummySize().x
             elementHeight = position.getDummySize().y
-
-            val isHovering = GuiRenderUtils.isPointInRect(
-                mouseX,
-                mouseY,
-                x - border,
-                y - border,
-                elementWidth + border * 2,
-                elementHeight + border * 2,
-            ) && !alreadyHadHover
 
             val gray = -0x7fbfbfc0 // #40404080
             val selected = -0x7F0F0F10 // #F0F0F080
@@ -184,40 +179,14 @@ class GuiPositionEditor(
 
         for (i in positions.indices.reversed()) {
             val position = positions[i]
-            val elementWidth = position.getDummySize().x
-            val elementHeight = position.getDummySize().y
-            val x = position.getAbsX()
-            val y = position.getAbsY()
-            val isHovered = GuiRenderUtils.isPointInRect(
-                mouseX,
-                mouseY,
-                x - border,
-                y - border,
-                elementWidth + border * 2,
-                elementHeight + border * 2,
-            )
-            if (!isHovered) continue
+            if (!position.isHovered()) continue
+
             if (mouseButton == 1) {
                 position.jumpToConfigOptions()
                 break
             }
-            if (mouseButton == 2) {
-                val field = position.linkField ?: return
-                val clazz = field.declaringClass.kotlin
-                val instance = clazz.createInstance()
-
-                val defaultPosition = clazz.declaredMemberProperties
-                    .firstNotNullOfOrNull { property ->
-                        property.javaField
-                            ?.getAnnotation(ConfigLink::class.java)
-                            ?.takeIf { it.field == field.name }
-                            ?.let { property.getter.call(instance) as? Position }
-                    } ?: return
-
-                with(position) {
-                    moveTo(defaultPosition.x, defaultPosition.y)
-                    scale = defaultPosition.scale
-                }
+            if (mouseButton == 2 && config.keyBindReset == -98) {
+                position.resetPositionAndScale()
                 break
             }
             if (!position.clicked && mouseButton == 0) {
@@ -231,6 +200,10 @@ class GuiPositionEditor(
     }
 
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
+        if (keyCode == config.keyBindReset) {
+            positions.first { it.isHovered() }.resetPositionAndScale()
+            return
+        }
         if (clickedPos == -1) return
         val position = positions[clickedPos]
         if (position.clicked) return
@@ -247,6 +220,42 @@ class GuiPositionEditor(
             Keyboard.KEY_EQUALS -> position.scale += .1F
             Keyboard.KEY_SUBTRACT -> position.scale -= .1F
             Keyboard.KEY_ADD -> position.scale += .1F
+        }
+    }
+
+    private fun Position.isHovered(): Boolean {
+        val (mouseX, mouseY) = GuiScreenUtils.mousePos
+
+        val elementWidth = getDummySize().x
+        val elementHeight = getDummySize().y
+        val x = getAbsX()
+        val y = getAbsY()
+        return GuiRenderUtils.isPointInRect(
+            mouseX,
+            mouseY,
+            x - border,
+            y - border,
+            elementWidth + border * 2,
+            elementHeight + border * 2,
+        )
+    }
+
+    private fun Position.resetPositionAndScale() {
+        val field = linkField ?: return
+        val clazz = field.declaringClass.kotlin
+        val instance = clazz.createInstance()
+
+        val defaultPosition = clazz.declaredMemberProperties
+            .firstNotNullOfOrNull { property ->
+                property.javaField
+                    ?.getAnnotation(ConfigLink::class.java)
+                    ?.takeIf { it.field == field.name }
+                    ?.let { property.getter.call(instance) as? Position }
+            } ?: return
+
+        with(this) {
+            moveTo(defaultPosition.x, defaultPosition.y)
+            scale = defaultPosition.scale
         }
     }
 
@@ -276,15 +285,7 @@ class GuiPositionEditor(
 
         val (mouseX, mouseY) = GuiScreenUtils.mousePos
 
-        val hovered = positions.firstOrNull { it.clicked }
-            ?: positions.lastOrNull {
-                val size = it.getDummySize()
-                GuiRenderUtils.isPointInRect(
-                    mouseX, mouseY,
-                    it.getAbsX() - border, it.getAbsY() - border,
-                    size.x + border * 2, size.y + border * 2,
-                )
-            } ?: return
+        val hovered = positions.firstOrNull { it.clicked } ?: positions.lastOrNull { it.isHovered() } ?: return
         if (mw < 0)
             hovered.scale -= .1F
         else
