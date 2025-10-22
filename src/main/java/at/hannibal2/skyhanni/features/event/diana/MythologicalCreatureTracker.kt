@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -84,7 +85,7 @@ object MythologicalCreatureTracker {
             }
             if (config.hideChat) event.blockedReason = "mythological_creature_dug"
         } else {
-            throw IllegalStateException("Unknown mythological creature $creatureMatch")
+            ErrorManager.skyHanniError("Unknown mythological creature $creatureMatch", "message" to event.message)
         }
     }
 
@@ -158,8 +159,8 @@ object MythologicalCreatureTracker {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(108, "#profile.diana.mythologicalMobTracker", ::fixData)
-        event.transform(108, "#profile.diana.mythologicalMobTrackerPerElection", ::fixPastData)
+        event.transform(110, "#profile.diana.mythologicalMobTracker", ::fixData)
+        event.transform(110, "#profile.diana.mythologicalMobTrackerPerElection", ::fixPastData)
     }
 
     private fun fixPastData(jsonElement: JsonElement): JsonElement {
@@ -173,7 +174,6 @@ object MythologicalCreatureTracker {
     }
 
     private fun fixData(jsonElement: JsonElement): JsonElement {
-        println(jsonElement)
         val jsonObject = jsonElement.asJsonObject
         jsonObject.add(
             "since",

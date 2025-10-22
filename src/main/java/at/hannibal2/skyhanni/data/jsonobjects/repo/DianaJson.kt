@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.StringUtils.removeFormattingCodes
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -16,7 +16,7 @@ data class MythologicalCreatureType(
     @Expose val rare: Boolean?
 ) {
     val cleanName
-        get() = name.removeFormattingCodes()
+        get() = name.removeColor()
     val trackerId
         get() = cleanName.replace(" ", "_").uppercase()
 }

@@ -60,6 +60,5 @@ object DianaApi {
         mythologicalCreatures = dianaJson.mythologicalCreatures
         sphinxQuestions = dianaJson.sphinxQuestions
         spades = dianaJson.spadeTypes.toSet()
-        println(spades)
     }
 }
