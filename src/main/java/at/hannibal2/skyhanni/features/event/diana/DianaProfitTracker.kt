@@ -198,18 +198,18 @@ object DianaProfitTracker {
         }
         val timedTrackerData: TimedTrackerData<Data> = TimedTrackerData { Data() }
 
-        event.transform(108, "#profile.diana.profitTracker") { entry ->
+        event.transform(110, "#profile.diana.profitTracker") { entry ->
             timedTrackerData.createEntry(DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<Data>(entry))
             entry
         }
-        event.transform(108, "#profile.diana.profitTrackerPerElection") { entry ->
+        event.transform(110, "#profile.diana.profitTrackerPerElection") { entry ->
             val mayors = ConfigManager.gson.fromJson<MutableMap<String, Data>>(entry)
             mayors.entries.forEach {
                 timedTrackerData.createEntry(DisplayMode.MAYOR, it.key, it.value)
             }
             entry
         }
-        event.add(108, "#profile.diana.timedProfitTracker") {
+        event.add(110, "#profile.diana.timedProfitTracker") {
             ConfigManager.gson.toJsonTree(timedTrackerData)
         }
     }

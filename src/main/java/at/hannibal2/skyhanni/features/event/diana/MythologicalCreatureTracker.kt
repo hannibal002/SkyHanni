@@ -153,18 +153,18 @@ object MythologicalCreatureTracker {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val timedTrackerData: TimedTrackerData<Data> = TimedTrackerData { Data() }
 
-        event.transform(108, "#profile.diana.mythologicalMobTracker") { entry ->
+        event.transform(110, "#profile.diana.mythologicalMobTracker") { entry ->
             timedTrackerData.createEntry(DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<Data>(entry))
             entry
         }
-        event.transform(108, "#profile.diana.mythologicalMobTrackerPerElection") { entry ->
+        event.transform(110, "#profile.diana.mythologicalMobTrackerPerElection") { entry ->
             val mayors = ConfigManager.gson.fromJson<MutableMap<String, Data>>(entry)
             mayors.entries.forEach {
                 timedTrackerData.createEntry(DisplayMode.MAYOR, it.key, it.value)
             }
             entry
         }
-        event.add(108, "#profile.diana.timedMythologicalMobTracker") {
+        event.add(110, "#profile.diana.timedMythologicalMobTracker") {
             ConfigManager.gson.toJsonTree(timedTrackerData)
         }
     }
