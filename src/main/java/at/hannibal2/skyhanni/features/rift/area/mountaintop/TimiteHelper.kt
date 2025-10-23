@@ -43,6 +43,7 @@ object TimiteHelper {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockHit(event: BlockClickEvent) {
         if (!isEnabled()) return
+        if (!config.evolutionTimer) return
         if (InventoryUtils.itemInHandId != TIME_GUN) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
         if (event.position != currentPos || currentBlockState != event.getBlockState) {
@@ -72,6 +73,7 @@ object TimiteHelper {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (!config.evolutionTimer) return
         if (InventoryUtils.itemInHandId != TIME_GUN) return
         if (lastClick + 400.milliseconds < SimpleTimeMark.now()) {
             holdingClick = SimpleTimeMark.farPast()
@@ -93,7 +95,8 @@ object TimiteHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!RiftApi.inMountainTop() || !config.expiryTimer) return
+        if (!isEnabled()) return
+        if (!config.expiryTimer) return
 
         val map = BlockUtils.nearbyBlocks(
             LocationUtils.playerLocation(),
@@ -120,7 +123,8 @@ object TimiteHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!RiftApi.inMountainTop() || !config.expiryTimer) return
+        if (!isEnabled()) return
+        if (!config.expiryTimer) return
 
         for (location in locations.entries) {
             val timeLeft = location.value + 31.seconds
@@ -135,5 +139,5 @@ object TimiteHelper {
         locations.clear()
     }
 
-    private fun isEnabled() = RiftApi.inMountainTop() && config.evolutionTimer
+    private fun isEnabled() = RiftApi.inMountainTop() && config.enabled
 }
