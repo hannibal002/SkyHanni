@@ -18,6 +18,7 @@ class ExperimentsSuperpairsConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Keep clicked items visible to help create matches.")
         @ConfigEditorBoolean
+        @FeatureToggle
         var enabled: Boolean = true
 
         @Expose
