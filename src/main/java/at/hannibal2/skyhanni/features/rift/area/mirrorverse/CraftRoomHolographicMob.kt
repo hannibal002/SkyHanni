@@ -94,6 +94,7 @@ object CraftRoomHolographicMob {
 
     @HandleEvent(receiveCancelled = true, onlyOnIsland = IslandType.THE_RIFT)
     fun onPlayerRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
+        if (!isEnabled()) return
         if (!config.hidePlayers) return
 
         val entity = event.entity
