@@ -24,6 +24,7 @@ class MountaintopConfig {
         desc = "Show the dropdown location to the hard Flowerpot point while in the Enigma Rose' End quest.",
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var enigmaRoseFlowerpot: Boolean = true
 
     @Expose

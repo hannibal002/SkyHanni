@@ -77,7 +77,6 @@ class PestTimerConfig {
         desc = "Set pest cooldown to a custom time after a pest spawns. Useful for equipment swapping."
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     val customCooldown: Property<Boolean> = Property.of(false)
 
     @Expose

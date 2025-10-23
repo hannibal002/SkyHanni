@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
@@ -66,7 +67,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //$$ import net.minecraft.component.DataComponentTypes
@@ -79,6 +79,10 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.component.type.ItemEnchantmentsComponent
 //$$ import net.minecraft.component.type.ProfileComponent
 //$$ import net.minecraft.registry.Registries
+//#endif
+//#if MC > 1.21.8
+//$$ import com.google.common.collect.ImmutableMultimap
+//$$ import com.mojang.authlib.properties.PropertyMap
 //#endif
 
 @SkyHanniModule
@@ -308,16 +312,25 @@ object ItemUtils {
 
     fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
 
-    // Checks for the enchantment glint as part of the minecraft enchantments
+    // Checks for the enchantment glint as part of the Minecraft enchantments
     fun ItemStack.isEnchanted(): Boolean =
         //#if MC < 1.21
         isItemEnchanted
     //#else
-    //$$ hasEnchantments() || this.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE) == true
+    //$$ hasGlint()
     //#endif
 
-    // Checks for hypixel enchantments in the attributes
-    fun ItemStack.hasHypixelEnchantments() = getHypixelEnchantments()?.isNotEmpty() ?: false
+    // Checks for Hypixel enchantments in the attributes
+    fun ItemStack.hasHypixelEnchantments(): Boolean =
+        getHypixelEnchantments()?.isNotEmpty() ?: false
+
+    fun ItemStack.addEnchantGlint(): ItemStack = apply {
+        //#if MC < 1.21
+        addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
+        //#else
+        //$$ set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true)
+        //#endif
+    }
 
     fun ItemStack.removeEnchants(): ItemStack = apply {
         //#if MC < 1.21
@@ -336,8 +349,10 @@ object ItemUtils {
         val compound = tagCompound ?: return null
         if (!compound.hasKey("SkullOwner")) return null
         return compound.getCompoundTag("SkullOwner").getSkullTexture()
-        //#else
+        //#elseif MC < 1.21.9
         //$$ return this.get(DataComponentTypes.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
+        //#else
+        //$$ return this.get(DataComponentTypes.PROFILE)?.gameProfile?.properties?.get("textures")?.firstOrNull()?.value
         //#endif
 
     }
@@ -354,8 +369,10 @@ object ItemUtils {
 
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
-        //#else
+        //#elseif MC < 1.21.9
         //$$ return this.get(DataComponentTypes.PROFILE)?.id?.get().toString()
+        //#else
+        //$$ return this.get(DataComponentTypes.PROFILE)?.gameProfile?.id.toString()
         //#endif
     }
 
@@ -388,9 +405,16 @@ object ItemUtils {
         return stack
         //#else
         //$$ val stack = ItemStack(Items.PLAYER_HEAD)
+        //#if MC < 1.21.9
         //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo")
         //$$ profile.properties.put("textures", Property("textures", value))
         //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent(profile))
+        //#else
+        //$$ val builder = ImmutableMultimap.builder<String, Property>()
+        //$$ builder.put("textures", Property("textures", value))
+        //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo", PropertyMap(builder.build()))
+        //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent.ofStatic(profile))
+        //#endif
         //$$ stack.setCustomItemName(displayName)
         //$$ stack.setLore(lore.toList())
         //$$ return stack
