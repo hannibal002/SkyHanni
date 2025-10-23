@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
@@ -39,7 +38,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
@@ -51,10 +49,7 @@ import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 //#endif
-//#if MC < 1.21
-import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
-//#else
-//$$ import net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity
+//#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 //$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
 //#endif
@@ -1247,65 +1242,6 @@ interface Renderable {
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
-            }
-        }
-
-        fun fakePlayer(
-            player: EntityPlayer,
-            followMouse: Boolean = false,
-            eyesX: Float = 0f,
-            eyesY: Float = 0f,
-            width: Int = 50,
-            height: Int = 100,
-            entityScale: Int = 30,
-            padding: Int = 5,
-            color: Color? = null,
-            colorCondition: () -> Boolean = { true },
-        ) = object : Renderable {
-            override val width = width + 2 * padding
-            override val height = height + 2 * padding
-            override val horizontalAlign = HorizontalAlignment.LEFT
-            override val verticalAlign = VerticalAlignment.TOP
-            val playerHeight = entityScale * 2
-            val playerX = width / 2 + padding
-            val playerY = height / 2 + playerHeight / 2 + padding
-
-            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                GlStateManager.color(1f, 1f, 1f, 1f)
-                if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
-                val mouse = currentRenderPassMousePosition ?: return
-                val (mouseXRelativeToPlayer, mouseYRelativeToPlayer) = if (followMouse) {
-                    val newOffsetX = (mouseOffsetX + playerX - mouse.first).toFloat()
-                    val newOffsetY = (mouseOffsetY + playerY - mouse.second - 1.62 * entityScale).toFloat()
-                    newOffsetX to newOffsetY
-                } else eyesX to eyesY
-                DrawContextUtils.translate(0f, 0f, 100f)
-                //#if MC < 1.21
-                drawEntityOnScreen(
-                    playerX,
-                    playerY,
-                    entityScale,
-                    mouseXRelativeToPlayer,
-                    mouseYRelativeToPlayer,
-                    player,
-                )
-                //#else
-                //$$ DrawContextUtils.translate(-35f, -125f, 0f)
-                //$$ drawEntity(
-                //$$     DrawContextUtils.drawContext,
-                //$$     playerX,
-                //$$     playerY,
-                //$$     playerX + width,
-                //$$     playerY + height,
-                //$$     entityScale,
-                //$$     0.0625f,
-                //$$     -mouseXRelativeToPlayer + if (followMouse) 70f else 0f,
-                //$$     -mouseYRelativeToPlayer + if (followMouse) 195f else 0f,
-                //$$     player
-                //$$ )
-                //$$ DrawContextUtils.translate(35f, 125f, 0f)
-                //#endif
-                DrawContextUtils.translate(0f, 0f, -100f)
             }
         }
     }

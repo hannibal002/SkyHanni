@@ -1766,6 +1766,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Block-Breaking Particle Hider. - ThatOneDevil (https://github.com/hannibal002/SkyHanni/pull/4673)
     + An option in Particle Hider to disable block-breaking particles.
     + Extra option for Garden only.
++ Added 1.21.10 support. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4596)
 
 </details>
 <details open><summary>

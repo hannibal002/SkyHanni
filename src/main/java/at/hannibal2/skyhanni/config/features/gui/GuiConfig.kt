@@ -113,6 +113,7 @@ class GuiConfig {
     @FeatureToggle
     var beaconPower: Boolean = false
 
+    // TODO move beacon power options into an accordion and into their own config file
     @Expose
     @ConfigOption(name = "Show Beacon Stat", desc = "Show what stat is being boosted by your beacon.")
     @ConfigEditorBoolean

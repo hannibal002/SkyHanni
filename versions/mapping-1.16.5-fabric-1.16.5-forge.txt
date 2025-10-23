@@ -7,10 +7,14 @@ net.fabricmc.loader.api.ModContainer net.minecraftforge.fml.ModContainer
 net.minecraft.client.gui.screen.GameMenuScreen net.minecraft.client.gui.screens.PauseScreen
 
 net.minecraft.client.network.ClientPlayerEntity net.minecraft.client.player.LocalPlayer
+net.minecraft.client.network.ClientPlayerInteractionManager net.minecraft.client.multiplayer.MultiPlayerGameMode
 
 net.minecraft.client.network.ClientPlayerEntity networkHandler connection
 net.minecraft.client.network.ClientPlayerEntity sendChatMessage() chat()
 net.minecraft.client.network.ClientPlayerEntity setExperience() setExperienceValues()
+
+net.minecraft.client.network.ClientPlayerInteractionManager currentBreakingPos currentBlock
+net.minecraft.client.network.ClientPlayerInteractionManager isBreakingBlock() isDestroying()
 
 net.minecraft.client.option.KeyBinding net.minecraft.client.KeyMapping
 net.minecraft.client.option.Perspective net.minecraft.client.CameraType

@@ -22,6 +22,9 @@ import org.lwjgl.input.Mouse
 //#else
 //$$ import net.minecraft.client.util.InputUtil
 //#endif
+//#if MC > 1.21.8
+//$$ import net.minecraft.client.input.KeyInput
+//#endif
 
 @SkyHanniModule
 object KeyboardManager {
@@ -68,8 +71,10 @@ object KeyboardManager {
         val isClose =
             //#if MC < 1.21
             keycode == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || keycode == Keyboard.KEY_ESCAPE
-        //#else
+        //#elseif MC < 1.21.9
         //$$ MinecraftClient.getInstance().options.inventoryKey.matchesKey(keycode, keycode) || keycode == GLFW.GLFW_KEY_ESCAPE
+        //#else
+        //$$ MinecraftClient.getInstance().options.inventoryKey.matchesKey(KeyInput(keycode, keycode, 0)) || keycode == GLFW.GLFW_KEY_ESCAPE
         //#endif
 
         if (!isClose) return false
@@ -216,7 +221,11 @@ object KeyboardManager {
         //$$ this < -1 -> ErrorManager.skyHanniError("Error while checking if a key is pressed. Keycode is invalid: $this")
         //$$ this == -1 -> false
         //$$ this in 0..5 -> MouseCompat.isButtonDown(this)
+        //#if MC < 1.21.9
         //$$ else -> InputUtil.isKeyPressed(MinecraftClient.getInstance().window.handle, this)
+        //#else
+        //$$ else -> InputUtil.isKeyPressed(MinecraftClient.getInstance().window, this)
+        //#endif
         //#endif
     }
 

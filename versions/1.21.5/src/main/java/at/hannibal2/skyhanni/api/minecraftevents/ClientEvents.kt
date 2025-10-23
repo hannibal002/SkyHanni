@@ -57,6 +57,7 @@ object ClientEvents {
 
                 override fun getFabricId(): Identifier = Identifier.of("skyhanni", "resources")
 
+                //#if MC < 1.21.9
                 override fun reload(
                     synchronizer: ResourceReloader.Synchronizer,
                     manager: ResourceManager,
@@ -69,6 +70,19 @@ object ClientEvents {
                         applyExecutor,
                     ).thenCompose(synchronizer::whenPrepared)
                 }
+                //#else
+                //$$ override fun reload(
+                //$$     store: ResourceReloader.Store,
+                //$$     prepareExecutor: Executor,
+                //$$     reloadSynchronizer: ResourceReloader.Synchronizer,
+                //$$     applyExecutor: Executor,
+                //$$ ): CompletableFuture<Void> {
+                //$$     return CompletableFuture.runAsync(
+                //$$         { ResourcePackReloadEvent(store.resourceManager).post() },
+                //$$         applyExecutor,
+                //$$     ).thenCompose(reloadSynchronizer::whenPrepared)
+                //$$ }
+                //#endif
             },
         )
 
