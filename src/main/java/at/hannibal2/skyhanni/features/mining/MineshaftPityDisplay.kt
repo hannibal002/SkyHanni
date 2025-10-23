@@ -325,7 +325,6 @@ object MineshaftPityDisplay {
         if (event.newIsland == IslandType.MINESHAFT || event.oldIsland == IslandType.MINESHAFT) {
             resetCounter()
         }
-        everFoundPityWidget = false
     }
 
     private fun isDisplayEnabled() = (MiningApi.inGlacialTunnels() || MiningApi.inDwarvenBaseCamp()) && config.enabled
