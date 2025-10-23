@@ -464,7 +464,7 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
         val path = "#profile.garden.visitorDrops"
         val timeData = TimeData()
         val bucketData = BucketData()
-        event.transform(110, "$path.rewardsCount") { entry ->
+        event.transform(114, "$path.rewardsCount") { entry ->
             val itemData = ConfigManager.gson.fromJson<MutableMap<VisitorReward, Int>>(entry)
             itemData.entries.forEach { itemEntry ->
                 val internalName = itemEntry.key.internalName
@@ -474,15 +474,15 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
             entry
         }
 
-        event.transform(110, "$path.acceptedVisitors") { entry ->
+        event.transform(114, "$path.acceptedVisitors") { entry ->
             bucketData.visitorsAccepted[VisitorRarity.UNKNOWN] = ConfigManager.gson.fromJson<Int>(entry).toLong()
             entry
         }
-        event.transform(110, "$path.deniedVisitors") { entry ->
+        event.transform(114, "$path.deniedVisitors") { entry ->
             bucketData.visitorsRejected[VisitorRarity.UNKNOWN] = ConfigManager.gson.fromJson<Int>(entry).toLong()
             entry
         }
-        event.transform(110, "$path.acceptedRarities") { entry ->
+        event.transform(114, "$path.acceptedRarities") { entry ->
             val oldMap = ConfigManager.gson.fromJson<MutableMap<LorenzRarity, Long>>(entry)
             val newMap = mutableMapOf<VisitorRarity, Long>()
             oldMap.entries.forEach { rarityEntry ->
@@ -499,40 +499,40 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
             bucketData.legacyVisitorRarity = newMap
             entry
         }
-        event.transform(110, "$path.copper") { entry ->
+        event.transform(114, "$path.copper") { entry ->
             bucketData.copper[VisitorRarity.UNKNOWN] = ConfigManager.gson.fromJson<Long>(entry)
             entry
         }
-        event.transform(110, "$path.farmingExp") { entry ->
+        event.transform(114, "$path.farmingExp") { entry ->
             bucketData.farmingXp[VisitorRarity.UNKNOWN] = ConfigManager.gson.fromJson<Long>(entry)
             entry
         }
-        event.transform(110, "$path.gardenExp") { entry ->
+        event.transform(114, "$path.gardenExp") { entry ->
             bucketData.gardenXp[VisitorRarity.UNKNOWN] = ConfigManager.gson.fromJson<Long>(entry)
             entry
         }
-        event.transform(110, "$path.coinsSpent") { entry ->
+        event.transform(114, "$path.coinsSpent") { entry ->
             bucketData.coinsSpent[VisitorRarity.UNKNOWN] = ConfigManager.gson.fromJson<Long>(entry)
             entry
         }
-        event.transform(110, "$path.bits") { entry ->
+        event.transform(114, "$path.bits") { entry ->
             bucketData.bits[VisitorRarity.UNKNOWN] = ConfigManager.gson.fromJson<Long>(entry)
             entry
         }
-        event.transform(110, "$path.mithrilPowder") { entry ->
+        event.transform(114, "$path.mithrilPowder") { entry ->
             bucketData.mithrilPowder[VisitorRarity.UNKNOWN] = ConfigManager.gson.fromJson<Long>(entry)
             entry
         }
-        event.transform(110, "$path.gemstonePowder") { entry ->
+        event.transform(114, "$path.gemstonePowder") { entry ->
             bucketData.gemstonePowder[VisitorRarity.UNKNOWN] = ConfigManager.gson.fromJson<Long>(entry)
             entry
         }
-        event.add(110, "#profile.garden.visitorDropTracker") {
+        event.add(114, "#profile.garden.visitorDropTracker") {
             timeData.createEntry(DisplayMode.TOTAL, "total", bucketData)
             ConfigManager.gson.toJsonTree(timeData)
         }
         // Add profit list to text entries if user had any rewards listed previously
-        event.transform(110, "garden.visitors.dropsStatistics.textFormat") { entry ->
+        event.transform(114, "garden.visitors.dropsStatistics.textFormat") { entry ->
             val textFormat = ConfigManager.gson.fromJson<MutableList<String>>(entry)
             val oldEnums = listOf(
                 "FLOWERING_BOUQUET",
@@ -556,6 +556,6 @@ object VisitorDropTracker : SkyHanniTimedBucketedItemTracker<VisitorRarity, Visi
             }
             ConfigManager.gson.toJsonTree(textFormat)
         }
-        if (event.oldVersion <= 110) config.perTrackerConfig.syncSettings()
+        if (event.oldVersion <= 114) config.perTrackerConfig.syncSettings()
     }
 }

@@ -83,6 +83,7 @@ open class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndivi
         )
     }
 
+    // TODO figure out why this isn't working
     // make sure stopwatches don't infinitely run when swapping data
     override fun startSessionUptime() {
         super.startSessionUptime()
