@@ -117,14 +117,8 @@ class GuiPositionEditor(
             "",
             "§eRight-Click to open associated config options!",
             "§eUse Scroll-Wheel to resize!",
-            "§e${getKeyName(config.keyBindReset)}to reset to default position!",
+            "§e${KeyboardManager.getKeyName(config.keyBindReset)}to reset to default position!",
         )
-    }
-
-    private fun getKeyName(keyCode: Int): String = when (keyCode) {
-        -98 -> "Middle-Click"
-        Keyboard.KEY_NONE -> "Unbound"
-        else -> Keyboard.getKeyName(keyCode) ?: "Unknown"
     }
 
     private fun renderHover(text: List<String>) {
@@ -184,7 +178,7 @@ class GuiPositionEditor(
 
             when (mouseButton) {
                 1 -> position.jumpToConfigOptions()
-                2 -> if (config.keyBindReset == -98) position.resetPositionAndScale()
+                2 -> if (config.keyBindReset == KeyboardManager.MIDDLE_MOUSE) position.resetPositionAndScale()
                 0 -> if (!position.clicked) {
                     clickedPos = i
                     position.clicked = true
