@@ -70,7 +70,7 @@ object InventoryCompat {
     }
 
     /**
-     * Internal method, not meant to be called directly. Prefer `InventoryUtils.clickSlot()`.
+     * Internal method, not meant to be called directly. Prefer `InventoryUtils.mouseClickSlot()`.
      */
     fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: Int) {
         if (slot < 0) return
