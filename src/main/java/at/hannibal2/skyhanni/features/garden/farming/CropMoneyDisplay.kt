@@ -63,9 +63,9 @@ object CropMoneyDisplay {
     private var moneyPerHour: Map<NeuInternalName, CropMoneyData> = mutableMapOf()
     private val extraMoneyPerHour: ExtraMoneyData = ExtraMoneyData(0.0, 0.0, 0.0)
 
-    private val BOX_OF_SEEDS by AutoUpdatingItemStack("BOX_OF_SEEDS")
+    val BOX_OF_SEEDS by AutoUpdatingItemStack("BOX_OF_SEEDS")
     val SEEDS = "SEEDS".toInternalName()
-    private val ENCHANTED_SEEDS = "ENCHANTED_SEEDS".toInternalName()
+    val ENCHANTED_SEEDS = "ENCHANTED_SEEDS".toInternalName()
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {

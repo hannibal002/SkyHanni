@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay.ENCHANTED_SEEDS
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay.SEEDS
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
@@ -134,6 +135,18 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
             )
         }
 
+        private fun merge(neuInternalName: NeuInternalName, acc: MutableMap<NeuInternalName, TrackedItem>, value: TrackedItem) {
+            val primitiveAmount = NeuItems.getPrimitiveMultiplier(neuInternalName).amount
+            val amount = floor((value.totalAmount / primitiveAmount).toDouble())
+            val trackedItem = value.copy(
+                timesGained = value.timesGained,
+                totalAmount = amount.toLong(),
+                hidden = value.hidden,
+                lastTimeUpdated = value.lastTimeUpdated
+            )
+            acc.merge(neuInternalName, trackedItem, ::mergeBuckets)
+        }
+
         override fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> =
             buckets.distinct().fold(mutableMapOf()) { acc, bucket ->
                 if (bucket in config.profitTypes.get()) {
@@ -145,6 +158,16 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
                                 // compact crops if config option enabled
                             } else if (bucket == GardenTrackerTypes.BREAKING_CROPS) {
                                 if (!config.includeHarvestedCrops.get()) return@forEach
+                                // seed handling
+                                if (key == SEEDS) {
+                                    val compactedCrop = when (config.compactMode.get()) {
+                                        HarvestedCropsMode.BASE -> SEEDS
+                                        HarvestedCropsMode.COMPACTED -> ENCHANTED_SEEDS
+                                        HarvestedCropsMode.SUPER_COMPACTED -> "BOX_OF_SEEDS".toInternalName()
+                                        else -> null
+                                    } ?: return@forEach
+                                    merge(compactedCrop, acc, value)
+                                }
                                 val crop = CropType.getByInternalNameOrNull(key) ?: run {
                                     // handling for skyblock coins
                                     acc.merge(key, value, ::mergeBuckets)
@@ -156,15 +179,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
                                     HarvestedCropsMode.SUPER_COMPACTED -> crop.superCompactedName
                                     else -> null
                                 } ?: return@forEach
-                                val primitiveAmount = NeuItems.getPrimitiveMultiplier(compactedCrop).amount
-                                val amount = floor((value.totalAmount / primitiveAmount).toDouble())
-                                val trackedItem = value.copy(
-                                    timesGained = value.timesGained,
-                                    totalAmount = amount.toLong(),
-                                    hidden = value.hidden,
-                                    lastTimeUpdated = value.lastTimeUpdated
-                                )
-                                acc.merge(compactedCrop, trackedItem, ::mergeBuckets)
+                                merge(compactedCrop, acc, value)
                             }
                         }
                 }
