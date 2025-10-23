@@ -174,6 +174,7 @@ class GuiPositionEditor(
     private fun getScaledHeight() = GuiScreenUtils.scaledWindowHeight
     private fun getScaledWidth() = GuiScreenUtils.scaledWindowWidth
 
+    @Suppress("LoopWithTooManyJumpStatements")
     override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
         val (mouseX, mouseY) = GuiScreenUtils.mousePos
 
