@@ -21,6 +21,7 @@ import kotlinx.coroutines.Job
 import net.minecraft.client.Minecraft
 import java.util.NavigableMap
 import java.util.TreeMap
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object ChangelogViewer {
@@ -61,7 +62,7 @@ object ChangelogViewer {
 
     private fun setupFetchJob() {
         if (fetchJob?.isActive == true) return
-        fetchJob = SkyHanniMod.launchIOCoroutine("changelog viewer fetch data") { getChangelog() }
+        fetchJob = SkyHanniMod.launchIOCoroutine("changelog viewer fetch data", timeout = 1.minutes) { getChangelog() }
     }
 
     private fun openChangelog() {

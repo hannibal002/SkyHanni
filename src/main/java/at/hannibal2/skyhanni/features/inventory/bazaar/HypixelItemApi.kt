@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
+import kotlin.time.Duration.Companion.minutes
 
 class HypixelItemApi {
 
@@ -59,7 +60,7 @@ class HypixelItemApi {
     }
 
     fun start() {
-        SkyHanniMod.launchIOCoroutine("hypixel item api fetch") {
+        SkyHanniMod.launchIOCoroutine("hypixel item api fetch", timeout = 1.minutes) {
             loadItemData()
             prices = georgePrices + npcPrices
         }

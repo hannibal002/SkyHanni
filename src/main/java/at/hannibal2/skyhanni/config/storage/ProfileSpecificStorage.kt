@@ -756,10 +756,10 @@ class ProfileSpecificStorage(
             var corpseProfitTracker: CorpseTracker.BucketData = CorpseTracker.BucketData()
 
             @Expose
-            var mineshaftsEnteredSince: MutableMap<MineshaftDetection.MineshaftTypes, Int> = mutableMapOf()
+            var mineshaftsEnteredSinceNew: MutableMap<MineshaftDetection.MineshaftType, Int> = mutableMapOf()
 
             @Expose
-            var lastMineshaftTime: MutableMap<MineshaftDetection.MineshaftTypes, SimpleTimeMark> = mutableMapOf()
+            var lastMineshaftTimeNew: MutableMap<MineshaftDetection.MineshaftType, SimpleTimeMark> = mutableMapOf()
         }
 
         @Expose

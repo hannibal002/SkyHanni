@@ -15,6 +15,9 @@ import com.mojang.blaze3d.systems.RenderPass
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.render.state.GlyphGuiElementRenderState
 import net.minecraft.client.gui.render.state.SimpleGuiElementRenderState
+//#if MC > 1.21.8
+//$$ import net.minecraft.client.font.BakedGlyphImpl.DrawnGlyph
+//#endif
 
 object GuiRendererHook {
     var chromaUniform = SkyHanniChromaUniform()
@@ -53,7 +56,12 @@ object GuiRendererHook {
         if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return original.call(state)
 
         if (state is GlyphGuiElementRenderState) {
+            //#if MC < 1.21.9
             val glyphColor = state.instance().style().color
+            //#else
+            //$$ val drawnGlyph = state.renderable as? DrawnGlyph ?: return original.call(state)
+            //$$ val glyphColor = drawnGlyph.style.color
+            //#endif
             if (glyphColor != null && glyphColor.name == "chroma") {
                 return SkyHanniRenderPipeline.CHROMA_TEXT.invoke()
             }
