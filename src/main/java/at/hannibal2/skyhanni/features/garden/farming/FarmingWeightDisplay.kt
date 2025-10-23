@@ -334,7 +334,7 @@ object FarmingWeightDisplay {
             }
         }
 
-        event.add(107, "garden.eliteFarmingWeights.text") {
+        event.add(110, "garden.eliteFarmingWeights.text") {
             ConfigManager.gson.toJsonTree(displayList)
         }
 
