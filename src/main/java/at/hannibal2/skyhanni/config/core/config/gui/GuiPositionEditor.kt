@@ -84,29 +84,27 @@ class GuiPositionEditor(
     }
 
     private fun renderLabels(hoveredPos: Int) {
-        var displayPos = -1
-        if (clickedPos != -1 && positions[clickedPos].clicked) {
-            displayPos = clickedPos
-        }
-        if (displayPos == -1) {
-            displayPos = hoveredPos
+        val displayPos = when {
+            clickedPos != -1 && positions[clickedPos].clicked -> clickedPos
+            else -> hoveredPos
         }
 
         // When the mouse isn't currently hovering over a gui element
-        if (displayPos == -1) {
+        val text = if (displayPos == -1) {
             val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == Keyboard.KEY_NONE
-            renderHover(
-                buildList {
-                    add("§cSkyHanni Position Editor")
-                    if (extraInfo) {
-                        add("§aTo edit hidden GUI elements set a key in /sh edit")
-                        add("§athen click that key while the GUI element is visible")
-                    }
-                },
-            )
-            return
+
+            buildList {
+                add("§cSkyHanni Position Editor")
+                if (extraInfo) {
+                    add("§aTo edit hidden GUI elements set a key in /sh edit")
+                    add("§athen click that key while the GUI element is visible")
+                }
+            }
+        } else {
+            getTextForPos(positions[displayPos])
         }
-        renderHover(getTextForPos(positions[displayPos]))
+
+        renderHover(text)
     }
 
     private fun getTextForPos(pos: Position): List<String> {
@@ -119,8 +117,14 @@ class GuiPositionEditor(
             "",
             "§eRight-Click to open associated config options!",
             "§eUse Scroll-Wheel to resize!",
-            "§eMiddle-Click to reset to default position!",
+            "§e${getKeyName(config.keyBindReset)}to reset to default position!",
         )
+    }
+
+    private fun getKeyName(keyCode: Int): String = when (keyCode) {
+        -98 -> "Middle-Click"
+        Keyboard.KEY_NONE -> "Unbound"
+        else -> Keyboard.getKeyName(keyCode) ?: "Unknown"
     }
 
     private fun renderHover(text: List<String>) {
@@ -129,52 +133,48 @@ class GuiPositionEditor(
 
     private fun renderRectangles(): Int {
         var hoveredPos = -1
-        DrawContextUtils.pushMatrix()
-        width = getScaledWidth()
-        height = getScaledHeight()
+        DrawContextUtils.pushPop {
+            width = getScaledWidth()
+            height = getScaledHeight()
 
-        val (mouseX, mouseY) = GuiScreenUtils.mousePos
+            val (mouseX, mouseY) = GuiScreenUtils.mousePos
+            var alreadyHadHover = false
 
-        var alreadyHadHover = false
-        for ((index, position) in positions.withIndex().reversed()) {
-            var elementWidth = position.getDummySize(true).x
-            var elementHeight = position.getDummySize(true).y
-            if (position.clicked) {
-                grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
-                grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
-            }
+            for ((index, position) in positions.withIndex().reversed()) {
+                val dummy = position.getDummySize(true)
+                if (position.clicked) {
+                    grabbedX += position.moveX(mouseX - grabbedX, dummy.x)
+                    grabbedY += position.moveY(mouseY - grabbedY, dummy.y)
+                }
 
-            val isHovering = position.isHovered() && !alreadyHadHover
+                val isHovering = position.isHovered() && !alreadyHadHover
 
-            val x = position.getAbsX()
-            val y = position.getAbsY()
+                val x = position.getAbsX()
+                val y = position.getAbsY()
 
-            elementWidth = position.getDummySize().x
-            elementHeight = position.getDummySize().y
+                val gray = -0x7fbfbfc0 // #40404080
+                val selected = -0x7F0F0F10 // #F0F0F080
+                GuiRenderUtils.drawRect(
+                    x - border,
+                    y - border,
+                    x + position.getDummySize().x + border * 2,
+                    y + position.getDummySize().y + border * 2,
+                    if (isHovering) selected else gray,
+                )
 
-            val gray = -0x7fbfbfc0 // #40404080
-            val selected = -0x7F0F0F10 // #F0F0F080
-            GuiRenderUtils.drawRect(
-                x - border,
-                y - border,
-                x + elementWidth + border * 2,
-                y + elementHeight + border * 2,
-                if (isHovering) selected else gray,
-            )
-
-            if (isHovering) {
-                alreadyHadHover = true
-                hoveredPos = index
+                if (isHovering) {
+                    alreadyHadHover = true
+                    hoveredPos = index
+                }
             }
         }
-        DrawContextUtils.popMatrix()
+
         return hoveredPos
     }
 
     private fun getScaledHeight() = GuiScreenUtils.scaledWindowHeight
     private fun getScaledWidth() = GuiScreenUtils.scaledWindowWidth
 
-    @Suppress("LoopWithTooManyJumpStatements")
     override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
         val (mouseX, mouseY) = GuiScreenUtils.mousePos
 
@@ -182,27 +182,24 @@ class GuiPositionEditor(
             val position = positions[i]
             if (!position.isHovered()) continue
 
-            if (mouseButton == 1) {
-                position.jumpToConfigOptions()
-                break
+            when (mouseButton) {
+                1 -> position.jumpToConfigOptions()
+                2 -> if (config.keyBindReset == -98) position.resetPositionAndScale()
+                0 -> if (!position.clicked) {
+                    clickedPos = i
+                    position.clicked = true
+                    grabbedX = mouseX
+                    grabbedY = mouseY
+                }
             }
-            if (mouseButton == 2 && config.keyBindReset == -98) {
-                position.resetPositionAndScale()
-                break
-            }
-            if (!position.clicked && mouseButton == 0) {
-                clickedPos = i
-                position.clicked = true
-                grabbedX = mouseX
-                grabbedY = mouseY
-                break
-            }
+
+            break
         }
     }
 
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
         if (keyCode == config.keyBindReset) {
-            positions.first { it.isHovered() }.resetPositionAndScale()
+            positions.firstOrNull { it.isHovered() }?.resetPositionAndScale()
             return
         }
         if (clickedPos == -1) return
@@ -217,10 +214,8 @@ class GuiPositionEditor(
             Keyboard.KEY_UP -> position.moveY(-dist, elementHeight)
             Keyboard.KEY_LEFT -> position.moveX(-dist, elementWidth)
             Keyboard.KEY_RIGHT -> position.moveX(dist, elementWidth)
-            Keyboard.KEY_MINUS -> position.scale -= .1F
-            Keyboard.KEY_EQUALS -> position.scale += .1F
-            Keyboard.KEY_SUBTRACT -> position.scale -= .1F
-            Keyboard.KEY_ADD -> position.scale += .1F
+            Keyboard.KEY_MINUS, Keyboard.KEY_SUBTRACT -> position.scale -= .1F
+            Keyboard.KEY_EQUALS, Keyboard.KEY_ADD -> position.scale += .1F
         }
     }
 
@@ -281,16 +276,9 @@ class GuiPositionEditor(
     }
 
     override fun onHandleMouseInput() {
-        val mw = MouseCompat.getScrollDelta()
-        if (mw == 0) return
-
-        val (mouseX, mouseY) = GuiScreenUtils.mousePos
-
+        val scroll = MouseCompat.getScrollDelta().takeIf { it != 0 } ?: return
         val hovered = positions.firstOrNull { it.clicked } ?: positions.lastOrNull { it.isHovered() } ?: return
-        if (mw < 0)
-            hovered.scale -= .1F
-        else
-            hovered.scale += .1F
+        hovered.scale += if (scroll > 0) .1F else -.1F
     }
 
     //#if MC > 1.21
