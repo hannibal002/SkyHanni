@@ -37,7 +37,7 @@ enum class CropType(
     POTATO(
         "Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0,
         { ItemStack(Items.potato) }, "potato", FarmingItemType.POTATO, "ENCHANTED_BAKED_POTATO".toInternalName(),
-        replenish = true
+        replenish = true, internalName = "POTATO_ITEM".toInternalName()
     ),
     NETHER_WART(
         "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
