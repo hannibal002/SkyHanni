@@ -118,28 +118,10 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         event.addItemFromEvent()
     }
 
-    private val rangedItems: MutableSet<NeuInternalName> = mutableSetOf()
-
     @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!isInIsland()) return
-        event.readTreeGifts()
         event.addLogs()
-    }
-
-    private fun SackChangeEvent.readTreeGifts() {
-        val treeType = treeType ?: return
-        if (lastTreeGiftAt.passedSince() >= 30.seconds) return
-        sackChanges.filter {
-            it.delta > 0 && it.internalName in rangedItems
-        }.forEach {
-            addItem(
-                treeType,
-                it.internalName,
-                it.delta,
-                command = false,
-            )
-        }
     }
 
     private data class LogSackChange(
@@ -195,8 +177,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private val STRETCHING_STICKS = "STRETCHING_STICKS".toInternalName()
     private var currentStretchingSticks = 0
 
-    @HandleEvent
-    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
+    @HandleEvent(OwnInventoryItemUpdateEvent::class)
+    fun onOwnInventoryItemUpdate() {
         if (!isInIsland()) return
         val treeType = treeType ?: return
 
@@ -289,13 +271,6 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
                 group("item") to amountString
             } ?: return@forEach
             ChatUtils.debug("found hover loot: $item x$amountString")
-            if (amountString.contains("-")) {
-                NeuInternalName.fromItemNameOrNull(item)?.let {
-                    // Skip ranges like "0-2" (for now), handle from sack changes
-                    rangedItems.add(it)
-                }
-                return@forEach
-            }
             val amount = amountString.formatIntOrNull() ?: return@forEach
             when (item) {
                 "HOTF Experience" -> modify {

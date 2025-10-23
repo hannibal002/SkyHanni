@@ -5,6 +5,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class LobbyWaypointsConfig {
+
     @Expose
     @ConfigOption(name = "Easter Egg Waypoints", desc = "")
     @Accordion

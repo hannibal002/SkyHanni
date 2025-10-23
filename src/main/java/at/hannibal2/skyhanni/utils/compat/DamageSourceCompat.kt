@@ -18,7 +18,7 @@ object DamageSourceCompat {
     val starve get(): DamageSource = DamageSource.starve
     val wither get(): DamageSource = DamageSource.wither
     //#else
-    //$$ private val damageSources = MinecraftCompat.localPlayer.world.damageSources
+    //$$ private val damageSources = MinecraftCompat.localWorld.damageSources
     //$$ val cactus get(): DamageSource = damageSources.cactus()
     //$$ val drown get(): DamageSource = damageSources.drown()
     //$$ val fall get(): DamageSource = damageSources.fall()
