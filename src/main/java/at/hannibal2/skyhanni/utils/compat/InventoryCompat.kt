@@ -56,7 +56,9 @@ val GuiChest.container: Container
 
 object InventoryCompat {
 
-    // Not meant to be called directly, prefer `InventoryUtils.clickSlot()`.
+    /**
+     * Internal method, not meant to be called directly. Prefer `InventoryUtils.clickSlot()`.
+     */
     fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: Int) {
         val controller = Minecraft.getMinecraft().playerController ?: return
         val player = Minecraft.getMinecraft().thePlayer ?: return
@@ -67,7 +69,9 @@ object InventoryCompat {
         //#endif
     }
 
-    // Not meant to be called directly, prefer `InventoryUtils.mouseClickSlot()`.
+    /**
+     * Internal method, not meant to be called directly. Prefer `InventoryUtils.clickSlot()`.
+     */
     fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: Int) {
         if (slot < 0) return
         val gui = Minecraft.getMinecraft().currentScreen
