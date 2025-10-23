@@ -203,7 +203,7 @@ object DicerRngDropTracker {
         event.move(87, "garden.dicerCounters.display", "garden.dicerCounters.enabled")
         event.move(88, "garden.dicerCounters", "garden.dicerRngDropTracker")
 
-        event.transform(109, "#profile.garden.dicerDropTracker") { entry ->
+        event.transform(112, "#profile.garden.dicerDropTracker") { entry ->
             val timedTrackerData: TimedTrackerData<Data> = TimedTrackerData { Data() }
             timedTrackerData.createEntry(SkyHanniTracker.DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<Data>(entry))
             ConfigManager.gson.toJsonTree(timedTrackerData)

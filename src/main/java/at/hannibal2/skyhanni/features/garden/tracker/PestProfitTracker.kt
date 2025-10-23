@@ -390,7 +390,7 @@ object PestProfitTracker : SkyHanniTimedBucketedItemTracker<PestType, PestProfit
             entry
         }
 
-        event.transform(109, "#profile.garden.pestProfitTracker") { entry ->
+        event.transform(112, "#profile.garden.pestProfitTracker") { entry ->
             val timedTrackerData: TimedTrackerData<BucketData> = TimedTrackerData { BucketData() }
             timedTrackerData.createEntry(DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<BucketData>(entry))
             ConfigManager.gson.toJsonTree(timedTrackerData)

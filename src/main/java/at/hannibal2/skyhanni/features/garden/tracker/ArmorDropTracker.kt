@@ -182,7 +182,7 @@ object ArmorDropTracker {
         event.move(87, "garden.farmingArmorDrop.pos", "garden.armorDropTracker.position")
         event.move(88, "garden.farmingArmorDrop", "garden.armorDropTracker")
 
-        event.transform(109, "#profile.garden.armorDropTracker") { entry ->
+        event.transform(112, "#profile.garden.armorDropTracker") { entry ->
             val timedTrackerData: TimedTrackerData<Data> = TimedTrackerData { Data() }
             timedTrackerData.createEntry(SkyHanniTracker.DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<Data>(entry))
             ConfigManager.gson.toJsonTree(timedTrackerData)
