@@ -3,9 +3,13 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
-
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
+//#endif
+//#if MC > 1.21.8
+//$$ import net.minecraft.client.gui.Click
+//$$ import net.minecraft.client.input.CharInput
+//$$ import net.minecraft.client.input.KeyInput
 //#endif
 
 @Suppress("UnusedParameter")
@@ -56,11 +60,17 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         super.mouseClicked(mouseX, mouseY, mouseButton)
         postMouseClicked(mouseX, mouseY, mouseButton)
     }
-    //#else
+    //#elseif MC < 1.21.9
     //$$ override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
     //$$     postMouseClicked(mouseX.toInt(), mouseY.toInt(), mouseButton)
     //$$     postHandleMouseInput()
     //$$     return super.mouseClicked(mouseX, mouseY, mouseButton)
+    //$$ }
+    //#else
+    //$$ override fun mouseClicked(click: Click, doubled: Boolean): Boolean {
+    //$$     postMouseClicked(click.x.toInt(), click.y.toInt(), click.button())
+    //$$     postHandleMouseInput()
+    //$$     return super.mouseClicked(click, doubled)
     //$$ }
     //#endif
 
@@ -79,7 +89,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         super.keyTyped(typedChar, keyCode)
         postKeyTyped(typedChar, keyCode)
     }
-    //#else
+    //#elseif MC < 1.21.9
     //$$ override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
     //$$     postKeyTyped(null, keyCode)
     //$$     return super.keyPressed(keyCode, scanCode, modifiers)
@@ -88,6 +98,16 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$ override fun charTyped(chr: Char, modifiers: Int): Boolean {
     //$$     postKeyTyped(chr, null)
     //$$     return super.charTyped(chr, modifiers)
+    //$$ }
+    //#else
+    //$$ override fun keyPressed(input: KeyInput): Boolean {
+    //$$     postKeyTyped(null, input.key)
+    //$$     return super.keyPressed(input)
+    //$$ }
+    //$$
+    //$$ override fun charTyped(input: CharInput): Boolean {
+    //$$     postKeyTyped(input.codepoint.toChar(), null)
+    //$$     return super.charTyped(input)
     //$$ }
     //#endif
 
@@ -106,11 +126,17 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         super.mouseReleased(mouseX, mouseY, state)
         postMouseReleased(mouseX, mouseY, state)
     }
-    //#else
+    //#elseif MC < 1.21.9
     //$$ override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
     //$$     postMouseReleased(mouseX.toInt(), mouseY.toInt(), button)
     //$$     postHandleMouseInput()
     //$$     return super.mouseReleased(mouseX, mouseY, button)
+    //$$ }
+    //#else
+    //$$ override fun mouseReleased(click: Click): Boolean {
+    //$$     postMouseReleased(click.x.toInt(), click.y.toInt(), click.button())
+    //$$     postHandleMouseInput()
+    //$$     return super.mouseReleased(click)
     //$$ }
     //#endif
 
@@ -129,12 +155,19 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick)
         postMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick)
     }
-    //#else
+    //#elseif MC < 1.21.9
     //$$ override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
     //$$     // TODO there is no timeSince last click in modern
     //$$     postMouseClickMove(mouseX.toInt(), mouseY.toInt(), button, 0L)
     //$$     postHandleMouseInput()
     //$$     return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
+    //$$ }
+    //#else
+    //$$ override fun mouseDragged(click: Click, mouseX: Double, mouseY: Double): Boolean {
+    //$$     // TODO idk if mouseX is correct or if it should be click.x
+    //$$     postMouseClickMove(mouseX.toInt(), mouseY.toInt(), click.button(), 0L)
+    //$$     postHandleMouseInput()
+    //$$     return super.mouseDragged(click, mouseX, mouseY)
     //$$ }
     //#endif
 

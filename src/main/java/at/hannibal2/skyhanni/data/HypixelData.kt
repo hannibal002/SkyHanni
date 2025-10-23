@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -64,16 +65,6 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST: §b§lArea: §r§7Private Island
-     * REGEX-TEST: §b§lDungeon: §r§7Catacombs
-     */
-    @Suppress("UnusedPrivateProperty")
-    private val islandNamePattern by patternGroup.pattern(
-        "islandname",
-        "(?:§.)*(?:Area|Dungeon): (?:§.)*(?<island>.*)",
-    )
-
-    /**
      * REGEX-TEST: §711/15/24 §8m19CJ
      * REGEX-TEST: §711/15/24 §8m1F
      */
@@ -119,11 +110,12 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST:  §a✌ §7(§a11§7/20)
+     * WRAPPED-REGEX-TEST: " §a✌ §7(§a11§7/20)"
+     * WRAPPED-REGEX-TEST: " §a✌ §7(§e1/1§7)"
      */
     private val scoreboardVisitingAmountPattern by patternGroup.pattern(
         "scoreboard.visiting.amount",
-        "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
+        "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)(?:§.)?/(?<maxamount>\\d+)(?:§.)?\\)",
     )
     private val guestPattern by patternGroup.pattern(
         "guesting.scoreboard",
@@ -134,10 +126,14 @@ object HypixelData {
      * REGEX-TEST: SKYBLOCK
      * REGEX-TEST: SKYBLOCK GUEST
      * REGEX-TEST: SKYBLOCK CO-OP
+     * REGEX-TEST: SKYBLOCK ♲
+     * REGEX-TEST: SKYBLOCK ☀
+     * REGEX-TEST: SKYBLOCK Ⓑ
+     *
      */
     private val scoreboardTitlePattern by patternGroup.pattern(
         "scoreboard.title",
-        "SK[YI]BLOCK(?: CO-OP| GUEST)?",
+        "SK[YI]BLOCK(?: CO-OP| GUEST)?(?: [♲☀Ⓑ])?",
     )
 
     /**
@@ -426,8 +422,11 @@ object HypixelData {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
                 SkyHanniMod.launchIOCoroutine("hypixel join repo update") {
-                    SkyHanniRepoManager.displayRepoStatus(true)
-                    EnoughUpdatesRepoManager.displayRepoStatus(true)
+                    val progress = ChatProgressUpdates()
+                    progress.start("hypixel join repo update check")
+                    SkyHanniRepoManager.displayRepoStatus(progress, joinEvent = true)
+                    EnoughUpdatesRepoManager.displayRepoStatus(progress, joinEvent = true)
+                    progress.end("done with checking both repos")
                 }
             }
 
@@ -446,7 +445,7 @@ object HypixelData {
 
         val inSkyBlock = checkScoreboard()
         if (inSkyBlock) {
-            checkSidebar()
+            checkSpecialModes()
             checkCurrentServerId()
         } else {
             if (!skyBlock) {
@@ -533,11 +532,20 @@ object HypixelData {
         HypixelLocationApi.checkEquals()
     }
 
-    private fun checkSidebar() {
+    private fun checkSpecialModes() {
+        val scoreboardTitle = getScoreboardTitle() ?: return
+        if (scoreboardTitle.contains("GUEST")) return
         ironman = false
         stranded = false
         bingo = false
 
+
+
+        if (scoreboardTitle.contains("♲")) ironman = true
+        else if (scoreboardTitle.contains("☀")) stranded = true
+
+        // remove once update is on main
+        // make sure to keep the bingo part when you remove it
         for (line in ScoreboardData.sidebarLinesFormatted) {
             if (BingoApi.getRankFromScoreboard(line) != null) {
                 bingo = true
@@ -600,11 +608,16 @@ object HypixelData {
         return islandType
     }
 
-    private fun checkScoreboard(): Boolean {
-        val world = MinecraftCompat.localWorldOrNull ?: return false
+    fun getScoreboardTitle(): String? {
+        val world = MinecraftCompat.localWorldOrNull ?: return null
 
-        val objective = world.scoreboard.getSidebarObjective() ?: return false
+        val objective = world.scoreboard.getSidebarObjective() ?: return null
         val displayName = objective.displayName
+        return displayName
+    }
+
+    private fun checkScoreboard(): Boolean {
+        val displayName = getScoreboardTitle() ?: return false
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
