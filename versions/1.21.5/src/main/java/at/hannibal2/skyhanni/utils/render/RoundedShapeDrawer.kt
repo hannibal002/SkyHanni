@@ -25,6 +25,9 @@ import net.minecraft.util.Identifier
 //$$ import org.joml.Matrix4f
 //$$ import org.joml.Vector4f
 //#endif
+//#if MC > 1.21.8
+//$$ import org.joml.Vector3f
+//#endif
 
 object RoundedShapeDrawer {
 
@@ -40,7 +43,7 @@ object RoundedShapeDrawer {
     //$$ var radialGradientCircleBufferSlice: GpuBufferSlice? = null
     //#endif
 
-    private fun <T: RoundedShader<T>> T.performBaseUniforms(
+    private fun <T : RoundedShader<T>> T.performBaseUniforms(
         renderPass: RenderPass,
         withSmoothness: Boolean = true,
         withHalfSize: Boolean = true,
@@ -57,7 +60,7 @@ object RoundedShapeDrawer {
         //#endif
     }
 
-    private fun <T: RoundedShader<T>> T.performVQuadAndUniforms(
+    private fun <T : RoundedShader<T>> T.performVQuadAndUniforms(
         pipeline: RenderPipeline,
         x1: Int, y1: Int, x2: Int, y2: Int,
         postVertexOps: List<(BufferBuilder.() -> Unit)>,
@@ -72,13 +75,17 @@ object RoundedShapeDrawer {
             x1 to y1,
             x1 to y2,
             x2 to y2,
-            x2 to y1
+            x2 to y1,
         ).map { (x, y) -> x.toFloat() to y.toFloat() }
 
         with(RenderPipelineDrawer) {
             val buffer = getBuffer(pipeline)
             floatPairs.forEachIndexed { i, (x, y) ->
+                //#if MC < 1.21.9
                 buffer.vertex(matrices, x, y, 0f).apply {
+                    //#else
+                    //$$ buffer.vertex(matrices, x, y).apply {
+                    //#endif
                     val postOp = postVertexOps.getOrNull(i)
                         ?: postVertexOps.getOrNull(0)
                         ?: return@forEachIndexed
@@ -102,7 +109,11 @@ object RoundedShapeDrawer {
             //$$     .write(
             //$$         Matrix4f().setTranslation(0.0f, 0.0f, -11000.0f),
             //$$ 		 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
+            //#if MC < 1.21.9
             //$$ 		 RenderSystem.getModelOffset(),
+            //#else
+            //$$         Vector3f(),
+            //#endif
             //$$ 		 RenderSystem.getTextureMatrix(),
             //$$ 		 RenderSystem.getShaderLineWidth()
             //$$     )
@@ -148,7 +159,7 @@ object RoundedShapeDrawer {
                 { texture(0f, 1f) },
                 { texture(1f, 1f) },
                 { texture(1f, 0f) },
-            )
+            ),
         ) {
             bindSampler("textureSampler", glTex)
         }
@@ -216,7 +227,7 @@ object RoundedShapeDrawer {
             SkyHanniRenderPipeline.RADIAL_GRADIENT_CIRCLE(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
-                { color(startColor.toColor().rgb ) },
+                { color(startColor.toColor().rgb) },
                 { color(endColor.toColor().rgb) },
             ),
             //#if MC > 1.21.6
@@ -248,7 +259,7 @@ object RoundedShapeDrawer {
             this.toColor().red.toFloat() / 255f,
             this.toColor().green.toFloat() / 255f,
             this.toColor().blue.toFloat() / 255f,
-            this.alpha.toFloat() / 255f
+            this.alpha.toFloat() / 255f,
         )
     }
 

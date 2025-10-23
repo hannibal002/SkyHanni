@@ -169,7 +169,7 @@ object PestProfitTracker : SkyHanniTimedBucketedItemTracker<PestType, PestProfit
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
-            if (config.hideChat) blockedReason = "pest_drop"
+            if (config.hideChat && config.enabled) blockedReason = "pest_drop"
 
             addItem(pest, internalName, amount, command = false)
 
@@ -395,7 +395,7 @@ object PestProfitTracker : SkyHanniTimedBucketedItemTracker<PestType, PestProfit
             entry
         }
 
-        event.transform(109, "#profile.garden.pestProfitTracker") { entry ->
+        event.transform(112, "#profile.garden.pestProfitTracker") { entry ->
             val timedTrackerData: TimedTrackerData<BucketData> = TimedTrackerData { BucketData() }
             timedTrackerData.createEntry(DisplayMode.TOTAL, "total", ConfigManager.gson.fromJson<BucketData>(entry))
             ConfigManager.gson.toJsonTree(timedTrackerData)

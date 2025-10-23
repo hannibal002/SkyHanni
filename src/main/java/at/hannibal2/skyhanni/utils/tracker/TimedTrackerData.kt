@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.features.misc.tracker.TimedTrackerConfig
+import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
 import at.hannibal2.skyhanni.utils.TimeUtils.weekFormatter
@@ -131,7 +132,7 @@ open class TimedTrackerData<Data : TrackerData<*>>(
     fun getDefaultName(displayMode: DisplayMode): String {
         if (displayMode.isDate) return getCurrentDateName(displayMode)
         return when (displayMode) {
-            DisplayMode.MAYOR -> SkyBlockTime.now().year.toString()
+            DisplayMode.MAYOR -> SkyBlockTime.now().getElectionYear().toString()
             DisplayMode.SESSION -> getMostRecentName(displayMode) ?: "1"
             else -> displayMode.name.lowercase()
         }

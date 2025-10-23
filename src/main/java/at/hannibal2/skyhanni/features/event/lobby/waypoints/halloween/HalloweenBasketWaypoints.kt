@@ -70,12 +70,12 @@ object HalloweenBasketWaypoints {
         if (newClosest == closestBasket) return
 
         closestBasket = newClosest
-        if (config.pathfind.get() && config.allWaypoints) startPathfind()
+        if (config.pathfind.get() && config.enabled) startPathfind()
     }
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!config.allWaypoints) return
+        if (!config.enabled) return
         if (!isActive) return
         if (!isEnabled()) return
 
@@ -98,7 +98,7 @@ object HalloweenBasketWaypoints {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!isActive) return
-        if (!config.allWaypoints) return
+        if (!config.enabled) return
 
         if (config.onlyClosest) {
             closestBasket.render(event)
@@ -145,7 +145,7 @@ object HalloweenBasketWaypoints {
                 basketList.add(EventWaypoint(position = node.position, isFound = false))
             }
             closestBasket = getClosest(nodeList)
-            if (config.pathfind.get() && config.allWaypoints) startPathfind()
+            if (config.pathfind.get() && config.enabled) startPathfind()
         }
         isActive = newIsActive
     }
@@ -164,7 +164,7 @@ object HalloweenBasketWaypoints {
             basket.position,
             "§dNext Basket",
             LorenzColor.LIGHT_PURPLE.toColor(),
-            condition = { config.pathfind.get() && closestBasket != null && config.allWaypoints },
+            condition = { config.pathfind.get() && closestBasket != null && config.enabled },
         )
     }
 
@@ -181,7 +181,7 @@ object HalloweenBasketWaypoints {
 
     private fun disableFeature() {
         ChatUtils.chat("Disabling Halloween Basket waypoints since you found all of them!")
-        config.allWaypoints = false
+        config.enabled = false
     }
 
     private fun isEnabled() = HypixelData.hypixelLive && !SkyBlockUtils.inSkyBlock
@@ -189,5 +189,6 @@ object HalloweenBasketWaypoints {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(13, "event.halloweenBasket", "event.lobbyWaypoints.halloweenBasket")
+        event.move(108, "event.lobbyWaypoints.halloweenBasket.allWaypoints", "event.lobbyWaypoints.halloweenBasket.enabled")
     }
 }
