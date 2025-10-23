@@ -19,5 +19,6 @@ class ForagingTutorialQuestConfig {
     @ConfigOption(name = "Suggest to enable", desc = "When useful, suggest in chat to enable this feature.")
     @OnlyModern
     @ConfigEditorBoolean
+    @FeatureToggle
     var suggestToEnable: Boolean = true
 }
