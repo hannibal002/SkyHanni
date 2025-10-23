@@ -16,6 +16,11 @@ class FakePlayer : OtherClientPlayerEntity(MinecraftCompat.localWorld, Minecraft
         override fun getNameTagVisibilityRule() = VisibilityRule.NEVER
     }
 
+    //#if MC < 1.21.9
     override fun isPartVisible(part: PlayerModelPart): Boolean =
         MinecraftCompat.localPlayer.isPartVisible(part) && part != PlayerModelPart.CAPE
+    //#else
+    //$$ override fun isModelPartVisible(part: PlayerModelPart): Boolean =
+    //$$    MinecraftCompat.localPlayer.isModelPartVisible(part) && part != PlayerModelPart.CAPE
+    //#endif
 }

@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class HalloweenBasketConfig {
-    // TODO rename to "enabled"
+
     @Expose
     @ConfigOption(
         name = "Enabled",
@@ -16,7 +16,7 @@ class HalloweenBasketConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var allWaypoints: Boolean = false
+    var enabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Only Closest", desc = "Only show the closest waypoint.")
@@ -26,5 +26,6 @@ class HalloweenBasketConfig {
     @Expose
     @ConfigOption(name = "Pathfind", desc = "Show a path to the closest basket.")
     @ConfigEditorBoolean
+    @FeatureToggle
     val pathfind: Property<Boolean> = Property.of(true)
 }
