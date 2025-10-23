@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenApi.readCounter
 import at.hannibal2.skyhanni.features.garden.GardenApi.readCultivatingCounter
+import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay.SEEDS
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -142,7 +143,7 @@ object GardenCropBreakTracker {
         }
 
         if (seedAmount > 0) {
-            GardenProfitTracker.addItem(GardenTrackerTypes.BREAKING_CROPS, "seed".toInternalName(), seedAmount, false)
+            GardenProfitTracker.addItem(GardenTrackerTypes.BREAKING_CROPS, SEEDS, seedAmount, false)
             seedAmount = 0
         }
     }
