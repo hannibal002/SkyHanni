@@ -10,15 +10,16 @@ data class EnforcedConfigValuesJson(
 )
 
 data class EnforcedValueData(
-    @Expose var enforcedValues: List<EnforcedValue> = listOf(),
-    @Expose var notificationPSA: List<String>? = null,
-    @Expose var chatPSA: List<String>? = null,
-    @Expose var affectedVersion: ModVersion,
-    @Expose var affectedMinecraftVersions: List<String>? = null,
-    @Expose var extraMessage: String? = null,
+    @Expose val enforcedValues: List<EnforcedValue> = listOf(),
+    @Expose val notificationPSA: List<String>? = null,
+    @Expose val chatPSA: List<String>? = null,
+    @Expose val minimumAffectedVersion: ModVersion? = null,
+    @Expose val affectedVersion: ModVersion,
+    @Expose val affectedMinecraftVersions: List<String>? = null,
+    @Expose val extraMessage: String? = null,
 )
 
 data class EnforcedValue(
-    @Expose var path: String,
-    @Expose var value: JsonElement,
+    @Expose val path: String,
+    @Expose val value: JsonElement,
 )

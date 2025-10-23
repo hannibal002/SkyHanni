@@ -22,6 +22,7 @@ public class MixinDebugHud {
     @Final
     private MinecraftClient client;
 
+    //#if MC < 1.21.9
     @WrapOperation(method = "getLeftText", slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getBiome(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/registry/entry/RegistryEntry;")), at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 2))
     public <E> boolean addDay(List instance, E e, Operation<Boolean> original) {
         long time = client.world.getTimeOfDay();
@@ -29,6 +30,7 @@ public class MixinDebugHud {
         instance.add("Local Difficulty: ?? (Day " + time / 24000L + ")");
         return false;
     }
+    //#endif
 
     @Inject(method = "shouldShowPacketSizeAndPingCharts", at = @At("HEAD"), cancellable = true)
     public void shouldShowPacketSizeAndPingCharts(CallbackInfoReturnable<Boolean> cir) {

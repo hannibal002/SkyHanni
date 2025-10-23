@@ -19,6 +19,9 @@ import net.minecraft.client.render.RenderLayer.MultiPhase
 //$$ import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
 //$$ import org.joml.Vector4f
 //#endif
+//#if MC > 1.21.8
+//$$ import org.joml.Vector3f
+//#endif
 
 class ChromaRenderLayer(
     name: String, size: Int, hasCrumbling: Boolean, translucent: Boolean, pipeline: RenderPipeline, phases: MultiPhaseParameters,
@@ -47,7 +50,11 @@ class ChromaRenderLayer(
         //$$     .write(
         //$$         RenderSystem.getModelViewMatrix(),
         //$$ 		 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
+        //#if MC < 1.21.9
         //$$ 		 RenderSystem.getModelOffset(),
+        //#else
+        //$$         Vector3f(),
+        //#endif
         //$$ 		 RenderSystem.getTextureMatrix(),
         //$$ 		 RenderSystem.getShaderLineWidth()
         //$$     )

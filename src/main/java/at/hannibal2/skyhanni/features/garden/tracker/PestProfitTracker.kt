@@ -162,7 +162,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
-            if (config.hideChat) blockedReason = "pest_drop"
+            if (config.hideChat && config.enabled) blockedReason = "pest_drop"
 
             addItem(pest, internalName, amount, command = false)
 
