@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -72,6 +73,8 @@ object GhostTracker {
 
     private var inArea: Boolean = false
     private var foundGhostBestiary: Boolean = false
+
+    private val ghostShard = "ATTRIBUTE_SHARD_VEIL;1".toInternalName()
 
     private val tracker = SkyHanniItemTracker(
         "Ghost Tracker",
@@ -206,6 +209,12 @@ object GhostTracker {
                 storage.addItem(sackChange.internalName, sackChange.delta, false)
             }
         }
+    }
+
+    @HandleEvent
+    fun onShard(event: ShardGainEvent) {
+        if (event.shardInternalName != ghostShard) return
+        tracker.addItem(ghostShard, event.amount, false)
     }
 
     @HandleEvent
