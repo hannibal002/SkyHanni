@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay.SEEDS
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
 import at.hannibal2.skyhanni.features.garden.tracker.GardenProfitTracker.drawDisplay
@@ -112,7 +113,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
         @Expose var blocksBroken: Long = 0L
     ) : BucketedItemTrackerData<GardenTrackerTypes, SessionUptime.Garden>(GardenTrackerTypes::class, SessionUptime.Garden::class) {
         private val baseCrops: Set<NeuInternalName> =
-            CropType.entries.map { it.internalName }.toSet() + "Seeds".toInternalName() + SKYBLOCK_COIN
+            CropType.entries.map { it.internalName }.toSet() + SEEDS + SKYBLOCK_COIN
 
         override fun getDescription(bucket: GardenTrackerTypes?, timesGained: Long): List<String> {
             return listOf(
