@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -136,6 +137,32 @@ object PestApi {
     val pestTrapPattern by patternGroup.pattern(
         "entity.pesttrap",
         "(?:§.)+§l(?<type>PEST|MOUSE) TRAP(?: #(?<number>\\d+))?(?:§.)*",
+    )
+
+    /**
+     * REGEX-TEST: Stereo Harmony
+     */
+    private val stereoInventoryPattern by patternGroup.pattern(
+        "stereo.inventory",
+        "Stereo Harmony"
+    )
+    val stereoInventory = InventoryDetector { name -> stereoInventoryPattern.matches(name) }
+
+    /**
+     * REGEX-TEST: §7Now Playing: §aWings of Harmony §8(Moth)
+     * REGEX-TEST: §7Now Playing: §a§cNone
+     */
+    val stereoPlayingPattern by patternGroup.pattern(
+        "stereo.playing",
+        "§7Now Playing: (?:§.)*(?<vinyl>[^§]+).*"
+    )
+
+    /**
+     * REGEX-TEST: §a§lPLAYING
+     */
+    val stereoPlayingItemPattern by patternGroup.pattern(
+        "stereo.playing.item",
+        "§a§lPLAYING",
     )
 
     private var gardenJoinTime = SimpleTimeMark.farPast()

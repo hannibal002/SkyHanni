@@ -594,7 +594,7 @@ class ProfileSpecificStorage(
         var pestProfitTracker: PestProfitTracker.BucketData = PestProfitTracker.BucketData()
 
         @Expose
-        var activeVinyl: VinylType? = null
+        var activeVinyl: VinylType = VinylType.NONE
     }
 
     // - gui

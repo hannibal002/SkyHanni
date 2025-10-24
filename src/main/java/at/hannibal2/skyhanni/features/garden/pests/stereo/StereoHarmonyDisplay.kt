@@ -1,19 +1,21 @@
 package at.hannibal2.skyhanni.features.garden.pests.stereo
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
@@ -23,38 +25,21 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object StereoHarmonyDisplay {
 
     private val config get() = PestApi.config.stereoHarmony
 
-    var activeVinyl: VinylType?
-        get() = ProfileStorageData.profileSpecific?.garden?.activeVinyl
+    var activeVinyl: VinylType
+        get() = ProfileStorageData.profileSpecific?.garden?.activeVinyl ?: VinylType.NONE
         private set(type) {
             ProfileStorageData.profileSpecific?.garden?.activeVinyl = type
+            update()
         }
 
     private fun VinylType.getPest() = PestType.filterableEntries.find { it.vinyl == this }
-
-    private val vinylTypeGroup = RepoPattern.group("garden.vinyl")
-
-    /**
-     * REGEX-TEST: §aYou are now playing §r§eNot Just a Pest§r§a!
-     */
-    private val selectVinylPattern by vinylTypeGroup.pattern(
-        "select",
-        "§aYou are now playing §r§e(?<type>.*)§r§a!",
-    )
-
-    /**
-     * REGEX-TEST: §aYou are no longer playing §r§eNot Just a Pest§r§a!
-     */
-    private val unselectVinylPattern by vinylTypeGroup.pattern(
-        "unselect",
-        "§aYou are no longer playing §r§e.*§r§a!",
-    )
 
     private var display = emptyList<Renderable>()
 
@@ -71,16 +56,14 @@ object StereoHarmonyDisplay {
     }
 
     private fun drawDisplay() = buildList {
-        val vinyl = activeVinyl ?: return@buildList
-        val pest = vinyl.getPest()
-
+        val pest = activeVinyl.getPest()
 
         if (config.showHead.get()) {
             val itemScale = 1.67
             add(pest?.internalName?.let { Renderable.item(it, itemScale) } ?: Renderable.item(questionMarkSkull))
         }
         val displayList = buildList {
-            val vinylName = vinyl.displayName
+            val vinylName = activeVinyl.displayName
             val pestName = pest?.displayName ?: "None"
             addString("§ePlaying: §a$vinylName")
             val pestLine = buildList {
@@ -92,20 +75,29 @@ object StereoHarmonyDisplay {
         add(Renderable.vertical(displayList, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
-        selectVinylPattern.matchMatcher(event.message) {
-            activeVinyl = VinylType.getByName(group("type"))
-            update()
+    private fun updateActiveVinyl(stack: ItemStack) =
+        PestApi.stereoPlayingPattern.firstMatcher(stack.getLore()) {
+            val vinyl = group("vinyl").trim()
+            activeVinyl = VinylType.getByNameOrNull(vinyl) ?: error("Unknown active vinyl: \"$vinyl\"")
         }
-        if (unselectVinylPattern.matches(event.message)) {
-            activeVinyl = VinylType.NONE
-            update()
-        }
+
+    // NOTE: Do not mark this as Garden only, it is possible to change the active vinyl outside the Garden
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!PestApi.stereoInventory.isInside()) return
+        event.inventoryItemsWithNull[4]?.let { updateActiveVinyl(it) }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    // NOTE: Do not mark this as Garden only, it is possible to change the active vinyl outside the Garden
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
+        val stack = event.itemStack
+        if (stack.getItemCategoryOrNull() != ItemCategory.VACUUM) return
+        updateActiveVinyl(stack)
+    }
+
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled()) return
         if (!GardenApi.isCurrentlyFarming() && !config.alwaysShow) return
 
@@ -122,8 +114,8 @@ object StereoHarmonyDisplay {
         display = emptyList()
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.showHead, config.showCrop) { update() }
     }
 
