@@ -85,8 +85,10 @@ object ElectionApi {
         "§9Perkpocalypse Perks:",
     )
 
-    var currentMayor: ElectionCandidate? = if (assumeMayorConfig.get() != ElectionCandidate.DISABLED) assumeMayorConfig.get() else null
-        private set
+    var currentMayor: ElectionCandidate? = if (shouldAssumeMayor()) assumeMayorConfig.get().addAllPerks() else null
+        private set(value) {
+            field = if (shouldAssumeMayor()) assumeMayorConfig.get().addAllPerks() else value
+        }
     var currentMinister: ElectionCandidate? = null
         private set
     private var lastMayor: ElectionCandidate? = null
@@ -248,16 +250,17 @@ object ElectionApi {
 
     private fun List<MayorCandidate>.bestCandidate() = maxBy { it.votes }
 
+    private fun shouldAssumeMayor() = assumeMayorConfig.get() != ElectionCandidate.DISABLED
+
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         assumeMayorConfig.onToggle {
             val mayor = assumeMayorConfig.get()
 
-            if (mayor == ElectionCandidate.DISABLED) {
+            if (!shouldAssumeMayor()) {
                 checkHypixelApi(forceReload = true)
             } else {
-                mayor.addPerks(mayor.perks.toList())
-                currentMayor = mayor
+                currentMayor = mayor.addAllPerks()
             }
         }
     }
