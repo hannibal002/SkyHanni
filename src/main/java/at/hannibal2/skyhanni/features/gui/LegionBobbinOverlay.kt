@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -55,17 +57,21 @@ object LegionBobbinOverlay {
 
     private var display: List<Renderable>? = null
 
-//     @HandleEvent
-//     fun onRepoReload(event: RepositoryReloadEvent) {
-//         val data = event.getConstant<ItemsJson>("Items").distanceEnchantData
-//         LEGION_DISTANCE = data.entries.first().value.distance
-//         LEGION_LIMIT = data.entries.first().value.maxamount
-//         LEGION_MULT = data.entries.first().value.perstackmultiplier
-//
-//         BOBBERS_DISTANCE = data.entries.last().value.distance
-//         BOBBERS_LIMIT = data.entries.last().value.maxamount
-//         BOBBIN_MULT = data.entries.last().value.perstackmultiplier
-//     }
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ItemsJson>("Items").distanceEnchantData
+        val legion = data["LEGION"]
+        LEGION_DISTANCE = legion?.distance ?: 30.0
+        LEGION_LIMIT = legion?.maxamount ?: 20
+        LEGION_MULT = legion?.perstackmultiplier ?: 0.07
+
+        val bobbin = data["BOBBIN"]
+        BOBBERS_DISTANCE = bobbin?.distance ?: 30.0
+        BOBBERS_LIMIT = bobbin?.maxamount ?: 5
+        BOBBIN_MULT = bobbin?.perstackmultiplier ?: 0.2
+
+        display = null
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick(event: SkyHanniTickEvent) {
