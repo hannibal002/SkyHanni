@@ -42,6 +42,7 @@ import kotlin.time.Duration.Companion.minutes
 object ElectionApi {
 
     private val group = RepoPattern.group("mayorapi")
+    private val assumeMayorConfig get() = SkyHanniMod.feature.dev.debug.assumeMayor
 
     /**
      * REGEX-TEST: Schedules an extra §bFishing Festival §7event during the year.
@@ -84,7 +85,7 @@ object ElectionApi {
         "§9Perkpocalypse Perks:",
     )
 
-    var currentMayor: ElectionCandidate? = null
+    var currentMayor: ElectionCandidate? = if (assumeMayorConfig.get() != ElectionCandidate.DISABLED) assumeMayorConfig.get() else null
         private set
     var currentMinister: ElectionCandidate? = null
         private set
@@ -219,6 +220,7 @@ object ElectionApi {
             }
         }
         lastUpdate = SimpleTimeMark.now()
+        if (assumeMayorConfig.get() != ElectionCandidate.DISABLED) return
 
         SkyHanniMod.launchIOCoroutine("election api fetch", timeout = 1.minutes) {
             val (_, jsonObject) = ApiUtils.getJsonResponse(hypixelElectionApiStatic).assertSuccessWithData() ?: return@launchIOCoroutine
@@ -248,9 +250,8 @@ object ElectionApi {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val config = SkyHanniMod.feature.dev.debug.assumeMayor
-        config.onToggle {
-            val mayor = config.get()
+        assumeMayorConfig.onToggle {
+            val mayor = assumeMayorConfig.get()
 
             if (mayor == ElectionCandidate.DISABLED) {
                 checkHypixelApi(forceReload = true)
