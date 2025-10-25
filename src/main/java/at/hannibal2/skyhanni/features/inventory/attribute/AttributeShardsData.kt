@@ -487,7 +487,7 @@ object AttributeShardsData {
         return Triple(tier, amountToNextTier, amountToMax)
     }
 
-    private fun shardInternalNameToShardName(internalName: NeuInternalName): String {
+    fun shardInternalNameToShardName(internalName: NeuInternalName): String {
         return internalNameToShard[internalName]
             ?: ErrorManager.skyHanniError("Unknown attribute shard internal name: $internalName")
     }
@@ -514,13 +514,25 @@ object AttributeShardsData {
         }
 
     private fun getLevel(shardName: String): Int =
-        storage?.get(shardName)?.amountSyphoned?.let {
+        getSyphonedAmount(shardName).let {
             findTierAndAmountUntilNext(shardName, it).first
-        } ?: 0
+        }
 
     private fun isEnabled(shardName: String): Boolean =
         storage?.get(shardName)?.enabled ?: false
 
     fun getActiveLevel(shardName: String) =
         if (isEnabled(shardName)) getLevel(shardName) else 0
+
+    fun getSyphonedAmount(shardName: String): Int {
+        return storage?.get(shardName)?.amountSyphoned ?: 0
+    }
+
+    fun getAmountInHuntingBox(shardName: String): Int {
+        return storage?.get(shardName)?.amountInBox ?: 0
+    }
+
+    fun getAmountUntilMax(shardName: String): Int {
+        return findTierAndAmountUntilNext(shardName, getSyphonedAmount(shardName)).third
+    }
 }

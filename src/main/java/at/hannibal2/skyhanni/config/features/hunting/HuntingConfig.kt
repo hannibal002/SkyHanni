@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
@@ -73,5 +74,10 @@ class HuntingConfig {
     @ConfigOption(name = "Show next Hideonleaf", desc = "Press this key to show the next Hideonleaf.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var nextHideonleafKeybind: Int = Keyboard.KEY_NONE
+
+    @Expose
+    @ConfigOption(name = "Shard Tracker", desc = "")
+    @Accordion
+    val shardTracker: ShardTracker = ShardTracker()
 
 }
