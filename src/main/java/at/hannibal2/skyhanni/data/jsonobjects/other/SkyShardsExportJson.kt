@@ -11,5 +11,5 @@ object SkyShardsExportJson {
 data class SkyShardsExportData(
     @Expose val name: String,
     @Expose val needed: Int,
-    @Expose val source: String,
+    @Expose val source: String?,
 )

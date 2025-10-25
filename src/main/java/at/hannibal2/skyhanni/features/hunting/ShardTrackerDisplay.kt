@@ -179,7 +179,7 @@ object ShardTrackerDisplay {
             val split = clipboard.split(":")
             val prefix = split.first()
             val suffix = split.getOrNull(1)
-            if (!prefix.startsWith("<NoFrillsRecipe>(V", true) || suffix == null) {
+            if (!(prefix.startsWith("<NoFrillsRecipe>(V") || prefix.startsWith("<SkyHanniRecipe>(V")) || suffix == null) {
                 ChatUtils.chat("Import from SkyShards failed, make sure you have a valid recipe copied.")
                 return@launchCoroutine
             }
@@ -188,7 +188,7 @@ object ShardTrackerDisplay {
             val skyShardsData: List<SkyShardsExportData> = ConfigManager.gson.fromJson(data, SkyShardsExportJson.TYPE)
             clearTrackedShards()
             for (shardData in skyShardsData) {
-                if (shardData.source != "Direct") continue
+                if (shardData.source != "Direct" && shardData.source != null) continue
                 val shardName = ItemResolutionQuery.attributeNameToInternalName(shardData.name) ?: continue
                 trackedShards[shardName] = shardData.needed
             }
