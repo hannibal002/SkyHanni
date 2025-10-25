@@ -21,7 +21,7 @@ class ShardTracker {
 
     @Expose
     @ConfigLink(owner = ShardTracker::class, field = "enabled")
-    val position: Position = Position(20, 20)
+    val position: Position = Position(80, 180)
 
     @Expose
     @ConfigOption(name = "Select Shard Key", desc = "Press this key in your hunting box to track the hovered shard.")

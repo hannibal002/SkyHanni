@@ -157,6 +157,12 @@ object ShardTrackerDisplay {
 
     @OptIn(ExperimentalEncodingApi::class)
     fun importFromSkyShards() {
+        if (!isEnabled()) {
+            ChatUtils.chatAndOpenConfig(
+                "§cAttribute Shard Tracker is disabled. §eClick here to enable it",
+                SkyHanniMod.feature.hunting.shardTracker::enabled,
+            )
+        }
         SkyHanniMod.launchCoroutine("reading skyshards data from clipboard") {
             val clipboard = OSUtils.readFromClipboard()
             if (clipboard == null) {
