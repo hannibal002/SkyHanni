@@ -126,7 +126,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         )
     }
 
-    private fun armorFortune(): Renderable  {
+    private fun armorFortune(): Renderable {
         val moreInfo = "§2Select a piece for more info"
         val wordArmor = if (FarmingItemType.currentArmor == null) "Armor" else "Piece"
         val armorName = FarmingItemType.currentArmor?.getItem()?.displayName.orEmpty()

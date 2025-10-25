@@ -140,7 +140,7 @@ object CaptureFarmingGear {
     )
 
     /**
-     * REGEX-TEST: Farming Fortune +2.5 (+2.5)
+     * REGEX-TEST: Farming Fortune: +2.5 (+2.5)
      */
     private val relicOfPowerFarmingFortune by RepoPattern.pattern(
         "relicofpower.farmingfortune",
