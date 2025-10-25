@@ -123,7 +123,6 @@ object ShardTrackerDisplay {
     fun onKeyPress(event: GuiKeyPressEvent) {
         if (!isEnabled()) return
         if (!config.selectShardKeybind.isKeyHeld()) return
-        val inventoryName = InventoryUtils.openInventoryName()
         if (!isInsideShardsMenu()) return
         val stack = stackUnderCursor() ?: return
         val internalName = stack.getInternalName()
