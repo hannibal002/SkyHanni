@@ -76,10 +76,18 @@ object ShardTrackerDisplay {
             val amountUntilMax = if (shard.value == -1) AttributeShardsData.getAmountUntilMax(shardName) else shard.value
 
             if (amountUntilMax == 0) {
-                renderable.add(Renderable.text(" $shardDisplayName§7: §a$amountInHuntingBox"))
+                renderable += Renderable.clickable(
+                    " $shardDisplayName§7: §a$amountInHuntingBox",
+                    onLeftClick = { toggleShard(shardId) },
+                    tips = listOf("§cClick to remove from tracker")
+                )
             } else {
                 val color = if (amountInHuntingBox >= amountUntilMax) "§a" else if (amountInHuntingBox == 0) "§c" else "§e"
-                renderable.add(Renderable.text(" $shardDisplayName§7: $color$amountInHuntingBox§7/§a$amountUntilMax"))
+                renderable += Renderable.clickable(
+                    " $shardDisplayName§7: $color$amountInHuntingBox§7/§a$amountUntilMax",
+                    onLeftClick = { toggleShard(shardId) },
+                    tips = listOf("§cClick to remove from tracker")
+                )
             }
 
         }
