@@ -85,7 +85,10 @@ object ElectionApi {
         "§9Perkpocalypse Perks:",
     )
 
-    var currentMayor: ElectionCandidate? = if (shouldAssumeMayor()) assumeMayorConfig.get().addAllPerks() else null
+    /**
+     * Overridden with max-perk assumed mayor if option enabled.
+     */
+    var currentMayor: ElectionCandidate? = null
         private set(value) {
             field = if (shouldAssumeMayor()) assumeMayorConfig.get().addAllPerks() else value
         }
@@ -254,6 +257,7 @@ object ElectionApi {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
+        if (shouldAssumeMayor()) currentMayor = assumeMayorConfig.get().addAllPerks()
         assumeMayorConfig.onToggle {
             val mayor = assumeMayorConfig.get()
 
