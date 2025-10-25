@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -55,7 +56,12 @@ object ShardTrackerDisplay {
     private val trackedShards = mutableMapOf<String, Int>()
 
     private fun toggleShard(neuId: NeuInternalName) {
-        if (!AttributeShardsData.isAttributeShard(neuId)) throw IllegalArgumentException("$neuId is not a valid attribute shard")
+        if (!AttributeShardsData.isAttributeShard(neuId)) {
+            ErrorManager.logErrorStateWithData(
+                "Error Getting Attribute Shard",
+                "$neuId is not a valid attribute shard"
+            )
+        }
         val id = neuId.asString()
         if (trackedShards.contains(id)) {
             trackedShards.remove(id)
@@ -85,8 +91,8 @@ object ShardTrackerDisplay {
             if (amountUntilMax == 0) {
                 renderable.add(Renderable.text("$shardDisplayName§7: §a$amountInHuntingBox"))
             } else {
-                val colour = if (amountInHuntingBox >= amountUntilMax) "§a" else if (amountInHuntingBox == 0) "§c" else "§e"
-                renderable.add(Renderable.text("$shardDisplayName§7: $colour$amountInHuntingBox§7/§a$amountUntilMax"))
+                val color = if (amountInHuntingBox >= amountUntilMax) "§a" else if (amountInHuntingBox == 0) "§c" else "§e"
+                renderable.add(Renderable.text("$shardDisplayName§7: $color$amountInHuntingBox§7/§a$amountUntilMax"))
             }
 
         }
