@@ -18,7 +18,7 @@ data class ItemsJson(
     @Expose @SerializedName("renamed_enchantments") val renamedEnchantments: Map<String, String>,
     @Expose @SerializedName("shard_name_overrides") val shardNameOverrides: Map<String, String>,
     @Expose @SerializedName("distance_enchant_data") val distanceEnchantData: Map<String, DistanceEnchantData>,
-    )
+)
 
 data class ItemValueCalculationDataJson(
     @Expose @SerializedName("always_active_enchants") val alwaysActiveEnchants: Map<String, AlwaysActiveEnchantJson>,
@@ -39,6 +39,6 @@ data class EndCapData(
 
 data class DistanceEnchantData(
     @Expose val distance: Double,
-    @Expose val maxamount: Int,
-    @Expose val perstackmultiplier: Double,
+    @Expose val maxAmount: Int,
+    @Expose val perStackMultiplier: Double,
 )

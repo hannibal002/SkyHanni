@@ -40,6 +40,7 @@ object LegionBobbinOverlay {
     private var LEGION_LIMIT = 20
     private var LEGION_MULT = 0.07
 
+    @Suppress("VarCouldBeVal")
     private var nearbyBobbers: Int = 0
     private var nearbyPlayers: Int = 0
     private var armorLegionBuff: Double = 0.0
@@ -62,13 +63,13 @@ object LegionBobbinOverlay {
         val data = event.getConstant<ItemsJson>("Items").distanceEnchantData
         val legion = data["LEGION"]
         LEGION_DISTANCE = legion?.distance ?: 30.0
-        LEGION_LIMIT = legion?.maxamount ?: 20
-        LEGION_MULT = legion?.perstackmultiplier ?: 0.07
+        LEGION_LIMIT = legion?.maxAmount ?: 20
+        LEGION_MULT = legion?.perStackMultiplier ?: 0.07
 
         val bobbin = data["BOBBIN"]
         BOBBERS_DISTANCE = bobbin?.distance ?: 30.0
-        BOBBERS_LIMIT = bobbin?.maxamount ?: 5
-        BOBBIN_MULT = bobbin?.perstackmultiplier ?: 0.2
+        BOBBERS_LIMIT = bobbin?.maxAmount ?: 5
+        BOBBIN_MULT = bobbin?.perStackMultiplier ?: 0.2
 
         display = null
     }
