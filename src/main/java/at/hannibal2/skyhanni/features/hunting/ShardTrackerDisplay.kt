@@ -104,7 +104,11 @@ object ShardTrackerDisplay {
             list += Renderable.clickable(
                 "§e[Import From SkyShards]",
                 onLeftClick = ::importFromSkyShards,
-                tips = listOf("Imports shard recipe exported from SkyShards", "This will reset the currently tracked shards")
+                tips = listOf(
+                    "Imports shard recipe exported from SkyShards",
+                    "This will reset the currently tracked shards",
+                    "You can also do §e/shimportskyshards§f to import shards"
+                    )
             )
 
             list += Renderable.clickable(
