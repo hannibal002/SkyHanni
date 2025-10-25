@@ -31,12 +31,12 @@ class ShardTracker {
     @ConfigOption(
         name = "SkyShards",
         desc = "Click this button to import a recipe from SkyShards.\n" +
-            "You can also use §e/shimportskyshards"
+            "You can also use §e/shimportskyshards§f."
     )
     @ConfigEditorButton(buttonText = "Import")
     val skyShardsImport: Runnable = Runnable { ShardTrackerDisplay.importFromSkyShards() }
 
-    @ConfigOption(name = "SkyShards", desc = "Click this button to open SkyShards in the browser")
+    @ConfigOption(name = "SkyShards", desc = "Click this button to open SkyShards in the browser.")
     @ConfigEditorButton(buttonText = "Open")
     val openSkyShards: Runnable = Runnable { openBrowser("https://skyshards.com/") }
 }

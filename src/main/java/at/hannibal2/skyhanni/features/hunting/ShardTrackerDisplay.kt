@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import org.lwjgl.input.Keyboard
 import java.util.zip.GZIPInputStream
@@ -70,8 +69,6 @@ object ShardTrackerDisplay {
         }
     }
 
-    val scroll = ScrollValue()
-
     fun render() {
         if (!isEnabled()) return
         if (trackedShards.isEmpty()) {
@@ -89,10 +86,10 @@ object ShardTrackerDisplay {
             val amountUntilMax = if (shard.value == -1) AttributeShardsData.getAmountUntilMax(shardName) else shard.value
 
             if (amountUntilMax == 0) {
-                renderable.add(Renderable.text("$shardDisplayName§7: §a$amountInHuntingBox"))
+                renderable.add(Renderable.text(" $shardDisplayName§7: §a$amountInHuntingBox"))
             } else {
                 val color = if (amountInHuntingBox >= amountUntilMax) "§a" else if (amountInHuntingBox == 0) "§c" else "§e"
-                renderable.add(Renderable.text("$shardDisplayName§7: $color$amountInHuntingBox§7/§a$amountUntilMax"))
+                renderable.add(Renderable.text(" $shardDisplayName§7: $color$amountInHuntingBox§7/§a$amountUntilMax"))
             }
 
         }
@@ -128,12 +125,16 @@ object ShardTrackerDisplay {
         }
     }
 
+    private fun isInsideShardsMenu(): Boolean {
+        return AttributeShardsData.attributeMenuInventory.isInside() || AttributeShardsData.huntingBoxInventory.isInside()
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: GuiKeyPressEvent) {
         if (!isEnabled()) return
         if (!config.selectShardKeybind.isKeyHeld()) return
         val inventoryName = InventoryUtils.openInventoryName()
-        if (inventoryName != "Attribute Menu" && inventoryName != "Hunting Box") return
+        if (!isInsideShardsMenu()) return
         val stack = stackUnderCursor() ?: return
         val internalName = stack.getInternalName()
         if (internalName == NeuInternalName.NONE) return
@@ -143,8 +144,7 @@ object ShardTrackerDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
-        val inventoryName = InventoryUtils.openInventoryName()
-        if (inventoryName != "Attribute Menu" && inventoryName != "Hunting Box") return
+        if (!isInsideShardsMenu()) return
         if (config.selectShardKeybind == Keyboard.KEY_NONE) return
         if (!AttributeShardsData.isAttributeShard(event.itemStack.getInternalName())) return
         event.toolTip.add("§ePress ${KeyboardManager.getKeyName(config.selectShardKeybind)} to track this shard.")
