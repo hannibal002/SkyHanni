@@ -108,7 +108,7 @@ object ShardTrackerDisplay {
                     "Imports shard recipe exported from SkyShards",
                     "This will reset the currently tracked shards",
                     "You can also do §e/shimportskyshards§f to import shards"
-                    )
+                )
             )
 
             list += Renderable.clickable(
