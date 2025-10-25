@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.other.SkyShardsExportData
 import at.hannibal2.skyhanni.data.jsonobjects.other.SkyShardsExportJson
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
@@ -40,19 +40,8 @@ object ShardTrackerDisplay {
     val config get() = SkyHanniMod.feature.hunting.shardTracker
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
-    init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = { isEnabled() },
-            onRender = {
-                render()
-            },
-        )
-    }
-
     private var renderables: List<Renderable>? = null
-    private val trackedShards = mutableMapOf<String, Int>()
+    private val trackedShards get() = ProfileStorageData.profileSpecific?.hunting?.trackedAttributeShards ?: mutableMapOf()
 
     private fun toggleShard(neuId: NeuInternalName) {
         if (!AttributeShardsData.isAttributeShard(neuId)) {
@@ -69,7 +58,8 @@ object ShardTrackerDisplay {
         }
     }
 
-    fun render() {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick() {
         if (!isEnabled()) return
         if (trackedShards.isEmpty()) {
             renderables = null
