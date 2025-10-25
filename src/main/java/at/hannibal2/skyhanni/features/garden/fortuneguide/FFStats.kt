@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -22,6 +23,11 @@ object FFStats {
     private val GREEN_BANDANA_ITEM = "GREEN_BANDANA".toInternalName()
     private val YELLOW_BANDANA_ITEM = "YELLOW_BANDANA".toInternalName()
     private val MINOS_RELIC_ITEM = "MINOS_RELIC".toInternalName()
+
+    private const val SHARD_FIREFLY = "SHARD_FIREFLY"
+    private const val SHARD_LUNAR_MOTH = "SHARD_LUNAR_MOTH"
+    private const val SHARD_TERMITE = "SHARD_TERMITE"
+    private const val SHARD_GALAXY_FISH = "SHARD_GALAXY_FISH"
 
     var cakeExpireTime
         get() = GardenApi.storage?.fortune?.cakeExpiring ?: SimpleTimeMark.farPast()
@@ -107,6 +113,7 @@ object FFStats {
             FortuneStats.CARROLYN.set(ff, 12.0)
         }
 
+        FortuneStats.PERSONAL_BEST.set(FarmingFortuneDisplay.getPersonalBest(crop), 100.0)
         FortuneStats.CROP_TOTAL.set(FortuneStats.getTotal())
     }
 
@@ -144,16 +151,28 @@ object FFStats {
     private fun getGenericFF(): Map<FFTypes, Double> = buildMap {
         val storage = GardenApi.storage?.fortune ?: return emptyMap()
         this[FFTypes.FARMING_LVL] = storage.farmingLevel.toDouble() * 4
+        this[FFTypes.ATTRIBUTE_SHARDS] = getAttributeShards()
         this[FFTypes.BESTIARY] = storage.bestiary
         this[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
         this[FFTypes.ANITA] = storage.anitaUpgrade.toDouble() * 4
         this[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
+        this[FFTypes.RELIC_OF_POWER] = storage.relicOfPower
+        this[FFTypes.DARK_CACAO_TRUFFLE] = storage.cacao.toDouble()
+
         if (cakeExpireTime.isInFuture() || cakeExpireTime.isFarPast()) {
             this[FFTypes.CAKE] = 5.0
         } else {
             this[FFTypes.CAKE] = 0.0
         }
         this[FFTypes.TOTAL] = this.values.sum()
+    }
+
+    fun getAttributeShards(): Double {
+        val solarPower = AttributeShardsData.getActiveLevel(SHARD_FIREFLY).toDouble() * 5
+        val lunarPower = AttributeShardsData.getActiveLevel(SHARD_LUNAR_MOTH).toDouble() * 5
+        val infiltration = AttributeShardsData.getActiveLevel(SHARD_TERMITE).toDouble() * 3
+        val ultimateDna = AttributeShardsData.getActiveLevel(SHARD_GALAXY_FISH).toDouble()
+        return maxOf(solarPower, lunarPower) + infiltration + ultimateDna
     }
 
     fun getTotalFF() {
