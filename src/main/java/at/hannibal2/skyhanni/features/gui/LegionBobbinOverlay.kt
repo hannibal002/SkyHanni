@@ -27,6 +27,7 @@ import net.minecraft.entity.projectile.EntityFishHook
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("VarCouldBeVal")
 @SkyHanniModule
 object LegionBobbinOverlay {
 
