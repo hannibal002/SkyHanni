@@ -31,7 +31,7 @@ class ShardTracker {
     @ConfigOption(
         name = "SkyShards",
         desc = "Click this button to import a recipe from SkyShards.\n" +
-        "You can also use §e/shimportskyshards"
+            "You can also use §e/shimportskyshards"
     )
     @ConfigEditorButton(buttonText = "Import")
     val skyShardsImport: Runnable = Runnable { ShardTrackerDisplay.importFromSkyShards() }
