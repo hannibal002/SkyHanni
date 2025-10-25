@@ -86,7 +86,9 @@ object ElectionApi {
     )
 
     /**
-     * Overridden with max-perk assumed mayor if option enabled.
+     * Current mayor on the main server. Mayor and perks set from the Hypixel Election API.
+     *
+     * Custom Setter: Overridden with max-perk assumed mayor if option enabled.
      */
     var currentMayor: ElectionCandidate? = null
         private set(value) {
