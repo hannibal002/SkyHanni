@@ -266,7 +266,7 @@ object ElectionApi {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mayor Election")
 
-        val assumeMayor = SkyHanniMod.feature.dev.debug.assumeMayor.get()
+        val assumeMayor = assumeMayorConfig.get()
 
         val list = buildList {
             add("Current Mayor: ${currentMayor?.name ?: "Unknown"}")
