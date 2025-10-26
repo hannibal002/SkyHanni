@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCaveSpider
 import net.minecraft.entity.monster.EntitySlime
@@ -63,20 +64,20 @@ object CraftRoomHolographicMob {
             instance.isChild = theMob.isChild
             instance.moveTo(currentLocation.mirror(), 0f)
 
-            val display = buildString {
-                val mobName = theMob.displayName.formattedText
-                if (config.showName) {
-                    append("§a$mobName ")
-                }
-                if (config.showHealth) {
-                    append("§c${theMob.health.roundTo(1)}♥")
-                }
-            }.trim()
-
-            newMap[instance] = display
+            newMap[instance] = theMob.display()
         }
         holograms = newMap
     }
+
+    private fun EntityLivingBase.display() = buildString {
+        val mobName = displayName.formattedText
+        if (config.showName) {
+            append("§a$mobName ")
+        }
+        if (config.showHealth) {
+            append("§c${health.roundTo(1)}♥")
+        }
+    }.trim()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
