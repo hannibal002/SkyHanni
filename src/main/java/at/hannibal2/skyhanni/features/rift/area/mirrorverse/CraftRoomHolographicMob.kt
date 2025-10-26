@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCaveSpider
 import net.minecraft.entity.monster.EntitySlime
@@ -47,26 +46,24 @@ object CraftRoomHolographicMob {
     fun onTick() {
         enabled = config.enabled && craftRoomArea.isInside(playerLocation())
         if (!enabled) return
-        val newMap = mutableMapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
-        for (theMob in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(25.0)) {
-            if (theMob is EntityPlayer) continue
-            val mob = entityToHolographicEntity[theMob::class.java] ?: continue
 
-            val currentLocation = theMob.getLorenzVec()
+        val map = mutableMapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
+        for (entity in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(25.0)) {
+            if (entity is EntityPlayer) continue
+            val holographicEntity = entityToHolographicEntity[entity::class.java] ?: continue
 
+            val currentLocation = entity.getLorenzVec()
             if (!craftRoomArea.isInside(currentLocation)) continue
-            val previousLocation = LorenzVec(theMob.lastTickPosX, theMob.lastTickPosY, theMob.lastTickPosZ) // used to interpolate movement
+            val previousLocation = LorenzVec(entity.lastTickPosX, entity.lastTickPosY, entity.lastTickPosZ) // used to interpolate movement
             if (!craftRoomArea.isInside(previousLocation)) continue
 
             // we currently don't rotate the body so head rotations looked very weird
-            val instance = mob.instance(previousLocation.mirror(), 0f)
-
-            instance.isChild = theMob.isChild
+            val instance = holographicEntity.instance(previousLocation.mirror(), 0f)
+            instance.isChild = entity.isChild
             instance.moveTo(currentLocation.mirror(), 0f)
-
-            newMap[instance] = theMob.display()
+            map[instance] = entity.display()
         }
-        holograms = newMap
+        holograms = map
     }
 
     private fun EntityLivingBase.display() = buildString {
