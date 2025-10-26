@@ -22,7 +22,6 @@ import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
-import kotlin.math.abs
 
 // TODO fix looking at direction, slime size, helmet/skull of zombie
 @SkyHanniModule
@@ -55,7 +54,6 @@ object CraftRoomHolographicMob {
             val currentLocation = entity.getLorenzVec()
             if (!craftRoomArea.isInside(currentLocation)) continue
             val previousLocation = LorenzVec(entity.lastTickPosX, entity.lastTickPosY, entity.lastTickPosZ) // used to interpolate movement
-            if (!craftRoomArea.isInside(previousLocation)) continue
 
             // we currently don't rotate the body so head rotations looked very weird
             val instance = holographicEntity.instance(previousLocation.mirror(), 0f)
@@ -95,9 +93,10 @@ object CraftRoomHolographicMob {
         }
     }
 
+    private const val WALL_Z = -116.5
     private fun LorenzVec.mirror(): LorenzVec {
-        val wallZ = -116.5
-        val dist = abs(this.z - wallZ)
-        return this.add(z = dist * 2)
+        require(z <= WALL_Z) { "mirror() assumes z <= WALL_Z, z was ${z.roundTo(1)} instead" }
+        val dist = WALL_Z - z
+        return add(z = dist * 2)
     }
 }
