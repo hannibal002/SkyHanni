@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
@@ -41,10 +40,12 @@ object CraftRoomHolographicMob {
     )
 
     private var holograms = mapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
+    private var enabled = false
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onTick() {
-        if (!isEnabled()) return
+        enabled = config.enabled && craftRoomArea.isInside(playerLocation())
+        if (!enabled) return
         val newMap = mutableMapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
         for (theMob in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(25.0)) {
             if (theMob is EntityPlayer) continue
@@ -79,7 +80,7 @@ object CraftRoomHolographicMob {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled()) return
+        if (!enabled) return
         for ((mob, string) in holograms) {
             event.renderHolographicEntity(mob)
 
@@ -91,7 +92,7 @@ object CraftRoomHolographicMob {
 
     @HandleEvent(receiveCancelled = true, onlyOnIsland = IslandType.THE_RIFT)
     fun onPlayerRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
-        if (!isEnabled()) return
+        if (!enabled) return
         if (!config.hidePlayers) return
 
         if (craftRoomArea.isInside(event.entity.getLorenzVec())) {
@@ -104,6 +105,4 @@ object CraftRoomHolographicMob {
         val dist = abs(this.z - wallZ)
         return this.add(z = dist * 2)
     }
-
-    private fun isEnabled() = RiftApi.inRift() && config.enabled && craftRoomArea.isInside(playerLocation())
 }
