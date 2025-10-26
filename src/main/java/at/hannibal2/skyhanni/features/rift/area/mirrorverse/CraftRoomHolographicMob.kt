@@ -84,8 +84,8 @@ object CraftRoomHolographicMob {
         for ((mob, string) in holograms) {
             event.renderHolographicEntity(mob)
 
-            if (string != null) {
-                event.drawString(mob.position.add(y = mob.entity.eyeHeight + .5), string)
+            string?.let {
+                event.drawString(mob.position.add(y = mob.entity.eyeHeight + .5), it)
             }
         }
     }
