@@ -92,10 +92,7 @@ object CraftRoomHolographicMob {
 
     @HandleEvent(receiveCancelled = true, onlyOnIsland = IslandType.THE_RIFT)
     fun onPlayerRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
-        if (!enabled) return
-        if (!config.hidePlayers) return
-
-        if (craftRoomArea.isInside(event.entity.getLorenzVec())) {
+        if (enabled && config.hidePlayers) {
             event.cancel()
         }
     }
