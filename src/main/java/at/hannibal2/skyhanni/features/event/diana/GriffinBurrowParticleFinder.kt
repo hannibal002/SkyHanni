@@ -155,7 +155,7 @@ object GriffinBurrowParticleFinder {
         if (!config.guess) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
-            message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
+            message == "§eYou finished the Griffin burrow chain! §r§7(\\d+/\\d+)"
         ) {
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             val burrow = lastDugParticleBurrow
