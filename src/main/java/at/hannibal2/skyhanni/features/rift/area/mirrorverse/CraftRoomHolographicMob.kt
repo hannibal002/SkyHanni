@@ -40,12 +40,12 @@ object CraftRoomHolographicMob {
         EntityCaveSpider::class.java to HolographicEntities.caveSpider,
     )
 
-    private var hologramMap: MutableMap<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?> = mutableMapOf()
+    private var holograms = mutableMapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onTick() {
         if (!isEnabled()) return
-        val newMap: MutableMap<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?> = mutableMapOf()
+        val newMap = mutableMapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
         for (theMob in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(25.0)) {
             if (theMob is EntityPlayer) continue
 
@@ -75,13 +75,13 @@ object CraftRoomHolographicMob {
 
             newMap[instance] = displayString
         }
-        hologramMap = newMap
+        holograms = newMap
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        for (entity in hologramMap.entries) {
+        for (entity in holograms.entries) {
             val mob = entity.key
             val string = entity.value
             event.renderHolographicEntity(mob)
