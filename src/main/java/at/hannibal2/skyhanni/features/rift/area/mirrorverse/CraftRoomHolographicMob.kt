@@ -48,14 +48,19 @@ object CraftRoomHolographicMob {
         val newMap = mutableMapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
         for (theMob in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(25.0)) {
             if (theMob is EntityPlayer) continue
+            val mob = entityToHolographicEntity[theMob::class.java] ?: continue
 
             val currentLocation = theMob.getLorenzVec()
 
             if (!craftRoomArea.isInside(currentLocation)) continue
             val previousLocation = LorenzVec(theMob.lastTickPosX, theMob.lastTickPosY, theMob.lastTickPosZ) // used to interpolate movement
             if (!craftRoomArea.isInside(previousLocation)) continue
-            val previousMirror = getMirroredLocation(previousLocation)
-            val currentMirror = getMirroredLocation(currentLocation)
+
+            // we currently don't rotate the body so head rotations looked very weird
+            val instance = mob.instance(getMirroredLocation(previousLocation), 0f)
+
+            instance.isChild = theMob.isChild
+            instance.moveTo(getMirroredLocation(currentLocation), 0f)
 
             val displayString = buildString {
                 val mobName = theMob.displayName.formattedText
@@ -66,14 +71,6 @@ object CraftRoomHolographicMob {
                     append("§c${theMob.health.roundTo(1)}♥")
                 }
             }.trim()
-
-            val mob = entityToHolographicEntity[theMob::class.java] ?: continue
-
-            // we currently don't rotate the body so head rotations looked very weird
-            val instance = mob.instance(previousMirror, 0f)
-
-            instance.isChild = theMob.isChild
-            instance.moveTo(currentMirror, 0f)
 
             newMap[instance] = displayString
         }
