@@ -40,7 +40,7 @@ object CraftRoomHolographicMob {
         EntityCaveSpider::class.java to HolographicEntities.caveSpider,
     )
 
-    private var holograms = mutableMapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
+    private var holograms = mapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onTick() {
@@ -49,11 +49,13 @@ object CraftRoomHolographicMob {
         for (theMob in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(25.0)) {
             if (theMob is EntityPlayer) continue
 
-            val mobPos = theMob.getLorenzVec()
-            val lastTickMobPos = LorenzVec(theMob.lastTickPosX, theMob.lastTickPosY, theMob.lastTickPosZ) // used to interpolate movement
-            if (!craftRoomArea.isInside(mobPos) || !craftRoomArea.isInside(lastTickMobPos)) continue
-            val holographicMobPos = getMirroredPos(lastTickMobPos)
-            val mirroredPos = getMirroredPos(mobPos)
+            val currentLocation = theMob.getLorenzVec()
+
+            if (!craftRoomArea.isInside(currentLocation)) continue
+            val previousLocation = LorenzVec(theMob.lastTickPosX, theMob.lastTickPosY, theMob.lastTickPosZ) // used to interpolate movement
+            if (!craftRoomArea.isInside(previousLocation)) continue
+            val previousMirror = getMirroredLocation(previousLocation)
+            val currentMirror = getMirroredLocation(currentLocation)
 
             val displayString = buildString {
                 val mobName = theMob.displayName.formattedText
@@ -68,10 +70,10 @@ object CraftRoomHolographicMob {
             val mob = entityToHolographicEntity[theMob::class.java] ?: continue
 
             // we currently don't rotate the body so head rotations looked very weird
-            val instance = mob.instance(holographicMobPos, 0f)
+            val instance = mob.instance(previousMirror, 0f)
 
             instance.isChild = theMob.isChild
-            instance.moveTo(mirroredPos, 0f)
+            instance.moveTo(currentMirror, 0f)
 
             newMap[instance] = displayString
         }
@@ -103,7 +105,7 @@ object CraftRoomHolographicMob {
         }
     }
 
-    private fun getMirroredPos(pos: LorenzVec): LorenzVec {
+    private fun getMirroredLocation(pos: LorenzVec): LorenzVec {
         val wallZ = -116.5
         val dist = abs(pos.z - wallZ)
         return pos.add(z = dist * 2)
