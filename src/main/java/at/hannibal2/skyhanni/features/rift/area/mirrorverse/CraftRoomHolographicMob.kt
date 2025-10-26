@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
-import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
+import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -43,7 +43,7 @@ object CraftRoomHolographicMob {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onTick() {
-        enabled = config.enabled && craftRoomArea.isInside(playerLocation())
+        enabled = config.enabled && craftRoomArea.isPlayerInside()
         if (!enabled) return
 
         val map = mutableMapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
