@@ -57,12 +57,12 @@ object CraftRoomHolographicMob {
             if (!craftRoomArea.isInside(previousLocation)) continue
 
             // we currently don't rotate the body so head rotations looked very weird
-            val instance = mob.instance(getMirroredLocation(previousLocation), 0f)
+            val instance = mob.instance(previousLocation.mirror(), 0f)
 
             instance.isChild = theMob.isChild
-            instance.moveTo(getMirroredLocation(currentLocation), 0f)
+            instance.moveTo(currentLocation.mirror(), 0f)
 
-            val displayString = buildString {
+            val display = buildString {
                 val mobName = theMob.displayName.formattedText
                 if (config.showName) {
                     append("§a$mobName ")
@@ -72,7 +72,7 @@ object CraftRoomHolographicMob {
                 }
             }.trim()
 
-            newMap[instance] = displayString
+            newMap[instance] = display
         }
         holograms = newMap
     }
@@ -80,9 +80,7 @@ object CraftRoomHolographicMob {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        for (entity in holograms.entries) {
-            val mob = entity.key
-            val string = entity.value
+        for ((mob, string) in holograms) {
             event.renderHolographicEntity(mob)
 
             if (string != null) {
@@ -96,16 +94,15 @@ object CraftRoomHolographicMob {
         if (!isEnabled()) return
         if (!config.hidePlayers) return
 
-        val entity = event.entity
-        if (craftRoomArea.isInside(entity.getLorenzVec())) {
+        if (craftRoomArea.isInside(event.entity.getLorenzVec())) {
             event.cancel()
         }
     }
 
-    private fun getMirroredLocation(pos: LorenzVec): LorenzVec {
+    private fun LorenzVec.mirror(): LorenzVec {
         val wallZ = -116.5
-        val dist = abs(pos.z - wallZ)
-        return pos.add(z = dist * 2)
+        val dist = abs(this.z - wallZ)
+        return this.add(z = dist * 2)
     }
 
     private fun isEnabled() = RiftApi.inRift() && config.enabled && craftRoomArea.isInside(playerLocation())
