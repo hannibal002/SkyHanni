@@ -43,5 +43,5 @@ enum class NonGodPotEffect(
     LUSHLILAC_BONBON("§r§5Lushlilac Bonbon§r§f"),
     PRIME_LUSHLILAC_BONBON("§r§5Prime Lushlilac Bonbon§r§f"),
     EXALTED_LUSHLILAC_BONBON("§r§5Exalted Lushlilac Bonbon§r§f"),
-    OCEANDY("§r§5Oceandy§r§f"),
+    OCEANDY("§r§5Candycomb§r§f"),
 }
