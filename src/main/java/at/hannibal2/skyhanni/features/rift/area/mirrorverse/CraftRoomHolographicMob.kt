@@ -67,14 +67,14 @@ object CraftRoomHolographicMob {
     }
 
     private fun EntityLivingBase.display() = buildString {
-        val mobName = displayName.formattedText
         if (config.showName) {
+            val mobName = displayName.formattedText
             append("§a$mobName ")
         }
         if (config.showHealth) {
             append("§c${health.roundTo(1)}♥")
         }
-    }.trim()
+    }.trim().takeIf { it.isNotEmpty() }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
