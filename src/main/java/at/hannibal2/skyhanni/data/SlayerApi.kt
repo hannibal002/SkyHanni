@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -52,6 +53,7 @@ object SlayerApi {
 
     // for an enum, use activeType
     var latestCategory = ""
+    var tier = 0
 
     var latestWrongAreaWarning = SimpleTimeMark.farPast()
 
@@ -157,19 +159,8 @@ object SlayerApi {
         val lines = getSlayerLines()
 
         val slayerQuest = lines.getOrNull(1).orEmpty()
-        if (slayerQuest != latestCategory) {
-            val old = latestCategory
-            latestCategory = slayerQuest
-            SlayerChangeEvent(old, latestCategory).post()
-        }
-
         val slayerProgress = lines.getOrNull(2).orEmpty()
-        if (latestProgress != slayerProgress) {
-            SlayerProgressChangeEvent(latestProgress, slayerProgress).post()
-            latestProgress = slayerProgress
-        }
-
-        if (event.isMod(5)) {
+        if (event.isMod(5) || slayerQuest != latestCategory || latestProgress != slayerProgress) {
             if (SkyBlockUtils.isStrandedProfile) {
                 isInAnyArea = true
                 isInCorrectArea = true
@@ -177,6 +168,18 @@ object SlayerApi {
                 isInAnyArea = currentAreaType != null
                 isInCorrectArea = currentAreaType == activeType && currentAreaType != null
             }
+        }
+        if (slayerQuest != latestCategory) {
+            val old = latestCategory
+            latestCategory = slayerQuest
+            tier = slayerQuest.split(" ").lastOrNull()?.romanToDecimalIfNecessary()
+                ?: error(("latestCategory does not contain roman number or int: '$slayerQuest'"))
+            SlayerChangeEvent(old, latestCategory).post()
+        }
+
+        if (latestProgress != slayerProgress) {
+            SlayerProgressChangeEvent(latestProgress, slayerProgress).post()
+            latestProgress = slayerProgress
         }
     }
 

@@ -40,6 +40,8 @@ object NonGodPotEffectDisplay {
     private val setRecently: TimeLimitedSet<NonGodPotEffect> = TimeLimitedSet(5.seconds)
     private var display = emptyList<String>()
 
+    fun isActive(effect: NonGodPotEffect): Boolean = effectDuration.any { it.key == effect && !it.value.ended }
+
     /**
      * REGEX-TEST: §7You have §e10 §7non-god effects.
      */
