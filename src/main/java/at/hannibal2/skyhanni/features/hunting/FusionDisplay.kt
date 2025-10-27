@@ -12,10 +12,13 @@ import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.find
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object FusionDisplay {
@@ -28,6 +31,14 @@ object FusionDisplay {
 
     private var lastInternalName: NeuInternalName? = null
     private var pureReptiles = 0
+
+    /**
+     * REGEX-TEST: §b§lPURE REPTILE
+     */
+    val pureReptilePattern by RepoPattern.group("attributeshards").pattern(
+        "pure-reptile-chat",
+        "^§b§lPURE REPTILE",
+    )
 
     @HandleEvent
     fun onShardGain(event: ShardEvent) {
@@ -59,7 +70,8 @@ object FusionDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onChat(event: SkyHanniChatEvent) {
-        if (event.message.startsWith("§b§lPURE REPTILE")) pureReptiles++
+        if (pureReptilePattern.find(event.message)) pureReptiles++
+
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
