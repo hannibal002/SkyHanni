@@ -275,7 +275,7 @@ object RemainingSlayerKills {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() },
+            condition = { isEnabled() && SlayerApi.isInCorrectArea },
             onRender = {
                 config.remainingKillsPosition.renderRenderables(display, posLabel = "Remaining Slayer Kills")
             },
