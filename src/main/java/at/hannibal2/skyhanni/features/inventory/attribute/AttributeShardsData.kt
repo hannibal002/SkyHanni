@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.item.ShardEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
-import at.hannibal2.skyhanni.events.item.Source
+import at.hannibal2.skyhanni.events.item.ShardSource
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -238,10 +238,10 @@ object AttributeShardsData {
 
     // the boolean is if it should post the shard gain event
     private val shardGainChatPatterns = mapOf(
-        caughtShardsPattern to (true to Source.HUNT),
-        lootShareShardPattern to (true to Source.HUNT),
+        caughtShardsPattern to (true to ShardSource.HUNT),
+        lootShareShardPattern to (true to ShardSource.HUNT),
         charmedShardPattern to (true to null),
-        sentToHuntingBoxPattern to (false to Source.SENT_TO_HUNTING_BOX),
+        sentToHuntingBoxPattern to (false to ShardSource.SENT_TO_HUNTING_BOX),
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
@@ -269,7 +269,7 @@ object AttributeShardsData {
             val shardInternalName = shardNameToInternalName(shardName) ?: return
             processShard(shardInternalName, level, untilNext)
 
-            ShardEvent(shardInternalName, -group("amount").toInt(), Source.SYPHON).post()
+            ShardEvent(shardInternalName, -group("amount").toInt(), ShardSource.SYPHON).post()
 
             lastSyphonedMessage = SimpleTimeMark.now()
             return
@@ -281,7 +281,7 @@ object AttributeShardsData {
             val shardInternalName = shardNameToInternalName(shardName) ?: return
             processShard(shardInternalName, 10, 0)
 
-            ShardEvent(shardInternalName, -group("amount").toInt(), Source.SYPHON).post()
+            ShardEvent(shardInternalName, -group("amount").toInt(), ShardSource.SYPHON).post()
 
             lastSyphonedMessage = SimpleTimeMark.now()
             return
@@ -328,13 +328,13 @@ object AttributeShardsData {
                 val newSource = if (source == null) {
                     val type = groupOrNull("charmType")
                     if (type == "CHARM") {
-                        Source.CHARM
+                        ShardSource.CHARM
                     } else if (type == "NAGA") {
-                        Source.NAGA
+                        ShardSource.NAGA
                     } else if (type == "SALT") {
-                        Source.SALT
+                        ShardSource.SALT
                     } else {
-                        Source.UNKNOWN
+                        ShardSource.UNKNOWN
                     }
                 } else {
                     source
@@ -352,9 +352,9 @@ object AttributeShardsData {
         fusionShardPattern.matchMatcher(event.message) {
             val currentFusionData = FusionData.currentFusionData ?: return
             val amount = groupOrNull("amount")?.toInt() ?: 1
-            ShardEvent(currentFusionData.outputShard, amount, Source.FUSE).post()
-            ShardEvent(currentFusionData.firstShard.internalName, -currentFusionData.firstShard.amount, Source.FUSE).post()
-            ShardEvent(currentFusionData.secondShard.internalName, -currentFusionData.secondShard.amount, Source.FUSE).post()
+            ShardEvent(currentFusionData.outputShard, amount, ShardSource.FUSE).post()
+            ShardEvent(currentFusionData.firstShard.internalName, -currentFusionData.firstShard.amount, ShardSource.FUSE).post()
+            ShardEvent(currentFusionData.secondShard.internalName, -currentFusionData.secondShard.amount, ShardSource.FUSE).post()
         }
     }
 

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.item.ShardEvent
-import at.hannibal2.skyhanni.events.item.Source
+import at.hannibal2.skyhanni.events.item.ShardSource
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
@@ -31,7 +31,7 @@ object FusionDisplay {
 
     @HandleEvent
     fun onShardGain(event: ShardEvent) {
-        if (event.source != Source.FUSE) return
+        if (event.source != ShardSource.FUSE) return
         if (event.amount < 0) return
         if (lastInternalName != event.shardInternalName) {
             lastInternalName = event.shardInternalName
