@@ -6,10 +6,20 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 /**
  * All shard events, e.g. fusions and syphoning
  */
-open class ShardEvent(val shardInternalName: NeuInternalName, val amount: Int) : SkyHanniEvent()
+open class ShardEvent(val shardInternalName: NeuInternalName, val amount: Int, val source: Source) : SkyHanniEvent()
 
 /**
  * Shard events that are explicitly the player gaining shards. For use in stuff like profit trackers
  */
-class ShardGainEvent(shardInternalName: NeuInternalName, amount: Int) : ShardEvent(shardInternalName, amount)
+class ShardGainEvent(shardInternalName: NeuInternalName, amount: Int, source: Source) : ShardEvent(shardInternalName, amount, source)
 
+enum class Source {
+    SYPHON,
+    FUSE,
+    CHARM,
+    NAGA,
+    SALT,
+    HUNT,
+    SENT_TO_HUNTING_BOX,
+    UNKNOWN,
+}

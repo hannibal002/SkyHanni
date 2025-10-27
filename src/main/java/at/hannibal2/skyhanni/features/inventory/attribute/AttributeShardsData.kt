@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.item.ShardEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
+import at.hannibal2.skyhanni.events.item.Source
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -64,6 +65,8 @@ object AttributeShardsData {
     val confirmFusionInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { FusionData.updateFusionData() } },
     ) { name -> name == "Confirm Fusion" }
+    val fusionBoxInventory = InventoryDetector { name -> name == "Fusion Box" }
+    val shardFusionInventory = InventoryDetector { name -> name == "Shard Fusion" }
 
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
 
@@ -219,7 +222,7 @@ object AttributeShardsData {
     @Suppress("MaxLineLength")
     private val charmedShardPattern by patternGroup.pattern(
         "charmed.shard",
-        "§.§l(?:CHARM|SALT|NAGA)§7 You charmed an? §.(?<shardName>.+)§7 and captured (?:§.(?<amount>\\d+) Shards §7from it|its §9Shard§7)\\.(?:§.)*",
+        "§.§l(?<charmType>CHARM|SALT|NAGA)§7 You charmed an? §.(?<shardName>.+)§7 and captured (?:§.(?<amount>\\d+) Shards §7from it|its §9Shard§7)\\.(?:§.)*",
     )
 
     /**
@@ -233,11 +236,12 @@ object AttributeShardsData {
         "§7You sent (?:§a)?(?:an?|(?<amount>\\d+)) §.(?<shardName>.+) Shards? §7to your §aHunting Box§7.",
     )
 
+    // the boolean is if it should post the shard gain event
     private val shardGainChatPatterns = mapOf(
-        caughtShardsPattern to true,
-        lootShareShardPattern to true,
-        charmedShardPattern to true,
-        sentToHuntingBoxPattern to false,
+        caughtShardsPattern to (true to Source.HUNT),
+        lootShareShardPattern to (true to Source.HUNT),
+        charmedShardPattern to (true to null),
+        sentToHuntingBoxPattern to (false to Source.SENT_TO_HUNTING_BOX),
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
@@ -265,7 +269,7 @@ object AttributeShardsData {
             val shardInternalName = shardNameToInternalName(shardName) ?: return
             processShard(shardInternalName, level, untilNext)
 
-            ShardEvent(shardInternalName, -group("amount").toInt()).post()
+            ShardEvent(shardInternalName, -group("amount").toInt(), Source.SYPHON).post()
 
             lastSyphonedMessage = SimpleTimeMark.now()
             return
@@ -277,7 +281,7 @@ object AttributeShardsData {
             val shardInternalName = shardNameToInternalName(shardName) ?: return
             processShard(shardInternalName, 10, 0)
 
-            ShardEvent(shardInternalName, -group("amount").toInt()).post()
+            ShardEvent(shardInternalName, -group("amount").toInt(), Source.SYPHON).post()
 
             lastSyphonedMessage = SimpleTimeMark.now()
             return
@@ -320,10 +324,26 @@ object AttributeShardsData {
                     return
                 }
 
-                if (shouldPostGainEvent) {
-                    ShardGainEvent(shardInternalName, amount).post()
+                val source = shouldPostGainEvent.second
+                val newSource = if (source == null) {
+                    val type = groupOrNull("charmType")
+                    if (type == "CHARM") {
+                        Source.CHARM
+                    } else if (type == "NAGA") {
+                        Source.NAGA
+                    } else if (type == "SALT") {
+                        Source.SALT
+                    } else {
+                        Source.UNKNOWN
+                    }
                 } else {
-                    ShardEvent(shardInternalName, amount).post()
+                    source
+                }
+
+                if (shouldPostGainEvent.first) {
+                    ShardGainEvent(shardInternalName, amount, newSource).post()
+                } else {
+                    ShardEvent(shardInternalName, amount, newSource).post()
                 }
                 return
             }
@@ -332,9 +352,9 @@ object AttributeShardsData {
         fusionShardPattern.matchMatcher(event.message) {
             val currentFusionData = FusionData.currentFusionData ?: return
             val amount = groupOrNull("amount")?.toInt() ?: 1
-            ShardEvent(currentFusionData.outputShard, amount).post()
-            ShardEvent(currentFusionData.firstShard.internalName, -currentFusionData.firstShard.amount).post()
-            ShardEvent(currentFusionData.secondShard.internalName, -currentFusionData.secondShard.amount).post()
+            ShardEvent(currentFusionData.outputShard, amount, Source.FUSE).post()
+            ShardEvent(currentFusionData.firstShard.internalName, -currentFusionData.firstShard.amount, Source.FUSE).post()
+            ShardEvent(currentFusionData.secondShard.internalName, -currentFusionData.secondShard.amount, Source.FUSE).post()
         }
     }
 
@@ -418,7 +438,7 @@ object AttributeShardsData {
         HuntingBoxValue.processInventory(slots)
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onShardGain(event: ShardEvent) {
         val attributeName = shardInternalNameToShardName(event.shardInternalName)
         val existing = storage?.get(attributeName)?.amountInBox ?: 0
@@ -487,7 +507,7 @@ object AttributeShardsData {
         return Triple(tier, amountToNextTier, amountToMax)
     }
 
-    private fun shardInternalNameToShardName(internalName: NeuInternalName): String {
+    fun shardInternalNameToShardName(internalName: NeuInternalName): String {
         return internalNameToShard[internalName]
             ?: ErrorManager.skyHanniError("Unknown attribute shard internal name: $internalName")
     }
@@ -514,13 +534,29 @@ object AttributeShardsData {
         }
 
     private fun getLevel(shardName: String): Int =
-        storage?.get(shardName)?.amountSyphoned?.let {
+        getSyphonedAmount(shardName).let {
             findTierAndAmountUntilNext(shardName, it).first
-        } ?: 0
+        }
 
     private fun isEnabled(shardName: String): Boolean =
         storage?.get(shardName)?.enabled ?: false
 
     fun getActiveLevel(shardName: String) =
         if (isEnabled(shardName)) getLevel(shardName) else 0
+
+    fun getSyphonedAmount(shardName: String): Int {
+        return storage?.get(shardName)?.amountSyphoned ?: 0
+    }
+
+    fun getAmountInHuntingBox(shardName: String): Int {
+        return storage?.get(shardName)?.amountInBox ?: 0
+    }
+
+    fun getAmountUntilMax(shardName: String): Int {
+        return findTierAndAmountUntilNext(shardName, getSyphonedAmount(shardName)).third
+    }
+
+    fun isInFusionMachine(): Boolean {
+        return fusionBoxInventory.isInside() || shardFusionInventory.isInside() || confirmFusionInventory.isInside()
+    }
 }
