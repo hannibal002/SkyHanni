@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -174,6 +175,8 @@ object GetFromSackApi {
 
         var amountString = arguments.last()
         amountString = Calculator.calculateOrNull(amountString)?.toString() ?: amountString
+
+        if (!amountString.isDouble()) return CommandResult.WRONG_ARGUMENT to null
 
         val itemString = arguments.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
         val replacedString = itemString.replace("_", " ")
