@@ -11,14 +11,13 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.Calculator
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NeuCalculator
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -174,9 +173,7 @@ object GetFromSackApi {
         } else args
 
         var amountString = arguments.last()
-        amountString = NeuCalculator.calculateOrNull(amountString)?.toString() ?: amountString
-
-        if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
+        amountString = Calculator.calculateOrNull(amountString)?.toString() ?: amountString
 
         val itemString = arguments.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
         val replacedString = itemString.replace("_", " ")

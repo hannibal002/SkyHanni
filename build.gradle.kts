@@ -278,6 +278,9 @@ dependencies {
     // getting clock offset
     shadowImpl("commons-net:commons-net:3.11.1")
 
+    // Calculator
+    shadowImpl("com.notkamui.libs:keval:1.1.1")
+
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
