@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests.stereo
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
-enum class VinylType(val displayName: String, private val internalNameOverride: String? = null) {
+enum class VinylType(val displayName: String, internalNameOverride: String? = null) {
     PRETTY_FLY("Pretty Fly"),
     CRICKET_CHOIR("Cricket Choir"),
     CICADA_SYMPHONY("Cicada Symphony"),
