@@ -14,7 +14,6 @@ enum class VinylType(val displayName: String, private val internalNameOverride: 
     WINGS_OF_HARMONY("Wings of Harmony"),
     SLOW_AND_GROOVY("Slow and Groovy"),
     NOT_JUST_A_PEST("Not Just a Pest", "VINYL_BEETLE"),
-    NONE("None")
     ;
 
     val internalName: NeuInternalName =
