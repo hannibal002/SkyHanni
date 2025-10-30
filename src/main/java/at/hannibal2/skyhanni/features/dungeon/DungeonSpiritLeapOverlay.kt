@@ -88,12 +88,8 @@ object DungeonSpiritLeapOverlay {
 
     @HandleEvent
     fun onKeyPress(event: KeyDownEvent) {
-        if (!isEnabled() ||
-            !config.spiritLeapKeybindConfig.enableKeybind ||
-            InventoryUtils.openInventoryName().removeColor() !in validInventoryNames
-        ) {
-            return
-        }
+        if (!isEnabled() || !config.spiritLeapKeybindConfig.enableKeybind) return
+        if (InventoryUtils.openInventoryName().removeColor() !in validInventoryNames) return
         val index = getKeybindIndex(event.keyCode)
         if (index !in 0..<playerList.count()) return
         leapToPlayer(playerList[index])
