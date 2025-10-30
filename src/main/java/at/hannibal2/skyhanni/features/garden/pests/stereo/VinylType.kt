@@ -21,10 +21,10 @@ enum class VinylType(val displayName: String, private val internalNameOverride: 
         (internalNameOverride ?: "VINYL_$name").toInternalName()
 
     companion object {
-        fun getByNameOrNull(name: String): VinylType? =
-            VinylType.entries.firstOrNull { it.displayName == name }
+        fun getByName(name: String): VinylType =
+            VinylType.entries.find { it.displayName == name } ?: error("Unknown vinyl: '$name'")
 
         fun getByInternalNameOrNull(internalName: NeuInternalName): VinylType? =
-            VinylType.entries.firstOrNull { it.internalName == internalName }
+            VinylType.entries.find { it.internalName == internalName }
     }
 }

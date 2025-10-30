@@ -28,17 +28,19 @@ object StereoHarmonyDiscReplacer {
         if (!PestApi.stereoInventory.isInside()) return
         if (event.slot !in 11..15 && event.slot !in 20..24) return
 
-        val internalName = event.originalItem?.getInternalNameOrNull() ?: return
+        val item = event.originalItem
+        val internalName = item?.getInternalNameOrNull() ?: return
         val vinylType = VinylType.getByInternalNameOrNull(internalName) ?: return
         val cropType = PestType.getByVinylOrNull(vinylType)?.crop ?: return
-        val isActiveVinyl = PestApi.stereoPlayingItemPattern.anyMatches(event.originalItem.getLore())
+        val lore = item.getLore()
+        val isActiveVinyl = PestApi.stereoPlayingItemPattern.anyMatches(lore)
         val iconId = "stereo_harmony_replacer:${vinylType.name}-$isActiveVinyl"
 
         val replacementStack = iconCache.getOrPut(iconId) {
             cropType.getItemStackCopy(iconId).apply {
                 if (isActiveVinyl) addEnchantGlint()
-                setLore(event.originalItem.getLore())
-                setCustomItemName(event.originalItem.displayName)
+                setLore(lore)
+                setCustomItemName(item.displayName)
             }
         }
 

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.pests.stereo
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -32,14 +32,10 @@ object StereoHarmonyDisplay {
 
     private val config get() = PestApi.config.stereoHarmony
 
-    var activeVinyl: VinylType
-        get() = ProfileStorageData.profileSpecific?.garden?.activeVinyl ?: VinylType.NONE
-        private set(type) {
-            ProfileStorageData.profileSpecific?.garden?.activeVinyl = type
-            update()
-        }
+    private val gardenStorage get() = GardenApi.storage
 
-    private fun VinylType.getPest() = PestType.filterableEntries.find { it.vinyl == this }
+    private fun VinylType.getPest(): PestType =
+        PestType.filterableEntries.find { it.vinyl == this } ?: error("no PestType for VinylType $this")
 
     private var display = emptyList<Renderable>()
 
@@ -55,45 +51,50 @@ object StereoHarmonyDisplay {
         display = drawDisplay()
     }
 
+    // TODO cleanup: we don't want three nested buildList calls
     private fun drawDisplay() = buildList {
-        val pest = activeVinyl.getPest()
-
+        val vinyl = gardenStorage?.activeVinyl ?: run {
+            add(Renderable.item(questionMarkSkull))
+            add(Renderable.vertical(listOf(StringRenderable("§ePlaying: §7Nothing")), verticalAlign = RenderUtils.VerticalAlignment.CENTER))
+            return@buildList
+        }
+        val pest = vinyl.getPest()
         if (config.showHead.get()) {
-            val itemScale = 1.67
-            add(pest?.internalName?.let { Renderable.item(it, itemScale) } ?: Renderable.item(questionMarkSkull))
+            add(Renderable.item(pest.internalName, scale = 1.67))
         }
         val displayList = buildList {
-            val vinylName = activeVinyl.displayName
-            val pestName = pest?.displayName ?: "None"
-            addString("§ePlaying: §a$vinylName")
+            addString("§ePlaying: §a${vinyl.displayName}")
             val pestLine = buildList {
-                addString("§ePest: §c$pestName ")
-                if (pest?.crop != null && config.showCrop.get()) addItemStack(pest.crop.icon)
+                addString("§ePest: §c${pest.displayName} ")
+                pest.crop?.let {
+                    if (config.showCrop.get()) addItemStack(it.icon)
+                }
             }
             add(Renderable.horizontal(pestLine))
         }
         add(Renderable.vertical(displayList, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
-    private fun updateActiveVinyl(stack: ItemStack) =
-        PestApi.stereoPlayingPattern.firstMatcher(stack.getLore()) {
-            val vinyl = group("vinyl").trim()
-            activeVinyl = VinylType.getByNameOrNull(vinyl) ?: error("Unknown active vinyl: \"$vinyl\"")
+    private fun updateActiveVinyl(stack: ItemStack?) {
+        PestApi.stereoPlayingPattern.firstMatcher(stack?.getLore() ?: return) {
+            gardenStorage?.activeVinyl = VinylType.getByName(group("vinyl").trim())
         }
+    }
 
     // NOTE: Do not mark this as Garden only, it is possible to change the active vinyl outside the Garden
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!PestApi.stereoInventory.isInside()) return
-        event.inventoryItemsWithNull[4]?.let { updateActiveVinyl(it) }
+        if (PestApi.stereoInventory.isInside()) {
+            updateActiveVinyl(event.inventoryItemsWithNull[4])
+        }
     }
 
     // NOTE: Do not mark this as Garden only, it is possible to change the active vinyl outside the Garden
     @HandleEvent(onlyOnSkyblock = true)
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-        val stack = event.itemStack
-        if (stack.getItemCategoryOrNull() != ItemCategory.VACUUM) return
-        updateActiveVinyl(stack)
+        if (event.itemStack.getItemCategoryOrNull() == ItemCategory.VACUUM) {
+            updateActiveVinyl(event.itemStack)
+        }
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
@@ -101,7 +102,7 @@ object StereoHarmonyDisplay {
         if (!isEnabled()) return
         if (!GardenApi.isCurrentlyFarming() && !config.alwaysShow) return
 
-        if (activeVinyl == VinylType.NONE && config.hideWhenNone) return
+        if (gardenStorage?.activeVinyl == null && config.hideWhenNone) return
         else if (display.isEmpty()) update()
         if (display.isEmpty()) return
         val content = Renderable.horizontal(display, 1, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
