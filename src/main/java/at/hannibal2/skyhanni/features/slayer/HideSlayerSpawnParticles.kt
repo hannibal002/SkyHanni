@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
@@ -16,7 +17,7 @@ object HideSlayerSpawnParticles {
     private val config get() = SlayerApi.config
 
     @Suppress("VarCouldBeVal")
-    private var mobRecentDeaths = mutableListOf<Pair<LorenzVec, SimpleTimeMark>>()
+    private var mobRecentDeaths = mutableMapOf<LorenzVec, SimpleTimeMark>()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -47,22 +48,14 @@ object HideSlayerSpawnParticles {
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (event.health.toDouble() != 0.0) return
-        val entity = event.entity
-        mobRecentDeaths.add(Pair(entity.getLorenzVec(), SimpleTimeMark.now()))
+        mobRecentDeaths[event.entity.getLorenzVec()] = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
-        val iterator = mobRecentDeaths.iterator()
-        while (iterator.hasNext()) {
-            val element = iterator.next()
-            if (element.second.passedSince() > 3.seconds) {
-                iterator.remove()
-            }
-        }
-
+        mobRecentDeaths.removeIf { it.value.passedSince() > 3.seconds }
     }
 
-    private fun LorenzVec.distanceToNearestDeadMob() = mobRecentDeaths.minOfOrNull { it.first.distanceSq(this) }
+    private fun LorenzVec.distanceToNearestDeadMob() = mobRecentDeaths.minOfOrNull { it.key.distanceSq(this) }
 }
 
