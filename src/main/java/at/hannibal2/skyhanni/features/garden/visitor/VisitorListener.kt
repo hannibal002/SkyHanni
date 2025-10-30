@@ -67,8 +67,7 @@ object VisitorListener {
         //#if MC < 1.21
         val entity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
         //#else
-        //$$ val world = MinecraftCompat.localPlayer.world
-        //$$ val entity = world.getEntityById(packet.entityId) ?: return
+        //$$ val entity = MinecraftCompat.localWorld.getEntityById(packet.entityId) ?: return
         //#endif
         val entityId = entity.entityId
 

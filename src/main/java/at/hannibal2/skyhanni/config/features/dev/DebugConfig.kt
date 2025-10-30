@@ -197,6 +197,11 @@ class DebugConfig {
     val assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
 
     @Expose
+    @ConfigOption(name = "Set Mayor on Start", desc = "Set assumed mayor to disabled on game start.")
+    @ConfigEditorBoolean
+    var disableAssumeMayor: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Always Year of Pig", desc = "Assumes the Year of the Pig is always active, even if it is not.")
     @ConfigEditorBoolean
     var alwaysYearOfThePig: Boolean = false
