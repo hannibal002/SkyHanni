@@ -6,16 +6,17 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object SpookyFestival {
-    private val config get() = SkyHanniMod.feature.event.spooky
+object SpookyChestAlert {
+    private val config get() = SkyHanniMod.feature.event.spooky.spookyChests
 
     private val patternGroup = RepoPattern.group("event.spooky")
 
     /**
-     * REGEX-TEST: §r§6§lSPOOKY! §r§7A §r§6Trick or Treat Chest §r§7has appeared!§r§7
+     * REGEX-TEST: §6§lSPOOKY! §r§7A §r§6Trick or Treat Chest §r§7has appeared!
      */
     private val chestMessagePattern by patternGroup.pattern(
         "chat.chest",
@@ -24,16 +25,18 @@ object SpookyFestival {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (config.spookyChestAlert) {
-            chestMessagePattern.matchMatcher(event.message) {
-                TitleManager.sendTitle(
-                    "§l§${group("color")}" + if (config.compactSpookyChest) {
-                        "${group("type")} CHEST"
-                    } else {
-                        "${group("chest").uppercase()}!"
-                    }
-                )
-            }
-        }
+        if (!config.enabled) return
+        chestMessagePattern.matchMatcher(event.message) {
+            TitleManager.sendTitle(
+                "§l§${group("color")}" + if (config.compactTitle) {
+                    "${group("type")} CHEST"
+                } else {
+                    "${group("chest").uppercase()}!"
+                },
+            )
+        } ?: return
+
+        if (!config.playSound) return
+        SoundUtils.playBeepSound()
     }
 }
