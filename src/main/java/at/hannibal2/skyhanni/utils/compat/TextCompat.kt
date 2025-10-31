@@ -100,20 +100,21 @@ fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false, leadingW
 //$$
 //$$ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
 //$$     this ?: return ""
-//$$     val sb = StringBuilder()
+//$$     val sb = StringBuilder(50)
+//$$     var wasFormated = false
 //$$     for (component in iterator()) {
 //$$         val chatStyle = component.style.chatStyle()
-//$$         if (leadingWhite || (sb.contains("§") && sb.toString() != "§r") || chatStyle != "§f") {
+//$$         if (leadingWhite || (wasFormated && sb.length == 2 && sb.get(0) == '§' && sb.get(1) == 'r') || chatStyle != "§f") {
 //$$             sb.append(chatStyle)
+//$$             wasFormated = true
 //$$         }
 //$$         sb.append(component.unformattedTextForChatCompat())
 //$$         if (!noExtraResets) {
 //$$             sb.append("§r")
-//$$         } else {
-//$$             if (component == Component.empty()) sb.append("§r")
-//$$         }
+//$$             wasFormated = true
+//$$         } else if (component == Text.empty()) sb.append("§r")
 //$$     }
-//$$     return sb.toString().removeSuffix("§r").removePrefix("§r")
+//$$     return sb.removeSuffix("§r").removeSuffix("§r").toString()
 //$$ }
 //$$
 //$$ private val textColorLUT = ChatFormatting.entries
