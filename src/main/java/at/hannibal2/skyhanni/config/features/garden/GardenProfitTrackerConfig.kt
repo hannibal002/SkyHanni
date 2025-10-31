@@ -101,7 +101,8 @@ class GardenProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Harvest Crops Compact Mode",
-        desc = "Choose whether to show crops should be shown/priced as their base form or one of their compacted forms."
+        desc = "Converts all harvested base crops to this tier. Only applies to the \"All\" Profit Type Mode." +
+            " Example: Base: Wheat, Compacted: Enchanted Wheat, Super-Compacted: Enchanted Hay Bale."
     )
     @ConfigEditorDropdown
     val compactMode: Property<HarvestedCropsMode> = Property.of(HarvestedCropsMode.BASE)
