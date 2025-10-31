@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.features.foraging
+package at.hannibal2.hanni.features.foraging
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ModernPatterns
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.WidgetUpdateEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ModernPatterns
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SoundUtils
 import kotlin.time.Duration.Companion.minutes
 
-@SkyHanniModule
+@HanniModule
 object MoongladeBeaconWarning {
 
     private var lastAlert = SimpleTimeMark.farPast()
@@ -30,6 +30,6 @@ object MoongladeBeaconWarning {
         }
     }
 
-    fun isEnabled() = SkyHanniMod.feature.foraging.moongladeBeacon.beaconAlert
+    fun isEnabled() = HanniMod.feature.foraging.moongladeBeacon.beaconAlert
 
 }

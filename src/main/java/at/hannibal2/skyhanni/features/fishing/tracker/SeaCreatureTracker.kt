@@ -1,40 +1,40 @@
-package at.hannibal2.skyhanni.features.fishing.tracker
+package at.hannibal2.hanni.features.fishing.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ExcludedSeaCreatureAreasJson
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.features.fishing.FishingApi
-import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.storage.Resettable
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.jsonobjects.repo.ExcludedSeaCreatureAreasJson
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.fishing.FishingBobberCastEvent
+import at.hannibal2.hanni.events.fishing.SeaCreatureFishEvent
+import at.hannibal2.hanni.features.fishing.FishingApi
+import at.hannibal2.hanni.features.fishing.SeaCreatureManager
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.addButton
+import at.hannibal2.hanni.utils.renderables.Searchable
+import at.hannibal2.hanni.utils.tracker.HanniTracker
 import com.google.gson.annotations.Expose
 
-@SkyHanniModule
+@HanniModule
 object SeaCreatureTracker {
     private var needMigration = true
 
-    private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
+    private val config get() = HanniMod.feature.fishing.seaCreatureTracker
 
-    private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker }) {
+    private val tracker = HanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker }) {
         drawDisplay(it)
     }
 

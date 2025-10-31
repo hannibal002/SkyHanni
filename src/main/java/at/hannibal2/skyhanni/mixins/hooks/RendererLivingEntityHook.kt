@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.misc.ContributorManager
-import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.features.misc.ContributorManager
+import at.hannibal2.hanni.utils.EntityOutlineRenderer
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.TimeUtils
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 
 object RendererLivingEntityHook {
-    private val config get() = SkyHanniMod.feature.dev
+    private val config get() = HanniMod.feature.dev
 
     @JvmStatic
     fun setOutlineColor(red: Float, green: Float, blue: Float, alpha: Float, entity: EntityLivingBase) {

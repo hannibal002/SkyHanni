@@ -1,5 +1,5 @@
-import at.skyhanni.sharedvariables.MultiVersionStage
-import at.skyhanni.sharedvariables.ProjectTarget
+import at.hanni.sharedvariables.MultiVersionStage
+import at.hanni.sharedvariables.ProjectTarget
 
 pluginManagement {
     includeBuild("sharedVariables")
@@ -35,14 +35,14 @@ pluginManagement {
 
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version ("0.8.0")
-    id("at.skyhanni.shared-variables")
+    id("at.hanni.shared-variables")
 }
 
 MultiVersionStage.initFrom(file(".gradle/private.properties"))
 
 include("annotation-processors")
 include("detekt")
-rootProject.name = "SkyHanni"
+rootProject.name = "Hanni"
 rootProject.buildFileName = "root.gradle.kts"
 
 ProjectTarget.activeVersions().forEach { target ->

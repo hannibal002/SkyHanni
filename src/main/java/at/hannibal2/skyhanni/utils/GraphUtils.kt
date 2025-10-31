@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.model.DijkstraTree
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.findPathToDestination
+import at.hannibal2.hanni.data.IslandGraphs
+import at.hannibal2.hanni.data.model.DijkstraTree
+import at.hannibal2.hanni.data.model.Graph
+import at.hannibal2.hanni.data.model.GraphNode
+import at.hannibal2.hanni.data.model.findPathToDestination
 import java.util.PriorityQueue
 import java.util.Stack
 

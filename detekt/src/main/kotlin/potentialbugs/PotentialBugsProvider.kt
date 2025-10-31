@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.detektrules.potentialbugs
+package at.hannibal2.hanni.detektrules.potentialbugs
 
 import com.google.auto.service.AutoService
 import io.gitlab.arturbosch.detekt.api.Config

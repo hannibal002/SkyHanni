@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.compat
+package at.hannibal2.hanni.utils.compat
 
-import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.DelayedRun
 import net.minecraft.client.MinecraftClient
 
 object MouseCompat {

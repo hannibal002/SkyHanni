@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.chroma
+package at.hannibal2.hanni.features.chroma
 
-import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.shader.ShaderHelper
+import at.hannibal2.hanni.utils.ColorUtils
+import at.hannibal2.hanni.utils.shader.ShaderHelper
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
 

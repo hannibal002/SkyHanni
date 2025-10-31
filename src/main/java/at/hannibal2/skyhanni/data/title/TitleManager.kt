@@ -1,33 +1,33 @@
-package at.hannibal2.skyhanni.data.title
+package at.hannibal2.hanni.data.title
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.title.CountdownTitleContext.Companion.fromTitleData
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.data.title.CountdownTitleContext.Companion.fromTitleData
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.TimeUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.enumMapOf
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object TitleManager {
 
     private val titleLocationQueues: MutableMap<TitleLocation, CollectionUtils.OrderedQueue<TitleContext>> = enumMapOf()
     private val currentTitles: MutableMap<TitleLocation, TitleContext?> = enumMapOf()
-    val guiConfig get() = SkyHanniMod.feature.gui
+    val guiConfig get() = HanniMod.feature.gui
     val existingIntentions = guiConfig.titleIntentionPositions.values.map { it.keys }.flatten().toSet()
     val intentionMapper: MutableMap<String, TitleIntention> = mutableMapOf()
 
@@ -52,7 +52,7 @@ object TitleManager {
             }
 
             val collisionItem = existingIntentions.firstOrNull { it != reifiedName && it.endsWith(".$name") }
-            if (collisionItem != null) ErrorManager.skyHanniError(
+            if (collisionItem != null) ErrorManager.hanniError(
                 "Unique title intention violation - ${invokerClazz.simpleName} " +
                     "attempted to register $name, but $collisionItem already exists."
             )
@@ -296,7 +296,7 @@ object TitleManager {
         }
     }
 
-    @HandleEvent(SkyHanniTickEvent::class)
+    @HandleEvent(HanniTickEvent::class)
     fun onTick() {
         TitleLocation.entries.filter {
             it.activationRequirement.invoke()

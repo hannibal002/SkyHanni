@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.hanni.features.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackApi
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SackApi
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.PrimitiveItemStack
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.GetFromSackApi
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.SackApi
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.PrimitiveItemStack
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object SuperCraftFeatures {
 
     /**
@@ -24,10 +24,10 @@ object SuperCraftFeatures {
         "inventory.supercrafting.craft.new",
         "§eYou Supercrafted §r§r§r§.(?<item>[^§]+)(?:§r§8x(?<amount>[\\d,]+))?§r§e!",
     )
-    private val config get() = SkyHanniMod.feature.inventory.gfs
+    private val config get() = HanniMod.feature.inventory.gfs
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!config.superCraftGFS) return
         val (internalName, amount) = craftedPattern.matchMatcher(event.message) {
             NeuInternalName.fromItemName(group("item")) to (group("amount")?.formatInt() ?: 1)

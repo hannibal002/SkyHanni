@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
 import net.minecraft.util.EnumParticleTypes
 //#if MC > 1.21
 //$$ import net.minecraft.particle.ParticleType

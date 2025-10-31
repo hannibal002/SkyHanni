@@ -1,39 +1,39 @@
-package at.hannibal2.skyhanni.utils.tracker
+package at.hannibal2.hanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.RenderData
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.TrackerManager
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
-import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.toRenderable
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.hanni.config.storage.Resettable
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.RenderData
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.data.TrackerManager
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.ItemPriceSource
+import at.hannibal2.hanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.RenderDisplayHelper
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.addButton
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.addRenderableNullableButton
+import at.hannibal2.hanni.utils.renderables.SearchTextInput
+import at.hannibal2.hanni.utils.renderables.Searchable
+import at.hannibal2.hanni.utils.renderables.buildSearchBox
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
-open class SkyHanniTracker<Data : Resettable>(
+open class HanniTracker<Data : Resettable>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
@@ -52,8 +52,8 @@ open class SkyHanniTracker<Data : Resettable>(
 
     companion object {
 
-        private val config get() = SkyHanniMod.feature.misc.tracker
-        private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
+        private val config get() = HanniMod.feature.misc.tracker
+        private val storedTrackers get() = HanniMod.feature.storage.trackerDisplayModes
 
         fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
     }
@@ -93,7 +93,7 @@ open class SkyHanniTracker<Data : Resettable>(
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
-        if (!currentlyOpen && config.hideOutsideInventory && this is SkyHanniItemTracker) {
+        if (!currentlyOpen && config.hideOutsideInventory && this is HanniItemTracker) {
             return
         }
         if (RenderData.outsideInventory) {
@@ -232,7 +232,7 @@ open class SkyHanniTracker<Data : Resettable>(
             entries.values.forEach(modifyFunction)
         }
 
-        fun get(displayMode: DisplayMode) = entries[displayMode] ?: ErrorManager.skyHanniError(
+        fun get(displayMode: DisplayMode) = entries[displayMode] ?: ErrorManager.hanniError(
             "Unregistered display mode accessed on tracker",
             "tracker" to name,
             "displayMode" to displayMode,

@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.hanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.isAlternateDay
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi.isAlternateDay
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.collection.CollectionUtils
 import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -122,9 +122,9 @@ enum class HoppityEggType(
         fun anyEggsUnclaimed(): Boolean = resettingEntries.any { !it.claimed }
         fun allEggsUnclaimed(): Boolean = resettingEntries.all { !it.claimed }
 
-        internal fun Matcher.getEggType(event: SkyHanniChatEvent): HoppityEggType =
+        internal fun Matcher.getEggType(event: HanniChatEvent): HoppityEggType =
             entries.find { it.mealName == group("meal") } ?: run {
-                ErrorManager.skyHanniError(
+                ErrorManager.hanniError(
                     "Unknown meal: ${group("meal")}",
                     "message" to event.message,
                 )

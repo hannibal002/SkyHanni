@@ -3,7 +3,7 @@
 in vec4 vertexColor;
 
 // Rect specific uniforms
-layout(std140) uniform SkyHanniRoundedUniforms {
+layout(std140) uniform HanniRoundedUniforms {
     float scaleFactor;
     float radius;
     float smoothness;
@@ -13,7 +13,7 @@ layout(std140) uniform SkyHanniRoundedUniforms {
 };
 
 // Outline specific uniforms
-layout(std140) uniform SkyHanniRoundedOutlineUniforms {
+layout(std140) uniform HanniRoundedOutlineUniforms {
     float borderThickness;
     float borderBlur;
 };

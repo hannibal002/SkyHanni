@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.api.hypixelapi
+package at.hannibal2.hanni.api.hypixelapi
 
-import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiJoinEvent
-import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.events.hypixel.modapi.HypixelApiJoinEvent
+import at.hannibal2.hanni.events.hypixel.modapi.HypixelApiServerChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 import net.hypixel.data.region.Environment
 import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
@@ -11,10 +11,10 @@ import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacke
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import kotlin.jvm.optionals.getOrNull
 //#if MC < 1.21
-import at.hannibal2.skyhanni.features.misc.CurrentPing
+import at.hannibal2.hanni.features.misc.CurrentPing
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object HypixelEventApi {
 
     private val modApi: HypixelModAPI = HypixelModAPI.getInstance()

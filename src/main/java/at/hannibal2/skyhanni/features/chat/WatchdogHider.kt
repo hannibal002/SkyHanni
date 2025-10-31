@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ChatUtils.chatMessage
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import net.minecraft.util.IChatComponent
 
-@SkyHanniModule
+@HanniModule
 object WatchdogHider {
 
     private var inWatchdog = false
@@ -22,8 +22,8 @@ object WatchdogHider {
     private const val END_LINE = "§c"
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
-        if (!SkyBlockUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog) return
+    fun onChat(event: HanniChatEvent) {
+        if (!SkyBlockUtils.onHypixel || !HanniMod.feature.chat.filterType.watchDog) return
 
         when (event.message) {
             START_LINE -> {

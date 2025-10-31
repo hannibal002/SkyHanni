@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.chat.translation
+package at.hannibal2.hanni.features.chat.translation
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.api.ApiUtils
-import at.hannibal2.skyhanni.utils.compat.setClickRunCommand
-import at.hannibal2.skyhanni.utils.compat.setHoverShowText
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.hanni.utils.ConditionalUtils.transformIf
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils.getPlayerNameFromChatMessage
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.api.ApiUtils
+import at.hannibal2.hanni.utils.compat.setClickRunCommand
+import at.hannibal2.hanni.utils.compat.setHoverShowText
 import com.google.gson.JsonArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,7 +26,7 @@ import java.net.URLEncoder
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO split into two classes: TranslatorCommand and GoogleTranslator. only communicates via getTranslationFromEnglish and getTranslationToEnglish
-@SkyHanniModule
+@HanniModule
 object Translator {
 
     private val messageContentRegex = Regex(".*: (.*)")
@@ -34,7 +34,7 @@ object Translator {
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -83,7 +83,7 @@ object Translator {
         }
     }
 
-    private val config get() = SkyHanniMod.feature.chat.translator
+    private val config get() = HanniMod.feature.chat.translator
 
     /*
      * Simplified version of the JSON response:
@@ -135,7 +135,7 @@ object Translator {
     private fun toNativeLanguage(args: Array<String>) {
         val message = args.joinToString(" ").removeColor()
 
-        SkyHanniMod.launchIOCoroutine("translator toNativeLanguage") {
+        HanniMod.launchIOCoroutine("translator toNativeLanguage") {
             val translation = getTranslation(message, getNativeLanguage())
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = translation?.get(1) ?: "Error!"
@@ -160,7 +160,7 @@ object Translator {
         val language = args[0]
         val message = args.drop(1).joinToString(" ")
 
-        SkyHanniMod.launchIOCoroutine("translator fromNativeLanguage") {
+        HanniMod.launchIOCoroutine("translator fromNativeLanguage") {
             val translation = getTranslation(message, language, getNativeLanguage())?.get(0) ?: "Error!"
             ChatUtils.clickableChat(
                 "Copied §f$language §etranslation to clipboard: §f$translation",
@@ -199,7 +199,7 @@ object Translator {
         val targetLanguage = args[1]
         val message = args.drop(2).joinToString(" ")
 
-        SkyHanniMod.launchIOCoroutine("shtranslateadvanced") {
+        HanniMod.launchIOCoroutine("shtranslateadvanced") {
             val translation = getTranslation(message, targetLanguage, sourceLanguage)
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""

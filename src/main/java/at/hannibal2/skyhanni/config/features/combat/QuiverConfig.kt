@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.features.combat
+package at.hannibal2.hanni.config.features.combat
 
-import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.hanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

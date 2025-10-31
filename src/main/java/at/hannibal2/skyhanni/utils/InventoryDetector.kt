@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.RegexUtils.matches
 import java.util.regex.Pattern
 
 /**
@@ -42,7 +42,7 @@ class InventoryDetector(
      */
     fun isInside() = inInventory
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
         private val detectors = mutableListOf<InventoryDetector>()
 

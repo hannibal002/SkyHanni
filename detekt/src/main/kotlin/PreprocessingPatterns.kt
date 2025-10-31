@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.detektrules
+package at.hannibal2.hanni.detektrules
 
 enum class PreprocessingPattern(val text: String) {
     IF("#if"),

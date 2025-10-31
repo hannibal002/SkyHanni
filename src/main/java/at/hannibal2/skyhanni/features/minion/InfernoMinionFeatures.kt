@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.minion
+package at.hannibal2.hanni.features.minion
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.InfernoMinionFuelsJson
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.InfernoMinionFuelsJson
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object InfernoMinionFeatures {
-    private val config get() = SkyHanniMod.feature.misc.minions
+    private val config get() = HanniMod.feature.misc.minions
 
     /**
      * REGEX-TEST: Inferno Minion II
@@ -70,12 +70,12 @@ object InfernoMinionFeatures {
 
         if (event.slot.slotNumber == 19) {
             event.toolTip.add("")
-            event.toolTip.add("§c[SkyHanni] is blocking you from taking this out!")
+            event.toolTip.add("§c[Hanni] is blocking you from taking this out!")
             event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
         }
         if (event.slot.slotNumber == 53) {
             event.toolTip.add("")
-            event.toolTip.add("§c[SkyHanni] is blocking you from picking this minion up!")
+            event.toolTip.add("§c[Hanni] is blocking you from picking this minion up!")
             event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
         }
     }

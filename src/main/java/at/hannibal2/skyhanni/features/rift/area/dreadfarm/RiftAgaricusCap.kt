@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.features.rift.area.dreadfarm
+package at.hannibal2.hanni.features.rift.area.dreadfarm
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.BlockUtils
+import at.hannibal2.hanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
 import net.minecraft.init.Blocks
 
-@SkyHanniModule
+@HanniModule
 object RiftAgaricusCap {
 
     private val config get() = RiftApi.config.area.dreadfarm
@@ -75,7 +75,7 @@ object RiftAgaricusCap {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         val location = location?.up(0.6) ?: return

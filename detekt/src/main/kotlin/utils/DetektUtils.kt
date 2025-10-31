@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.detektrules.utils
+package at.hannibal2.hanni.detektrules.utils
 
 import io.gitlab.arturbosch.detekt.rules.hasAnnotation
 import org.jetbrains.kotlin.psi.KtProperty

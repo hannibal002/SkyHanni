@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.garden.inventory
+package at.hannibal2.hanni.features.garden.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.GardenCropMilestones
+import at.hannibal2.hanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.cleanName
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.NumberUtil.toRoman
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.compat.setCustomItemName
 
 // TODO: Merge common code with skill overflow
-@SkyHanniModule
+@HanniModule
 object GardenInventoryTooltipOverflow {
 
-    private val config get() = SkyHanniMod.feature.garden.cropMilestones.overflow
+    private val config get() = HanniMod.feature.garden.cropMilestones.overflow
 
     @HandleEvent
     fun onToolTip(event: ToolTipEvent) {

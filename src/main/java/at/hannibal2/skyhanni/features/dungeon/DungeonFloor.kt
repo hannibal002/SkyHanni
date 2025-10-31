@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.hanni.features.dungeon
 
 enum class DungeonFloor(private val bossName: String) {
     E("The Watcher"),

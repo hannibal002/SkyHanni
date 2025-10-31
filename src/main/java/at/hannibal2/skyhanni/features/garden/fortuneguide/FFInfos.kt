@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide
+package at.hannibal2.hanni.features.garden.fortuneguide
 
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.GuiRenderUtils
 
 internal enum class FFInfos(
     val sumTo: FFInfos?,
@@ -126,7 +126,7 @@ internal enum class FFInfos(
         from = { FarmingItemType.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
         what = FFTypes.ENCHANT,
         x4 = { FarmingItemType.currentEquip == null },
-        max = { at.hannibal2.skyhanni.features.garden.GardenApi.totalAmountVisitorsExisting.toDouble() / 4.0 },
+        max = { at.hannibal2.hanni.features.garden.GardenApi.totalAmountVisitorsExisting.toDouble() / 4.0 },
     ),
     ;
 

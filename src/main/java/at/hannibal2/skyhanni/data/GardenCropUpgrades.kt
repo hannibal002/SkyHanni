@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object GardenCropUpgrades {
 
     private val patternGroup = RepoPattern.group("garden.cropupgrades")
@@ -37,7 +37,7 @@ object GardenCropUpgrades {
     private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenApi.storage?.cropUpgrades
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
 
         chatUpgradePattern.matchMatcher(event.message) {
             val crop = CropType.getByNameOrNull(group("crop"))

@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.combat.damageindicator
+package at.hannibal2.hanni.features.combat.damageindicator
 
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUnit
-import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.TimeUnit
+import at.hannibal2.hanni.utils.TimeUtils.format
 
 class DamageIndicatorEntityData(
     val mob: Mob,

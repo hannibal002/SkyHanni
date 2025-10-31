@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.utils.LorenzVec
 import java.awt.Color
 
-class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent) {
+class QuadDrawer @PublishedApi internal constructor(val event: HanniRenderWorldEvent) {
 
     inline fun draw(
         middlePoint: LorenzVec,
@@ -12,7 +12,7 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         sidePoint2: LorenzVec,
         c: Color,
     ) {
-        val layer = SkyHanniRenderLayers.getQuads(false)
+        val layer = HanniRenderLayers.getQuads(false)
         val buf = event.vertexConsumers.getBuffer(layer)
         event.matrices.push()
 
@@ -37,7 +37,7 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
 
     companion object {
         inline fun draw3D(
-            event: SkyHanniRenderWorldEvent,
+            event: HanniRenderWorldEvent,
             crossinline quads: QuadDrawer.() -> Unit,
         ) {
             quads.invoke(QuadDrawer(event))

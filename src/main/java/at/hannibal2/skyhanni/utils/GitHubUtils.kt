@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
-import at.hannibal2.skyhanni.data.repo.RepoCommit
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.api.ApiUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.data.repo.AbstractRepoLocationConfig
+import at.hannibal2.hanni.data.repo.RepoCommit
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.hanni.utils.api.ApiUtils
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.io.File
@@ -40,13 +40,13 @@ object GitHubUtils {
 
         suspend fun getLatestCommit(silentError: Boolean = true): RepoCommit? {
             val (_, jsonResponse) = ApiUtils.getJsonResponse(commitApiUrl, apiName, silentError).assertSuccessWithData() ?: run {
-                SkyHanniMod.logger.error("Failed to fetch latest commits.")
+                HanniMod.logger.error("Failed to fetch latest commits.")
                 return null
             }
             val apiResponse = runCatching {
                 ConfigManager.gson.fromJson(jsonResponse, CommitsApiResponse::class.java)
             }.getOrNull() ?: run {
-                SkyHanniMod.logger.error("Failed to parse latest commit response: $jsonResponse")
+                HanniMod.logger.error("Failed to parse latest commit response: $jsonResponse")
                 return null
             }
             return RepoCommit(sha = apiResponse.sha, time = apiResponse.commit.committer.date)
@@ -54,19 +54,19 @@ object GitHubUtils {
 
         suspend fun downloadCommitZipToFile(destinationZip: File, shaOverride: String? = null): Boolean {
             val shaToUse = shaOverride ?: getLatestCommit(!shouldError)?.sha ?: run {
-                if (shouldError) ErrorManager.skyHanniError("Cannot get full archive URL without a valid SHA")
+                if (shouldError) ErrorManager.hanniError("Cannot get full archive URL without a valid SHA")
                 return false
             }
             val fullArchiveUrl = "https://github.com/$user/$repo/archive/$shaToUse.zip"
             return try {
                 if (shouldError) {
-                    SkyHanniMod.logger.info("Downloading $shaToUse for $user/$repo/$branch\nUrl: $fullArchiveUrl")
+                    HanniMod.logger.info("Downloading $shaToUse for $user/$repo/$branch\nUrl: $fullArchiveUrl")
                 }
                 ApiUtils.getZipResponse(destinationZip, fullArchiveUrl, apiName, !shouldError)
                 true
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(e, "Failed to download archive from $fullArchiveUrl")
-                SkyHanniMod.logger.error("Failed to download archive from $fullArchiveUrl", e)
+                HanniMod.logger.error("Failed to download archive from $fullArchiveUrl", e)
                 false
             }
         }

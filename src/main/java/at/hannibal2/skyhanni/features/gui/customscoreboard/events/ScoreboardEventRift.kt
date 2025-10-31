@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.events
+package at.hannibal2.hanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
-import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.features.rift.area.stillgorechateau.RiftBloodEffigies
+import at.hannibal2.hanni.utils.RegexUtils.allMatches
 
 // scoreboard
 // scoreboard update event

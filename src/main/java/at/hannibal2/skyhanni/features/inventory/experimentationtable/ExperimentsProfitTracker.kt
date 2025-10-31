@@ -1,56 +1,56 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable
+package at.hannibal2.hanni.features.inventory.experimentationtable
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.ExperimentationTableApi
-import at.hannibal2.skyhanni.api.ExperimentationTableApi.experienceBottlePattern
-import at.hannibal2.skyhanni.api.ExperimentationTableApi.experimentRenewPattern
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
-import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.pluralize
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.ExperimentationTableApi
+import at.hannibal2.hanni.api.ExperimentationTableApi.experienceBottlePattern
+import at.hannibal2.hanni.api.ExperimentationTableApi.experimentRenewPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.ItemAddManager
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.ItemAddEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.experiments.TableTaskCompletedEvent
+import at.hannibal2.hanni.events.experiments.TableXPBottleUsedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemPriceSource
+import at.hannibal2.hanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils.pluralize
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.Searchable
+import at.hannibal2.hanni.utils.renderables.toSearchable
+import at.hannibal2.hanni.utils.tracker.ItemTrackerData
+import at.hannibal2.hanni.utils.tracker.HanniItemTracker
+import at.hannibal2.hanni.utils.tracker.HanniTracker
 import com.google.gson.annotations.Expose
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object ExperimentsProfitTracker {
-    private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
-    private val tracker = SkyHanniItemTracker(
+    private val config get() = HanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
+    private val tracker = HanniItemTracker(
         "Experiments Profit Tracker",
         { Data() },
         { it.experimentation.experimentsProfitTracker },
@@ -86,7 +86,7 @@ object ExperimentsProfitTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
         experimentRenewPattern.matchMatcher(event.message.removeColor()) {
             val increments = mapOf(1 to 150, 2 to 300, 3 to 500)
@@ -182,14 +182,14 @@ object ExperimentsProfitTracker {
     }
 
     private fun calculateBottlePrice(internalName: NeuInternalName): Int {
-        val price = SkyHanniTracker.getPricePer(internalName)
+        val price = HanniTracker.getPricePer(internalName)
         val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
         return npcPrice.coerceAtLeast(price).toInt()
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lExperiments Profit Tracker")
-        val startCost = when (SkyHanniMod.feature.misc.tracker.priceSource) {
+        val startCost = when (HanniMod.feature.misc.tracker.priceSource) {
             ItemPriceSource.NPC_SELL -> 0
             else -> data.startCost
         }

@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.data.hotx
+package at.hannibal2.hanni.data.hotx
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.HotfApi
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.HotfApi
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.jsonobjects.local.HotxTree
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NumberUtil.formatLong
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import java.util.regex.Matcher
@@ -299,7 +299,7 @@ enum class HotfData(
     override val totalCostMaxLevel = calculateTotalCost(maxLevel)
     override fun getStorage(): HotxTree? = ProfileStorageData.profileSpecific?.foraging?.hotFTree
 
-    @SkyHanniModule
+    @HanniModule
     companion object : HotxHandler<HotfData, HotfReward, HotfApi.LotteryPerk>(entries) {
         override val name: String = "HotF"
         override val core: HotfData = CENTER_OF_THE_FOREST
@@ -438,11 +438,11 @@ enum class HotfData(
             // Hi I'm not empty
         }
 
-        override fun extraChatHandling(event: SkyHanniChatEvent) {
+        override fun extraChatHandling(event: HanniChatEvent) {
             // Hi I'm not empty
         }
 
-        override fun tryBlock(event: SkyHanniChatEvent) {
+        override fun tryBlock(event: HanniChatEvent) {
             if (!chatConfig.hideLottery || IslandTypeTags.FORAGING.inAny()) return
             event.blockedReason = "lottery"
         }
@@ -469,7 +469,7 @@ enum class HotfData(
         }
 
         @HandleEvent(onlyOnSkyblock = true)
-        override fun onChat(event: SkyHanniChatEvent) = super.onChat(event)
+        override fun onChat(event: HanniChatEvent) = super.onChat(event)
 
         @HandleEvent
         fun onDebug(event: DebugDataCollectEvent) {
@@ -484,7 +484,7 @@ enum class HotfData(
     }
 }
 
-private val chatConfig get() = SkyHanniMod.feature.chat
+private val chatConfig get() = HanniMod.feature.chat
 
 private val patternGroup = RepoPattern.group("foraging.hotf")
 

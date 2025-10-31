@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.mining.glacitemineshaft
+package at.hannibal2.hanni.features.mining.glacitemineshaft
 
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
 
 enum class CorpseType(val displayName: String, key: String? = null) {
     LAPIS("§9Lapis"),

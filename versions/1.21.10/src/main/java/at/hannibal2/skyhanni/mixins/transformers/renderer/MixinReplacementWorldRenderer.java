@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.hanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent;
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -55,7 +55,7 @@ public class MixinReplacementWorldRenderer {
         original.call(instance, group);
         if (contextMatrixStack == null) return;
 
-        SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
+        HanniRenderWorldEvent event = new HanniRenderWorldEvent(
             contextMatrixStack,
             currentCamera,
             bufferBuilders.getEntityVertexConsumers(),

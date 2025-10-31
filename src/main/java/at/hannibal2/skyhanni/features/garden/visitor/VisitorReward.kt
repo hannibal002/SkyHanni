@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.features.garden.visitor
+package at.hannibal2.hanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig
-import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.config.features.garden.visitor.DropsStatisticsConfig
+import at.hannibal2.hanni.utils.AutoUpdatingItemStack
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
 
 private typealias StatsEntry = DropsStatisticsConfig.DropsStatisticsTextEntry
 

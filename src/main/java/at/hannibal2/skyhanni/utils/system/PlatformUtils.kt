@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.utils.system
+package at.hannibal2.hanni.utils.system
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.MarkdownBuilder
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.VersionConstants
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.MarkdownBuilder
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.VersionConstants
 import net.minecraftforge.fml.common.ModContainer
 //#if MC < 1.16
-import at.hannibal2.skyhanni.data.NotificationManager
-import at.hannibal2.skyhanni.data.SkyHanniNotification
-import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.hanni.data.NotificationManager
+import at.hannibal2.hanni.data.HanniNotification
+import at.hannibal2.hanni.utils.DelayedRun
 import kotlin.time.Duration.Companion.INFINITE
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -29,7 +29,7 @@ import net.minecraftforge.fml.common.Loader
  * This object contains utilities for all platform specific operations.
  * i.e. operations that are specific to the mod loader or the environment the mod is running in.
  */
-@SkyHanniModule
+@HanniModule
 object PlatformUtils {
 
     //#if MC < 1.21
@@ -100,7 +100,7 @@ object PlatformUtils {
 
     fun shutdownMinecraft(reason: String? = null) {
         val reasonLine = reason?.let { " Reason: $it" }.orEmpty()
-        System.err.println("SkyHanni-${VersionConstants.MOD_VERSION} ${"forced the game to shutdown.$reasonLine"}")
+        System.err.println("Hanni-${VersionConstants.MOD_VERSION} ${"forced the game to shutdown.$reasonLine"}")
 
         //#if FORGE
         FMLCommonHandler.instance().handleExit(-1)
@@ -120,7 +120,7 @@ object PlatformUtils {
     //#else
     //$$ private fun getModFromPackage(packageName: String?): ModInstance? {
     //$$    packageName ?: return null
-    //$$    if (packageName.startsWith("at.hannibal2.skyhanni")) return ModInstance("skyhanni", "SkyHanni", VersionConstants.MOD_VERSION, "")
+    //$$    if (packageName.startsWith("at.hannibal2.hanni")) return ModInstance("hanni", "Hanni", VersionConstants.MOD_VERSION, "")
     //$$    return null
     //$$ }
     //#endif
@@ -162,13 +162,13 @@ object PlatformUtils {
 
         val text = listOf(
             "§c§lOutdated NotEnoughUpdates version detected!",
-            "§cWhile Skyhanni doesn't require NotEnoughUpdates to function anymore,",
+            "§cWhile Hanni doesn't require NotEnoughUpdates to function anymore,",
             "§cif you choose to still use NotEnoughUpdates, which is recommended,",
             "§cwe require you to use a newer version of NotEnoughUpdates to ensure",
             "§ccompatibility with some of our features.",
             "§cPlease update NotEnoughUpdates",
         )
-        DelayedRun.runNextTick { NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true)) }
+        DelayedRun.runNextTick { NotificationManager.queueNotification(HanniNotification(text, INFINITE, true)) }
         //#endif
     }
 }

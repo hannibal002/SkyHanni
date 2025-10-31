@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.compat.ReiCompat;
-import at.hannibal2.skyhanni.events.minecraft.CharEvent;
-import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
-import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
+import at.hannibal2.hanni.compat.ReiCompat;
+import at.hannibal2.hanni.events.minecraft.CharEvent;
+import at.hannibal2.hanni.events.minecraft.KeyDownEvent;
+import at.hannibal2.hanni.events.minecraft.KeyUpEvent;
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import org.lwjgl.glfw.GLFW;

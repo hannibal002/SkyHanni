@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.utils.collection
+package at.hannibal2.hanni.utils.collection
 
-import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import at.hannibal2.hanni.utils.ItemUtils.addEnchantGlint
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.NeuItems.getItemStack
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.RenderableUtils
+import at.hannibal2.hanni.utils.renderables.Searchable
+import at.hannibal2.hanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.hanni.utils.renderables.primitives.placeholder
+import at.hannibal2.hanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.utils.renderables.toSearchable
 import net.minecraft.item.ItemStack
 import java.util.Collections
 

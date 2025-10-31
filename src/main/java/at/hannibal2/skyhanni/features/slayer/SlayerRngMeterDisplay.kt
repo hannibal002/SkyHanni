@@ -1,42 +1,42 @@
-package at.hannibal2.skyhanni.features.slayer
+package at.hannibal2.hanni.features.slayer
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuRNGScore
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuRNGScore
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.slayer.SlayerChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.ItemUtils.repoItemName
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatLong
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderDisplayHelper
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.hanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object SlayerRngMeterDisplay {
 
     private val config get() = SlayerApi.config.rngMeterDisplay
@@ -91,7 +91,7 @@ object SlayerRngMeterDisplay {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
 
         if (config.hideChat && SlayerApi.isInCorrectArea) {

@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.api.enoughupdates.ItemResolutionQuery
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.hanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.hanni.utils.StringUtils.removeColor
 
-@SkyHanniModule
+@HanniModule
 object ItemNameResolver {
     private val itemNameCache = mutableMapOf<String, NeuInternalName>() // item name -> internal name
 

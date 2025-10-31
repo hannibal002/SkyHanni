@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.features.misc.compacttablist
+package at.hannibal2.hanni.features.misc.compacttablist
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
-import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.TabListUpdateEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.RegexUtils.findMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeResets
+import at.hannibal2.hanni.utils.StringUtils.removeSFormattingCode
+import at.hannibal2.hanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.hanni.utils.TabListData
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
 // heavily inspired by SBA code
-@SkyHanniModule
+@HanniModule
 object TabListReader {
 
-    private val config get() = SkyHanniMod.feature.gui.compactTabList
+    private val config get() = HanniMod.feature.gui.compactTabList
 
     private val patternGroup = RepoPattern.group("misc.compacttablist")
 

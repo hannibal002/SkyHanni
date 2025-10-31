@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.garden.visitor
+package at.hannibal2.hanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.InventoryOpenEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.garden.visitor.VisitorOpenEvent
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceTo
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Fixing the visitor detection problem with Anita and Jacob, as those two are on the garden twice when visiting.
  */
-@SkyHanniModule
+@HanniModule
 object NpcVisitorFix {
     private val staticVisitors = listOf("Jacob", "Anita")
 
@@ -70,7 +70,7 @@ object NpcVisitorFix {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         barnSkinChangePattern.matchMatcher(event.message) {
             GardenApi.storage?.npcVisitorLocations?.clear()
         }

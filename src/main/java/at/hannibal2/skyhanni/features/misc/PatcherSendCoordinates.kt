@@ -1,30 +1,30 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object PatcherSendCoordinates {
 
-    private val config get() = SkyHanniMod.feature.misc.patcherCoordsWaypoint
+    private val config get() = HanniMod.feature.misc.patcherCoordsWaypoint
     private val patcherBeacon = mutableListOf<PatcherBeacon>()
     private val logger = LorenzLogger("misc/patchercoords")
 
@@ -39,7 +39,7 @@ object PatcherSendCoordinates {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!config.enabled) return
 
         val message = event.message.removeColor()
@@ -62,7 +62,7 @@ object PatcherSendCoordinates {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!config.enabled) return
 
         for (beacon in patcherBeacon) {
@@ -78,7 +78,7 @@ object PatcherSendCoordinates {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (!event.isMod(10)) return
 
         val location = LocationUtils.playerLocation()

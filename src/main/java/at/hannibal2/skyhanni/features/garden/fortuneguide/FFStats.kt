@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide
+package at.hannibal2.hanni.features.garden.fortuneguide
 
-import at.hannibal2.skyhanni.data.CropAccessoryData
-import at.hannibal2.skyhanni.data.GardenCropUpgrades.getUpgradeLevel
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHeldPetItem
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
-import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.hanni.data.CropAccessoryData
+import at.hannibal2.hanni.data.GardenCropUpgrades.getUpgradeLevel
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.FarmingFortuneDisplay
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getHeldPetItem
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getPetLevel
+import at.hannibal2.hanni.utils.SkyBlockTime
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
 

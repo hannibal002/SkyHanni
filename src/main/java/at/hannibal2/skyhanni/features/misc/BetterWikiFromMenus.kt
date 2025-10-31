@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.commands.WikiManager
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.features.commands.WikiManager
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.StringUtils.removeColor
 
-@SkyHanniModule
+@HanniModule
 object BetterWikiFromMenus {
 
-    private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
+    private val config get() = HanniMod.feature.misc.commands.betterWiki
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.render.uniforms
+package at.hannibal2.hanni.utils.render.uniforms
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
@@ -6,10 +6,10 @@ import com.mojang.blaze3d.buffers.Std140SizeCalculator
 import java.nio.ByteBuffer
 import net.minecraft.client.gl.DynamicUniformStorage
 
-class SkyHanniRoundedOutlineUniform : AutoCloseable {
+class HanniRoundedOutlineUniform : AutoCloseable {
     private val UNIFORM_SIZE = Std140SizeCalculator().putFloat().putFloat().get()
 
-    val storage = DynamicUniformStorage<UniformValue>("SkyHanni Rounded Outline Rect UBO", UNIFORM_SIZE, 2)
+    val storage = DynamicUniformStorage<UniformValue>("Hanni Rounded Outline Rect UBO", UNIFORM_SIZE, 2)
 
     fun writeWith(borderThickness: Float, borderBlur: Float): GpuBufferSlice {
         return storage.write(UniformValue(borderThickness, borderBlur))

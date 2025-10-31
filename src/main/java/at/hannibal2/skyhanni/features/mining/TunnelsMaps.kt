@@ -1,72 +1,72 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.hanni.features.mining
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullKeys
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
-import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
-import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.ClickType
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.model.Graph
+import at.hannibal2.hanni.data.model.GraphNode
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.ItemClickEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.HanniWarpEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.GraphUtils
+import at.hannibal2.hanni.utils.GraphUtils.getNearestNode
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.ItemUtils.repoItemName
+import at.hannibal2.hanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.hanni.utils.KeyboardManager.RIGHT_MOUSE
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.RegexUtils.anyMatches
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderDisplayHelper
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.CollectionUtils.filterNotNullKeys
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.container.table.TableRenderable.Companion.table
+import at.hannibal2.hanni.utils.renderables.primitives.emptyText
+import at.hannibal2.hanni.utils.renderables.primitives.placeholder
+import at.hannibal2.hanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import java.awt.Color
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object TunnelsMaps {
 
-    private val config get() = SkyHanniMod.feature.mining.tunnelMaps
+    private val config get() = HanniMod.feature.mining.tunnelMaps
 
     private var graph: Graph = Graph()
     private lateinit var campfire: GraphNode
@@ -453,7 +453,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         val path = path?.takeIf { it.first.isNotEmpty() } ?: return
         event.draw3DPathWithWaypoint(
@@ -507,7 +507,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onWarp(event: SkyHanniWarpEvent) {
+    fun onWarp(event: HanniWarpEvent) {
         if (!isEnabled() || goal == null) return
         DelayedRun.runNextTick { setNextGoal() }
     }

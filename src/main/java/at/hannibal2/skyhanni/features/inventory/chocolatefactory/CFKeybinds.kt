@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.hanni.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.GuiKeyPressEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import net.minecraft.client.gui.inventory.GuiChest
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object CFKeybinds {
     private val config get() = CFApi.config.keybinds
     private var lastClick = SimpleTimeMark.farPast()

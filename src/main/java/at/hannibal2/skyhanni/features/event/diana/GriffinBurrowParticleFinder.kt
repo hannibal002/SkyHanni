@@ -1,34 +1,34 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.hanni.features.event.diana
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
-import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
-import at.hannibal2.skyhanni.features.misc.CurrentPing
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.BlockClickEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.diana.BurrowDetectEvent
+import at.hannibal2.hanni.events.diana.BurrowDugEvent
+import at.hannibal2.hanni.features.event.diana.DianaApi.isDianaSpade
+import at.hannibal2.hanni.features.misc.CurrentPing
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.TimeUtils.inWholeTicks
+import at.hannibal2.hanni.utils.collection.TimeLimitedSet
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object GriffinBurrowParticleFinder {
 
-    private val config get() = SkyHanniMod.feature.event.diana
+    private val config get() = HanniMod.feature.event.diana
 
     private val recentlyDugParticleBurrows = TimeLimitedSet<LorenzVec>(1.minutes)
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
@@ -149,7 +149,7 @@ object GriffinBurrowParticleFinder {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
         if (!config.guess) return
         val message = event.message

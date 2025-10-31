@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.hanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
+import at.hannibal2.hanni.mixins.hooks.GlowingStateStore;
+import at.hannibal2.hanni.utils.render.HanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -17,10 +17,10 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public class MixinItemCommandRenderer {
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/OutlineVertexConsumerProvider;setColor(I)V"))
-    private void setSkyHanniOutlineColor(OutlineVertexConsumerProvider outlineConsumer, int i, Operation<Void> original, @Local OrderedRenderCommandQueueImpl.ItemCommand itemCommand) {
+    private void setHanniOutlineColor(OutlineVertexConsumerProvider outlineConsumer, int i, Operation<Void> original, @Local OrderedRenderCommandQueueImpl.ItemCommand itemCommand) {
         Object obj = (Object) itemCommand;
-        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
-            original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), i);
+        if (obj instanceof GlowingStateStore casted && casted.hanni$isUsingCustomOutline()) {
+            original.call(HanniOutlineVertexConsumerProvider.getVertexConsumers(), i);
         } else {
             original.call(outlineConsumer, i);
         }
@@ -29,8 +29,8 @@ public class MixinItemCommandRenderer {
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;renderItem(Lnet/minecraft/item/ItemDisplayContext;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II[ILjava/util/List;Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/item/ItemRenderState$Glint;)V", ordinal = 1), index = 2)
     private VertexConsumerProvider modifyOutlineVertexConsumerProvider(VertexConsumerProvider outlineConsumer, @Local OrderedRenderCommandQueueImpl.ItemCommand itemCommand) {
         Object obj = (Object) itemCommand;
-        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
-            return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers();
+        if (obj instanceof GlowingStateStore casted && casted.hanni$isUsingCustomOutline()) {
+            return HanniOutlineVertexConsumerProvider.getVertexConsumers();
         } else {
             return outlineConsumer;
         }

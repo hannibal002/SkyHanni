@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.hanni.features.garden
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.features.garden.GardenPlotApi.renderPlot
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object GardenPlotBorders {
 
     private val config get() = GardenApi.config.plotBorders
@@ -35,7 +35,7 @@ object GardenPlotBorders {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!showBorders) return
         val plot = GardenPlotApi.getCurrentPlot() ?: getClosestPlot() ?: return

@@ -1,33 +1,33 @@
-package at.hannibal2.skyhanni.features.misc.items.enchants
+package at.hannibal2.hanni.features.misc.items.enchants
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig
-import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig.CommaFormat
-import at.hannibal2.skyhanni.events.ChatHoverEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
-import at.hannibal2.skyhanni.features.chroma.ChromaManager
-import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.OtherModsSettings
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.createHoverEvent
-import at.hannibal2.skyhanni.utils.compat.value
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.inventory.EnchantParsingConfig
+import at.hannibal2.hanni.config.features.inventory.EnchantParsingConfig.CommaFormat
+import at.hannibal2.hanni.events.ChatHoverEvent
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.item.ItemHoverEvent
+import at.hannibal2.hanni.features.chroma.ChromaManager
+import at.hannibal2.hanni.mixins.hooks.GuiChatHook
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.ItemCategory
+import at.hannibal2.hanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.hanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.hanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.hanni.utils.OtherModsSettings
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.compat.createHoverEvent
+import at.hannibal2.hanni.utils.compat.value
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.IChatComponent
@@ -36,10 +36,10 @@ import java.util.TreeSet
 /**
  * Modified Enchant Parser from [SkyblockAddons](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/features/enchants/EnchantManager.java)
  */
-@SkyHanniModule
+@HanniModule
 object EnchantParser {
 
-    private val config get() = SkyHanniMod.feature.inventory.enchantParsing
+    private val config get() = HanniMod.feature.inventory.enchantParsing
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     // Pattern to check that the line contains ONLY enchants (and the other bits that come with a valid enchant line)
@@ -173,7 +173,7 @@ object EnchantParser {
         if (aaron.isEnabled("skyblock.enchantments.rainbowMaxEnchants")) {
             if (config.colorParsing.get()) {
                 ChatUtils.clickToActionOrDisable(
-                    "SkyHanni's enchant parsing breaks with Aaron's Mod's 'Rainbow Max Enchants'",
+                    "Hanni's enchant parsing breaks with Aaron's Mod's 'Rainbow Max Enchants'",
                     config::colorParsing,
                     "turn off Aaron's Mod's Rainbow Max Enchants",
                     { removeAaronMaxEnchant() }
@@ -181,7 +181,7 @@ object EnchantParser {
             }
             if (config.hideEnchantDescriptions.get()) {
                 ChatUtils.clickToActionOrDisable(
-                    "SkyHanni's hide enchant descriptions breaks with Aaron's Mod's 'Rainbow Max Enchants'",
+                    "Hanni's hide enchant descriptions breaks with Aaron's Mod's 'Rainbow Max Enchants'",
                     config::hideEnchantDescriptions,
                     "turn off Aaron's Mod's Rainbow Max Enchants",
                     { removeAaronMaxEnchant() }
@@ -339,7 +339,7 @@ object EnchantParser {
     private fun orderEnchants(loreList: MutableList<String>) {
         var lastEnchant: FormattedEnchant? = null
 
-        val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
+        val isRoman = !HanniMod.feature.misc.replaceRomanNumerals.get()
         val regex = "[\\d,.kKmMbB]+\$".toRegex()
         for (i in startEnchant..endEnchant) {
             val matcher = enchantmentPattern.matcher(loreList[i])

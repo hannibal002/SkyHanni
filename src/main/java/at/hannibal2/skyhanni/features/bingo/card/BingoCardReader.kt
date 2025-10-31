@@ -1,31 +1,31 @@
-package at.hannibal2.skyhanni.features.bingo.card
+package at.hannibal2.hanni.features.bingo.card
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoData
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
-import at.hannibal2.skyhanni.events.bingo.BingoGoalReachedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.bingo.BingoApi
-import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
-import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
-import at.hannibal2.skyhanni.features.bingo.card.goals.HiddenGoalData
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.BingoData
+import at.hannibal2.hanni.events.InventoryUpdatedEvent
+import at.hannibal2.hanni.events.bingo.BingoCardUpdateEvent
+import at.hannibal2.hanni.events.bingo.BingoGoalReachedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.bingo.BingoApi
+import at.hannibal2.hanni.features.bingo.card.goals.BingoGoal
+import at.hannibal2.hanni.features.bingo.card.goals.GoalType
+import at.hannibal2.hanni.features.bingo.card.goals.HiddenGoalData
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.TimeUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 
-@SkyHanniModule
+@HanniModule
 object BingoCardReader {
 
-    private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
+    private val config get() = HanniMod.feature.event.bingo.bingoCard
     private val patternGroup = RepoPattern.group("bingo.card")
     private val percentagePattern by patternGroup.pattern(
         "percentage",
@@ -151,7 +151,7 @@ object BingoCardReader {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!SkyBlockUtils.isBingoProfile) return
         if (!config.enabled) return
 

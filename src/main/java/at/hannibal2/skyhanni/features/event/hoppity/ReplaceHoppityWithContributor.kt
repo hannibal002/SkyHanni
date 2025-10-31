@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.hanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.features.misc.ContributorManager
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CircularList
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.item.ItemHoverEvent
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.features.misc.ContributorManager
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.CircularList
 
-@SkyHanniModule
+@HanniModule
 object ReplaceHoppityWithContributor {
 
     private val config get() = CFApi.config

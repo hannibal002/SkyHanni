@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.gui
+package at.hannibal2.hanni.config.features.gui
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.PositionList
-import at.hannibal2.skyhanni.features.gui.TabWidgetDisplay
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.PositionList
+import at.hannibal2.hanni.features.gui.TabWidgetDisplay
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList

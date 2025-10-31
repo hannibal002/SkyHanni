@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.commands.brigadier.arguments
+package at.hannibal2.hanni.config.commands.brigadier.arguments
 
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.addOptionalEscaped
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierUtils.addOptionalEscaped
 import com.mojang.brigadier.LiteralMessage
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType

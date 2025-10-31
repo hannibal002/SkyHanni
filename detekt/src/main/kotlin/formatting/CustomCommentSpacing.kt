@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.detektrules.formatting
+package at.hannibal2.hanni.detektrules.formatting
 
-import at.hannibal2.skyhanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import at.hannibal2.hanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
+import at.hannibal2.hanni.detektrules.HanniRule
 import io.gitlab.arturbosch.detekt.api.CodeSmell
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.com.intellij.psi.PsiComment
 /**
  * This rule enforces the default spacing rules for comments but ignores preprocessed comments.
  */
-class CustomCommentSpacing(config: Config) : SkyHanniRule(config) {
+class CustomCommentSpacing(config: Config) : HanniRule(config) {
     override val issue = Issue(
         "CustomCommentSpacing",
         Severity.Style,

@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.config.features.inventory
+package at.hannibal2.hanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig
-import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
-import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig
-import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig
-import at.hannibal2.skyhanni.config.features.inventory.sacks.OutsideSackValueConfig
-import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig
-import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
-import at.hannibal2.skyhanni.config.features.misc.PocketSackInASackConfig
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.features.inventory.chocolatefactory.CFConfig
+import at.hannibal2.hanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
+import at.hannibal2.hanni.config.features.inventory.experimentationtable.ExperimentationTableConfig
+import at.hannibal2.hanni.config.features.inventory.helper.HelperConfig
+import at.hannibal2.hanni.config.features.inventory.sacks.OutsideSackValueConfig
+import at.hannibal2.hanni.config.features.itemability.ItemAbilityConfig
+import at.hannibal2.hanni.config.features.misc.EstimatedItemValueConfig
+import at.hannibal2.hanni.config.features.misc.PocketSackInASackConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -35,7 +35,7 @@ class InventoryConfig {
     val experimentationTable: ExperimentationTableConfig = ExperimentationTableConfig()
 
     @Expose
-    @Category(name = "Enchant Parsing", desc = "Settings for SkyHanni's Enchant Parsing")
+    @Category(name = "Enchant Parsing", desc = "Settings for Hanni's Enchant Parsing")
     val enchantParsing: EnchantParsingConfig = EnchantParsingConfig()
 
     @Expose

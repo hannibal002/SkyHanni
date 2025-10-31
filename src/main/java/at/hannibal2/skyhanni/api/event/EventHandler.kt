@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.api.event
+package at.hannibal2.hanni.api.event
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.test.command.ErrorManager.maybeSkipError
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.test.command.ErrorManager.maybeSkipError
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.chat.TextHelper
 
-class EventHandler<T : SkyHanniEvent> private constructor(
+class EventHandler<T : HanniEvent> private constructor(
     val name: String,
     private val listeners: List<EventListeners.Listener>,
     private val canReceiveCancelled: Boolean,
 ) {
 
-    val invokeLog = SkyHanniEvents.EventInvokeLog()
+    val invokeLog = HanniEvents.EventInvokeLog()
 
     constructor(event: Class<T>, listeners: List<EventListeners.Listener>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
@@ -25,7 +25,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         invokeLog.invokeCount++
         if (this.listeners.isEmpty()) return false
 
-        if (SkyHanniEvents.isDisabledHandler(name)) return false
+        if (HanniEvents.isDisabledHandler(name)) return false
 
         var errors = 0
 
@@ -51,7 +51,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
             val hiddenErrors = errors - 3
             ChatUtils.chat(
                 TextHelper.text(
-                    "§c[SkyHanni/${SkyHanniMod.VERSION}] $hiddenErrors more errors in $name are hidden!",
+                    "§c[Hanni/${HanniMod.VERSION}] $hiddenErrors more errors in $name are hidden!",
                 ),
             )
         }

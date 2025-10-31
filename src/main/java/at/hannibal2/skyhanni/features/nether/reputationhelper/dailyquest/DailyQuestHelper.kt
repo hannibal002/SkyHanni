@@ -1,62 +1,62 @@
-package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
+package at.hannibal2.hanni.features.nether.reputationhelper.dailyquest
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
-import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.ProgressQuest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.Quest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestCategory
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.RescueMissionQuest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.SackApi.getAmountInSacksOrNull
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.WidgetUpdateEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.fishing.TrophyFishCaughtEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.features.nether.kuudra.KuudraTier
+import at.hannibal2.hanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
+import at.hannibal2.hanni.features.nether.reputationhelper.FactionType
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.ProgressQuest
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.Quest
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.QuestCategory
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.QuestState
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.RescueMissionQuest
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
+import at.hannibal2.hanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NeuItems.getItemStack
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RenderUtils.highlight
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object DailyQuestHelper {
 
     private val questBoardMage = LorenzVec(-138, 92, -755)
@@ -96,7 +96,7 @@ object DailyQuestHelper {
         "§aYou completed your (?<type>\\w+) quest! Visit the Town Board to claim the rewards.*",
     )
 
-    private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
+    private val config get() = HanniMod.feature.crimsonIsle.reputationHelper
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -157,7 +157,7 @@ object DailyQuestHelper {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
 
         val type = chatCompletedPattern.matchMatcher(event.message) {
@@ -218,7 +218,7 @@ object DailyQuestHelper {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!CrimsonIsleReputationHelper.showLocations()) return
 
@@ -235,14 +235,14 @@ object DailyQuestHelper {
     }
 
     fun getQuestBoardLocation(): LorenzVec {
-        val factionType = CrimsonIsleReputationHelper.factionType ?: ErrorManager.skyHanniError("faction type is unknown")
+        val factionType = CrimsonIsleReputationHelper.factionType ?: ErrorManager.hanniError("faction type is unknown")
         return when (factionType) {
             FactionType.BARBARIAN -> questBoardBarbarian
             FactionType.MAGE -> questBoardMage
         }
     }
 
-    private fun renderTownBoard(event: SkyHanniRenderWorldEvent) {
+    private fun renderTownBoard(event: HanniRenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
 
         // we do not call getQuestBoardLocation in the first few seconds when faction type is null, since this will show an error

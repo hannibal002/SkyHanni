@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events.experiments
+package at.hannibal2.hanni.events.experiments
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.utils.NeuInternalName
 
-class TableXPBottleUsedEvent(val internalName: NeuInternalName, val amount: Int) : SkyHanniEvent()
+class TableXPBottleUsedEvent(val internalName: NeuInternalName, val amount: Int) : HanniEvent()

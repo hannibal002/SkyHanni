@@ -1,4 +1,4 @@
-package skyhannibuildsystem.utils
+package hannibuildsystem.utils
 
 data class ModVersion(val stable: Int, val beta: Int, val bugfix: Int) : Comparable<ModVersion> {
 

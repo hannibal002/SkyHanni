@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.event.jerry
+package at.hannibal2.hanni.features.event.jerry
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
-import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onEnable
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.data.mob.Mob.Companion.belongsToPlayer
+import at.hannibal2.hanni.data.mob.MobData
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ConditionalUtils.onEnable
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.RegexUtils.matchGroup
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object HighlightJerries {
 
-    private val config get() = SkyHanniMod.feature.event.jerry
+    private val config get() = HanniMod.feature.event.jerry
 
     /**
      * REGEX-TEST: Blue Jerry

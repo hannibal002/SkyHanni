@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.skillprogress
+package at.hannibal2.hanni.features.skillprogress
 
 data class SkillLevel(
     val level: Int,

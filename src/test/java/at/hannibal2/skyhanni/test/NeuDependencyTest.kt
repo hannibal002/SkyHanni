@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.test.NeuDependent.test
+import at.hannibal2.hanni.test.NeuDependent.test
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import io.mockk.every
 import io.mockk.mockkObject

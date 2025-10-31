@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.hanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.hanni.events.minecraft.packet.PacketSentEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.ItemUtils.repoItemName
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.getItemOnCursor
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S2FPacketSetSlot
@@ -29,7 +29,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object OwnInventoryData {
 
     private var itemAmounts = mapOf<NeuInternalName, Int>()
@@ -170,7 +170,7 @@ object OwnInventoryData {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         sackToInventoryChatPattern.matchMatcher(event.message) {
             val name = group("name")
             ignoreItem(500.milliseconds) { it.repoItemName.contains(name) }

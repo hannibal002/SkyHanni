@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.enums.OutsideSBFeature
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.RenderUtils.renderString
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import net.minecraft.init.Blocks
 import kotlin.concurrent.fixedRateTimer
 
-@SkyHanniModule
+@HanniModule
 object MovementSpeedDisplay {
 
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = HanniMod.feature.misc
 
     private var display = ""
     private val soulSandSpeeds = mutableListOf<Double>()
@@ -33,7 +33,7 @@ object MovementSpeedDisplay {
 
     init {
         // TODO use LorenzTickEvent
-        fixedRateTimer(name = "skyhanni-movement-speed-display", period = 250, initialDelay = 1_000) {
+        fixedRateTimer(name = "hanni-movement-speed-display", period = 250, initialDelay = 1_000) {
             checkSpeed()
         }
     }

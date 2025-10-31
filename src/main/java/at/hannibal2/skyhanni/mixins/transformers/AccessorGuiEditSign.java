@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
 import net.minecraft.tileentity.TileEntitySign;
 import org.spongepowered.asm.mixin.Mixin;

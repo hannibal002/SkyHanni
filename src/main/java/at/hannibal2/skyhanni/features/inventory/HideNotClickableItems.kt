@@ -1,62 +1,62 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.hanni.features.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorApi
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
-import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.isCoopSoulBound
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.ItemUtils.isSoulBound
-import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.MultiFilter
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasAttributes
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.jsonobjects.repo.HideNotClickableItemsJson
+import at.hannibal2.hanni.data.jsonobjects.repo.SalvageFilter
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.features.garden.composter.ComposterOverlay
+import at.hannibal2.hanni.features.garden.visitor.VisitorApi
+import at.hannibal2.hanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.hanni.features.mining.fossilexcavator.FossilExcavatorApi
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.features.rift.RiftApi.motesNpcPrice
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.InventoryUtils.getLowerItems
+import at.hannibal2.hanni.utils.ItemCategory
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.ItemUtils.cleanName
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.ItemUtils.isCoopSoulBound
+import at.hannibal2.hanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.hanni.utils.ItemUtils.isSoulBound
+import at.hannibal2.hanni.utils.ItemUtils.isVanilla
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.MultiFilter
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RenderUtils.drawBorder
+import at.hannibal2.hanni.utils.RenderUtils.highlight
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.hasAttributes
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.isRiftExportable
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.hanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object HideNotClickableItems {
 
-    private val config get() = SkyHanniMod.feature.inventory.hideNotClickable
+    private val config get() = HanniMod.feature.inventory.hideNotClickable
 
     private var hideReason = ""
     private var showGreenLine = false
@@ -145,7 +145,7 @@ object HideNotClickableItems {
             event.toolTip.add("")
             if (hideReason == "") {
                 event.toolTip.add("§4No hide reason!")
-                ErrorManager.skyHanniError("No hide reason for not clickable item!")
+                ErrorManager.hanniError("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
                 if (config.itemsBypass && !hideReason.contains("SkyBlock Menu")) {

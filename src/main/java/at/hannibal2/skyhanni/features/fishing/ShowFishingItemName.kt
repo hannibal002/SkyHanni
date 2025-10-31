@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.hanni.features.fishing
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.fishing.FishingApi.isBait
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.features.fishing.FishingApi.isBait
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ConditionalUtils.transformIf
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.hanni.utils.SkullTextureHolder
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.entity.item.EntityItem
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object ShowFishingItemName {
 
-    private val config get() = SkyHanniMod.feature.fishing.fishedItemName
+    private val config get() = HanniMod.feature.fishing.fishedItemName
     private val itemsOnGround = TimeLimitedCache<EntityItem, String>(750.milliseconds)
 
     // Textures taken from Skytils - moved to REPO
@@ -61,7 +61,7 @@ object ShowFishingItemName {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         for ((item, text) in itemsOnGround) {

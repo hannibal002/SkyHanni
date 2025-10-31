@@ -1,26 +1,26 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils.chat
-import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
-import at.hannibal2.skyhanni.utils.ClipboardUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.GardenJson
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.garden.farming.CropMilestoneUpdateEvent
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils.chat
+import at.hannibal2.hanni.utils.ChatUtils.clickableChat
+import at.hannibal2.hanni.utils.ClipboardUtils
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NumberUtil.formatLong
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.SoundUtils.playSound
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object GardenCropMilestones {
 
     private val patternGroup = RepoPattern.group("data.garden.milestone")
@@ -73,10 +73,10 @@ object GardenCropMilestones {
 
         // TODO utils function that is shared with Garden Level Display
         val rewards = buildList {
-            add("    §r§8+§aRespect from Elite Farmers and SkyHanni members :)")
+            add("    §r§8+§aRespect from Elite Farmers and Hanni members :)")
             add("    §r§8+§b1 Flexing Point")
             if (newLevel % 5 == 0)
-                add("    §r§7§8+§d2 SkyHanni User Luck")
+                add("    §r§7§8+§d2 Hanni User Luck")
         }
 
         val cropName = crop.cropName

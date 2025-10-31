@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorJsonEntry
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
-import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.appendComponent
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.ContributorJsonEntry
+import at.hannibal2.hanni.data.jsonobjects.repo.ContributorsJson
+import at.hannibal2.hanni.data.mob.MobFilter.isRealPlayer
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.entity.EntityDisplayNameEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.compat.appendComponent
 import net.minecraft.entity.player.EntityPlayer
 
-@SkyHanniModule
+@HanniModule
 object ContributorManager {
-    private val config get() = SkyHanniMod.feature.dev
+    private val config get() = HanniMod.feature.dev
 
     // Key is the lowercase contributor name
     private var contributors: Map<String, ContributorJsonEntry> = emptyMap()
@@ -49,7 +49,7 @@ object ContributorManager {
     private fun ContributorJsonEntry.isAllowed(): Boolean {
         if (!config.fancyContributors) return false
         return when (externalMod) {
-            // normal SkyHanni contributor
+            // normal Hanni contributor
             null -> true
 
             // TODO add other mod's devs, e.g skytils

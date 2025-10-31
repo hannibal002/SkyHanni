@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.mixins.transformers.neu;
+package at.hannibal2.hanni.mixins.transformers.neu;
 
-import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue;
-import at.hannibal2.skyhanni.utils.compat.DrawContext;
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils;
+import at.hannibal2.hanni.features.misc.items.EstimatedItemValue;
+import at.hannibal2.hanni.utils.compat.DrawContext;
+import at.hannibal2.hanni.utils.compat.DrawContextUtils;
 import io.github.moulberry.notenoughupdates.miscgui.StorageOverlay;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;

@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.api.event
+package at.hannibal2.hanni.api.event
 
-import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.utils.ReflectionUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.api.minecraftevents.ClientEvents
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.utils.ReflectionUtils
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.util.function.Consumer
 
-typealias EventPredicate = (event: SkyHanniEvent) -> Boolean
+typealias EventPredicate = (event: HanniEvent) -> Boolean
 
 class EventListeners private constructor(val name: String, private val isGeneric: Boolean) {
 
@@ -16,7 +16,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
     constructor(event: Class<*>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
-        GenericSkyHanniEvent::class.java.isAssignableFrom(event),
+        GenericHanniEvent::class.java.isAssignableFrom(event),
     )
 
     fun removeListener(listener: Any) {
@@ -66,7 +66,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
         method.genericParameterTypes.getOrNull(0)?.let { genericType ->
             ReflectionUtils.resolveUpperBoundSuperClassGenericParameter(
                 genericType,
-                GenericSkyHanniEvent::class.java.typeParameters[0],
+                GenericHanniEvent::class.java.typeParameters[0],
             ) ?: error(
                 "Generic event handler type parameter is not present in " +
                     "event class hierarchy for type $genericType",
@@ -92,8 +92,8 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         private val predicates: List<EventPredicate>
 
-        fun shouldInvoke(event: SkyHanniEvent): Boolean {
-            if (SkyHanniEvents.isDisabledInvoker(name)) return false
+        fun shouldInvoke(event: HanniEvent): Boolean {
+            if (HanniEvents.isDisabledInvoker(name)) return false
             if (lastTick != ClientEvents.totalTicks) {
                 cachedPredicateValue = cachedPredicates.all { it(event) }
                 lastTick = ClientEvents.totalTicks
@@ -121,7 +121,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
                 if (generic != null) {
                     add { event ->
-                        event is GenericSkyHanniEvent<*> && generic.isAssignableFrom(event.type)
+                        event is GenericHanniEvent<*> && generic.isAssignableFrom(event.type)
                     }
                 }
                 // Makes it possible to be able to add more predicates from other sources, such as other annotations

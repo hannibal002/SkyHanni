@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.test.garden
+package at.hannibal2.hanni.test.garden
 
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.events.WidgetUpdateEvent
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.features.garden.visitor.VisitorApi
+import at.hannibal2.hanni.features.garden.visitor.VisitorListener
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject

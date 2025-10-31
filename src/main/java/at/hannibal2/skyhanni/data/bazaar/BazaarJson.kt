@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.bazaar
+package at.hannibal2.hanni.data.bazaar
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName

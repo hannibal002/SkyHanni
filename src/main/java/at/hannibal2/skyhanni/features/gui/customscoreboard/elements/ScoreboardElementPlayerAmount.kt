@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.HypixelData.getMaxPlayersForCurrentServer
-import at.hannibal2.skyhanni.data.HypixelData.getPlayersOnCurrentServer
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.hanni.data.HypixelData.getMaxPlayersForCurrentServer
+import at.hannibal2.hanni.data.HypixelData.getPlayersOnCurrentServer
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils
 
 // tablist
 // tablist update event (maybe possible with widgets)

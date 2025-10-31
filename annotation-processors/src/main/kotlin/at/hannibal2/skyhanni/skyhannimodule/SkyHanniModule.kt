@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.skyhannimodule
+package at.hannibal2.hanni.hannimodule
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class SkyHanniModule(
+annotation class HanniModule(
     /**
      * If the module will only be loaded in a development environment.
      */

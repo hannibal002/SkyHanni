@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.hanni.features.mining
 
-import at.hannibal2.skyhanni.data.MiningApi
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.data.MiningApi
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
 import net.minecraft.block.state.IBlockState
 
 enum class OreType(

@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.hanni.features.mining
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackApi
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.data.MiningApi
-import at.hannibal2.skyhanni.data.MiningApi.inGlaciteArea
-import at.hannibal2.skyhanni.data.MiningApi.lastColdReset
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.ColdUpdateEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.GetFromSackApi
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.data.MiningApi
+import at.hannibal2.hanni.data.MiningApi.inGlaciteArea
+import at.hannibal2.hanni.data.MiningApi.lastColdReset
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.ColdUpdateEvent
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object MiningNotifications {
 
     private val ASCENSION_ROPE by lazy { "ASCENSION_ROPE".toInternalName().makePrimitiveStack(1) }
@@ -54,13 +54,13 @@ object MiningNotifications {
         "§6A §r§bDiamond Goblin §r§6has spawned!",
     )
 
-    private val config get() = SkyHanniMod.feature.mining.notifications
+    private val config get() = HanniMod.feature.mining.notifications
 
     private var hasSentCold = false
     private var hasSentAscensionRope = false
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!IslandTypeTags.MINING.inAny()) return
         if (!config.enabled) return
         val message = event.message

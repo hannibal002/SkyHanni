@@ -1,30 +1,30 @@
-package at.hannibal2.skyhanni.features.nether
+package at.hannibal2.hanni.features.nether
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SkullTextureHolder
+import at.hannibal2.hanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawHitbox
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.entity.item.EntityArmorStand
 import java.awt.Color
 
-@SkyHanniModule
+@HanniModule
 object AtomHitBox {
 
-    private val config get() = SkyHanniMod.feature.crimsonIsle.atomHitBox
+    private val config get() = HanniMod.feature.crimsonIsle.atomHitBox
     private val atomsList = mutableMapOf<EntityArmorStand, AtomType>()
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!config.enabled) return
         atomsList.removeIfKey { !it.isEntityAlive }
         for ((entity, atom) in atomsList) {

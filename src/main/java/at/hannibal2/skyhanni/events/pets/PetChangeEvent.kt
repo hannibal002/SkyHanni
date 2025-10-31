@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events.pets
+package at.hannibal2.hanni.events.pets
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.data.PetData
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.data.PetData
 
-class PetChangeEvent(val pet: PetData) : SkyHanniEvent()
+class PetChangeEvent(val pet: PetData) : HanniEvent()

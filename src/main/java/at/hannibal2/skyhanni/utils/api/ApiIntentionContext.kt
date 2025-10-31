@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.api
+package at.hannibal2.hanni.utils.api
 
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addAll
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost

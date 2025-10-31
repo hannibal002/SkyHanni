@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.config.features.inventory
+package at.hannibal2.hanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.inventory.ItemPickupLog
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.features.inventory.ItemPickupLog
+import at.hannibal2.hanni.utils.RenderUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

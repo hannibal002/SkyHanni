@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ElectionApi.derpy
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
-import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
-import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
-import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ElectionApi.derpy
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.events.entity.EntityDisplayNameEvent
+import at.hannibal2.hanni.events.entity.EntityHealthDisplayEvent
+import at.hannibal2.hanni.events.entity.EntityLeaveWorldEvent
+import at.hannibal2.hanni.events.entity.EntityMaxHealthUpdateEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.EntityUtils.baseMaxHealth
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.ChatComponentText
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object EntityData {
 
     private val maxHealthMap = mutableMapOf<Int, Int>()

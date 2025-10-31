@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.utils.system.ModVersion
+import at.hannibal2.hanni.utils.system.ModVersion
 import org.junit.jupiter.api.Test
 
 class UpdateVersionTest {

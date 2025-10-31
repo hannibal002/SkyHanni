@@ -1,35 +1,35 @@
-package at.hannibal2.skyhanni.features.event.yearofthepig
+package at.hannibal2.hanni.features.event.yearofthepig
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbChargedEvent
-import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbLootedEvent
-import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbUsedEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.yearofthepig.ShinyOrbChargedEvent
+import at.hannibal2.hanni.events.yearofthepig.ShinyOrbLootedEvent
+import at.hannibal2.hanni.events.yearofthepig.ShinyOrbUsedEvent
+import at.hannibal2.hanni.features.skillprogress.SkillType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.hanni.utils.renderables.Searchable
+import at.hannibal2.hanni.utils.tracker.ItemTrackerData
+import at.hannibal2.hanni.utils.tracker.HanniItemTracker
+import at.hannibal2.hanni.utils.tracker.TrackerUtils.addSkillXpInfo
 import com.google.gson.annotations.Expose
 
-@SkyHanniModule
+@HanniModule
 object ShinyOrbTracker {
 
-    private val config get() = SkyHanniMod.feature.event.yearOfThePig.shinyOrbTracker
+    private val config get() = HanniMod.feature.event.yearOfThePig.shinyOrbTracker
     private val SHINY_ORB_ITEM = "SHINY_ORB".toInternalName()
     private val SHINY_ROD_ITEM = "SHINY_ROD".toInternalName()
-    private val tracker = SkyHanniItemTracker(
+    private val tracker = HanniItemTracker(
         "Shiny Orb Tracker",
         { ShinyOrbData() },
         { it.shinyOrbTracker },

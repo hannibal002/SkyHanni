@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.features.misc.update
+package at.hannibal2.hanni.features.misc.update
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.CommandArgument
-import at.hannibal2.skyhanni.utils.CommandContextAwareObject
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.api.ApiUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
-import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.system.ModVersion
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.jsonobjects.other.ChangelogJson
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ColorUtils.addAlpha
+import at.hannibal2.hanni.utils.CommandArgument
+import at.hannibal2.hanni.utils.CommandContextAwareObject
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.api.ApiUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.containsKeys
+import at.hannibal2.hanni.utils.json.fromJson
+import at.hannibal2.hanni.utils.system.ModVersion
 import kotlinx.coroutines.Job
 import net.minecraft.client.Minecraft
 import java.util.NavigableMap
 import java.util.TreeMap
 import kotlin.time.Duration.Companion.minutes
 
-@SkyHanniModule
+@HanniModule
 object ChangelogViewer {
     internal val cache: NavigableMap<ModVersion, Map<String, List<String>>> = TreeMap()
 
@@ -35,7 +35,7 @@ object ChangelogViewer {
     internal var shouldMakeNewList = false
     private var fetchJob: Job? = null
 
-    internal var shouldShowBeta = SkyHanniMod.isBetaVersion
+    internal var shouldShowBeta = HanniMod.isBetaVersion
     internal var showTechnicalDetails = false
 
     internal val primaryColor = LorenzColor.DARK_GRAY.toColor().addAlpha(218)
@@ -62,21 +62,21 @@ object ChangelogViewer {
 
     private fun setupFetchJob() {
         if (fetchJob?.isActive == true) return
-        fetchJob = SkyHanniMod.launchIOCoroutine("changelog viewer fetch data", timeout = 1.minutes) { getChangelog() }
+        fetchJob = HanniMod.launchIOCoroutine("changelog viewer fetch data", timeout = 1.minutes) { getChangelog() }
     }
 
     private fun openChangelog() {
-        if (Minecraft.getMinecraft().currentScreen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen = ChangeLogViewerScreen()
+        if (Minecraft.getMinecraft().currentScreen !is ChangeLogViewerScreen) HanniMod.screenToOpen = ChangeLogViewerScreen()
     }
 
     private suspend fun getChangelog() {
-        val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
+        val url = "https://api.github.com/repos/hannibal002/Hanni/releases?per_page=100&page="
         val data = mutableListOf<ChangelogJson>()
         var pageNumber = 1
         while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
             val pagedUrl = "$url$pageNumber"
             val (_, jsonObject) = ApiUtils.getJsonResponse(pagedUrl, apiName = "github").assertSuccessWithData()
-                ?: ErrorManager.skyHanniError("Changelog Loading Failed")
+                ?: ErrorManager.hanniError("Changelog Loading Failed")
             val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
             data.addAll(page)
             pageNumber++
@@ -129,7 +129,7 @@ object ChangelogViewer {
         .replace("(- [^-\r\n]*(?:\r\n|$))".toRegex(), "§b§l$1") // Color contributors
         .replace("\\[(.+?)\\]\\(.+?\\)".toRegex(), "$1") // Random Links
         .replace("`", "\"") // Fix Code Blocks to look better
-        .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
+        .replace("§l§9(?:Version|Hanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -194,9 +194,9 @@ object ChangelogViewer {
         var since: ModVersion? = null
 
         override fun post() {
-            val since = since ?: ModVersion.fromString(SkyHanniMod.VERSION)
+            val since = since ?: ModVersion.fromString(HanniMod.VERSION)
             val until =
-                until ?: UpdateManager.getNextVersion()?.let { ModVersion.fromString(it) } ?: ModVersion.fromString(SkyHanniMod.VERSION)
+                until ?: UpdateManager.getNextVersion()?.let { ModVersion.fromString(it) } ?: ModVersion.fromString(HanniMod.VERSION)
 
             if (until < since) {
                 errorMessage = "until:'$until' is less than since:'$since', where it is expected to be greater"

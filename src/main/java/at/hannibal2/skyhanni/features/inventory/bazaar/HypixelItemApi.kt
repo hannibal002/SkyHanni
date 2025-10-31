@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.features.inventory.bazaar
+package at.hannibal2.hanni.features.inventory.bazaar
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.jsonobjects.other.SkyblockItemsDataJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuGeorgeJson
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
-import at.hannibal2.skyhanni.utils.api.ApiUtils
-import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.data.jsonobjects.other.SkyblockItemsDataJson
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuGeorgeJson
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.api.ApiStaticGetPath
+import at.hannibal2.hanni.utils.api.ApiUtils
+import at.hannibal2.hanni.utils.json.fromJson
 import kotlin.time.Duration.Companion.minutes
 
 class HypixelItemApi {
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
         // prices = george prices + npc prices
@@ -60,7 +60,7 @@ class HypixelItemApi {
     }
 
     fun start() {
-        SkyHanniMod.launchIOCoroutine("hypixel item api fetch", timeout = 1.minutes) {
+        HanniMod.launchIOCoroutine("hypixel item api fetch", timeout = 1.minutes) {
             loadItemData()
             prices = georgePrices + npcPrices
         }

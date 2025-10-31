@@ -3,16 +3,16 @@
 # Every other line needs to be in the format
 # <directory without src/main/java prefix> <illegal import>
 
-at/hannibal2/skyhanni/ scala.
-at/hannibal2/skyhanni/ jline.
-at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.core.GlScissorStack
-at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.events.SlotClickEvent
-at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
-at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.util.Constants
-at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.util.Utils
-at/hannibal2/skyhanni/ java.util.function.Supplier
-at/hannibal2/skyhanni/ com.mojang.realmsclient.
-at/hannibal2/skyhanni/ com.ibm.icu.
-at/hannibal2/skyhanni/ io.netty.util.internal.
-# Here because SkyHanniDebugsAndTests references way too much stuff and this way we keep the internal dependencies lower
-at/hannibal2/skyhanni/ at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+at/hannibal2/hanni/ scala.
+at/hannibal2/hanni/ jline.
+at/hannibal2/hanni/ io.github.moulberry.notenoughupdates.core.GlScissorStack
+at/hannibal2/hanni/ io.github.moulberry.notenoughupdates.events.SlotClickEvent
+at/hannibal2/hanni/ io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
+at/hannibal2/hanni/ io.github.moulberry.notenoughupdates.util.Constants
+at/hannibal2/hanni/ io.github.moulberry.notenoughupdates.util.Utils
+at/hannibal2/hanni/ java.util.function.Supplier
+at/hannibal2/hanni/ com.mojang.realmsclient.
+at/hannibal2/hanni/ com.ibm.icu.
+at/hannibal2/hanni/ io.netty.util.internal.
+# Here because HanniDebugsAndTests references way too much stuff and this way we keep the internal dependencies lower
+at/hannibal2/hanni/ at.hannibal2.hanni.test.HanniDebugsAndTests

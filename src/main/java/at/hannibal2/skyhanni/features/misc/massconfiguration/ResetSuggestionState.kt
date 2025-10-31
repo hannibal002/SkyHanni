@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.massconfiguration
+package at.hannibal2.hanni.features.misc.massconfiguration
 
 enum class ResetSuggestionState(val label: String) {
     TURN_ALL_OFF("§c§lTurn all off"),

@@ -1,35 +1,35 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.hanni.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.TimeUtils.minutes
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.features.fame.ReminderUtils
+import at.hannibal2.hanni.features.inventory.chocolatefactory.data.ChocolateAmount
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NumberUtil.formatLong
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.TimeUtils.minutes
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object CFCustomReminder {
     private val configReminder get() = CFApi.config.customReminder
     private val configUpgradeWarnings get() = CFApi.config.chocolateUpgradeWarnings

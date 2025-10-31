@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.misc.IslandAreas
-import at.hannibal2.skyhanni.test.SkyBlockIslandTest
-import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.features.misc.IslandAreas
+import at.hannibal2.hanni.test.SkyBlockIslandTest
+import at.hannibal2.hanni.test.TestBingo
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
 
 object SkyBlockUtils {
 
@@ -39,7 +39,7 @@ object SkyBlockUtils {
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
-    val debug: Boolean get() = onHypixel && SkyHanniMod.feature.dev.debug.enabled
+    val debug: Boolean get() = onHypixel && HanniMod.feature.dev.debug.enabled
 
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && currentIsland in islandTypes
 

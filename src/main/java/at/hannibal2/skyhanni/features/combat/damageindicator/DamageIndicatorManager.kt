@@ -1,61 +1,61 @@
-package at.hannibal2.skyhanni.features.combat.damageindicator
+package at.hannibal2.hanni.features.combat.damageindicator
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
-import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.BossHealthChangeEvent
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
-import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
-import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
-import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.combat.end.DragonFightAPI
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
-import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.currentPhase
-import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
-import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
-import at.hannibal2.skyhanni.features.slayer.spider.SlayerSpiderFeatures
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
-import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
+import at.hannibal2.hanni.data.ScoreboardData
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.events.BossHealthChangeEvent
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.events.DamageIndicatorDeathEvent
+import at.hannibal2.hanni.events.DamageIndicatorDetectedEvent
+import at.hannibal2.hanni.events.DamageIndicatorFinalBossEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.hanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.hanni.events.minecraft.ServerTickEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.features.combat.end.DragonFightAPI
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.features.rift.area.colosseum.BacteApi
+import at.hannibal2.hanni.features.rift.area.colosseum.BacteApi.currentPhase
+import at.hannibal2.hanni.features.slayer.blaze.HellionShield
+import at.hannibal2.hanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
+import at.hannibal2.hanni.features.slayer.spider.SlayerSpiderFeatures
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.CopyNearbyEntitiesCommand
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.EntityUtils.baseMaxHealth
+import at.hannibal2.hanni.utils.EntityUtils.canBeSeen
+import at.hannibal2.hanni.utils.EntityUtils.getNameTagWith
+import at.hannibal2.hanni.utils.EntityUtils.hasNameTagWith
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.MobUtils.mob
+import at.hannibal2.hanni.utils.NumberUtil
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.TimeUtils.ticks
+import at.hannibal2.hanni.utils.collection.CollectionUtils.removeIf
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
 import com.google.gson.JsonArray
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -71,18 +71,18 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import at.hannibal2.skyhanni.data.mob.Mob as ShMob
+import at.hannibal2.hanni.data.mob.Mob as ShMob
 
 typealias EntityData = DamageIndicatorEntityData
 
 // TODO cut class into smaller pieces
-@SkyHanniModule
+@HanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null
     private val maxHealth = mutableMapOf<UUID, Long>()
-    private val config get() = SkyHanniMod.feature.combat.damageIndicator
+    private val config get() = HanniMod.feature.combat.damageIndicator
 
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
 
@@ -135,12 +135,12 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         mobFinder?.handleChat(event.message)
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         if (SkyBlockUtils.debug) {
@@ -391,7 +391,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onSkyHanniTick(event: SkyHanniTickEvent) {
+    fun onHanniTick(event: HanniTickEvent) {
         if (!isEnabled()) return
         data.values.forEach(::update)
         // TODO config to define between 100ms and 5 sec
@@ -654,7 +654,7 @@ object DamageIndicatorManager {
         maxHealth: Int,
     ): String? {
         val slimeSize = entity.slimeSize
-        val crimsonIsleConfig = SkyHanniMod.feature.crimsonIsle
+        val crimsonIsleConfig = HanniMod.feature.crimsonIsle
         val prefix = when (slimeSize) {
             24 -> "§c1/6"
             22 -> "§e2/6"
@@ -999,7 +999,7 @@ object DamageIndicatorManager {
             if (showNameAndHealth && config.hideDamageSplash) {
                 event.cancel()
             }
-            if (SkyHanniMod.feature.slayer.damageSplashHider && entityData.bossType.isSlayer) {
+            if (HanniMod.feature.slayer.damageSplashHider && entityData.bossType.isSlayer) {
                 event.cancel()
             }
             if (entityData.bossType == BossType.DUMMY) {
@@ -1050,7 +1050,7 @@ object DamageIndicatorManager {
         }
     }
 
-    private val backendEnabled get() = SkyHanniMod.feature.dev.damageIndicatorBackend
+    private val backendEnabled get() = HanniMod.feature.dev.damageIndicatorBackend
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {

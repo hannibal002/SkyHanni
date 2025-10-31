@@ -18,8 +18,8 @@ sourceSets.main {
 gradlePlugin {
     this.plugins {
         this.create("simplePlugin") {
-            this.id = "at.skyhanni.shared-variables"
-            this.implementationClass = "at.skyhanni.sharedvariables.NoOp"
+            this.id = "at.hanni.shared-variables"
+            this.implementationClass = "at.hanni.sharedvariables.NoOp"
         }
     }
 }

@@ -1,31 +1,31 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.hanni.features.mining
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.events.ColdUpdateEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.events.ColdUpdateEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.NumberUtil
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.createResourceLocation
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object ColdOverlay {
 
-    private val config get() = SkyHanniMod.feature.mining.coldOverlay
+    private val config get() = HanniMod.feature.mining.coldOverlay
 
     private var cold = 0
     private var lastCold = 0
     private var lastColdUpdate = SimpleTimeMark.farPast()
 
-    private val textureLocation = createResourceLocation("skyhanni", "cold_overlay.png")
+    private val textureLocation = createResourceLocation("hanni", "cold_overlay.png")
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

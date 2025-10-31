@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.data.GlobalRender
-import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.enums.OutsideSBFeature
+import at.hannibal2.hanni.data.GlobalRender
+import at.hannibal2.hanni.events.RenderEntityOutlineEvent
+import at.hannibal2.hanni.mixins.transformers.CustomRenderGlobal
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.getFirstPassenger
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.OpenGlHelper
@@ -36,7 +36,7 @@ import java.lang.reflect.Method
  * https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/features/EntityOutlines/EntityOutlineRenderer.java
  *
  */
-@SkyHanniModule
+@HanniModule
 object EntityOutlineRenderer {
 
     private val entityRenderCache: CachedInfo = CachedInfo(null, null, null)
@@ -51,8 +51,8 @@ object EntityOutlineRenderer {
     private val mc get() = Minecraft.getMinecraft()
     private val BUF_FLOAT_4: java.nio.FloatBuffer = org.lwjgl.BufferUtils.createFloatBuffer(4)
 
-    private val CustomRenderGlobal.frameBuffer get() = entityOutlineFramebuffer_skyhanni
-    private val CustomRenderGlobal.shader get() = entityOutlineShader_skyhanni
+    private val CustomRenderGlobal.frameBuffer get() = entityOutlineFramebuffer_hanni
+    private val CustomRenderGlobal.shader get() = entityOutlineShader_hanni
 
     /**
      * @return a new framebuffer with the size of the main framebuffer
@@ -276,10 +276,10 @@ object EntityOutlineRenderer {
     // Add new features that need the entity outline logic here
     private fun isEnabled(): Boolean {
         if (isMissingMixin) return false
-        if (SkyHanniMod.feature.fishing.rareCatches.highlight) return true
-        if (SkyHanniMod.feature.misc.glowingDroppedItems.enabled) return true
-        if (SkyHanniMod.feature.dungeon.highlightTeammates) return true
-        if (SkyHanniMod.feature.misc.highlightPartyMembers.enabled) return true
+        if (HanniMod.feature.fishing.rareCatches.highlight) return true
+        if (HanniMod.feature.misc.glowingDroppedItems.enabled) return true
+        if (HanniMod.feature.dungeon.highlightTeammates) return true
+        if (HanniMod.feature.misc.highlightPartyMembers.enabled) return true
 
         return false
     }

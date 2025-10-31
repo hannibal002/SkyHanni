@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.api.minecraftevents
+package at.hannibal2.hanni.api.minecraftevents
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.data.mob.MobDetection
-import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.compat.DamageSourceCompat
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.mob.MobData
+import at.hannibal2.hanni.data.mob.MobDetection
+import at.hannibal2.hanni.events.entity.EntityHurtEvent
+import at.hannibal2.hanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.compat.DamageSourceCompat
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
 import net.minecraft.network.packet.s2c.play.DamageTiltS2CPacket
 
-@SkyHanniModule
+@HanniModule
 object EntityEvents {
 
     @HandleEvent

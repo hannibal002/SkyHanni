@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
+import at.hannibal2.hanni.features.chroma.ChromaFontManagerKt;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;

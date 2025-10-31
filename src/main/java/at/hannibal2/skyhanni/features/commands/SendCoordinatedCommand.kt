@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.features.commands
+package at.hannibal2.hanni.features.commands
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.LocationUtils
 
-@SkyHanniModule
+@HanniModule
 object SendCoordinatedCommand {
 
     @HandleEvent

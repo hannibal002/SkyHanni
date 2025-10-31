@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.features.misc.visualwords
+package at.hannibal2.hanni.features.misc.visualwords
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils.requiredStyleChangeString
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.collection.TimeAndSizeLimitedCache
+import at.hannibal2.hanni.utils.compat.OrderedTextUtils.requiredStyleChangeString
 import net.minecraft.client.MinecraftClient
 import net.minecraft.text.OrderedText
 import net.minecraft.text.StringVisitable
@@ -12,9 +12,9 @@ import net.minecraft.text.TextVisitFactory
 import java.util.Optional
 import kotlin.time.Duration.Companion.minutes
 
-@SkyHanniModule
+@HanniModule
 object ModifyVisualWords {
-    private val config get() = SkyHanniMod.feature.gui.modifyWords
+    private val config get() = HanniMod.feature.gui.modifyWords
 
     val textCache = TimeAndSizeLimitedCache<OrderedText, OrderedText>(131072, 5.minutes)
     val stringVisitableCache = TimeAndSizeLimitedCache<StringVisitable, StringVisitable>(65565, 5.minutes)
@@ -30,7 +30,7 @@ object ModifyVisualWords {
         finalWordsList = modModifiedWords + userModifiedWords
         textCache.clear()
         stringVisitableCache.clear()
-        SkyHanniMod.visualWordsData.modifiedWords = userModifiedWords.map { visualWordText -> visualWordText.toVisualWord() }.toMutableList()
+        HanniMod.visualWordsData.modifiedWords = userModifiedWords.map { visualWordText -> visualWordText.toVisualWord() }.toMutableList()
         MinecraftClient.getInstance().inGameHud.chatHud.refresh()
     }
 
@@ -42,8 +42,8 @@ object ModifyVisualWords {
         if (!config.enabled) return null
         if (!changeWords) return null
 
-        if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
-            userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
+        if (userModifiedWords.isEmpty() && HanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
+            userModifiedWords.addAll(HanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
             update()
         }
 
@@ -95,8 +95,8 @@ object ModifyVisualWords {
         if (!config.enabled) return null
         if (!changeWords) return null
 
-        if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
-            userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
+        if (userModifiedWords.isEmpty() && HanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
+            userModifiedWords.addAll(HanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
             update()
         }
 

@@ -1,33 +1,33 @@
-package at.hannibal2.skyhanni.features.rift.area.dreadfarm
+package at.hannibal2.hanni.features.rift.area.dreadfarm
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.PlaySoundEvent
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object RiftWiltedBerberisHelper {
 
     private val config get() = RiftApi.config.area.dreadfarm.wiltedBerberis
@@ -48,7 +48,7 @@ object RiftWiltedBerberisHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
@@ -120,7 +120,7 @@ object RiftWiltedBerberisHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 

@@ -1,54 +1,54 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.SackDataUpdateEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.fishing.FishingApi
-import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.features.inventory.SackDisplay
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigFileType
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuSacksJson
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.events.ProfileJoinEvent
+import at.hannibal2.hanni.events.SackChangeEvent
+import at.hannibal2.hanni.events.SackDataUpdateEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.fishing.FishingApi
+import at.hannibal2.hanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.hanni.features.inventory.SackDisplay
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.ItemUtils.itemNameWithoutColor
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matchAll
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.removeNonAsciiNonColorCode
+import at.hannibal2.hanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.hanni.utils.compat.hover
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 
 private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 private typealias GemstoneType = SkyBlockItemModifierUtils.GemstoneType
 
-@SkyHanniModule
+@HanniModule
 object SackApi {
 
-    private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
-    private val chatConfig get() = SkyHanniMod.feature.chat
+    private val sackDisplayConfig get() = HanniMod.feature.inventory.sackDisplay
+    private val chatConfig get() = HanniMod.feature.chat
     private val patternGroup = RepoPattern.group("data.sacks")
     private var lastOpenedInventory = ""
 
@@ -321,7 +321,7 @@ object SackApi {
     private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!event.message.removeColor().startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
@@ -435,7 +435,7 @@ object SackApi {
 
     private fun saveSackData() {
         ProfileStorageData.sackProfiles?.sackContents = sackData
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "saving-data")
+        HanniMod.configManager.saveConfig(ConfigFileType.SACKS, "saving-data")
 
         SackDataUpdateEvent.post()
     }

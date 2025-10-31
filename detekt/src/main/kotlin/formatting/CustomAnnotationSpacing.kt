@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.detektrules.formatting
+package at.hannibal2.hanni.detektrules.formatting
 
-import at.hannibal2.skyhanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import at.hannibal2.hanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
+import at.hannibal2.hanni.detektrules.HanniRule
 import io.gitlab.arturbosch.detekt.api.CodeSmell
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.psi.psiUtil.siblings
  * This rule enforces the default spacing rules for annotations but allows preprocessed comments to be between
  * an annotation and the annotated construct.
  */
-class CustomAnnotationSpacing(config: Config) : SkyHanniRule(config) {
+class CustomAnnotationSpacing(config: Config) : HanniRule(config) {
     override val issue = Issue(
         "CustomAnnotationSpacing",
         Severity.Style,

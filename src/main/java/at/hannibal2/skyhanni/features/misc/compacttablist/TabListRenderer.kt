@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.features.misc.compacttablist
+package at.hannibal2.hanni.features.misc.compacttablist
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.GlobalRender
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SkipTabListLineEvent
-import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.minecraftevents.RenderLayer
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.GlobalRender
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.SkipTabListLineEvent
+import at.hannibal2.hanni.events.render.gui.GameOverlayRenderPreEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.KeyboardManager.isActive
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.TabListData
+import at.hannibal2.hanni.utils.collection.CollectionUtils.filterToMutable
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EnumPlayerModelParts
 
-@SkyHanniModule
+@HanniModule
 object TabListRenderer {
 
-    private val config get() = SkyHanniMod.feature.gui.compactTabList
+    private val config get() = HanniMod.feature.gui.compactTabList
 
     const val MAX_LINES = 22
     private const val LINE_HEIGHT = 8 + 1

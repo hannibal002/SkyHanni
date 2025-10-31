@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.data.ActionBarData
-import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.hanni.data.ActionBarData
+import at.hannibal2.hanni.data.ChatManager
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.minecraft.client.MinecraftClient

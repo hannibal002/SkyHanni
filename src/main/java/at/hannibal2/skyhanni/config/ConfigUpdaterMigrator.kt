@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.config
+package at.hannibal2.hanni.config
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.json.asIntOrNull
-import at.hannibal2.skyhanni.utils.json.shDeepCopy
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.json.asIntOrNull
+import at.hannibal2.hanni.utils.json.shDeepCopy
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -29,7 +29,7 @@ object ConfigUpdaterMigrator {
         val oldVersion: Int,
         var movesPerformed: Int,
         val dynamicPrefix: Map<String, List<String>>,
-    ) : SkyHanniEvent() {
+    ) : HanniEvent() {
 
         init {
             dynamicPrefix.entries

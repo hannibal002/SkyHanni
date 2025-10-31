@@ -1,52 +1,52 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.hanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.pets.PetChangeEvent
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.moveEntryToTop
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.ProfileJoinEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.garden.GardenToolChangeEvent
+import at.hannibal2.hanni.events.pets.PetChangeEvent
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.CropType.Companion.getByNameOrNull
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.features.garden.GardenNextJacobContest
+import at.hannibal2.hanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.hanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
+import at.hannibal2.hanni.features.inventory.bazaar.BazaarApi.getBazaarData
+import at.hannibal2.hanni.features.inventory.bazaar.BazaarApi.isBazaarItem
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.AutoUpdatingItemStack
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemPriceUtils.getNpcPrice
+import at.hannibal2.hanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.hanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.itemNameWithoutColor
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addNotNull
+import at.hannibal2.hanni.utils.collection.CollectionUtils.moveEntryToTop
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.primitives.text
 
-@SkyHanniModule
+@HanniModule
 object CropMoneyDisplay {
 
     var multipliers = mapOf<NeuInternalName, Int>()
@@ -176,7 +176,7 @@ object CropMoneyDisplay {
                     CropType.MELON -> GardenCropSpeed.latestMelonDicer to "ENCHANTED_MELON".toInternalName()
                     CropType.PUMPKIN -> GardenCropSpeed.latestPumpkinDicer to "ENCHANTED_PUMPKIN".toInternalName()
 
-                    else -> ErrorManager.skyHanniError(
+                    else -> ErrorManager.hanniError(
                         "Unknown dicer detected.",
                         "crop" to it,
                         "item in hand" to itemInHand,
@@ -359,7 +359,7 @@ object CropMoneyDisplay {
         if (loaded) return
         loaded = true
 
-        SkyHanniMod.launchCoroutine("garden crop money display init") {
+        HanniMod.launchCoroutine("garden crop money display init") {
             val map = mutableMapOf<NeuInternalName, Int>()
             for ((rawInternalName, _) in NeuItems.allNeuRepoItems()) {
                 if (rawInternalName == "ENCHANTED_PAPER") continue

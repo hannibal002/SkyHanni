@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.GuiPlayerTabOverlayHookKt;
+import at.hannibal2.hanni.mixins.hooks.GuiPlayerTabOverlayHookKt;
 import net.minecraft.client.gui.GuiPlayerTabOverlay;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.scoreboard.ScorePlayerTeam;

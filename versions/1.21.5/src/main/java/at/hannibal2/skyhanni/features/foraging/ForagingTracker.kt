@@ -1,56 +1,56 @@
-package at.hannibal2.skyhanni.features.foraging
+package at.hannibal2.hanni.features.foraging
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
-import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.foraging.ForagingTracker.drawDisplay
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.data.ItemAddManager
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.ItemAddEvent
+import at.hannibal2.hanni.events.ItemInHandChangeEvent
+import at.hannibal2.hanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.hanni.events.SackChangeEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.foraging.ForagingTracker.drawDisplay
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemCategory
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuItems.getItemStack
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatDoubleOrNull
+import at.hannibal2.hanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.hanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.hanni.utils.compat.formattedTextCompat
+import at.hannibal2.hanni.utils.compat.hover
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.Searchable
+import at.hannibal2.hanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.utils.renderables.toSearchable
+import at.hannibal2.hanni.utils.tracker.HanniBucketedItemTracker
 import net.minecraft.text.Text
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
-object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeType, ForagingTrackerLegacy.BucketData>(
+@HanniModule
+object ForagingTracker : HanniBucketedItemTracker<ForagingTrackerLegacy.TreeType, ForagingTrackerLegacy.BucketData>(
     "Foraging Tracker",
     { ForagingTrackerLegacy.BucketData() },
     { it.foraging.trackerData },
     { drawDisplay(it) },
 ) {
-    private val config get() = SkyHanniMod.feature.foraging.tracker
+    private val config get() = HanniMod.feature.foraging.tracker
 
     init {
         initRenderer({ config.position }) { isInIsland() && heldItemEnabled() && config.enabled }
@@ -168,7 +168,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private val loot = mutableMapOf<NeuInternalName, Int>()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isInIsland()) return
         event.tryReadLoot()
         event.tryBlock()
@@ -192,7 +192,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         addItem(treeType, STRETCHING_STICKS, change, command = false)
     }
 
-    private fun SkyHanniChatEvent.tryReadLoot() {
+    private fun HanniChatEvent.tryReadLoot() {
         ForagingTrackerLegacy.openCloseRewardPattern.matchMatcher(message) {
             openLootLoop = !openLootLoop
             if (openLootLoop) {
@@ -255,7 +255,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         }
     }
 
-    private fun SkyHanniChatEvent.tryBlock() {
+    private fun HanniChatEvent.tryBlock() {
         if (!config.compactGiftChats || !openLootLoop) return
         blockedReason = "TREE_GIFT"
     }

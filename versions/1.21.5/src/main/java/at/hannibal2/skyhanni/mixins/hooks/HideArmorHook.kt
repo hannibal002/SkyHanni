@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.features.misc.HideArmor
+import at.hannibal2.hanni.features.misc.HideArmor
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.player.PlayerEntity
 

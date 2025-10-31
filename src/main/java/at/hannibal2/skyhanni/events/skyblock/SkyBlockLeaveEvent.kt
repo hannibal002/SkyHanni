@@ -1,5 +1,5 @@
-package at.hannibal2.skyhanni.events.skyblock
+package at.hannibal2.hanni.events.skyblock
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 
-object SkyBlockLeaveEvent : SkyHanniEvent()
+object SkyBlockLeaveEvent : HanniEvent()

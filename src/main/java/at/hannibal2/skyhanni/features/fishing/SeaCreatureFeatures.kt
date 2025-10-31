@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.hanni.features.fishing
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.PartyApi
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.RenderEntityOutlineEvent
+import at.hannibal2.hanni.events.fishing.SeaCreatureFishEvent
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils.baseMaxHealth
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.MobUtils.mob
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.collection.TimeLimitedSet
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntitySlime
@@ -29,10 +29,10 @@ import java.awt.Color
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object SeaCreatureFeatures {
 
-    private val config get() = SkyHanniMod.feature.fishing.rareCatches
+    private val config get() = HanniMod.feature.fishing.rareCatches
     private var lastRareCatch = SimpleTimeMark.farPast()
     private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
     private val entityIds = TimeLimitedSet<Int>(6.minutes)

@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events.hypixel.modapi
+package at.hannibal2.hanni.events.hypixel.modapi
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 import net.hypixel.data.type.ServerType
 
 data class HypixelApiServerChangeEvent(
@@ -9,4 +9,4 @@ data class HypixelApiServerChangeEvent(
     val lobbyName: String?,
     val mode: String?,
     val map: String?,
-) : SkyHanniEvent()
+) : HanniEvent()

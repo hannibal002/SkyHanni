@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.api.event
+package at.hannibal2.hanni.api.event
 
-import at.hannibal2.skyhanni.utils.compat.DrawContext
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.DrawContext
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
 
 /**
  * Use @[HandleEvent]
  */
-abstract class SkyHanniEvent protected constructor() {
+abstract class HanniEvent protected constructor() {
     // TODO: This should only be accessible in the cancellable interface
     var isCancelled: Boolean = false
         private set
@@ -18,16 +18,16 @@ abstract class SkyHanniEvent protected constructor() {
     private fun prePost(onError: ((Throwable) -> Unit)?): Boolean {
         if (this is Rendering) {
             DrawContextUtils.setContext(this.context)
-            val result = SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
+            val result = HanniEvents.getEventHandler(javaClass).post(this, onError)
             DrawContextUtils.clearContext()
             return result
         }
-        return SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
+        return HanniEvents.getEventHandler(javaClass).post(this, onError)
     }
 
     interface Cancellable {
         fun cancel() {
-            val event = this as SkyHanniEvent
+            val event = this as HanniEvent
             event.isCancelled = true
         }
     }

@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.hanni.features.fishing
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
-import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
-import at.hannibal2.skyhanni.features.fishing.FishingApi.isBait
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.hanni.events.fishing.FishingBobberInLiquidEvent
+import at.hannibal2.hanni.features.fishing.FishingApi.isBait
+import at.hannibal2.hanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.LocationUtils.distanceTo
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.collection.TimeLimitedSet
+import at.hannibal2.hanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityItem
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object FishingBaitWarnings {
 
-    private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarnings
+    private val config get() = HanniMod.feature.fishing.fishingBaitWarnings
 
     private data class Bait(
         private val entity: EntityItem,

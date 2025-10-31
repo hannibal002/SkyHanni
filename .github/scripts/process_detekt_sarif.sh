@@ -16,7 +16,7 @@ read -r -d '' jq_command <<'EOF'
 .runs[].results[] |
 {
     # Adjust the path to remove the runner workspace prefix
-    "full_path": (.locations[].physicalLocation.artifactLocation.uri | sub("file://.*/SkyHanni/"; "")),
+    "full_path": (.locations[].physicalLocation.artifactLocation.uri | sub("file://.*/Hanni/"; "")),
     "file_name": (.locations[].physicalLocation.artifactLocation.uri | split("/") | last),
     "l": .locations[].physicalLocation,
     "level": .level,

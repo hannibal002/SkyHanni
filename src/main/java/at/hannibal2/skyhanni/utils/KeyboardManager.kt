@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.inventory.AttemptedInventoryCloseEvent
+import at.hannibal2.hanni.events.minecraft.KeyDownEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.events.minecraft.KeyUpEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
@@ -16,7 +16,7 @@ import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
-import at.hannibal2.skyhanni.data.model.TextInput
+import at.hannibal2.hanni.data.model.TextInput
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import org.lwjgl.input.Mouse
 //#else
@@ -26,7 +26,7 @@ import org.lwjgl.input.Mouse
 //$$ import net.minecraft.client.input.KeyInput
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object KeyboardManager {
 
     //#if MC < 1.21
@@ -218,7 +218,7 @@ object KeyboardManager {
 
         else -> Keyboard.isKeyDown(this)
         //#else
-        //$$ this < -1 -> ErrorManager.skyHanniError("Error while checking if a key is pressed. Keycode is invalid: $this")
+        //$$ this < -1 -> ErrorManager.hanniError("Error while checking if a key is pressed. Keycode is invalid: $this")
         //$$ this == -1 -> false
         //$$ this in 0..5 -> MouseCompat.isButtonDown(this)
         //#if MC < 1.21.9

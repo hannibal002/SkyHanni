@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
-import at.hannibal2.skyhanni.utils.compat.getAllEquipment
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.hanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.MobUtils.isDefaultValue
+import at.hannibal2.hanni.utils.compat.getAllEquipment
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityMob
 import net.minecraft.entity.player.EntityPlayer
@@ -23,10 +23,10 @@ import net.minecraft.network.play.server.S13PacketDestroyEntities
  * This feature fixes ghost entities sent by hypixel that are not properly deleted in the correct order.
  * This included Diana, Dungeon and Crimson Isle mobs and nametags.
  */
-@SkyHanniModule
+@HanniModule
 object FixGhostEntities {
 
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = HanniMod.feature.misc
 
     private var recentlyRemovedEntities = ArrayDeque<Int>()
     private var recentlySpawnedEntities = ArrayDeque<Int>()

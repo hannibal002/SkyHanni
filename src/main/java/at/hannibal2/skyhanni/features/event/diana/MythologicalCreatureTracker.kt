@@ -1,34 +1,34 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.hanni.features.event.diana
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.storage.Resettable
+import at.hannibal2.hanni.data.ElectionApi.getElectionYear
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderDisplayHelper
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.hanni.utils.renderables.Searchable
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.tracker.HanniTracker
 import com.google.gson.annotations.Expose
 import java.util.regex.Pattern
 
-@SkyHanniModule
+@HanniModule
 object MythologicalCreatureTracker {
 
-    private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
+    private val config get() = HanniMod.feature.event.diana.mythologicalMobtracker
 
     private val patternGroup = RepoPattern.group("event.diana.mythological.tracker")
     private val minotaurPattern by patternGroup.pattern(
@@ -56,10 +56,10 @@ object MythologicalCreatureTracker {
         ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!",
     )
 
-    private val tracker = SkyHanniTracker(
+    private val tracker = HanniTracker(
         "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
         extraDisplayModes = mapOf(
-            SkyHanniTracker.DisplayMode.MAYOR to {
+            HanniTracker.DisplayMode.MAYOR to {
                 it.diana.mythologicalMobTrackerPerElection.getOrPut(
                     SkyBlockTime.now().getElectionYear(), ::Data,
                 )
@@ -82,7 +82,7 @@ object MythologicalCreatureTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         for (creatureType in MythologicalCreatureType.entries) {
             if (!creatureType.pattern.matches(event.message)) continue
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()

@@ -1,49 +1,49 @@
-package at.hannibal2.skyhanni.test.graph
+package at.hannibal2.hanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.dev.GraphConfig
-import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
-import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
-import at.hannibal2.skyhanni.utils.GraphUtils.getNearestToPlayer
-import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RaycastUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.features.dev.GraphConfig
+import at.hannibal2.hanni.data.IslandGraphs
+import at.hannibal2.hanni.data.IslandGraphs.pathFind
+import at.hannibal2.hanni.data.model.Graph
+import at.hannibal2.hanni.data.model.GraphNode
+import at.hannibal2.hanni.data.model.GraphNodeTag
+import at.hannibal2.hanni.data.model.TextInput
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ColorUtils
+import at.hannibal2.hanni.utils.GraphUtils
+import at.hannibal2.hanni.utils.GraphUtils.distanceSqToPlayer
+import at.hannibal2.hanni.utils.GraphUtils.getNearestNode
+import at.hannibal2.hanni.utils.GraphUtils.getNearestToPlayer
+import at.hannibal2.hanni.utils.GraphUtils.playerPosition
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.RaycastUtils
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.hanni.utils.TimeUtils.ticks
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawPyramid
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.primitives.StringRenderable
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
@@ -53,10 +53,10 @@ import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("LargeClass")
-@SkyHanniModule
+@HanniModule
 object GraphEditor {
 
-    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
+    val config: GraphConfig get() = HanniMod.feature.dev.devTool.graph
 
     fun isEnabled(): Boolean = config.enabled
 
@@ -117,7 +117,7 @@ object GraphEditor {
     private var active = false
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
         edges.forEach { event.drawEdge(it) }
@@ -192,7 +192,7 @@ object GraphEditor {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (!isEnabled()) return
         input()
         if (event.isMod(5)) {
@@ -256,7 +256,7 @@ object GraphEditor {
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.drawNode(node: GraphingNode) {
+    private fun HanniRenderWorldEvent.drawNode(node: GraphingNode) {
         if (!node.rendering) return
         this.drawWaypointFilled(
             node.position,
@@ -294,7 +294,7 @@ object GraphEditor {
         )
     }
 
-    private fun SkyHanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {
+    private fun HanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {
         if (!edge.node1.rendering && !edge.node2.rendering) return
         val color = when {
             selectedEdge == edge -> edgeSelectedColor
@@ -314,7 +314,7 @@ object GraphEditor {
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.drawDirection(edge: GraphingEdge, color: Color) {
+    private fun HanniRenderWorldEvent.drawDirection(edge: GraphingEdge, color: Color) {
         val lineVec = edge.node2.position - edge.node1.position
         val center = edge.node1.position + lineVec / 2.0
         val quad1 = edge.node1.position + lineVec / 4.0

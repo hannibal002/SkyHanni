@@ -1,39 +1,39 @@
-package at.hannibal2.skyhanni.utils.renderables
+package at.hannibal2.hanni.utils.renderables
 
-import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
-import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
-import at.hannibal2.skyhanni.data.GuiData
-import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
-import at.hannibal2.skyhanni.data.RenderData
-import at.hannibal2.skyhanni.data.ToolTipData
-import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.ColorUtils.darker
-import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import at.hannibal2.skyhanni.utils.guide.GuideGui
-import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableScrollTable.Companion.searchableScrollTable
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.config.core.config.gui.GuiPositionEditor
+import at.hannibal2.hanni.config.features.skillprogress.SkillProgressBarConfig
+import at.hannibal2.hanni.data.GuiData
+import at.hannibal2.hanni.data.HighlightOnHoverSlot
+import at.hannibal2.hanni.data.RenderData
+import at.hannibal2.hanni.data.ToolTipData
+import at.hannibal2.hanni.data.model.TextInput
+import at.hannibal2.hanni.utils.ColorUtils
+import at.hannibal2.hanni.utils.ColorUtils.addAlpha
+import at.hannibal2.hanni.utils.ColorUtils.darker
+import at.hannibal2.hanni.utils.ConfigUtils
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.hanni.utils.KeyboardManager.RIGHT_MOUSE
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.hanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.hanni.utils.collection.CollectionUtils.contains
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.createResourceLocation
+import at.hannibal2.hanni.utils.guide.GuideGui
+import at.hannibal2.hanni.utils.render.ShaderRenderUtils
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.renderYAligned
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.container.table.SearchableScrollTable.Companion.searchableScrollTable
+import at.hannibal2.hanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.hanni.utils.renderables.primitives.placeholder
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -44,14 +44,14 @@ import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
 //#if TODO
-import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
-import at.hannibal2.skyhanni.features.chroma.ChromaType
-import at.hannibal2.skyhanni.features.misc.DarkenShader
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
+import at.hannibal2.hanni.features.chroma.ChromaShaderManager
+import at.hannibal2.hanni.features.chroma.ChromaType
+import at.hannibal2.hanni.features.misc.DarkenShader
+import at.hannibal2.hanni.utils.shader.ShaderManager
 //#endif
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
-//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
+//$$ import at.hannibal2.hanni.utils.compat.RenderCompat
+//$$ import at.hannibal2.hanni.utils.render.HanniRenderLayers
 //#endif
 
 // todo 1.21 impl needed
@@ -162,7 +162,7 @@ interface Renderable {
             text: String,
             /**
              * This should be a direct map of key code int, to the unit that should be invoked.
-             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
+             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.hanni.utils.KeyboardManager].
              * For keyboard codes, use the [org.lwjgl.input.Keyboard] enums.
              */
             onAnyClick: Map<Int, () -> Unit>,
@@ -176,7 +176,7 @@ interface Renderable {
             render: Renderable,
             /**
              * This should be a direct map of key code int, to the unit that should be invoked.
-             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
+             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.hanni.utils.KeyboardManager].
              * For keyboard codes, use the [org.lwjgl.input.Keyboard] enums.
              */
             onAnyClick: Map<Int, () -> Unit>,
@@ -602,7 +602,7 @@ interface Renderable {
                     GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
                     //#else
                     //$$ if (useChroma) {
-                    //$$     DrawContextUtils.drawContext.fill(SkyHanniRenderLayers.getChromaStandard(), 1, 1, progress, height - 1, color.rgb)
+                    //$$     DrawContextUtils.drawContext.fill(HanniRenderLayers.getChromaStandard(), 1, 1, progress, height - 1, color.rgb)
                     //$$ } else {
                     //$$     GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
                     //$$ }
@@ -644,10 +644,10 @@ interface Renderable {
                         )
                         //#else
                         //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                        //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
+                        //$$     DrawContextUtils.drawContext.drawGuiTexture(HanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
                         //$$         width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
                         //$$ } else {
-                        //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
+                        //$$     DrawContextUtils.drawContext.drawTexture(HanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
                         //$$         mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
                         //$$ }
                         //#endif

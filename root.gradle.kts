@@ -1,8 +1,8 @@
-import at.skyhanni.sharedvariables.ProjectTarget
+import at.hanni.sharedvariables.ProjectTarget
 import com.replaymod.gradle.preprocess.Node
 
 plugins {
-    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "1.0.8"
+    id("com.github.HanniStudios.Hanni-Preprocessor") version "1.0.8"
     id("gg.essential.loom") version "1.10.36" apply false
     kotlin("jvm") version "2.0.0" apply false
     kotlin("plugin.power-assert") version "2.0.0" apply false
@@ -12,10 +12,10 @@ plugins {
 }
 
 allprojects {
-    group = "at.hannibal2.skyhanni"
+    group = "at.hannibal2.hanni"
 
     val buildToolsPath = when (name) {
-        "SkyHanni" -> layout.projectDirectory.dir("buildTools")
+        "Hanni" -> layout.projectDirectory.dir("buildTools")
         "annotation-processors", "detekt" -> layout.projectDirectory.dir("../buildTools")
         else -> layout.projectDirectory.dir("../../buildTools")
     }

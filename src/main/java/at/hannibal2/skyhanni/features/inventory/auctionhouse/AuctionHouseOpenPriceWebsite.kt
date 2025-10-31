@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.features.inventory.auctionhouse
+package at.hannibal2.hanni.features.inventory.auctionhouse
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuItems.getItemStack
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.item.ItemStack
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object AuctionHouseOpenPriceWebsite {
 
-    private val config get() = SkyHanniMod.feature.inventory.auctions
+    private val config get() = HanniMod.feature.inventory.auctions
     private var lastClick = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("inventory.auctionhouse")
@@ -52,7 +52,7 @@ object AuctionHouseOpenPriceWebsite {
     private fun createDisplayItem() = ItemUtils.createItemStack(
         "PAPER".toInternalName().getItemStack().item,
         "§bPrice History",
-        "§8(From SkyHanni)",
+        "§8(From Hanni)",
         "",
         "§7Click here to open",
         "§7the price history",

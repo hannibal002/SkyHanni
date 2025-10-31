@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChromaUniforms
-import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonRoundedUniforms
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.utils.render.HanniRenderPipelineUtils.commonChromaUniforms
+import at.hannibal2.hanni.utils.render.HanniRenderPipelineUtils.getCommonRoundedUniforms
 import com.mojang.blaze3d.pipeline.BlendFunction
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.platform.DepthTestFunction
@@ -12,7 +12,7 @@ import net.minecraft.client.gl.UniformType
 import net.minecraft.client.render.VertexFormats
 import net.minecraft.util.Identifier
 
-enum class SkyHanniRenderPipeline(
+enum class HanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
     vFormat: VertexFormat = VertexFormats.POSITION_COLOR,
     vDrawMode: VertexFormat.DrawMode = VertexFormat.DrawMode.QUADS,
@@ -103,7 +103,7 @@ enum class SkyHanniRenderPipeline(
         ),
         //#else
         //$$ uniforms = getCommonRoundedUniforms() + mapOf(
-        //$$     "SkyHanniRoundedOutlineUniforms" to UniformType.UNIFORM_BUFFER
+        //$$     "HanniRoundedOutlineUniforms" to UniformType.UNIFORM_BUFFER
         //$$ ),
         //#endif
         depthWrite = false,
@@ -120,7 +120,7 @@ enum class SkyHanniRenderPipeline(
         ),
         //#else
         //$$ uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
-        //$$     "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
+        //$$     "HanniCircleUniforms" to UniformType.UNIFORM_BUFFER
         //$$ ),
         //#endif
     ),
@@ -140,7 +140,7 @@ enum class SkyHanniRenderPipeline(
         )
         //#else
         //$$ uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
-        //$$     "SkyHanniRadialGradientCircleUniforms" to UniformType.UNIFORM_BUFFER
+        //$$     "HanniRadialGradientCircleUniforms" to UniformType.UNIFORM_BUFFER
         //$$ ),
         //#endif
     ),
@@ -163,13 +163,13 @@ enum class SkyHanniRenderPipeline(
 
     private val _pipe: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, this.name.lowercase()))
+            .withLocation(Identifier.of(HanniMod.MODID, this.name.lowercase()))
             .withVertexFormat(vFormat, vDrawMode)
             .apply {
                 // One or the other, never both
                 blend?.let(this::withBlend) ?: withCull?.let(this::withCull)
-                vertexShaderPath?.let { withVertexShader(Identifier.of(SkyHanniMod.MODID, it)) }
-                fragmentShaderPath?.let { withFragmentShader(Identifier.of(SkyHanniMod.MODID, it)) }
+                vertexShaderPath?.let { withVertexShader(Identifier.of(HanniMod.MODID, it)) }
+                fragmentShaderPath?.let { withFragmentShader(Identifier.of(HanniMod.MODID, it)) }
                 sampler?.let(this::withSampler)
                 uniforms.forEach(this::withUniform)
                 withDepthWrite(depthWrite)
@@ -180,7 +180,7 @@ enum class SkyHanniRenderPipeline(
     operator fun invoke(): RenderPipeline = _pipe
 }
 
-private object SkyHanniRenderPipelineUtils {
+private object HanniRenderPipelineUtils {
     fun getCommonRoundedUniforms(
         withSmoothness: Boolean = true,
         withHalfSize: Boolean = true,
@@ -198,7 +198,7 @@ private object SkyHanniRenderPipelineUtils {
                 (withHalfSize || it.key != "halfSize")
         }
         //#else
-        //$$ return mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
+        //$$ return mapOf("HanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
         //#endif
     }
 
@@ -209,7 +209,7 @@ private object SkyHanniRenderPipelineUtils {
         "saturation" to UniformType.FLOAT,
         "forwardDirection" to UniformType.INT,
         //#else
-        //$$ "SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER,
+        //$$ "HanniChromaUniforms" to UniformType.UNIFORM_BUFFER,
         //#endif
     )
 }

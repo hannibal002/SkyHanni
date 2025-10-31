@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.garden.visitor
+package at.hannibal2.hanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.StringUtils.removeResets
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object GardenVisitorCompactChat {
 
     private val config get() = VisitorApi.config
@@ -73,7 +73,7 @@ object GardenVisitorCompactChat {
     private var rewardsList = mutableListOf<String>()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (GardenApi.inGarden() && config.compactRewardChat && (
                 fullyAcceptedPattern.matcher(event.message.removeResets()).matches() ||
                     visitorRewardPattern.matcher(event.message.removeResets()).matches() ||
@@ -84,7 +84,7 @@ object GardenVisitorCompactChat {
         }
     }
 
-    private fun handleChat(event: SkyHanniChatEvent) {
+    private fun handleChat(event: HanniChatEvent) {
         val transformedMessage = event.message.removeResets()
 
         fullyAcceptedPattern.matchMatcher(transformedMessage) {
@@ -129,7 +129,7 @@ object GardenVisitorCompactChat {
         compactChat(event)
     }
 
-    private fun compactChat(event: SkyHanniChatEvent) {
+    private fun compactChat(event: HanniChatEvent) {
         event.blockedReason = "compact_visitor"
         visitorAcceptedChat.add(event.message)
         if (visitorAcceptedChat.size == 3) {

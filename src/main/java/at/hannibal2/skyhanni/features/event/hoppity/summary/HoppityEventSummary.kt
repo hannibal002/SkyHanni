@@ -1,46 +1,46 @@
-package at.hannibal2.skyhanni.features.event.hoppity.summary
+package at.hannibal2.hanni.features.event.hoppity.summary
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig.HoppityStat
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.Companion.LeaderboardPosition
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventEndMark
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getHoppityEventNumber
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.isAlternateDay
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.StatString
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
-import at.hannibal2.skyhanni.utils.SkyblockSeason
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig.HoppityStat
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage.HoppityEventStats
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage.HoppityEventStats.Companion.LeaderboardPosition
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi.getEventEndMark
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi.getHoppityEventNumber
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi.isAlternateDay
+import at.hannibal2.hanni.features.event.hoppity.HoppityCollectionStats
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType
+import at.hannibal2.hanni.features.event.hoppity.summary.HoppityEventSummary.StatString
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
+import at.hannibal2.hanni.utils.SkyblockSeason
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sumByKey
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.utils.collection.TimeLimitedSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -48,7 +48,7 @@ import kotlin.time.Duration.Companion.seconds
 
 typealias MappedStatStrings = Map<HoppityStat, MutableList<StatString>>
 
-@SkyHanniModule
+@HanniModule
 @Suppress("LargeClass")
 object HoppityEventSummary {
     /**
@@ -61,7 +61,7 @@ object HoppityEventSummary {
 
     private const val LINE_HEADER = "    "
     private val SEPARATOR = "§d§l${"▬".repeat(64)}"
-    private val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val config get() = HanniMod.feature.event.hoppityEggs
     private val statDisplayList get() = config.eventSummary.statDisplayList.get()
     private val storage get() = ProfileStorageData.profileSpecific
     private val updateCfConfig get() = config.eventSummary.cfReminder
@@ -125,7 +125,7 @@ object HoppityEventSummary {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!HoppityApi.isHoppityEvent()) return
         val stats = getYearStats() ?: return
 
@@ -181,7 +181,7 @@ object HoppityEventSummary {
         storage?.let {
             it.hoppityEventStats.clear()
             ChatUtils.chat("Hoppity Event stats have been reset.")
-        } ?: ErrorManager.skyHanniError("Could not reset Hoppity Event stats.")
+        } ?: ErrorManager.hanniError("Could not reset Hoppity Event stats.")
     }
 
     private fun checkStatsTypeCountInit() {
@@ -307,7 +307,7 @@ object HoppityEventSummary {
         if (chocGained <= 0) return
         val chocFormatLine = buildString {
             append(" §6+${chocGained.addSeparators()} Chocolate")
-            if (SkyHanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
+            if (HanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
                 val timeFormatted = CFApi.timeUntilNeed(chocGained).format(maxUnits = 2)
                 append(" §7(§a+§b$timeFormatted§7)")
             }

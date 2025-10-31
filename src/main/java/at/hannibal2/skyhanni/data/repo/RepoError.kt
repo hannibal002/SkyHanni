@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.repo
+package at.hannibal2.hanni.data.repo
 
 class RepoError : Error {
     constructor(errorMessage: String) : super(errorMessage)

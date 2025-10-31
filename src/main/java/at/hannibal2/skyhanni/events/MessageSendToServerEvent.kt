@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
-import at.hannibal2.skyhanni.utils.system.ModInstance
+import at.hannibal2.hanni.api.event.CancellableHanniEvent
+import at.hannibal2.hanni.utils.system.ModInstance
 
 class MessageSendToServerEvent(
     val message: String,
     val splitMessage: List<String>,
     val originatingModContainer: ModInstance?
-) : CancellableSkyHanniEvent() {
+) : CancellableHanniEvent() {
     val isCommand by lazy { message.startsWith("/") }
 }

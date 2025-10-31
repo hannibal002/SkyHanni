@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.entity.EndermanTeleportEvent
-import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent
-import at.hannibal2.skyhanni.events.render.OverlayType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.ActionBarUpdateEvent
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.events.entity.EndermanTeleportEvent
+import at.hannibal2.hanni.events.render.BlockOverlayRenderEvent
+import at.hannibal2.hanni.events.render.OverlayType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.EnumParticleTypes
 
 /**
  *  I need these features in my dev env
  */
-@SkyHanniModule
+@HanniModule
 object MiscFeatures {
 
     /**
@@ -32,7 +32,7 @@ object MiscFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEndermanTeleport(event: EndermanTeleportEvent) {
-        if (!SkyHanniMod.feature.combat.mobs.endermanTeleportationHider) return
+        if (!HanniMod.feature.combat.mobs.endermanTeleportationHider) return
         event.cancel()
     }
 
@@ -43,7 +43,7 @@ object MiscFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!SkyHanniMod.feature.misc.hideExplosions) return
+        if (!HanniMod.feature.misc.hideExplosions) return
         if (inChickenRace) return
 
         when (event.type) {
@@ -58,7 +58,7 @@ object MiscFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderBlockOverlay(event: BlockOverlayRenderEvent) {
-        if (!SkyHanniMod.feature.misc.hideFireOverlay) return
+        if (!HanniMod.feature.misc.hideFireOverlay) return
 
         if (event.overlayType == OverlayType.FIRE) {
             event.cancel()

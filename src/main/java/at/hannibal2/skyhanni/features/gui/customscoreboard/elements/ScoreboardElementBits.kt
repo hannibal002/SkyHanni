@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.BitsApi
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.data.BitsApi
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import kotlinx.coroutines.Job
 
 // internal

@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.utils.renderables.animated
+package at.hannibal2.hanni.utils.renderables.animated
 
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.inPartialSeconds
-import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.CircularRenderable
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.inPartialSeconds
+import at.hannibal2.hanni.utils.render.ShaderRenderUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.primitives.CircularRenderable
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import kotlin.time.Duration
 

@@ -1,65 +1,65 @@
-package at.hannibal2.skyhanni.api
+package at.hannibal2.hanni.api
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ExperimentsJson
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.WorldClickEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
-import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
-import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
-import at.hannibal2.skyhanni.events.experiments.TableTaskStartedEvent
-import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.subtract
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.pet.CurrentPetApi
+import at.hannibal2.hanni.config.storage.Resettable
+import at.hannibal2.hanni.data.ClickType
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.jsonobjects.repo.ExperimentsJson
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.InventoryOpenEvent
+import at.hannibal2.hanni.events.InventoryUpdatedEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.WorldClickEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.hanni.events.experiments.TableRareUncoverEvent
+import at.hannibal2.hanni.events.experiments.TableTaskCompletedEvent
+import at.hannibal2.hanni.events.experiments.TableTaskStartedEvent
+import at.hannibal2.hanni.events.experiments.TableXPBottleUsedEvent
+import at.hannibal2.hanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.formatLong
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matchGroup
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SkullTextureHolder
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.collection.CollectionUtils.subtract
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 
 typealias TaskType = ExperimentationTableApi.ExperimentationTaskType
 
-@SkyHanniModule
+@HanniModule
 object ExperimentationTableApi {
 
     private const val ADDONS_OVER_DATA_SLOT = 11
     private const val SUPERPAIRS_OVER_DATA_SLOT = 13
 
-    private val config get() = SkyHanniMod.feature.inventory.experimentationTable
+    private val config get() = HanniMod.feature.inventory.experimentationTable
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
     private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val currentExperimentData = ExperimentationDataSet()
@@ -361,7 +361,7 @@ object ExperimentationTableApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (claimMessagePattern.matches(event.message) && ExperimentationMessages.DONE.isSelected()) {
             event.blockedReason = "CLAIM_MESSAGE"
             return
@@ -372,7 +372,7 @@ object ExperimentationTableApi {
         }
     }
 
-    private fun SkyHanniChatEvent.tryBlockChat(reward: String) {
+    private fun HanniChatEvent.tryBlockChat(reward: String) {
         val rewardInternalName = NeuInternalName.fromItemNameOrNull(reward)
         blockedReason = when {
             enchantingExpPattern.matches(reward) && ExperimentationMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
@@ -467,7 +467,7 @@ object ExperimentationTableApi {
     private fun InventoryOpenEvent.tryProcessExperimentOver() {
         if (!expOverInventoryPattern.matches(inventoryName) || currentExpOverHash != 0) return
         val slotIndex = when (currentExperimentData.type) {
-            null -> ErrorManager.skyHanniError(
+            null -> ErrorManager.hanniError(
                 "Found Experiment Over GUI without a set task type!",
                 "inventoryName" to inventoryName,
                 "inventoryItems" to inventoryItems,

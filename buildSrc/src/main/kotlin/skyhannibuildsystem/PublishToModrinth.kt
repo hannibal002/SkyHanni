@@ -1,9 +1,9 @@
-package skyhannibuildsystem
+package hannibuildsystem
 
 import at.hannibal2.changelog.ModVersion
-import at.skyhanni.sharedvariables.DependencyType
-import at.skyhanni.sharedvariables.ModrinthDependency
-import at.skyhanni.sharedvariables.ProjectTarget
+import at.hanni.sharedvariables.DependencyType
+import at.hanni.sharedvariables.ModrinthDependency
+import at.hanni.sharedvariables.ProjectTarget
 import com.github.mizosoft.methanol.Methanol
 import com.github.mizosoft.methanol.MultipartBodyPublisher
 import com.github.mizosoft.methanol.MutableRequest
@@ -29,7 +29,7 @@ abstract class PublishToModrinth : DefaultTask() {
     private lateinit var modrinthToken: String
 
     private val userAgent: String
-        get() = "SkyHanni-$versionNumber"
+        get() = "Hanni-$versionNumber"
 
     @TaskAction
     fun publishToModrinth() {
@@ -47,7 +47,7 @@ abstract class PublishToModrinth : DefaultTask() {
         modrinthToken = project.findProperty("modrinthToken") as String
     }
 
-    private val jarNamePattern = "SkyHanni-(?<modVersion>[\\d.]+)-mc(?<mcVersion>[\\d.]+)\\.jar".toPattern()
+    private val jarNamePattern = "Hanni-(?<modVersion>[\\d.]+)-mc(?<mcVersion>[\\d.]+)\\.jar".toPattern()
     private val client by lazy { constructClient() }
 
     private fun processJar(file: File) {
@@ -97,7 +97,7 @@ abstract class PublishToModrinth : DefaultTask() {
         modrinthJson.addProperty("featured", featured)
         modrinthJson.addProperty("status", status)
         modrinthJson.addProperty("requested_status", requestedStatus)
-        modrinthJson.addProperty("project_id", ModrinthDependency.SKYHANNI.projectId)
+        modrinthJson.addProperty("project_id", ModrinthDependency.HANNI.projectId)
         modrinthJson.add("file_parts", fileParts)
         modrinthJson.addProperty("primary_file", fileName)
 

@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.compat
+package at.hannibal2.hanni.compat
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.utils.InitFinishedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.utils.InitFinishedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 import com.mojang.blaze3d.pipeline.RenderPipeline
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.render.HanniRenderPipeline
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import java.lang.reflect.Method
 
-@SkyHanniModule
+@HanniModule
 object IrisCompat {
 
     private val isIrisLoaded by lazy { PlatformUtils.isModInstalled("iris") }
@@ -41,23 +41,23 @@ object IrisCompat {
     }
 
     private fun assignPipelines() {
-        assignPipeline(SkyHanniRenderPipeline.LINES(), IRIS_PROGRAM_LINES)
-        assignPipeline(SkyHanniRenderPipeline.LINES_XRAY(), IRIS_PROGRAM_LINES)
-        assignPipeline(SkyHanniRenderPipeline.FILLED(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.FILLED_XRAY(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.TRIANGLES(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.TRIANGLES_XRAY(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.TRIANGLE_FAN(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.TRIANGLE_FAN_XRAY(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.QUADS(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.QUADS_XRAY(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.ROUNDED_RECT(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.ROUNDED_TEXTURED_RECT(), IRIS_PROGRAMS_TEXTURED)
-        assignPipeline(SkyHanniRenderPipeline.ROUNDED_RECT_OUTLINE(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.CIRCLE(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.RADIAL_GRADIENT_CIRCLE(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.CHROMA_STANDARD(), IRIS_PROGRAM_BASIC)
-        assignPipeline(SkyHanniRenderPipeline.CHROMA_TEXT(), IRIS_PROGRAMS_TEXTURED)
+        assignPipeline(HanniRenderPipeline.LINES(), IRIS_PROGRAM_LINES)
+        assignPipeline(HanniRenderPipeline.LINES_XRAY(), IRIS_PROGRAM_LINES)
+        assignPipeline(HanniRenderPipeline.FILLED(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.FILLED_XRAY(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.TRIANGLES(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.TRIANGLES_XRAY(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.TRIANGLE_FAN(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.TRIANGLE_FAN_XRAY(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.QUADS(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.QUADS_XRAY(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.ROUNDED_RECT(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.ROUNDED_TEXTURED_RECT(), IRIS_PROGRAMS_TEXTURED)
+        assignPipeline(HanniRenderPipeline.ROUNDED_RECT_OUTLINE(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.CIRCLE(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.RADIAL_GRADIENT_CIRCLE(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.CHROMA_STANDARD(), IRIS_PROGRAM_BASIC)
+        assignPipeline(HanniRenderPipeline.CHROMA_TEXT(), IRIS_PROGRAMS_TEXTURED)
     }
 
     private fun assignPipeline(pipeline: RenderPipeline, enumValue: Any?) {

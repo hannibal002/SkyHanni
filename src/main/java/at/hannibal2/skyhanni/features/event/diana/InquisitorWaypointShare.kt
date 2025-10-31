@@ -1,42 +1,42 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.hanni.features.event.diana
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
-import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.diana.InquisitorFoundEvent
+import at.hannibal2.hanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.RegexUtils.hasGroup
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matchMatchers
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.SoundUtils.playSound
+import at.hannibal2.hanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.hanni.utils.collection.CollectionUtils.removeIf
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object InquisitorWaypointShare {
 
-    private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
+    private val config get() = HanniMod.feature.event.diana.inquisitorSharing
 
     private val patternGroup = RepoPattern.group("diana.waypoints.inquisitor")
 
@@ -130,7 +130,7 @@ object InquisitorWaypointShare {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message
 

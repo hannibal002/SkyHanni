@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds

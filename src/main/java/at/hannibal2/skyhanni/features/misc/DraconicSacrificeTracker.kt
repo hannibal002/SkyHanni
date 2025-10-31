@@ -1,34 +1,34 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LocationUtils.isPlayerInside
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.Searchable
+import at.hannibal2.hanni.utils.renderables.toSearchable
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.tracker.ItemTrackerData
+import at.hannibal2.hanni.utils.tracker.HanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
 
-@SkyHanniModule
+@HanniModule
 object DraconicSacrificeTracker {
 
-    private val config get() = SkyHanniMod.feature.combat.endIsland.draconicSacrificeTracker
+    private val config get() = HanniMod.feature.combat.endIsland.draconicSacrificeTracker
     private val patternGroup = RepoPattern.group("misc.draconicsacrifice")
 
     /**
@@ -51,7 +51,7 @@ object DraconicSacrificeTracker {
     )
 
     private val tracker =
-        SkyHanniItemTracker("Draconic Sacrifice Profit Tracker", { Data() }, { it.draconicSacrificeTracker }) {
+        HanniItemTracker("Draconic Sacrifice Profit Tracker", { Data() }, { it.draconicSacrificeTracker }) {
             drawDisplay(it)
         }
 
@@ -99,7 +99,7 @@ object DraconicSacrificeTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         sacrificeLoot.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val item = group("item")

@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils.tracker
+package at.hannibal2.hanni.utils.tracker
 
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.renderables.ScrollValue
 import com.google.gson.annotations.Expose
 import kotlin.reflect.KClass
 

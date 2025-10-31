@@ -1,46 +1,46 @@
-package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
+package at.hannibal2.hanni.features.itemabilities.abilitycooldown
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
-import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
-import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.events.RenderObject
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
-import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.recentlyHeld
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.ActionBarUpdateEvent
+import at.hannibal2.hanni.events.ItemClickEvent
+import at.hannibal2.hanni.events.PlaySoundEvent
+import at.hannibal2.hanni.events.RenderGuiItemOverlayEvent
+import at.hannibal2.hanni.events.RenderItemTipEvent
+import at.hannibal2.hanni.events.RenderObject
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
+import at.hannibal2.hanni.features.nether.ashfang.AshfangFreezeCooldown
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.CachedItemData.Companion.cachedData
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.InventoryUtils.recentlyHeld
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.ItemUtils.cleanName
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RenderUtils.highlight
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getItemId
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getItemUuid
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.hanni.utils.collection.CollectionUtils.mapKeysNotNull
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object ItemAbilityCooldown {
 
-    private val config get() = SkyHanniMod.feature.inventory.itemAbilities
+    private val config get() = HanniMod.feature.inventory.itemAbilities
 
     private val patternGroup = RepoPattern.group("item.abilities.cooldown")
     private val youAlignedOthersPattern by patternGroup.pattern(
@@ -310,7 +310,7 @@ object ItemAbilityCooldown {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (!isEnabled()) return
 
         checkHotBar(event.isMod(10))
@@ -418,7 +418,7 @@ object ItemAbilityCooldown {
 
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message

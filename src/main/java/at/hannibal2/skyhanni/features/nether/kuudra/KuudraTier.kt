@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.features.nether.kuudra
+package at.hannibal2.hanni.features.nether.kuudra
 
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
+import at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest.QuestState
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
 enum class KuudraTier(val displayName: String) {
     BASIC("Basic"),
@@ -33,7 +33,7 @@ enum class KuudraTier(val displayName: String) {
 
     fun getTieredDisplayName() = "Tier $intTierNumber ($displayName)"
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
         private val patternGroup = RepoPattern.group("crimson.kuudra")
 

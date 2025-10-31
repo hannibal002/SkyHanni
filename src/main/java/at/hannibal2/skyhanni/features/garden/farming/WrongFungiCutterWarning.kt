@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.hanni.features.garden.farming
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFungiCutterMode
-import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ClickType
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.garden.GardenToolChangeEvent
+import at.hannibal2.hanni.events.garden.farming.CropClickEvent
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getFungiCutterMode
+import at.hannibal2.hanni.utils.SoundUtils
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object WrongFungiCutterWarning {
 
     private var mode = FungiMode.UNKNOWN
     private var lastPlaySoundTime = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         val message = event.message
         if (message == "§eFungi Cutter Mode: §r§cRed Mushrooms") {
             mode = FungiMode.RED

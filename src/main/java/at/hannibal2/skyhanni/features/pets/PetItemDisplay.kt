@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.features.pets
+package at.hannibal2.hanni.features.pets
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderItemEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHeldPetItem
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiRenderItemEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RenderUtils.drawSlotText
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getHeldPetItem
 import net.minecraft.client.Minecraft
 
-@SkyHanniModule
+@HanniModule
 object PetItemDisplay {
 
-    private val config get() = SkyHanniMod.feature.misc.pets
+    private val config get() = HanniMod.feature.misc.pets
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {

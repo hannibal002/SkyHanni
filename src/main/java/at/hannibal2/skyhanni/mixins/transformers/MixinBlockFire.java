@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.SkyHanniMod;
-import at.hannibal2.skyhanni.features.misc.ParticleHider;
+import at.hannibal2.hanni.HanniMod;
+import at.hannibal2.hanni.features.misc.ParticleHider;
 import net.minecraft.block.BlockFire;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;

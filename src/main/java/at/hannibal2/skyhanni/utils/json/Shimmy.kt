@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils.json
+package at.hannibal2.hanni.utils.json
 
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.utils.ReflectionUtils.makeAccessible
 import com.google.gson.JsonElement
 import io.github.notenoughupdates.moulconfig.observer.Property
 import java.lang.reflect.Field

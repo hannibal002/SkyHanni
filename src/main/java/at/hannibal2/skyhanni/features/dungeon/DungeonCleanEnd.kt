@@ -1,30 +1,30 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.hanni.features.dungeon
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.events.DamageIndicatorFinalBossEvent
+import at.hannibal2.hanni.events.PlaySoundEvent
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.MinecraftCompat.isLocalPlayer
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityGuardian
 
-@SkyHanniModule
+@HanniModule
 object DungeonCleanEnd {
 
-    private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
+    private val config get() = HanniMod.feature.dungeon.cleanEnd
 
     /**
      * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor III
@@ -41,7 +41,7 @@ object DungeonCleanEnd {
     private var lastBossId: Int = -1
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!config.enabled) return
 
         val message = event.message

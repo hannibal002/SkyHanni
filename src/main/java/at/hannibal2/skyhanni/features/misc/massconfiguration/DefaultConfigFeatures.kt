@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.features.misc.massconfiguration
+package at.hannibal2.hanni.features.misc.massconfiguration
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
-import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigFileType
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierUtils
+import at.hannibal2.hanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.hanni.features.misc.update.ChangelogViewer
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 
-@SkyHanniModule
+@HanniModule
 object DefaultConfigFeatures {
 
     private var didNotifyOnce = false
@@ -23,40 +23,40 @@ object DefaultConfigFeatures {
         if (didNotifyOnce) return
         didNotifyOnce = true
 
-        val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
-        val updated = SkyHanniMod.VERSION !in knownToggles
+        val knownToggles = HanniMod.knownFeaturesData.knownFeatures
+        val updated = HanniMod.VERSION !in knownToggles
         val processor = FeatureToggleProcessor()
         val driver = ConfigProcessorDriver(processor)
         driver.warnForPrivateFields = false
-        driver.processConfig(SkyHanniMod.feature)
-        knownToggles[SkyHanniMod.VERSION] = processor.allOptions.map { it.path }
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.KNOWN_FEATURES, "Updated known feature flags")
-        if (!SkyHanniMod.feature.storage.hasPlayedBefore) {
-            SkyHanniMod.feature.storage.hasPlayedBefore = true
+        driver.processConfig(HanniMod.feature)
+        knownToggles[HanniMod.VERSION] = processor.allOptions.map { it.path }
+        HanniMod.configManager.saveConfig(ConfigFileType.KNOWN_FEATURES, "Updated known feature flags")
+        if (!HanniMod.feature.storage.hasPlayedBefore) {
+            HanniMod.feature.storage.hasPlayedBefore = true
             ChatUtils.clickableChat(
-                "Looks like this is the first time you are using SkyHanni. " +
+                "Looks like this is the first time you are using Hanni. " +
                     "Click here to configure default options, or run /shdefaultoptions.",
                 onClick = { onCommand("null", "null") },
                 "§eClick to run /shdefaultoptions!",
             )
         } else if (updated) {
-            val lastVersion = knownToggles.keys.lastOrNull { it != SkyHanniMod.VERSION }
-                ?: ErrorManager.skyHanniError(
+            val lastVersion = knownToggles.keys.lastOrNull { it != HanniMod.VERSION }
+                ?: ErrorManager.hanniError(
                     "lastVersion is null, this should never happen",
                     "knownToggles" to knownToggles,
-                    "version" to SkyHanniMod.VERSION,
+                    "version" to HanniMod.VERSION,
                 )
-            val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}"
-            ChatUtils.chat("Looks like you updated SkyHanni.")
+            val command = "/shdefaultoptions $lastVersion ${HanniMod.VERSION}"
+            ChatUtils.chat("Looks like you updated Hanni.")
             ChatUtils.clickableChat(
                 "Click here to configure the newly introduced options, or run $command.",
-                onClick = { onCommand(lastVersion, SkyHanniMod.VERSION) },
-                "§eClick to run /shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}!",
+                onClick = { onCommand(lastVersion, HanniMod.VERSION) },
+                "§eClick to run /shdefaultoptions $lastVersion ${HanniMod.VERSION}!",
             )
             ChatUtils.clickableChat(
                 "Click here to see the changelog.",
                 onClick = {
-                    ChangelogViewer.showChangelog(lastVersion, SkyHanniMod.VERSION)
+                    ChangelogViewer.showChangelog(lastVersion, HanniMod.VERSION)
                 },
             )
         }
@@ -66,9 +66,9 @@ object DefaultConfigFeatures {
         val processor = FeatureToggleProcessor()
         val driver = ConfigProcessorDriver(processor)
         driver.warnForPrivateFields = false
-        driver.processConfig(SkyHanniMod.feature)
+        driver.processConfig(HanniMod.feature)
         var optionList = processor.orderedOptions
-        val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
+        val knownToggles = HanniMod.knownFeaturesData.knownFeatures
         val togglesInNewVersion = knownToggles[new]
         if (new != "null" && togglesInNewVersion == null) {
             ChatUtils.chat("Unknown version $new")
@@ -91,7 +91,7 @@ object DefaultConfigFeatures {
             ChatUtils.chat("There are no new options to configure between $old and $new")
             return
         }
-        SkyHanniMod.screenToOpen = DefaultConfigOptionGui(optionList, old, new)
+        HanniMod.screenToOpen = DefaultConfigOptionGui(optionList, old, new)
     }
 
     fun applyCategorySelections(
@@ -113,7 +113,7 @@ object DefaultConfigFeatures {
         }
     }
 
-    private val autocomplete get() = SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null")
+    private val autocomplete get() = HanniMod.knownFeaturesData.knownFeatures.keys + listOf("null")
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

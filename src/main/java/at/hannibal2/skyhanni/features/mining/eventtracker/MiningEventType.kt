@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.features.mining.eventtracker
+package at.hannibal2.hanni.features.mining.eventtracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.DyeCompat
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.ItemUtils.overrideId
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.SkullTextureHolder
+import at.hannibal2.hanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.DyeCompat
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.Renderable.Companion.darken
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration
@@ -168,7 +168,7 @@ enum class MiningEventType(
     fun getRenderableAsPast(): Renderable = getRenderable().darken(0.4f)
 
     companion object {
-        private val config get() = SkyHanniMod.feature.mining.miningEvent
+        private val config get() = HanniMod.feature.mining.miningEvent
 
         // Because we don't want to hard-code the goblin texture, this gets called by SkullTextureHolder when the repository is loaded
         fun fixGoblinItemStack() {

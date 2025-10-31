@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.json
+package at.hannibal2.hanni.utils.json
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.hanni.HanniMod
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter
 import com.google.gson.TypeAdapterFactory
@@ -30,7 +30,7 @@ object SkippingTypeAdapterFactory : TypeAdapterFactory {
                 parent.read(reader)
             } catch (e: Exception) {
                 // TODO include path and value found (as string)
-                SkyHanniMod.logger.warn("Failed to read value from JSON, skipping", e)
+                HanniMod.logger.warn("Failed to read value from JSON, skipping", e)
                 if (!reader.hasNext()) return null
                 // reader skip value seems to have an infinite loop if you dont have another element
                 reader.skipValue()

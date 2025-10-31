@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.shader
+package at.hannibal2.hanni.shader
 
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.shader.Shader
-import at.hannibal2.skyhanni.utils.shader.Uniform
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.shader.Shader
+import at.hannibal2.hanni.utils.shader.Uniform
 //#if MC > 1.21
 //$$ import java.nio.FloatBuffer
 //$$ import org.joml.Matrix4f

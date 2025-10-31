@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.detektrules.imports
+package at.hannibal2.hanni.detektrules.imports
 
-import at.hannibal2.skyhanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import at.hannibal2.hanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
+import at.hannibal2.hanni.detektrules.HanniRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.com.intellij.psi.PsiComment
 import org.jetbrains.kotlin.com.intellij.psi.PsiWhiteSpace
 import org.jetbrains.kotlin.psi.KtImportList
 
-class PreprocessingImportOrdering(config: Config) : SkyHanniRule(config) {
+class PreprocessingImportOrdering(config: Config) : HanniRule(config) {
     override val issue = Issue(
         "PreprocessingImportOrdering",
         Severity.Style,

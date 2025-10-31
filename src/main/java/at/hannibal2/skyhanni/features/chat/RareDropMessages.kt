@@ -1,33 +1,33 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
-import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
-import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.isVowel
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.ItemAddManager
+import at.hannibal2.hanni.events.ItemAddEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.misc.UserLuckBreakdown
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ChatUtils.chatMessage
+import at.hannibal2.hanni.utils.ChatUtils.passedSinceSent
+import at.hannibal2.hanni.utils.ItemCategory
+import at.hannibal2.hanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.hanni.utils.ItemUtils.repoItemName
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.RegexUtils.matchMatchers
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.isVowel
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object RareDropMessages {
 
     private val repoGroup = RepoPattern.group("raredrop")
@@ -109,10 +109,10 @@ object RareDropMessages {
 
     private val userLuck get() = UserLuckBreakdown.getTotalUserLuck()
 
-    private val config get() = SkyHanniMod.feature.chat.rareDropMessages
+    private val config get() = HanniMod.feature.chat.rareDropMessages
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!config.petRarity) return
 
         petPatterns.matchMatchers(event.message) {
@@ -161,11 +161,11 @@ object RareDropMessages {
         // Hypixel send Slayer Book messages late, so we do a manual internalName Regex Match
         if (!anyRecentMessage && config.enchantedBookMissingMessage && !slayerBookIDPattern.matches(internalName.asString())) {
             var message = "§r§6§lRARE DROP! ${internalName.repoItemName}"
-            if (SkyHanniMod.feature.misc.userLuck) {
+            if (HanniMod.feature.misc.userLuck) {
                 userLuck.takeIf { it != 0f }?.let { luck ->
                     var luckString = luck.roundTo(2).addSeparators()
                     if (luck > 0) luckString = "+$luckString"
-                    message += " §a($luckString ✴ SkyHanni User Luck)"
+                    message += " §a($luckString ✴ Hanni User Luck)"
                 }
             }
             ChatUtils.chat(message, prefix = false)

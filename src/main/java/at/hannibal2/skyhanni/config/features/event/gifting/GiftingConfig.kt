@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.event.gifting
+package at.hannibal2.hanni.config.features.event.gifting
 
-import at.hannibal2.skyhanni.config.features.event.winter.GiftingOpportunitiesConfig
-import at.hannibal2.skyhanni.config.features.event.winter.UniqueGiftConfig
+import at.hannibal2.hanni.config.features.event.winter.GiftingOpportunitiesConfig
+import at.hannibal2.hanni.config.features.event.winter.UniqueGiftConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption

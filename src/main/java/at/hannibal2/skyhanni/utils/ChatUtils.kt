@@ -1,30 +1,30 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
-import at.hannibal2.skyhanni.data.ChatManager.editChatLine
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ChatManager.deleteChatLine
+import at.hannibal2.hanni.data.ChatManager.editChatLine
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.mixins.hooks.ChatLineData
 //#if MC < 1.21
-import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
+import at.hannibal2.hanni.mixins.transformers.AccessorMixinGuiNewChat
 //#endif
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
-import at.hannibal2.skyhanni.utils.chat.TextHelper.prefix
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
-import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.compat.url
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ConfigUtils.jumpToEditor
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.hanni.utils.TimeUtils.ticks
+import at.hannibal2.hanni.utils.chat.TextHelper
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.onClick
+import at.hannibal2.hanni.utils.chat.TextHelper.prefix
+import at.hannibal2.hanni.utils.chat.TextHelper.send
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.addChatMessageToChat
+import at.hannibal2.hanni.utils.compat.command
+import at.hannibal2.hanni.utils.compat.hover
+import at.hannibal2.hanni.utils.compat.url
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.IChatComponent
@@ -34,16 +34,16 @@ import kotlin.reflect.KProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
-@SkyHanniModule
+@HanniModule
 object ChatUtils {
 
     // TODO log based on chat category (error, warning, debug, user error, normal)
     private val log = LorenzLogger("chat/mod_sent")
     var lastButtonClicked = 0L
 
-    private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
-    private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
-    private const val CHAT_PREFIX = "[SkyHanni] "
+    private const val DEBUG_PREFIX = "[Hanni Debug] §7"
+    private const val USER_ERROR_PREFIX = "§c[Hanni] "
+    private const val CHAT_PREFIX = "[Hanni] "
 
     /**
      * Sends a debug message to the chat and the console.
@@ -272,15 +272,15 @@ object ChatUtils {
 
     //#if MC < 1.21
     var chatLines: MutableList<ChatLine>
-        get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
+        get() = (chatGui as AccessorMixinGuiNewChat).chatLines_hanni
         set(value) {
-            (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni = value
+            (chatGui as AccessorMixinGuiNewChat).chatLines_hanni = value
         }
 
     var drawnChatLines: MutableList<ChatLine>
-        get() = (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni
+        get() = (chatGui as AccessorMixinGuiNewChat).drawnChatLines_hanni
         set(value) {
-            (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
+            (chatGui as AccessorMixinGuiNewChat).drawnChatLines_hanni = value
         }
     //#else
     //$$ var chatLines: MutableList<ChatHudLine>
@@ -327,7 +327,7 @@ object ChatUtils {
     private var deleteNext: Pair<String, (String) -> Boolean>? = null
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         val (reason, predicate) = deleteNext ?: return
         this.deleteNext = null
 
@@ -338,7 +338,7 @@ object ChatUtils {
 
     @HandleEvent
     fun onSendMessage(event: MessageSendToServerEvent) {
-        if (event.senderIsSkyhanni()) return
+        if (event.senderIsHanni()) return
         lastMessageSent = SimpleTimeMark.now()
     }
 
@@ -384,7 +384,7 @@ object ChatUtils {
     fun MessageSendToServerEvent.isCommand(commandsWithSlash: Collection<String>) =
         splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
 
-    fun MessageSendToServerEvent.senderIsSkyhanni() = originatingModContainer?.id == "skyhanni"
+    fun MessageSendToServerEvent.senderIsHanni() = originatingModContainer?.id == "hanni"
 
     fun MessageSendToServerEvent.eventWithNewMessage(message: String) =
         MessageSendToServerEvent(message, message.split(" "), this.originatingModContainer)
@@ -404,7 +404,7 @@ object ChatUtils {
         action: () -> Unit,
         oneTimeClick: Boolean = false,
     ) {
-        val hint = if (SkyHanniMod.feature.chat.hideClickableHint) "" else
+        val hint = if (HanniMod.feature.chat.hideClickableHint) "" else
             "\n§e[CLICK to $actionName or disable this feature]"
         clickableChat(
             "$message$hint",
@@ -422,9 +422,9 @@ object ChatUtils {
     }
 
     var ChatLine.fullComponent: IChatComponent
-        get() = (this as ChatLineData).skyHanni_fullComponent
+        get() = (this as ChatLineData).hanni_fullComponent
         set(value) {
-            (this as ChatLineData).skyHanni_fullComponent = value
+            (this as ChatLineData).hanni_fullComponent = value
         }
 
     //#if MC < 1.16
@@ -439,7 +439,7 @@ object ChatUtils {
     //#endif
 
     fun consoleLog(text: String) {
-        SkyHanniMod.consoleLog(text)
+        HanniMod.consoleLog(text)
     }
 
 }

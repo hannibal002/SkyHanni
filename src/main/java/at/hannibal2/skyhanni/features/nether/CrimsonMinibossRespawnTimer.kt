@@ -1,40 +1,40 @@
-package at.hannibal2.skyhanni.features.nether
+package at.hannibal2.hanni.features.nether
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawned
-import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawningSoon
-import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isTimerKnown
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.isInside
-import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.mob.MobData
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawned
+import at.hannibal2.hanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawningSoon
+import at.hannibal2.hanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isTimerKnown
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.LocationUtils.isInside
+import at.hannibal2.hanni.utils.LocationUtils.isPlayerInside
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.toLorenzVec
 import net.minecraft.tileentity.TileEntityBeacon
 import net.minecraft.util.AxisAlignedBB
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object CrimsonMinibossRespawnTimer {
 
-    private val config get() = SkyHanniMod.feature.crimsonIsle
+    private val config get() = HanniMod.feature.crimsonIsle
 
     private val patternGroup = RepoPattern.group("crimson.miniboss")
 
@@ -59,7 +59,7 @@ object CrimsonMinibossRespawnTimer {
     private var display: Renderable? = null
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message
         downPattern.matchMatcher(message) {

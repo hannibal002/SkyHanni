@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.json.toJsonArray
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.SoundUtils.playSound
+import at.hannibal2.hanni.utils.json.toJsonArray
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 
-@SkyHanniModule
+@HanniModule
 object ChatSoundResponse {
 
-    private val config get() = SkyHanniMod.feature.chat.soundResponse
+    private val config get() = HanniMod.feature.chat.soundResponse
 
     init {
         SoundResponseTypes.entries.forEach { it.pattern }
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
 
         for (soundType in SoundResponseTypes.entries) {

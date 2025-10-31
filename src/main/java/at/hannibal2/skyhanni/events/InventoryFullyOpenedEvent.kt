@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.data.OtherInventoryData
-import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.utils.PrimitiveItemStack
-import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.data.OtherInventoryData
+import at.hannibal2.hanni.hannimodule.PrimaryFunction
+import at.hannibal2.hanni.utils.PrimitiveItemStack
+import at.hannibal2.hanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
+import at.hannibal2.hanni.utils.compat.InventoryCompat.isNotEmpty
 import net.minecraft.item.ItemStack
 
-open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : SkyHanniEvent() {
+open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : HanniEvent() {
 
     val inventoryId: Int get() = inventory.windowId
     val inventoryName: String get() = inventory.title

@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.slayer.enderman
+package at.hannibal2.hanni.features.slayer.enderman
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.getLorenzVec
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.util.EnumParticleTypes
 
-@SkyHanniModule
+@HanniModule
 object EndermanSlayerHideParticles {
 
     private var endermanLocations = listOf<LorenzVec>()

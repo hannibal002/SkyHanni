@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
 /**
  * This object holds all the methods of RenderSystem (GlStateManager), as time goes on they will be implemented but for

@@ -1,34 +1,34 @@
-package at.hannibal2.skyhanni.features.misc.limbo
+package at.hannibal2.hanni.features.misc.limbo
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.LocationUtils.isPlayerInside
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.RenderUtils.renderString
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
 import net.minecraft.util.AxisAlignedBB
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-@SkyHanniModule
+@HanniModule
 object LimboTimeTracker {
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = HanniMod.feature.misc
 
     private var limboJoinTime = SimpleTimeMark.farPast()
     var inLimbo = false
@@ -43,7 +43,7 @@ object LimboTimeTracker {
     private val bedWarsLobbyLimbo = AxisAlignedBB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
@@ -122,9 +122,9 @@ object LimboTimeTracker {
         } else ChatUtils.chat("§fYou were in Limbo for §e$duration§f.")
         if (userLuck > oldLuck) {
             if (onFire) {
-                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.roundTo(2)}§c✴ §aSkyHanni User Luck§f! ")
+                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.roundTo(2)}§c✴ §aHanni User Luck§f! ")
             } else {
-                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.roundTo(2)}✴ SkyHanni User Luck§f!")
+                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.roundTo(2)}✴ Hanni User Luck§f!")
             }
             storage?.userLuck = userLuck
         }
@@ -154,7 +154,7 @@ object LimboTimeTracker {
             var luckString = tryTruncateFloat(userLuck.roundTo(2))
             if (userLuck > 0) luckString = "+$luckString"
             var firstMessage =
-                "§fYour current PB is §e${limboPB.seconds}§f, granting you §a$luckString✴ SkyHanni User Luck§f!"
+                "§fYour current PB is §e${limboPB.seconds}§f, granting you §a$luckString✴ Hanni User Luck§f!"
             val secondMessage = "§fYou have §e${playtime.seconds} §fof playtime!"
             if (userLuck == Float.POSITIVE_INFINITY || userLuck == Float.NEGATIVE_INFINITY) {
                 firstMessage = "$firstMessage §Zwhat"
@@ -190,7 +190,7 @@ object LimboTimeTracker {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shlimbostats") {
-            description = "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!"
+            description = "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aHanni User Luck§7!"
             category = CommandCategory.USERS_ACTIVE
             simpleCallback { printStats() }
         }

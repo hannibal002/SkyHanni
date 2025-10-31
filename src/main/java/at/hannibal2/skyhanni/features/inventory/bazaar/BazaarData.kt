@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.inventory.bazaar
+package at.hannibal2.hanni.features.inventory.bazaar
 
-import at.hannibal2.skyhanni.data.bazaar.BazaarProduct
+import at.hannibal2.hanni.data.bazaar.BazaarProduct
 
 data class BazaarData(
     val displayName: String,

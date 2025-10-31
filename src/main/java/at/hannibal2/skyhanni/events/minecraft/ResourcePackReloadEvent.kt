@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.events.minecraft
+package at.hannibal2.hanni.events.minecraft
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.json.fromJson
 import com.google.gson.JsonSyntaxException
 import net.minecraft.client.resources.IResourceManager
 import net.minecraft.util.ResourceLocation
@@ -15,7 +15,7 @@ import java.io.IOException
 
 class ResourcePackReloadEvent(
     val resourceManager: IResourceManager,
-) : SkyHanniEvent() {
+) : HanniEvent() {
     inline fun <reified T : Any> getJsonResource(location: ResourceLocation): T? {
         return try {
             val packOverridesStream = resourceManager.getResource(location)

@@ -23,7 +23,7 @@ registerInspection(CopyConfigPathIntention())
 class CopyConfigPathIntention : AbstractKotlinInspection() {
     override fun getDisplayName() = "Copy config path for a ConfigOption property"
     override fun getShortName() = "CopyConfigPath"
-    override fun getGroupDisplayName() = "SkyHanni"
+    override fun getGroupDisplayName() = "Hanni"
     override fun isEnabledByDefault() = true
 
     override fun buildVisitor(

@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.config.features.event
+package at.hannibal2.hanni.config.features.event
 
-import at.hannibal2.skyhanni.config.features.event.bingo.BingoConfig
-import at.hannibal2.skyhanni.config.features.event.carnival.CarnivalConfig
-import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig
-import at.hannibal2.skyhanni.config.features.event.gifting.GiftingConfig
-import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
-import at.hannibal2.skyhanni.config.features.event.waypoints.LobbyWaypointsConfig
-import at.hannibal2.skyhanni.config.features.event.winter.WinterConfig
-import at.hannibal2.skyhanni.config.features.event.yearofthepig.YearOfThePigConfig
+import at.hannibal2.hanni.config.features.event.bingo.BingoConfig
+import at.hannibal2.hanni.config.features.event.carnival.CarnivalConfig
+import at.hannibal2.hanni.config.features.event.diana.DianaConfig
+import at.hannibal2.hanni.config.features.event.gifting.GiftingConfig
+import at.hannibal2.hanni.config.features.event.hoppity.HoppityEggsConfig
+import at.hannibal2.hanni.config.features.event.waypoints.LobbyWaypointsConfig
+import at.hannibal2.hanni.config.features.event.winter.WinterConfig
+import at.hannibal2.hanni.config.features.event.yearofthepig.YearOfThePigConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category

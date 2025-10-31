@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.utils.shader
+package at.hannibal2.hanni.utils.shader
 
-import at.hannibal2.skyhanni.features.chroma.StandardChromaShader
-import at.hannibal2.skyhanni.features.chroma.TexturedChromaShader
-import at.hannibal2.skyhanni.features.misc.DarkenShader
-import at.hannibal2.skyhanni.shader.CircleShader
-import at.hannibal2.skyhanni.shader.RadialGradientCircleShader
-import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
-import at.hannibal2.skyhanni.shader.RoundedRectangleShader
-import at.hannibal2.skyhanni.shader.RoundedTextureShader
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
+import at.hannibal2.hanni.features.chroma.StandardChromaShader
+import at.hannibal2.hanni.features.chroma.TexturedChromaShader
+import at.hannibal2.hanni.features.misc.DarkenShader
+import at.hannibal2.hanni.shader.CircleShader
+import at.hannibal2.hanni.shader.RadialGradientCircleShader
+import at.hannibal2.hanni.shader.RoundedRectangleOutlineShader
+import at.hannibal2.hanni.shader.RoundedRectangleShader
+import at.hannibal2.hanni.shader.RoundedTextureShader
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.createResourceLocation
 import net.minecraft.client.Minecraft
 import org.apache.commons.lang3.StringUtils
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
 /**
- * Object to handle shaders for SkyHanni
+ * Object to handle shaders for Hanni
  */
 object ShaderManager {
 
@@ -64,7 +64,7 @@ object ShaderManager {
     }
 
     fun loadShader(type: ShaderType, fileName: String): Int {
-        val resourceLocation = createResourceLocation("skyhanni:shaders/$fileName${type.extension}")
+        val resourceLocation = createResourceLocation("hanni:shaders/$fileName${type.extension}")
 
         val source = StringBuilder()
 

@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.features.combat
+package at.hannibal2.hanni.features.combat
 
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.ScoreboardData
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RegexUtils.anyMatches
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object SpidersDenApi {
 
     private val patternGroup = RepoPattern.group("combat.spidersden")

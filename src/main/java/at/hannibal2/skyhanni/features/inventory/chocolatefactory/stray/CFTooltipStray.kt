@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
+package at.hannibal2.hanni.features.inventory.chocolatefactory.stray
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NumberUtil.formatLong
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.TimeUtils.format
 
-@SkyHanniModule
+@HanniModule
 object CFTooltipStray {
     private val config get() = CFApi.config
 

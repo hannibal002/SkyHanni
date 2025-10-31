@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.features.foraging
+package at.hannibal2.hanni.features.foraging
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.entity.decoration.DisplayEntity
 
-@SkyHanniModule
+@HanniModule
 object ClearTreeLogs {
 
     private val treeBlocks = buildList<BlockState> {
@@ -22,7 +22,7 @@ object ClearTreeLogs {
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onRender(event: CheckRenderEntityEvent<DisplayEntity.BlockDisplayEntity>) {
-        if (!SkyHanniMod.feature.foraging.trees.cleanView) return
+        if (!HanniMod.feature.foraging.trees.cleanView) return
         val block = event.entity.blockState
         if (block in treeBlocks) event.cancel()
     }

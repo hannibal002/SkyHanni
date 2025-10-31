@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard
+package at.hannibal2.hanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
-import at.hannibal2.skyhanni.data.BitsApi
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.MiningApi
-import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.features.bingo.BingoApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.hanni.config.features.gui.customscoreboard.DisplayConfig
+import at.hannibal2.hanni.data.BitsApi
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.MiningApi
+import at.hannibal2.hanni.data.ScoreboardData
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.features.bingo.BingoApi
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatDouble
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchGroup
+import at.hannibal2.hanni.utils.StringUtils.removeResets
+import at.hannibal2.hanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.hanni.utils.TimeUtils
 import java.util.regex.Pattern
 
 @Suppress("TooManyFunctions")

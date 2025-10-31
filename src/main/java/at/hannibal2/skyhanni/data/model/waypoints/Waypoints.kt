@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.model.waypoints
+package at.hannibal2.hanni.data.model.waypoints
 
 import com.google.gson.annotations.Expose
 

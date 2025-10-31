@@ -1,35 +1,35 @@
-package at.hannibal2.skyhanni.features.garden.farming.lane
+package at.hannibal2.hanni.features.garden.farming.lane
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.title.TitleContext
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.garden.farming.FarmingLaneSwitchEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneApi.getValue
-import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneApi.setValue
-import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.title.TitleContext
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.garden.GardenToolChangeEvent
+import at.hannibal2.hanni.events.garden.farming.FarmingLaneSwitchEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.features.garden.farming.lane.FarmingLaneApi.getValue
+import at.hannibal2.hanni.features.garden.farming.lane.FarmingLaneApi.setValue
+import at.hannibal2.hanni.features.misc.MovementSpeedDisplay
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.RenderUtils.renderStrings
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.SoundUtils.playSound
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.TimeUtils.ticks
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object FarmingLaneFeatures {
     val config get() = FarmingLaneApi.config
 
@@ -198,7 +198,7 @@ object FarmingLaneFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!config.cornerWaypoints) return
 
         val lane = FarmingLaneApi.currentLane ?: return

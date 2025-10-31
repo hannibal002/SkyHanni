@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.utils.navigation
+package at.hannibal2.hanni.utils.navigation
 
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.data.model.GraphNode
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.GraphUtils
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SkyBlockUtils
 
 object NavigationUtils {
 
@@ -14,7 +14,7 @@ object NavigationUtils {
         val output = calculateTravelingSalesman(input, maxIterations, neighborhoodSize)
 
         if (input.size != output.size) {
-            ErrorManager.skyHanniError(
+            ErrorManager.hanniError(
                 "calculateTravelingSalesman could not reach all goals",
                 "input" to input.size,
                 "output" to output.size,

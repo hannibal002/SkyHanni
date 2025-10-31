@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.detektrules
+package at.hannibal2.hanni.detektrules
 
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression

@@ -1,36 +1,36 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.hanni.features.mining
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
-import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ParkourHelper
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.jsonobjects.repo.ParkourJson
+import at.hannibal2.hanni.data.repo.HanniRepoManager
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.ParkourHelper
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.init.Items
 
-@SkyHanniModule
+@HanniModule
 object DeepCavernsGuide {
 
-    private val config get() = SkyHanniMod.feature.mining.deepCavernsGuide
+    private val config get() = HanniMod.feature.mining.deepCavernsGuide
 
     private var parkourHelper: ParkourHelper? = null
     private var show = false
@@ -40,7 +40,7 @@ object DeepCavernsGuide {
         ItemUtils.createItemStack(
             Items.map,
             "§bDeep Caverns Guide",
-            "§8(From SkyHanni)",
+            "§8(From Hanni)",
             "",
             "§7Manually enable the ",
             "§7guide to the bottom",
@@ -92,7 +92,7 @@ object DeepCavernsGuide {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
         if (SkyBlockUtils.graphArea != "Gunpowder Mines") return
         if (notUnlockedPattern.matches(event.message)) {
@@ -124,9 +124,9 @@ object DeepCavernsGuide {
         if (parkourHelper == null) {
             // TODO add generic repo outdated error logic here
             ChatUtils.clickableChat(
-                "DeepCavernsParkour missing in SkyHanni Repo! Try /shupdaterepo to fix it!",
+                "DeepCavernsParkour missing in Hanni Repo! Try /shupdaterepo to fix it!",
                 onClick = {
-                    SkyHanniRepoManager.updateRepo("click on chat after deep caverns parkour error")
+                    HanniRepoManager.updateRepo("click on chat after deep caverns parkour error")
                 },
                 "§eClick to update the repo!",
                 prefixColor = "§c",
@@ -161,7 +161,7 @@ object DeepCavernsGuide {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!show) return
 

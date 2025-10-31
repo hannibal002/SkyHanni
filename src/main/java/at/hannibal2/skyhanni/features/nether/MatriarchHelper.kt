@@ -1,37 +1,37 @@
-package at.hannibal2.skyhanni.features.nether
+package at.hannibal2.hanni.features.nether
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
-import at.hannibal2.skyhanni.utils.render.LineDrawer
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandGraphs
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.data.model.GraphNode
+import at.hannibal2.hanni.events.IslandGraphReloadEvent
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.GraphUtils
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.navigation.NavigationUtils
+import at.hannibal2.hanni.utils.render.LineDrawer
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.expandBlock
 import java.util.TreeSet
 
-@SkyHanniModule
+@HanniModule
 object MatriarchHelper {
 
-    private val config get() = SkyHanniMod.feature.crimsonIsle.matriarchHelper
+    private val config get() = HanniMod.feature.crimsonIsle.matriarchHelper
 
     private val pearlList = TreeSet<Pair<Mob, GraphNode>> { first, second ->
         first.first.baseEntity.getLorenzVec().y.compareTo(second.first.baseEntity.getLorenzVec().y)
@@ -100,7 +100,7 @@ object MatriarchHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (SkyBlockUtils.graphArea != AREA_NAME) return
         path.clear()
         path.addAll(accessPearls())
@@ -121,7 +121,7 @@ object MatriarchHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.highlight) {
             val color = config.highlightColor

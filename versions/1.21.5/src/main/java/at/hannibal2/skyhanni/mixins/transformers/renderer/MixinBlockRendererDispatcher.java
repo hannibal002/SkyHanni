@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.hanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.mixins.hooks.BlockRendererDispatcherHookKt;
+import at.hannibal2.hanni.mixins.hooks.BlockRendererDispatcherHookKt;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.model.BlockStateModel;

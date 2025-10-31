@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.api.event.CancellableHanniEvent
+import at.hannibal2.hanni.utils.LorenzVec
 
 /**
  * This class is a placeholder for world-related events.
  */
-abstract class CancellableWorldEvent : CancellableSkyHanniEvent() {
+abstract class CancellableWorldEvent : CancellableHanniEvent() {
     abstract val location: LorenzVec
 }

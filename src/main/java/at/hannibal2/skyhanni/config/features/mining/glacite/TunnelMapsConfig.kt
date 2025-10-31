@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.mining.glacite
+package at.hannibal2.hanni.config.features.mining.glacite
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -47,7 +47,7 @@ class TunnelMapsConfig {
     @Expose
     @ConfigOption(
         name = "Travel Scroll",
-        desc = "Let SkyHanni know that you have unlocked the §eTravel Scroll to Dwarven Base Camp§7."
+        desc = "Let Hanni know that you have unlocked the §eTravel Scroll to Dwarven Base Camp§7."
     )
     @ConfigEditorBoolean
     var travelScroll: Boolean = false

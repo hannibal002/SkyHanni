@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
+package at.hannibal2.hanni.features.garden.fortuneguide.pages
 
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFInfos
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFTypes
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.TimeUnit
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.guide.GuideTablePage
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.features.garden.fortuneguide.FFInfos
+import at.hannibal2.hanni.features.garden.fortuneguide.FFStats
+import at.hannibal2.hanni.features.garden.fortuneguide.FFTypes
+import at.hannibal2.hanni.features.garden.fortuneguide.FarmingItemType
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.TimeUnit
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.guide.GuideTablePage
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 
 class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7, footerSpacing: Int = 6) : GuideTablePage(
     sizeX, sizeY, paddingX, paddingY, footerSpacing,

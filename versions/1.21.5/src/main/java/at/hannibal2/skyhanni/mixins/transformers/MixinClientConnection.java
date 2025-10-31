@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent;
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent;
+import at.hannibal2.hanni.events.minecraft.packet.PacketReceivedEvent;
+import at.hannibal2.hanni.events.minecraft.packet.PacketSentEvent;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;

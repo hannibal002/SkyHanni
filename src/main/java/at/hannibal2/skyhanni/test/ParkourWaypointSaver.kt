@@ -1,30 +1,30 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.ParkourHelper
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.LorenzVec.Companion.toLorenzVec
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.ParkourHelper
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object ParkourWaypointSaver {
 
-    private val config get() = SkyHanniMod.feature.dev.waypoint
+    private val config get() = HanniMod.feature.dev.waypoint
     private var timeLastSaved = SimpleTimeMark.farPast()
     private var locations = mutableListOf<LorenzVec>()
     private var parkourHelper: ParkourHelper? = null
@@ -35,7 +35,7 @@ object ParkourWaypointSaver {
         if (!SkyBlockUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NeuItems.neuHasFocus()) return
-        if (SkyHanniMod.feature.dev.devTool.graph.enabled) return
+        if (HanniMod.feature.dev.devTool.graph.enabled) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
         when (event.keyCode) {
@@ -68,7 +68,7 @@ object ParkourWaypointSaver {
      */
 
     private fun loadClipboard() {
-        SkyHanniMod.launchCoroutine("parkour waypoint load clipboard") {
+        HanniMod.launchCoroutine("parkour waypoint load clipboard") {
             val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
             try {
                 locations = clipboard.split("\n").map { line ->
@@ -107,7 +107,7 @@ object ParkourWaypointSaver {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         @Suppress("InSkyBlockEarlyReturn")
         if (!SkyBlockUtils.inSkyBlock && !config.parkourOutsideSB) return
 

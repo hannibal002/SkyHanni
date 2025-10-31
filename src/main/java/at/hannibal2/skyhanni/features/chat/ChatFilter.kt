@@ -1,33 +1,33 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.pests.PestApi
-import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.features.garden.pests.PestApi
+import at.hannibal2.hanni.features.gifting.GiftProfitTracker
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RegexUtils.groupOrEmpty
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import java.util.regex.Pattern
 
-@SkyHanniModule
+@HanniModule
 object ChatFilter {
 
-    private val generalConfig get() = SkyHanniMod.feature.chat
-    private val config get() = SkyHanniMod.feature.chat.filterType
-    private val dungeonConfig get() = SkyHanniMod.feature.dungeon.messageFilter
+    private val generalConfig get() = HanniMod.feature.chat
+    private val config get() = HanniMod.feature.chat.filterType
+    private val dungeonConfig get() = HanniMod.feature.dungeon.messageFilter
     private val foragingConfig get() = config.foraging
     private val huntingConfig get() = config.hunting
 
@@ -566,7 +566,7 @@ object ChatFilter {
     // </editor-fold>
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         var blockReason = block(event.message)
         if (blockReason == null && config.powderMining.enabled) blockReason = powderMiningBlock(event)
         if (blockReason == null && config.crystalNucleus.enabled) blockReason = crystalNucleusBlock(event)
@@ -627,7 +627,7 @@ object ChatFilter {
      * @return Block reason if applicable
      * @see block
      */
-    private fun powderMiningBlock(event: SkyHanniChatEvent): String? {
+    private fun powderMiningBlock(event: HanniChatEvent): String? {
         val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
         if (powderMiningMatchResult == "no_filter") {
             genericMiningRewardMessage.matchMatcher(event.message) {
@@ -649,7 +649,7 @@ object ChatFilter {
      * @return Block reason if applicable
      * @see block
      */
-    private fun crystalNucleusBlock(event: SkyHanniChatEvent): String? {
+    private fun crystalNucleusBlock(event: HanniChatEvent): String? {
         val (blockCode, newMessage) = CrystalNucleusChatFilter.block(event.message)?.getPair() ?: Pair(null, null)
         newMessage?.let { event.chatComponent = it.asComponent() }
         blockCode?.let { return it }

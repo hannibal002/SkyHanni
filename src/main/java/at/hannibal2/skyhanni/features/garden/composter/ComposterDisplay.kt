@@ -1,34 +1,34 @@
-package at.hannibal2.skyhanni.features.garden.composter
+package at.hannibal2.hanni.features.garden.composter
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.addLine
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.enums.OutsideSBFeature
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.WidgetUpdateEvent
+import at.hannibal2.hanni.features.fame.ReminderUtils
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.AutoUpdatingItemStack
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addNotNull
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.addLine
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -36,7 +36,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Showing the composter data while outside the inventory
  */
-@SkyHanniModule
+@HanniModule
 object ComposterDisplay {
 
     private val config get() = GardenApi.config.composters

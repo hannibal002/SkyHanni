@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.utils.renderables.primitives
+package at.hannibal2.hanni.utils.renderables.primitives
 
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.StringUtils.splitLines
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.StringUtils.splitLines
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.RenderableUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import java.awt.Color

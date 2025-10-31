@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.hanni.features.dungeon
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.dungeon.DungeonStartEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils.renderString
 
-@SkyHanniModule
+@HanniModule
 object DungeonDeathCounter {
-    private val config get() = SkyHanniMod.feature.dungeon
+    private val config get() = HanniMod.feature.dungeon
 
     private var display = ""
     private var deaths = 0
@@ -52,7 +52,7 @@ object DungeonDeathCounter {
         deathPatternsList.any { it.matches(message) }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
 
         if (isDeathMessage(event.message)) {

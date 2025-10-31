@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide
+package at.hannibal2.hanni.features.garden.fortuneguide
 
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
 enum class CarrolynTable(val crop: CropType, val label: String, completeMessage: String, thxMessage: String) {
     EXPORTABLE_CARROTS(

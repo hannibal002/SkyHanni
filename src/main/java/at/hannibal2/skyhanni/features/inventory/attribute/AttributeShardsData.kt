@@ -1,45 +1,45 @@
-package at.hannibal2.skyhanni.features.inventory.attribute
+package at.hannibal2.hanni.features.inventory.attribute
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.inventory.AttributeShardsConfig
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardJson
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.item.ShardEvent
-import at.hannibal2.skyhanni.events.item.ShardGainEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.enoughupdates.ItemResolutionQuery
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.inventory.AttributeShardsConfig
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuAttributeShardData
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuAttributeShardJson
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.item.ShardEvent
+import at.hannibal2.hanni.events.item.ShardGainEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object AttributeShardsData {
 
-    val config get(): AttributeShardsConfig = SkyHanniMod.feature.inventory.attributeShards
+    val config get(): AttributeShardsConfig = HanniMod.feature.inventory.attributeShards
     private val storage get() = ProfileStorageData.profileSpecific?.attributeShards
 
     private var attributeLevelling = mapOf<LorenzRarity, List<Int>>()
@@ -256,7 +256,7 @@ object AttributeShardsData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         shardSyphonedPattern.matchMatcher(event.message) {
             val attributeName = group("attributeName")
             val level = group("level").toInt()
@@ -289,7 +289,7 @@ object AttributeShardsData {
             val amount = group("amount").toInt()
             DelayedRun.runNextTick {
                 ChatUtils.clickableChat(
-                    "§aClick here and scroll through to refresh SkyHanni's attribute overlay data with $amount shards",
+                    "§aClick here and scroll through to refresh Hanni's attribute overlay data with $amount shards",
                     { HypixelCommands.attributeMenu() },
                 )
             }
@@ -436,7 +436,7 @@ object AttributeShardsData {
         val attributeName = shardInternalNameToShardName(internalName)
         if (attributeName in unconsumableAttributes) return
         val rarity = attributeInfo[attributeName]?.rarity
-            ?: ErrorManager.skyHanniError("Unknown attribute shard rarity for $attributeName")
+            ?: ErrorManager.hanniError("Unknown attribute shard rarity for $attributeName")
         val totalAmount = findTotalAmount(currentTier, toNextTier, rarity)
         storage?.getOrPut(attributeName) {
             ProfileSpecificStorage.AttributeShardData()
@@ -449,7 +449,7 @@ object AttributeShardsData {
     ) {
         val attributeName = shardInternalNameToShardName(internalName)
         if (attributeName in unconsumableAttributes) {
-            ErrorManager.skyHanniError("Unconsumable attribute was toggled: $attributeName. This should never happen.")
+            ErrorManager.hanniError("Unconsumable attribute was toggled: $attributeName. This should never happen.")
         }
         storage?.getOrPut(attributeName) {
             ProfileSpecificStorage.AttributeShardData()
@@ -457,9 +457,9 @@ object AttributeShardsData {
     }
 
     private fun findTotalAmount(currentTier: Int, toNextTier: Int, rarity: LorenzRarity): Int {
-        val tierLevelling = attributeLevelling[rarity] ?: ErrorManager.skyHanniError("Unknown attribute rarity: $rarity")
+        val tierLevelling = attributeLevelling[rarity] ?: ErrorManager.hanniError("Unknown attribute rarity: $rarity")
         if (currentTier > tierLevelling.size) {
-            ErrorManager.skyHanniError("Current attribute tier $currentTier exceeds the maximum tier")
+            ErrorManager.hanniError("Current attribute tier $currentTier exceeds the maximum tier")
         }
         val cumulativeAmount = tierLevelling.take(currentTier + 1).sum()
         return cumulativeAmount - toNextTier
@@ -467,9 +467,9 @@ object AttributeShardsData {
 
     fun findTierAndAmountUntilNext(shardName: String, totalAmount: Int): Triple<Int, Int, Int> {
         val rarity = attributeInfo[shardName]?.rarity
-            ?: ErrorManager.skyHanniError("Unknown attribute shard rarity for $shardName")
+            ?: ErrorManager.hanniError("Unknown attribute shard rarity for $shardName")
         val tierLevelling = attributeLevelling[rarity]
-            ?: ErrorManager.skyHanniError("Unknown attribute rarity: $rarity")
+            ?: ErrorManager.hanniError("Unknown attribute rarity: $rarity")
 
         var tier = 0
         var cumulativeCount = 0
@@ -489,7 +489,7 @@ object AttributeShardsData {
 
     private fun shardInternalNameToShardName(internalName: NeuInternalName): String {
         return internalNameToShard[internalName]
-            ?: ErrorManager.skyHanniError("Unknown attribute shard internal name: $internalName")
+            ?: ErrorManager.hanniError("Unknown attribute shard internal name: $internalName")
     }
 
     private fun abilityNameToShardName(ability: String): String? {

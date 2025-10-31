@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getTimeSymbol
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getTimeSymbol
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.TimeUtils.formatted
 
 // internal
 // 1s update

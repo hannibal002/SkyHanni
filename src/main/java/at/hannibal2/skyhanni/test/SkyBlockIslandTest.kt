@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
 
-@SkyHanniModule
+@HanniModule
 object SkyBlockIslandTest {
 
     var testIsland: IslandType? = null
@@ -30,7 +30,7 @@ object SkyBlockIslandTest {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestisland") {
-            description = "Changes the SkyBlock island SkyHanni thinks you are on"
+            description = "Changes the SkyBlock island Hanni thinks you are on"
             category = CommandCategory.DEVELOPER_TEST
 
             literal("reset") {

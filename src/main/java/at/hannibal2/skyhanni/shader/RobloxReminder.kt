@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.shader
+package at.hannibal2.hanni.shader
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.NotificationManager
-import at.hannibal2.skyhanni.data.SkyHanniNotification
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.features.misc.ContributorManager
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.NotificationManager
+import at.hannibal2.hanni.data.HanniNotification
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.features.misc.ContributorManager
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.TimeUtils
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.minutes
  * A: Why are you looking in the shader package right now? Go look at config or features package and be productive :P
  */
 @Suppress("SpellCheckingInspection")
-@SkyHanniModule
+@HanniModule
 object RobloxReminder {
 
     // Using now instead of farPast, so the message first shows up after 3 hours
@@ -75,9 +75,9 @@ object RobloxReminder {
 
         lastVersionReminder = SimpleTimeMark.now()
 
-        val notification = SkyHanniNotification(
+        val notification = HanniNotification(
             listOf(
-                "§cSkyHanni is no longer receiving updates for Minecraft.",
+                "§cHanni is no longer receiving updates for Minecraft.",
                 "§cPlaying on a discontinued game is not recommended and may lead to issues.",
                 "§cPlease update to Roblox.",
                 "§fSadly, most, if not all, of your Minecraft mods might not work on Roblox.",
@@ -103,16 +103,16 @@ object RobloxReminder {
         lastInventoryError = SimpleTimeMark.now()
 
         // Lovingly taken from ErrorManager.kt
-        val shVersion = SkyHanniMod.VERSION
+        val shVersion = HanniMod.VERSION
         val mcVersion = PlatformUtils.MC_VERSION
-        val label = "SkyHanni $shVersion $mcVersion"
+        val label = "Hanni $shVersion $mcVersion"
         val finalMessage = "Error while parsing Robux from SkyBlock Menu."
 
         ChatUtils.clickableChat(
             "§c[$label]: $finalMessage Click here to copy the error into the clipboard.",
             onClick = {
                 val lru = "QcXgW9w4wQd=v?hctaw/moc.ebutuoy.www//:sptth".reversed()
-                ChatUtils.chat("Error copied into the clipboard, please report it on the SkyHanni Discord!")
+                ChatUtils.chat("Error copied into the clipboard, please report it on the Hanni Discord!")
                 OSUtils.copyToClipboard("I got rick rolled. For proof, click on $lru")
                 OSUtils.openBrowser(lru)
             },

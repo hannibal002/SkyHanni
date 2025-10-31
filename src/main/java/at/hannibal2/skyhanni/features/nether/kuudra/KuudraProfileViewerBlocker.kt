@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.nether.kuudra
+package at.hannibal2.hanni.features.nether.kuudra
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ClickType
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.entity.EntityClickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils.isNpc
 import net.minecraft.entity.player.EntityPlayer
 
-@SkyHanniModule
+@HanniModule
 object KuudraProfileViewerBlocker {
 
-    private val config get() = SkyHanniMod.feature.crimsonIsle
+    private val config get() = HanniMod.feature.crimsonIsle
 
     @HandleEvent(onlyOnIsland = IslandType.KUUDRA_ARENA)
     fun onClickEntity(event: EntityClickEvent) {

@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.features.cosmetics
+package at.hannibal2.hanni.features.cosmetics
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.getPrevLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.enums.OutsideSBFeature
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.compat.MinecraftCompat.isLocalPlayer
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.getPrevLorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DLine
 import net.minecraft.entity.projectile.EntityArrow
 import java.util.LinkedList
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-@SkyHanniModule
+@HanniModule
 object ArrowTrail {
 
-    private val config get() = SkyHanniMod.feature.gui.cosmetic.arrowTrail
+    private val config get() = HanniMod.feature.gui.cosmetic.arrowTrail
 
     private data class Line(val start: LorenzVec, val end: LorenzVec, val deathTime: SimpleTimeMark)
 
@@ -51,7 +51,7 @@ object ArrowTrail {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         val color = if (config.handlePlayerArrowsDifferently) config.playerArrowColor else config.arrowColor
         listYourArrow.forEach {

@@ -1,31 +1,31 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.PetData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.PetsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.pet.CurrentPetApi
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.PetData
+import at.hannibal2.hanni.data.jsonobjects.repo.PetsJson
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.AnimatedSkinJson
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuItemJson
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuPetData
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuPetsJson
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
+import at.hannibal2.hanni.features.nether.reputationhelper.FactionType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.hanni.utils.collection.CollectionUtils.indexOfFirstOrNull
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sublistAfter
 
-@SkyHanniModule
+@HanniModule
 object PetUtils {
     // Late load from NEU repo
     private var petSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
@@ -241,7 +241,7 @@ object PetUtils {
             LorenzRarity.EPIC -> 16
             LorenzRarity.LEGENDARY -> 20
             LorenzRarity.MYTHIC -> 20
-            else -> ErrorManager.skyHanniError("Unknown pet rarity $rarity")
+            else -> ErrorManager.hanniError("Unknown pet rarity $rarity")
         }
     }
 

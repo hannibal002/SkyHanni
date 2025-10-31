@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
 import kotlinx.coroutines.delay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.audio.ISound
@@ -18,15 +18,15 @@ import net.minecraft.client.audio.PositionedSound
 //$$ import net.minecraft.sound.SoundEvent
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object SoundUtils {
 
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = HanniMod.feature.misc
     private val beepSoundCache = mutableMapOf<Float, ISound>()
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
     private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
     val plingSound by lazy { createSound("note.pling", 1f) }
-    val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
+    val centuryActiveTimerAlert by lazy { createSound("hanni:centurytimer.active", 1f) }
 
     fun ISound.playSound() {
         DelayedRun.onThread.execute {
@@ -81,7 +81,7 @@ object SoundUtils {
         }
         return sound
         //#else
-        //$$ val newSound = at.hannibal2.skyhanni.utils.compat.SoundCompat.getModernSoundName(name)
+        //$$ val newSound = at.hannibal2.hanni.utils.compat.SoundCompat.getModernSoundName(name)
         //$$ val identifier = Identifier.of(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
         //$$ return PositionedSoundInstance.master(SoundEvent.of(identifier), pitch, volume)
         //#endif
@@ -119,7 +119,7 @@ object SoundUtils {
 
     // TODO use duration for delay
     fun repeatSound(delay: Long, repeat: Int, sound: ISound) {
-        SkyHanniMod.launchCoroutine("repeatSound") {
+        HanniMod.launchCoroutine("repeatSound") {
             repeat(repeat) {
                 sound.playSound()
                 delay(delay)

@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer
-import at.hannibal2.skyhanni.features.chroma.ChromaManager
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.features.chroma.ChromaFontRenderer
+import at.hannibal2.hanni.features.chroma.ChromaManager
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import net.minecraft.client.renderer.GlStateManager
 
@@ -40,7 +40,7 @@ object FontRendererHook {
     }
 
     /**
-     * Setups the [ChromaFontRenderer][at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer] for rendering text
+     * Setups the [ChromaFontRenderer][at.hannibal2.hanni.features.chroma.ChromaFontRenderer] for rendering text
      * in chroma. This should only be used when you don't have control over the color code a string uses, or it
      * doesn't make sense to add §Z color code to a string.
      *

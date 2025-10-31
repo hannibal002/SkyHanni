@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.utils.renderables.animated
+package at.hannibal2.hanni.utils.renderables.animated
 
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.inPartialSeconds
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.inPartialSeconds
+import at.hannibal2.hanni.utils.renderables.Renderable
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.time.Duration

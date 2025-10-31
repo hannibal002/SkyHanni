@@ -1,32 +1,32 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.hanni.features.fishing
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playBeepSound
-import at.hannibal2.skyhanni.utils.TimeUnit
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils.renderStrings
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SoundUtils.playBeepSound
+import at.hannibal2.hanni.utils.TimeUnit
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.collection.TimeLimitedSet
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawSphereInWorld
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
 import java.util.UUID
@@ -34,10 +34,10 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object TotemOfCorruption {
 
-    private val config get() = SkyHanniMod.feature.fishing.totemOfCorruption
+    private val config get() = HanniMod.feature.fishing.totemOfCorruption
 
     private var display = emptyList<String>()
     private var totems: List<Totem> = emptyList()
@@ -86,7 +86,7 @@ object TotemOfCorruption {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEffectiveAreaEnabled()) return
         if (totems.isEmpty()) return
 

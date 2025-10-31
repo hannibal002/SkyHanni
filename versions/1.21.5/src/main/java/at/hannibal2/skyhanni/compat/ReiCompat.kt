@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.compat
+package at.hannibal2.hanni.compat
 
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import me.shedaniel.math.impl.PointHelper
 import me.shedaniel.rei.api.client.REIRuntime
 import me.shedaniel.rei.api.client.gui.widgets.Slot

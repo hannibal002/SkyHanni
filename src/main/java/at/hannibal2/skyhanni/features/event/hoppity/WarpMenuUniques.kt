@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.hanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object WarpMenuUniques {
 
     /**
@@ -27,7 +27,7 @@ object WarpMenuUniques {
     private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>?
         get() = CFApi.profileStorage?.collectedEggLocations
 
-    private val config get() = SkyHanniMod.feature.event.hoppityEggs.warpMenu
+    private val config get() = HanniMod.feature.event.hoppityEggs.warpMenu
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {

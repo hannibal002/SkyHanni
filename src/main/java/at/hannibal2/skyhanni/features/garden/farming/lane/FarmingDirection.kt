@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.farming.lane
+package at.hannibal2.hanni.features.garden.farming.lane
 
 enum class FarmingDirection {
     NORTH_SOUTH,

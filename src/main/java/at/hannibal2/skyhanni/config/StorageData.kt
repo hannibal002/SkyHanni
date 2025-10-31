@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config
+package at.hannibal2.hanni.config
 
-import at.hannibal2.skyhanni.data.model.SkyHanniInventoryContainer
+import at.hannibal2.hanni.data.model.HanniInventoryContainer
 import com.google.gson.annotations.Expose
 import java.util.NavigableMap
 import java.util.TreeMap
@@ -17,6 +17,6 @@ class StorageData {
 
     class ProfileSpecific {
         @Expose
-        var data: NavigableMap<String, SkyHanniInventoryContainer> = TreeMap()
+        var data: NavigableMap<String, HanniInventoryContainer> = TreeMap()
     }
 }

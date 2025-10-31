@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.rift.area.mirrorverse.danceroomhelper
+package at.hannibal2.hanni.config.features.rift.area.mirrorverse.danceroomhelper
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.rift.area.mirrorverse.danceroomhelper.danceroomformatting.DanceRoomFormattingConfig
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.config.features.rift.area.mirrorverse.danceroomhelper.danceroomformatting.DanceRoomFormattingConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

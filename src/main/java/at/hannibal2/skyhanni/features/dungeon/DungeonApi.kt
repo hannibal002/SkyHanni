@@ -1,45 +1,45 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.hanni.features.dungeon
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.ClickedBlockType
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ClickType
+import at.hannibal2.hanni.data.ClickedBlockType
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.BlockClickEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.ScoreboardUpdateEvent
+import at.hannibal2.hanni.events.TabListUpdateEvent
+import at.hannibal2.hanni.events.TablistFooterUpdateEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.dungeon.DungeonBlockClickEvent
+import at.hannibal2.hanni.events.dungeon.DungeonBossRoomEnterEvent
+import at.hannibal2.hanni.events.dungeon.DungeonCompleteEvent
+import at.hannibal2.hanni.events.dungeon.DungeonEnterEvent
+import at.hannibal2.hanni.events.dungeon.DungeonStartEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.BlockUtils
+import at.hannibal2.hanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchAll
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SkullTextureHolder
+import at.hannibal2.hanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
 @Suppress("MemberVisibilityCanBePrivate")
-@SkyHanniModule
+@HanniModule
 object DungeonApi {
 
     // TODO repo patterns
@@ -268,7 +268,7 @@ object DungeonApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         val floor = dungeonFloor ?: return
         if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
             started = true

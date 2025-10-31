@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.utils.CTMUtils
+import at.hannibal2.hanni.utils.CTMUtils
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

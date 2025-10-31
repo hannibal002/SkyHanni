@@ -1,26 +1,26 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.hanni.features.garden.farming
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerDropsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerType
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.ClickType
+import at.hannibal2.hanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.hanni.data.GardenCropMilestones.setCounter
+import at.hannibal2.hanni.data.jsonobjects.repo.DicerDropsJson
+import at.hannibal2.hanni.data.jsonobjects.repo.DicerType
+import at.hannibal2.hanni.events.ProfileJoinEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.garden.GardenToolChangeEvent
+import at.hannibal2.hanni.events.garden.farming.CropClickEvent
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.collection.CollectionUtils.editCopy
 import kotlin.concurrent.fixedRateTimer
 
-@SkyHanniModule
+@HanniModule
 object GardenCropSpeed {
 
     private val config get() = GardenApi.config
@@ -43,7 +43,7 @@ object GardenCropSpeed {
 
     init {
         // TODO use SecondPassedEvent + passedSince
-        fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
+        fixedRateTimer(name = "hanni-crop-milestone-speed", period = 1000L) {
             if (isEnabled()) {
                 if (GardenApi.mushroomCowPet) {
                     CropType.MUSHROOM.setCounter(

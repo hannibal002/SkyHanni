@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RecipeType.CRAFTING
+import at.hannibal2.hanni.api.enoughupdates.EnoughUpdatesManager
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.RecipeType.CRAFTING
 import com.google.gson.JsonObject
 
 data class PrimitiveRecipe(

@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.features.slayer
+package at.hannibal2.hanni.features.slayer
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object SlayerCocoonWarning {
     /**
      * REGEX-TEST:   §r§c§lYOU COCOONED YOUR SLAYER BOSS
@@ -22,7 +22,7 @@ object SlayerCocoonWarning {
     private val config get() = SlayerApi.config
 
     @HandleEvent
-    fun onChatMessage(event: SkyHanniChatEvent) {
+    fun onChatMessage(event: HanniChatEvent) {
         if (slayerCocoonPattern.matches(event.message)) {
             if (config.cocoonTitle) TitleManager.sendTitle("§lSlayer Boss Cocooned!")
             if (config.cocoonDing) SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)

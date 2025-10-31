@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide
+package at.hannibal2.hanni.features.garden.fortuneguide
 
 enum class FarmingSet(
     val helmetIncrease: Double,

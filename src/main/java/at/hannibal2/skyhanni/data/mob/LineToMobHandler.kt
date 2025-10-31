@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.data.mob
+package at.hannibal2.hanni.data.mob
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawLineToEye
 import io.github.notenoughupdates.moulconfig.ChromaColour
 
-@SkyHanniModule
+@HanniModule
 object LineToMobHandler {
 
     data class LineSettings(
@@ -39,7 +39,7 @@ object LineToMobHandler {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (lines.isEmpty()) return
 
         for ((mob, settings) in lines) {

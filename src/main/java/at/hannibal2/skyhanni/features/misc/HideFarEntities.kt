@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.GlobalRender
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
-import at.hannibal2.skyhanni.features.combat.mobs.AreaMiniBossFeatures
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.dungeon.DungeonMobManager
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.GlobalRender
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.PartyApi
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.features.combat.damageindicator.DamageIndicatorManager
+import at.hannibal2.hanni.features.combat.mobs.AreaMiniBossFeatures
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.features.dungeon.DungeonMobManager
+import at.hannibal2.hanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.EntityUtils.isNpc
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.MobUtils.mob
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.EntityDragon
@@ -26,15 +26,15 @@ import net.minecraft.entity.monster.EntityGhast
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntityMagmaCube
 
-@SkyHanniModule
+@HanniModule
 object HideFarEntities {
-    private val config get() = SkyHanniMod.feature.misc.hideFarEntities
+    private val config get() = HanniMod.feature.misc.hideFarEntities
 
     private var ignored = emptySet<Int>()
     private var neverHide = emptySet<Int>()
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (GlobalRender.renderDisabled) return
         if (!isEnabled()) return
         if (event.isMod(20)) {

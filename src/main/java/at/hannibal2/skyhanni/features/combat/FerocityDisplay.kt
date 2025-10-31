@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.features.combat
+package at.hannibal2.hanni.features.combat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.model.SkyblockStat
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RenderUtils.renderString
+import at.hannibal2.hanni.utils.SkyBlockUtils
 
-@SkyHanniModule
+@HanniModule
 object FerocityDisplay {
 
-    private val config get() = SkyHanniMod.feature.combat.ferocityDisplay
+    private val config get() = HanniMod.feature.combat.ferocityDisplay
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {

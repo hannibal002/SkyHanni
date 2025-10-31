@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers.gui;
+package at.hannibal2.hanni.mixins.transformers.gui;
 
-import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
+import at.hannibal2.hanni.mixins.hooks.GuiChatHook;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;

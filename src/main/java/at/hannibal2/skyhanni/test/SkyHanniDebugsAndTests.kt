@@ -1,70 +1,70 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.SkyHanniEvents
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.events.mining.OreMinedEvent
-import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
-import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
-import at.hannibal2.skyhanni.features.mining.OreBlock
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getRawBaseStats
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzDebug
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.addLine
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.event.HanniEvents
+import at.hannibal2.hanni.config.ConfigFileType
+import at.hannibal2.hanni.config.ConfigGuiManager
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.IslandGraphs
+import at.hannibal2.hanni.data.repo.ChatProgressUpdates
+import at.hannibal2.hanni.events.GuiKeyPressEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.events.mining.OreMinedEvent
+import at.hannibal2.hanni.features.garden.GardenNextJacobContest
+import at.hannibal2.hanni.features.garden.visitor.GardenVisitorColorNames
+import at.hannibal2.hanni.features.inventory.bazaar.BazaarApi.getBazaarData
+import at.hannibal2.hanni.features.mining.OreBlock
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.BlockUtils
+import at.hannibal2.hanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.hanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.hanni.utils.ItemPriceUtils.getRawCraftCostOrNull
+import at.hannibal2.hanni.utils.ItemPriceUtils.isAuctionHouseItem
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getRawBaseStats
+import at.hannibal2.hanni.utils.ItemUtils.repoItemName
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzDebug
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuItems.getItemStack
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.RenderUtils.renderString
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.stackUnderCursor
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.addLine
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import net.minecraft.nbt.NBTTagCompound
 //#if FORGE
 import net.minecraftforge.common.MinecraftForge
@@ -72,10 +72,10 @@ import net.minecraftforge.common.MinecraftForge
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
-object SkyHanniDebugsAndTests {
+@HanniModule
+object HanniDebugsAndTests {
 
-    private val config get() = SkyHanniMod.feature.dev
+    private val config get() = HanniMod.feature.dev
     private val debugConfig get() = config.debug
     var displayLine = ""
 
@@ -103,7 +103,7 @@ object SkyHanniDebugsAndTests {
     private var testLocation: LorenzVec? = null
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
             event.drawDynamicText(it, "Debug Test", 1.5)
@@ -132,7 +132,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-        SkyHanniMod.launchCoroutine("shtest command") {
+        HanniMod.launchCoroutine("shtest command") {
             asyncTest(args)
         }
     }
@@ -184,18 +184,18 @@ object SkyHanniDebugsAndTests {
 
     private fun resetConfig() {
         // saving old config state
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "reload config manager")
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "reload config manager")
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "reload config manager")
+        HanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "reload config manager")
+        HanniMod.configManager.saveConfig(ConfigFileType.SACKS, "reload config manager")
+        HanniMod.configManager.saveConfig(ConfigFileType.PETS, "reload config manager")
         Thread {
             Thread.sleep(500)
-            SkyHanniMod.configManager.disableSaving()
+            HanniMod.configManager.disableSaving()
 
             // initializing a new config manager, calling firstLoad, and setting it as the config manager in use.
             val configManager = ConfigManager()
             configManager.firstLoad()
-            SkyHanniMod::class.java.enclosingClass.getDeclaredField("configManager").makeAccessible()
-                .set(SkyHanniMod, configManager)
+            HanniMod::class.java.enclosingClass.getDeclaredField("configManager").makeAccessible()
+                .set(HanniMod, configManager)
 
             // resetting the MoulConfigProcessor in use
             ConfigGuiManager.editor = null
@@ -246,19 +246,19 @@ object SkyHanniDebugsAndTests {
     private fun reloadListeners() {
         // TODO: use repo for this and implement it correctly
         val blockedFeatures = try {
-            File("config/skyhanni/blocked-features.txt").readLines().toList()
+            File("config/hanni/blocked-features.txt").readLines().toList()
         } catch (e: Exception) {
             emptyList()
         }
 
-        val modules = SkyHanniMod.modules
+        val modules = HanniMod.modules
         for (original in modules.toMutableList()) {
             val javaClass = original.javaClass
             val simpleName = javaClass.simpleName
             //#if FORGE
             MinecraftForge.EVENT_BUS.unregister(original)
             //#endif
-            SkyHanniEvents.unregister(original)
+            HanniEvents.unregister(original)
             println("Unregistered listener $simpleName")
 
             if (simpleName !in blockedFeatures) {
@@ -267,7 +267,7 @@ object SkyHanniDebugsAndTests {
                 //#if FORGE
                 MinecraftForge.EVENT_BUS.register(original)
                 //#endif
-                SkyHanniEvents.register(original)
+                HanniEvents.register(original)
                 println("Registered listener $simpleName")
             } else {
                 println("Skipped registering listener $simpleName")
@@ -280,14 +280,14 @@ object SkyHanniDebugsAndTests {
         ChatUtils.clickableChat(
             "§cAre you sure you want to stop all listeners? Doing this will make most features not work.",
             onClick = {
-                val modules = SkyHanniMod.modules
+                val modules = HanniMod.modules
                 for (original in modules.toMutableList()) {
                     val javaClass = original.javaClass
                     val simpleName = javaClass.simpleName
                     //#if FORGE
                     MinecraftForge.EVENT_BUS.unregister(original)
                     //#endif
-                    SkyHanniEvents.unregister(original)
+                    HanniEvents.unregister(original)
                     println("Unregistered listener $simpleName")
                 }
                 ChatUtils.clickableChat(
@@ -433,7 +433,7 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item name: '$name§7'")
     }
 
-    @HandleEvent(SkyHanniChatEvent::class)
+    @HandleEvent(HanniChatEvent::class)
     @Suppress("EmptyFunctionBlock")
     fun onChat() {
     }
@@ -525,7 +525,7 @@ object SkyHanniDebugsAndTests {
             category = CommandCategory.DEVELOPER_TEST
             callback {
                 ChatUtils.clickableChat(
-                    "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
+                    "§cTHIS WILL RESET YOUR Hanni CONFIG! Click here to proceed.",
                     onClick = { resetConfig() },
                     "§eClick to confirm.",
                     prefix = false,
@@ -534,10 +534,10 @@ object SkyHanniDebugsAndTests {
             }
         }
         event.registerBrigadier("shversion") {
-            description = "Prints the SkyHanni version in the chat"
+            description = "Prints the Hanni version in the chat"
             category = CommandCategory.DEVELOPER_DEBUG
             callback {
-                val name1 = "SkyHanni ${SkyHanniMod.VERSION} on Minecraft ${PlatformUtils.MC_VERSION}"
+                val name1 = "Hanni ${HanniMod.VERSION} on Minecraft ${PlatformUtils.MC_VERSION}"
                 ChatUtils.chat("§eYou are using $name1")
                 OSUtils.copyToClipboard(name1)
             }
@@ -576,7 +576,7 @@ object SkyHanniDebugsAndTests {
             category = CommandCategory.DEVELOPER_TEST
             legacyCallbackArgs {
                 println("start null finder")
-                findNull(SkyHanniMod.feature, "config")
+                findNull(HanniMod.feature, "config")
                 println("stop null finder")
             }
         }

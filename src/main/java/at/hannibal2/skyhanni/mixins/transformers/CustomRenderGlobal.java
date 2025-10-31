@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.shader.Framebuffer;
@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(RenderGlobal.class)
 public interface CustomRenderGlobal {
     @Accessor("entityOutlineFramebuffer")
-    Framebuffer getEntityOutlineFramebuffer_skyhanni();
+    Framebuffer getEntityOutlineFramebuffer_hanni();
 
     @Accessor("entityOutlineShader")
-    ShaderGroup getEntityOutlineShader_skyhanni();
+    ShaderGroup getEntityOutlineShader_hanni();
 
 }

@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardPattern
 
 // internal
 // update on config load

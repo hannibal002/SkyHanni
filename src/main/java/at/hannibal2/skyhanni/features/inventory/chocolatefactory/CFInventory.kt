@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.hanni.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RenderUtils.drawSlotText
+import at.hannibal2.hanni.utils.RenderUtils.highlight
 
-@SkyHanniModule
+@HanniModule
 object CFInventory {
 
     private val config get() = CFApi.config

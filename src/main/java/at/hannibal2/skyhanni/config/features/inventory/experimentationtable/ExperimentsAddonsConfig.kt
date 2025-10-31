@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
+package at.hannibal2.hanni.config.features.inventory.experimentationtable
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
+package at.hannibal2.hanni.features.nether.reputationhelper.miniboss
 
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NeuInternalName
 import java.util.regex.Pattern
 
 class CrimsonMiniBoss(

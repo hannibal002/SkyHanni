@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.test.command.track
+package at.hannibal2.hanni.test.command.track
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.config.commands.brigadier.LiteralCommandBuilder
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.PlaySoundEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
 import kotlin.ranges.contains
 
-@SkyHanniModule
+@HanniModule
 object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
     commonName = "sound"
 ) {
-    override val config get() = SkyHanniMod.feature.dev.debug.trackSound
+    override val config get() = HanniMod.feature.dev.debug.trackSound
 
     // todo change this from a string arg to a qualified sound name arg
     // todo add suggestion provider for sound names
@@ -63,7 +63,7 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
     override fun onKeyPress(event: KeyPressEvent) = super.onKeyPress(event)
 
     @HandleEvent
-    override fun onRenderWorld(event: SkyHanniRenderWorldEvent) = super.onRenderWorld(event)
+    override fun onRenderWorld(event: HanniRenderWorldEvent) = super.onRenderWorld(event)
 
     @HandleEvent
     override fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) = super.onRenderOverlay(event)

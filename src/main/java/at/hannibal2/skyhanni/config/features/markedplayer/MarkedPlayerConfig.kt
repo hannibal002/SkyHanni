@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.features.markedplayer
+package at.hannibal2.hanni.config.features.markedplayer
 
-import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

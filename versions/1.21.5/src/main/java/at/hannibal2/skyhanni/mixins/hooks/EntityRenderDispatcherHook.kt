@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
 import net.minecraft.entity.Entity
 

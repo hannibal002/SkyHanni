@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent;
+import at.hannibal2.hanni.events.render.gui.GuiScreenOpenEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory.data
+package at.hannibal2.hanni.features.inventory.chocolatefactory.data
 
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.profileStorage
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi.profileStorage
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.TimeUtils.format
 import kotlin.time.Duration
 
 enum class ChocolateAmount(val chocolate: () -> Long) {

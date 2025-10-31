@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.config.commands
+package at.hannibal2.hanni.config.commands
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CommandArgument
-import at.hannibal2.skyhanni.utils.CommandArgument.Companion.findSpecifierAndGetResult
-import at.hannibal2.skyhanni.utils.CommandContextAwareObject
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.CommandArgument
+import at.hannibal2.hanni.utils.CommandArgument.Companion.findSpecifierAndGetResult
+import at.hannibal2.hanni.utils.CommandContextAwareObject
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos

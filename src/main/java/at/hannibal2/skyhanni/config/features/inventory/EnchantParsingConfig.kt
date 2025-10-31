@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.inventory
+package at.hannibal2.hanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -36,7 +36,7 @@ class EnchantParsingConfig {
     @ConfigOption(
         name = "Perfect Enchantment Color",
         desc = "The color an enchantment will be at max level. " +
-            "§eIf SkyHanni chroma is disabled this will default to §6Gold."
+            "§eIf Hanni chroma is disabled this will default to §6Gold."
     )
     @ConfigEditorDropdown
     val perfectEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.CHROMA)

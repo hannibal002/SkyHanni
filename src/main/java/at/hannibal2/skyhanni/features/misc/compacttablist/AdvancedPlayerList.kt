@@ -1,35 +1,35 @@
-package at.hannibal2.skyhanni.features.misc.compacttablist
+package at.hannibal2.hanni.features.misc.compacttablist
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
-import at.hannibal2.skyhanni.data.FriendApi
-import at.hannibal2.skyhanni.data.GlobalRender
-import at.hannibal2.skyhanni.data.GuildApi
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.features.bingo.BingoApi
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.misc.ContributorManager
-import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
+import at.hannibal2.hanni.data.FriendApi
+import at.hannibal2.hanni.data.GlobalRender
+import at.hannibal2.hanni.data.GuildApi
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.PartyApi
+import at.hannibal2.hanni.features.bingo.BingoApi
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.features.misc.ContributorManager
+import at.hannibal2.hanni.features.misc.MarkedPlayerManager
+import at.hannibal2.hanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import java.util.regex.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
-@SkyHanniModule
+@HanniModule
 object AdvancedPlayerList {
 
     val tabPlayerData = mutableMapOf<String, PlayerData>()
 
-    private val config get() = SkyHanniMod.feature.gui.compactTabList.advancedPlayerList
+    private val config get() = HanniMod.feature.gui.compactTabList.advancedPlayerList
 
     /**
      * REGEX-TEST: §8[§r§9290§r§8] §r§bSkirtwearer §r§6ꀾ§r§7♲
@@ -179,7 +179,7 @@ object AdvancedPlayerList {
     }
 
     fun ignoreCustomTabList(): Boolean {
-        val denyKeyPressed = SkyHanniMod.feature.dev.debug.bypassAdvancedPlayerTabList.isKeyHeld()
+        val denyKeyPressed = HanniMod.feature.dev.debug.bypassAdvancedPlayerTabList.isKeyHeld()
         return GlobalRender.renderDisabled || denyKeyPressed
     }
 

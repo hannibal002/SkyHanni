@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.data.ElectionApi.currentMayor
-import at.hannibal2.skyhanni.data.ElectionApi.foxyExtraEventPattern
-import at.hannibal2.skyhanni.data.Perk.Companion.toPerk
-import at.hannibal2.skyhanni.data.jsonobjects.other.MayorPerk
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.data.ElectionApi.currentMayor
+import at.hannibal2.hanni.data.ElectionApi.foxyExtraEventPattern
+import at.hannibal2.hanni.data.Perk.Companion.toPerk
+import at.hannibal2.hanni.data.jsonobjects.other.MayorPerk
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
 
 enum class ElectionCandidate(
     val mayorName: String,

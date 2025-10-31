@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.hanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityRabbitTextureEntry
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityRabbitTexturesJson
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.HoppityRabbitTextureEntry
+import at.hannibal2.hanni.data.jsonobjects.repo.HoppityRabbitTexturesJson
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LorenzRarity
 
-@SkyHanniModule
+@HanniModule
 object HoppityTextureHandler {
 
     private var hoppityRabbitTextures = mutableMapOf<LorenzRarity, List<HoppityRabbitTextureEntry>>()

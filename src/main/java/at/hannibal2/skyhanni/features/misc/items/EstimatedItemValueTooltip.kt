@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.misc.items
+package at.hannibal2.hanni.features.misc.items
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
 
-@SkyHanniModule
+@HanniModule
 object EstimatedItemValueTooltip {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipEvent) {
-        if (!SkyHanniMod.feature.inventory.estimatedItemValues.showTooltip) return
+        if (!HanniMod.feature.inventory.estimatedItemValues.showTooltip) return
         event.itemStack.getInternalNameOrNull() ?: return
 
         val total = EstimatedItemValueCalculator.getTotalPrice(event.itemStack, ignoreBasePrice = true) ?: return

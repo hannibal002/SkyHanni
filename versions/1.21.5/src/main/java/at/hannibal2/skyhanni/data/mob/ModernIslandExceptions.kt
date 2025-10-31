@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.mob
+package at.hannibal2.hanni.data.mob
 
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.decoration.ArmorStandEntity

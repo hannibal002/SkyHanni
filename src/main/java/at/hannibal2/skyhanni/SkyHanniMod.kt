@@ -1,38 +1,38 @@
-package at.hannibal2.skyhanni
+package at.hannibal2.hanni
 
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.SkyHanniEvents
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.Features
-import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.StorageData
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
-import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.data.OtherInventoryData
-import at.hannibal2.skyhanni.data.PetDataStorage
-import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
-import at.hannibal2.skyhanni.events.utils.InitFinishedEvent
-import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
-import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
-import at.hannibal2.skyhanni.utils.VersionConstants
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.system.ModVersion
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.api.enoughupdates.EnoughUpdatesRepoManager
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.event.HanniEvents
+import at.hannibal2.hanni.config.ConfigFileType
+import at.hannibal2.hanni.config.ConfigGuiManager.openConfigGui
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.Features
+import at.hannibal2.hanni.config.SackData
+import at.hannibal2.hanni.config.StorageData
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.hanni.data.GuiEditManager
+import at.hannibal2.hanni.data.OtherInventoryData
+import at.hannibal2.hanni.data.PetDataStorage
+import at.hannibal2.hanni.data.jsonobjects.local.FriendsJson
+import at.hannibal2.hanni.data.jsonobjects.local.JacobContestsJson
+import at.hannibal2.hanni.data.jsonobjects.local.KnownFeaturesJson
+import at.hannibal2.hanni.data.jsonobjects.local.VisualWordsJson
+import at.hannibal2.hanni.data.repo.HanniRepoManager
+import at.hannibal2.hanni.events.utils.InitFinishedEvent
+import at.hannibal2.hanni.events.utils.PreInitFinishedEvent
+import at.hannibal2.hanni.hannimodule.LoadedModules
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.MinecraftConsoleFilter
+import at.hannibal2.hanni.utils.VersionConstants
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.system.ModVersion
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,15 +54,15 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
-object SkyHanniMod {
+@HanniModule
+object HanniMod {
 
     fun preInit() {
         PlatformUtils.checkIfNeuIsLoaded()
 
-        LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
+        LoadedModules.modules.forEach { HanniModLoader.loadModule(it) }
 
-        SkyHanniEvents.init(modules)
+        HanniEvents.init(modules)
 
         PreInitFinishedEvent.post()
     }
@@ -76,7 +76,7 @@ object SkyHanniMod {
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
         try {
-            SkyHanniRepoManager.initRepo()
+            HanniRepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
@@ -105,7 +105,7 @@ object SkyHanniMod {
         }
     }
 
-    const val MODID: String = "skyhanni"
+    const val MODID: String = "hanni"
     const val VERSION: String = VersionConstants.MOD_VERSION
 
     val modVersion: ModVersion = ModVersion.fromString(VERSION)
@@ -125,15 +125,15 @@ object SkyHanniMod {
     lateinit var orderedWaypointsRoutesData: OrderedWaypointsRoutes
 
     lateinit var configManager: ConfigManager
-    val logger: Logger = LogManager.getLogger("SkyHanni")
+    val logger: Logger = LogManager.getLogger("Hanni")
     fun getLogger(name: String): Logger {
-        return LogManager.getLogger("SkyHanni.$name")
+        return LogManager.getLogger("Hanni.$name")
     }
 
     val modules: MutableList<Any> = ArrayList()
     private val globalJob: Job = Job(null)
     private val coroutineScope = CoroutineScope(
-        CoroutineName("SkyHanni") + SupervisorJob(globalJob),
+        CoroutineName("Hanni") + SupervisorJob(globalJob),
     )
 
     /**
@@ -154,7 +154,7 @@ object SkyHanniMod {
     }
 
     /**
-     * Launch an IO coroutine in the SkyHanni scope.
+     * Launch an IO coroutine in the Hanni scope.
      * This coroutine will catch any exceptions thrown by the provided function.
      * @param block The suspend function to execute within the IO context.
      */
@@ -167,7 +167,7 @@ object SkyHanniMod {
     }
 
     /**
-     * Launches a coroutine in the SkyHanni scope.
+     * Launches a coroutine in the Hanni scope.
      * This coroutine will catch any exceptions thrown by the provided function.
      * The function provided here must not rely on the CoroutineScope's context.
      * @param block The block to execute in the coroutine.
@@ -194,7 +194,7 @@ object SkyHanniMod {
     }
 
     /**
-     * Launches a coroutine in the SkyHanni scope.
+     * Launches a coroutine in the Hanni scope.
      * This coroutine will catch any exceptions thrown by the provided function.
      * @param function The suspend function to execute in the coroutine.
      */
@@ -203,7 +203,7 @@ object SkyHanniMod {
         name: String,
         timeout: Duration = 10.seconds,
         function: suspend CoroutineScope.() -> Unit,
-    ): Job = coroutineScope.launch(CoroutineName("SkyHanni $name")) {
+    ): Job = coroutineScope.launch(CoroutineName("Hanni $name")) {
         try {
             if (timeout != Duration.INFINITE && timeout > Duration.ZERO) {
                 withTimeout(timeout) { function() }
@@ -243,8 +243,8 @@ object SkyHanniMod {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("sh") {
-            aliases = listOf("skyhanni")
-            description = "Opens the main SkyHanni config"
+            aliases = listOf("hanni")
+            description = "Opens the main Hanni config"
             literalCallback("gui") {
                 GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
             }

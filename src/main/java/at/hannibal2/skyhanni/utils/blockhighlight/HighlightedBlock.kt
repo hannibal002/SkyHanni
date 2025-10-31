@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.blockhighlight
+package at.hannibal2.hanni.utils.blockhighlight
 
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.LorenzVec
 
 /**
  * A default highlighted block that only stores its location

@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.hanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.data.entity.EntityOpacityManager;
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.hanni.data.entity.EntityOpacityManager;
+import at.hannibal2.hanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.item.ItemRenderer;

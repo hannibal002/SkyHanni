@@ -1,57 +1,57 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.NotificationManager
-import at.hannibal2.skyhanni.data.SkyHanniNotification
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
-import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
-import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.NbtCompat
-import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
-import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.enoughupdates.EnoughUpdatesManager
+import at.hannibal2.hanni.api.enoughupdates.EnoughUpdatesRepoManager
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.data.NotificationManager
+import at.hannibal2.hanni.data.HanniNotification
+import at.hannibal2.hanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.hanni.data.model.SkyblockStat
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.features.misc.ReplaceRomanNumerals
+import at.hannibal2.hanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.CachedItemData.Companion.cachedData
+import at.hannibal2.hanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.hanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getAttributes
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getPetInfo
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.isRecombobulated
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.removeResets
+import at.hannibal2.hanni.utils.chat.TextHelper
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.onClick
+import at.hannibal2.hanni.utils.chat.TextHelper.onHover
+import at.hannibal2.hanni.utils.chat.TextHelper.send
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.hanni.utils.compat.EnchantmentsCompat
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.NbtCompat
+import at.hannibal2.hanni.utils.compat.getItemOnCursor
+import at.hannibal2.hanni.utils.compat.setCustomItemName
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
@@ -68,7 +68,7 @@ import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+//$$ import at.hannibal2.hanni.utils.compat.formattedTextCompatLessResets
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.LoreComponent
 //$$ import net.minecraft.component.type.NbtComponent
@@ -85,7 +85,7 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import com.mojang.authlib.properties.PropertyMap
 //#endif
 
-@SkyHanniModule
+@HanniModule
 @Suppress("LargeClass")
 object ItemUtils {
 
@@ -144,7 +144,7 @@ object ItemUtils {
 
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
-        ConditionalUtils.onToggle(SkyHanniMod.feature.misc.replaceRomanNumerals) {
+        ConditionalUtils.onToggle(HanniMod.feature.misc.replaceRomanNumerals) {
             itemNameCache.clear()
             compactItemNameCache.clear()
         }
@@ -830,7 +830,7 @@ object ItemUtils {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
-        SkyHanniMod.launchIOCoroutine("shtestitem") {
+        HanniMod.launchIOCoroutine("shtestitem") {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }
@@ -839,7 +839,7 @@ object ItemUtils {
 
     private fun buildTestItemMessage(input: String) = buildList {
         add("".asComponent())
-        add("§bSkyHanni Test Item".asComponent())
+        add("§bHanni Test Item".asComponent())
         add("§eInput: '§f$input§e'".asComponent())
 
         NeuInternalName.fromItemNameOrNull(input)?.let { internalName ->
@@ -950,11 +950,11 @@ object ItemUtils {
     private fun showRepoWarning(item: String) {
         val text = listOf(
             "§c§lMissing repo data for item: $item",
-            "§cData used for some SkyHanni features is not up to date, this should normally not be the case.",
+            "§cData used for some Hanni features is not up to date, this should normally not be the case.",
             "§cYou can try §l/$resetCommand§r§c and restart your game to see if that fixes the issue.",
-            "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
+            "§cIf the problem persists please join the Hanni Discord and message in §l#support§r§c to get support.",
         )
-        NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
+        NotificationManager.queueNotification(HanniNotification(text, INFINITE, true))
     }
 
     fun NBTTagCompound.getStringList(key: String): List<String> {

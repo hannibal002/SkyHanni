@@ -3,7 +3,7 @@
 const float pi = 3.14159265f;
 const float tau = 6.2831853f;
 
-layout(std140) uniform SkyHanniRoundedUniforms {
+layout(std140) uniform HanniRoundedUniforms {
     float scaleFactor;
     float radius;
     float smoothness;
@@ -12,7 +12,7 @@ layout(std140) uniform SkyHanniRoundedUniforms {
     mat4 modelViewMatrix;
 };
 
-layout(std140) uniform SkyHanniRadialGradientCircleUniforms {
+layout(std140) uniform HanniRadialGradientCircleUniforms {
     float angle;
     vec4 startColor;
     vec4 endColor;

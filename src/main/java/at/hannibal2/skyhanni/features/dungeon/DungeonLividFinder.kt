@@ -1,53 +1,53 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.hanni.features.dungeon
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
-import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isWool
-import at.hannibal2.skyhanni.utils.compat.EffectsCompat
-import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.ServerBlockChangeEvent
+import at.hannibal2.hanni.events.dungeon.DungeonBossRoomEnterEvent
+import at.hannibal2.hanni.events.dungeon.DungeonCompleteEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.EntityUtils.canBeSeen
+import at.hannibal2.hanni.utils.EntityUtils.isNpc
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.RecalculatingValue
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.TimeUtils.ticks
+import at.hannibal2.hanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
+import at.hannibal2.hanni.utils.compat.ColoredBlockCompat.Companion.isWool
+import at.hannibal2.hanni.utils.compat.EffectsCompat
+import at.hannibal2.hanni.utils.compat.EffectsCompat.Companion.activePotionEffect
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.exactBoundingBox
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.exactLocation
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 
 // TODO replace all drawLineToEye with LineToMobHandler
 
-@SkyHanniModule
+@HanniModule
 object DungeonLividFinder {
-    private val config get() = SkyHanniMod.feature.dungeon.lividFinder
+    private val config get() = HanniMod.feature.dungeon.lividFinder
     private val blockLocation = LorenzVec(6, 109, 43)
 
     private val isBlind by RecalculatingValue(2.ticks, ::isCurrentlyBlind)
@@ -196,7 +196,7 @@ object DungeonLividFinder {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!inLividBossRoom() || !config.enabled.get()) return
         if (isBlind) return
 

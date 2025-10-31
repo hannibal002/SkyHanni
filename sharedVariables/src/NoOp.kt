@@ -1,4 +1,4 @@
-package at.skyhanni.sharedvariables
+package at.hanni.sharedvariables
 
 import org.gradle.api.Plugin
 /**

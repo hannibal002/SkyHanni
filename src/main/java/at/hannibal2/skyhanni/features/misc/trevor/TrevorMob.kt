@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.trevor
+package at.hannibal2.hanni.features.misc.trevor
 
 import net.minecraft.client.resources.I18n
 

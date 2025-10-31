@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.events.hoppity
+package at.hannibal2.hanni.events.hoppity
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType
 
 class EggFoundEvent(
     val type: HoppityEggType,
     val slotIndex: Int? = null,
     val note: String? = null,
-    val chatEvent: SkyHanniChatEvent? = null
-) : SkyHanniEvent()
+    val chatEvent: HanniChatEvent? = null
+) : HanniEvent()

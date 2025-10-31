@@ -1,35 +1,35 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable.superpairs
+package at.hannibal2.hanni.features.inventory.experimentationtable.superpairs
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.ExperimentationTableApi
-import at.hannibal2.skyhanni.api.TaskType
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.compat.DyeCompat
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.ExperimentationTableApi
+import at.hannibal2.hanni.api.TaskType
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.EnumUtils.isAnyOf
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils.renderStrings
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.hanni.utils.compat.DyeCompat
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO: Split reading into ExperimentationSuperpairApi, leaving display to just use the data
-@SkyHanniModule
+@HanniModule
 object SuperpairDataDisplay {
 
-    private val config get() = SkyHanniMod.feature.inventory.experimentationTable
+    private val config get() = HanniMod.feature.inventory.experimentationTable
 
     private data class SuperpairItem(val slotId: Int, val reward: String, val damage: Int)
     private data class FoundData(

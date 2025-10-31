@@ -1,5 +1,5 @@
-package at.hannibal2.skyhanni.events.inventory
+package at.hannibal2.hanni.events.inventory
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
+import at.hannibal2.hanni.api.event.CancellableHanniEvent
 
-class AttemptedInventoryCloseEvent : CancellableSkyHanniEvent()
+class AttemptedInventoryCloseEvent : CancellableHanniEvent()

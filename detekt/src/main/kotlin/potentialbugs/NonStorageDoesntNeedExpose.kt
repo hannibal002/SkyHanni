@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.detektrules.potentialbugs
+package at.hannibal2.hanni.detektrules.potentialbugs
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import at.hannibal2.skyhanni.detektrules.potentialbugs.StorageNeedsExpose.Companion.CONFIG_PACKAGE
-import at.hannibal2.skyhanni.detektrules.potentialbugs.StorageNeedsExpose.Companion.STORAGE_PACKAGE
+import at.hannibal2.hanni.detektrules.HanniRule
+import at.hannibal2.hanni.detektrules.potentialbugs.StorageNeedsExpose.Companion.CONFIG_PACKAGE
+import at.hannibal2.hanni.detektrules.potentialbugs.StorageNeedsExpose.Companion.STORAGE_PACKAGE
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
 
-class NonStorageDoesntNeedExpose(config: Config): SkyHanniRule(config) {
+class NonStorageDoesntNeedExpose(config: Config): HanniRule(config) {
     override val issue = Issue(
         "NonStorageDoesntNeedExpose",
         Severity.Defect,

@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.events.minecraft.packet
+package at.hannibal2.hanni.events.minecraft.packet
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
+import at.hannibal2.hanni.api.event.CancellableHanniEvent
 import net.minecraft.network.Packet
 
-class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
+class PacketSentEvent(val packet: Packet<*>) : CancellableHanniEvent() {
 
-    fun findOriginatingModCall(skipSkyhanni: Boolean = false): StackTraceElement? {
+    fun findOriginatingModCall(skipHanni: Boolean = false): StackTraceElement? {
         return Thread.currentThread().stackTrace
             // Skip calls before the event is being called
             .dropWhile { !isNetworkHandlerClass(it.className) }
             // Limit the remaining callstack until only the main entrypoint to hide the relauncher
             .takeWhile { !it.className.endsWith(".Main") }
-            // Drop minecraft or skyhanni call frames
+            // Drop minecraft or hanni call frames
             .dropWhile {
-                startsWithMinecraft(it.className) || (skipSkyhanni && it.className.startsWith("at.hannibal2.skyhanni."))
+                startsWithMinecraft(it.className) || (skipHanni && it.className.startsWith("at.hannibal2.hanni."))
             }
             .firstOrNull()
     }

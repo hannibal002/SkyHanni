@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config
+package at.hannibal2.hanni.config
 
 // Some position elements don't need config links as they don't have a config option.
 // Use this annotation to mark config elements that don't need a config link.

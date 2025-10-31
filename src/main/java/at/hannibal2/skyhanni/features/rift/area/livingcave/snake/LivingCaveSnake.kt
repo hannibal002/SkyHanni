@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.features.rift.area.livingcave.snake
+package at.hannibal2.hanni.features.rift.area.livingcave.snake
 
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveSnakeFeatures
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.render.LineDrawer
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.features.rift.area.livingcave.LivingCaveSnakeFeatures
+import at.hannibal2.hanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.render.LineDrawer
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.init.Blocks
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -43,7 +43,7 @@ class LivingCaveSnake(
 
     private fun isSelected() = LivingCaveSnakeFeatures.selectedSnake == this
 
-    fun render(event: SkyHanniRenderWorldEvent, currentRole: LivingCaveSnakeFeatures.Role) {
+    fun render(event: HanniRenderWorldEvent, currentRole: LivingCaveSnakeFeatures.Role) {
         if (blocks.isEmpty()) return
         if (SkyBlockUtils.debug) {
             event.drawString(head.add(0.5, 0.8, 0.5), "§fstate = $state", isSelected())
@@ -72,7 +72,7 @@ class LivingCaveSnake(
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec) {
+    private fun HanniRenderWorldEvent.renderBlock(location: LorenzVec) {
         val isSelected = isSelected()
         drawColor(location, state.chromaColor, alpha = 1f, seeThroughBlocks = isSelected)
         if (isSelected) {

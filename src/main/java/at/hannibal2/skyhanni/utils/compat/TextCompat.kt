@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.compat
+package at.hannibal2.hanni.utils.compat
 
-import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzColor
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -8,11 +8,11 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
 //#if MC < 1.16
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
 import net.minecraft.util.ChatComponentText
 //#endif
 //#if MC > 1.16
-//$$ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+//$$ import at.hannibal2.hanni.utils.collection.TimeLimitedCache
 //$$ import net.minecraft.ChatFormatting
 //$$ import net.minecraft.network.chat.MutableComponent
 //$$ import net.minecraft.network.chat.TextColor
@@ -379,11 +379,11 @@ fun IChatComponent.convertToJsonString(): String {
 //$$     return mutableText.append(newText)
 //$$ }
 //#else
-fun at.hannibal2.skyhanni.utils.compat.Text.append(string: String): at.hannibal2.skyhanni.utils.compat.Text {
-    return at.hannibal2.skyhanni.utils.compat.Text.of(this.text + string)
+fun at.hannibal2.hanni.utils.compat.Text.append(string: String): at.hannibal2.hanni.utils.compat.Text {
+    return at.hannibal2.hanni.utils.compat.Text.of(this.text + string)
 }
 
-fun at.hannibal2.skyhanni.utils.compat.Text.append(newText: Text): at.hannibal2.skyhanni.utils.compat.Text {
-    return at.hannibal2.skyhanni.utils.compat.Text.of(this.text + newText.text)
+fun at.hannibal2.hanni.utils.compat.Text.append(newText: Text): at.hannibal2.hanni.utils.compat.Text {
+    return at.hannibal2.hanni.utils.compat.Text.of(this.text + newText.text)
 }
 //#endif

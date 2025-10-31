@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import kotlin.time.Duration.Companion.minutes

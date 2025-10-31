@@ -1,57 +1,57 @@
-package at.hannibal2.skyhanni.api.pet
+package at.hannibal2.hanni.api.pet
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.PetData
-import at.hannibal2.skyhanni.data.PetDataStorage
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
-import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.PetUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstUniqueByOrNull
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigFileType
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.PetData
+import at.hannibal2.hanni.data.PetDataStorage
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuItemJson
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.WidgetUpdateEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NumberUtil.formatDouble
+import at.hannibal2.hanni.utils.NumberUtil.formatDoubleOrNull
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.PetUtils
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getPetInfo
+import at.hannibal2.hanni.utils.StringUtils.removeResets
+import at.hannibal2.hanni.utils.collection.CollectionUtils.firstUniqueByOrNull
+import at.hannibal2.hanni.utils.collection.CollectionUtils.indexOfFirstOrNull
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.hanni.utils.compat.formattedTextCompat
+import at.hannibal2.hanni.utils.compat.hover
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import java.util.regex.Matcher
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object PetStorageApi {
 
-    private val config get() = SkyHanniMod.feature.misc.pets
+    private val config get() = HanniMod.feature.misc.pets
     private val petStorage get() = ProfileStorageData.petProfiles
     private val patternGroup = RepoPattern.group("misc.pet.storage")
     private const val PET_MENU_CURRENT_PET_SLOT = 4
@@ -172,7 +172,7 @@ object PetStorageApi {
     @HandleEvent
     fun onSecondPassed() {
         if (!jsonNeedsSave || lastSaved.passedSince() < 30.seconds) return
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
+        HanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
         jsonNeedsSave = false
         lastSaved = SimpleTimeMark.now()
     }
@@ -219,7 +219,7 @@ object PetStorageApi {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         autoPetMessagePattern.matchMatcher(event.message) {
             if (config.hideAutopet) event.blockedReason = "autopet"
 
@@ -431,7 +431,7 @@ object PetStorageApi {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shresetpetstorage") {
-            description = "Removes all pets from SkyHanni's storage"
+            description = "Removes all pets from Hanni's storage"
             category = CommandCategory.USERS_RESET
             callback {
                 ProfileStorageData.petProfiles = PetDataStorage.ProfileSpecific()

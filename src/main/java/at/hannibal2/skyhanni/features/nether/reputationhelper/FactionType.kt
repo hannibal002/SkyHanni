@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.nether.reputationhelper
+package at.hannibal2.hanni.features.nether.reputationhelper
 
 enum class FactionType(val factionName: String) {
     BARBARIAN("Barbarian"),

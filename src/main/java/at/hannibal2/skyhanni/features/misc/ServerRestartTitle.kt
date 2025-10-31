@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.title.TitleContext
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ScoreboardData
+import at.hannibal2.hanni.data.title.TitleContext
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object ServerRestartTitle {
 
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = HanniMod.feature.misc
     private val patternGroup = RepoPattern.group("features.misc.serverrestart")
     private var timerTitleContext: TitleContext? = null
 

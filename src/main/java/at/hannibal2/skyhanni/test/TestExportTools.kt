@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.CopyItemCommand.copyItemToClipboard
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.KSerializable
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.GuiKeyPressEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.CopyItemCommand.copyItemToClipboard
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.KSerializable
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.KotlinTypeAdapterFactory
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.compat.stackUnderCursor
 //#if TODO
-import at.hannibal2.skyhanni.utils.json.ItemStackTypeAdapterFactory
-import at.hannibal2.skyhanni.utils.json.NBTTypeAdapter
+import at.hannibal2.hanni.utils.json.ItemStackTypeAdapterFactory
+import at.hannibal2.hanni.utils.json.NBTTypeAdapter
 //#endif
-import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.hanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
@@ -24,10 +24,10 @@ import net.minecraft.nbt.NBTTagCompound
 import java.io.InputStreamReader
 import java.io.Reader
 
-@SkyHanniModule
+@HanniModule
 object TestExportTools {
 
-    private val config get() = SkyHanniMod.feature.dev.debug
+    private val config get() = HanniMod.feature.dev.debug
 
     val gson = GsonBuilder()
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())

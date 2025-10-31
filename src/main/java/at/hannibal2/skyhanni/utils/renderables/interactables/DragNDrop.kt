@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.utils.renderables.interactables
+package at.hannibal2.hanni.utils.renderables.interactables
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.decorators.RenderableDecoratorOnlyRender
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.decorators.RenderableDecoratorOnlyRender
+import at.hannibal2.hanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object DragNDrop {
 
     private var currentDrag: DragItem<*>? = null

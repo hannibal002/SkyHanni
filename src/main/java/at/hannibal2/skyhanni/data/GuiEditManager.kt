@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
-import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.SignUtils.isGardenSign
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.DrawContext
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.config.core.config.gui.GuiPositionEditor
+import at.hannibal2.hanni.events.GuiPositionMovedEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.SignUtils.isGardenSign
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.utils.compat.DrawContext
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -28,7 +28,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object GuiEditManager {
 
     private var lastHotkeyPressed = SimpleTimeMark.farPast()
@@ -39,7 +39,7 @@ object GuiEditManager {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
+        if (event.keyCode != HanniMod.feature.gui.keyBindOpen) return
         if (event.keyCode == Keyboard.KEY_RETURN) {
             ChatUtils.chat("You can't use Enter as a keybind to open the gui editor!")
             return
@@ -90,8 +90,8 @@ object GuiEditManager {
 
     @JvmStatic
     fun openGuiPositionEditor(hotkeyReminder: Boolean) {
-        SkyHanniMod.shouldCloseScreen = false
-        SkyHanniMod.screenToOpen = GuiPositionEditor(
+        HanniMod.shouldCloseScreen = false
+        HanniMod.screenToOpen = GuiPositionEditor(
             currentPositions.values.toList(),
             2,
             Minecraft.getMinecraft().currentScreen as? GuiContainer,

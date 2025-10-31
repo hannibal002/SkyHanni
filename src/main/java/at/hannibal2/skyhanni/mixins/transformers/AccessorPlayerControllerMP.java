@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
 import net.minecraft.util.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
@@ -9,5 +9,5 @@ import net.minecraft.client.multiplayer.PlayerControllerMP;
 @Mixin(PlayerControllerMP.class)
 public interface AccessorPlayerControllerMP {
     @Accessor("currentBlock")
-    BlockPos skyhanni_getCurrentBlock();
+    BlockPos hanni_getCurrentBlock();
 }

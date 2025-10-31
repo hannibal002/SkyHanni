@@ -1,37 +1,37 @@
-package at.hannibal2.skyhanni.features.rift.area.dreadfarm
+package at.hannibal2.hanni.features.rift.area.dreadfarm
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftWoodenButtonsJson
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
-import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.features.rift.RiftApi.isBlowgun
-import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints.soulLocations
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ClickType
+import at.hannibal2.hanni.data.IslandGraphs
+import at.hannibal2.hanni.data.jsonobjects.repo.RiftWoodenButtonsJson
+import at.hannibal2.hanni.data.model.GraphNode
+import at.hannibal2.hanni.data.model.GraphNodeTag
+import at.hannibal2.hanni.events.BlockClickEvent
+import at.hannibal2.hanni.events.ItemClickEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.features.rift.RiftApi.isBlowgun
+import at.hannibal2.hanni.features.rift.everywhere.EnigmaSoulWaypoints.soulLocations
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.hanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.GraphUtils.getNearestNode
+import at.hannibal2.hanni.utils.LocationUtils.canBeSeen
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockButtonWood
 import net.minecraft.init.Blocks
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object WoodenButtonsHelper {
 
     private val config get() = RiftApi.config.enigmaSoulWaypoints
@@ -146,7 +146,7 @@ object WoodenButtonsHelper {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!checkButtons()) return
 
         buttonHitPattern.matchMatcher(event.message) {
@@ -167,7 +167,7 @@ object WoodenButtonsHelper {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!showButtons()) return
 
         val spot = currentSpot ?: return

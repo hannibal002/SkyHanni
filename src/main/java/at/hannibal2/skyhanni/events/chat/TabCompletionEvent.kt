@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.events.chat
+package at.hannibal2.hanni.events.chat
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.utils.system.PlatformUtils
 
 class TabCompletionEvent(
     val leftOfCursor: String,
     val fullText: String,
     private val originalCompletions: List<String>,
-) : SkyHanniEvent() {
+) : HanniEvent() {
     val lastWord = leftOfCursor.substringAfterLast(' ')
     private val additionalSuggestions = mutableSetOf<String>()
 

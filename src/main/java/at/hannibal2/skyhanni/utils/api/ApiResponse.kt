@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.api
+package at.hannibal2.hanni.utils.api
 
 import com.google.gson.JsonElement
 

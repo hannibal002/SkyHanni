@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.init;
+package at.hannibal2.hanni.mixins.init;
 
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.lib.tree.AbstractInsnNode;
@@ -28,10 +28,10 @@ import java.util.Collection;
  *
  *
  * <pre>{@code
- * @Inject(method = "...", at = @At(value = "SKYHANNI_FORLOOP_LOCAL_VAR", args = "lvIndex=1"))
+ * @Inject(method = "...", at = @At(value = "HANNI_FORLOOP_LOCAL_VAR", args = "lvIndex=1"))
  * }</pre>
  */
-@InjectionPoint.AtCode("SKYHANNI_FORLOOP_LOCAL_VAR")
+@InjectionPoint.AtCode("HANNI_FORLOOP_LOCAL_VAR")
 public class BeforeForLoopInjectionPoint extends InjectionPoint {
     private final int lvIndex;
 

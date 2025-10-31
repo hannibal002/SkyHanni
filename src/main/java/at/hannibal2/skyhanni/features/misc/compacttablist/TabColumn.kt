@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.compacttablist
+package at.hannibal2.hanni.features.misc.compacttablist
 
 class TabColumn(val columnTitle: String) {
 

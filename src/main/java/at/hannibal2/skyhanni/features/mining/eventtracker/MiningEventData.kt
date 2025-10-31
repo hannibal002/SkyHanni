@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.mining.eventtracker
+package at.hannibal2.hanni.features.mining.eventtracker
 
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.hanni.data.IslandType
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 

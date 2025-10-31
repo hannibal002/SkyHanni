@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.tweaker;
+package at.hannibal2.hanni.tweaker;
 
 import javax.swing.JButton;
 import java.awt.Desktop;

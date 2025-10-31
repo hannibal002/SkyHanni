@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.commands
+package at.hannibal2.hanni.config.commands
 
-import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
-import at.hannibal2.skyhanni.utils.CommandArgument
-import at.hannibal2.skyhanni.utils.CommandContextAwareObject
+import at.hannibal2.hanni.config.commands.brigadier.CommandData
+import at.hannibal2.hanni.utils.CommandArgument
+import at.hannibal2.hanni.utils.CommandContextAwareObject
 import com.mojang.brigadier.CommandDispatcher
 //#if MC < 1.21
 import net.minecraft.command.ICommand

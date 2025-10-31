@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo
+package at.hannibal2.hanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.hanni.data.IslandType
 import com.google.gson.annotations.Expose
 
 data class ExcludedSeaCreatureAreasJson(

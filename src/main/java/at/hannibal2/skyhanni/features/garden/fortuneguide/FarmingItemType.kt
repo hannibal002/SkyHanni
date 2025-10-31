@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide
+package at.hannibal2.hanni.features.garden.fortuneguide
 
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.ItemCategory
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.compat.setCustomItemName
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 

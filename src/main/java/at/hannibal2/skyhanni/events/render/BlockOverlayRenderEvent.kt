@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.events.render
+package at.hannibal2.hanni.events.render
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
+import at.hannibal2.hanni.api.event.CancellableHanniEvent
 
-class BlockOverlayRenderEvent(val overlayType: OverlayType) : CancellableSkyHanniEvent()
+class BlockOverlayRenderEvent(val overlayType: OverlayType) : CancellableHanniEvent()
 
 enum class OverlayType {
     FIRE,

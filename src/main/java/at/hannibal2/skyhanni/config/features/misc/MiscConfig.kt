@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.config.features.misc
+package at.hannibal2.hanni.config.features.misc
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.NoConfigLink
-import at.hannibal2.skyhanni.config.OnlyLegacy
-import at.hannibal2.skyhanni.config.OnlyModern
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
-import at.hannibal2.skyhanni.config.features.minion.MinionsConfig
-import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
-import at.hannibal2.skyhanni.config.features.pets.PetConfig
-import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.NoConfigLink
+import at.hannibal2.hanni.config.OnlyLegacy
+import at.hannibal2.hanni.config.OnlyModern
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.config.enums.OutsideSBFeature
+import at.hannibal2.hanni.config.features.commands.CommandsConfig
+import at.hannibal2.hanni.config.features.minion.MinionsConfig
+import at.hannibal2.hanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
+import at.hannibal2.hanni.config.features.pets.PetConfig
+import at.hannibal2.hanni.config.features.stranded.StrandedConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -335,7 +335,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Fix Patcher Lines",
-        desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else.",
+        desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks Hanni's line from middle of player to somewhere else.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -453,7 +453,7 @@ class MiscConfig {
     var gfsPiggyBank: Boolean = true
 
     @Expose
-    @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
+    @ConfigOption(name = "Hanni User Luck", desc = "Shows Hanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
     @FeatureToggle
     var userLuck: Boolean = true
@@ -462,7 +462,7 @@ class MiscConfig {
     @ConfigOption(
         name = "Computer Time Offset Warning",
         desc = "Sends a Chat Warning if your computer time is not synchronized with the actual time.\n" +
-            "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly.",
+            "§cMaking sure your computer time is correct is important for Hanni to display times correctly.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -482,7 +482,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Transparent Tooltips",
-        desc = "Shows item tooltips transparent. This only impacts tooltips shown in SkyHanni GUI's.. §cFUN!",
+        desc = "Shows item tooltips transparent. This only impacts tooltips shown in Hanni GUI's.. §cFUN!",
     )
     @ConfigEditorBoolean
     var transparentTooltips: Boolean = false

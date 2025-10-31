@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
+package at.hannibal2.hanni.config.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider

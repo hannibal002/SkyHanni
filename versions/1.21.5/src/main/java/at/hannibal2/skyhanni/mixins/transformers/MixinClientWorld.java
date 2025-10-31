@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent;
+import at.hannibal2.hanni.events.entity.EntityEnterWorldEvent;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#if MC > 1.21.8
-//$$ import at.hannibal2.skyhanni.features.misc.ParticleHider;
+//$$ import at.hannibal2.hanni.features.misc.ParticleHider;
 //$$ import net.minecraft.block.BlockState;
 //$$ import net.minecraft.util.math.BlockPos;
 //$$ import net.minecraft.util.math.Direction;

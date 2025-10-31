@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers.gui;
+package at.hannibal2.hanni.mixins.transformers.gui;
 
-import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent;
+import at.hannibal2.hanni.events.render.gui.ReplaceItemEvent;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;

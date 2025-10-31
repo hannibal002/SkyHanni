@@ -1,38 +1,38 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
+package at.hannibal2.hanni.features.inventory.chocolatefactory.stray
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFStrayRabbitWarningConfig.StrayTypeEntry
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
-import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityTextureHandler
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.caughtRabbitPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.specialRabbitTextures
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeGoldenRabbitPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeRabbitPattern
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
-import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.config.features.inventory.chocolatefactory.CFStrayRabbitWarningConfig.StrayTypeEntry
+import at.hannibal2.hanni.data.jsonobjects.repo.HoppityEggLocationsJson
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryUpdatedEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.hanni.events.inventory.AttemptedInventoryCloseEvent
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType
+import at.hannibal2.hanni.features.event.hoppity.HoppityTextureHandler
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi.caughtRabbitPattern
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi.specialRabbitTextures
+import at.hannibal2.hanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeGoldenRabbitPattern
+import at.hannibal2.hanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeRabbitPattern
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.hanni.utils.ItemUtils.getSingleLineLore
+import at.hannibal2.hanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils.highlight
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
@@ -40,7 +40,7 @@ import net.minecraft.item.ItemStack
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object CFStrayWarning {
 
     private val config get() = CFApi.config
@@ -194,7 +194,7 @@ object CFStrayWarning {
         event.sendPreventCloseTitle()
     }
 
-    private fun SkyHanniEvent.Cancellable.sendPreventCloseTitle() {
+    private fun HanniEvent.Cancellable.sendPreventCloseTitle() {
         TitleManager.sendTitle(
             "§cStray Rabbit Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",

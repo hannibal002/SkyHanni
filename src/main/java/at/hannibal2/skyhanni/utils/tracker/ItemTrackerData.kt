@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils.tracker
+package at.hannibal2.hanni.utils.tracker
 
-import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.config.storage.Resettable
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
 
 abstract class ItemTrackerData : Resettable {
@@ -14,7 +14,7 @@ abstract class ItemTrackerData : Resettable {
     // TODO add amount in the string
     abstract fun getCoinDescription(item: TrackedItem): List<String>
 
-    open fun getCustomPricePer(internalName: NeuInternalName) = SkyHanniTracker.getPricePer(internalName)
+    open fun getCustomPricePer(internalName: NeuInternalName) = HanniTracker.getPricePer(internalName)
 
     override fun reset() {
         super.reset()

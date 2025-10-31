@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.features.commands
+package at.hannibal2.hanni.config.features.commands
 
-import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.hanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -20,7 +20,7 @@ class BetterWikiCommandConfig {
 
     // TODO Make this method not suck
     @Expose
-    @ConfigOption(name = "SkyBlock Guide", desc = "Use SkyHanni's method in the SkyBlock Guide.")
+    @ConfigOption(name = "SkyBlock Guide", desc = "Use Hanni's method in the SkyBlock Guide.")
     @ConfigEditorBoolean
     @FeatureToggle
     var sbGuide: Boolean = false

@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.misc.visualwords
+package at.hannibal2.hanni.features.misc.visualwords
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.enums.OutsideSBFeature
+import at.hannibal2.hanni.mixins.transformers.AccessorMixinGuiNewChat
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.convertToFormatted
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.minutes
 
-@SkyHanniModule
+@HanniModule
 object ModifyVisualWords {
 
-    private val config get() = SkyHanniMod.feature.gui.modifyWords
+    private val config get() = HanniMod.feature.gui.modifyWords
     private val textCache = TimeLimitedCache<String, String>(5.minutes)
 
     // Replacements the user added manually via /shwords
@@ -30,8 +30,8 @@ object ModifyVisualWords {
     fun update() {
         finalWordsList = modModifiedWords + userModifiedWords
         textCache.clear()
-        SkyHanniMod.visualWordsData.modifiedWords = userModifiedWords
-        (Minecraft.getMinecraft().ingameGUI.chatGUI as Any as AccessorMixinGuiNewChat).refreshChat_skyhanni()
+        HanniMod.visualWordsData.modifiedWords = userModifiedWords
+        (Minecraft.getMinecraft().ingameGUI.chatGUI as Any as AccessorMixinGuiNewChat).refreshChat_hanni()
     }
 
     @HandleEvent
@@ -58,8 +58,8 @@ object ModifyVisualWords {
         if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) return originalText
         if (!changeWords) return originalText
 
-        if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
-            userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords)
+        if (userModifiedWords.isEmpty() && HanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
+            userModifiedWords.addAll(HanniMod.visualWordsData.modifiedWords)
             update()
         }
 

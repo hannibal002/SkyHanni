@@ -1,35 +1,35 @@
-package at.hannibal2.skyhanni.features.mining.powdertracker
+package at.hannibal2.hanni.features.mining.powdertracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.hotx.HotmData
-import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.TimeUnit
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.mining.nucleus.PowderChestTimerConfig
+import at.hannibal2.hanni.data.ClickType
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.hotx.HotmData
+import at.hannibal2.hanni.events.BlockClickEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.PlaySoundEvent
+import at.hannibal2.hanni.events.ServerBlockChangeEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.RecalculatingValue
+import at.hannibal2.hanni.utils.RenderUtils.renderString
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.TimeUnit
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.block.BlockChest
 import net.minecraft.block.state.IBlockState
 import java.awt.Color
@@ -37,10 +37,10 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object PowderChestTimer {
 
-    private val config get() = SkyHanniMod.feature.mining.powderChestTimer
+    private val config get() = HanniMod.feature.mining.powderChestTimer
 
     private var display: String? = null
     private val chests = TimeLimitedCache<LorenzVec, SimpleTimeMark>(61.seconds)
@@ -121,7 +121,7 @@ object PowderChestTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         val chests = chests.takeIf { it.isNotEmpty() }?.toMap() ?: return
 
@@ -134,7 +134,7 @@ object PowderChestTimer {
         event.drawRemainingLines(chestToConnect)
     }
 
-    private fun SkyHanniRenderWorldEvent.drawFirstLine(list: List<Map.Entry<LorenzVec, SimpleTimeMark>>) {
+    private fun HanniRenderWorldEvent.drawFirstLine(list: List<Map.Entry<LorenzVec, SimpleTimeMark>>) {
         val (firstPos, firstTime) = list.first()
 
         drawLineToEye(
@@ -145,7 +145,7 @@ object PowderChestTimer {
         )
     }
 
-    private fun SkyHanniRenderWorldEvent.drawRemainingLines(list: List<Map.Entry<LorenzVec, SimpleTimeMark>>) {
+    private fun HanniRenderWorldEvent.drawRemainingLines(list: List<Map.Entry<LorenzVec, SimpleTimeMark>>) {
         for ((first, second) in list.zipWithNext()) {
             val (current, currentTime) = first
             val (next, _) = second
@@ -165,7 +165,7 @@ object PowderChestTimer {
         return sortedChests.take(config.drawLineToChestAmount)
     }
 
-    private fun SkyHanniRenderWorldEvent.renderChests(chests: Map<LorenzVec, SimpleTimeMark>) {
+    private fun HanniRenderWorldEvent.renderChests(chests: Map<LorenzVec, SimpleTimeMark>) {
         val playerY = LocationUtils.playerLocation().y
         for ((loc, time) in chests) {
             val timeLeft = time.timeUntil()

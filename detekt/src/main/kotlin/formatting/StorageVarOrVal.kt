@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.detektrules.formatting
+package at.hannibal2.hanni.detektrules.formatting
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import at.hannibal2.skyhanni.detektrules.potentialbugs.StorageNeedsExpose.Companion.CONFIG_PACKAGE
-import at.hannibal2.skyhanni.detektrules.potentialbugs.StorageNeedsExpose.Companion.STORAGE_PACKAGE
-import at.hannibal2.skyhanni.detektrules.utils.DetektUtils.doWeNeedToCheckConfigProp
+import at.hannibal2.hanni.detektrules.HanniRule
+import at.hannibal2.hanni.detektrules.potentialbugs.StorageNeedsExpose.Companion.CONFIG_PACKAGE
+import at.hannibal2.hanni.detektrules.potentialbugs.StorageNeedsExpose.Companion.STORAGE_PACKAGE
+import at.hannibal2.hanni.detektrules.utils.DetektUtils.doWeNeedToCheckConfigProp
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.types.typeUtil.isEnum
 import org.jetbrains.kotlin.types.typeUtil.isPrimitiveNumberType
 
 @RequiresTypeResolution
-class StorageVarOrVal(config: Config) : SkyHanniRule(config) {
+class StorageVarOrVal(config: Config) : HanniRule(config) {
     override val issue = Issue(
         "StorageVarOrVal",
         Severity.CodeSmell,

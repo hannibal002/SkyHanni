@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ActionBarStatsData
-import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ActionBarStatsData
+import at.hannibal2.hanni.events.ActionBarValueUpdateEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
 
-@SkyHanniModule
+@HanniModule
 object SkyblockXPInChat {
 
-    val config get() = SkyHanniMod.feature.chat.skyBlockXPInChat
+    val config get() = HanniMod.feature.chat.skyBlockXPInChat
 
     @HandleEvent
     fun onActionBarValueUpdate(event: ActionBarValueUpdateEvent) {

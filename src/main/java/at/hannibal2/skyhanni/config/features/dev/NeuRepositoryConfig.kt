@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.dev
+package at.hannibal2.hanni.config.features.dev
 
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
-import at.hannibal2.skyhanni.data.repo.AbstractRepoConfig
-import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
+import at.hannibal2.hanni.api.enoughupdates.EnoughUpdatesRepoManager
+import at.hannibal2.hanni.data.repo.AbstractRepoConfig
+import at.hannibal2.hanni.data.repo.AbstractRepoLocationConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

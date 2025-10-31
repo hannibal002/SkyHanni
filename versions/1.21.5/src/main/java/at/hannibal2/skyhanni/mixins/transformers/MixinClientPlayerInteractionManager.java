@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.data.ClickType;
-import at.hannibal2.skyhanni.events.BlockClickEvent;
-import at.hannibal2.skyhanni.events.ItemClickEvent;
-import at.hannibal2.skyhanni.utils.InventoryUtils;
-import at.hannibal2.skyhanni.utils.LorenzVec;
-import at.hannibal2.skyhanni.utils.LorenzVecKt;
+import at.hannibal2.hanni.data.ClickType;
+import at.hannibal2.hanni.events.BlockClickEvent;
+import at.hannibal2.hanni.events.ItemClickEvent;
+import at.hannibal2.hanni.utils.InventoryUtils;
+import at.hannibal2.hanni.utils.LorenzVec;
+import at.hannibal2.hanni.utils.LorenzVecKt;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;

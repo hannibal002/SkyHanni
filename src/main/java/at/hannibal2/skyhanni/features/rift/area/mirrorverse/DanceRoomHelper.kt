@@ -1,33 +1,33 @@
-package at.hannibal2.skyhanni.features.rift.area.mirrorverse
+package at.hannibal2.hanni.features.rift.area.mirrorverse
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DanceRoomInstructionsJson
-import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.TitleReceivedEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.jsonobjects.repo.DanceRoomInstructionsJson
+import at.hannibal2.hanni.data.mob.MobFilter.isRealPlayer
+import at.hannibal2.hanni.data.repo.HanniRepoManager
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.PlaySoundEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.TitleReceivedEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LocationUtils.isPlayerInside
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 import kotlin.time.Duration
 
-@SkyHanniModule
+@HanniModule
 object DanceRoomHelper {
 
     private var display = emptyList<Renderable>()
@@ -45,7 +45,7 @@ object DanceRoomHelper {
             addString("§cError fetching Dance Room Instructions!")
             Renderable.optionalLink(
                 "§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo §c(Click to update now)",
-                onLeftClick = { SkyHanniRepoManager.updateRepo("click on chat after dance doom error") },
+                onLeftClick = { HanniRepoManager.updateRepo("click on chat after dance doom error") },
             ).let { add(it) }
         }
     }
@@ -102,7 +102,7 @@ object DanceRoomHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         // We want this to run even if not enabled, so that the Hide Other Players feature
         // properly updates without the helper being enabled
         if (event.isMod(10)) {
@@ -170,7 +170,7 @@ object DanceRoomHelper {
     }
 
     // TODO maybe change to run delayed or tick based timer
-    fun start(interval: Long) = SkyHanniMod.launchCoroutine("rift dance room helper", timeout = Duration.INFINITE) {
+    fun start(interval: Long) = HanniMod.launchCoroutine("rift dance room helper", timeout = Duration.INFINITE) {
         while (isActive && foundNext) {
             index++
             startCountdown(0, 500)

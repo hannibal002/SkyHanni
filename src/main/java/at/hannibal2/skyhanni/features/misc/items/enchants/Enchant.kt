@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.misc.items.enchants
+package at.hannibal2.hanni.features.misc.items.enchants
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.chroma.ChromaManager
-import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.StringUtils.insert
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.features.chroma.ChromaManager
+import at.hannibal2.hanni.utils.ItemCategory
+import at.hannibal2.hanni.utils.ItemUtils.extraAttributes
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.hanni.utils.ItemUtils.repoItemName
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.StringUtils.insert
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.splitCamelCase
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
@@ -40,7 +40,7 @@ open class Enchant : Comparable<Enchant> {
     open fun getFormattedName(level: Int, itemStack: ItemStack?) = getFormat(level, itemStack) + loreName
 
     open fun getFormat(level: Int, itemStack: ItemStack? = null): String {
-        val config = SkyHanniMod.feature.inventory.enchantParsing
+        val config = HanniMod.feature.inventory.enchantParsing
 
         // TODO change color to string (support for bold)
         var color = when {
@@ -74,7 +74,7 @@ open class Enchant : Comparable<Enchant> {
      * @param itemStack The ItemStack of the hovered item. Can be null, e.g. when hovering over `/show` items
      */
     private fun checkExceptions(color: Property<LorenzColor>, level: Int, itemStack: ItemStack?): Property<LorenzColor> {
-        val config = SkyHanniMod.feature.inventory.enchantParsing
+        val config = HanniMod.feature.inventory.enchantParsing
 
         val itemCategory = itemStack?.getItemCategoryOrNull()
         val internalName = itemStack?.getInternalNameOrNull()

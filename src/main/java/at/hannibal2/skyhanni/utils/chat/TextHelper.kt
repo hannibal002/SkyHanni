@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.utils.chat
+package at.hannibal2.hanni.utils.chat
 
-import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.ExtendedChatColor
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
-import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.appendString
-import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.hanni.utils.ColorUtils
+import at.hannibal2.hanni.utils.ExtendedChatColor
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.compat.addDeletableMessageToChat
+import at.hannibal2.hanni.utils.compat.append
+import at.hannibal2.hanni.utils.compat.appendString
+import at.hannibal2.hanni.utils.compat.command
+import at.hannibal2.hanni.utils.compat.hover
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.awt.Color
 //#if MC < 1.21
-import at.hannibal2.skyhanni.utils.compat.Text
+import at.hannibal2.hanni.utils.compat.Text
 import net.minecraft.util.ChatComponentText
 //#endif
 //#if MC > 1.16

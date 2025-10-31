@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo.neu
+package at.hannibal2.hanni.data.jsonobjects.repo.neu
 
-import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 

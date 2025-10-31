@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.misc.trevor
+package at.hannibal2.hanni.features.misc.trevor
 
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.LorenzVec
 
 enum class TrapperMobArea(val location: String, val coordinates: LorenzVec) {
     OASIS("Oasis", LorenzVec(126.0, 77.0, -456.0)),

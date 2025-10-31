@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.hanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.api.pet.CurrentPetApi
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
 
 object MythicRabbitPetWarning {

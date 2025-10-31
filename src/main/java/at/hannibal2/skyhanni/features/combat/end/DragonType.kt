@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.combat.end
+package at.hannibal2.hanni.features.combat.end
 
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.StringUtils.firstLetterUppercase
 
 enum class DragonType(
     val color: LorenzColor,

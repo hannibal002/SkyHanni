@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.garden.optimalspeed
+package at.hannibal2.hanni.config.features.garden.optimalspeed
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider

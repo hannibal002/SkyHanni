@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.api.event
+package at.hannibal2.hanni.api.event
 
-import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.optionalEmpty
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.hanni.api.minecraftevents.ClientEvents
+import at.hannibal2.hanni.data.jsonobjects.repo.DisabledEventsJson
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.collection.CollectionUtils.optionalEmpty
+import at.hannibal2.hanni.utils.collection.CollectionUtils.removeIfKey
 import java.lang.reflect.Method
 
-@SkyHanniModule
-object SkyHanniEvents {
+@HanniModule
+object HanniEvents {
 
-    private val listeners: MutableMap<Class<out SkyHanniEvent>, EventListeners> = mutableMapOf()
-    private val handlers: MutableMap<Class<out SkyHanniEvent>, EventHandler<out SkyHanniEvent>> = mutableMapOf()
+    private val listeners: MutableMap<Class<out HanniEvent>, EventListeners> = mutableMapOf()
+    private val handlers: MutableMap<Class<out HanniEvent>, EventHandler<out HanniEvent>> = mutableMapOf()
     private var disabledHandlers = emptySet<String>()
     private var disabledHandlerInvokers = emptySet<String>()
 
@@ -30,7 +30,7 @@ object SkyHanniEvents {
     fun unregister(instance: Any) = instance.javaClass.declaredMethods.forEach(::unregisterMethod)
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : SkyHanniEvent> getEventHandler(event: Class<T>): EventHandler<T> = handlers.getOrPut(event) {
+    fun <T : HanniEvent> getEventHandler(event: Class<T>): EventHandler<T> = handlers.getOrPut(event) {
         EventHandler(
             event,
             getEventClasses(event).mapNotNull { listeners[it] }.flatMap(EventListeners::getListeners),
@@ -49,19 +49,19 @@ object SkyHanniEvents {
     }
 
     @JvmStatic
-    val eventPrimaryFunctionNames: Map<String, Class<out SkyHanniEvent>> =
+    val eventPrimaryFunctionNames: Map<String, Class<out HanniEvent>> =
         GeneratedEventPrimaryFunctionNames.map
 
     @Suppress("UNCHECKED_CAST")
-    private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+    private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out HanniEvent>>>? {
         val options = method.getAnnotation(HandleEvent::class.java) ?: return null
         when (method.parameterCount) {
             1 -> {
                 val eventType = method.parameterTypes.first()
-                require(SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
-                    "Method ${method.name} parameter must be a subclass of SkyHanniEvent."
+                require(HanniEvent::class.java.isAssignableFrom(eventType)) {
+                    "Method ${method.name} parameter must be a subclass of HanniEvent."
                 }
-                return options to listOf(eventType as Class<out SkyHanniEvent>)
+                return options to listOf(eventType as Class<out HanniEvent>)
             }
 
             0 -> {
@@ -69,7 +69,7 @@ object SkyHanniEvents {
                 if (primaryFunctionEventType != null) {
                     return options to listOf(primaryFunctionEventType)
                 }
-                if (options.eventType != SkyHanniEvent::class) return options to listOf(options.eventType.java)
+                if (options.eventType != HanniEvent::class) return options to listOf(options.eventType.java)
                 require(options.eventTypes.isNotEmpty()) {
                     "Method ${method.name} must have at least one event type specified in @HandleEvent."
                 }
@@ -87,7 +87,7 @@ object SkyHanniEvents {
         }
     }
 
-    private fun unregisterHandler(clazz: Class<out SkyHanniEvent>) {
+    private fun unregisterHandler(clazz: Class<out HanniEvent>) {
         this.handlers.removeIfKey { it.isAssignableFrom(clazz) }
     }
 
@@ -173,7 +173,7 @@ object SkyHanniEvents {
     }
 
     /**
-     * Returns a list of all super classes and the class itself up to [SkyHanniEvent].
+     * Returns a list of all super classes and the class itself up to [HanniEvent].
      */
     private fun getEventClasses(clazz: Class<*>): List<Class<*>> {
         val classes = mutableListOf<Class<*>>()
@@ -183,10 +183,10 @@ object SkyHanniEvents {
         @Suppress("LoopWithTooManyJumpStatements")
         while (current.superclass != null) {
             val superClass = current.superclass
-            if (superClass == SkyHanniEvent::class.java) break
-            if (superClass == GenericSkyHanniEvent::class.java) break
-            if (superClass == RenderingSkyHanniEvent::class.java) break
-            if (superClass == CancellableSkyHanniEvent::class.java) break
+            if (superClass == HanniEvent::class.java) break
+            if (superClass == GenericHanniEvent::class.java) break
+            if (superClass == RenderingHanniEvent::class.java) break
+            if (superClass == CancellableHanniEvent::class.java) break
             classes.add(superClass)
             current = superClass
         }

@@ -1,4 +1,4 @@
-package skyhannibuildsystem
+package hannibuildsystem
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty

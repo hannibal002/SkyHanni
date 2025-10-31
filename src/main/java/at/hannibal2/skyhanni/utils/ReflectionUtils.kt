@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles

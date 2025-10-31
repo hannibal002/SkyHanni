@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.data.model
+package at.hannibal2.hanni.data.model
 
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.utils.LorenzColor
 
 enum class GraphNodeTag(
     val internalName: String,

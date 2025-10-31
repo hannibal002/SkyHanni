@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.features.garden.visitor
+package at.hannibal2.hanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.isInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.events.garden.visitor.VisitorAcceptedEvent
+import at.hannibal2.hanni.events.garden.visitor.VisitorArrivalEvent
+import at.hannibal2.hanni.events.garden.visitor.VisitorLeftEvent
+import at.hannibal2.hanni.events.garden.visitor.VisitorRefusedEvent
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ColorUtils.addAlpha
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NumberUtil.isInt
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import java.awt.Color
 
-@SkyHanniModule
+@HanniModule
 object VisitorApi {
 
     private var visitors = mapOf<String, Visitor>()

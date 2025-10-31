@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.core.elements
+package at.hannibal2.hanni.config.core.elements
 
-import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
+import at.hannibal2.hanni.utils.ConfigUtils.asStructuredText
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import java.awt.Color
 

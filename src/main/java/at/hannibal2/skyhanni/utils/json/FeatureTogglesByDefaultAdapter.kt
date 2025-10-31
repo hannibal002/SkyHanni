@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils.json
+package at.hannibal2.hanni.utils.json
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.utils.ReflectionUtils.getDeclaredFieldOrNull
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive

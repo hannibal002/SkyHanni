@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.features.garden.pests.stereo
+package at.hannibal2.hanni.features.garden.pests.stereo
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
-import at.hannibal2.skyhanni.features.garden.pests.PestApi
-import at.hannibal2.skyhanni.features.garden.pests.PestType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.hanni.features.garden.GardenApi.getItemStackCopy
+import at.hannibal2.hanni.features.garden.pests.PestApi
+import at.hannibal2.hanni.features.garden.pests.PestType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils.addEnchantGlint
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.ItemUtils.setLore
+import at.hannibal2.hanni.utils.RegexUtils.anyMatches
+import at.hannibal2.hanni.utils.compat.setCustomItemName
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object StereoHarmonyDiscReplacer {
 
     private val config get() = PestApi.config.stereoHarmony

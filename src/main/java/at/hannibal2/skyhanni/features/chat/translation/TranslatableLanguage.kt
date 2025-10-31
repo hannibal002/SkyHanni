@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.chat.translation
+package at.hannibal2.hanni.features.chat.translation
 
 enum class TranslatableLanguage(private val englishName: String, private val nativeName: String, val languageCode: String) {
 

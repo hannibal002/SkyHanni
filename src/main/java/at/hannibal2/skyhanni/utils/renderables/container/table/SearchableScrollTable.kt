@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.utils.renderables.container.table
+package at.hannibal2.hanni.utils.renderables.container.table
 
-import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.filterListMap
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.renderables.ScrollInput
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
-import at.hannibal2.skyhanni.utils.renderables.container.SlidingWindowWithScrollHints
-import at.hannibal2.skyhanni.utils.renderables.container.absoluteProvider
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.data.model.TextInput
+import at.hannibal2.hanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.hanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.Renderable.Companion.filterListMap
+import at.hannibal2.hanni.utils.renderables.Renderable.Companion.shouldAllowLink
+import at.hannibal2.hanni.utils.renderables.RenderableUtils
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.hanni.utils.renderables.ScrollInput
+import at.hannibal2.hanni.utils.renderables.ScrollValue
+import at.hannibal2.hanni.utils.renderables.container.SlidingWindowWithScrollHints
+import at.hannibal2.hanni.utils.renderables.container.absoluteProvider
+import at.hannibal2.hanni.utils.renderables.primitives.text
 
 class SearchableScrollTable private constructor(
     rawContent: Map<List<Renderable>, String?>,

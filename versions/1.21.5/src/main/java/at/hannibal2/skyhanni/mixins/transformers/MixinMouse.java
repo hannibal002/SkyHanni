@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
-import at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook;
-import at.hannibal2.skyhanni.utils.DelayedRun;
-import at.hannibal2.skyhanni.utils.compat.MouseCompat;
+import at.hannibal2.hanni.events.minecraft.KeyDownEvent;
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent;
+import at.hannibal2.hanni.mixins.hooks.MouseSensitivityHook;
+import at.hannibal2.hanni.utils.DelayedRun;
+import at.hannibal2.hanni.utils.compat.MouseCompat;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Mouse;
 import org.spongepowered.asm.mixin.Mixin;

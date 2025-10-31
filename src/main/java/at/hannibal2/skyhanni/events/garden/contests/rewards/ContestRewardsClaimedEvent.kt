@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.events.garden.contests.rewards
+package at.hannibal2.hanni.events.garden.contests.rewards
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.features.garden.AnitaMedalProfit
-import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.config.storage.Resettable
+import at.hannibal2.hanni.features.garden.AnitaMedalProfit
+import at.hannibal2.hanni.features.garden.CropType
 
-class ContestRewardsClaimedEvent(val rewards: ContestRewardSet, val messages: List<String>) : SkyHanniEvent()
+class ContestRewardsClaimedEvent(val rewards: ContestRewardSet, val messages: List<String>) : HanniEvent()
 
 data class ContestRewardSet(
     var jacobTickets: Int = 0,

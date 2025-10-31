@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.test.renderable
+package at.hannibal2.hanni.test.renderable
 
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItemStackProvider
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
-import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackAnimationFrame
-import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackBounceDefinition
-import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackRotationDefinition
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuItemStackProvider
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.hanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
+import at.hannibal2.hanni.utils.renderables.animated.ItemStackAnimationFrame
+import at.hannibal2.hanni.utils.renderables.animated.ItemStackBounceDefinition
+import at.hannibal2.hanni.utils.renderables.animated.ItemStackRotationDefinition
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.container.table.TableRenderable.Companion.table
+import at.hannibal2.hanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing
 
-@SkyHanniModule(devOnly = true)
+@HanniModule(devOnly = true)
 object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
 
     private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())

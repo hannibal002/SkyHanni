@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.shader
+package at.hannibal2.hanni.utils.shader
 
 import java.util.Objects
 //#if MC > 1.21

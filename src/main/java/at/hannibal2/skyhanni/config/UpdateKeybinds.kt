@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.config
+package at.hannibal2.hanni.config
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.NotificationManager
-import at.hannibal2.skyhanni.data.SkyHanniNotification
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.json.Shimmy
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.NotificationManager
+import at.hannibal2.hanni.data.HanniNotification
+import at.hannibal2.hanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.HanniConfigSearchResetCommand
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.json.Shimmy
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object UpdateKeybinds {
 
     @Suppress("LongMethod")
@@ -176,17 +176,17 @@ object UpdateKeybinds {
         if (shouldNotify) {
             val text = listOf(
                 "§c§lMissing Keybind Mapping Data",
-                "§cData used to convert your skyhanni keybinds between versions is outdated",
-                "§cPlease join the SkyHanni Discord and message in §l#support§r§c to get support.",
+                "§cData used to convert your hanni keybinds between versions is outdated",
+                "§cPlease join the Hanni Discord and message in §l#support§r§c to get support.",
             )
-            NotificationManager.queueNotification(SkyHanniNotification(text, Duration.INFINITE, false))
+            NotificationManager.queueNotification(HanniNotification(text, Duration.INFINITE, false))
         }
     }
 
     private fun readKeybindConfig(keybind: String): Pair<Shimmy, Int>? {
-        val shimmy = Shimmy.makeShimmy(SkyHanniMod.feature, keybind.split("."))
+        val shimmy = Shimmy.makeShimmy(HanniMod.feature, keybind.split("."))
             ?: try {
-                ErrorManager.skyHanniError("Could not create shimmy for path $keybind")
+                ErrorManager.hanniError("Could not create shimmy for path $keybind")
             } catch (_: Exception) {
                 return null
             }
@@ -200,12 +200,12 @@ object UpdateKeybinds {
     fun onTick(event: HypixelJoinEvent) {
         if (hasUpdated) return
         hasUpdated = true
-        val config = SkyHanniMod.feature
+        val config = HanniMod.feature
         val lastMcVersion = config.lastMinecraftVersion ?: "1.8.9"
         val currentMcVersion = PlatformUtils.MC_VERSION
         config.lastMinecraftVersion = currentMcVersion
         if (!config.storage.hasPlayedBefore) {
-            logger.log("User has never used skyhanni before!")
+            logger.log("User has never used hanni before!")
             return
         }
         if (lastMcVersion == currentMcVersion || (lastMcVersion != "1.8.9" && currentMcVersion != "1.8.9")) {
@@ -224,7 +224,7 @@ object UpdateKeybinds {
             val (_, currentValue) = readKeybindConfig(keybind) ?: continue
 
             if (currentValue >= 255) {
-                SkyHanniConfigSearchResetCommand.resetCommand(arrayOf("reset", "config.$keybind"))
+                HanniConfigSearchResetCommand.resetCommand(arrayOf("reset", "config.$keybind"))
                 logger.log("$keybind old $currentValue")
                 logger.log("$keybind resetting to default because it was above 255 on 1.8")
 
@@ -236,20 +236,20 @@ object UpdateKeybinds {
     }
 
     private fun resetKeybind(key: String) {
-        SkyHanniConfigSearchResetCommand.resetCommand(arrayOf("reset", "config.$key"))
+        HanniConfigSearchResetCommand.resetCommand(arrayOf("reset", "config.$key"))
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetkeybinds") {
             category = CommandCategory.USERS_RESET
-            description = "Resets all of your skyhanni keybinds"
+            description = "Resets all of your hanni keybinds"
             aliases = listOf("shkeybindreset")
             simpleCallback {
                 for (keybind in keybinds) {
                     resetKeybind(keybind)
                 }
-                ChatUtils.chat("§aSuccessfully reset all SkyHanni Keybinds")
+                ChatUtils.chat("§aSuccessfully reset all Hanni Keybinds")
             }
         }
     }

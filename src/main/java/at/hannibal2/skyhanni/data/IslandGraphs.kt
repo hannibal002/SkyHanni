@@ -1,46 +1,46 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandGraphSettingsJson
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
-import at.hannibal2.skyhanni.features.misc.IslandAreas
-import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.GraphUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.IslandGraphSettingsJson
+import at.hannibal2.hanni.data.model.Graph
+import at.hannibal2.hanni.data.model.GraphNode
+import at.hannibal2.hanni.data.repo.HanniRepoManager
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.IslandGraphReloadEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.entity.EntityMoveEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.events.skyblock.ScoreboardAreaChangeEvent
+import at.hannibal2.hanni.features.misc.IslandAreas
+import at.hannibal2.hanni.features.misc.pathfind.NavigationFeedback
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.GraphUtils
+import at.hannibal2.hanni.utils.GraphUtils.distanceSqToPlayer
+import at.hannibal2.hanni.utils.GraphUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.GraphUtils.playerPosition
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.onClick
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.hover
+import at.hannibal2.hanni.utils.compat.normalizeAsArray
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityPlayerSP
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
@@ -98,7 +98,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * 	option to compare two graphs, and store multiple graphs in the edit mode in paralell
  */
 
-@SkyHanniModule
+@HanniModule
 object IslandGraphs {
 
     var currentIslandGraph: Graph? = null
@@ -180,7 +180,7 @@ object IslandGraphs {
     @HandleEvent
     fun onWorldChange() {
         currentIslandGraph = null
-        if (currentTarget != null) NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped because of world switch!")
+        if (currentTarget != null) NavigationFeedback.sendPathFindMessage("§e[Hanni] Navigation stopped because of world switch!")
         reset()
     }
 
@@ -264,9 +264,9 @@ object IslandGraphs {
     private fun reloadFromJson(islandName: String) {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
-        SkyHanniMod.launchCoroutine("load island graph data for $islandName") {
+        HanniMod.launchCoroutine("load island graph data for $islandName") {
             try {
-                val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
+                val graph = HanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
                 IslandAreas.display = null
                 DelayedRun.runNextTick {
                     setNewGraph(graph)
@@ -304,10 +304,10 @@ object IslandGraphs {
     }
 
     /**
-     * calling before [at.hannibal2.skyhanni.test.graph.GraphEditor], so that we always have the latest playerPosition.
+     * calling before [at.hannibal2.hanni.test.graph.GraphEditor], so that we always have the latest playerPosition.
      */
     @HandleEvent(priority = -1)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         GraphUtils.updatePlayerPosition()
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
@@ -330,7 +330,7 @@ object IslandGraphs {
         GraphUtils.updatePlayerPosition()
         currentTarget?.let {
             if (distanceSqToPlayer(it) < 9) {
-                NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$label§e!")
+                NavigationFeedback.sendPathFindMessage("§e[Hanni] Navigation reached §r$label§e!")
                 reset()
                 onFound()
             }
@@ -552,20 +552,20 @@ object IslandGraphs {
         }
 
         val percentage = (1 - (distance / totalDistance)) * 100
-        val component = "§e[SkyHanni] Navigating to §r$label §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
+        val component = "§e[Hanni] Navigating to §r$label §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
         component.onClick(onClick = ::cancelClick)
         component.hover = "§eClick to stop navigating!".asComponent()
         NavigationFeedback.sendPathFindMessage(component)
     }
 
     fun cancelClick() {
-        NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
+        NavigationFeedback.sendPathFindMessage("§e[Hanni] Navigation stopped!")
         stop()
         onManualCancel()
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (currentIslandGraph == null) return
         val path = fastestPath ?: return
 
@@ -647,7 +647,7 @@ object IslandGraphs {
             callback {
                 if (currentTarget != null) {
                     stop()
-                    NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
+                    NavigationFeedback.sendPathFindMessage("§e[Hanni] Navigation stopped!")
                 } else {
                     ChatUtils.userError("No navigation is currently active.")
                 }
@@ -713,7 +713,7 @@ object IslandGraphs {
             data["area scoreboard"] = scoreboardArea
         }
 
-        SkyHanniRepoManager.localRepoCommit.let { (hash, time) ->
+        HanniRepoManager.localRepoCommit.let { (hash, time) ->
             data["repo update time"] = time?.toString() ?: "none"
             data["repo update age"] = time?.passedSince() ?: "unknown"
             data["repo update hash"] = hash ?: "none"

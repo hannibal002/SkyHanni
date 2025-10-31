@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.jsonobjects.local;
+package at.hannibal2.hanni.data.jsonobjects.local;
 
 import com.google.gson.annotations.Expose;
 

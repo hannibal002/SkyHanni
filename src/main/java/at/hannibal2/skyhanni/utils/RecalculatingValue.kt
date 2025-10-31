@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuItems.getItemStack
 import net.minecraft.item.ItemStack
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -63,7 +63,7 @@ class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<An
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): ItemStack = value.getValue(thisRef, property)
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
         val list = mutableListOf<ResettableValue<ItemStack>>()
 

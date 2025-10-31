@@ -1,26 +1,26 @@
-package at.hannibal2.skyhanni.test.graph
+package at.hannibal2.hanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.misc.IslandAreas.getAreaTag
-import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandGraphs
+import at.hannibal2.hanni.data.IslandGraphs.pathFind
+import at.hannibal2.hanni.data.model.GraphNode
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.features.misc.IslandAreas.getAreaTag
+import at.hannibal2.hanni.features.misc.pathfind.NavigationHelper
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.GraphUtils
+import at.hannibal2.hanni.utils.GraphUtils.distanceSqToPlayer
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
 import java.awt.Color
 
 // Trying to find errors in Area Graph for the current graph editor instance
-@SkyHanniModule
+@HanniModule
 object GraphEditorBugFinder {
     private var errorsInWorld = emptyMap<GraphNode, String>()
 
     fun runTests() {
-        SkyHanniMod.launchCoroutine("graph editor bug finder") {
+        HanniMod.launchCoroutine("graph editor bug finder") {
             asyncTest()
         }
     }
@@ -90,7 +90,7 @@ object GraphEditorBugFinder {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         for ((node, text) in errorsInWorld) {

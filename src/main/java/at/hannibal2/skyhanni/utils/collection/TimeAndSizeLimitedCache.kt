@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.collection
+package at.hannibal2.hanni.utils.collection
 
 import com.google.common.cache.Cache
 import com.google.common.cache.RemovalCause

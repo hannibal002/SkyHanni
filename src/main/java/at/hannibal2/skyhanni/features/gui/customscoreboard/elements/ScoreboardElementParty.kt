@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.data.PartyApi
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard
+import at.hannibal2.hanni.utils.SkyBlockUtils
 
 // internal
 // add party update event

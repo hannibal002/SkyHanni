@@ -1,60 +1,60 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.hanni.features.event.diana
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.ElectionCandidate
-import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
-import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
-import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
-import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.addDoublePlant
-import at.hannibal2.skyhanni.utils.compat.addLeaves
-import at.hannibal2.skyhanni.utils.compat.addLeaves2
-import at.hannibal2.skyhanni.utils.compat.addRedFlower
-import at.hannibal2.skyhanni.utils.compat.addTallGrass
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.data.ElectionCandidate
+import at.hannibal2.hanni.data.EntityMovementData
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.BlockClickEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.ItemClickEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.diana.BurrowDetectEvent
+import at.hannibal2.hanni.events.diana.BurrowDugEvent
+import at.hannibal2.hanni.events.diana.BurrowGuessEvent
+import at.hannibal2.hanni.events.entity.EntityMoveEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.features.event.diana.DianaApi.isDianaSpade
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.hanni.utils.BlockUtils.isInLoadedChunk
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayerIgnoreY
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.addDoublePlant
+import at.hannibal2.hanni.utils.compat.addLeaves
+import at.hannibal2.hanni.utils.compat.addLeaves2
+import at.hannibal2.hanni.utils.compat.addRedFlower
+import at.hannibal2.hanni.utils.compat.addTallGrass
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawLineToEye
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object GriffinBurrowHelper {
 
-    private val config get() = SkyHanniMod.feature.event.diana
+    private val config get() = HanniMod.feature.event.diana
 
     private val allowedBlocksAboveGround = buildList {
         add(Blocks.air)
@@ -240,7 +240,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
@@ -328,7 +328,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         showTestLocations(event)
@@ -412,7 +412,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    private fun showTestLocations(event: SkyHanniRenderWorldEvent) {
+    private fun showTestLocations(event: HanniRenderWorldEvent) {
         if (!testGriffinSpots) return
         for (location in testList) {
             // TODO add chroma color support via config
@@ -470,7 +470,7 @@ object GriffinBurrowHelper {
             if (!ElectionCandidate.DIANA.isActive()) {
                 ChatUtils.chatAndOpenConfig(
                     "§cSelect Diana as mayor overwrite!",
-                    SkyHanniMod.feature.dev.debug::assumeMayor,
+                    HanniMod.feature.dev.debug::assumeMayor,
                 )
 
             } else {

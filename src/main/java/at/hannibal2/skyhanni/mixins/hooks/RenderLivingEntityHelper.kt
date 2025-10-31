@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.GlobalRender
-import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.GlobalRender
+import at.hannibal2.hanni.events.RenderEntityOutlineEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.collection.CollectionUtils.removeIfKey
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
 
-@SkyHanniModule
+@HanniModule
 object RenderLivingEntityHelper {
 
     private val entityColorMap = mutableMapOf<EntityLivingBase, Color>()
@@ -56,7 +56,7 @@ object RenderLivingEntityHelper {
         entityNoHurtTimeCondition.clear()
     }
 
-    @HandleEvent(SkyHanniTickEvent::class)
+    @HandleEvent(HanniTickEvent::class)
     fun onTick() {
         entityColorMap.removeIfKey { it.isDead }
         entityColorCondition.removeIfKey { it.isDead }

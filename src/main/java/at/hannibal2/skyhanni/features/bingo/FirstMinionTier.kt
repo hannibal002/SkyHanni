@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.features.bingo
+package at.hannibal2.hanni.features.bingo
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.PrimitiveRecipe
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.hanni.utils.PrimitiveRecipe
+import at.hannibal2.hanni.utils.StringUtils.removeColor
 
 object FirstMinionTier {
 

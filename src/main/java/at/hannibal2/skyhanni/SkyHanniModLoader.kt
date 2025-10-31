@@ -1,32 +1,32 @@
-package at.hannibal2.skyhanni
+package at.hannibal2.hanni
 
-import at.hannibal2.skyhanni.SkyHanniMod.modules
-import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
+import at.hannibal2.hanni.HanniMod.modules
+import at.hannibal2.hanni.test.hotswap.HotswapSupport
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 
 @Mod(
-    modid = SkyHanniMod.MODID,
+    modid = HanniMod.MODID,
     clientSideOnly = true,
     useMetadata = true,
-    guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = SkyHanniMod.VERSION,
-    modLanguageAdapter = "at.hannibal2.skyhanni.utils.system.KotlinLanguageAdapter",
+    guiFactory = "at.hannibal2.hanni.config.ConfigGuiForgeInterop",
+    version = HanniMod.VERSION,
+    modLanguageAdapter = "at.hannibal2.hanni.utils.system.KotlinLanguageAdapter",
 )
-class SkyHanniModLoader {
+class HanniModLoader {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
         HotswapSupport.load()
-        SkyHanniMod.preInit()
+        HanniMod.preInit()
         loadedClasses.clear()
     }
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent?) {
-        SkyHanniMod.init()
+        HanniMod.init()
     }
 
     companion object {

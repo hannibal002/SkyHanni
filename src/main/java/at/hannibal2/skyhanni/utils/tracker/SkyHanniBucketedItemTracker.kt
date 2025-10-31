@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.utils.tracker
+package at.hannibal2.hanni.utils.tracker
 
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
-import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.hanni.data.ItemAddManager
+import at.hannibal2.hanni.events.ItemAddEvent
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.addNullableButton
+import at.hannibal2.hanni.utils.renderables.Searchable
 
 @Suppress("SpreadOperator")
-abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTrackerData<E>>(
+abstract class HanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTrackerData<E>>(
     name: String,
     createNewSession: () -> BucketedData,
     getStorage: (ProfileSpecificStorage) -> BucketedData,
     drawDisplay: (BucketedData) -> List<Searchable>,
     extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> BucketedData> = emptyMap(),
-) : SkyHanniItemTracker<BucketedData>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
+) : HanniItemTracker<BucketedData>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
 
     final override fun addCoins(amount: Int, command: Boolean) =
         throw UnsupportedOperationException("Use addCoins(bucket, coins, command) instead")

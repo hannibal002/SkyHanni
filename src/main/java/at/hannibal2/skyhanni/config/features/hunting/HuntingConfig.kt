@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.config.features.hunting
+package at.hannibal2.hanni.config.features.hunting
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyLegacy
-import at.hannibal2.skyhanni.config.OnlyModern
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.OnlyLegacy
+import at.hannibal2.hanni.config.OnlyModern
+import at.hannibal2.hanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -22,8 +22,8 @@ class HuntingConfig {
 
     @ConfigOption(
         name = "§cNotice",
-        desc = "To see all Hunting features, please launch the game on a modern version of Minecraft with SkyHanni installed.\n" +
-            "§eJoin the SkyHanni Discord for a guide on how to migrate the config.",
+        desc = "To see all Hunting features, please launch the game on a modern version of Minecraft with Hanni installed.\n" +
+            "§eJoin the Hanni Discord for a guide on how to migrate the config.",
     )
     @OnlyLegacy
     @ConfigEditorInfoText

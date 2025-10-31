@@ -1,6 +1,6 @@
 # Open Source Software
 
-SkyHanni would not be possible without the following open source software:
+Hanni would not be possible without the following open source software:
 
 | Software                                                                       | License                                                                                                           |
 |--------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|

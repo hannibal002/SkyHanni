@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.chroma
+package at.hannibal2.hanni.features.chroma
 
 /**
  * A type of chroma shader generally used for standard GUI elements using Gui.drawRect and

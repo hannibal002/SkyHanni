@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.features.mining.crystalhollows
+package at.hannibal2.hanni.features.mining.crystalhollows
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.render.QuadDrawer
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.inflateBlock
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LocationUtils.getCornersAtHeight
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.render.QuadDrawer
+import at.hannibal2.hanni.utils.render.WorldRenderUtils
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.expandBlock
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.inflateBlock
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
 
-@SkyHanniModule
+@HanniModule
 object CrystalHollowsWalls {
 
-    private val config get() = SkyHanniMod.feature.mining.crystalHollowsAreaWalls
+    private val config get() = HanniMod.feature.mining.crystalHollowsAreaWalls
 
     private enum class Area(val color: Color) {
         MITHRIL(LorenzColor.GREEN.addOpacity(60)),
@@ -68,7 +68,7 @@ object CrystalHollowsWalls {
     private fun Double.shiftNZ() = this - LorenzVec.expandVector.z * EXPAND_TIMES
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         val position = WorldRenderUtils.getViewerPos(event.partialTicks)
         when {
@@ -96,23 +96,23 @@ object CrystalHollowsWalls {
         }
     }
 
-    private fun drawGoblin(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
+    private fun drawGoblin(event: HanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(true, false, Area.JUNGLE.color, Area.PRECURSOR.color)
     }
 
-    private fun drawJungle(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
+    private fun drawJungle(event: HanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(true, true, Area.GOBLIN.color, Area.MITHRIL.color)
     }
 
-    private fun drawPrecursor(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
+    private fun drawPrecursor(event: HanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(false, false, Area.MITHRIL.color, Area.GOBLIN.color)
     }
 
-    private fun drawMithril(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
+    private fun drawMithril(event: HanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         drawArea(false, true, Area.PRECURSOR.color, Area.JUNGLE.color)
     }
 
-    private fun drawHeat(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
+    private fun drawHeat(event: HanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         val heatHeight = HEAT_HEIGHT.shiftNY()
         draw(
             LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.minZ),
@@ -127,7 +127,7 @@ object CrystalHollowsWalls {
         drawHeatAreaForHeat(true, true, Area.JUNGLE.color, heatHeight)
     }
 
-    private fun drawNucleus(event: SkyHanniRenderWorldEvent) {
+    private fun drawNucleus(event: HanniRenderWorldEvent) {
         val (southEastCorner, southWestCorner, northWestCorner, northEastCorner) =
             nucleusBBInflate.getCornersAtHeight(nucleusBBInflate.minY)
         val (southEastTopCorner, southWestTopCorner, northWestTopCorner, northEastTopCorner) =

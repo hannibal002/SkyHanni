@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.shader.CircleShader
-import at.hannibal2.skyhanni.shader.RadialGradientCircleShader
-import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
-import at.hannibal2.skyhanni.shader.RoundedRectangleShader
-import at.hannibal2.skyhanni.shader.RoundedShader
-import at.hannibal2.skyhanni.shader.RoundedTextureShader
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.shader.CircleShader
+import at.hannibal2.hanni.shader.RadialGradientCircleShader
+import at.hannibal2.hanni.shader.RoundedRectangleOutlineShader
+import at.hannibal2.hanni.shader.RoundedRectangleShader
+import at.hannibal2.hanni.shader.RoundedShader
+import at.hannibal2.hanni.shader.RoundedTextureShader
+import at.hannibal2.hanni.utils.ColorUtils.toColor
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
@@ -15,10 +15,10 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.BufferBuilder
 import net.minecraft.util.Identifier
 //#if MC > 1.21.6
-//$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniCircleUniform
-//$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleUniform
-//$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedOutlineUniform
-//$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedUniform
+//$$ import at.hannibal2.hanni.utils.render.uniforms.HanniCircleUniform
+//$$ import at.hannibal2.hanni.utils.render.uniforms.HanniRadialGradientCircleUniform
+//$$ import at.hannibal2.hanni.utils.render.uniforms.HanniRoundedOutlineUniform
+//$$ import at.hannibal2.hanni.utils.render.uniforms.HanniRoundedUniform
 //$$ import com.mojang.blaze3d.buffers.GpuBufferSlice
 //$$ import com.mojang.blaze3d.systems.ProjectionType
 //$$ import net.minecraft.client.render.ProjectionMatrix2
@@ -32,11 +32,11 @@ import net.minecraft.util.Identifier
 object RoundedShapeDrawer {
 
     //#if MC > 1.21.6
-    //$$ val projectionMatrix = ProjectionMatrix2("SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true)
-    //$$ var roundedUniform = SkyHanniRoundedUniform()
-    //$$ var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
-    //$$ var circleUniform = SkyHanniCircleUniform()
-    //$$ var radialGradientCircleUniform = SkyHanniRadialGradientCircleUniform()
+    //$$ val projectionMatrix = ProjectionMatrix2("Hanni Rounded Shapes", 1000.0f, 11000.0f, true)
+    //$$ var roundedUniform = HanniRoundedUniform()
+    //$$ var roundedOutlineUniform = HanniRoundedOutlineUniform()
+    //$$ var circleUniform = HanniCircleUniform()
+    //$$ var radialGradientCircleUniform = HanniRadialGradientCircleUniform()
     //$$ var roundedBufferSlice: GpuBufferSlice? = null
     //$$ var roundedOutlineBufferSlice: GpuBufferSlice? = null
     //$$ var circleBufferSlice: GpuBufferSlice? = null
@@ -56,7 +56,7 @@ object RoundedShapeDrawer {
         if (withSmoothness) renderPass.setUniform("smoothness", this.smoothness)
         if (withHalfSize) renderPass.setUniform("halfSize", this.halfSize[0], this.halfSize[1])
         //#else
-        //$$ renderPass.setUniform("SkyHanniRoundedUniforms", roundedBufferSlice)
+        //$$ renderPass.setUniform("HanniRoundedUniforms", roundedBufferSlice)
         //#endif
     }
 
@@ -138,7 +138,7 @@ object RoundedShapeDrawer {
 
     fun drawRoundedRect(left: Int, top: Int, right: Int, bottom: Int, color: Int) =
         RoundedRectangleShader.performVQuadAndUniforms(
-            SkyHanniRenderPipeline.ROUNDED_RECT(),
+            HanniRenderPipeline.ROUNDED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf { color(color) },
         )
@@ -152,7 +152,7 @@ object RoundedShapeDrawer {
         RenderSystem.assertOnRenderThread()
         RenderSystem.setShaderTexture(0, glTex)
         RoundedTextureShader.performVQuadAndUniforms(
-            SkyHanniRenderPipeline.ROUNDED_TEXTURED_RECT(),
+            HanniRenderPipeline.ROUNDED_TEXTURED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
                 { texture(0f, 0f) },
@@ -168,7 +168,7 @@ object RoundedShapeDrawer {
 
     fun drawRoundedRectOutline(left: Int, top: Int, right: Int, bottom: Int, topColor: Int, bottomColor: Int) =
         RoundedRectangleOutlineShader.performVQuadAndUniforms(
-            SkyHanniRenderPipeline.ROUNDED_RECT_OUTLINE(),
+            HanniRenderPipeline.ROUNDED_RECT_OUTLINE(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
                 { color(topColor) },
@@ -187,13 +187,13 @@ object RoundedShapeDrawer {
             setUniform("borderThickness", RoundedRectangleOutlineShader.borderThickness)
             setUniform("borderBlur", RoundedRectangleOutlineShader.borderBlur)
             //#else
-            //$$ setUniform("SkyHanniRoundedOutlineUniforms", roundedOutlineBufferSlice)
+            //$$ setUniform("HanniRoundedOutlineUniforms", roundedOutlineBufferSlice)
             //#endif
         }
 
     fun drawRoundedRect(left: Int, top: Int, right: Int, bottom: Int, topColor: Int, bottomColor: Int) =
         RoundedRectangleShader.performVQuadAndUniforms(
-            SkyHanniRenderPipeline.ROUNDED_RECT(),
+            HanniRenderPipeline.ROUNDED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
                 { color(topColor) },
@@ -205,7 +205,7 @@ object RoundedShapeDrawer {
 
     fun drawCircle(left: Int, top: Int, right: Int, bottom: Int, color: Int) =
         CircleShader.performVQuadAndUniforms(
-            SkyHanniRenderPipeline.CIRCLE(),
+            HanniRenderPipeline.CIRCLE(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf { color(color) },
             //#if MC > 1.21.6
@@ -218,13 +218,13 @@ object RoundedShapeDrawer {
             setUniform("angle1", CircleShader.angle1)
             setUniform("angle2", CircleShader.angle2)
             //#else
-            //$$ setUniform("SkyHanniCircleUniforms", circleBufferSlice)
+            //$$ setUniform("HanniCircleUniforms", circleBufferSlice)
             //#endif
         }
 
     fun drawGradientCircle(left: Int, top: Int, right: Int, bottom: Int, startColor: ChromaColour, endColor: ChromaColour) =
         RadialGradientCircleShader.performVQuadAndUniforms(
-            SkyHanniRenderPipeline.RADIAL_GRADIENT_CIRCLE(),
+            HanniRenderPipeline.RADIAL_GRADIENT_CIRCLE(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
                 { color(startColor.toColor().rgb) },
@@ -250,7 +250,7 @@ object RoundedShapeDrawer {
             setUniform("progress", RadialGradientCircleShader.progress)
             setUniform("phaseOffset", RadialGradientCircleShader.phaseOffset)
             //#else
-            //$$ setUniform("SkyHanniRadialGradientCircleUniforms", radialGradientCircleBufferSlice)
+            //$$ setUniform("HanniRadialGradientCircleUniforms", radialGradientCircleBufferSlice)
             //#endif
         }
 

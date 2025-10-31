@@ -1,34 +1,34 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.features.inventory.FixIronman
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.getPlayerNames
-import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.events.RawScoreboardUpdateEvent
+import at.hannibal2.hanni.events.ScoreboardUpdateEvent
+import at.hannibal2.hanni.events.minecraft.ScoreboardTitleUpdateEvent
+import at.hannibal2.hanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.hanni.features.inventory.FixIronman
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils.lastColorCode
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.getPlayerNames
+import at.hannibal2.hanni.utils.compat.getSidebarObjective
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.IScoreObjectiveCriteria
 import net.minecraft.scoreboard.ScorePlayerTeam
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+//$$ import at.hannibal2.hanni.utils.compat.formattedTextCompatLessResets
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object ScoreboardData {
 
     var sidebarLinesFormatted: List<String> = emptyList()
@@ -188,18 +188,18 @@ object ScoreboardData {
 
     private fun tryToReplaceScoreboardLineHarder(text: String): String? {
         //#if MC < 1.21
-        if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
+        if (HanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
             return null
         }
         //#endif
-        if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
+        if (HanniMod.feature.misc.hidePiggyScoreboard) {
             PurseApi.piggyPattern.matchMatcher(text) {
                 val coins = group("coins")
                 return "Purse: $coins"
             }
         }
 
-        if (SkyHanniMod.feature.misc.colorMonthNames) {
+        if (HanniMod.feature.misc.colorMonthNames) {
             for (season in Season.entries) {
                 if (text.trim().startsWith(season.prefix)) {
                     return season.colorCode + text

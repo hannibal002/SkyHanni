@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.guide
+package at.hannibal2.hanni.utils.guide
 
 abstract class GuidePage {
     abstract fun drawPage(mouseX: Int, mouseY: Int)

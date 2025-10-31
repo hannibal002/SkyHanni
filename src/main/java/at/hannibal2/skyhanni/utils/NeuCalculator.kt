@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.util.Calculator
 import java.math.BigDecimal
 

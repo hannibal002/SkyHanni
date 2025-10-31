@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface AccessorRendererLivingEntity<T extends EntityLivingBase>
     extends AccessorRender<T> {
     @Invoker("setBrightness")
-    boolean setBrightness_skyhanni(T entityLivingBaseIn, float partialTicks, boolean combineTextures);
+    boolean setBrightness_hanni(T entityLivingBaseIn, float partialTicks, boolean combineTextures);
 
     @Invoker("unsetBrightness")
-    void unsetBrightness_skyhanni();
+    void unsetBrightness_hanni();
 }

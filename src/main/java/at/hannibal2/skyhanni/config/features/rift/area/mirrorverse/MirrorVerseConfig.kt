@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.features.rift.area.mirrorverse
+package at.hannibal2.hanni.config.features.rift.area.mirrorverse
 
-import at.hannibal2.skyhanni.config.features.rift.area.mirrorverse.danceroomhelper.DanceRoomHelperConfig
+import at.hannibal2.hanni.config.features.rift.area.mirrorverse.danceroomhelper.DanceRoomHelperConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption

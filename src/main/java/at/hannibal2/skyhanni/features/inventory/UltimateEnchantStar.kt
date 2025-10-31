@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.hanni.features.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.events.RenderObject
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.RenderItemTipEvent
+import at.hannibal2.hanni.events.RenderObject
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import net.minecraft.init.Items
 
-@SkyHanniModule
+@HanniModule
 object UltimateEnchantStar {
 
-    private val config get() = SkyHanniMod.feature.inventory
+    private val config get() = HanniMod.feature.inventory
 
     @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {

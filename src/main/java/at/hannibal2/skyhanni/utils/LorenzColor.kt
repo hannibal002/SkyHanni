@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.util.EnumChatFormatting

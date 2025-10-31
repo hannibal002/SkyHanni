@@ -1,32 +1,32 @@
-package at.hannibal2.skyhanni.features.gui.quiver
+package at.hannibal2.hanni.features.gui.quiver
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ArrowType
-import at.hannibal2.skyhanni.data.QuiverApi
-import at.hannibal2.skyhanni.data.QuiverApi.amount
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.QuiverUpdateEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
-import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.ArrowType
+import at.hannibal2.hanni.data.QuiverApi
+import at.hannibal2.hanni.data.QuiverApi.amount
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.QuiverUpdateEvent
+import at.hannibal2.hanni.events.dungeon.DungeonCompleteEvent
+import at.hannibal2.hanni.events.kuudra.KuudraCompleteEvent
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.hanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.StringUtils.createCommaSeparatedList
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object QuiverWarning {
 
-    private val config get() = SkyHanniMod.feature.combat.quiverConfig
+    private val config get() = HanniMod.feature.combat.quiverConfig
 
     private var lastLowQuiverReminder = SimpleTimeMark.farPast()
     private val arrowsInInstance = mutableSetOf<ArrowType>()

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
 /**
  * Taken with love (and permission), and adapted from, the NEU source code.

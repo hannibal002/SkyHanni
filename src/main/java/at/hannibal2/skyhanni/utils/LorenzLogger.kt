@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.TimeUtils.formatCurrentTime
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.utils.TimeUtils.formatCurrentTime
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -18,13 +18,13 @@ class LorenzLogger(filePath: String) {
 
     companion object {
 
-        private val LOG_DIRECTORY = File("config/skyhanni/logs")
+        private val LOG_DIRECTORY = File("config/hanni/logs")
         private var PREFIX_PATH: String
         var hasDone = false
 
         init {
             val format = SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
-            PREFIX_PATH = "config/skyhanni/logs/$format/"
+            PREFIX_PATH = "config/hanni/logs/$format/"
         }
     }
 
@@ -63,7 +63,7 @@ class LorenzLogger(filePath: String) {
 
         if (!hasDone && SkyBlockUtils.onHypixel) {
             hasDone = true
-            OSUtils.deleteExpiredFiles(LOG_DIRECTORY, SkyHanniMod.feature.dev.logExpiryTime.days)
+            OSUtils.deleteExpiredFiles(LOG_DIRECTORY, HanniMod.feature.dev.logExpiryTime.days)
         }
 
         return logger

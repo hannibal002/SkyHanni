@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.detektrules.formatting
+package at.hannibal2.hanni.detektrules.formatting
 
 import com.google.auto.service.AutoService
 import io.gitlab.arturbosch.detekt.api.Config

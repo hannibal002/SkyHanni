@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.events.entity
+package at.hannibal2.hanni.events.entity
 
-import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
+import at.hannibal2.hanni.api.event.GenericHanniEvent
 import net.minecraft.entity.Entity
 import net.minecraft.util.DamageSource
 
-class EntityHurtEvent<T : Entity>(val entity: T, val source: DamageSource, val amount: Float) : GenericSkyHanniEvent<T>(entity.javaClass)
+class EntityHurtEvent<T : Entity>(val entity: T, val source: DamageSource, val amount: Float) : GenericHanniEvent<T>(entity.javaClass)

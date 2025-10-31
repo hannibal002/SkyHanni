@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.features.garden.pests
+package at.hannibal2.hanni.features.garden.pests
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.garden.pests.PestTrapConfig
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataEvent
-import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.MAX_TRAPS
-import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.fullTraps
-import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.noBaitTraps
-import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.trapsPlaced
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.garden.pests.PestTrapConfig
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.GuiKeyPressEvent
+import at.hannibal2.hanni.events.garden.pests.PestTrapDataEvent
+import at.hannibal2.hanni.features.garden.pests.PestTrapApi.MAX_TRAPS
+import at.hannibal2.hanni.features.garden.pests.PestTrapApi.fullTraps
+import at.hannibal2.hanni.features.garden.pests.PestTrapApi.noBaitTraps
+import at.hannibal2.hanni.features.garden.pests.PestTrapApi.trapsPlaced
+import at.hannibal2.hanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.SoundUtils.playSound
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.compat.InventoryCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.audio.ISound
 import kotlin.math.max
@@ -30,10 +30,10 @@ import kotlin.time.Duration.Companion.seconds
 private typealias WarningReason = PestTrapConfig.WarningConfig.WarningReason
 private typealias WarningDisplayType = PestTrapConfig.WarningConfig.WarningDisplayType
 
-@SkyHanniModule
+@HanniModule
 object PestTrapFeatures {
 
-    private val config get() = SkyHanniMod.feature.garden.pests.pestTrap
+    private val config get() = HanniMod.feature.garden.pests.pestTrap
     private val enabledTypes: WarningDisplayType get() = config.warningConfig.warningDisplayType.get()
     private val userEnabledWarnings: List<WarningReason> get() = config.warningConfig.enabledWarnings.get()
     private val chatWarnEnabled: Boolean

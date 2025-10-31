@@ -1,5 +1,5 @@
-package at.hannibal2.skyhanni.events.entity
+package at.hannibal2.hanni.events.entity
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
+import at.hannibal2.hanni.api.event.CancellableHanniEvent
 
-class EndermanTeleportEvent : CancellableSkyHanniEvent()
+class EndermanTeleportEvent : CancellableHanniEvent()

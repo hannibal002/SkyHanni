@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.hanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.inventory.AttemptedInventoryCloseEvent
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.RegexUtils.anyMatches
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils.highlight
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SoundUtils
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object HoppityRabbitTheFishChecker {
 
     // <editor-fold desc="Patterns">
@@ -53,7 +53,7 @@ object HoppityRabbitTheFishChecker {
     )
     // </editor-fold>
 
-    private val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val config get() = HanniMod.feature.event.hoppityEggs
     private var rabbitTheFishIndex: Int? = null
 
     @HandleEvent
@@ -95,7 +95,7 @@ object HoppityRabbitTheFishChecker {
         event.sendPreventClosureTitle()
     }
 
-    private fun SkyHanniEvent.Cancellable.sendPreventClosureTitle() {
+    private fun HanniEvent.Cancellable.sendPreventClosureTitle() {
         TitleManager.sendTitle(
             "§cRabbit the Fish Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",

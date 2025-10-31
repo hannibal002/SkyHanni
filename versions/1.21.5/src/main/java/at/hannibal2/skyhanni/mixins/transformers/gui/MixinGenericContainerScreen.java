@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers.gui;
+package at.hannibal2.hanni.mixins.transformers.gui;
 
-import at.hannibal2.skyhanni.mixins.hooks.GenericContainerScreenHook;
+import at.hannibal2.hanni.mixins.hooks.GenericContainerScreenHook;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 //#if MC > 1.21.6
-//$$ import at.hannibal2.skyhanni.data.GuiData;
+//$$ import at.hannibal2.hanni.data.GuiData;
 //$$ import net.minecraft.client.gui.DrawContext;
 //$$ import org.spongepowered.asm.mixin.injection.Inject;
 //$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(GenericContainerScreen.class)
 abstract class MixinGenericContainerScreen {
     @Unique
-    private final GenericContainerScreenHook skyhanni$hook = new GenericContainerScreenHook();
+    private final GenericContainerScreenHook hanni$hook = new GenericContainerScreenHook();
 
     @ModifyArg(
         method = "drawBackground",
@@ -32,7 +32,7 @@ abstract class MixinGenericContainerScreen {
         index = 1
     )
     private Identifier getCustomTexture(Identifier sprite) {
-        return skyhanni$hook.getTexture(sprite);
+        return hanni$hook.getTexture(sprite);
     }
 
     //#if MC > 1.21.6

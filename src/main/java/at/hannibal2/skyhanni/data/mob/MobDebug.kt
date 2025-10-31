@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.data.mob
+package at.hannibal2.hanni.data.mob
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.dev.DebugMobConfig.HowToShow
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
-import at.hannibal2.skyhanni.utils.LocationUtils.getTopCenter
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzDebug
-import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.dev.DebugMobConfig.HowToShow
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
+import at.hannibal2.hanni.utils.LocationUtils.getTopCenter
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzDebug
+import at.hannibal2.hanni.utils.MobUtils
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.expandBlock
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.entity.EntityPlayerSP
 
-@SkyHanniModule
+@HanniModule
 object MobDebug {
 
-    private val config get() = SkyHanniMod.feature.dev.mobDebug.mobDetection
+    private val config get() = HanniMod.feature.dev.mobDebug.mobDetection
 
     private var lastRayHit: Mob? = null
 
@@ -33,13 +33,13 @@ object MobDebug {
 
     private fun Mob.isNotInvisible() = !this.isInvisible() || (config.showInvisible && this == lastRayHit)
 
-    private fun MobData.MobSet.highlight(event: SkyHanniRenderWorldEvent, color: (Mob) -> (ChromaColour)) {
+    private fun MobData.MobSet.highlight(event: HanniRenderWorldEvent, color: (Mob) -> (ChromaColour)) {
         for (mob in filter { it.isNotInvisible() }) {
             event.drawFilledBoundingBox(mob.boundingBox.expandBlock(), color.invoke(mob), 0.3f)
         }
     }
 
-    private fun MobData.MobSet.showName(event: SkyHanniRenderWorldEvent) {
+    private fun MobData.MobSet.showName(event: HanniRenderWorldEvent) {
         val map = filter { it.canBeSeen() && it.isNotInvisible() }
             .map { it.boundingBox.getTopCenter() to it.name }
         for ((location, text) in map) {
@@ -48,7 +48,7 @@ object MobDebug {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (config.showRayHit || config.showInvisible) {
             lastRayHit = MobUtils.rayTraceForMobs(MinecraftCompat.localPlayer, event.partialTicks)
                 ?.firstOrNull { it.canBeSeen() && (!config.showInvisible || !it.isInvisible()) }

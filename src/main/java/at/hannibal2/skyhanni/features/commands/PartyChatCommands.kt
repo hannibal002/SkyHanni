@@ -1,31 +1,31 @@
-package at.hannibal2.skyhanni.features.commands
+package at.hannibal2.hanni.features.commands
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.features.misc.PartyCommandsConfig
-import at.hannibal2.skyhanni.data.FriendApi
-import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
-import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
-import at.hannibal2.skyhanni.features.misc.CurrentPing
-import at.hannibal2.skyhanni.features.misc.TpsCounter
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.config.features.misc.PartyCommandsConfig
+import at.hannibal2.hanni.data.FriendApi
+import at.hannibal2.hanni.data.PartyApi
+import at.hannibal2.hanni.data.hypixel.chat.event.PartyChatEvent
+import at.hannibal2.hanni.events.chat.TabCompletionEvent
+import at.hannibal2.hanni.features.misc.CurrentPing
+import at.hannibal2.hanni.features.misc.TpsCounter
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConfigUtils.jumpToEditor
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object PartyChatCommands {
-    private val config get() = SkyHanniMod.feature.misc.partyCommands
-    private val storage get() = SkyHanniMod.feature.storage
-    private val devConfig get() = SkyHanniMod.feature.dev
+    private val config get() = HanniMod.feature.misc.partyCommands
+    private val storage get() = HanniMod.feature.storage
+    private val devConfig get() = HanniMod.feature.dev
 
     data class PartyChatCommand(
         val names: List<String>,

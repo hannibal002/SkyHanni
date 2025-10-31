@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.core.config
+package at.hannibal2.hanni.config.core.config
 
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 

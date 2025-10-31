@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.mining
+package at.hannibal2.hanni.config.features.mining
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

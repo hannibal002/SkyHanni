@@ -18,13 +18,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with NotEnoughUpdates. If not, see <https://www.gnu.org/licenses/>.
  */
-package at.hannibal2.skyhanni.config.core.config
+package at.hannibal2.hanni.config.core.config
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigGuiManager.getEditorInstance
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.ConfigGuiManager.getEditorInstance
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ConfigUtils
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -80,7 +80,7 @@ class Position @JvmOverloads constructor(
         private set
 
     val effectiveScale: Float
-        get() = if (ignoreCustomScale) DEFAULT_SCALE else (scale * SkyHanniMod.feature.gui.globalScale).coerceIn(MIN_SCALE, MAX_SCALE)
+        get() = if (ignoreCustomScale) DEFAULT_SCALE else (scale * HanniMod.feature.gui.globalScale).coerceIn(MIN_SCALE, MAX_SCALE)
 
     fun set(other: Position): Position {
         this.x = other.x

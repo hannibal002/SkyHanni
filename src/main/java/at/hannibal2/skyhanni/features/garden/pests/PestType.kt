@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.features.garden.pests
+package at.hannibal2.hanni.features.garden.pests
 
-import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.features.combat.damageindicator.BossType
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.pests.stereo.VinylType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
 
 enum class PestType(
     val displayName: String,
@@ -124,7 +124,7 @@ enum class PestType(
         return displayName
     }
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
         val filterableEntries by lazy { entries.filter { it.displayName.isNotEmpty() } }
 

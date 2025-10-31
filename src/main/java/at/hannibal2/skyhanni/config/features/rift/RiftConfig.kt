@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.rift
+package at.hannibal2.hanni.config.features.rift
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.features.rift.area.RiftAreasConfig
-import at.hannibal2.skyhanni.config.features.rift.motes.MotesConfig
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.features.rift.area.RiftAreasConfig
+import at.hannibal2.hanni.config.features.rift.motes.MotesConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category

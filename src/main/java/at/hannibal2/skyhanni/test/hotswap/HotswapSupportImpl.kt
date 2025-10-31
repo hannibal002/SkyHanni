@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.test.hotswap
+package at.hannibal2.hanni.test.hotswap
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.ReflectionUtils.removeFinal
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.hanni.utils.ReflectionUtils.removeFinal
 import moe.nea.hotswapagentforge.forge.ClassDefinitionEvent
 import moe.nea.hotswapagentforge.forge.HotswapEvent
 import moe.nea.hotswapagentforge.forge.HotswapFinishedEvent
@@ -15,12 +15,12 @@ class HotswapSupportImpl : HotswapSupportHandle {
 
     override fun load() {
         MinecraftForge.EVENT_BUS.register(this)
-        println("Hotswap Client in Skyhanni loaded")
+        println("Hotswap Client in Hanni loaded")
     }
 
     @SubscribeEvent
     fun onHotswapClass(event: ClassDefinitionEvent.Redefinition) {
-        val instance = SkyHanniMod.modules.find { it.javaClass.name == event.fullyQualifiedName } ?: return
+        val instance = HanniMod.modules.find { it.javaClass.name == event.fullyQualifiedName } ?: return
         val primaryConstructor = runCatching { instance.javaClass.getDeclaredConstructor() }.getOrNull()
         DelayedRun.onThread.execute {
             ChatUtils.chat("Refreshing event subscriptions for module $instance!")
@@ -28,7 +28,7 @@ class HotswapSupportImpl : HotswapSupportHandle {
             if (primaryConstructor == null) {
                 MinecraftForge.EVENT_BUS.register(instance)
             } else {
-                SkyHanniMod.modules.remove(instance)
+                HanniMod.modules.remove(instance)
                 val newInstance = primaryConstructor.makeAccessible().newInstance()
                 ChatUtils.chat("Reconstructing $instance -> $newInstance!")
                 val instanceField = runCatching { instance.javaClass.getDeclaredField("INSTANCE") }.getOrNull()
@@ -39,7 +39,7 @@ class HotswapSupportImpl : HotswapSupportHandle {
                     ChatUtils.chat("Re-injected static instance $newInstance!")
                     instanceField.set(null, newInstance)
                 }
-                SkyHanniMod.modules.add(newInstance)
+                HanniMod.modules.add(newInstance)
                 MinecraftForge.EVENT_BUS.register(newInstance)
             }
         }

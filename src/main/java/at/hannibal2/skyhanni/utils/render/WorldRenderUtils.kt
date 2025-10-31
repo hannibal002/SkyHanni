@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.ColorUtils.rgb
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import at.hannibal2.skyhanni.utils.expand
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.hanni.data.model.Graph
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.hanni.utils.ColorUtils.rgb
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.LocationUtils.getCornersAtHeight
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.createResourceLocation
+import at.hannibal2.hanni.utils.expand
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.toLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -40,11 +40,11 @@ object WorldRenderUtils {
      * @author Moulberry
      * @author Mojang
      */
-    fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
+    fun HanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
     }
 
-    fun SkyHanniRenderWorldEvent.renderBeaconBeam(
+    fun HanniRenderWorldEvent.renderBeaconBeam(
         x: Double,
         y: Double,
         z: Double,
@@ -124,7 +124,7 @@ object WorldRenderUtils {
         tessellator.draw()
     }
 
-    fun SkyHanniRenderWorldEvent.drawColor(
+    fun HanniRenderWorldEvent.drawColor(
         location: LorenzVec,
         color: ChromaColour,
         beacon: Boolean = false,
@@ -160,7 +160,7 @@ object WorldRenderUtils {
     }
 
     // TODO add chroma support
-    fun SkyHanniRenderWorldEvent.drawWaypointFilled(
+    fun HanniRenderWorldEvent.drawWaypointFilled(
         location: LorenzVec,
         color: Color,
         seeThroughBlocks: Boolean = false,
@@ -203,7 +203,7 @@ object WorldRenderUtils {
         }
     }
 
-    fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
+    fun HanniRenderWorldEvent.drawFilledBoundingBox(
         aabb: AxisAlignedBB,
         c: ChromaColour,
         alphaMultiplier: Float = 1f,
@@ -218,7 +218,7 @@ object WorldRenderUtils {
     }
 
     // TODO make deprecated
-    fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
+    fun HanniRenderWorldEvent.drawFilledBoundingBox(
         aabb: AxisAlignedBB,
         c: Color,
         alphaMultiplier: Float = 1f,
@@ -312,7 +312,7 @@ object WorldRenderUtils {
         GlStateManager.disableBlend()
     }
 
-    fun SkyHanniRenderWorldEvent.drawString(
+    fun HanniRenderWorldEvent.drawString(
         location: LorenzVec,
         text: String,
         seeThroughBlocks: Boolean = false,
@@ -359,7 +359,7 @@ object WorldRenderUtils {
     /**
      * @author Mojang
      */
-    private fun SkyHanniRenderWorldEvent.drawNametag(str: String, color: Color?) {
+    private fun HanniRenderWorldEvent.drawNametag(str: String, color: Color?) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
         val f1 = 0.02666667f
         GlStateManager.pushMatrix()
@@ -398,7 +398,7 @@ object WorldRenderUtils {
     }
 
     // modified from Autumn Client's TargetStrafe
-    fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {
+    fun HanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0f, 1f, 0f)
 
@@ -439,7 +439,7 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun SkyHanniRenderWorldEvent.drawCircleFilled(
+    fun HanniRenderWorldEvent.drawCircleFilled(
         entity: Entity,
         rad: Double,
         color: Color,
@@ -450,7 +450,7 @@ object WorldRenderUtils {
         drawCircleFilled(exactLocation.x, exactLocation.y, exactLocation.z, rad, color, depth, segments)
     }
 
-    fun SkyHanniRenderWorldEvent.drawCircleFilled(
+    fun HanniRenderWorldEvent.drawCircleFilled(
         locX: Double,
         locY: Double,
         locZ: Double,
@@ -497,7 +497,7 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
+    fun HanniRenderWorldEvent.drawCylinderInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
@@ -506,7 +506,7 @@ object WorldRenderUtils {
         drawCylinderInWorld(color, location.x, location.y, location.z, radius, height)
     }
 
-    fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
+    fun HanniRenderWorldEvent.drawCylinderInWorld(
         color: Color,
         x: Double,
         y: Double,
@@ -551,7 +551,7 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun SkyHanniRenderWorldEvent.drawPyramid(
+    fun HanniRenderWorldEvent.drawPyramid(
         topPoint: LorenzVec,
         baseCenterPoint: LorenzVec,
         baseEdgePoint: LorenzVec,
@@ -625,7 +625,7 @@ object WorldRenderUtils {
         }
     }
 
-    fun SkyHanniRenderWorldEvent.drawSphereInWorld(
+    fun HanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
@@ -634,7 +634,7 @@ object WorldRenderUtils {
         drawSphereInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
-    fun SkyHanniRenderWorldEvent.drawSphereInWorld(
+    fun HanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
         x: Double,
         y: Double,
@@ -695,7 +695,7 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
+    fun HanniRenderWorldEvent.drawSphereWireframeInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
@@ -704,7 +704,7 @@ object WorldRenderUtils {
         drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
-    fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
+    fun HanniRenderWorldEvent.drawSphereWireframeInWorld(
         color: Color,
         x: Double,
         y: Double,
@@ -762,7 +762,7 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun SkyHanniRenderWorldEvent.drawDynamicText(
+    fun HanniRenderWorldEvent.drawDynamicText(
         location: LorenzVec,
         text: String,
         scaleMultiplier: Double,
@@ -813,7 +813,7 @@ object WorldRenderUtils {
         renderText(renderLocation, "§f$text", scale, !seeThroughBlocks, true, yOff)
     }
 
-    private fun SkyHanniRenderWorldEvent.renderText(
+    private fun HanniRenderWorldEvent.renderText(
         location: LorenzVec,
         text: String,
         scale: Double,
@@ -860,20 +860,20 @@ object WorldRenderUtils {
     }
 
     // TODO add chroma color support
-    fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+    fun HanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         LineDrawer.draw3D(this, lineWidth, depth) {
             drawEdges(location, color)
         }
     }
 
     // TODO add chroma color support
-    fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
+    fun HanniRenderWorldEvent.drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
         LineDrawer.draw3D(this, lineWidth, depth) {
             drawEdges(axisAlignedBB, color)
         }
     }
 
-    fun SkyHanniRenderWorldEvent.draw3DLine(
+    fun HanniRenderWorldEvent.draw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
         color: ChromaColour,
@@ -883,7 +883,7 @@ object WorldRenderUtils {
         draw3DLine(p1, p2, color.toColor(), lineWidth, depth)
     }
 
-    fun SkyHanniRenderWorldEvent.draw3DLine(
+    fun HanniRenderWorldEvent.draw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
         color: Color,
@@ -893,7 +893,7 @@ object WorldRenderUtils {
         draw3DLine(p1, p2, color)
     }
 
-    fun SkyHanniRenderWorldEvent.outlineTopFace(
+    fun HanniRenderWorldEvent.outlineTopFace(
         boundingBox: AxisAlignedBB,
         lineWidth: Int,
         color: Color,
@@ -907,7 +907,7 @@ object WorldRenderUtils {
     }
 
     // TODO add chroma color support
-    fun SkyHanniRenderWorldEvent.drawHitbox(
+    fun HanniRenderWorldEvent.drawHitbox(
         boundingBox: AxisAlignedBB,
         color: Color,
         lineWidth: Int = 3,
@@ -928,15 +928,15 @@ object WorldRenderUtils {
         }
     }
 
-    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
+    fun HanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
         drawLineToEye(location, color.toColor(), lineWidth, depth)
     }
 
-    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+    fun HanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
     }
 
-    fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
+    fun HanniRenderWorldEvent.draw3DPathWithWaypoint(
         path: Graph,
         colorLine: Color,
         lineWidth: Int,
@@ -992,21 +992,21 @@ object WorldRenderUtils {
         return LorenzVec(x, y, z)
     }
 
-    fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
+    fun HanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
+    fun HanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
         return exactLocation(player).add(y = eyeHeight)
     }
 
-    fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AxisAlignedBB {
+    fun HanniRenderWorldEvent.exactBoundingBox(entity: Entity): AxisAlignedBB {
         if (entity.isDead) return entity.entityBoundingBox
         val offset = exactLocation(entity) - entity.getLorenzVec()
         return entity.entityBoundingBox.offset(offset.x, offset.y, offset.z)
     }
 
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
+    fun HanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
         return exactLocation(player) + add
     }

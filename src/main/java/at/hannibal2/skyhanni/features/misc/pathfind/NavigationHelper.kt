@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.features.misc.pathfind
+package at.hannibal2.hanni.features.misc.pathfind
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
-import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.IslandGraphs
+import at.hannibal2.hanni.data.IslandGraphs.pathFind
+import at.hannibal2.hanni.data.model.GraphNode
+import at.hannibal2.hanni.data.model.GraphNodeTag
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.GraphUtils
+import at.hannibal2.hanni.utils.LorenzVec.Companion.toLorenzVec
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.chat.TextHelper
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.onClick
+import at.hannibal2.hanni.utils.chat.TextHelper.send
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeIfAllNotNull
+import at.hannibal2.hanni.utils.compat.hover
 
-@SkyHanniModule
+@HanniModule
 object NavigationHelper {
     private val messageId = ChatUtils.getUniqueMessageId()
 
@@ -50,7 +50,7 @@ object NavigationHelper {
             }
         }
 
-        SkyHanniMod.launchCoroutine("shnavigate command") {
+        HanniMod.launchCoroutine("shnavigate command") {
             doCommandAsync(args)
         }
     }
@@ -64,7 +64,7 @@ object NavigationHelper {
             onCommand(searchTerm.split(" ").toTypedArray())
             IslandGraphs.stop()
         }
-        val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
+        val title = if (searchTerm.isBlank()) "Hanni Navigation Locations" else "Hanni Navigation Locations Matching: \"$searchTerm\""
 
         TextHelper.displayPaginatedList(
             title,

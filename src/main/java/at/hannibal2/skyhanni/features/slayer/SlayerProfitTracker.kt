@@ -1,43 +1,43 @@
-package at.hannibal2.skyhanni.features.slayer
+package at.hannibal2.hanni.features.slayer
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson
-import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.PurseChangeCause
-import at.hannibal2.skyhanni.events.PurseChangeEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
-import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.hanni.data.ItemAddManager
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson
+import at.hannibal2.hanni.events.ItemAddEvent
+import at.hannibal2.hanni.events.PurseChangeCause
+import at.hannibal2.hanni.events.PurseChangeEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.SlayerQuestCompleteEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.slayer.SlayerChangeEvent
+import at.hannibal2.hanni.features.misc.ReplaceRomanNumerals
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatDouble
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RenderDisplayHelper
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.toSearchable
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.tracker.ItemTrackerData
+import at.hannibal2.hanni.utils.tracker.HanniItemTracker
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 
-@SkyHanniModule
+@HanniModule
 object SlayerProfitTracker {
 
     private val config get() = SlayerApi.config.itemProfitTracker
@@ -45,7 +45,7 @@ object SlayerProfitTracker {
     private var category = ""
     private val categoryName get() = ReplaceRomanNumerals.replaceLine(category)
     private var baseSlayerType = ""
-    private val trackers = mutableMapOf<String, SkyHanniItemTracker<Data>>()
+    private val trackers = mutableMapOf<String, HanniItemTracker<Data>>()
 
     /**
      * REGEX-TEST: §7Took 1.9k coins from your bank for auto-slayer...
@@ -116,7 +116,7 @@ object SlayerProfitTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
         autoSlayerBankPattern.matchMatcher(event.message) {
             addSlayerCosts(-group("coins").formatDouble())
@@ -131,7 +131,7 @@ object SlayerProfitTracker {
         getTracker()?.update()
     }
 
-    private fun getTracker(): SkyHanniItemTracker<Data>? {
+    private fun getTracker(): HanniItemTracker<Data>? {
         if (category == "") return null
 
         return trackers.getOrPut(category) {
@@ -140,7 +140,7 @@ object SlayerProfitTracker {
                     category,
                 ) { Data() }
             }
-            SkyHanniItemTracker("$categoryName Profit Tracker", { Data() }, getStorage) { drawDisplay(it) }
+            HanniItemTracker("$categoryName Profit Tracker", { Data() }, getStorage) { drawDisplay(it) }
         }
     }
 

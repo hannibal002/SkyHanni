@@ -1,50 +1,50 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.hanni.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CFStorage
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.MilestoneJson
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.chroma.ChromaManager
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFUpgrade
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.UtilsPatterns
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.features.inventory.chocolatefactory.CFConfig
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage.CFStorage
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.jsonobjects.repo.HoppityEggLocationsJson
+import at.hannibal2.hanni.data.jsonobjects.repo.MilestoneJson
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.features.chroma.ChromaManager
+import at.hannibal2.hanni.features.event.hoppity.HoppityCollectionStats
+import at.hannibal2.hanni.features.inventory.chocolatefactory.data.CFDataLoader
+import at.hannibal2.hanni.features.inventory.chocolatefactory.data.CFUpgrade
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatLong
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.UtilsPatterns
+import at.hannibal2.hanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import java.util.TreeSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object CFApi {
 
     private val chromaEnabled get() = ChromaManager.config.enabled.get()
-    val config: CFConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
+    val config: CFConfig get() = HanniMod.feature.inventory.chocolateFactory
     val profileStorage: CFStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
 
@@ -303,7 +303,7 @@ object CFApi {
                 message += " §7in §b${it.passedSince().format(maxUnits = 2)}"
             }
 
-            ChatUtils.chat(" \n§7(SkyHanni) §6CF Leaderboard Change§7:\n $message\n ", prefix = false)
+            ChatUtils.chat(" \n§7(Hanni) §6CF Leaderboard Change§7:\n $message\n ", prefix = false)
         }
 
         storage.lastTime = SimpleTimeMark.now()

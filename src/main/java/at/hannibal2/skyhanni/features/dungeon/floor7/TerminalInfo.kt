@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.features.dungeon.floor7
+package at.hannibal2.hanni.features.dungeon.floor7
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonBossApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.features.dungeon.DungeonBossApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LorenzVec
 
 private typealias BossPhase = DungeonBossApi.DungeonBossPhase
 
@@ -46,7 +46,7 @@ enum class TerminalInfo(val location: LorenzVec, val phase: BossPhase, val text:
 
     var highlight: Boolean = true
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
         @HandleEvent

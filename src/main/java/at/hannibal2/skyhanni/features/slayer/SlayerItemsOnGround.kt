@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.slayer
+package at.hannibal2.hanni.features.slayer
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.seconds
@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.item.SpawnEggItem
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object SlayerItemsOnGround {
 
     private val config get() = SlayerApi.config.itemsOnGround
@@ -43,7 +43,7 @@ object SlayerItemsOnGround {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         for ((item, text) in itemsOnGround) {

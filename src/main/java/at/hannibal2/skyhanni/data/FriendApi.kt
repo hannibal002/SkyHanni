@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends.Friend
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigFileType
+import at.hannibal2.hanni.data.jsonobjects.local.FriendsJson
+import at.hannibal2.hanni.data.jsonobjects.local.FriendsJson.PlayerFriends.Friend
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.hanni.utils.compat.command
+import at.hannibal2.hanni.utils.compat.hover
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
 import java.util.UUID
 
-@SkyHanniModule
+@HanniModule
 object FriendApi {
     private val patternGroup = RepoPattern.group("data.friends")
 
@@ -72,14 +72,14 @@ object FriendApi {
 
     private val tempFriends = mutableListOf<Friend>()
 
-    private fun getFriends() = SkyHanniMod.friendsData.players.getOrPut(PlayerUtils.getRawUuid()) {
+    private fun getFriends() = HanniMod.friendsData.players.getOrPut(PlayerUtils.getRawUuid()) {
         FriendsJson.PlayerFriends().also { it.friends = mutableMapOf() }
     }.friends
 
     @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
-        if (SkyHanniMod.friendsData.players == null) {
-            SkyHanniMod.friendsData.players = mutableMapOf()
+        if (HanniMod.friendsData.players == null) {
+            HanniMod.friendsData.players = mutableMapOf()
             saveConfig()
         }
     }
@@ -92,11 +92,11 @@ object FriendApi {
     }
 
     fun saveConfig() {
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.FRIENDS, "Save file")
+        HanniMod.configManager.saveConfig(ConfigFileType.FRIENDS, "Save file")
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         readFriendsList(event)
 
         removedFriendPattern.matchMatcher(event.message) {
@@ -135,7 +135,7 @@ object FriendApi {
         saveConfig()
     }
 
-    private fun readFriendsList(event: SkyHanniChatEvent) {
+    private fun readFriendsList(event: HanniChatEvent) {
         if (!event.message.contains("Friends")) return
 
         for (sibling in event.chatComponent.siblings) {

@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.hanni.features.event.diana
 
-import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzColor
 import io.github.notenoughupdates.moulconfig.ChromaColour
 
 enum class BurrowType(val text: String, val color: ChromaColour) {

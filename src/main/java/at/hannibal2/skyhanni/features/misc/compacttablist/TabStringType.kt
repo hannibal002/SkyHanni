@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.misc.compacttablist
+package at.hannibal2.hanni.features.misc.compacttablist
 
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.removeColor
 
 enum class TabStringType {
     TITLE,

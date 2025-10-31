@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.features.inventory.wardrobe
+package at.hannibal2.hanni.features.inventory.wardrobe
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.SkyBlockUtils
 
-@SkyHanniModule
+@HanniModule
 object EstimatedWardrobePrice {
 
-    private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
+    private val config get() = HanniMod.feature.inventory.estimatedItemValues
 
     @HandleEvent
     fun onToolTip(event: ToolTipEvent) {

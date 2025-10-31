@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.chat
+package at.hannibal2.hanni.config.features.chat
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -209,7 +209,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Hide Clickable Hints",
-        desc = "Hides the 'Click to x' chat line from SkyHanni messages. " +
+        desc = "Hides the 'Click to x' chat line from Hanni messages. " +
             "The message is still clickable and shows infos on hover.",
     )
     @ConfigEditorBoolean

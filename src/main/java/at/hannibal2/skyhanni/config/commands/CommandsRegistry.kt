@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.config.commands
+package at.hannibal2.hanni.config.commands
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BaseBrigadierBuilder
-import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
-import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.requireDevEnv
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrInsert
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.brigadier.BaseBrigadierBuilder
+import at.hannibal2.hanni.config.commands.brigadier.CommandData
+import at.hannibal2.hanni.events.utils.PreInitFinishedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.requireDevEnv
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrInsert
 import com.mojang.brigadier.CommandDispatcher
 //#if MC < 1.21
 import net.minecraftforge.client.ClientCommandHandler
@@ -16,7 +16,7 @@ import net.minecraftforge.client.ClientCommandHandler
 //$$ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object CommandsRegistry {
     //#if MC < 1.21
     private val dispatcher: CommandDispatcher<Any?> = CommandDispatcher()

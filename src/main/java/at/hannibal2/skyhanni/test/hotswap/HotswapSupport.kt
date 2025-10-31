@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.test.hotswap
+package at.hannibal2.hanni.test.hotswap
 
 object HotswapSupport {
 

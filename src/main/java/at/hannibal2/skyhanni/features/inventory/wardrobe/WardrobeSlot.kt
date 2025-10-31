@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.wardrobe
+package at.hannibal2.hanni.features.inventory.wardrobe
 
 class WardrobeSlot(
     val id: Int,

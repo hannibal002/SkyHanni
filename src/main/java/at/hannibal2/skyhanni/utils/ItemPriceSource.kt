@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
 enum class ItemPriceSource(val displayName: String, val sellName: String = displayName, val buyName: String = displayName) {
     BAZAAR_INSTANT_BUY("BZ Instant Buy", buyName = "BZ Sell Offer"),

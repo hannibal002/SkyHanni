@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.hanni.utils.RegexUtils.matchGroup
+import at.hannibal2.hanni.utils.toLorenzVec
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.BlockPos
 
-class ServerBlockChangeEvent(blockPos: BlockPos, blockState: IBlockState) : SkyHanniEvent() {
+class ServerBlockChangeEvent(blockPos: BlockPos, blockState: IBlockState) : HanniEvent() {
 
     val location = blockPos.toLorenzVec()
     val old by lazy { oldState.block.toString().getName() }

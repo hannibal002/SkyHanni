@@ -1,44 +1,44 @@
-package at.hannibal2.skyhanni.features.inventory.caketracker
+package at.hannibal2.hanni.features.inventory.caketracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.inventory.CakeTrackerConfig.CakeTrackerDisplayOrderType
-import at.hannibal2.skyhanni.config.features.inventory.CakeTrackerConfig.CakeTrackerDisplayType
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CakeData
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
-import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.features.inventory.CakeTrackerConfig.CakeTrackerDisplayOrderType
+import at.hannibal2.hanni.config.features.inventory.CakeTrackerConfig.CakeTrackerDisplayType
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage.CakeData
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.hanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.RegexUtils.matchGroup
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils.highlight
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.hanni.utils.renderables.ScrollValue
+import at.hannibal2.hanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.tracker.HanniTracker
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.inventory.ContainerChest
 import org.lwjgl.input.Keyboard.KEY_DOWN
@@ -51,7 +51,7 @@ import kotlin.time.Duration.Companion.minutes
 private typealias DisplayOrder = CakeTrackerDisplayOrderType
 private typealias DisplayType = CakeTrackerDisplayType
 
-@SkyHanniModule
+@HanniModule
 object CakeTracker {
 
     private val patternGroup = RepoPattern.group("inventory.cake-tracker")
@@ -116,7 +116,7 @@ object CakeTracker {
     // </editor-fold>
 
     private val storage get() = ProfileStorageData.profileSpecific?.cakeData
-    private val config get() = SkyHanniMod.feature.inventory.cakeTracker
+    private val config get() = HanniMod.feature.inventory.cakeTracker
     private val maxTrackerHeight: Float get() = config.maxHeight.get()
     private val cakeScrollValue = ScrollValue().apply { init(0.0) }
     private val cakePriceCache = TimeLimitedCache<Int, Double>(5.minutes)
@@ -165,7 +165,7 @@ object CakeTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!config.enabled) return
         cakePurchasedPattern.matchMatcher(event.message) {
             val year = group("year").formatInt()
@@ -296,7 +296,7 @@ object CakeTracker {
     private fun getCakePrice(year: Int): Double {
         return cakePriceCache.getOrPut(year) {
             val cakeItem = "NEW_YEAR_CAKE+$year".toInternalName()
-            SkyHanniTracker.getPricePer(cakeItem)
+            HanniTracker.getPricePer(cakeItem)
         }
     }
 

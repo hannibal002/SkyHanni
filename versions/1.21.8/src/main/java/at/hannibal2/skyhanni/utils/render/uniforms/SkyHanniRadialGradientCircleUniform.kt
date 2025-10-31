@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.render.uniforms
+package at.hannibal2.hanni.utils.render.uniforms
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
@@ -7,11 +7,11 @@ import net.minecraft.client.gl.DynamicUniformStorage
 import org.joml.Vector4f
 import java.nio.ByteBuffer
 
-class SkyHanniRadialGradientCircleUniform : AutoCloseable {
+class HanniRadialGradientCircleUniform : AutoCloseable {
     private val UNIFORM_SIZE = Std140SizeCalculator().putFloat().putVec4().putVec4().putFloat().putFloat().putInt().get()
 
     val storage = DynamicUniformStorage<UniformValue>(
-        "Skyhanni Gradient Circle UBO",
+        "Hanni Gradient Circle UBO",
         UNIFORM_SIZE,
         6,
     )

@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent;
+import at.hannibal2.hanni.events.DataWatcherUpdatedEvent;
 import net.minecraft.entity.DataWatcher;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Final;

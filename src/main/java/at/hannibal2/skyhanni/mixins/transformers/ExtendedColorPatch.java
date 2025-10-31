@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
 import net.minecraft.client.gui.FontRenderer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,18 +21,18 @@ public abstract class ExtendedColorPatch {
     @Shadow
     private float alpha;
     @Unique
-    private int skyhanni$colorSR;
+    private int hanni$colorSR;
     @Unique
-    private int skyhanni$colorState;
+    private int hanni$colorState;
 
     @Inject(method = "renderStringAtPos", at = @At("HEAD"))
     private void resetStateWhenRendering(String text, boolean shadow, CallbackInfo ci) {
-        skyhanni$colorSR = 0;
-        skyhanni$colorState = -1;
+        hanni$colorSR = 0;
+        hanni$colorState = -1;
     }
 
     @Unique
-    private static boolean skyhanni$isSpecial = false;
+    private static boolean hanni$isSpecial = false;
 
     @Inject(
         method = "isFormatSpecial",
@@ -41,9 +41,9 @@ public abstract class ExtendedColorPatch {
     )
     private static void protectFormatCodesSpecial(char formatChar, CallbackInfoReturnable<Boolean> cir) {
         if (formatChar == '/') {
-            skyhanni$isSpecial = false;
+            hanni$isSpecial = false;
             cir.setReturnValue(true);
-        } else if (skyhanni$isSpecial) {
+        } else if (hanni$isSpecial) {
             cir.setReturnValue(true);
         }
     }
@@ -55,9 +55,9 @@ public abstract class ExtendedColorPatch {
     )
     private static void protectFormatCodesSimple(char formatChar, CallbackInfoReturnable<Boolean> cir) {
         if (formatChar == '#') {
-            skyhanni$isSpecial = true;
+            hanni$isSpecial = true;
             cir.setReturnValue(true);
-        } else if (skyhanni$isSpecial) {
+        } else if (hanni$isSpecial) {
             cir.setReturnValue(false);
         }
     }
@@ -67,7 +67,7 @@ public abstract class ExtendedColorPatch {
         at = @At(value = "TAIL")
     )
     private static void resetState(String text, CallbackInfoReturnable<String> cir) {
-        skyhanni$isSpecial = false;
+        hanni$isSpecial = false;
     }
 
     @Inject(
@@ -75,7 +75,7 @@ public abstract class ExtendedColorPatch {
         at = @At(value = "HEAD")
     )
     private static void resetStateAtHead(String text, CallbackInfoReturnable<String> cir) {
-        skyhanni$isSpecial = false;
+        hanni$isSpecial = false;
     }
 
     @Inject(
@@ -101,29 +101,29 @@ public abstract class ExtendedColorPatch {
         char c = text.charAt(i + 1);
         int hexCode = "0123456789abcdef".indexOf(c);
         if (c == '#') {
-            if (skyhanni$colorState != -1) {
+            if (hanni$colorState != -1) {
                 throw new IllegalStateException("Encountered §# while inside push sequence");
             }
-            skyhanni$colorState = 0;
-            skyhanni$colorSR = 0;
+            hanni$colorState = 0;
+            hanni$colorSR = 0;
         } else if (c == '/') {
-            if (skyhanni$colorState != 8 && skyhanni$colorState != 6) {
-                throw new IllegalStateException("Encountered §/ without encountering enough pushes: " + skyhanni$colorState);
+            if (hanni$colorState != 8 && hanni$colorState != 6) {
+                throw new IllegalStateException("Encountered §/ without encountering enough pushes: " + hanni$colorState);
             }
-            textColor = skyhanni$colorSR;
+            textColor = hanni$colorSR;
             int shadowDivisor = shadow ? 4 : 1;
             setColor(
-                (skyhanni$colorSR >> 16 & 0xFF) / 255f / shadowDivisor,
-                (skyhanni$colorSR >> 8 & 0xFF) / 255f / shadowDivisor,
-                (skyhanni$colorSR & 0xFF) / 255f / shadowDivisor,
-                (skyhanni$colorState == 8 ? (skyhanni$colorSR >> 24 & 0xFF) / 255f : this.alpha)
+                (hanni$colorSR >> 16 & 0xFF) / 255f / shadowDivisor,
+                (hanni$colorSR >> 8 & 0xFF) / 255f / shadowDivisor,
+                (hanni$colorSR & 0xFF) / 255f / shadowDivisor,
+                (hanni$colorState == 8 ? (hanni$colorSR >> 24 & 0xFF) / 255f : this.alpha)
             );
-            skyhanni$colorState = -1;
-        } else if (0 <= hexCode && skyhanni$colorState != -1) {
-            skyhanni$colorState++;
-            if (skyhanni$colorState > 8)
+            hanni$colorState = -1;
+        } else if (0 <= hexCode && hanni$colorState != -1) {
+            hanni$colorState++;
+            if (hanni$colorState > 8)
                 throw new IllegalStateException("Encountered too many pushes inside of §#§/ sequence");
-            skyhanni$colorSR = (skyhanni$colorSR << 4) | hexCode;
+            hanni$colorSR = (hanni$colorSR << 4) | hexCode;
         }
     }
 

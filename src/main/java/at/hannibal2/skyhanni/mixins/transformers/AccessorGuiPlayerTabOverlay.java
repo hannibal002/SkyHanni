@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
 import net.minecraft.util.IChatComponent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 //#endif
 public interface AccessorGuiPlayerTabOverlay {
     @Accessor("footer")
-    IChatComponent getFooter_skyhanni();
+    IChatComponent getFooter_hanni();
 
     @Accessor("header")
-    IChatComponent getHeader_skyhanni();
+    IChatComponent getHeader_hanni();
 }

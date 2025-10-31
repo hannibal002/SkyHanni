@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.MaxwellApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.data.MaxwellApi
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
 
 // internal
 // power update event?

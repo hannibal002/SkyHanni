@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.features.commands
+package at.hannibal2.hanni.features.commands
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpsJson
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.jsonobjects.repo.WarpsJson
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.chat.TabCompletionEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.HypixelCommands
 
-@SkyHanniModule
+@HanniModule
 object ShortenWarpCommand {
 
-    private val config get() = SkyHanniMod.feature.misc.commands
+    private val config get() = HanniMod.feature.misc.commands
     private var warps = emptyList<String>()
 
     @HandleEvent
@@ -32,7 +32,7 @@ object ShortenWarpCommand {
         val command = message.lowercase().removePrefix("/").trimEnd()
         // Avoid overriding commands on islands where they have a different use
         if (command == "jerry" && IslandType.PRIVATE_ISLAND.isCurrent()) return
-        if (command == "barn" && IslandType.GARDEN.isCurrent() && SkyHanniMod.feature.garden.gardenCommands.warpCommands) return
+        if (command == "barn" && IslandType.GARDEN.isCurrent() && HanniMod.feature.garden.gardenCommands.warpCommands) return
 
         if (command in warps) {
             event.cancel()

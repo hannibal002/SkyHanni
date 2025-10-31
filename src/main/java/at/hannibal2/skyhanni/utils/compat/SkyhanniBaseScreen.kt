@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.compat
+package at.hannibal2.hanni.utils.compat
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.hanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 //#if MC > 1.21
@@ -13,7 +13,7 @@ import net.minecraft.client.gui.GuiScreen
 //#endif
 
 @Suppress("UnusedParameter")
-abstract class SkyhanniBaseScreen : GuiScreen(
+abstract class HanniBaseScreen : GuiScreen(
     //#if MC > 1.20
     //$$ net.minecraft.text.Text.empty()
     //#elseif MC > 1.16

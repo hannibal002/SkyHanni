@@ -1,36 +1,36 @@
-package at.hannibal2.skyhanni.features.event.anniversary
+package at.hannibal2.hanni.features.event.anniversary
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.AnniversaryTeamFinderColorConfig
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.event.AnniversaryTeamFinderColorConfig
+import at.hannibal2.hanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.data.mob.MobData
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.ItemInHandChangeEvent
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.entity.EntityClickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.EntityUtils.isNpc
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.hanni.utils.MobUtils.mob
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object Year400Features {
-    private val config get() = SkyHanniMod.feature.event.anniversaryCelebration400
+    private val config get() = HanniMod.feature.event.anniversaryCelebration400
 
     private var colorInHand: CakeColor? = null
     private val playerColors = mutableMapOf<Mob, CakeColor?>()

@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.data.ChatManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.splitLines
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import at.hannibal2.skyhanni.utils.compat.convertToJsonString
-import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.hanni.data.ChatManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.StringUtils.splitLines
+import at.hannibal2.hanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.MouseCompat
+import at.hannibal2.hanni.utils.compat.HanniBaseScreen
+import at.hannibal2.hanni.utils.compat.convertToJsonString
+import at.hannibal2.hanni.utils.renderables.RenderableTooltips
+import at.hannibal2.hanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.util.IChatComponent
 
-class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyhanniBaseScreen() {
+class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : HanniBaseScreen() {
 
     private var scroll = -1.0
     private val w = 500

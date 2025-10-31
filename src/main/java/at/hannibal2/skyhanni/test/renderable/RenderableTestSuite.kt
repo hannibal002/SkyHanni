@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.test.renderable
+package at.hannibal2.hanni.test.renderable
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.Renderable.Companion.renderBounds
 
-@SkyHanniModule(devOnly = true)
+@HanniModule(devOnly = true)
 object RenderableTestSuite {
 
     private val register = mutableMapOf<String, TestRenderable>()
 
-    private val storage get() = SkyHanniMod.feature.storage
+    private val storage get() = HanniMod.feature.storage
 
     private val active = mutableSetOf<TestRenderable>()
 
@@ -67,7 +67,7 @@ object RenderableTestSuite {
      *
      * How to use:
      * Declare an object with [RenderableTestSuite.TestRenderable] as supertype.
-     * Annotate the object with `@SkyHanniModule(devOnly = true)`.
+     * Annotate the object with `@HanniModule(devOnly = true)`.
      * Give it a lowercase [name] (this is used to call it via the command later on).
      * Define your test you want to do with the [renderable] function.
      *

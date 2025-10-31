@@ -1,33 +1,33 @@
-package at.hannibal2.skyhanni.features.garden.pests
+package at.hannibal2.hanni.features.garden.pests
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isSprayExpired
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.markExpiredSprayAsNotified
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.plots
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
-import at.hannibal2.skyhanni.utils.StringUtils.pluralize
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.features.garden.GardenPlotApi
+import at.hannibal2.hanni.features.garden.GardenPlotApi.currentSpray
+import at.hannibal2.hanni.features.garden.GardenPlotApi.isBarn
+import at.hannibal2.hanni.features.garden.GardenPlotApi.isSprayExpired
+import at.hannibal2.hanni.features.garden.GardenPlotApi.markExpiredSprayAsNotified
+import at.hannibal2.hanni.features.garden.GardenPlotApi.name
+import at.hannibal2.hanni.features.garden.GardenPlotApi.plots
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.RenderUtils.renderString
+import at.hannibal2.hanni.utils.StringUtils.createCommaSeparatedList
+import at.hannibal2.hanni.utils.StringUtils.pluralize
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.TimeUtils.timerColor
 
-@SkyHanniModule
+@HanniModule
 object SprayDisplay {
 
     private val config get() = PestApi.config.spray
     private var display: String? = null
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (!event.isMod(5, 3)) return
 
         if (config.displayEnabled) {

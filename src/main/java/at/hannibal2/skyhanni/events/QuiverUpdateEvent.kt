@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.data.ArrowType
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.data.ArrowType
 
-class QuiverUpdateEvent(val currentArrow: ArrowType?, val currentAmount: Int) : SkyHanniEvent()
+class QuiverUpdateEvent(val currentArrow: ArrowType?, val currentAmount: Int) : HanniEvent()

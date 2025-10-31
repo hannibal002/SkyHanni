@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.rift.area.westvillage.kloon
+package at.hannibal2.hanni.features.rift.area.westvillage.kloon
 
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.LorenzVec
 
 enum class KloonTerminal(val location: LorenzVec) {
     RED(LorenzVec(-69.0, 65.0, -63.0)),

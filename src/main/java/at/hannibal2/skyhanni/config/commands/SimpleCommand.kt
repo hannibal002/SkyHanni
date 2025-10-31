@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.commands
+package at.hannibal2.hanni.config.commands
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.hanni.test.command.ErrorManager
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos

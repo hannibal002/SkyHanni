@@ -1,5 +1,5 @@
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.hanni.utils.compat.formattedTextCompat
+import at.hannibal2.hanni.utils.compat.withColor
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import org.junit.jupiter.api.Assertions

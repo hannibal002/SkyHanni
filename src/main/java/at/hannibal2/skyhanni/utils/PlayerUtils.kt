@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.StringUtils.toUnDashedUUID
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.StringUtils.toUnDashedUUID
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import java.util.UUID
 

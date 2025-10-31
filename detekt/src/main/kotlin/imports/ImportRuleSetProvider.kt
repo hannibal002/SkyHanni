@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.detektrules.imports
+package at.hannibal2.hanni.detektrules.imports
 
 import com.google.auto.service.AutoService
 import io.gitlab.arturbosch.detekt.api.Config

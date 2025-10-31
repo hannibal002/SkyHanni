@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.itemability
+package at.hannibal2.hanni.config.features.itemability
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour

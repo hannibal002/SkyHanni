@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.events
+package at.hannibal2.hanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.hanni.utils.RegexUtils.allMatches
+import at.hannibal2.hanni.utils.RegexUtils.matches
 
 // scoreboard
 // scoreboard update event

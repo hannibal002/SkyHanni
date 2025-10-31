@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable.superpairs
+package at.hannibal2.hanni.features.inventory.experimentationtable.superpairs
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.ExperimentationTableApi
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsAddonsHelper
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.ExperimentationTableApi
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.InventoryOpenEvent
+import at.hannibal2.hanni.events.InventoryUpdatedEvent
+import at.hannibal2.hanni.features.inventory.experimentationtable.ExperimentsAddonsHelper
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
 
-@SkyHanniModule
+@HanniModule
 object SuperpairsClicksAlert {
 
-    private val config get() = SkyHanniMod.feature.inventory.experimentationTable
+    private val config get() = HanniMod.feature.inventory.experimentationTable
 
     private var roundsNeeded = -1
     private val roundsNeededRegex = Regex("""(?:Chain|Series) of (\d+):""")

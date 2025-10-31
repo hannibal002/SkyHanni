@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.api.minecraftevents
+package at.hannibal2.hanni.api.minecraftevents
 
-import at.hannibal2.skyhanni.data.RenderData
-import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
-import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.data.RenderData
+import at.hannibal2.hanni.events.render.gui.GameOverlayRenderPostEvent
+import at.hannibal2.hanni.events.render.gui.GameOverlayRenderPreEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderTickCounter
@@ -16,23 +16,23 @@ import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
 //$$ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 //#endif
 //#if MC < 1.21.9
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.util.math.MatrixStack
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object RenderEvents {
 
     init {
 
-        // SkyHanniRenderWorldEvent
+        // HanniRenderWorldEvent
         //#if MC < 1.21.9
         WorldRenderEvents.AFTER_TRANSLUCENT.register { event ->
             val immediateVertexConsumers = event.consumers() as? VertexConsumerProvider.Immediate ?: return@register
             val stack = event.matrixStack() ?: MatrixStack()
-            SkyHanniRenderWorldEvent(stack, event.camera(), immediateVertexConsumers, event.tickCounter().getTickProgress(true)).post()
+            HanniRenderWorldEvent(stack, event.camera(), immediateVertexConsumers, event.tickCounter().getTickProgress(true)).post()
         }
         //#endif
 
@@ -50,12 +50,12 @@ object RenderEvents {
 
         //#if MC < 1.21.6
         HudLayerRegistrationCallback.EVENT.register { context ->
-            context.attachLayerAfter(IdentifiedLayer.SLEEP, Identifier.of("skyhanni", "gui_render_layer"), RenderEvents::postGui)
+            context.attachLayerAfter(IdentifiedLayer.SLEEP, Identifier.of("hanni", "gui_render_layer"), RenderEvents::postGui)
         }
         //#else
         //$$ HudElementRegistry.attachElementBefore(
         //$$     VanillaHudElements.SLEEP,
-        //$$     Identifier.of("skyhanni", "gui_render_layer"),
+        //$$     Identifier.of("hanni", "gui_render_layer"),
         //$$     RenderEvents::postGui
         //$$ )
         //#endif

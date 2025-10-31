@@ -1,39 +1,39 @@
-package at.hannibal2.skyhanni.features.event.yearoftheseal
+package at.hannibal2.hanni.features.event.yearoftheseal
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onDisable
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.LineDrawer
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.ConditionalUtils.onDisable
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkullTextureHolder
+import at.hannibal2.hanni.utils.TimeUtils.ticks
+import at.hannibal2.hanni.utils.collection.CollectionUtils.removeIf
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeWhileInclusive
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.render.LineDrawer
+import at.hannibal2.hanni.utils.render.WorldRenderUtils
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object BeachBallCatchHelper {
 
-    private val config get() = SkyHanniMod.feature.event.yearOfTheSeal
+    private val config get() = HanniMod.feature.event.yearOfTheSeal
 
     private val predictors = mutableMapOf<Int, Predictor>()
 
@@ -70,7 +70,7 @@ object BeachBallCatchHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (predictors.isEmpty()) return
         val color = config.bouncyBallLineColor.toColor()
@@ -83,7 +83,7 @@ object BeachBallCatchHelper {
         event.renderLandingPosition()
     }
 
-    private fun SkyHanniRenderWorldEvent.renderLandingPosition() {
+    private fun HanniRenderWorldEvent.renderLandingPosition() {
         if (!config.bouncyBallLandingSpot.get()) return
         val player = WorldRenderUtils.exactLocation(MinecraftCompat.localPlayer, partialTicks).add(y = 1)
         for ((e, predictor) in predictors.map { EntityUtils.getEntityByID(it.key) to it.value }) {
@@ -94,7 +94,7 @@ object BeachBallCatchHelper {
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.renderString(predictor: Predictor, location: LorenzVec) {
+    private fun HanniRenderWorldEvent.renderString(predictor: Predictor, location: LorenzVec) {
         val counter = predictor.bounceCounter
         val (qualityColor, quality) = when {
             counter < 2 -> "§c" to null // aww man
@@ -108,7 +108,7 @@ object BeachBallCatchHelper {
         drawString(location.add(y = 0.7), "$qualityColor§l$counter$qualityString")
     }
 
-    private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec, player: LorenzVec, predictor: Predictor) {
+    private fun HanniRenderWorldEvent.renderBlock(location: LorenzVec, player: LorenzVec, predictor: Predictor) {
         val distance = location.distance(player)
         drawFilledBoundingBox(
             location.getAABB(predictor.variant),

@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events.diana
+package at.hannibal2.hanni.events.diana
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.utils.LorenzVec
 
-class BurrowGuessEvent(val guessLocation: LorenzVec, val precise: Boolean, val new: Boolean) : SkyHanniEvent()
+class BurrowGuessEvent(val guessLocation: LorenzVec, val precise: Boolean, val new: Boolean) : HanniEvent()

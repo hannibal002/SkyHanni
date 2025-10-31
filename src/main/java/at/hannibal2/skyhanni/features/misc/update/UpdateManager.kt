@@ -1,26 +1,26 @@
-package at.hannibal2.skyhanni.features.misc.update
+package at.hannibal2.hanni.features.misc.update
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.features.About.UpdateStream
-import at.hannibal2.skyhanni.data.NotificationManager
-import at.hannibal2.skyhanni.data.SkyHanniNotification
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DiscontinuedMinecraftVersion
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DiscontinuedMinecraftVersionsJson
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
-import at.hannibal2.skyhanni.utils.system.ModVersion
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.config.features.About.UpdateStream
+import at.hannibal2.hanni.data.NotificationManager
+import at.hannibal2.hanni.data.HanniNotification
+import at.hannibal2.hanni.data.jsonobjects.repo.DiscontinuedMinecraftVersion
+import at.hannibal2.hanni.data.jsonobjects.repo.DiscontinuedMinecraftVersionsJson
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.api.ApiInternalUtils
+import at.hannibal2.hanni.utils.system.ModVersion
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
 import kotlin.time.Duration
 
-@SkyHanniModule
+@HanniModule
 object UpdateManager {
 
     private val logger = LorenzLogger("update_manager")
@@ -53,7 +53,7 @@ object UpdateManager {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        SkyHanniMod.feature.about.updateStream.onToggle {
+        HanniMod.feature.about.updateStream.onToggle {
             reset()
         }
     }
@@ -75,7 +75,7 @@ object UpdateManager {
         }
     }
 
-    private val config get() = SkyHanniMod.feature.about
+    private val config get() = HanniMod.feature.about
 
     fun reset() {
         updateState = UpdateState.NONE
@@ -97,7 +97,7 @@ object UpdateManager {
         }
         logger.log("Starting update check")
         val currentStream = config.updateStream.get()
-        if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || SkyHanniMod.isBetaVersion)) {
+        if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || HanniMod.isBetaVersion)) {
             config.updateStream.set(UpdateStream.BETA)
             updateStream = UpdateStream.BETA
         }
@@ -112,23 +112,23 @@ object UpdateManager {
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
                     if (config.fullAutoUpdates || forceDownload) {
-                        ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}, starting to download now.")
+                        ChatUtils.chat("§aHanni found a new update: ${it.update.versionName}, starting to download now.")
                         queueUpdate()
                     } else if (config.autoUpdates) {
                         ChatUtils.chatAndOpenConfig(
-                            "§aSkyHanni found a new update: ${it.update.versionName}. " +
+                            "§aHanni found a new update: ${it.update.versionName}. " +
                                 "Check §b/sh download update §afor more info.",
                             config::autoUpdates,
                         )
                         ChatUtils.clickableChat(
                             "§e§lCLICK HERE §r§eto view changes.",
                             onClick = {
-                                ChangelogViewer.showChangelog(SkyHanniMod.VERSION, it.update.versionName)
+                                ChangelogViewer.showChangelog(HanniMod.VERSION, it.update.versionName)
                             },
                         )
                     }
                 } else if (forceDownload) {
-                    ChatUtils.chat("§aSkyHanni didn't find a new update.")
+                    ChatUtils.chat("§aHanni didn't find a new update.")
                 }
             },
             DelayedRun.onThread,
@@ -156,20 +156,20 @@ object UpdateManager {
     }
 
     private val context = UpdateContext(
-        CustomGithubReleaseUpdateSource("hannibal002", "SkyHanni"),
+        CustomGithubReleaseUpdateSource("hannibal002", "Hanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
         object : CurrentVersion {
-            private val debug get() = SkyHanniMod.feature.dev.debug.alwaysOutdated
-            override fun display(): String = if (debug) "Force Outdated" else SkyHanniMod.VERSION
+            private val debug get() = HanniMod.feature.dev.debug.alwaysOutdated
+            override fun display(): String = if (debug) "Force Outdated" else HanniMod.VERSION
 
             override fun isOlderThan(element: JsonElement?): Boolean {
                 if (debug) return true
                 val asString = element?.asString ?: return true
                 val otherVersion = ModVersion.fromString(asString)
-                return SkyHanniMod.modVersion < otherVersion
+                return HanniMod.modVersion < otherVersion
             }
         },
-        SkyHanniMod.MODID,
+        HanniMod.MODID,
     )
 
     init {
@@ -191,19 +191,19 @@ object UpdateManager {
     private var potentialUpdate: PotentialUpdate? = null
 
     private fun updateCommand(arg: String) {
-        val currentStream = SkyHanniMod.feature.about.updateStream.get()
+        val currentStream = HanniMod.feature.about.updateStream.get()
         val updateStream = when {
             arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
             arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
             else -> currentStream
         }
 
-        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !SkyHanniMod.isBetaVersion)
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !HanniMod.isBetaVersion)
         if (switchingToBeta) {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
-                    val newUpdateStream = SkyHanniMod.feature.about.updateStream
+                    val newUpdateStream = HanniMod.feature.about.updateStream
                     newUpdateStream.set(UpdateStream.BETA)
                     checkUpdate(true, newUpdateStream.get())
                 },
@@ -249,9 +249,9 @@ object UpdateManager {
         if (PlatformUtils.MC_VERSION in discontinuedVersions) {
             val extraInfo = discontinuedVersions[PlatformUtils.MC_VERSION]?.extraInfo.orEmpty()
 
-            val notification = SkyHanniNotification(
+            val notification = HanniNotification(
                 listOf(
-                    "§cSkyHanni is no longer receiving updates for Minecraft §e${PlatformUtils.MC_VERSION}§c.",
+                    "§cHanni is no longer receiving updates for Minecraft §e${PlatformUtils.MC_VERSION}§c.",
                     "§cPlaying on a discontinued version is not recommended and may lead to issues.",
                     "§cPlease update to a newer Minecraft version.",
                 ) + extraInfo,

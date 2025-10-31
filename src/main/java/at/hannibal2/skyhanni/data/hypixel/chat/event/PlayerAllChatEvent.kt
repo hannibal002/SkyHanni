@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.data.hypixel.chat.event
+package at.hannibal2.hanni.data.hypixel.chat.event
 
-import at.hannibal2.skyhanni.utils.ComponentSpan
+import at.hannibal2.hanni.utils.ComponentSpan
 import net.minecraft.util.IChatComponent
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.compat.toChatFormatting
+//$$ import at.hannibal2.hanni.utils.compat.toChatFormatting
 //#endif
 
 class PlayerAllChatEvent(

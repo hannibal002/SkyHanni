@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.hanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderStateStore;
+import at.hannibal2.hanni.mixins.hooks.EntityRenderStateStore;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -10,29 +10,29 @@ import org.spongepowered.asm.mixin.Unique;
 public class MixinEntityRenderState implements EntityRenderStateStore {
 
     @Unique
-    Entity skyhanni$savedEntity = null;
+    Entity hanni$savedEntity = null;
 
     @Unique
-    boolean skyhanni$usingCustomOutline = false;
+    boolean hanni$usingCustomOutline = false;
 
     @Override
-    public void skyhanni$setEntity(Entity entity) {
-        skyhanni$savedEntity = entity;
+    public void hanni$setEntity(Entity entity) {
+        hanni$savedEntity = entity;
     }
 
     @Override
-    public Entity skyhanni$getEntity() {
-        return skyhanni$savedEntity;
+    public Entity hanni$getEntity() {
+        return hanni$savedEntity;
     }
 
     @Override
-    public void skyhanni$setUsingCustomOutline() {
-        skyhanni$usingCustomOutline = true;
+    public void hanni$setUsingCustomOutline() {
+        hanni$usingCustomOutline = true;
     }
 
     @Override
-    public boolean skyhanni$isUsingCustomOutline() {
-        return skyhanni$usingCustomOutline;
+    public boolean hanni$isUsingCustomOutline() {
+        return hanni$usingCustomOutline;
     }
 
 }

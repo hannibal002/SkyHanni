@@ -1,55 +1,55 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.hanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.EliteDevApi
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.DialogUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.json.toJsonArray
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.EliteDevApi
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigFileType
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.enums.OutsideSBFeature
+import at.hannibal2.hanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteFarmingContest
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.WidgetUpdateEvent
+import at.hannibal2.hanni.features.garden.GardenApi.getItemStackCopy
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.DialogUtils
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.ItemUtils.addEnchantGlint
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchAll
+import at.hannibal2.hanni.utils.RegexUtils.matchGroups
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.hanni.utils.json.toJsonArray
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.hanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
@@ -59,12 +59,12 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object GardenNextJacobContest {
 
     private const val CLOSE_TO_NEW_YEAR_TEXT = "§7Close to new SB year!"
     private const val MAX_CONTESTS_PER_YEAR = 124
-    private val profileStorage get() = SkyHanniMod.feature.storage
+    private val profileStorage get() = HanniMod.feature.storage
     private val config get() = GardenApi.config.jacobContest.nextContest
     private val patternGroup = RepoPattern.group("garden.nextcontest")
     private val calendarDetector by lazy { InventoryDetector(monthPattern) }
@@ -309,19 +309,19 @@ object GardenNextJacobContest {
 
     private fun saveKnownContests() {
         val currentYear = SkyBlockTime.now().year
-        SkyHanniMod.jacobContestsData.knownContests = knownContests.filter {
+        HanniMod.jacobContestsData.knownContests = knownContests.filter {
             it.endTime.toSkyBlockTime().year == currentYear
         }
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.JACOB_CONTESTS, "Save contests")
+        HanniMod.configManager.saveConfig(ConfigFileType.JACOB_CONTESTS, "Save contests")
     }
 
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
-        val savedContests = SkyHanniMod.jacobContestsData.knownContests
+        val savedContests = HanniMod.jacobContestsData.knownContests
         val savedYear = savedContests.firstOrNull()?.endTime?.toSkyBlockTime()?.year ?: return
         // Clear contests if from previous year
         if (savedYear != SkyBlockTime.now().year) {
-            SkyHanniMod.jacobContestsData.knownContests = listOf()
+            HanniMod.jacobContestsData.knownContests = listOf()
         } else knownContests = savedContests
     }
 
@@ -333,7 +333,7 @@ object GardenNextJacobContest {
             "§2Click here to automatically share future contests!",
             onClick = {
                 config.shareAutomatically = ShareContestsEntry.AUTO
-                SkyHanniMod.feature.storage.contestSendingAsked = true
+                HanniMod.feature.storage.contestSendingAsked = true
                 ChatUtils.chat("§2Enabled automatic sharing of future contests!")
             },
             "§eClick to enable autosharing!",
@@ -432,9 +432,9 @@ object GardenNextJacobContest {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
         if (config.warnPopup && !Minecraft.getMinecraft().inGameHasFocus) {
-            SkyHanniMod.launchCoroutine("garden jacob contest openPopupWindow") {
+            HanniMod.launchCoroutine("garden jacob contest openPopupWindow") {
                 DialogUtils.openPopupWindow(
-                    title = "SkyHanni Jacob Contest Notification",
+                    title = "Hanni Jacob Contest Notification",
                     message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",
                 )
             }
@@ -467,7 +467,7 @@ object GardenNextJacobContest {
         // Allows retries every 10 minutes when it's after 1 day into the new year
         if (lastFetchAttempted.passedSince() < 10.minutes || nextContestsAvailableAt.isInFuture()) return
 
-        SkyHanniMod.launchIOCoroutineWithMutex("garden jacob contest fetch", fetchingContestsMutex) {
+        HanniMod.launchIOCoroutineWithMutex("garden jacob contest fetch", fetchingContestsMutex) {
             knownContests = EliteDevApi.fetchUpcomingContests().orEmpty()
             handleFetchedContests()
             lastFetchAttempted = SimpleTimeMark.now()
@@ -496,7 +496,7 @@ object GardenNextJacobContest {
 
     private fun sendContestsIfAble() {
         if (!haveAllContests || isCloseToNewYear()) return
-        SkyHanniMod.launchIOCoroutineWithMutex("garden jacob contest send", sendingContestsMutex) {
+        HanniMod.launchIOCoroutineWithMutex("garden jacob contest send", sendingContestsMutex) {
             if (EliteDevApi.submitContests(knownContests)) {
                 ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
             } else ErrorManager.logErrorStateWithData(

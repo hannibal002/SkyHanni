@@ -1,42 +1,42 @@
-package at.hannibal2.skyhanni.features.bingo.card.nextstephelper
+package at.hannibal2.hanni.features.bingo.card.nextstephelper
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.CollectionApi
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SkillExperience
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.bingo.BingoApi
-import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ChatMessageStep
-import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.CollectionStep
-import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.CraftStep
-import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.IslandVisitStep
-import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ItemsStep
-import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.NextStep
-import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ObtainCrystalStep
-import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.PartialProgressItemsStep
-import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ProgressionStep
-import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.SkillLevelStep
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.CollectionApi
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.SkillExperience
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.features.bingo.BingoApi
+import at.hannibal2.hanni.features.bingo.card.nextstephelper.steps.ChatMessageStep
+import at.hannibal2.hanni.features.bingo.card.nextstephelper.steps.CollectionStep
+import at.hannibal2.hanni.features.bingo.card.nextstephelper.steps.CraftStep
+import at.hannibal2.hanni.features.bingo.card.nextstephelper.steps.IslandVisitStep
+import at.hannibal2.hanni.features.bingo.card.nextstephelper.steps.ItemsStep
+import at.hannibal2.hanni.features.bingo.card.nextstephelper.steps.NextStep
+import at.hannibal2.hanni.features.bingo.card.nextstephelper.steps.ObtainCrystalStep
+import at.hannibal2.hanni.features.bingo.card.nextstephelper.steps.PartialProgressItemsStep
+import at.hannibal2.hanni.features.bingo.card.nextstephelper.steps.ProgressionStep
+import at.hannibal2.hanni.features.bingo.card.nextstephelper.steps.SkillLevelStep
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object BingoNextStepHelper {
 
-    private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
+    private val config get() = HanniMod.feature.event.bingo.bingoCard
     private var dirty = true
 
     private val patternGroup = RepoPattern.group("bingo.steps")
@@ -150,7 +150,7 @@ object BingoNextStepHelper {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (!isEnabled()) return
 
         if (event.isMod(5)) {
@@ -161,7 +161,7 @@ object BingoNextStepHelper {
     private var nextMessageIsCrystal = false
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
 
         for (currentStep in currentSteps) {

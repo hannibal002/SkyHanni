@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.config.features.dev
+package at.hannibal2.hanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.NoConfigLink
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.NoConfigLink
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -38,12 +38,12 @@ class DevConfig {
     val repoPattern: RepoPatternConfig = RepoPatternConfig()
 
     @Expose
-    @ConfigOption(name = "Log Expiry Time", desc = "Deletes your SkyHanni logs after this time period in days.")
+    @ConfigOption(name = "Log Expiry Time", desc = "Deletes your Hanni logs after this time period in days.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 30f, minStep = 1f)
     var logExpiryTime: Int = 14
 
     @Expose
-    @ConfigOption(name = "Backup Expiry Time", desc = "Deletes your backups of SkyHanni configs after this time period in days.")
+    @ConfigOption(name = "Backup Expiry Time", desc = "Deletes your backups of Hanni configs after this time period in days.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 30f, minStep = 1f)
     var configBackupExpiryTime: Int = 7
 
@@ -95,7 +95,7 @@ class DevConfig {
     @Expose
     @ConfigOption(
         name = "Fancy Contributors",
-        desc = "Marks §cSkyHanni's contributors §7fancy in the tab list. " +
+        desc = "Marks §cHanni's contributors §7fancy in the tab list. " +
             "§eThose are the folks that coded the mod for you for free :)"
     )
     @ConfigEditorBoolean
@@ -103,13 +103,13 @@ class DevConfig {
     var fancyContributors: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Contributor Nametags", desc = "Makes SkyHanni contributors' nametags fancy too.")
+    @ConfigOption(name = "Contributor Nametags", desc = "Makes Hanni contributors' nametags fancy too.")
     @ConfigEditorBoolean
     @FeatureToggle
     var contributorNametags: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Flip Contributors", desc = "Make SkyHanni contributors appear upside down in the world.")
+    @ConfigOption(name = "Flip Contributors", desc = "Make Hanni contributors appear upside down in the world.")
     @ConfigEditorBoolean
     @FeatureToggle
     var flipContributors: Boolean = true
@@ -117,14 +117,14 @@ class DevConfig {
     @Expose
     @ConfigOption(
         name = "Spin Contributors",
-        desc = "Make SkyHanni contributors spin around when you are looking at them. " +
+        desc = "Make Hanni contributors spin around when you are looking at them. " +
             "§eRequires 'Flip Contributors' to be enabled."
     )
     @ConfigEditorBoolean
     var rotateContributors: Boolean = false
 
     @Expose
-    @ConfigOption(name = "SBA Contributors", desc = "Mark SBA Contributors the same way as SkyHanni contributors.")
+    @ConfigOption(name = "SBA Contributors", desc = "Mark SBA Contributors the same way as Hanni contributors.")
     @ConfigEditorBoolean
     var fancySbaContributors: Boolean = false
 

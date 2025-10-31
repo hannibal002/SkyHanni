@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.slayer
+package at.hannibal2.hanni.features.slayer
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
 import net.minecraft.entity.item.EntityArmorStand
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
-@SkyHanniModule
+@HanniModule
 object HideMobNames {
 
     private val lastMobName = TimeLimitedCache<Int, String>(2.minutes)

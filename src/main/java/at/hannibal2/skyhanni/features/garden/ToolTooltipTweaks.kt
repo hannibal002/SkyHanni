@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.hanni.features.garden
 
-import at.hannibal2.skyhanni.api.ReforgeApi
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getAbilityFortune
-import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.RegexUtils.find
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.ReforgeApi
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.features.garden.FarmingFortuneDisplay.getAbilityFortune
+import at.hannibal2.hanni.features.garden.GardenApi.getCropType
+import at.hannibal2.hanni.features.garden.fortuneguide.FFGuideGui
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.RegexUtils.find
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
-@SkyHanniModule
+@HanniModule
 object ToolTooltipTweaks {
 
     private val config get() = GardenApi.config.tooltipTweak

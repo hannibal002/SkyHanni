@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

@@ -1,50 +1,50 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
-import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
-import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
-import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
-import at.hannibal2.skyhanni.features.bingo.BingoApi
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.UtilsPatterns
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.enoughupdates.EnoughUpdatesRepoManager
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.hypixelapi.HypixelLocationApi
+import at.hannibal2.hanni.config.ConfigManager.Companion.gson
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.data.repo.ChatProgressUpdates
+import at.hannibal2.hanni.data.repo.HanniRepoManager
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.ProfileJoinEvent
+import at.hannibal2.hanni.events.ScoreboardUpdateEvent
+import at.hannibal2.hanni.events.WidgetUpdateEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.hanni.events.hypixel.HypixelLeaveEvent
+import at.hannibal2.hanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.events.skyblock.ScoreboardAreaChangeEvent
+import at.hannibal2.hanni.events.skyblock.SkyBlockLeaveEvent
+import at.hannibal2.hanni.features.bingo.BingoApi
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.RegexUtils.allMatches
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.TabListData
+import at.hannibal2.hanni.utils.UtilsPatterns
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.getSidebarObjective
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
@@ -360,7 +360,7 @@ object HypixelData {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!SkyBlockUtils.onHypixel) return
 
         val message = event.message.removeColor().lowercase()
@@ -392,7 +392,7 @@ object HypixelData {
 
     // TODO rewrite everything in here
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (!SkyBlockUtils.inSkyBlock) {
             sendLocraw()
         }
@@ -421,10 +421,10 @@ object HypixelData {
         when {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
-                SkyHanniMod.launchIOCoroutine("hypixel join repo update") {
+                HanniMod.launchIOCoroutine("hypixel join repo update") {
                     val progress = ChatProgressUpdates()
                     progress.start("hypixel join repo update check")
-                    SkyHanniRepoManager.displayRepoStatus(progress, joinEvent = true)
+                    HanniRepoManager.displayRepoStatus(progress, joinEvent = true)
                     EnoughUpdatesRepoManager.displayRepoStatus(progress, joinEvent = true)
                     progress.end("done with checking both repos")
                 }

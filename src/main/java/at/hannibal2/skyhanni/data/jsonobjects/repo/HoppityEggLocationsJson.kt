@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo
+package at.hannibal2.hanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.utils.LorenzVec
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.util.TreeSet

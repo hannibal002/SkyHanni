@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.farming.lane
+package at.hannibal2.hanni.features.garden.farming.lane
 
 import com.google.gson.annotations.Expose
 

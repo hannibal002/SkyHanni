@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
+import at.hannibal2.hanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getItemUuid
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import org.junit.jupiter.api.Test
 
 class ItemModifierTest {

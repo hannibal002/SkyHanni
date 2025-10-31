@@ -1,34 +1,34 @@
-package at.hannibal2.skyhanni.features.misc.discordrpc
+package at.hannibal2.hanni.features.misc.discordrpc
 
-// SkyblockAddons code, adapted for SkyHanni with some additions and fixes
+// SkyblockAddons code, adapted for Hanni with some additions and fixes
 
-import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.data.ActionBarStatsData
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
-import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
-import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
-import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
-import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import at.hannibal2.hanni.api.pet.CurrentPetApi
+import at.hannibal2.hanni.data.ActionBarStatsData
+import at.hannibal2.hanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.hanni.data.GardenCropMilestones.getTierForCropCount
+import at.hannibal2.hanni.data.GardenCropMilestones.isMaxed
+import at.hannibal2.hanni.data.GardenCropMilestones.progressToNextLevel
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.ScoreboardData
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.features.garden.GardenApi.getCropType
+import at.hannibal2.hanni.features.misc.compacttablist.AdvancedPlayerList
+import at.hannibal2.hanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.extraAttributes
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.TimeUtils.formatted
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 

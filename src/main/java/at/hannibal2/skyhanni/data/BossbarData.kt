@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.BossbarUpdateEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.BossbarUpdateEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 //#if MC < 1.21
 import net.minecraft.entity.boss.BossStatus
 //#else
-//$$ import at.hannibal2.skyhanni.test.command.ErrorManager
-//$$ import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+//$$ import at.hannibal2.hanni.test.command.ErrorManager
+//$$ import at.hannibal2.hanni.utils.compat.unformattedTextCompat
 //$$ import net.minecraft.client.MinecraftClient
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object BossbarData {
     private var bossbar: String? = null
     private var previousServerBossbar = ""
@@ -40,7 +40,7 @@ object BossbarData {
         //$$ var multipleBossBars = false
         //$$ for (bossBar in MinecraftClient.getInstance().inGameHud.bossBarHud.bossBars.values) {
         //$$     if (multipleBossBars) {
-        //$$         ErrorManager.skyHanniError("Multiple Bossbars")
+        //$$         ErrorManager.hanniError("Multiple Bossbars")
         //$$     }
         //$$     multipleBossBars = true
         //$$     val bossbarLine = bossBar.name.unformattedTextCompat()

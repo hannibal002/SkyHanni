@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.effect
+package at.hannibal2.hanni.data.effect
 
 // TODO move the whole list into the repo
 enum class NonGodPotEffect(

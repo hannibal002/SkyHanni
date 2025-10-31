@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.ScoreboardData
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.hanni.utils.RegexUtils.firstMatches
 
 // internal and scoreboard
 // area change event and on scoreboard update in garden

@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.hanni.features.event.diana
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.diana.InquisitorFoundEvent
+import at.hannibal2.hanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.toColor
 
-@SkyHanniModule
+@HanniModule
 object HighlightInquisitors {
 
-    private val config get() = SkyHanniMod.feature.event.diana
+    private val config get() = HanniMod.feature.event.diana
 
     @HandleEvent
     fun onInquisitorFound(event: InquisitorFoundEvent) {

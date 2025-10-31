@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.skillprogress
+package at.hannibal2.hanni.features.skillprogress
 
-import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.ItemUtils
 import net.minecraft.block.Block
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items

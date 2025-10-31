@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
+package at.hannibal2.hanni.features.mining.fossilexcavator.solver
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

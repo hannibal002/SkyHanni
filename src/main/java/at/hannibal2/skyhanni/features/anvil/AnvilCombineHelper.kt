@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.anvil
+package at.hannibal2.hanni.features.anvil
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.inventory.AnvilUpdateEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryUpdatedEvent
+import at.hannibal2.hanni.events.inventory.AnvilUpdateEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.RenderUtils.highlight
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object AnvilCombineHelper {
 
     private var highlightedSlots = setOf<Int>()
@@ -57,5 +57,5 @@ object AnvilCombineHelper {
         }
     }
 
-    fun isEnabled() = SkyHanniMod.feature.inventory.anvilCombineHelper && AnvilApi.inventory.isInside()
+    fun isEnabled() = HanniMod.feature.inventory.anvilCombineHelper && AnvilApi.inventory.isInside()
 }

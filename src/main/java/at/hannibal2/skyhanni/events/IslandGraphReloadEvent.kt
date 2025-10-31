@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.data.model.Graph
 
-class IslandGraphReloadEvent(val graph: Graph) : SkyHanniEvent()
+class IslandGraphReloadEvent(val graph: Graph) : HanniEvent()

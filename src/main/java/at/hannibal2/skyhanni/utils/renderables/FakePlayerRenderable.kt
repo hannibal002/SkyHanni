@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.utils.renderables
+package at.hannibal2.hanni.utils.renderables
 
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.hanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.hanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer

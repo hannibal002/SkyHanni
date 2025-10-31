@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.api
+package at.hannibal2.hanni.api
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.model.SkyHanniInventoryContainer
-import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.subMapOfStringsStartingWith
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigFileType
+import at.hannibal2.hanni.data.ClickType
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.model.HanniInventoryContainer
+import at.hannibal2.hanni.events.BlockClickEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.StringUtils.subMapOfStringsStartingWith
+import at.hannibal2.hanni.utils.collection.CollectionUtils.removeIf
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.block.BlockChest
@@ -31,10 +31,10 @@ import net.minecraft.item.ItemStack
 import java.util.NavigableMap
 import java.util.TreeMap
 
-@SkyHanniModule
+@HanniModule
 object StorageApi {
 
-    private val storage: NavigableMap<String, SkyHanniInventoryContainer>
+    private val storage: NavigableMap<String, HanniInventoryContainer>
         get() = ProfileStorageData.storageProfiles?.data ?: TreeMap()
 
     private var saveJob: Job? = null
@@ -66,18 +66,18 @@ object StorageApi {
         "Rift Storage(?: \\((?<page>\\d+)/\\d+\\))?",
     )
 
-    val accessStorage: Map<String, SkyHanniInventoryContainer> get() = storage
-    val enderchest: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Ender Chest", storage)
-    val backpack: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Backpack", storage)
-    val riftStorage: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Rift Storage", storage)
-    private val mutableIslandChest: MutableMap<String, SkyHanniInventoryContainer>
+    val accessStorage: Map<String, HanniInventoryContainer> get() = storage
+    val enderchest: Map<String, HanniInventoryContainer> get() = subMapOfStringsStartingWith("Ender Chest", storage)
+    val backpack: Map<String, HanniInventoryContainer> get() = subMapOfStringsStartingWith("Backpack", storage)
+    val riftStorage: Map<String, HanniInventoryContainer> get() = subMapOfStringsStartingWith("Rift Storage", storage)
+    private val mutableIslandChest: MutableMap<String, HanniInventoryContainer>
         get() = subMapOfStringsStartingWith(
             "Private Island Chest",
             storage,
         )
-    val islandChest: Map<String, SkyHanniInventoryContainer> get() = mutableIslandChest
+    val islandChest: Map<String, HanniInventoryContainer> get() = mutableIslandChest
 
-    var currentStorage: SkyHanniInventoryContainer? = null
+    var currentStorage: HanniInventoryContainer? = null
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -127,9 +127,9 @@ object StorageApi {
     }
 
     private fun setupSaveJob() {
-        saveJob = SkyHanniMod.launchIOCoroutineWithMutex("storage api save", saveMutex) {
+        saveJob = HanniMod.launchIOCoroutineWithMutex("storage api save", saveMutex) {
             if (!shouldSave) return@launchIOCoroutineWithMutex
-            SkyHanniMod.configManager.saveConfig(ConfigFileType.STORAGE, "Updated Items")
+            HanniMod.configManager.saveConfig(ConfigFileType.STORAGE, "Updated Items")
             shouldSave = false
         }
     }
@@ -161,9 +161,9 @@ object StorageApi {
     private fun handleRead(name: String, inventory: Collection<ItemStack?>) {
         val saneInventory = inventory.drop(9)
         val old = storage[name]
-        val stored: SkyHanniInventoryContainer
+        val stored: HanniInventoryContainer
         if (old == null) {
-            stored = SkyHanniInventoryContainer(name, 9, saneInventory)
+            stored = HanniInventoryContainer(name, 9, saneInventory)
             storage[name] = stored
             return
         } else {
@@ -183,9 +183,9 @@ object StorageApi {
         val name = "Private Island Chest $primary"
         val saneInventory = inventory.toList()
         val old = storage[name]
-        val stored: SkyHanniInventoryContainer
+        val stored: HanniInventoryContainer
         if (old == null) {
-            stored = SkyHanniInventoryContainer(name, 9, saneInventory, "Private Island Chest", primary, secondary)
+            stored = HanniInventoryContainer(name, 9, saneInventory, "Private Island Chest", primary, secondary)
             storage[name] = stored
             return
         } else {
@@ -233,5 +233,5 @@ object StorageApi {
         }
     }
 
-    private fun isPrivateIslandStorageEnabled() = SkyHanniMod.feature.inventory.savePrivateIslandChests
+    private fun isPrivateIslandStorageEnabled() = HanniMod.feature.inventory.savePrivateIslandChests
 }

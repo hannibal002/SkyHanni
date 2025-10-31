@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.test.command
+package at.hannibal2.hanni.test.command
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
 import net.minecraft.util.IChatComponent
 
-@SkyHanniModule
+@HanniModule
 object TestChatCommand {
 
     fun command(args: Array<String>) {
@@ -29,7 +29,7 @@ object TestChatCommand {
             return
         }
 
-        SkyHanniMod.launchCoroutine("test chat command") {
+        HanniMod.launchCoroutine("test chat command") {
             val mutArgs = args.toMutableList()
             val multiLines = mutArgs.remove("-lines")
             val isComplex = mutArgs.remove("-complex")
@@ -75,7 +75,7 @@ object TestChatCommand {
 
     private fun test(componentText: IChatComponent, isHidden: Boolean) {
         val message = componentText.formattedText.stripHypixelMessage()
-        val event = SkyHanniChatEvent(message, componentText)
+        val event = HanniChatEvent(message, componentText)
         event.post()
 
         if (event.blockedReason != null) {

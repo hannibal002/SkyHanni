@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.gui.customscoreboard
+package at.hannibal2.hanni.config.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.utils.OSUtils.openBrowser
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion

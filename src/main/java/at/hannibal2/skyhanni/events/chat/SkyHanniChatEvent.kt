@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.events.chat
+package at.hannibal2.hanni.events.chat
 
-import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.hannimodule.PrimaryFunction
+import at.hannibal2.hanni.utils.ComponentMatcherUtils.intoSpan
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
 import net.minecraft.util.IChatComponent
 
 @PrimaryFunction("onChat")
-open class SkyHanniChatEvent(
+open class HanniChatEvent(
     message: String,
     chatComponent: IChatComponent,
     blockedReason: String? = null,

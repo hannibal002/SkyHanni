@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.config.features.garden.contest
+package at.hannibal2.hanni.config.features.garden.contest
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig
-import at.hannibal2.skyhanni.config.features.garden.PersonalBestsConfig
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.config.features.garden.NextJacobContestConfig
+import at.hannibal2.hanni.config.features.garden.PersonalBestsConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils.compat
+package at.hannibal2.hanni.utils.compat
 
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzColor.Companion.toLorenzColor
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks

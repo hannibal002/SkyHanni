@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
 /**
  * Adapted from NEU's DiscordMarkdownBuilder.

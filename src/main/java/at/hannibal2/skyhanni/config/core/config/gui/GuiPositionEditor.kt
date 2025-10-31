@@ -16,25 +16,25 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with NotEnoughUpdates. If not, see <https://www.gnu.org/licenses/>.
  */
-package at.hannibal2.skyhanni.config.core.config.gui
+package at.hannibal2.hanni.config.core.config.gui
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
-import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
-import at.hannibal2.skyhanni.data.OtherInventoryData
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.data.GuiEditManager
+import at.hannibal2.hanni.data.GuiEditManager.getAbsX
+import at.hannibal2.hanni.data.GuiEditManager.getAbsY
+import at.hannibal2.hanni.data.GuiEditManager.getDummySize
+import at.hannibal2.hanni.data.OtherInventoryData
+import at.hannibal2.hanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.compat.MouseCompat
+import at.hannibal2.hanni.utils.compat.HanniBaseScreen
+import at.hannibal2.hanni.utils.renderables.RenderableTooltips
+import at.hannibal2.hanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
@@ -43,7 +43,7 @@ class GuiPositionEditor(
     private val positions: List<Position>,
     private val border: Int,
     private val oldScreen: GuiContainer? = null,
-) : SkyhanniBaseScreen() {
+) : HanniBaseScreen() {
 
     private var grabbedX = 0
     private var grabbedY = 0
@@ -66,7 +66,7 @@ class GuiPositionEditor(
             //#endif
             //#if MC < 1.21
             val accessor = oldScreen as AccessorGuiContainer
-            accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
+            accessor.invokeDrawGuiContainerBackgroundLayer_hanni(partialTicks, -1, -1)
             //#else
             //$$ oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
             //#endif
@@ -89,10 +89,10 @@ class GuiPositionEditor(
 
         // When the mouse isn't currently hovering over a gui element
         if (displayPos == -1) {
-            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == Keyboard.KEY_NONE
+            val extraInfo = HanniMod.feature.gui.keyBindOpen == Keyboard.KEY_NONE
             renderHover(
                 buildList {
-                    add("§cSkyHanni Position Editor")
+                    add("§cHanni Position Editor")
                     if (extraInfo) {
                         add("§aTo edit hidden GUI elements set a key in /sh edit")
                         add("§athen click that key while the GUI element is visible")
@@ -108,7 +108,7 @@ class GuiPositionEditor(
         if (pos.clicked) return listOf("§7x: §e${pos.x}§7, y: §e${pos.y}")
 
         return listOf(
-            "§cSkyHanni Position Editor",
+            "§cHanni Position Editor",
             "§b${pos.internalName}",
             "  §7x: §e${pos.x}§7, y: §e${pos.y}§7, scale: §e${pos.scale.roundTo(2)}",
             "",

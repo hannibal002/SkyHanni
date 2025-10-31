@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.slayer
+package at.hannibal2.hanni.features.slayer
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
-import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.events.entity.EntityOpacityActiveEvent
-import at.hannibal2.skyhanni.events.entity.EntityOpacityEvent
-import at.hannibal2.skyhanni.features.misc.CarryTracker
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.data.mob.Mob.Companion.belongsToPlayer
+import at.hannibal2.hanni.data.mob.MobFilter.isDisplayNpc
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.entity.EntityClickEvent
+import at.hannibal2.hanni.events.entity.EntityOpacityActiveEvent
+import at.hannibal2.hanni.events.entity.EntityOpacityEvent
+import at.hannibal2.hanni.features.misc.CarryTracker
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.MobUtils.mob
+import at.hannibal2.hanni.utils.compat.MinecraftCompat.isLocalPlayer
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.network.play.client.C02PacketUseEntity
 
-@SkyHanniModule
+@HanniModule
 object ActiveBossTransparency {
 
     private val config get() = SlayerApi.config.activeBossTransparency

@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.shader.CircleShader
-import at.hannibal2.skyhanni.shader.RadialGradientCircleShader
-import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
-import at.hannibal2.skyhanni.shader.RoundedRectangleShader
-import at.hannibal2.skyhanni.shader.RoundedShader
-import at.hannibal2.skyhanni.shader.RoundedTextureShader
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
+import at.hannibal2.hanni.shader.CircleShader
+import at.hannibal2.hanni.shader.RadialGradientCircleShader
+import at.hannibal2.hanni.shader.RoundedRectangleOutlineShader
+import at.hannibal2.hanni.shader.RoundedRectangleShader
+import at.hannibal2.hanni.shader.RoundedShader
+import at.hannibal2.hanni.shader.RoundedTextureShader
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
 import kotlin.math.max
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer
+//$$ import at.hannibal2.hanni.utils.render.RoundedShapeDrawer
 //$$ import org.joml.Matrix3x2f
 //$$ import org.joml.Matrix4f
 //#endif

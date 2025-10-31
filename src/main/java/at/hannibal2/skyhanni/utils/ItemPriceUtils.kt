@@ -1,35 +1,35 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
-import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
-import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getRecipes
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
-import at.hannibal2.skyhanni.utils.api.ApiUtils
-import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.features.inventory.bazaar.BazaarApi.getBazaarData
+import at.hannibal2.hanni.features.inventory.bazaar.HypixelItemApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getNumberedName
+import at.hannibal2.hanni.utils.ItemUtils.getRecipePrice
+import at.hannibal2.hanni.utils.ItemUtils.repoItemName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuItems.getRecipes
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.api.ApiStaticGetPath
+import at.hannibal2.hanni.utils.api.ApiUtils
+import at.hannibal2.hanni.utils.json.fromJson
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import kotlin.time.Duration.Companion.minutes
 
-@SkyHanniModule
+@HanniModule
 object ItemPriceUtils {
 
     private val JACK_O_LANTERN = "JACK_O_LANTERN".toInternalName()
@@ -158,7 +158,7 @@ object ItemPriceUtils {
         if (lastLowestBinRefresh.passedSince() < 2.minutes) return
         lastLowestBinRefresh = SimpleTimeMark.now()
 
-        SkyHanniMod.launchIOCoroutine("neu lowest bin item price fetch", timeout = 1.minutes) {
+        HanniMod.launchIOCoroutine("neu lowest bin item price fetch", timeout = 1.minutes) {
             val (_, data) = ApiUtils.getTypedJsonResponse<JsonObject>(lbinStatic).assertSuccessWithData() ?: return@launchIOCoroutine
             lowestBins = ConfigManager.gson.fromJson<Map<NeuInternalName, Long>>(data)
         }
@@ -208,10 +208,10 @@ object ItemPriceUtils {
             description = "Test fetching Moulberry's lowest bin data."
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback {
-                SkyHanniMod.launchIOCoroutine("shfetchmoulblbins command", timeout = 1.minutes) {
+                HanniMod.launchIOCoroutine("shfetchmoulblbins command", timeout = 1.minutes) {
                     val timeNow = SimpleTimeMark.now()
                     val (_, fetchedLowestBins) = ApiUtils.getJsonResponse(lbinStatic).assertSuccessWithData()
-                        ?: ErrorManager.skyHanniError("Failed to fetch Moulberry's lowest bin data!")
+                        ?: ErrorManager.hanniError("Failed to fetch Moulberry's lowest bin data!")
                     lowestBins = ConfigManager.gson.fromJson<Map<NeuInternalName, Long>>(fetchedLowestBins)
                     val formatString = buildString {
                         appendLine("§aFetched Moulberry's lowest bin data in §b${timeNow.passedSince().format()}§a!")

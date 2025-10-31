@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events.render.gui
+package at.hannibal2.hanni.events.render.gui
 
-import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.hanni.api.event.RenderingHanniEvent
+import at.hannibal2.hanni.utils.compat.DrawContext
 
-class RenderingTickEvent(context: DrawContext, val startPhase: Boolean) : RenderingSkyHanniEvent(context)
+class RenderingTickEvent(context: DrawContext, val startPhase: Boolean) : RenderingHanniEvent(context)

@@ -1,36 +1,36 @@
-package at.hannibal2.skyhanni.features.slayer.enderman
+package at.hannibal2.hanni.features.slayer.enderman
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.ServerBlockChangeEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.addAlpha
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.EntityUtils.canBeSeen
+import at.hannibal2.hanni.utils.EntityUtils.getBlockInHand
+import at.hannibal2.hanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkullTextureHolder
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.hanni.utils.compat.getStandHelmet
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
@@ -38,7 +38,7 @@ import net.minecraft.init.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 // TODO replace all drawLineToEye with LineToMobHandler
-@SkyHanniModule
+@HanniModule
 object EndermanSlayerFeatures {
 
     private val config get() = SlayerApi.config.endermen
@@ -99,7 +99,7 @@ object EndermanSlayerFeatures {
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (beaconConfig.highlightBeacon) {
             endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
@@ -113,7 +113,7 @@ object EndermanSlayerFeatures {
         drawNukekubiSkulls(event)
     }
 
-    private fun drawNukekubiSkulls(event: SkyHanniRenderWorldEvent) {
+    private fun drawNukekubiSkulls(event: HanniRenderWorldEvent) {
         for (skull in nukekubiSkulls) {
             if (skull.isDead) continue
             if (config.highlightNukekebi) {
@@ -139,7 +139,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawFlyingBeacon(event: SkyHanniRenderWorldEvent) {
+    private fun drawFlyingBeacon(event: HanniRenderWorldEvent) {
         for (beacon in flyingBeacons) {
             if (!beacon.canBeSeen(ignoreFrustum = true)) continue
             if (beaconConfig.highlightBeacon) {
@@ -159,7 +159,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawSittingBeacon(event: SkyHanniRenderWorldEvent) {
+    private fun drawSittingBeacon(event: HanniRenderWorldEvent) {
         for ((location, time) in sittingBeacon) {
             if (location.distanceToPlayer() > 20) continue
             if (beaconConfig.showLine) {

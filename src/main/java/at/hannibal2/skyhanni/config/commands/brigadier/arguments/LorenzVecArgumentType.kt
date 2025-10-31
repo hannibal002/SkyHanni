@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.commands.brigadier.arguments
+package at.hannibal2.hanni.config.commands.brigadier.arguments
 
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzVec
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType
 

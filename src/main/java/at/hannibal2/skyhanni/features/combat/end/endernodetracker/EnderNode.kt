@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.combat.end.endernodetracker
+package at.hannibal2.hanni.features.combat.end.endernodetracker
 
-import at.hannibal2.skyhanni.config.features.combat.end.EnderNodeConfig
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.config.features.combat.end.EnderNodeConfig
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
 
 enum class EnderNode(
     val internalName: NeuInternalName,

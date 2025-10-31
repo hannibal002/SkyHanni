@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.event.lobby.waypoints
+package at.hannibal2.hanni.features.event.lobby.waypoints
 
-import at.hannibal2.skyhanni.data.jsonobjects.repo.EventWaypointData
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.data.jsonobjects.repo.EventWaypointData
+import at.hannibal2.hanni.utils.LorenzVec
 
 data class EventWaypoint(
     val name: String = "",

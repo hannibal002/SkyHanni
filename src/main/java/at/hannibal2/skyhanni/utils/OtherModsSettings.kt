@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
 import java.lang.reflect.Field
 import java.util.concurrent.ConcurrentHashMap

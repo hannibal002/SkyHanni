@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.features.misc.teleportpad
+package at.hannibal2.hanni.features.misc.teleportpad
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object TeleportPadInventoryNumber {
 
     private val numbers: Map<String, Int> by lazy {
@@ -70,7 +70,7 @@ object TeleportPadInventoryNumber {
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inTeleportPad =
-            event.inventoryName == "Set Destination" && SkyHanniMod.feature.misc.teleportPad.inventoryNumbers
+            event.inventoryName == "Set Destination" && HanniMod.feature.misc.teleportPad.inventoryNumbers
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)

@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getItemCategoryOrNull
 import net.minecraft.item.ItemStack
 
 enum class ItemCategory {

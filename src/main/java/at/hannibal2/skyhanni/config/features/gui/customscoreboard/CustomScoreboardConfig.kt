@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.config.features.gui.customscoreboard
+package at.hannibal2.hanni.config.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigElement
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardConfigElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

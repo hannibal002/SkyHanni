@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
-import at.hannibal2.skyhanni.events.GuiRenderItemEvent
-import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.DrawScreenAfterEvent
+import at.hannibal2.hanni.events.GuiRenderItemEvent
+import at.hannibal2.hanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.hanni.events.RenderItemTipEvent
+import at.hannibal2.hanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.RenderUtils.drawSlotText
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.InventoryCompat.orNull
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 
-@SkyHanniModule
+@HanniModule
 object ItemTipHelper {
 
     @HandleEvent(onlyOnSkyblock = true)

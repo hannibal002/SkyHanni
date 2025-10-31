@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.init;
+package at.hannibal2.hanni.mixins.init;
 
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
+public class HanniMixinPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
         InjectionPoint.register(BeforeForLoopInjectionPoint.class);
@@ -60,7 +60,7 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
         return classUrl;
     }
 
-    String mixinBasePackage = "at.hannibal2.skyhanni.mixins.transformers.";
+    String mixinBasePackage = "at.hannibal2.hanni.mixins.transformers.";
     String mixinBaseDir = mixinBasePackage.replace(".", "/");
 
     List<String> mixins = null;

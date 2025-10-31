@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.api.SkyBlockXPApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.hanni.api.SkyBlockXPApi
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils
 
 object ScoreboardElementSkyBlockXP : ScoreboardElement() {
     override fun getDisplay() = buildList {

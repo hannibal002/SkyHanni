@@ -1,5 +1,5 @@
-package at.hannibal2.skyhanni.events.bingo
+package at.hannibal2.hanni.events.bingo
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 
-object BingoCardUpdateEvent : SkyHanniEvent()
+object BingoCardUpdateEvent : HanniEvent()

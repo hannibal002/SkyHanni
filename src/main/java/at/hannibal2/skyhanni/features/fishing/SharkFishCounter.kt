@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.hanni.features.fishing
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.fishing.SeaCreatureFishEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.RenderUtils.renderString
 
-@SkyHanniModule
+@HanniModule
 object SharkFishCounter {
 
     private var counter = mutableListOf(0, 0, 0, 0)
@@ -20,7 +20,7 @@ object SharkFishCounter {
 
     @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
+        if (!HanniMod.feature.fishing.sharkFishCounter) return
 
         val name = event.seaCreature.name
         if (!name.contains("Shark")) return
@@ -38,8 +38,8 @@ object SharkFishCounter {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
-        if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
+    fun onTick(event: HanniTickEvent) {
+        if (!HanniMod.feature.fishing.sharkFishCounter) return
 
         if (event.isMod(10)) {
             hasWaterRodInHand = isWaterFishingRod()
@@ -47,7 +47,7 @@ object SharkFishCounter {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (event.message != "§b§lFISHING FESTIVAL §r§eThe festival has concluded! Time to dry off and repair your rods!") return
         val count = counter.sum()
         if (count == 0) return
@@ -77,9 +77,9 @@ object SharkFishCounter {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
+        if (!HanniMod.feature.fishing.sharkFishCounter) return
         if (!hasWaterRodInHand) return
 
-        SkyHanniMod.feature.fishing.sharkFishCounterPos.renderString(display, posLabel = "Shark Fish Counter")
+        HanniMod.feature.fishing.sharkFishCounterPos.renderString(display, posLabel = "Shark Fish Counter")
     }
 }

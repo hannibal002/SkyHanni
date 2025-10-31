@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.event.diana
+package at.hannibal2.hanni.config.features.event.diana
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

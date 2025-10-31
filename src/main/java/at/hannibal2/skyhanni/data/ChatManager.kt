@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-import at.hannibal2.skyhanni.features.chat.ChatHistoryGui
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.IdentityCharacteristics
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils
-import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.minecraft.packet.PacketSentEvent
+import at.hannibal2.hanni.features.chat.ChatHistoryGui
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.IdentityCharacteristics
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.ReflectionUtils.getClassInstance
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.send
+import at.hannibal2.hanni.utils.collection.CollectionUtils
+import at.hannibal2.hanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.network.Packet
@@ -32,10 +32,10 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object ChatManager {
 
-    private val config get() = SkyHanniMod.feature.dev
+    private val config get() = HanniMod.feature.dev
 
     private val loggerAll = LorenzLogger("chat/all")
     private val loggerFiltered = LorenzLogger("chat/blocked")
@@ -167,7 +167,7 @@ object ChatManager {
             return null to cancelled
         }
         val key = IdentityCharacteristics(component)
-        val chatEvent = SkyHanniChatEvent(message, component)
+        val chatEvent = HanniChatEvent(message, component)
         chatEvent.post()
 
         val blockReason = chatEvent.blockedReason.orEmpty().uppercase()
@@ -208,7 +208,7 @@ object ChatManager {
     }
 
     private fun openChatHistoryGui(args: Array<String>) {
-        SkyHanniMod.screenToOpen = if (args.isEmpty()) {
+        HanniMod.screenToOpen = if (args.isEmpty()) {
             ChatHistoryGui(getRecentMessageHistory())
         } else {
             val searchTerm = args.joinToString(" ")

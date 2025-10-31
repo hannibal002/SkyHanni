@@ -1,42 +1,42 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.features.misc.CurrentPing
-import at.hannibal2.skyhanni.features.misc.TpsCounter
-import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.enoughupdates.EnoughUpdatesRepoManager
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.repo.HanniRepoManager
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.features.misc.CurrentPing
+import at.hannibal2.hanni.features.misc.TpsCounter
+import at.hannibal2.hanni.features.misc.limbo.LimboTimeTracker
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.equalsIgnoreColor
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.utils.toLorenzVec
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object DebugCommand {
 
     fun command(search: String) {
         val list = mutableListOf<String>()
         list.add("```")
-        list.add("= Debug Information for SkyHanni ${SkyHanniMod.VERSION} ${PlatformUtils.MC_VERSION} =")
+        list.add("= Debug Information for Hanni ${HanniMod.VERSION} ${PlatformUtils.MC_VERSION} =")
         list.add("")
 
         list.add(
@@ -68,7 +68,7 @@ object DebugCommand {
 
         list.add("```")
         OSUtils.copyToClipboard(list.joinToString("\n"))
-        ChatUtils.chat("§eCopied SkyHanni debug data in the clipboard.")
+        ChatUtils.chat("§eCopied Hanni debug data in the clipboard.")
     }
 
     private fun profileType(event: DebugDataCollectEvent) {
@@ -157,17 +157,17 @@ object DebugCommand {
     // todo clean this up so that it commonly reports on any AbstractRepoManager
     private fun repoData(event: DebugDataCollectEvent) {
         event.title("Repo Information")
-        val config = SkyHanniMod.feature.dev.repo
+        val config = HanniMod.feature.dev.repo
 
         val hasDefaultSettings = config.location.hasDefaultSettings()
-        val unsuccessfulConstants = SkyHanniRepoManager.getFailedConstants()
+        val unsuccessfulConstants = HanniRepoManager.getFailedConstants()
         val list = buildList {
             add(" repoAutoUpdate: ${config.repoAutoUpdate}")
-            add(" usingBackupRepo: ${SkyHanniRepoManager.isUsingBackup}")
+            add(" usingBackupRepo: ${HanniRepoManager.isUsingBackup}")
             if (hasDefaultSettings) {
                 add((" repo location: default"))
             } else {
-                add(" non-default repo location: '${SkyHanniRepoManager.getGitHubRepoPath()}'")
+                add(" non-default repo location: '${HanniRepoManager.getGitHubRepoPath()}'")
             }
 
             if (unsuccessfulConstants.isNotEmpty()) {
@@ -177,7 +177,7 @@ object DebugCommand {
                 }
             }
 
-            val neuRepoConfig = SkyHanniMod.feature.dev.neuRepo
+            val neuRepoConfig = HanniMod.feature.dev.neuRepo
             add(" neuRepoAutoUpdate: ${neuRepoConfig.repoAutoUpdate}")
 
             if (!neuRepoConfig.location.hasDefaultSettings()) {
@@ -189,7 +189,7 @@ object DebugCommand {
             add(" loaded neu items: ${NeuItems.allNeuRepoItems().size}")
         }
 
-        val isRelevant = SkyHanniRepoManager.isUsingBackup || unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
+        val isRelevant = HanniRepoManager.isUsingBackup || unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
         if (isRelevant) {
             event.addData(list)
         } else {
@@ -211,7 +211,7 @@ object DebugCommand {
     private fun networkInfo(event: DebugDataCollectEvent) {
         event.title("Network Information")
         val tps = TpsCounter.tps ?: 0.0
-        val pingEnabled = SkyHanniMod.feature.dev.pingApi
+        val pingEnabled = HanniMod.feature.dev.pingApi
 
         val list = buildList {
             add("tps: $tps")
@@ -251,7 +251,7 @@ object DebugCommand {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdebug") {
-            description = "Copies SkyHanni debug data in the clipboard."
+            description = "Copies Hanni debug data in the clipboard."
             category = CommandCategory.DEVELOPER_DEBUG
             argCallback("profilename profile", BrigadierArguments.string()) { profile ->
                 HypixelData.profileName = profile.lowercase()

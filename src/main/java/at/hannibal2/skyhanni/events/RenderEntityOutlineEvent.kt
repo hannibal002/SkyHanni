@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.utils.EntityUtils
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItemFrame
 import java.awt.Color
 
-class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity>?) : SkyHanniEvent() {
+class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity>?) : HanniEvent() {
 
     /**
      * The phase of the event (see [Type]

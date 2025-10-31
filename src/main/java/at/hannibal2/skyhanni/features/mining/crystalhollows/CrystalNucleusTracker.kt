@@ -1,46 +1,46 @@
-package at.hannibal2.skyhanni.features.mining.crystalhollows
+package at.hannibal2.hanni.features.mining.crystalhollows
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.item.ShardGainEvent
-import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.BAL_SHARD_ITEM
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.EPIC_BAL_ITEM
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JUNGLE_KEY_ITEM
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.LEGENDARY_BAL_ITEM
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.event.HandleEvent.Companion.HIGH
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.ItemAddManager
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.ItemAddEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.item.ShardGainEvent
+import at.hannibal2.hanni.events.mining.CrystalNucleusLootEvent
+import at.hannibal2.hanni.features.mining.crystalhollows.CrystalNucleusApi.BAL_SHARD_ITEM
+import at.hannibal2.hanni.features.mining.crystalhollows.CrystalNucleusApi.EPIC_BAL_ITEM
+import at.hannibal2.hanni.features.mining.crystalhollows.CrystalNucleusApi.JUNGLE_KEY_ITEM
+import at.hannibal2.hanni.features.mining.crystalhollows.CrystalNucleusApi.LEGENDARY_BAL_ITEM
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RenderDisplayHelper
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.Searchable
+import at.hannibal2.hanni.utils.renderables.toSearchable
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.tracker.ItemTrackerData
+import at.hannibal2.hanni.utils.tracker.HanniItemTracker
+import at.hannibal2.hanni.utils.tracker.HanniTracker
 import com.google.gson.annotations.Expose
 
-@SkyHanniModule
+@HanniModule
 object CrystalNucleusTracker {
-    private val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
+    private val config get() = HanniMod.feature.mining.crystalNucleusTracker
     private val patternGroup = RepoPattern.group("mining.crystalnucleus.tracker")
 
     /**
@@ -55,7 +55,7 @@ object CrystalNucleusTracker {
         "(?:(?:§.)*\\[.*(?:§.)*\\+*(?:§.)*\\] )?(?<player>.*)§r§f §r§ehas obtained §r§a§r§7\\[Lvl 1\\] §r§(?<raritycolor>[65])Bal§r§e!",
     )
 
-    private val tracker = SkyHanniItemTracker(
+    private val tracker = HanniItemTracker(
         "Crystal Nucleus Tracker",
         { Data() },
         { it.mining.crystalNucleusTracker },
@@ -79,7 +79,7 @@ object CrystalNucleusTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         balObtainedPattern.matchMatcher(event.message) {
             if (!group("player").equals(PlayerUtils.getName(), ignoreCase = true)) return@matchMatcher
 
@@ -133,7 +133,7 @@ object CrystalNucleusTracker {
         val runsCompleted = data.runsCompleted
         if (runsCompleted > 0) {
             var profit = tracker.drawItems(data, { true }, this)
-            val jungleKeyCost: Double = SkyHanniTracker.getPricePer(JUNGLE_KEY_ITEM) * runsCompleted
+            val jungleKeyCost: Double = HanniTracker.getPricePer(JUNGLE_KEY_ITEM) * runsCompleted
             profit -= jungleKeyCost
             val jungleKeyCostFormat = jungleKeyCost.shortFormat()
             add(
@@ -147,7 +147,7 @@ object CrystalNucleusTracker {
             )
 
             val usesApparatus = CrystalNucleusApi.usesApparatus()
-            val partsCost = CrystalNucleusApi.getPrecursorRunPrice { SkyHanniTracker.getPricePer(it) }
+            val partsCost = CrystalNucleusApi.getPrecursorRunPrice { HanniTracker.getPricePer(it) }
             val totalSapphireCost: Double = partsCost * runsCompleted
             val rawConfigString = config.professorUsage.get().toString()
             val usageString = if (usesApparatus) StringUtils.pluralize(

@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
+import at.hannibal2.hanni.utils.LorenzVec.Companion.toLorenzVec
 import kotlin.math.pow
 
 class PolynomialFitter(private val degree: Int) {

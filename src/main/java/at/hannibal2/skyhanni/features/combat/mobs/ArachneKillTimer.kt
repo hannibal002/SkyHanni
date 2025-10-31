@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.combat.mobs
+package at.hannibal2.hanni.features.combat.mobs
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.chat.ArachneChatMessageHider
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 
-@SkyHanniModule
+@HanniModule
 object ArachneKillTimer {
 
-    private val config get() = SkyHanniMod.feature.combat.mobs
+    private val config get() = HanniMod.feature.combat.mobs
 
     private val patternGroup = RepoPattern.group("chat.arachne")
 
@@ -56,7 +56,7 @@ object ArachneKillTimer {
     private var arachneKillTime = Duration.ZERO
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
         if (arachneCallingSpawnedPattern.matches(event.message) || arachneCrystalSpawnedPattern.matches(event.message)) {
             arachneSpawnedTime = SimpleTimeMark.now()

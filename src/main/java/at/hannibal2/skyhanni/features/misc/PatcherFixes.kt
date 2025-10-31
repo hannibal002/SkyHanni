@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.OtherModsSettings
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.OtherModsSettings
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object PatcherFixes {
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = HanniMod.feature.misc
 
     private var lastCheck = SimpleTimeMark.farPast()
     private var lastChatMessage = SimpleTimeMark.farPast()
@@ -26,7 +26,7 @@ object PatcherFixes {
         lastChatMessage = SimpleTimeMark.now()
 
         ChatUtils.clickToActionOrDisable(
-            "§cPatcher's Parallax Fix breaks SkyHanni's line rendering!",
+            "§cPatcher's Parallax Fix breaks Hanni's line rendering!",
             config::fixPatcherLines,
             actionName = "disable this option in Patcher",
             action = { tryFix() },
@@ -37,7 +37,7 @@ object PatcherFixes {
         val patcher = OtherModsSettings.patcher()
         if (patcher.isEnabled("parallaxFix")) {
             patcher.setBoolean("parallaxFix", false)
-            ChatUtils.chat("§aDisabled Patcher's Parallax Fix! SkyHanni's lines should now work correctly.")
+            ChatUtils.chat("§aDisabled Patcher's Parallax Fix! Hanni's lines should now work correctly.")
         } else {
             ChatUtils.userError("Patcher's Parallax is already disabled!")
         }

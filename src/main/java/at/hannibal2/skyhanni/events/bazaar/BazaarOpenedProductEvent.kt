@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.events.bazaar
+package at.hannibal2.hanni.events.bazaar
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.utils.NeuInternalName
 
-class BazaarOpenedProductEvent(val openedProduct: NeuInternalName?, val inventoryOpenEvent: InventoryFullyOpenedEvent) : SkyHanniEvent()
+class BazaarOpenedProductEvent(val openedProduct: NeuInternalName?, val inventoryOpenEvent: InventoryFullyOpenedEvent) : HanniEvent()

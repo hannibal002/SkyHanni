@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.utils.shader.Shader
-import at.hannibal2.skyhanni.utils.shader.Uniform
+import at.hannibal2.hanni.utils.shader.Shader
+import at.hannibal2.hanni.utils.shader.Uniform
 
 object DarkenShader : Shader("darken", "darken") {
 

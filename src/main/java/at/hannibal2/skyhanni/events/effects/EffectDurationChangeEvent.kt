@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.events.effects
+package at.hannibal2.hanni.events.effects
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.data.effect.NonGodPotEffect
 import kotlin.time.Duration
 
 class EffectDurationChangeEvent(
     val effect: NonGodPotEffect,
     val durationChangeType: EffectDurationChangeType,
     val duration: Duration? = null
-) : SkyHanniEvent()
+) : HanniEvent()
 
 enum class EffectDurationChangeType {
     ADD,

@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.chroma
+package at.hannibal2.hanni.config.features.chroma
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.features.chroma.ChromaManager
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.features.chroma.ChromaManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
@@ -12,12 +12,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ChromaConfig {
-    @ConfigOption(name = "Chroma Preview", desc = "§fPlease star SkyHanni on GitHub!")
+    @ConfigOption(name = "Chroma Preview", desc = "§fPlease star Hanni on GitHub!")
     @ConfigEditorInfoText(infoTitle = "Only in SkyBlock")
     var chromaPreview: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Toggle SkyHanni's chroma.")
+    @ConfigOption(name = "Enabled", desc = "Toggle Hanni's chroma.")
     @ConfigEditorBoolean
     @FeatureToggle
     val enabled: Property<Boolean> = Property.of(false)

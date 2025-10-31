@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.data.model
+package at.hannibal2.hanni.data.model
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.WidgetUpdateEvent
+import at.hannibal2.hanni.events.minecraft.ResourcePackReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.hanni.utils.compat.createResourceLocation
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import org.intellij.lang.annotations.Language
 import java.util.EnumMap
@@ -192,7 +192,7 @@ enum class SkyblockStat(
 
     fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
         val fontSizeOfLargestIcon by lazy {
@@ -223,7 +223,7 @@ enum class SkyblockStat(
         @HandleEvent
         fun onResourcePackLoad(event: ResourcePackReloadEvent) {
             val packOverrides = event.getJsonResource<Map<String, String>>(
-                createResourceLocation("skyhanni", "icon_overrides.json"),
+                createResourceLocation("hanni", "icon_overrides.json"),
             )
 
             resourcePackOverrides = packOverrides.orEmpty()

@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.collection.SizeLimitedSet
+import at.hannibal2.hanni.utils.collection.SizeLimitedSet
 import com.google.common.cache.RemovalCause
 
-@Deprecated("Use at.hannibal2.skyhanni.utils.collection.SizeLimitedSet import instead")
+@Deprecated("Use at.hannibal2.hanni.utils.collection.SizeLimitedSet import instead")
 fun <T : Any> SizeLimitedSet(
     maxSize: Long,
     removalListener: ((T?, RemovalCause) -> Unit)? = null,

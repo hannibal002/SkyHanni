@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.utils.render.layers
+package at.hannibal2.hanni.utils.render.layers
 
-import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
-import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
-import at.hannibal2.skyhanni.features.chroma.ChromaManager
-import at.hannibal2.skyhanni.mixins.transformers.AccessorMinecraft
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.compat.RenderCompat.createRenderPass
-import at.hannibal2.skyhanni.utils.compat.RenderCompat.drawIndexed
-import at.hannibal2.skyhanni.utils.compat.RenderCompat.enableRenderPassScissorStateIfAble
+import at.hannibal2.hanni.api.minecraftevents.ClientEvents
+import at.hannibal2.hanni.config.features.chroma.ChromaConfig.Direction
+import at.hannibal2.hanni.features.chroma.ChromaManager
+import at.hannibal2.hanni.mixins.transformers.AccessorMinecraft
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.compat.RenderCompat.createRenderPass
+import at.hannibal2.hanni.utils.compat.RenderCompat.drawIndexed
+import at.hannibal2.hanni.utils.compat.RenderCompat.enableRenderPassScissorStateIfAble
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderSystem
@@ -16,7 +16,7 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.BuiltBuffer
 import net.minecraft.client.render.RenderLayer.MultiPhase
 //#if MC > 1.21.6
-//$$ import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
+//$$ import at.hannibal2.hanni.mixins.hooks.GuiRendererHook
 //$$ import org.joml.Vector4f
 //#endif
 //#if MC > 1.21.8
@@ -78,11 +78,11 @@ class ChromaRenderLayer(
 
             val framebuffer = phases.target.get()
 
-            RenderSystem.getDevice().createRenderPass("SkyHanni Immediate Chroma Pipeline Draw", framebuffer).use { renderPass ->
+            RenderSystem.getDevice().createRenderPass("Hanni Immediate Chroma Pipeline Draw", framebuffer).use { renderPass ->
                 //#if MC > 1.21.6
                 //$$ RenderSystem.bindDefaultUniforms(renderPass)
                 //$$ renderPass.setUniform("DynamicTransforms", dynamicTransforms)
-                //$$ renderPass.setUniform("SkyHanniChromaUniforms", GuiRendererHook.chromaBufferSlice)
+                //$$ renderPass.setUniform("HanniChromaUniforms", GuiRendererHook.chromaBufferSlice)
                 //#else
                 renderPass.setUniform("chromaSize", chromaSize)
                 renderPass.setUniform("timeOffset", timeOffset)

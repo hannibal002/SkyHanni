@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.test.entity
+package at.hannibal2.hanni.test.entity
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.holdingSkullTexture
-import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.EntityUtils.holdingSkullTexture
+import at.hannibal2.hanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.entity.item.EntityArmorStand
 
-@SkyHanniModule
+@HanniModule
 object DebugEntitySkinCommand {
 
     private var skinToFind: String? = null
@@ -40,7 +40,7 @@ object DebugEntitySkinCommand {
             foundEntities = emptySet()
             return
         }
-        SkyHanniMod.launchIOCoroutine("debug entity skin read clipboard") {
+        HanniMod.launchIOCoroutine("debug entity skin read clipboard") {
             val skin = OSUtils.readFromClipboard() ?: error("no string in clipboard")
             skinToFind = skin
             ChatUtils.chat("Enabled Debug Entity Skin Highlighter and set clipboard as skin texture.")
@@ -60,7 +60,7 @@ object DebugEntitySkinCommand {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         for (location in foundEntities.map { it.getLorenzVec() }) {
             event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor())
             event.drawDynamicText(location, "Skin", 1.5)

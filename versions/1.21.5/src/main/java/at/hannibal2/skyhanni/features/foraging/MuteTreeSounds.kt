@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.features.foraging
+package at.hannibal2.hanni.features.foraging
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.PlaySoundEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 
-@SkyHanniModule
+@HanniModule
 object MuteTreeSounds {
-    val config get() = SkyHanniMod.feature.foraging.trees
+    val config get() = HanniMod.feature.foraging.trees
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlaySound(event: PlaySoundEvent) {

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config
+package at.hannibal2.hanni.config
 
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 

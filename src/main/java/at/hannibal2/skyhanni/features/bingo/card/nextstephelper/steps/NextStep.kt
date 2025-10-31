@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps
+package at.hannibal2.hanni.features.bingo.card.nextstephelper.steps
 
 abstract class NextStep(
     val displayName: String,

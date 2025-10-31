@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.UtilsPatterns.seasonPattern
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.UtilsPatterns.seasonPattern
 import kotlin.time.Duration.Companion.seconds
 
 enum class SkyblockSeason(

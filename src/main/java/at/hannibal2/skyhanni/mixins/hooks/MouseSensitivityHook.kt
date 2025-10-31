@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager
+import at.hannibal2.hanni.features.garden.sensitivity.MouseSensitivityManager
 
 object MouseSensitivityHook {
     fun remapSensitivity(original: Float): Float {

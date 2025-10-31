@@ -1,41 +1,41 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.hanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
-import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary
-import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.ProfileJoinEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.hoppity.EggFoundEvent
+import at.hannibal2.hanni.events.hoppity.EggSpawnedEvent
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.Companion.getEggType
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
+import at.hannibal2.hanni.features.event.hoppity.summary.HoppityEventSummary
+import at.hannibal2.hanni.features.fame.ReminderUtils
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.now
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sumAllValues
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object HoppityEggsManager {
 
-    val config get() = SkyHanniMod.feature.event.hoppityEggs
+    val config get() = HanniMod.feature.event.hoppityEggs
     private val chatConfig get() = config.chat
     private val unclaimedEggsConfig get() = config.unclaimedEggs
     private val waypointsConfig get() = config.waypoints
@@ -183,7 +183,7 @@ object HoppityEggsManager {
         lastNote = event.note
     }
 
-    private fun SkyHanniChatEvent.sendNextEggAvailable() {
+    private fun HanniChatEvent.sendNextEggAvailable() {
         val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil } ?: return
         val currentYear = SkyBlockTime.now().year
         val spawnedEggs = HoppityEventSummary.getSpawnedEggCounts(currentYear).sumAllValues().toInt()
@@ -194,7 +194,7 @@ object HoppityEggsManager {
         blockedReason = "hoppity_egg"
     }
 
-    private fun SkyHanniChatEvent.sendNextHuntIn(
+    private fun HanniChatEvent.sendNextHuntIn(
         reason: String = "Hoppity's Hunt is not active",
     ) {
         val currentYear = SkyBlockTime.now().year
@@ -204,7 +204,7 @@ object HoppityEggsManager {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         hoppityEventNotOn.matchMatcher(event.message) {
             if (!chatConfig.eggLocatorTimeInChat) return@matchMatcher
             return event.sendNextHuntIn()

@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.utils.renderables.animated
+package at.hannibal2.hanni.utils.renderables.animated
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
-import at.hannibal2.skyhanni.utils.NeuItemStackProvider
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.inPartialSeconds
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.GuiRenderUtils.renderOnScreen
+import at.hannibal2.hanni.utils.NeuItemStackProvider
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.hanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.inPartialSeconds
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.primitives.ItemStackRenderable
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.Vec3
@@ -78,7 +78,7 @@ class AnimatedItemStackRenderable private constructor(
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) : ItemStackRenderable(
     {
-        frames.firstOrNull()?.stack ?: ErrorManager.skyHanniError(
+        frames.firstOrNull()?.stack ?: ErrorManager.hanniError(
             "Cannot initialize AnimatedItemStackRenderable with an empty animation context.",
         )
     },

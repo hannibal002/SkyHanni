@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.detektrules.style
+package at.hannibal2.hanni.detektrules.style
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import at.hannibal2.hanni.detektrules.HanniRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 
-class InSkyBlockEarlyReturn(config: Config) : SkyHanniRule(config) {
+class InSkyBlockEarlyReturn(config: Config) : HanniRule(config) {
     override val issue = Issue(
         "InSkyBlockEarlyReturn",
         Severity.Style,

@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.TitleReceivedEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.TitleReceivedEvent
+import at.hannibal2.hanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 import net.minecraft.network.play.server.S45PacketTitle
 //#if MC > 1.21
 //$$ import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object TitleData {
 
     @HandleEvent

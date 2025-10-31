@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.config
+package at.hannibal2.hanni.config
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.About
-import at.hannibal2.skyhanni.config.features.chat.ChatConfig
-import at.hannibal2.skyhanni.config.features.combat.CombatConfig
-import at.hannibal2.skyhanni.config.features.crimsonisle.CrimsonIsleConfig
-import at.hannibal2.skyhanni.config.features.dev.DevConfig
-import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig
-import at.hannibal2.skyhanni.config.features.event.EventConfig
-import at.hannibal2.skyhanni.config.features.fishing.FishingConfig
-import at.hannibal2.skyhanni.config.features.foraging.ForagingConfig
-import at.hannibal2.skyhanni.config.features.garden.GardenConfig
-import at.hannibal2.skyhanni.config.features.gui.GuiConfig
-import at.hannibal2.skyhanni.config.features.hunting.HuntingConfig
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig
-import at.hannibal2.skyhanni.config.features.mining.MiningConfig
-import at.hannibal2.skyhanni.config.features.misc.MiscConfig
-import at.hannibal2.skyhanni.config.features.rift.RiftConfig
-import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
-import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
-import at.hannibal2.skyhanni.config.storage.Storage
-import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.features.About
+import at.hannibal2.hanni.config.features.chat.ChatConfig
+import at.hannibal2.hanni.config.features.combat.CombatConfig
+import at.hannibal2.hanni.config.features.crimsonisle.CrimsonIsleConfig
+import at.hannibal2.hanni.config.features.dev.DevConfig
+import at.hannibal2.hanni.config.features.dungeon.DungeonConfig
+import at.hannibal2.hanni.config.features.event.EventConfig
+import at.hannibal2.hanni.config.features.fishing.FishingConfig
+import at.hannibal2.hanni.config.features.foraging.ForagingConfig
+import at.hannibal2.hanni.config.features.garden.GardenConfig
+import at.hannibal2.hanni.config.features.gui.GuiConfig
+import at.hannibal2.hanni.config.features.hunting.HuntingConfig
+import at.hannibal2.hanni.config.features.inventory.InventoryConfig
+import at.hannibal2.hanni.config.features.mining.MiningConfig
+import at.hannibal2.hanni.config.features.misc.MiscConfig
+import at.hannibal2.hanni.config.features.rift.RiftConfig
+import at.hannibal2.hanni.config.features.skillprogress.SkillProgressConfig
+import at.hannibal2.hanni.config.features.slayer.SlayerConfig
+import at.hannibal2.hanni.config.storage.Storage
+import at.hannibal2.hanni.utils.ConfigUtils.asStructuredText
+import at.hannibal2.hanni.utils.TimeUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
@@ -32,9 +32,9 @@ import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory
 
 class Features : Config() {
-    private val discord = MyResourceLocation("skyhanni", "social/discord.png")
-    private val github = MyResourceLocation("skyhanni", "social/github.png")
-    private val patreon = MyResourceLocation("skyhanni", "social/patreon.png")
+    private val discord = MyResourceLocation("hanni", "social/discord.png")
+    private val github = MyResourceLocation("hanni", "social/github.png")
+    private val patreon = MyResourceLocation("hanni", "social/patreon.png")
 
     // in moulconfig, this value is currently bugged (version 3.5.0)
     override fun shouldAutoFocusSearchbar(): Boolean {
@@ -48,19 +48,19 @@ class Features : Config() {
 
     override fun getSocials(): List<Social> {
         return listOf(
-            Social.forLink("Discord".asStructuredText(), discord, "https://discord.com/invite/skyhanni-997079228510117908"),
-            Social.forLink("GitHub".asStructuredText(), github, "https://github.com/hannibal002/SkyHanni"),
+            Social.forLink("Discord".asStructuredText(), discord, "https://discord.com/invite/hanni-997079228510117908"),
+            Social.forLink("GitHub".asStructuredText(), github, "https://github.com/hannibal002/Hanni"),
             Social.forLink("Patreon".asStructuredText(), patreon, "https://www.patreon.com/hannibal2"),
         )
     }
 
     override fun saveNow() {
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "close-gui")
+        HanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "close-gui")
     }
 
     override fun getTitle(): StructuredText {
-        val modName = if (TimeUtils.isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
-        return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89".asStructuredText()
+        val modName = if (TimeUtils.isAprilFoolsDay) "Hanni".reversed() else "Hanni"
+        return "$modName ${HanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89".asStructuredText()
     }
 
     /*
@@ -70,7 +70,7 @@ class Features : Config() {
      */
     // Top
     @Expose
-    @Category(name = "About", desc = "Information about SkyHanni and updates.")
+    @Category(name = "About", desc = "Information about Hanni and updates.")
     var about: About = About()
 
     @JvmField

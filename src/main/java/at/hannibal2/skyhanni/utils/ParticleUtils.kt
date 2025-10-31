@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
 import net.minecraft.util.EnumParticleTypes
 //#if MC > 1.21

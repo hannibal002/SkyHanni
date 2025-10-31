@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features
+package at.hannibal2.hanni.config.features
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay
-import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.features.misc.update.ConfigVersionDisplay
+import at.hannibal2.hanni.utils.OSUtils.openBrowser
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class About {
-    @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are currently running")
+    @ConfigOption(name = "Current Version", desc = "This is the Hanni version you are currently running")
     @ConfigVersionDisplay
     @Transient
     var currentVersion: Unit? = null
@@ -28,7 +28,7 @@ class About {
     @ConfigEditorBoolean
     var fullAutoUpdates: Boolean = false
 
-    @ConfigOption(name = "Update Stream", desc = "How frequently you want updates for SkyHanni")
+    @ConfigOption(name = "Update Stream", desc = "How frequently you want updates for Hanni")
     @Expose
     @ConfigEditorDropdown
     val updateStream: Property<UpdateStream> = Property.of(UpdateStream.RELEASES)

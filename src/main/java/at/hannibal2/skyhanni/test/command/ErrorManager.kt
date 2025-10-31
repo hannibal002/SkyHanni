@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.test.command
+package at.hannibal2.hanni.test.command
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.ChangedChatErrorsJson
+import at.hannibal2.hanni.data.jsonobjects.repo.RepoErrorData
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.TimeLimitedSet
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
@@ -32,7 +32,7 @@ fun requireDevEnv(value: Boolean, lazyMessage: (() -> Any)?) {
     }
 }
 
-@SkyHanniModule
+@HanniModule
 object ErrorManager {
 
     // random id -> error message
@@ -42,16 +42,16 @@ object ErrorManager {
     private var repoErrors: List<RepoErrorData> = emptyList()
 
     private val breakAfter = listOf(
-        "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand",
+        "at at.hannibal2.hanni.config.commands.Commands\$createCommand",
         "at net.minecraftforge.fml.common.eventhandler.EventBus.post",
-        "at at.hannibal2.skyhanni.mixins.hooks.NetHandlerPlayClientHookKt.onSendPacket",
+        "at at.hannibal2.hanni.mixins.hooks.NetHandlerPlayClientHookKt.onSendPacket",
         "at net.minecraft.client.main.Main.main",
-        "at.hannibal2.skyhanni.api.event.EventListeners.createZeroParameterConsumer",
-        "at.hannibal2.skyhanni.api.event.EventListeners.createSingleParameterConsumer",
+        "at.hannibal2.hanni.api.event.EventListeners.createZeroParameterConsumer",
+        "at.hannibal2.hanni.api.event.EventListeners.createSingleParameterConsumer",
     )
 
     private val replace = mapOf(
-        "at.hannibal2.skyhanni." to "SH.",
+        "at.hannibal2.hanni." to "SH.",
         "io.moulberry.notenoughupdates." to "NEU.",
         "net.minecraft." to "MC.",
         "net.minecraftforge.fml." to "FML.",
@@ -60,8 +60,8 @@ object ErrorManager {
     )
 
     private val replaceEntirely = mapOf(
-        "at.hannibal2.skyhanni.api.event.EventListeners.createZeroParameterConsumer" to "<Skyhanni event post>",
-        "at.hannibal2.skyhanni.api.event.EventListeners.createSingleParameterConsumer" to "<Skyhanni event post>",
+        "at.hannibal2.hanni.api.event.EventListeners.createZeroParameterConsumer" to "<Hanni event post>",
+        "at.hannibal2.hanni.api.event.EventListeners.createSingleParameterConsumer" to "<Hanni event post>",
     )
 
     private val ignored = listOf(
@@ -77,12 +77,12 @@ object ErrorManager {
         "at com.google.gson.internal.",
         "at sun.reflect.",
 
-        "at at.hannibal2.skyhanni.config.commands.SimpleCommand.",
-        "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand\$1.processCommand",
-        "at at.hannibal2.skyhanni.test.command.ErrorManager.logError",
-        "at at.hannibal2.skyhanni.test.command.ErrorManager.skyHanniError",
-        "at at.hannibal2.skyhanni.api.event.SkyHanniEvent.post",
-        "at at.hannibal2.skyhanni.api.event.EventHandler.post",
+        "at at.hannibal2.hanni.config.commands.SimpleCommand.",
+        "at at.hannibal2.hanni.config.commands.Commands\$createCommand\$1.processCommand",
+        "at at.hannibal2.hanni.test.command.ErrorManager.logError",
+        "at at.hannibal2.hanni.test.command.ErrorManager.hanniError",
+        "at at.hannibal2.hanni.api.event.HanniEvent.post",
+        "at at.hannibal2.hanni.api.event.EventHandler.post",
         "at net.minecraft.launchwrapper.",
     )
 
@@ -120,7 +120,7 @@ object ErrorManager {
 
     // throw an error, best to not use it if not absolutely necessary
     // when extraData is not used, rather call kotlin's `error()`
-    fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
+    fun hanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         buildExtraDataString(extraData)?.let {
             cachedExtraData = it
         }
@@ -138,14 +138,14 @@ object ErrorManager {
         ChatUtils.chat(
             errorMessage?.let {
                 OSUtils.copyToClipboard(it)
-                "$name copied into the clipboard, please report it on the SkyHanni discord!"
+                "$name copied into the clipboard, please report it on the Hanni discord!"
             } ?: "Error id not found!",
         )
     }
 
     inline fun crashInDevEnv(reason: String, t: (String) -> Throwable = { RuntimeException(it) }) {
         if (!PlatformUtils.isDevEnvironment) return
-        Minecraft.getMinecraft().crashed(CrashReport("SkyHanni - $reason", t(reason)))
+        Minecraft.getMinecraft().crashed(CrashReport("Hanni - $reason", t(reason)))
     }
 
     // just log for debug cases
@@ -197,7 +197,7 @@ object ErrorManager {
         if (MinecraftCompat.localPlayerOrNull == null) {
             println("extra data:\n${getExtraDataOrCached(extraData)}")
         }
-        if (betaOnly && !SkyHanniMod.isBetaVersion) return false
+        if (betaOnly && !HanniMod.isBetaVersion) return false
         val throwable = originalThrowable.maybeSkipError()
         if (!ignoreErrorCache) {
             val cachedError = throwable.stackTrace.getOrNull(0)?.let {
@@ -225,9 +225,9 @@ object ErrorManager {
 
         val extraDataString = getExtraDataOrCached(extraData)
         val rawMessage = message.removeColor()
-        val shVersion = SkyHanniMod.VERSION
+        val shVersion = HanniMod.VERSION
         val mcVersion = PlatformUtils.MC_VERSION
-        val label = "SkyHanni $shVersion $mcVersion"
+        val label = "Hanni $shVersion $mcVersion"
         errorMessages[randomId] = "```\n$label: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
             "```\n$label: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
@@ -290,7 +290,7 @@ object ErrorManager {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ChangedChatErrorsJson>("ChangedChatErrors")
-        val version = SkyHanniMod.modVersion
+        val version = HanniMod.modVersion
 
         repoErrors = data.changedErrorMessages.filter { it.fixedIn == null || version < it.fixedIn }
     }

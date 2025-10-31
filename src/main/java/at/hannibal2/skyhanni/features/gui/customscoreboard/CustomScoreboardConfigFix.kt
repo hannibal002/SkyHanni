@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard
+package at.hannibal2.hanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.hanni.utils.RenderUtils.VerticalAlignment
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 
-@SkyHanniModule
+@HanniModule
 object CustomScoreboardConfigFix {
 
     private const val PREFIX = "gui.customScoreboard"

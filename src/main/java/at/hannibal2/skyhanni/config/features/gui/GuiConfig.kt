@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.config.features.gui
+package at.hannibal2.hanni.config.features.gui
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.NoConfigLink
-import at.hannibal2.skyhanni.config.OnlyLegacy
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
-import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig
-import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig
-import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig
-import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig
-import at.hannibal2.skyhanni.data.GuiEditManager.openGuiPositionEditor
-import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.NoConfigLink
+import at.hannibal2.hanni.config.OnlyLegacy
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.config.features.chroma.ChromaConfig
+import at.hannibal2.hanni.config.features.gui.customscoreboard.CustomScoreboardConfig
+import at.hannibal2.hanni.config.features.markedplayer.MarkedPlayerConfig
+import at.hannibal2.hanni.config.features.misc.DiscordRPCConfig
+import at.hannibal2.hanni.config.features.misc.compacttablist.CompactTabListConfig
+import at.hannibal2.hanni.config.features.misc.cosmetic.CosmeticConfig
+import at.hannibal2.hanni.data.GuiEditManager.openGuiPositionEditor
+import at.hannibal2.hanni.data.title.TitleManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -41,7 +41,7 @@ class GuiConfig {
 
     @ConfigOption(
         name = "Edit GUI Locations",
-        desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays."
+        desc = "Opens the Position Editor, allows changing the position of Hanni's overlays."
     )
     @ConfigEditorButton(buttonText = "Edit")
     val positions: Runnable = Runnable { openGuiPositionEditor(true) }
@@ -52,12 +52,12 @@ class GuiConfig {
     var keyBindOpen: Int = Keyboard.KEY_NONE
 
     @Expose
-    @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all SkyHanni GUIs.")
+    @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all Hanni GUIs.")
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 10f, minStep = 0.05f)
     var globalScale: Float = 1f
 
     @Expose
-    @ConfigOption(name = "Time Format", desc = "Change SkyHanni to use 24h time instead of 12h time.")
+    @ConfigOption(name = "Time Format", desc = "Change Hanni to use 24h time instead of 12h time.")
     @ConfigEditorBoolean
     @FeatureToggle
     var timeFormat24h: Boolean = false
@@ -164,14 +164,14 @@ class GuiConfig {
     val tpsDisplayPosition: Position = Position(10, 10)
 
     @Expose
-    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
+    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure Hanni.")
     @ConfigEditorBoolean
     @FeatureToggle
     @OnlyLegacy
     var configButtonOnPause: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Widen Config", desc = "Make SkyHanni's config window wider. (~1.5x)")
+    @ConfigOption(name = "Widen Config", desc = "Make Hanni's config window wider. (~1.5x)")
     @ConfigEditorBoolean
     val widenConfig: Property<Boolean> = Property.of(false)
 

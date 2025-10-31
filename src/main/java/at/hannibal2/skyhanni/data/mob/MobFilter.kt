@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.data.mob
+package at.hannibal2.hanni.data.mob
 
-import at.hannibal2.skyhanni.data.ElectionApi.derpy
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.MobData.MobResult
-import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
-import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
-import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
-import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.data.ElectionApi.derpy
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.mob.MobData.MobResult
+import at.hannibal2.hanni.data.mob.MobData.MobResult.Companion.makeMobResult
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils.baseMaxHealth
+import at.hannibal2.hanni.utils.EntityUtils.cleanName
+import at.hannibal2.hanni.utils.EntityUtils.isNpc
+import at.hannibal2.hanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.hanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.hanni.utils.MobUtils
+import at.hannibal2.hanni.utils.MobUtils.isDefaultValue
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SkullTextureHolder
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeWhileInclusive
+import at.hannibal2.hanni.utils.compat.getFirstPassenger
+import at.hannibal2.hanni.utils.compat.getStandHelmet
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -49,7 +49,7 @@ import net.minecraft.entity.player.EntityPlayer
 import org.intellij.lang.annotations.Language
 
 @Suppress("RegExpRedundantEscape")
-@SkyHanniModule
+@HanniModule
 object MobFilter {
 
     private val patternGroup = RepoPattern.group("mob.detection")

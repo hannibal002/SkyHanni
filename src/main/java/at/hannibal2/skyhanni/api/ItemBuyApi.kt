@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.api
+package at.hannibal2.hanni.api
 
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.hanni.features.inventory.bazaar.BazaarApi.isBazaarItem
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.ItemPriceUtils.isAuctionHouseItem
+import at.hannibal2.hanni.utils.ItemUtils.repoItemName
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.StringUtils.removeColor
 
 object ItemBuyApi {
 

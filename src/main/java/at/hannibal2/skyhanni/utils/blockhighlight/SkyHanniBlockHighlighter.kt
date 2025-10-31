@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.utils.blockhighlight
+package at.hannibal2.hanni.utils.blockhighlight
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.expand
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.hanni.utils.expand
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.block.state.IBlockState
 
 /**
- * A [SkyHanniBlockHighlighter] is used to highlight blocks based on a certain condition
+ * A [HanniBlockHighlighter] is used to highlight blocks based on a certain condition
  *
  * @property highlightCondition A condition for when the highlighter should be running its code such as an isEnabled function.
  * @property blockCondition A condition that the blockstate at a location must fulfill to be highlighted.
  * @property colorProvider Provides the color that the highlighter will use when rendering the highlighted block.
  */
-class SkyHanniBlockHighlighter<T : AbstractHighlightedBlock>(
+class HanniBlockHighlighter<T : AbstractHighlightedBlock>(
     val highlightCondition: () -> Boolean,
     val blockCondition: (IBlockState) -> Boolean,
     val colorProvider: () -> ChromaColour,
@@ -50,7 +50,7 @@ class SkyHanniBlockHighlighter<T : AbstractHighlightedBlock>(
         return blockCondition(blockToCheck.location.getBlockStateAt())
     }
 
-    private fun drawHighlight(event: SkyHanniRenderWorldEvent) {
+    private fun drawHighlight(event: HanniRenderWorldEvent) {
         if (!highlightCondition()) return
         synchronized(blocksLock) {
             if (blocksToHighlight.isEmpty()) return
@@ -63,13 +63,13 @@ class SkyHanniBlockHighlighter<T : AbstractHighlightedBlock>(
 
     init {
         @Suppress("UNCHECKED_CAST")
-        blockHighlighters.add(this as SkyHanniBlockHighlighter<AbstractHighlightedBlock>)
+        blockHighlighters.add(this as HanniBlockHighlighter<AbstractHighlightedBlock>)
     }
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
-        private val blockHighlighters = mutableListOf<SkyHanniBlockHighlighter<AbstractHighlightedBlock>>()
+        private val blockHighlighters = mutableListOf<HanniBlockHighlighter<AbstractHighlightedBlock>>()
 
         @HandleEvent(priority = HandleEvent.HIGHEST)
         fun onTick() {
@@ -77,7 +77,7 @@ class SkyHanniBlockHighlighter<T : AbstractHighlightedBlock>(
         }
 
         @HandleEvent
-        fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        fun onRenderWorld(event: HanniRenderWorldEvent) {
             blockHighlighters.forEach { it.drawHighlight(event) }
         }
 

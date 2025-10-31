@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.hanni.features.dungeon
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.RenderEntityOutlineEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.hanni.utils.StringUtils
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.scoreboard.Team
 import java.awt.Color
 
-@SkyHanniModule
+@HanniModule
 object DungeonTeammateOutlines {
 
-    private val config get() = SkyHanniMod.feature.dungeon
+    private val config get() = HanniMod.feature.dungeon
 
     @HandleEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {

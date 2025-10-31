@@ -1,4 +1,4 @@
-package at.skyhanni.sharedvariables
+package at.hanni.sharedvariables
 
 enum class ModrinthInfo(
     val minecraftVersions: List<String>,
@@ -41,7 +41,7 @@ enum class ModrinthInfo(
 enum class ModrinthDependency(
     val projectId: String,
 ) {
-    SKYHANNI("byNkmv5G"),
+    HANNI("byNkmv5G"),
     NOT_ENOUGH_UPDATES("GGamhqbw"),
     FABRIC_API("P7dR8mSH"),
     FABRIC_LANGUAGE_KOTLIN("Ha28R6CL"),

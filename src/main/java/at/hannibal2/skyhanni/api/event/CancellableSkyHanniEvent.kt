@@ -1,3 +1,3 @@
-package at.hannibal2.skyhanni.api.event
+package at.hannibal2.hanni.api.event
 
-abstract class CancellableSkyHanniEvent : SkyHanniEvent(), SkyHanniEvent.Cancellable
+abstract class CancellableHanniEvent : HanniEvent(), HanniEvent.Cancellable

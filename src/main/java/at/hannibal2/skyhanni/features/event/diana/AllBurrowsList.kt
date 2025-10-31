@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.hanni.features.event.diana
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.diana.BurrowDetectEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawColor
 
-@SkyHanniModule
+@HanniModule
 object AllBurrowsList {
     private var list = listOf<LorenzVec>()
-    private val config get() = SkyHanniMod.feature.event.diana.allBurrowsList
+    private val config get() = HanniMod.feature.event.diana.allBurrowsList
     private var burrowLocations
-        get() = SkyHanniMod.feature.storage.foundDianaBurrowLocations
+        get() = HanniMod.feature.storage.foundDianaBurrowLocations
         set(value) {
-            SkyHanniMod.feature.storage.foundDianaBurrowLocations = value
+            HanniMod.feature.storage.foundDianaBurrowLocations = value
         }
 
     @HandleEvent
@@ -53,7 +53,7 @@ object AllBurrowsList {
     }
 
     private fun addFromClipboard() {
-        SkyHanniMod.launchIOCoroutine("diana burrows all addFromClipboard") {
+        HanniMod.launchIOCoroutine("diana burrows all addFromClipboard") {
             val text = OSUtils.readFromClipboard() ?: return@launchIOCoroutine
 
             var new = 0
@@ -77,7 +77,7 @@ object AllBurrowsList {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showAll) return
 

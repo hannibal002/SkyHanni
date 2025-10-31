@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.hanni.data.ClickType
+import at.hannibal2.hanni.events.BlockClickEvent
+import at.hannibal2.hanni.events.ItemClickEvent
+import at.hannibal2.hanni.events.entity.EntityClickEvent
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.toLorenzVec
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition

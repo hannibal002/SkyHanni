@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.api.pet
+package at.hannibal2.hanni.api.pet
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.PetData
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.pets.PetChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.PetUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.PetData
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.pets.PetChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.PetUtils
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object CurrentPetApi {
     val patternGroup = RepoPattern.group("misc.pet")
 
@@ -68,7 +68,7 @@ object CurrentPetApi {
         lastAssertion[source] = SimpleTimeMark.now()
 
         if (petData.uuid == null) {
-            ErrorManager.skyHanniError("Tried to assert a non-UUID having pet!")
+            ErrorManager.hanniError("Tried to assert a non-UUID having pet!")
         }
 
         PetChangeEvent(petData).post()
@@ -76,7 +76,7 @@ object CurrentPetApi {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         chatSummonPattern.matchMatcher(event.message) {
             val resolvedPet = PetStorageApi.resolvePetDataOrNull(
                 name = group("pet"),

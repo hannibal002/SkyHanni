@@ -16,10 +16,10 @@ import org.jetbrains.kotlin.psi.*
 
 val forgeEvent = "SubscribeEvent"
 val handleEvent = "HandleEvent"
-val skyHanniModule = "SkyHanniModule"
+val hanniModule = "HanniModule"
 
-val skyhanniPath = "at.hannibal2.skyhanni"
-val patternGroup = "at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup"
+val hanniPath = "at.hannibal2.hanni"
+val patternGroup = "at.hannibal2.hanni.utils.repopatterns.RepoPatternGroup"
 val pattern = "java.util.regex.Pattern"
 
 registerInspection(ModuleInspectionKotlin())
@@ -42,8 +42,8 @@ fun isRepoPattern(property: KtProperty): Boolean {
     return false
 }
 
-fun isFromSkyhanni(declaration: KtNamedDeclaration): Boolean {
-    return declaration.fqName?.asString()?.startsWith(skyhanniPath) ?: false
+fun isFromHanni(declaration: KtNamedDeclaration): Boolean {
+    return declaration.fqName?.asString()?.startsWith(hanniPath) ?: false
 }
 
 class ModuleInspectionKotlin : AbstractKotlinInspection() {
@@ -52,30 +52,30 @@ class ModuleInspectionKotlin : AbstractKotlinInspection() {
         val visitor = object : KtVisitorVoid() {
 
             override fun visitClass(klass: KtClass) {
-                if (!isFromSkyhanni(klass)) return
-                val hasAnnotation = klass.annotationEntries.any { it.shortName?.asString() == skyHanniModule }
+                if (!isFromHanni(klass)) return
+                val hasAnnotation = klass.annotationEntries.any { it.shortName?.asString() == hanniModule }
 
                 if (hasAnnotation) {
                     holder.registerProblem(
                         klass.nameIdentifier!!,
-                        "@SkyHanniModule can only be applied to objects",
+                        "@HanniModule can only be applied to objects",
                         ProblemHighlightType.GENERIC_ERROR
                     )
                 }
             }
 
             override fun visitObjectDeclaration(declaration: KtObjectDeclaration) {
-                if (!isFromSkyhanni(declaration)) return
-                val hasAnnotation = declaration.annotationEntries.any { it.shortName?.asString() == skyHanniModule }
+                if (!isFromHanni(declaration)) return
+                val hasAnnotation = declaration.annotationEntries.any { it.shortName?.asString() == hanniModule }
                 if (hasAnnotation) return
 
-                val hasSkyHanniEvents = declaration.body!!.functions.any { function -> isEvent(function) }
+                val hasHanniEvents = declaration.body!!.functions.any { function -> isEvent(function) }
                 val hasRepoPatterns = declaration.body!!.properties.any { property -> isRepoPattern(property) }
-                if (!hasSkyHanniEvents && !hasRepoPatterns) return
+                if (!hasHanniEvents && !hasRepoPatterns) return
 
                 holder.registerProblem(
                     declaration,
-                    "Module should have a @SkyHanniModule annotation",
+                    "Module should have a @HanniModule annotation",
                     ModuleQuickFix()
                 )
             }
@@ -84,9 +84,9 @@ class ModuleInspectionKotlin : AbstractKotlinInspection() {
         return visitor
     }
 
-    override fun getDisplayName() = "Modules should have a @SkyHanniModule annotation"
-    override fun getShortName() = "SkyHanniModuleInspection"
-    override fun getGroupDisplayName() = "SkyHanni"
+    override fun getDisplayName() = "Modules should have a @HanniModule annotation"
+    override fun getShortName() = "HanniModuleInspection"
+    override fun getGroupDisplayName() = "Hanni"
     override fun isEnabledByDefault() = true
 }
 
@@ -95,7 +95,7 @@ class ModuleQuickFix : LocalQuickFix {
         val obj = descriptor.psiElement as KtObjectDeclaration
         AnnotationModificationHelper.addAnnotation(
             obj,
-            FqName("at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule"),
+            FqName("at.hannibal2.hanni.hannimodule.HanniModule"),
             null,
             null,
             { null },
@@ -104,7 +104,7 @@ class ModuleQuickFix : LocalQuickFix {
         )
     }
 
-    override fun getName() = "Annotate with @SkyHanniModule"
+    override fun getName() = "Annotate with @HanniModule"
 
     override fun getFamilyName() = name
 }

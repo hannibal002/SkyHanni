@@ -43,7 +43,7 @@ import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
-public class SkyHanniInstallerFrame extends JFrame implements ActionListener, MouseListener {
+public class HanniInstallerFrame extends JFrame implements ActionListener, MouseListener {
     private static final Pattern IN_MODS_SUBFOLDER = Pattern.compile("1\\.8\\.9[/\\\\]?$");
     private static final int TOTAL_HEIGHT = 435;
     private static final int TOTAL_WIDTH = 404;
@@ -67,10 +67,10 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
     private int h;
     private int margin;
 
-    public SkyHanniInstallerFrame() {
+    public HanniInstallerFrame() {
         try {
-            setName("SkyHanniInstallerFrame");
-            setTitle("SkyHanni Installer");
+            setName("HanniInstallerFrame");
+            setTitle("Hanni Installer");
             setResizable(false);
             setSize(TOTAL_WIDTH, TOTAL_HEIGHT);
             setContentPane(getPanelContentPane());
@@ -95,7 +95,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            SkyHanniInstallerFrame frame = new SkyHanniInstallerFrame();
+            HanniInstallerFrame frame = new HanniInstallerFrame();
             frame.centerFrame(frame);
             frame.setVisible(true);
 
@@ -167,7 +167,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
                 BufferedImage myPicture = ImageIO.read(Objects.requireNonNull(getClass()
                     .getClassLoader()
-                    .getResourceAsStream("assets/skyhanni/logo.png"), "Logo not found."));
+                    .getResourceAsStream("assets/hanni/logo.png"), "Logo not found."));
                 Image scaled = myPicture.getScaledInstance(w - margin * 2, h - margin, Image.SCALE_SMOOTH);
                 logo = new JLabel(new ImageIcon(scaled));
                 logo.setName("Logo");
@@ -195,7 +195,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
                 versionInfo.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
                 versionInfo.setHorizontalAlignment(SwingConstants.CENTER);
                 versionInfo.setPreferredSize(new Dimension(w, h));
-                versionInfo.setText("SkyHanni by hannibal2, Installer by Biscuit");
+                versionInfo.setText("Hanni by hannibal2, Installer by Biscuit");
 
                 y += h;
             } catch (Throwable ivjExc) {
@@ -215,7 +215,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
                 descriptionText.setName("TextArea");
                 setStandardFormatting(descriptionText);
                 descriptionText.setText(
-                    "This installer will copy SkyHanni into your forge mods folder for you, and replace any old versions that already exist. " +
+                    "This installer will copy Hanni into your forge mods folder for you, and replace any old versions that already exist. " +
                         "Close this if you prefer to do this yourself!");
                 descriptionText.setWrapStyleWord(true);
 
@@ -313,7 +313,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
             try {
                 BufferedImage myPicture = ImageIO.read(Objects.requireNonNull(getClass()
                     .getClassLoader()
-                    .getResourceAsStream("assets/skyhanni/folder.png"), "Folder icon not found."));
+                    .getResourceAsStream("assets/hanni/folder.png"), "Folder icon not found."));
                 Image scaled = myPicture.getScaledInstance(w - 8, h - 6, Image.SCALE_SMOOTH);
                 buttonChooseFolder = new JButton(new ImageIcon(scaled));
                 buttonChooseFolder.setName("ButtonFolder");
@@ -459,18 +459,18 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
             boolean deletingFailure = false;
             if (modsFolder.isDirectory()) { // Delete in this current folder.
-                boolean failed = findSkyHanniAndDelete(modsFolder.listFiles());
+                boolean failed = findHanniAndDelete(modsFolder.listFiles());
                 if (failed) deletingFailure = true;
             }
             if (inSubFolder) { // We are in the 1.8.9 folder, delete in the parent folder as well.
                 if (modsFolder.getParentFile().isDirectory()) {
-                    boolean failed = findSkyHanniAndDelete(modsFolder.getParentFile().listFiles());
+                    boolean failed = findHanniAndDelete(modsFolder.getParentFile().listFiles());
                     if (failed) deletingFailure = true;
                 }
             } else { // We are in the main mods folder, but the 1.8.9 subfolder exists... delete in there too.
                 File subFolder = new File(modsFolder, "1.8.9");
                 if (subFolder.exists() && subFolder.isDirectory()) {
-                    boolean failed = findSkyHanniAndDelete(subFolder.listFiles());
+                    boolean failed = findHanniAndDelete(subFolder.listFiles());
                     if (failed) deletingFailure = true;
                 }
             }
@@ -489,13 +489,13 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
                 return;
             }
 
-            showMessage("SkyHanni has been successfully installed into your mods folder.");
+            showMessage("Hanni has been successfully installed into your mods folder.");
             dispose();
             System.exit(0);
         }
     }
 
-    private boolean findSkyHanniAndDelete(File[] files) {
+    private boolean findHanniAndDelete(File[] files) {
         if (files == null) return false;
 
         for (File file : files) {
@@ -506,7 +506,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
                     if (mcModInfo != null) {
                         InputStream inputStream = jarFile.getInputStream(mcModInfo);
                         String modID = getModIDFromInputStream(inputStream);
-                        if (modID.equals("SkyHanni")) {
+                        if (modID.equals("Hanni")) {
                             jarFile.close();
                             try {
                                 boolean deleted = file.delete();
@@ -515,7 +515,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
                                 }
                             } catch (Exception ex) {
                                 ex.printStackTrace();
-                                showErrorMessage("Was not able to delete the other SkyHanni files found in your mods folder!" +
+                                showErrorMessage("Was not able to delete the other Hanni files found in your mods folder!" +
                                     System.lineSeparator() +
                                     "Please make sure that your minecraft is currently closed and try again, or feel" +
                                     System.lineSeparator() +
@@ -618,11 +618,11 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
     }
 
     public void showMessage(String message) {
-        JOptionPane.showMessageDialog(null, message, "SkyHanni", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, message, "Hanni", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void showErrorMessage(String message) {
-        JOptionPane.showMessageDialog(null, message, "SkyHanni - Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, message, "Hanni - Error", JOptionPane.ERROR_MESSAGE);
     }
 
     private String getModIDFromInputStream(InputStream inputStream) {
@@ -644,7 +644,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
     private File getThisFile() {
         try {
-            return new File(SkyHanniInstallerFrame.class
+            return new File(HanniInstallerFrame.class
                 .getProtectionDomain()
                 .getCodeSource()
                 .getLocation()

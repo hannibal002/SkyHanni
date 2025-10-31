@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.compat.Text
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.compat.Text
 import java.awt.Color
 //#if MC > 1.21
 //$$ import net.minecraft.text.MutableText
@@ -37,7 +37,7 @@ class ExtendedChatColor(
         //#endif
     }
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
         @HandleEvent

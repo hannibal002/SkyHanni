@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.events.entity
+package at.hannibal2.hanni.events.entity
 
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.events.WorldClickEvent
+import at.hannibal2.hanni.data.ClickType
+import at.hannibal2.hanni.events.WorldClickEvent
 import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C02PacketUseEntity

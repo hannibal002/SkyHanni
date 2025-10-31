@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.ComposterUpgrade
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.garden.composter.ComposterApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.model.ComposterUpgrade
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.features.garden.composter.ComposterApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
 
-@SkyHanniModule
+@HanniModule
 object GardenComposterUpgradesData {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

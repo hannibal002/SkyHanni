@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.data.model
+package at.hannibal2.hanni.data.model
 
-import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
-import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
-import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.hanni.features.misc.pathfind.NavigationHelper
+import at.hannibal2.hanni.utils.GraphUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.json.HanniTypeAdapters.registerTypeAdapter
+import at.hannibal2.hanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose

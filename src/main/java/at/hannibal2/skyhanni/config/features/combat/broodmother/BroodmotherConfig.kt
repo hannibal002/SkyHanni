@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.combat.broodmother
+package at.hannibal2.hanni.config.features.combat.broodmother
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.combat.BroodmotherFeatures.StageEntry
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.features.combat.BroodmotherFeatures.StageEntry
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

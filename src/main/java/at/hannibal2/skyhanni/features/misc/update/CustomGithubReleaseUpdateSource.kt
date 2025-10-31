@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.misc.update
+package at.hannibal2.hanni.features.misc.update
 
-import at.hannibal2.skyhanni.utils.VersionConstants
-import at.hannibal2.skyhanni.utils.system.ModVersion
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.utils.VersionConstants
+import at.hannibal2.hanni.utils.system.ModVersion
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import com.google.gson.JsonPrimitive
 import moe.nea.libautoupdate.GithubReleaseUpdateData
 import moe.nea.libautoupdate.GithubReleaseUpdateSource

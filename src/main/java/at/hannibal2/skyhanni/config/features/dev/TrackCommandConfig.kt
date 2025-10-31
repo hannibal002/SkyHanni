@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.dev
+package at.hannibal2.hanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.NoConfigLink
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.hanni.config.NoConfigLink
+import at.hannibal2.hanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider

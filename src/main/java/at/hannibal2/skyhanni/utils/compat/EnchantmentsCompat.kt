@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.compat
+package at.hannibal2.hanni.utils.compat
 
 import net.minecraft.enchantment.Enchantment
 //#if MC > 1.21

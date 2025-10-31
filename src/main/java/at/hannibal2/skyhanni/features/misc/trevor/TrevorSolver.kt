@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.features.misc.trevor
+package at.hannibal2.hanni.features.misc.trevor
 
-import at.hannibal2.skyhanni.data.ElectionApi.derpy
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.compat.EffectsCompat
-import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.hanni.data.ElectionApi.derpy
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.data.mob.MobData
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.EntityUtils.baseMaxHealth
+import at.hannibal2.hanni.utils.EntityUtils.canBeSeen
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.compat.EffectsCompat
+import at.hannibal2.hanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 
@@ -62,7 +62,7 @@ object TrevorSolver {
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
 
                 val currentMob = currentMob ?: run {
-                    ErrorManager.skyHanniError(
+                    ErrorManager.hanniError(
                         "Found trevor mob but current mob is null",
                         "entity" to entity,
                         "mobDataMob" to mob,

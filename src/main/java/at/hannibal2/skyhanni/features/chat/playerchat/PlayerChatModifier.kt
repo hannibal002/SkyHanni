@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.features.chat.playerchat
+package at.hannibal2.hanni.features.chat.playerchat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
-import at.hannibal2.skyhanni.utils.compat.value
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.hanni.features.misc.MarkedPlayerManager
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.StringUtils.applyIfPossible
+import at.hannibal2.hanni.utils.compat.value
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.IChatComponent
 
-@SkyHanniModule
+@HanniModule
 object PlayerChatModifier {
 
-    private val config get() = SkyHanniMod.feature.chat.playerMessage
+    private val config get() = HanniMod.feature.chat.playerMessage
     private val patterns = mutableListOf<Regex>()
 
     init {

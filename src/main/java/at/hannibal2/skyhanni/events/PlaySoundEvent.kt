@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.SoundUtils.playSound
 
 class PlaySoundEvent(
     val rawSoundName: String,
@@ -36,7 +36,7 @@ class PlaySoundEvent(
             //#if MC < 1.21
             return rawSoundName
             //#else
-            //$$ return at.hannibal2.skyhanni.utils.compat.SoundCompat.getLegacySoundName(rawSoundName)
+            //$$ return at.hannibal2.hanni.utils.compat.SoundCompat.getLegacySoundName(rawSoundName)
             //#endif
         }
     }

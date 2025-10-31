@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.test.command.ErrorManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -43,7 +43,7 @@ object ClipboardUtils {
     //#endif
 
     fun copyToClipboard(text: String, step: Int = 0) {
-        SkyHanniMod.launchCoroutine("copyToClipboard") {
+        HanniMod.launchCoroutine("copyToClipboard") {
             try {
                 //#if MC < 1.21
                 getClipboard()?.setContents(StringSelection(text), null)

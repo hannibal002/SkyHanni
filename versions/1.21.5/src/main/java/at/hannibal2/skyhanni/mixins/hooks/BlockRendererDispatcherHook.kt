@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.features.mining.MiningCommissionsBlocksColor
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import net.minecraft.block.BlockState
 import net.minecraft.client.render.block.BlockRenderManager
 import net.minecraft.client.render.model.BlockStateModel

@@ -1,42 +1,42 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.hanni.features.event.diana
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
-import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
-import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.ElectionApi.getElectionYear
+import at.hannibal2.hanni.data.ItemAddManager
+import at.hannibal2.hanni.data.jsonobjects.repo.DianaDropsJson
+import at.hannibal2.hanni.events.ItemAddEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderDisplayHelper
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.Searchable
+import at.hannibal2.hanni.utils.renderables.toSearchable
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.tracker.ItemTrackerData
+import at.hannibal2.hanni.utils.tracker.HanniItemTracker
+import at.hannibal2.hanni.utils.tracker.HanniTracker
 import com.google.gson.annotations.Expose
 
-@SkyHanniModule
+@HanniModule
 object DianaProfitTracker {
 
-    private val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
+    private val config get() = HanniMod.feature.event.diana.dianaProfitTracker
     private var allowedDrops = listOf<NeuInternalName>()
 
     private val patternGroup = RepoPattern.group("diana.chat")
@@ -49,12 +49,12 @@ object DianaProfitTracker {
         "§6§lWow! §r§eYou dug out §r§6(?<coins>.*) coins§r§e!",
     )
 
-    private val tracker = SkyHanniItemTracker(
+    private val tracker = HanniItemTracker(
         "Diana Profit Tracker",
         { Data() },
         { it.diana.profitTracker },
         extraDisplayModes = mapOf(
-            SkyHanniTracker.DisplayMode.MAYOR to {
+            HanniTracker.DisplayMode.MAYOR to {
                 it.diana.profitTrackerPerElection.getOrPut(
                     SkyBlockTime.now().getElectionYear(), ::Data,
                 )
@@ -123,7 +123,7 @@ object DianaProfitTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         val message = event.message
         if (chatDugOutPattern.matches(message)) {
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
@@ -146,8 +146,8 @@ object DianaProfitTracker {
         }
     }
 
-    private fun tryHide(event: SkyHanniChatEvent) {
-        if (SkyHanniMod.feature.chat.filterType.diana) {
+    private fun tryHide(event: HanniChatEvent) {
+        if (HanniMod.feature.chat.filterType.diana) {
             event.blockedReason = "diana_chain_or_drops"
         }
     }

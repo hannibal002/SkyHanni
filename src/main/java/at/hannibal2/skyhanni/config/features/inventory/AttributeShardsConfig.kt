@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.inventory
+package at.hannibal2.hanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardOverlay
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.features.inventory.attribute.AttributeShardOverlay
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.chroma
+package at.hannibal2.hanni.features.chroma
 
 /**
  * This chroma type is used for GUI elements with textures, that includes text,
@@ -6,7 +6,7 @@ package at.hannibal2.skyhanni.features.chroma
  *
  * **Usage:**
  *
- * If you want to use chroma for text see [FontRendererHook][at.hannibal2.skyhanni.mixins.hooks.FontRendererHook.setupChromaFont]
+ * If you want to use chroma for text see [FontRendererHook][at.hannibal2.hanni.mixins.hooks.FontRendererHook.setupChromaFont]
  *
  * ```
  *      ChromaShaderManager.begin(ChromaType.TEXTURE)

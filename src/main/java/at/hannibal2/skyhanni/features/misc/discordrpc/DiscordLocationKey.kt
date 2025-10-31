@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.misc.discordrpc
+package at.hannibal2.hanni.features.misc.discordrpc
 
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.utils.SkyBlockUtils
 
 object DiscordLocationKey {
 

@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.jsonobjects.other.DisplayInfo
-import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
-import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
-import at.hannibal2.skyhanni.data.jsonobjects.other.PropertiesInfo
-import at.hannibal2.skyhanni.data.jsonobjects.other.SkullOwnerInfo
-import at.hannibal2.skyhanni.data.jsonobjects.other.TextureInfo
-import at.hannibal2.skyhanni.data.jsonobjects.other.toGameProfile
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemModel
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.getIdentifierString
-import at.hannibal2.skyhanni.utils.compat.getVanillaItem
-import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.data.jsonobjects.other.DisplayInfo
+import at.hannibal2.hanni.data.jsonobjects.other.NbtBoolean
+import at.hannibal2.hanni.data.jsonobjects.other.NeuNbtInfoJson
+import at.hannibal2.hanni.data.jsonobjects.other.PropertiesInfo
+import at.hannibal2.hanni.data.jsonobjects.other.SkullOwnerInfo
+import at.hannibal2.hanni.data.jsonobjects.other.TextureInfo
+import at.hannibal2.hanni.data.jsonobjects.other.toGameProfile
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ItemUtils.getItemModel
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.ItemUtils.setLore
+import at.hannibal2.hanni.utils.compat.formattedTextCompat
+import at.hannibal2.hanni.utils.compat.getIdentifierString
+import at.hannibal2.hanni.utils.compat.getVanillaItem
+import at.hannibal2.hanni.utils.compat.setCustomItemName
 import com.google.gson.JsonObject
 import com.mojang.serialization.JsonOps
 import net.minecraft.component.DataComponentTypes
@@ -53,7 +53,7 @@ object ComponentUtils {
             if (display.name != null) {
                 stack.setCustomItemName(display.name)
             } else {
-                ErrorManager.skyHanniError("stack display name is null", "extra attributes" to nbtInfo.extraAttributes)
+                ErrorManager.hanniError("stack display name is null", "extra attributes" to nbtInfo.extraAttributes)
             }
             if (display.lore != null) {
                 stack.setLore(display.lore)

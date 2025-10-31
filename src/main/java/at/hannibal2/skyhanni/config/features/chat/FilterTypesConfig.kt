@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.chat
+package at.hannibal2.hanni.config.features.chat
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyModern
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.OnlyModern
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -133,7 +133,7 @@ class FilterTypesConfig {
     @ConfigOption(
         name = "Factory Upgrade",
         desc = "Hide §nHypixel's§r Chocolate Factory upgrade and employee promotion messages.\n" +
-            "§eTo turn off SkyHanni's upgrade messages, search §lUpgrade Warning",
+            "§eTo turn off Hanni's upgrade messages, search §lUpgrade Warning",
     )
     @ConfigEditorBoolean
     @FeatureToggle

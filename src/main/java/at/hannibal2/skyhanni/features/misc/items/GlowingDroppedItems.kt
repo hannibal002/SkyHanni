@@ -1,26 +1,26 @@
-package at.hannibal2.skyhanni.features.misc.items
+package at.hannibal2.hanni.features.misc.items
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.features.garden.pests.SprayType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EnumUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.events.RenderEntityOutlineEvent
+import at.hannibal2.hanni.features.garden.pests.SprayType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EnumUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.hanni.utils.RecalculatingValue
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object GlowingDroppedItems {
 
-    private val config get() = SkyHanniMod.feature.misc.glowingDroppedItems
+    private val config get() = HanniMod.feature.misc.glowingDroppedItems
 
     /**
      * List of SkyBlock locations where we might see items in showcases

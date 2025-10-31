@@ -9,7 +9,7 @@
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
     <ID>ChainWrapping:Renderable.kt$Renderable.Companion$||</ID>
     <ID>CyclomaticComplexMethod:AdvancedPlayerList.kt$AdvancedPlayerList$fun newSorting(original: List&lt;String&gt;): List&lt;String&gt;</ID>
-    <ID>CyclomaticComplexMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
+    <ID>CyclomaticComplexMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: HanniRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:DungeonHideItems.kt$DungeonHideItems$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onCheckRender(event: CheckRenderEntityEvent&lt;Entity&gt;)</ID>
     <ID>CyclomaticComplexMethod:EnoughUpdatesManager.kt$EnoughUpdatesManager$private fun getPetLoreReplacements(petName: String?, tier: String?, level: Int): Map&lt;String, String&gt;</ID>
     <ID>CyclomaticComplexMethod:GardenCropMilestoneDisplay.kt$GardenCropMilestoneDisplay$private fun drawProgressDisplay(crop: CropType): List&lt;Renderable&gt;</ID>
@@ -23,13 +23,13 @@
     <ID>CyclomaticComplexMethod:SoopyGuessBurrow.kt$SoopyGuessBurrow$@HandleEvent(onlyOnSkyblock = true) fun onReceiveParticle(event: ReceiveParticleEvent)</ID>
     <ID>CyclomaticComplexMethod:ToolTooltipTweaks.kt$ToolTooltipTweaks$@HandleEvent(onlyOnSkyblock = true) fun onToolTip(event: ToolTipEvent)</ID>
     <ID>CyclomaticComplexMethod:TrevorSolver.kt$TrevorSolver$fun findMob()</ID>
-    <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
+    <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$@HandleEvent fun onRenderWorld(event: HanniRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$private fun EntityOtherPlayerMP.process()</ID>
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
-    <ID>InjectDispatcher:SkyHanniMod.kt$SkyHanniMod$IO</ID>
+    <ID>InjectDispatcher:HanniMod.kt$HanniMod$IO</ID>
     <ID>LargeClass:WorldRenderUtils.kt$WorldRenderUtils</ID>
-    <ID>LongMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
+    <ID>LongMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: HanniRenderWorldEvent)</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>LongMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
@@ -45,7 +45,7 @@
     <ID>LoopWithTooManyJumpStatements:ItemResolutionQuery.kt$ItemResolutionQuery.Companion$for</ID>
     <ID>LoopWithTooManyJumpStatements:RiftBloodEffigies.kt$RiftBloodEffigies$for</ID>
     <ID>LoopWithTooManyJumpStatements:SkyBlockItemModifierUtils.kt$SkyBlockItemModifierUtils$for</ID>
-    <ID>LoopWithTooManyJumpStatements:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$for</ID>
+    <ID>LoopWithTooManyJumpStatements:HanniConfigSearchResetCommand.kt$HanniConfigSearchResetCommand$for</ID>
     <ID>LoopWithTooManyJumpStatements:SuperpairsClicksAlert.kt$SuperpairsClicksAlert$for</ID>
     <ID>MapGetWithNotNullAssertionOperator:NavigationHelper.kt$NavigationHelper$distances[node]!!</ID>
     <ID>MaxLineLength:ItemUtils.kt$ItemUtils$"ewogICJ0aW1lc3RhbXAiIDogMTYzNTk1NzQ4ODQxNywKICAicHJvZmlsZUlkIiA6ICJmNThkZWJkNTlmNTA0MjIyOGY2MDIyMjExZDRjMTQwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJ1bnZlbnRpdmV0YWxlbnQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I5NTFmZWQ2YTdiMmNiYzIwMzY5MTZkZWM3YTQ2YzRhNTY0ODE1NjRkMTRmOTQ1YjZlYmMwMzM4Mjc2NmQzYiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"</ID>
@@ -224,7 +224,7 @@
     <ID>ReturnCount:PowderMiningChatFilter.kt$PowderMiningChatFilter$@Suppress("CyclomaticComplexMethod") fun block(message: String): String?</ID>
     <ID>ReturnCount:PurseApi.kt$PurseApi$private fun getCause(diff: Double): PurseChangeCause</ID>
     <ID>ReturnCount:QuestLoader.kt$QuestLoader$private fun addQuest(name: String, state: QuestState, needAmount: Int): Quest</ID>
-    <ID>ReturnCount:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$private suspend fun setCommand(args: Array&lt;String&gt;): String</ID>
+    <ID>ReturnCount:HanniConfigSearchResetCommand.kt$HanniConfigSearchResetCommand$private suspend fun setCommand(args: Array&lt;String&gt;): String</ID>
     <ID>SpreadOperator:ItemUtils.kt$ItemUtils$(tag, displayName, *lore.toTypedArray())</ID>
     <ID>SpreadOperator:LimboPlaytime.kt$LimboPlaytime$( itemID.getItemStack().item, ITEM_NAME, *createItemLore() )</ID>
     <ID>SpreadOperator:TextHelper.kt$TextHelper$(*component.toTypedArray(), separator = separator)</ID>
@@ -233,10 +233,10 @@
     <ID>TooManyFunctions:ItemResolutionQuery.kt$ItemResolutionQuery</ID>
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
-    <ID>TooManyFunctions:OreBlock.kt$at.hannibal2.skyhanni.features.mining.OreBlock.kt</ID>
+    <ID>TooManyFunctions:OreBlock.kt$at.hannibal2.hanni.features.mining.OreBlock.kt</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
-    <ID>TooManyFunctions:SkyhanniBaseScreen.kt$SkyhanniBaseScreen : GuiScreen</ID>
-    <ID>TooManyFunctions:TextCompat.kt$at.hannibal2.skyhanni.utils.compat.TextCompat.kt</ID>
+    <ID>TooManyFunctions:HanniBaseScreen.kt$HanniBaseScreen : GuiScreen</ID>
+    <ID>TooManyFunctions:TextCompat.kt$at.hannibal2.hanni.utils.compat.TextCompat.kt</ID>
     <ID>TooManyFunctions:WorldRenderUtils.kt$WorldRenderUtils</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Double::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Float::plus)!!</ID>
@@ -315,6 +315,6 @@
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt$RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>
     <ID>VarCouldBeVal:RepoPatternManager.kt$RepoPatternManager$/** * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for * checking duplicate registrations. */ private var usedKeys: NavigableMap&lt;String, CommonPatternInfo&lt;*, *&gt;&gt; = TreeMap()</ID>
-    <ID>VarCouldBeVal:SkyHanniItemTracker.kt$SkyHanniItemTracker$private var scrollValue = ScrollValue()</ID>
+    <ID>VarCouldBeVal:HanniItemTracker.kt$HanniItemTracker$private var scrollValue = ScrollValue()</ID>
   </CurrentIssues>
 </SmellBaseline>

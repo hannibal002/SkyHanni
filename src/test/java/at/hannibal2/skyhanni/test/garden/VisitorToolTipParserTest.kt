@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.test.garden
+package at.hannibal2.hanni.test.garden
 
-import at.hannibal2.skyhanni.config.features.garden.GardenConfig
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorTooltipParser
+import at.hannibal2.hanni.config.features.garden.GardenConfig
+import at.hannibal2.hanni.features.garden.visitor.VisitorTooltipParser
 import org.junit.jupiter.api.Test
 
 class VisitorToolTipParserTest {

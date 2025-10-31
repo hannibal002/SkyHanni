@@ -1,37 +1,37 @@
-package at.hannibal2.skyhanni.data.hypixel.chat
+package at.hannibal2.hanni.data.hypixel.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
-import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
-import at.hannibal2.skyhanni.features.bingo.BingoApi
-import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
-import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
-import at.hannibal2.skyhanni.utils.ComponentSpan
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.applyFormattingFrom
-import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.style
-import at.hannibal2.skyhanni.utils.compat.appendComponent
-import at.hannibal2.skyhanni.utils.compat.appendString
-import at.hannibal2.skyhanni.utils.compat.changeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.features.chat.PlayerMessagesConfig
+import at.hannibal2.hanni.data.hypixel.chat.event.CoopChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.GuildChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.PartyChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.PlayerAllChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.PlayerShowItemChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.PrivateMessageChatEvent
+import at.hannibal2.hanni.features.bingo.BingoApi
+import at.hannibal2.hanni.features.chat.playerchat.PlayerChatFilter
+import at.hannibal2.hanni.features.misc.MarkedPlayerManager
+import at.hannibal2.hanni.features.misc.compacttablist.AdvancedPlayerList
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.hanni.utils.ComponentMatcherUtils.intoSpan
+import at.hannibal2.hanni.utils.ComponentMatcherUtils.matchStyledMatcher
+import at.hannibal2.hanni.utils.ComponentSpan
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.StringUtils.applyFormattingFrom
+import at.hannibal2.hanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.chat.TextHelper
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.style
+import at.hannibal2.hanni.utils.compat.appendComponent
+import at.hannibal2.hanni.utils.compat.appendString
+import at.hannibal2.hanni.utils.compat.changeColor
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import net.minecraft.util.EnumChatFormatting
@@ -41,9 +41,9 @@ import net.minecraft.util.IChatComponent
  * Listening to the player chat events, and applying custom chat options to them.
  * E.g. part order, rank hider, etc
  */
-@SkyHanniModule
+@HanniModule
 object PlayerNameFormatter {
-    private val config get() = SkyHanniMod.feature.chat.playerMessage
+    private val config get() = HanniMod.feature.chat.playerMessage
 
     private val patternGroup = RepoPattern.group("data.chat.player.name")
 

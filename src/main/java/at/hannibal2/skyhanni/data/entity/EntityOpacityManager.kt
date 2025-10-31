@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.data.entity
+package at.hannibal2.hanni.data.entity
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.events.entity.EntityOpacityActiveEvent
-import at.hannibal2.skyhanni.events.entity.EntityOpacityEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.HanniRenderEntityEvent
+import at.hannibal2.hanni.events.entity.EntityOpacityActiveEvent
+import at.hannibal2.hanni.events.entity.EntityOpacityEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.events.render.EntityRenderLayersEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.containsKeys
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import org.lwjgl.opengl.GL11
 
-@SkyHanniModule
+@HanniModule
 object EntityOpacityManager {
 
     private var shouldHide: Boolean = false
@@ -29,7 +29,7 @@ object EntityOpacityManager {
         active = event.isActive()
     }
 
-    @HandleEvent(SkyHanniTickEvent::class, onlyOnSkyblock = true)
+    @HandleEvent(HanniTickEvent::class, onlyOnSkyblock = true)
     fun onTick() {
         if (!active) return
         val entities = mutableMapOf<EntityLivingBase, Int>()
@@ -57,7 +57,7 @@ object EntityOpacityManager {
     private fun opacity(entity: EntityLivingBase): Int = entities[entity] ?: error("can not read opacity bc not in map")
 
     @HandleEvent
-    fun onPreRender(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
+    fun onPreRender(event: HanniRenderEntityEvent.Pre<EntityLivingBase>) {
         if (!active) return
         val canChangeOpacity = canChangeOpacity(event.entity)
         shouldHide = canChangeOpacity
@@ -72,7 +72,7 @@ object EntityOpacityManager {
     }
 
     @HandleEvent
-    fun onPostRender(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
+    fun onPostRender(event: HanniRenderEntityEvent.Post<EntityLivingBase>) {
         if (!active) return
         if (!canChangeOpacity(event.entity)) return
 

@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.features.commands.tabcomplete
+package at.hannibal2.hanni.features.commands.tabcomplete
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpsJson
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.WarpsJson
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.chat.TabCompletionEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.SkyBlockUtils
 
-@SkyHanniModule
+@HanniModule
 object WarpTabComplete {
 
-    private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
+    private val config get() = HanniMod.feature.misc.commands.tabComplete
     private var warps = emptyList<String>()
 
     @HandleEvent

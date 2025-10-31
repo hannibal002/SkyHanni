@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.detektrules.style
+package at.hannibal2.hanni.detektrules.style
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import at.hannibal2.hanni.detektrules.HanniRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtNamedFunction
 
-class OnlyOnIslandSpecificity(config: Config) : SkyHanniRule(config) {
+class OnlyOnIslandSpecificity(config: Config) : HanniRule(config) {
     override val issue = Issue(
         "OnlyOnIslandSpecificity",
         Severity.Style,

@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.hanni.features.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.RegexUtils.anyMatches
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils.highlight
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import org.intellij.lang.annotations.Language
 
 private val patternGroup = RepoPattern.group("skyblockguide.highlight")
@@ -69,10 +69,10 @@ class SkyblockGuideHighlightFeature private constructor(
         objectList.add(this)
     }
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
-        private val skyblockGuideConfig get() = SkyHanniMod.feature.inventory.skyblockGuide
+        private val skyblockGuideConfig get() = HanniMod.feature.inventory.skyblockGuide
 
         private val objectList = mutableListOf<SkyblockGuideHighlightFeature>()
 
@@ -158,7 +158,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
         init {
             SkyblockGuideHighlightFeature(
-                { SkyHanniMod.feature.inventory.skyblockGuide.missingTasks },
+                { HanniMod.feature.inventory.skyblockGuide.missingTasks },
                 "level.guide",
                 ".*Guide ➜.*",
                 xPattern,
@@ -261,13 +261,13 @@ class SkyblockGuideHighlightFeature private constructor(
                 "§7Progress to .*|§7Find this item to add it to your|§7Kill this boss once to view collection|§7(?:Boss )?Collections (?:Unlocked|Maxed Out): §e.*",
             )
             SkyblockGuideHighlightFeature(
-                { SkyHanniMod.feature.event.anniversaryCelebration400.highlightDailyTasks },
+                { HanniMod.feature.event.anniversaryCelebration400.highlightDailyTasks },
                 "century",
                 "Daily Tasks",
                 "§c§lINCOMPLETE",
             )
             SkyblockGuideHighlightFeature(
-                { SkyHanniMod.feature.inventory.attributeShards.highlightDisabledAttributes },
+                { HanniMod.feature.inventory.attributeShards.highlightDisabledAttributes },
                 "attribute.disable",
                 "Attribute Menu",
                 "§7Enabled: §cNo",

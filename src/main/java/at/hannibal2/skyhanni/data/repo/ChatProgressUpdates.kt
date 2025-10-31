@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.data.repo
+package at.hannibal2.hanni.data.repo
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.chat.TextHelper
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.send
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.hover
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -56,13 +56,13 @@ class ChatProgressUpdates {
         updates.add(this)
     }
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
         private val updates = mutableListOf<ChatProgressUpdates>()
 
         @HandleEvent(onlyOnSkyblock = true)
-        fun onTick(event: SkyHanniTickEvent) {
+        fun onTick(event: HanniTickEvent) {
             if (!SkyBlockUtils.debug) return
             if (event.isMod(2)) {
                 for (update in updates) {
@@ -110,7 +110,7 @@ class ChatProgressUpdates {
         if (phase == Phase.START) {
             if (currentlyRunning) {
                 ErrorManager.logErrorStateWithData(
-                    "error properly logging something in SkyHanni",
+                    "error properly logging something in Hanni",
                     "trying to start an already running chat",
                     "next step" to nextStep,
                     "last step" to currentStep?.lastOrNull(),
@@ -124,7 +124,7 @@ class ChatProgressUpdates {
         if (phase == Phase.UPDATE) {
             if (!currentlyRunning) {
                 ErrorManager.logErrorStateWithData(
-                    "error properly logging something in SkyHanni",
+                    "error properly logging something in Hanni",
                     "trying to update an not running chat",
                     "next step" to nextStep,
                 )
@@ -145,7 +145,7 @@ class ChatProgressUpdates {
         if (phase == Phase.END) {
             if (!currentlyRunning) {
                 ErrorManager.logErrorStateWithData(
-                    "error properly logging something in SkyHanni",
+                    "error properly logging something in Hanni",
                     "trying to end an not running chat",
                     "next step" to nextStep,
                     "last step" to currentStep?.lastOrNull(),
@@ -182,7 +182,7 @@ class ChatProgressUpdates {
 
         val hover = mutableListOf<String>()
         hover.add("§e$title")
-        hover.add("§8SkyHanni Debug Log")
+        hover.add("§8Hanni Debug Log")
         hover.add("")
         hover.addAll(previousSteps)
         val currentTime = startOfCurrent?.format() ?: error("startOfCurrent is null")

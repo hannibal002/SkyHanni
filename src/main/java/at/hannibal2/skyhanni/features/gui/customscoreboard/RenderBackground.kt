@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard
+package at.hannibal2.hanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConfig
-import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
-import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.hanni.config.features.gui.customscoreboard.BackgroundConfig
+import at.hannibal2.hanni.data.GuiEditManager
+import at.hannibal2.hanni.data.GuiEditManager.getAbsX
+import at.hannibal2.hanni.data.GuiEditManager.getAbsY
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.compat.createResourceLocation
+import at.hannibal2.hanni.utils.renderables.Renderable
 
 object RenderBackground {
 
     private val config get() = CustomScoreboard.config.background
-    private val textureLocation = createResourceLocation("skyhanni", "scoreboard.png")
+    private val textureLocation = createResourceLocation("hanni", "scoreboard.png")
 
     internal fun addBackground(renderable: Renderable): Renderable {
         with(config) {

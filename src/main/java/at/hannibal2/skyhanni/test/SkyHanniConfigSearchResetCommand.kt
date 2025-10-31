@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.Features
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.json.Shimmy
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.Features
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.hanni.utils.json.Shimmy
 import com.google.gson.JsonElement
 import java.io.File
 import java.lang.reflect.Field
@@ -27,8 +27,8 @@ import java.util.Date
 import java.util.UUID
 
 // TODO in the future change something here
-@SkyHanniModule
-object SkyHanniConfigSearchResetCommand {
+@HanniModule
+object HanniConfigSearchResetCommand {
 
     private var lastCommand = emptyArray<String>()
 
@@ -55,7 +55,7 @@ object SkyHanniConfigSearchResetCommand {
 
         try {
             val (field, defaultObject, _) = getComplexField(term, Features())
-            val (_, _, parent) = getComplexField(term, SkyHanniMod.feature)
+            val (_, _, parent) = getComplexField(term, HanniMod.feature)
             val affectedElements = findConfigElements({ it.startsWith("$term.") }, { true }).size
             if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
                 return "§cThis will change $affectedElements config elements! Use the command again to confirm."
@@ -96,7 +96,7 @@ object SkyHanniConfigSearchResetCommand {
         }
 
         val root: Any = when {
-            term.startsWith("config") -> SkyHanniMod.feature
+            term.startsWith("config") -> HanniMod.feature
 
             term.startsWith("playerSpecific") -> {
                 ProfileStorageData.playerSpecific ?: return "§cplayerSpecific is null!"
@@ -173,7 +173,7 @@ object SkyHanniConfigSearchResetCommand {
         val elements = findConfigElements(configFilter, classFilter)
         val builder = StringBuilder()
         builder.append("```\n")
-        builder.append("Search config for SkyHanni ${SkyHanniMod.VERSION}\n")
+        builder.append("Search config for Hanni ${HanniMod.VERSION}\n")
         builder.append("configSearchTerm: $configSearchTerm\n")
         builder.append("classSearchTerm: $classSearchTerm\n")
         builder.append("\n")
@@ -196,7 +196,7 @@ object SkyHanniConfigSearchResetCommand {
         val list = mutableListOf<String>()
 
         val map = buildMap {
-            putAll(loadAllFields("config", SkyHanniMod.feature))
+            putAll(loadAllFields("config", HanniMod.feature))
 
             val playerSpecific = ProfileStorageData.playerSpecific
             if (playerSpecific != null) {
@@ -230,8 +230,8 @@ object SkyHanniConfigSearchResetCommand {
                 if (obj !is Runnable &&
                     objectName.startsWith(className) &&
                     (
-                        objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
-                            objectName.startsWith("at.hannibal2.skyhanni.config.storage.Storage")
+                        objectName.startsWith("at.hannibal2.hanni.config.features.") ||
+                            objectName.startsWith("at.hannibal2.hanni.config.storage.Storage")
                         )
                 ) {
                     "<category>"
@@ -295,7 +295,7 @@ object SkyHanniConfigSearchResetCommand {
                     map.putAll(loadAllFields(fieldName, value, depth + 1))
                 }
             } catch (_: Throwable) {
-                SkyHanniMod.logger.warn("Could not access field '$fieldName' in class '${obj.javaClass.name}'")
+                HanniMod.logger.warn("Could not access field '$fieldName' in class '${obj.javaClass.name}'")
                 continue
             }
         }
@@ -332,7 +332,7 @@ object SkyHanniConfigSearchResetCommand {
 
         // we don't use javaClass.simpleName since we want to catch edge cases
         return when (val name = javaClass.name) {
-            "at.hannibal2.skyhanni.config.core.config.Position" -> "Position"
+            "at.hannibal2.hanni.config.core.config.Position" -> "Position"
             "java.lang.Boolean" -> "Boolean"
             "java.lang.Integer" -> "Int"
             "java.lang.Long" -> "Long"
@@ -382,7 +382,7 @@ object SkyHanniConfigSearchResetCommand {
             description = "Searches or resets config elements §c(warning, dangerous!)"
             category = CommandCategory.DEVELOPER_DEBUG
             legacyCallbackArgs {
-                SkyHanniMod.launchCoroutine("shconfig command") {
+                HanniMod.launchCoroutine("shconfig command") {
                     ChatUtils.chat(runCommand(it))
                 }
                 lastCommand = it

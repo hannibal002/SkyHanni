@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.garden.contests.rewards.ContestRewardSet
-import at.hannibal2.skyhanni.events.garden.contests.rewards.ContestRewardsClaimedEvent
-import at.hannibal2.skyhanni.features.garden.AnitaMedalProfit
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.garden.contests.rewards.ContestRewardSet
+import at.hannibal2.hanni.events.garden.contests.rewards.ContestRewardsClaimedEvent
+import at.hannibal2.hanni.features.garden.AnitaMedalProfit
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object CompactJacobClaim {
 
-    private val config get() = SkyHanniMod.feature.chat
+    private val config get() = HanniMod.feature.chat
     private val patternGroup = RepoPattern.group("chat.jacobcompact")
 
     // <editor-fold desc="Patterns">
@@ -106,13 +106,13 @@ object CompactJacobClaim {
         CropType.WHEAT to Pair(LorenzColor.GOLD, "Wh"),
     )
 
-    private fun SkyHanniChatEvent.block(reason: String) {
+    private fun HanniChatEvent.block(reason: String) {
         messageSet.add(message)
         blockedReason = reason
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!config.compactJacobClaim) return
         val message = event.message
         var eventDelay = 300.milliseconds

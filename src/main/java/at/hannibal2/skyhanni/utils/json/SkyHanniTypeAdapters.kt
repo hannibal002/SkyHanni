@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.utils.json
+package at.hannibal2.hanni.utils.json
 
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
-import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.pests.PestType
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.Stopwatch
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.system.ModVersion
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.jsonobjects.other.NbtBoolean
+import at.hannibal2.hanni.data.model.SkyblockStat
+import at.hannibal2.hanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.pests.PestType
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.hanni.utils.Stopwatch
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.system.ModVersion
+import at.hannibal2.hanni.utils.tracker.HanniTracker
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
@@ -27,7 +27,7 @@ import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-object SkyHanniTypeAdapters {
+object HanniTypeAdapters {
     val NEU_ITEMSTACK: TypeAdapter<ItemStack> = SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData)
 
     val UUID: TypeAdapter<UUID> = SimpleStringTypeAdapter(
@@ -97,7 +97,7 @@ object SkyHanniTypeAdapters {
 
     val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)
 
-    val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
+    val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<HanniTracker.DefaultDisplayMode>()
     val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>(IslandType.UNKNOWN)
     val RARITY = SimpleStringTypeAdapter.forEnum<LorenzRarity>()
 

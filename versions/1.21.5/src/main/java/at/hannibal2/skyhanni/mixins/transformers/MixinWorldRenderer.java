@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent;
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
+import at.hannibal2.hanni.events.RenderEntityOutlineEvent;
+import at.hannibal2.hanni.mixins.hooks.RenderLivingEntityHelper;
+import at.hannibal2.hanni.utils.render.HanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -74,20 +74,20 @@ public class MixinWorldRenderer {
         if (glowColor == null) {
             return original.call(storage);
         }
-        return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers();
+        return HanniOutlineVertexConsumerProvider.getVertexConsumers();
     }
     //#endif
 
     @Inject(method = "method_62214", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))
     private void setGlowDepth(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
-        SkyHanniOutlineVertexConsumerProvider.checkIfDepthAttachmentNeedsUpdating();
+        HanniOutlineVertexConsumerProvider.checkIfDepthAttachmentNeedsUpdating();
     }
 
     @Inject(method = "method_62214", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/OutlineVertexConsumerProvider;draw()V"))
-    private void renderSkyhanniGlow(CallbackInfo ci) {
+    private void renderHanniGlow(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
-        SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().draw();
+        HanniOutlineVertexConsumerProvider.getVertexConsumers().draw();
     }
 
 }

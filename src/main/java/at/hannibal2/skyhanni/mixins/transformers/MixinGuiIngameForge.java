@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.data.RenderData;
-import at.hannibal2.skyhanni.utils.compat.DrawContext;
+import at.hannibal2.hanni.data.RenderData;
+import at.hannibal2.hanni.utils.compat.DrawContext;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.client.GuiIngameForge;
 import org.spongepowered.asm.mixin.Mixin;

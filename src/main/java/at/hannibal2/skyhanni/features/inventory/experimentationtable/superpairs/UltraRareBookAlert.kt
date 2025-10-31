@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable.superpairs
+package at.hannibal2.hanni.features.inventory.experimentationtable.superpairs
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.ExperimentationTableApi
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SoundUtils.createSound
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.ExperimentationTableApi
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.title.TitleManager
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.experiments.TableRareUncoverEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SoundUtils.createSound
+import at.hannibal2.hanni.utils.SoundUtils.playSound
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object UltraRareBookAlert {
 
-    private val config get() = SkyHanniMod.feature.inventory.experimentationTable
+    private val config get() = HanniMod.feature.inventory.experimentationTable
     private val dragonSound by lazy { createSound("mob.enderdragon.growl", 1f) }
 
     private var enchantsFound = false

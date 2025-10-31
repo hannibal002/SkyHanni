@@ -1,44 +1,44 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.hanni.features.mining
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
-import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
-import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ClipboardUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigFileType
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierUtils
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.model.waypoints.HanniWaypoint
+import at.hannibal2.hanni.data.model.waypoints.WaypointFormat
+import at.hannibal2.hanni.data.model.waypoints.Waypoints
+import at.hannibal2.hanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ClipboardUtils
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawEdges
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import kotlinx.coroutines.Job
 import java.util.Locale
 import java.util.ServiceLoader
 
-@SkyHanniModule
+@HanniModule
 object OrderedWaypoints {
-    private val config get() = SkyHanniMod.feature.mining.orderedWaypoints
+    private val config get() = HanniMod.feature.mining.orderedWaypoints
     private val storage get() = ProfileStorageData.orderedWaypointsRoutes
 
-    private var orderedWaypointsList = Waypoints<SkyhanniWaypoint>()
+    private var orderedWaypointsList = Waypoints<HanniWaypoint>()
     private val renderWaypoints: MutableList<Int> = mutableListOf()
     private var currentOrderedWaypointIndex = 0
     private var lastCloser = 0
@@ -46,18 +46,18 @@ object OrderedWaypoints {
 
     @HandleEvent(HypixelJoinEvent::class)
     fun onHypixelJoin() {
-        if (SkyHanniMod.orderedWaypointsRoutesData.routes == null) {
-            SkyHanniMod.orderedWaypointsRoutesData.routes = mutableMapOf()
+        if (HanniMod.orderedWaypointsRoutesData.routes == null) {
+            HanniMod.orderedWaypointsRoutesData.routes = mutableMapOf()
             saveConfig()
         }
     }
 
     fun saveConfig() {
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.ROUTES, "Save file")
+        HanniMod.configManager.saveConfig(ConfigFileType.ROUTES, "Save file")
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!config.enabled) return
 
         for (i in renderWaypoints.indices) {
@@ -239,7 +239,7 @@ object OrderedWaypoints {
         loadJob?.join()
     }
 
-    private fun setupLoadJob(name: String): Job = SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
+    private fun setupLoadJob(name: String): Job = HanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
         val loadedRoute = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
         else storage?.routes?.get(name) ?: return@launchIOCoroutine ChatUtils.userError(
             "Route $name doesn't exist.\n" +
@@ -326,7 +326,7 @@ object OrderedWaypoints {
             return ChatUtils.userError("$number is not between 1 and ${orderedWaypointsList.size + 1}.")
         }
 
-        val newWaypoint = SkyhanniWaypoint(pos, number = number, options = mutableMapOf("name" to number.toString()))
+        val newWaypoint = HanniWaypoint(pos, number = number, options = mutableMapOf("name" to number.toString()))
         if (number == orderedWaypointsList.size + 1) {
             orderedWaypointsList.add(newWaypoint)
         } else {
@@ -340,7 +340,7 @@ object OrderedWaypoints {
     }
 
     private fun export(format: String) {
-        SkyHanniMod.launchIOCoroutine("ordered waypoints export format:$format") {
+        HanniMod.launchIOCoroutine("ordered waypoints export format:$format") {
             val route = if (format.isEmpty()) exportWaypoints(orderedWaypointsList, "coleweight")
             else exportWaypoints(orderedWaypointsList, format.lowercase(Locale.getDefault()))
 
@@ -432,7 +432,7 @@ object OrderedWaypoints {
         currentOrderedWaypointIndex = Math.floorMod(currentOrderedWaypointIndex + increment, orderedWaypointsList.size)
     }
 
-    private fun loadWaypoints(data: String): Waypoints<SkyhanniWaypoint>? {
+    private fun loadWaypoints(data: String): Waypoints<HanniWaypoint>? {
         return ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull {
             it.load(data)
         }?.let {
@@ -440,7 +440,7 @@ object OrderedWaypoints {
         }
     }
 
-    private fun exportWaypoints(waypoints: Waypoints<SkyhanniWaypoint>, name: String): String? {
+    private fun exportWaypoints(waypoints: Waypoints<HanniWaypoint>, name: String): String? {
         return ServiceLoader.load(WaypointFormat::class.java).firstOrNull { it.name == name }?.export(waypoints)
     }
 

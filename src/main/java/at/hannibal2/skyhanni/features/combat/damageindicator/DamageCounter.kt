@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.combat.damageindicator
+package at.hannibal2.hanni.features.combat.damageindicator
 
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import java.util.LinkedList
 
 class DamageCounter {

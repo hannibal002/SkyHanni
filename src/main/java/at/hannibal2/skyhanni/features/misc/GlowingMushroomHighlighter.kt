@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.blockhighlight.SkyHanniBlockHighlighter
-import at.hannibal2.skyhanni.utils.blockhighlight.TimedHighlightBlock
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.blockhighlight.HanniBlockHighlighter
+import at.hannibal2.hanni.utils.blockhighlight.TimedHighlightBlock
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object GlowingMushroomHighlighter {
 
-    private val config get() = SkyHanniMod.feature.misc.glowingMushroomHighlighter
+    private val config get() = HanniMod.feature.misc.glowingMushroomHighlighter
 
-    private val blockHighlighter = SkyHanniBlockHighlighter<TimedHighlightBlock>(
+    private val blockHighlighter = HanniBlockHighlighter<TimedHighlightBlock>(
         highlightCondition = { isEnabled() },
         blockCondition = { it.block == Blocks.red_mushroom || it.block == Blocks.brown_mushroom },
         colorProvider = { config.mushroomColor },

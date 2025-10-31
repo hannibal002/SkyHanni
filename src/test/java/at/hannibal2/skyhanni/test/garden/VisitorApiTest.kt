@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.test.garden
+package at.hannibal2.hanni.test.garden
 
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
+import at.hannibal2.hanni.features.garden.visitor.VisitorApi
 import org.junit.jupiter.api.Test
 
 class VisitorApiTest {

@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.features.misc.massconfiguration
+package at.hannibal2.hanni.features.misc.massconfiguration
 
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.StringUtils.splitLines
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.StringUtils.splitLines
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.MouseCompat
+import at.hannibal2.hanni.utils.compat.HanniBaseScreen
+import at.hannibal2.hanni.utils.renderables.RenderableTooltips
+import at.hannibal2.hanni.utils.renderables.primitives.StringRenderable
 import kotlin.math.max
 import kotlin.math.min
 
@@ -15,18 +15,18 @@ class DefaultConfigOptionGui(
     private val orderedOptions: Map<Category, List<FeatureToggleableOption>>,
     old: String,
     new: String,
-) : SkyhanniBaseScreen() {
+) : HanniBaseScreen() {
 
     private val guiTitle = if (old == "null") {
         if (new == "null")
-            "§5SkyHanni Default Options"
+            "§5Hanni Default Options"
         else
-            "§5SkyHanni Options In Version $new"
+            "§5Hanni Options In Version $new"
     } else {
         if (new == "null")
-            "§5SkyHanni Options since $old"
+            "§5Hanni Options since $old"
         else
-            "§5SkyHanni Options $old → $new"
+            "§5Hanni Options $old → $new"
     }
 
     private val xSize = 400

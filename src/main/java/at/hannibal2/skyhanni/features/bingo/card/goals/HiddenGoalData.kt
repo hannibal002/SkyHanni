@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bingo.card.goals
+package at.hannibal2.hanni.features.bingo.card.goals
 
 import kotlin.time.Duration
 

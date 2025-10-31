@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackApi
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.GetFromSackApi
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.hanni.utils.RegexUtils.matchMatchers
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object GFSPiggyBank {
 
     private val ENCHANTED_PORK by lazy { "ENCHANTED_PORK".toInternalName().makePrimitiveStack(8) }
@@ -37,12 +37,12 @@ object GFSPiggyBank {
     private val patternList = listOf(crackedPattern, brokePattern)
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
         patternList.matchMatchers(event.message) {
             GetFromSackApi.getFromChatMessageSackItems(ENCHANTED_PORK)
         }
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.misc.gfsPiggyBank
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && HanniMod.feature.misc.gfsPiggyBank
 }

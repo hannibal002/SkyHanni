@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
+import at.hannibal2.hanni.api.event.GenericHanniEvent
 import net.minecraft.entity.Entity
 //#if MC < 1.21
 import net.minecraft.entity.DataWatcher
@@ -10,7 +10,7 @@ import net.minecraft.entity.DataWatcher
 
 //#if MC < 1.21
 data class DataWatcherUpdatedEvent<T : Entity>(val entity: T, val updatedEntries: List<DataWatcher.WatchableObject>) :
-    GenericSkyHanniEvent<T>(entity.javaClass)
+    GenericHanniEvent<T>(entity.javaClass)
 //#else
-//$$ data class DataWatcherUpdatedEvent<T : Entity>(val entity: T, val updatedEntries: List<DataTracker.Entry<*>>) : GenericSkyHanniEvent<T>(entity.javaClass)
+//$$ data class DataWatcherUpdatedEvent<T : Entity>(val entity: T, val updatedEntries: List<DataTracker.Entry<*>>) : GenericHanniEvent<T>(entity.javaClass)
 //#endif

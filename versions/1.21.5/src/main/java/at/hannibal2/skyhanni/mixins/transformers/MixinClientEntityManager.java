@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.data.EntityData;
-import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent;
+import at.hannibal2.hanni.data.EntityData;
+import at.hannibal2.hanni.events.entity.EntityRemovedEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.entity.EntityLike;
 import org.spongepowered.asm.mixin.Final;

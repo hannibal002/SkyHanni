@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuEssenceCostJson
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.essenceUpgradePattern
-import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.maxedUpgradeLorePattern
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuEssenceCostJson
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.features.inventory.EssenceShopHelper.essenceUpgradePattern
+import at.hannibal2.hanni.features.inventory.EssenceShopHelper.maxedUpgradeLorePattern
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object EssenceUtils {
     var itemPrices = mapOf<NeuInternalName, Map<Int, EssenceUpgradePrice>>()
 
@@ -104,7 +104,7 @@ object EssenceUtils {
     ) {
 
         operator fun plus(other: EssenceUpgradePrice): EssenceUpgradePrice {
-            if (other.essencePrice.essenceType != essencePrice.essenceType) ErrorManager.skyHanniError(
+            if (other.essencePrice.essenceType != essencePrice.essenceType) ErrorManager.hanniError(
                 "Trying to add non compatible EssenceUpgradePrices!",
                 "essencePrice.essenceType" to essencePrice.essenceType,
                 "other.essencePrice.essenceType" to other.essencePrice.essenceType,
@@ -125,7 +125,7 @@ object EssenceUtils {
     data class EssencePrice(val essenceAmount: Int, val essenceType: String) {
 
         operator fun plus(other: EssencePrice): EssencePrice {
-            if (other.essenceType != essenceType) ErrorManager.skyHanniError(
+            if (other.essenceType != essenceType) ErrorManager.hanniError(
                 "Trying to add non compatible essence prices!",
                 "essenceType" to essenceType,
                 "other.essenceType" to other.essenceType,

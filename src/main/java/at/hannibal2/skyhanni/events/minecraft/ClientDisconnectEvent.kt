@@ -1,5 +1,5 @@
-package at.hannibal2.skyhanni.events.minecraft
+package at.hannibal2.hanni.events.minecraft
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 
-object ClientDisconnectEvent : SkyHanniEvent()
+object ClientDisconnectEvent : HanniEvent()

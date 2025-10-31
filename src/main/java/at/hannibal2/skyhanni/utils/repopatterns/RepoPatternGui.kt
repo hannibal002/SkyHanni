@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.utils.repopatterns
+package at.hannibal2.hanni.utils.repopatterns
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ConfigUtils.asStructuredText
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
@@ -24,7 +24,7 @@ import io.github.notenoughupdates.moulconfig.gui.GuiComponentWrapper
  */
 class RepoPatternGui private constructor() {
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
         @HandleEvent
@@ -37,13 +37,13 @@ class RepoPatternGui private constructor() {
                 description = "See where regexes are loaded from"
                 category = CommandCategory.DEVELOPER_TEST
                 simpleCallback {
-                    val location = MyResourceLocation("skyhanni", "gui/regexes.xml")
+                    val location = MyResourceLocation("hanni", "gui/regexes.xml")
                     val universe = XMLUniverse.getDefaultUniverse()
                     val context = GuiContext(universe.load(RepoPatternGui(), location))
                     //#if FORGE
-                    SkyHanniMod.screenToOpen = GuiComponentWrapper(context)
+                    HanniMod.screenToOpen = GuiComponentWrapper(context)
                     //#else
-                    //$$ SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Text.empty(), context, null)
+                    //$$ HanniMod.screenToOpen = MoulConfigScreenComponent(Text.empty(), context, null)
                     //#endif
                 }
             }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.visualwords
+package at.hannibal2.hanni.features.misc.visualwords
 
 import com.google.gson.annotations.Expose
 

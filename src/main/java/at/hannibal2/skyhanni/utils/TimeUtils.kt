@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.data.ScoreboardData
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -25,7 +25,7 @@ object TimeUtils {
 
     val isAprilFoolsDay: Boolean by RecalculatingValue(1.seconds) {
         val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
-        val (always, never) = SkyHanniMod.feature.dev.debug.let { it.alwaysFunnyTime to it.neverFunnyTime }
+        val (always, never) = HanniMod.feature.dev.debug.let { it.alwaysFunnyTime to it.neverFunnyTime }
         !never && (always || itsTime)
     }
 

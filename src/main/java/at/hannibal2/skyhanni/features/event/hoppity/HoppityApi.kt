@@ -1,62 +1,62 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.hanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
-import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
-import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT_ABIPHONE
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.HITMAN
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFBarnManager
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker.duplicateDoradoStrayPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker.duplicatePseudoStrayPattern
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
-import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
-import at.hannibal2.skyhanni.utils.LorenzRarity.RARE
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SkyblockSeason
-import at.hannibal2.skyhanni.utils.SkyblockSeasonModifier
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.event.HandleEvent.Companion.HIGHEST
+import at.hannibal2.hanni.config.storage.Resettable
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.jsonobjects.repo.HoppityEggLocationsJson
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.InventoryUpdatedEvent
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.hoppity.EggFoundEvent
+import at.hannibal2.hanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.BOUGHT
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.BOUGHT_ABIPHONE
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.Companion.getEggType
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.HITMAN
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.SIDE_DISH
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.STRAY
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFBarnManager
+import at.hannibal2.hanni.features.inventory.chocolatefactory.stray.CFStrayTracker
+import at.hannibal2.hanni.features.inventory.chocolatefactory.stray.CFStrayTracker.duplicateDoradoStrayPattern
+import at.hannibal2.hanni.features.inventory.chocolatefactory.stray.CFStrayTracker.duplicatePseudoStrayPattern
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.ItemUtils.getSingleLineLore
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.LorenzRarity.DIVINE
+import at.hannibal2.hanni.utils.LorenzRarity.LEGENDARY
+import at.hannibal2.hanni.utils.LorenzRarity.RARE
+import at.hannibal2.hanni.utils.RegexUtils.anyMatches
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SkyblockSeason
+import at.hannibal2.hanni.utils.SkyblockSeasonModifier
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import net.minecraft.init.Items
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 // todo 1.21 impl needed
-@SkyHanniModule
+@HanniModule
 object HoppityApi {
 
     // <editor-fold desc="Patterns">
@@ -155,7 +155,7 @@ object HoppityApi {
 
     fun onHoppityIsland() = onHoppityIsland
 
-    fun isHoppityEvent() = (SkyblockSeason.SPRING.isSeason() || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
+    fun isHoppityEvent() = (SkyblockSeason.SPRING.isSeason() || HanniMod.feature.dev.debug.alwaysHoppitys)
 
     // First event was year 346 -> #1, 20th event was year 365, etc.
     fun getHoppityEventNumber(skyblockYear: Int): Int = (skyblockYear - 345)
@@ -203,7 +203,7 @@ object HoppityApi {
         stack != null && stack.item != null && (stack.item == Items.skull || stack.isStainedGlassPane()) &&
             stack.displayName.isNotEmpty() && stack.getLore().isNotEmpty()
 
-    private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent, note: String? = null) {
+    private fun postApiEggFoundEvent(type: HoppityEggType, event: HanniChatEvent, note: String? = null) {
         EggFoundEvent(
             type,
             chatEvent = event,
@@ -328,7 +328,7 @@ object HoppityApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
             hoppityDataSet.reset()
             val type = getEggType(event)
@@ -368,7 +368,7 @@ object HoppityApi {
         }
     }
 
-    fun attemptFireRabbitFound(event: SkyHanniChatEvent? = null, lastDuplicateAmount: Long? = null) {
+    fun attemptFireRabbitFound(event: HanniChatEvent? = null, lastDuplicateAmount: Long? = null) {
         lastDuplicateAmount?.let {
             hoppityDataSet.lastDuplicateAmount = it
             hoppityDataSet.duplicate = true

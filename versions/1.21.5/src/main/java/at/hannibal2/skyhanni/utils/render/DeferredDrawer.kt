@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawPyramid
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.util.math.Box
 import java.awt.Color
 
-@SkyHanniModule
+@HanniModule
 object DeferredDrawer {
 
     private val boxesNoDepth = mutableListOf<DeferredBox>()
@@ -21,7 +21,7 @@ object DeferredDrawer {
     private val stringsDepth = mutableListOf<DeferredString>()
 
     @HandleEvent(priority = 999)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         event.isCurrentlyDeferring = false
         boxesNoDepth.forEach { box ->
             event.drawFilledBoundingBox(

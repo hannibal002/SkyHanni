@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.features.combat.end
+package at.hannibal2.hanni.features.combat.end
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
 import net.minecraft.entity.item.EntityArmorStand
 import java.util.UUID
 import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object ProfitPerDragon {
     var finishedLoot = true
 
@@ -132,7 +132,7 @@ object ProfitPerDragon {
     private var lastScanned = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (lastScanned.passedSince() >= 1.seconds && !DragonFeatures.eggSpawned && !finishedLoot) {
             scanForLoot()
             lastScanned = SimpleTimeMark.now()

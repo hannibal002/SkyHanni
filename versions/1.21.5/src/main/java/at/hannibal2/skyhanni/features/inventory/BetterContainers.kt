@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.hanni.features.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CTMUtils
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
-import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
-import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
-import at.hannibal2.skyhanni.utils.compat.container
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.CTMUtils
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.hanni.utils.compat.ColoredBlockCompat
+import at.hannibal2.hanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
+import at.hannibal2.hanni.utils.compat.DyeCompat.Companion.isDye
+import at.hannibal2.hanni.utils.compat.container
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
@@ -40,21 +40,21 @@ import kotlin.time.Duration.Companion.milliseconds
  * Taken with love (and permission), and adapted from, the NEU source code.
  * https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/miscfeatures/BetterContainers.java
  */
-@SkyHanniModule
+@HanniModule
 object BetterContainers {
 
     private val patternGroup = RepoPattern.group("inventory.bettercontainers")
 
-    private val config get() = SkyHanniMod.feature.inventory.improvedSBMenus
+    private val config get() = HanniMod.feature.inventory.improvedSBMenus
 
-    private val x: Identifier = Identifier.of("skyhanni", "dynamic_54")
+    private val x: Identifier = Identifier.of("hanni", "dynamic_54")
 
-    private val toggleOff = Identifier.of("skyhanni", "dynamic_54/toggle_off.png")
-    private val toggleOn = Identifier.of("skyhanni", "dynamic_54/toggle_on.png")
-    private val dynamic54Base = Identifier.of("skyhanni", "dynamic_54/style1/dynamic_54.png")
-    private val dynamic54Slot = Identifier.of("skyhanni", "dynamic_54/style1/dynamic_54_slot_ctm.png")
-    private val dynamic54Button = Identifier.of("skyhanni", "dynamic_54/style1/dynamic_54_button_ctm.png")
-    private val customDynamicChest = Identifier.of("skyhanni", "dynamic_chest_inventory.png")
+    private val toggleOff = Identifier.of("hanni", "dynamic_54/toggle_off.png")
+    private val toggleOn = Identifier.of("hanni", "dynamic_54/toggle_on.png")
+    private val dynamic54Base = Identifier.of("hanni", "dynamic_54/style1/dynamic_54.png")
+    private val dynamic54Slot = Identifier.of("hanni", "dynamic_54/style1/dynamic_54_slot_ctm.png")
+    private val dynamic54Button = Identifier.of("hanni", "dynamic_54/style1/dynamic_54_button_ctm.png")
+    private val customDynamicChest = Identifier.of("hanni", "dynamic_chest_inventory.png")
 
     private val disallowedInventoryPattern by patternGroup.pattern(
         "disallowed",

@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
-import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.hanni.api.event.CancellableHanniEvent
+import at.hannibal2.hanni.data.ItemAddManager
+import at.hannibal2.hanni.utils.NeuInternalName
 
-class ItemAddEvent(val internalName: NeuInternalName, val amount: Int, val source: ItemAddManager.Source) : CancellableSkyHanniEvent()
+class ItemAddEvent(val internalName: NeuInternalName, val amount: Int, val source: ItemAddManager.Source) : CancellableHanniEvent()

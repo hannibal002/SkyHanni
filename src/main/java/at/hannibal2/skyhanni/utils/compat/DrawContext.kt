@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.compat
+package at.hannibal2.hanni.utils.compat
 
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
 import net.minecraft.client.Minecraft

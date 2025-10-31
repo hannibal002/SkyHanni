@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.InventoryUpdatedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.ItemUtils.getSkullOwner
+import at.hannibal2.hanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.hanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object TestCopyBestiaryValues {
 
     class BestiaryObject { // TODO fix typo
@@ -50,8 +50,8 @@ object TestCopyBestiaryValues {
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!SkyHanniMod.feature.dev.debug.copyBestiaryData) return
-        SkyHanniDebugsAndTests.displayLine = ""
+        if (!HanniMod.feature.dev.debug.copyBestiaryData) return
+        HanniDebugsAndTests.displayLine = ""
 
         val backItem = event.inventoryItems[3 + 9 * 5 + 3] ?: return
         if (backItem.getLore().none { it.contains("Bestiary Milestone") }) {
@@ -107,7 +107,7 @@ object TestCopyBestiaryValues {
         val text = gson.toJson(obj)
         OSUtils.copyToClipboard(text)
 
-        SkyHanniDebugsAndTests.displayLine = "Bestiary for $titleName"
+        HanniDebugsAndTests.displayLine = "Bestiary for $titleName"
     }
 
     @HandleEvent

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.repopatterns
+package at.hannibal2.hanni.utils.repopatterns
 
 import org.intellij.lang.annotations.Language
 import java.util.regex.Pattern
@@ -13,7 +13,7 @@ import java.util.regex.Pattern
  * in the future, please have a kotlin wrapper from which you pull the regex using a getter method of sorts.
  *
  * In order to use a RepoPattern, you need to obtain a reference to that repo pattern statically during pre init. This
- * means you must either be loaded by [SkyHanniMod.loadModule] directly, or must be loaded during class or object
+ * means you must either be loaded by [HanniMod.loadModule] directly, or must be loaded during class or object
  * initialization of an object that is pre init loaded. You will then have to bind that repo pattern to a field using
  * kotlin delegation syntax:
  *

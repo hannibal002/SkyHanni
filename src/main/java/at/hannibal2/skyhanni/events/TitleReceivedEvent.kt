@@ -1,5 +1,5 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
+import at.hannibal2.hanni.api.event.CancellableHanniEvent
 
-class TitleReceivedEvent(val title: String) : CancellableSkyHanniEvent()
+class TitleReceivedEvent(val title: String) : CancellableHanniEvent()

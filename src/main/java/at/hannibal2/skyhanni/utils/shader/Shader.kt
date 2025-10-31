@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils.shader
+package at.hannibal2.hanni.utils.shader
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
 import net.minecraft.client.Minecraft
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.GL11

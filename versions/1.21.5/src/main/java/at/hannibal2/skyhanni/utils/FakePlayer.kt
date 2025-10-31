@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
 import net.minecraft.client.network.OtherClientPlayerEntity
 import net.minecraft.client.util.DefaultSkinHelper
 import net.minecraft.client.util.SkinTextures

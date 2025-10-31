@@ -1,26 +1,26 @@
-package at.hannibal2.skyhanni.features.misc.pathfind
+package at.hannibal2.hanni.features.misc.pathfind
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.misc.PathfindConfig
-import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.misc.PathfindConfig
+import at.hannibal2.hanni.data.IslandGraphs
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.RenderDisplayHelper
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.send
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import net.minecraft.util.ChatComponentText
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object NavigationFeedback {
 
-    private val config get() = SkyHanniMod.feature.misc.pathfinding
+    private val config get() = HanniMod.feature.misc.pathfinding
     private val pathFindMessageId = ChatUtils.getUniqueMessageId()
     private var guiRenderable: Renderable? = null
     private var lastChatMessageSent = SimpleTimeMark.farPast()
@@ -58,7 +58,7 @@ object NavigationFeedback {
     }
 
     private fun sendGuiFeedback(component: ChatComponentText): Boolean {
-        val guiFormattedText = component.formattedText.replace("§e[SkyHanni] ", "§e")
+        val guiFormattedText = component.formattedText.replace("§e[Hanni] ", "§e")
         guiRenderable = Renderable.clickable(
             Renderable.text(guiFormattedText),
             onLeftClick = IslandGraphs::cancelClick,

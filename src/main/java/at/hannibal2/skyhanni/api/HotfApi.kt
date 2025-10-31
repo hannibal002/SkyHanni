@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.api
+package at.hannibal2.hanni.api
 
-import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
-import at.hannibal2.skyhanni.data.hotx.RotatingPerk
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.data.hotx.HotxPatterns.asPatternId
+import at.hannibal2.hanni.data.hotx.RotatingPerk
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import org.intellij.lang.annotations.Language
 
-@SkyHanniModule
+@HanniModule
 object HotfApi {
 
     var lottery: LotteryPerk? = null

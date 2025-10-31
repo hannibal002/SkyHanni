@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.data.ElectionApi
-import at.hannibal2.skyhanni.data.ElectionApi.derpy
-import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.keepOnlyIn
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.getAllEquipment
-import at.hannibal2.skyhanni.utils.compat.getEntityLevel
-import at.hannibal2.skyhanni.utils.compat.getHandItem
-import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
-import at.hannibal2.skyhanni.utils.render.FrustumUtils
+import at.hannibal2.hanni.data.ElectionApi
+import at.hannibal2.hanni.data.ElectionApi.derpy
+import at.hannibal2.hanni.data.mob.MobFilter.isRealPlayer
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.hanni.utils.LocationUtils.canBeSeen
+import at.hannibal2.hanni.utils.LocationUtils.distanceTo
+import at.hannibal2.hanni.utils.LocationUtils.distanceToIgnoreY
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.CollectionUtils.keepOnlyIn
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.getAllEquipment
+import at.hannibal2.hanni.utils.compat.getEntityLevel
+import at.hannibal2.hanni.utils.compat.getHandItem
+import at.hannibal2.hanni.utils.compat.getLoadedPlayers
+import at.hannibal2.hanni.utils.compat.getStandHelmet
+import at.hannibal2.hanni.utils.compat.normalizeAsArray
+import at.hannibal2.hanni.utils.render.FrustumUtils
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -31,14 +31,14 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+//$$ import at.hannibal2.hanni.utils.compat.InventoryCompat.orNull
 //$$ import net.minecraft.entity.attribute.EntityAttributes
 //$$ import net.minecraft.entity.EquipmentSlot
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object EntityUtils {
 
     // TODO remove this relatively heavy call everywhere

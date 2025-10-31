@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.features.pets
+package at.hannibal2.hanni.features.pets
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.api.pet.PetStorageApi
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.pet.CurrentPetApi
+import at.hannibal2.hanni.api.pet.PetStorageApi
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils.highlight
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getPetInfo
 
-@SkyHanniModule
+@HanniModule
 object HighlightCurrentPet {
 
-    private val config get() = SkyHanniMod.feature.misc.pets.highlightInMenu
+    private val config get() = HanniMod.feature.misc.pets.highlightInMenu
 
     private var inInventory = false
     private var highlightSlot: Int? = null

@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers.gui;
+package at.hannibal2.hanni.mixins.transformers.gui;
 
-import at.hannibal2.skyhanni.data.ToolTipData;
-import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
+import at.hannibal2.hanni.data.ToolTipData;
+import at.hannibal2.hanni.mixins.hooks.GuiContainerHook;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -33,7 +33,7 @@ public abstract class MixinGuiContainer<T extends ScreenHandler> extends Screen 
     }
 
     @Unique
-    private final GuiContainerHook skyHanni$hook = new GuiContainerHook(this);
+    private final GuiContainerHook hanni$hook = new GuiContainerHook(this);
 
     @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;close()V", shift = At.Shift.BEFORE), cancellable = true)
     //#if MC < 1.21.9
@@ -41,7 +41,7 @@ public abstract class MixinGuiContainer<T extends ScreenHandler> extends Screen 
         //#else
         //$$ private void closeWindowPressed(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
         //#endif
-        skyHanni$hook.closeWindowPressed(cir);
+        hanni$hook.closeWindowPressed(cir);
     }
 
     //#if MC < 1.21.6
@@ -50,17 +50,17 @@ public abstract class MixinGuiContainer<T extends ScreenHandler> extends Screen 
     //$$ @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightBack(Lnet/minecraft/client/gui/DrawContext;)V"))
     //#endif
     private void backgroundDrawn(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        skyHanni$hook.backgroundDrawn(context, mouseX, mouseY, deltaTicks);
+        hanni$hook.backgroundDrawn(context, mouseX, mouseY, deltaTicks);
     }
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void preDraw(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        skyHanni$hook.preDraw(context, mouseX, mouseY, deltaTicks, ci);
+        hanni$hook.preDraw(context, mouseX, mouseY, deltaTicks, ci);
     }
 
     @Inject(method = "render", at = @At("TAIL"))
     private void postDraw(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        skyHanni$hook.postDraw(context, mouseX, mouseY, deltaTicks);
+        hanni$hook.postDraw(context, mouseX, mouseY, deltaTicks);
     }
 
     //#if MC < 1.21.6
@@ -69,22 +69,22 @@ public abstract class MixinGuiContainer<T extends ScreenHandler> extends Screen 
     //$$ @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightFront(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
     //#endif
     private void onForegroundDraw(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        skyHanni$hook.foregroundDrawn(context, mouseX, mouseY, deltaTicks);
+        hanni$hook.foregroundDrawn(context, mouseX, mouseY, deltaTicks);
     }
 
     @Inject(method = "drawSlot", at = @At("HEAD"), cancellable = true)
     private void onDrawSlot(DrawContext context, Slot slot, CallbackInfo ci) {
-        skyHanni$hook.onDrawSlot(slot, ci);
+        hanni$hook.onDrawSlot(slot, ci);
     }
 
     @Inject(method = "drawSlot", at = @At("RETURN"))
     private void onDrawSlotReturn(DrawContext context, Slot slot, CallbackInfo ci) {
-        skyHanni$hook.onDrawSlotPost(slot);
+        hanni$hook.onDrawSlotPost(slot);
     }
 
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
     private void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo cir) {
-        skyHanni$hook.onMouseClick(slot, slotId, button, actionType.getIndex(), cir);
+        hanni$hook.onMouseClick(slot, slotId, button, actionType.getIndex(), cir);
     }
 
     //#if MC < 1.21.6

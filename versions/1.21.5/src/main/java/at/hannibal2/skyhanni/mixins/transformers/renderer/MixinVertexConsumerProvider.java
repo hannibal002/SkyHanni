@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.hanni.mixins.transformers.renderer;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.render.BufferBuilder;
@@ -19,7 +19,7 @@ public class MixinVertexConsumerProvider {
 
     @Inject(method = "getBuffer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;draw(Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/BufferBuilder;)V", shift = At.Shift.BEFORE), cancellable = true)
     private void onGetBuffer(RenderLayer renderLayer, CallbackInfoReturnable<VertexConsumer> cir, @Local BufferBuilder bufferBuilder) {
-        if (!renderLayer.getName().contains("skyhanni")) {
+        if (!renderLayer.getName().contains("hanni")) {
             return;
         }
         if (renderLayer.getName().equals(currentLayer.getName())) {

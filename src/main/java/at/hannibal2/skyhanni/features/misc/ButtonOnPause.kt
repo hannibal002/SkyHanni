@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.render.gui.GuiActionPerformedEvent
-import at.hannibal2.skyhanni.events.render.gui.InitializeGuiEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigGuiManager
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.render.gui.GuiActionPerformedEvent
+import at.hannibal2.hanni.events.render.gui.InitializeGuiEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
 //#if MC > 1.21
@@ -15,10 +15,10 @@ import net.minecraft.client.gui.GuiIngameMenu
 //$$ import net.minecraft.text.Text
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object ButtonOnPause {
 
-    private val config get() = SkyHanniMod.feature.gui
+    private val config get() = HanniMod.feature.gui
     private val buttonId = System.nanoTime().toInt()
 
     //#if MC < 1.21
@@ -53,9 +53,9 @@ object ButtonOnPause {
                 }
             }
             //#if MC < 1.21
-            event.buttonList.add(GuiButton(buttonId, x, 0.coerceAtLeast(y), 100, 20, "SkyHanni"))
+            event.buttonList.add(GuiButton(buttonId, x, 0.coerceAtLeast(y), 100, 20, "Hanni"))
             //#else
-            //$$ ButtonWidget.builder(Text.of("Skyhanni")) {
+            //$$ ButtonWidget.builder(Text.of("Hanni")) {
             //$$     ConfigGuiManager.openConfigGui()
             //$$ }.dimensions(x, 0.coerceAtLeast(y), 100, 20).build()
             //#endif

@@ -1,5 +1,5 @@
-package at.hannibal2.skyhanni.events.kuudra
+package at.hannibal2.hanni.events.kuudra
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 
-class KuudraEnterEvent(val kuudraTier: Int) : SkyHanniEvent()
+class KuudraEnterEvent(val kuudraTier: Int) : HanniEvent()

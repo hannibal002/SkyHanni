@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.data.MinecraftData
-import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.hanni.data.MinecraftData
+import at.hannibal2.hanni.utils.TimeUtils.inWholeTicks
+import at.hannibal2.hanni.utils.TimeUtils.ticks
 import kotlin.time.Duration
 
 /**

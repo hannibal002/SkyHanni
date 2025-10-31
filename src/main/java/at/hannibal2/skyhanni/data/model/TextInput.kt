@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.data.model
+package at.hannibal2.hanni.data.model
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.insert
-import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.StringUtils.insert
+import at.hannibal2.hanni.utils.StringUtils.removeWordsAtEnd
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
@@ -68,7 +68,7 @@ open class TextInput {
         updateEvents.remove(key)
     }
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
         private var activeInstance: TextInput? = null
 
@@ -142,7 +142,7 @@ open class TextInput {
 
         //#if MC > 1.21
         //$$ @HandleEvent
-        //$$ fun onChar(event: at.hannibal2.skyhanni.events.minecraft.CharEvent) {
+        //$$ fun onChar(event: at.hannibal2.hanni.events.minecraft.CharEvent) {
         //$$     handleTextInput(event.keyCode.toChar())
         //$$ }
         //#endif

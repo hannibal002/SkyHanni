@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.test.renderable
+package at.hannibal2.hanni.test.renderable
 
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.compat.BlockCompat
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.interactables.DragNDrop.draggable
-import at.hannibal2.skyhanni.utils.renderables.interactables.DragNDrop.droppable
-import at.hannibal2.skyhanni.utils.renderables.interactables.Droppable
-import at.hannibal2.skyhanni.utils.renderables.interactables.toDragItem
-import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.compat.BlockCompat
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.interactables.DragNDrop.draggable
+import at.hannibal2.hanni.utils.renderables.interactables.DragNDrop.droppable
+import at.hannibal2.hanni.utils.renderables.interactables.Droppable
+import at.hannibal2.hanni.utils.renderables.interactables.toDragItem
+import at.hannibal2.hanni.utils.renderables.primitives.placeholder
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule(devOnly = true)
+@HanniModule(devOnly = true)
 object TestDragNDrop : RenderableTestSuite.TestRenderable("drag") {
 
     override fun renderable(): Renderable {

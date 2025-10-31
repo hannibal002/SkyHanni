@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.garden.visitor
+package at.hannibal2.hanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.config.features.garden.GardenConfig
-import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.hanni.config.features.garden.GardenConfig
+import at.hannibal2.hanni.utils.ItemUtils
 
 class VisitorTooltipParser {
     class ParsedTooltip(

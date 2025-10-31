@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.mining.crystalhollows
+package at.hannibal2.hanni.features.mining.crystalhollows
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.fromItemNameOrNull
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.mining.CrystalNucleusLootEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.fromItemNameOrNull
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object CrystalNucleusApi {
 
     private val patternGroup = RepoPattern.group("mining.crystalnucleus")
-    private val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
+    private val config get() = HanniMod.feature.mining.crystalNucleusTracker
 
     /**
      * REGEX-TEST:   §r§5§lCRYSTAL NUCLEUS LOOT BUNDLE
@@ -90,7 +90,7 @@ object CrystalNucleusApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         val message = event.message
 
         if (startPattern.matches(message)) {
@@ -116,7 +116,7 @@ object CrystalNucleusApi {
         }
     }
 
-    private fun SkyHanniChatEvent.getLoot(): Pair<NeuInternalName, Int>? {
+    private fun HanniChatEvent.getLoot(): Pair<NeuInternalName, Int>? {
         // All loot rewards start with 4 spaces.
         // To simplify regex statements, this check is done outside the main logic.
         // This also nerfs the "§r§a§lREWARDS" message.

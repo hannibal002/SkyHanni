@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman
+package at.hannibal2.hanni.features.inventory.chocolatefactory.hitman
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CFStorage.HitmanStatsStorage
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.isAlternateDay
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.inPartialMinutes
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage.CFStorage.HitmanStatsStorage
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi.isAlternateDay
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
+import at.hannibal2.hanni.features.inventory.chocolatefactory.data.CFDataLoader
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.inPartialMinutes
 import kotlin.math.ceil
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object HitmanApi {
 
     private const val MINUTES_PER_DAY = 20 // Real minutes per SkyBlock day
@@ -68,7 +68,7 @@ object HitmanApi {
     private fun getFirstHuntedMeal(): HoppityEggType =
         resettingEntries.filter { !it.isClaimed() }.minByOrNull { it.timeUntil }
             ?: resettingEntries.minByOrNull { it.timeUntil }
-            ?: ErrorManager.skyHanniError("Could not find initial meal to hunt")
+            ?: ErrorManager.hanniError("Could not find initial meal to hunt")
 
     /**
      * Determine the next meal that would be hunted by Hitman if given an infinite amount of time.
@@ -82,7 +82,7 @@ object HitmanApi {
             passingEggs.firstOrNull { it.resetsAt > previousMeal.resetsAt && it.altDay == previousMeal.altDay }
                 ?: passingEggs.firstOrNull { it.altDay != previousMeal.altDay }
                 ?: orderOrdinalMap[previousMeal]
-                ?: ErrorManager.skyHanniError("Could not find next meal to hunt after $previousMeal")
+                ?: ErrorManager.hanniError("Could not find next meal to hunt after $previousMeal")
         }
 
     /**
@@ -218,7 +218,7 @@ object HitmanApi {
             it.resetsAt > sbTimeAllSlots.hour && it.altDay == isAllSlotDayAlt
         } ?: resettingEntries.filter {
             it.altDay != isAllSlotDayAlt
-        }.minByOrNull { it.resetsAt } ?: ErrorManager.skyHanniError("Could not find next meal after all slots")
+        }.minByOrNull { it.resetsAt } ?: ErrorManager.hanniError("Could not find next meal after all slots")
 
         // Return the adjusted time until the next meal
         val sbDayDiff = if (nextMealAfterAllSlots.altDay != isAllSlotDayAlt) 1 else 0

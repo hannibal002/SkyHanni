@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.event.jerry.frozentreasure
+package at.hannibal2.hanni.features.event.jerry.frozentreasure
 
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
 enum class FrozenTreasure(
     val internalName: String,

@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.hanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.minutes
 
@@ -26,7 +26,7 @@ class NeuInternalName private constructor(private val internalName: String) {
 
         fun String.toInternalName(): NeuInternalName = uppercase().replace(" ", "_").let {
             if (it.contains("§") || it.contains("&") || it.contains("'")) {
-                ErrorManager.skyHanniError(
+                ErrorManager.hanniError(
                     "Internal name found with color codes",
                     "Internal Name" to it, "Original String" to this,
                 )

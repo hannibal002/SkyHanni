@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.detektrules.grammar
+package at.hannibal2.hanni.detektrules.grammar
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import at.hannibal2.hanni.detektrules.HanniRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
  * This rule reports all usages of the british spelling over the american spelling in the codebase,
  * this will ignore any type annotations, i.e., `@ConfigEditorColour` will not be reported.
  */
-class AvoidBritishSpelling(config: Config) : SkyHanniRule(config) {
+class AvoidBritishSpelling(config: Config) : HanniRule(config) {
     override val issue = Issue(
         "AvoidBritishSpelling",
         Severity.Style,

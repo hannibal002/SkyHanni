@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.data.hotx
+package at.hannibal2.hanni.data.hotx
 
-import at.hannibal2.skyhanni.data.IslandTypeTag
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.data.IslandTypeTag
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.RegexUtils.indexOfFirstMatch
+import at.hannibal2.hanni.utils.RegexUtils.matchGroup
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
 import net.minecraft.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -98,7 +98,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
         // raw level to ignore the blue egg buff
         if (entry.rawLevel > entry.maxLevel) {
-            ErrorManager.skyHanniError(
+            ErrorManager.hanniError(
                 "$name Perk '${entry.name}' over max level",
                 "name" to entry.name,
                 "activeLevel" to entry.activeLevel,
@@ -195,9 +195,9 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
     abstract val resetChatPattern: Pattern
 
-    abstract fun extraChatHandling(event: SkyHanniChatEvent)
+    abstract fun extraChatHandling(event: HanniChatEvent)
 
-    open fun onChat(event: SkyHanniChatEvent) {
+    open fun onChat(event: HanniChatEvent) {
         if (resetChatPattern.matches(event.message)) {
             resetTree()
             return
@@ -205,9 +205,9 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         extraChatHandling(event)
     }
 
-    abstract fun tryBlock(event: SkyHanniChatEvent)
+    abstract fun tryBlock(event: HanniChatEvent)
 
-    fun tryReadRotatingPerkChat(event: SkyHanniChatEvent): Boolean? {
+    fun tryReadRotatingPerkChat(event: HanniChatEvent): Boolean? {
         rotatingPerkPattern.matchMatcher(event.message) {
             val perkString = group("perk")
             val foundPerk = rotatingPerks.firstNotNullOfOrNull { perk ->

@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.compat.DrawContext
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
-abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : SkyHanniEvent() {
+abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : HanniEvent() {
 
     data class BackgroundDrawnEvent(
         override val context: DrawContext,

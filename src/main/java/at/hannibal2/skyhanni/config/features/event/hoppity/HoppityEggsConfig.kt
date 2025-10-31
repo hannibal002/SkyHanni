@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.event.hoppity
+package at.hannibal2.hanni.config.features.event.hoppity
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyModern
-import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.OnlyModern
+import at.hannibal2.hanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

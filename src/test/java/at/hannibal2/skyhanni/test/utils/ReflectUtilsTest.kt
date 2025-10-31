@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.test.utils
+package at.hannibal2.hanni.test.utils
 
-import at.hannibal2.skyhanni.utils.ReflectionUtils
+import at.hannibal2.hanni.utils.ReflectionUtils
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.lang.reflect.ParameterizedType

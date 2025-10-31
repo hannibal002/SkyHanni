@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.renderables.container
+package at.hannibal2.hanni.utils.renderables.container
 
-import at.hannibal2.skyhanni.utils.renderables.ScrollInput
+import at.hannibal2.hanni.utils.renderables.ScrollInput
 
 
 /**

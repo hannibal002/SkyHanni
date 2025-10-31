@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.config.storage
+package at.hannibal2.hanni.config.storage
 
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.misc.reminders.Reminder
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.features.misc.reminders.Reminder
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.tracker.HanniTracker
 import com.google.gson.annotations.Expose
 import java.util.UUID
 
@@ -18,7 +18,7 @@ class Storage {
     var contestSendingAsked: Boolean = false
 
     @Expose
-    var trackerDisplayModes: MutableMap<String, SkyHanniTracker.DisplayMode> = mutableMapOf()
+    var trackerDisplayModes: MutableMap<String, HanniTracker.DisplayMode> = mutableMapOf()
 
     @Expose
     var foundDianaBurrowLocations: List<LorenzVec> = emptyList()

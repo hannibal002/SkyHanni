@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.renderables.container.table
+package at.hannibal2.hanni.utils.renderables.container.table
 
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.Renderable
 
 /**
  * @property content Collection of rows of Renderables

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.commands.brigadier
+package at.hannibal2.hanni.config.commands.brigadier
 
 data class BrigadierArgument<T>(val argumentName: String, val clazz: Class<T>) {
     fun get(context: ArgContext): T = context.getArg(this)

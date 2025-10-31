@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.mining.powdertracker
+package at.hannibal2.hanni.features.mining.powdertracker
 
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
 enum class PowderChestReward(val displayName: String, pattern: String) {
 

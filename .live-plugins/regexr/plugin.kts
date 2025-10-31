@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.psi.*
 registerIntention(RenameKotlinFunctionToUseCamelCaseIntention())
 if (!isIdeStartup) show("Reloaded Regex intentions")
 val logger =
-    Logger.getInstance("SkyHanni")
+    Logger.getInstance("Hanni")
 
 val regexTestPrefix = "REGEX-TEST: "
 val regexTestFailPrefix = "REGEX-FAIL: "

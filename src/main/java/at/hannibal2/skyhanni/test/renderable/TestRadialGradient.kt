@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.test.renderable
+package at.hannibal2.hanni.test.renderable
 
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.animated.RadialGradientCircularRenderable.Companion.radialGradientCircular
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.animated.RadialGradientCircularRenderable.Companion.radialGradientCircular
 
-@SkyHanniModule(devOnly = true)
+@HanniModule(devOnly = true)
 object TestRadialGradient : RenderableTestSuite.TestRenderable("radial_gradient") {
     private val gradientCircularRenderable by lazy {
         with(Renderable) {

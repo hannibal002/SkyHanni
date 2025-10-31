@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.utils.LocationUtils.calculateEdges
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.collection.CollectionUtils.zipWithNext3
 import net.minecraft.util.math.Box
 import java.awt.Color
 
-class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent, val lineWidth: Int, val depth: Boolean) {
+class LineDrawer @PublishedApi internal constructor(val event: HanniRenderWorldEvent, val lineWidth: Int, val depth: Boolean) {
 
     private val queuedLines = mutableListOf<QueuedLine>()
 
@@ -15,7 +15,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
     internal fun drawQueuedLines() {
         if (queuedLines.isEmpty()) return
 
-        val layer = SkyHanniRenderLayers.getLines(lineWidth.toDouble(), !depth)
+        val layer = HanniRenderLayers.getLines(lineWidth.toDouble(), !depth)
         val buf = event.vertexConsumers.getBuffer(layer)
         val matrix = event.matrices.peek()
 
@@ -120,7 +120,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
 
     companion object {
         inline fun draw3D(
-            event: SkyHanniRenderWorldEvent,
+            event: HanniRenderWorldEvent,
             lineWidth: Int,
             depth: Boolean,
             crossinline draws: LineDrawer.() -> Unit,

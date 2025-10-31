@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 import net.minecraft.client.Minecraft
 
-@SkyHanniModule
+@HanniModule
 object ScreenData {
     private var wasOpen = false
 

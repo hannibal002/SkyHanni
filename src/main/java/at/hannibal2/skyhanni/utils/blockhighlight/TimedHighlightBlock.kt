@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils.blockhighlight
+package at.hannibal2.hanni.utils.blockhighlight
 
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 

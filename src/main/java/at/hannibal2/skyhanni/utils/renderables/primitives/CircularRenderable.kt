@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.utils.renderables.primitives
+package at.hannibal2.hanni.utils.renderables.primitives
 
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.hanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.hanni.utils.render.ShaderRenderUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 

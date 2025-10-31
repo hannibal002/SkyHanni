@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers.gui;
+package at.hannibal2.hanni.mixins.transformers.gui;
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard;
-import at.hannibal2.skyhanni.mixins.hooks.GuiIngameHook;
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard;
+import at.hannibal2.hanni.mixins.hooks.GuiIngameHook;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.gui.ScaledResolution;

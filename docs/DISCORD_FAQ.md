@@ -1,9 +1,9 @@
 _Frequently Asked Questions_
 
-> **1: How do I open the SkyHanni Menu?**
+> **1: How do I open the Hanni Menu?**
 > Use the command `/sh`.
 
-> **2: Why does SkyHanni tell me to update NotEnoughUpdates (NEU) even if I already have the latest version?**
+> **2: Why does Hanni tell me to update NotEnoughUpdates (NEU) even if I already have the latest version?**
 > To make the mod work, you need to use the latest version from <#1123201092193366027>.
 
 > **3: How can I resize the GUI?**
@@ -11,12 +11,12 @@ _Frequently Asked Questions_
 > Do `/sh scale` to change the global GUI scale of all elements at once.
 
 > **4: My Garden Crop Milestones are not accurate. What should I do?**
-> To sync your Crop Milestones with SkyHanni, open `/cropmilestones` once.
+> To sync your Crop Milestones with Hanni, open `/cropmilestones` once.
 
 > **5: How can I move GUIs like Coins/Copper in SkyMart?**
 > Use the command `/sh open hotkey` to set a hotkey, and press it inside the GUI you want to move.
 
-> **6: Will SkyHanni support newer Minecraft versions (1.21+)?**
+> **6: Will Hanni support newer Minecraft versions (1.21+)?**
 > Yes, it is planned. The Foraging Update isn't expected to release for several more months (state march 2025), but we're already working on updating the mod to support newer versions behind the scenes.
 > Initially, we plan to support both 1.8.9 and 1.21.4, but we will consider removing support for 1.8.9 once the newer version becomes more integral for SkyBlock gameplay.
 
@@ -34,12 +34,12 @@ _Frequently Asked Questions_
      >   - Go to `Hypixel Settings -> Personal -> Chat Feedback` and enable `Sack Notifications`.
 > 3. If you want the [Sacks] messages to be hidden, do `/sh sacks hider` and enable that.
 
-> **10: How do I remove SkyHanni GUI elements?**
+> **10: How do I remove Hanni GUI elements?**
 > 1. Type `/sh gui`.
 > 2. Click the UI element (if the UI element is not shown, follow FaQ #5).
 > 3. Disable this feature.
 
-> **11: How do I reset a SkyHanni tracker?**
+> **11: How do I reset a Hanni tracker?**
 > 1. Do you want to **view only the current session**?
      >   - Open the inventory (Press E) and hover over the display.
 >   - Then click on `[This Session]`.
@@ -67,7 +67,7 @@ _Frequently Asked Questions_
 > If you don't use any of these mods, make sure the option to "Hide Vanilla Scoreboard" is actually enabled.
 
 > **13: Why doesn't the burrow warp key and line prioritize my guess waypoint when there are known burrows nearby?**
-> This is intended behavior. SkyHanni prioritizes the closest known burrow or guess waypoint, not necessarily the guess waypoint itself. Focusing on the closest point, even if it's a known burrow and not your guess, is faster and leads to a higher "burrows dug over time" rate, meaning more mobs, more inquisitors, more money and faster milestones.
+> This is intended behavior. Hanni prioritizes the closest known burrow or guess waypoint, not necessarily the guess waypoint itself. Focusing on the closest point, even if it's a known burrow and not your guess, is faster and leads to a higher "burrows dug over time" rate, meaning more mobs, more inquisitors, more money and faster milestones.
 > While interrupting your current chain to focus on a nearby burrow might feel counterintuitive, it ultimately benefits you in the long run.
 > The existing chain isn't reset, and you gain the advantage of a higher burrow digging rate.
 

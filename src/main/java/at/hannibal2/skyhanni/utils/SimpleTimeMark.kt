@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.hanni.HanniMod
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -46,7 +46,7 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
     }
 
     private fun String.applyTimeFormat(): String {
-        return if (SkyHanniMod.feature.gui.timeFormat24h) {
+        return if (HanniMod.feature.gui.timeFormat24h) {
             replace("h", "H").replace("a", "")
         } else this
     }

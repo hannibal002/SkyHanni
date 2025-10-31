@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.chat
+package at.hannibal2.hanni.config.features.chat
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.features.chat.SoundResponseTypes
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.features.chat.SoundResponseTypes
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList

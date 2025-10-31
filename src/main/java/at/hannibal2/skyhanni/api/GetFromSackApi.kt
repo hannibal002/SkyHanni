@@ -1,39 +1,39 @@
-package at.hannibal2.skyhanni.api
+package at.hannibal2.hanni.api
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SackApi
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
-import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NeuCalculator
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
-import at.hannibal2.skyhanni.utils.PrimitiveItemStack
-import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.SackApi
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.features.commands.tabcomplete.GetFromSacksTabComplete
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ChatUtils.isCommand
+import at.hannibal2.hanni.utils.ChatUtils.senderIsHanni
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.NeuCalculator
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.isDouble
+import at.hannibal2.hanni.utils.PrimitiveItemStack
+import at.hannibal2.hanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import java.util.Deque
 import java.util.LinkedList
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object GetFromSackApi {
-    private val config get() = SkyHanniMod.feature.inventory.gfs
+    private val config get() = HanniMod.feature.inventory.gfs
 
     val commands = arrayOf("gfs", "getfromsacks")
     val commandsWithSlash = commands.map { "/$it" }
@@ -139,7 +139,7 @@ object GetFromSackApi {
 
     private fun queuedHandler(event: MessageSendToServerEvent) {
         if (!config.queuedGFS || SkyBlockUtils.isOnAlphaServer) return
-        if (event.senderIsSkyhanni()) return
+        if (event.senderIsHanni()) return
 
         val (result, stack) = commandValidator(event.splitMessage.drop(1))
 
@@ -199,7 +199,7 @@ object GetFromSackApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!config.bazaarGFS || SkyBlockUtils.noTradeMode) return
         val stack = lastItemStack ?: return
         val message = event.message

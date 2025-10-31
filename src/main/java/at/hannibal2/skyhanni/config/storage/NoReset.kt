@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.storage
+package at.hannibal2.hanni.config.storage
 
 /**
  * Used in cases where you want to exclude a field present in a [Resettable] to not be reset.

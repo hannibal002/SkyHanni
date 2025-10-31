@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.features.inventory.attribute
+package at.hannibal2.hanni.features.inventory.attribute
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
 
-@SkyHanniModule
+@HanniModule
 object AttributesShardsInventory {
 
     private val config get() = AttributeShardsData.config

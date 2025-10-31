@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.data.EntityData;
+import at.hannibal2.hanni.data.EntityData;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ChatComponentText;
 import org.spongepowered.asm.mixin.Mixin;

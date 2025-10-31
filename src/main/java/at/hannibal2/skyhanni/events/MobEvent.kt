@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.data.mob.Mob
 import net.minecraft.util.DamageSource
 
-open class MobEvent(val mob: Mob) : SkyHanniEvent() {
+open class MobEvent(val mob: Mob) : HanniEvent() {
     open class Spawn(mob: Mob) : MobEvent(mob) {
         class SkyblockMob(mob: Mob) : Spawn(mob)
         class Summon(mob: Mob) : Spawn(mob)

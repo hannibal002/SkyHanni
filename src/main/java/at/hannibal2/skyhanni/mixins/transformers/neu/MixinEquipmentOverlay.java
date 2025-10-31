@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers.neu;
+package at.hannibal2.hanni.mixins.transformers.neu;
 
-import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue;
+import at.hannibal2.hanni.features.misc.items.EstimatedItemValue;
 import io.github.moulberry.notenoughupdates.overlays.EquipmentOverlay;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;

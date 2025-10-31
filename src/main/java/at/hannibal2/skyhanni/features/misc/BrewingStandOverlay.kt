@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 
-@SkyHanniModule
+@HanniModule
 object BrewingStandOverlay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!SkyHanniMod.feature.misc.brewingStandOverlay) return
+        if (!HanniMod.feature.misc.brewingStandOverlay) return
 
         if (event.inventoryName != "Brewing Stand") return
 

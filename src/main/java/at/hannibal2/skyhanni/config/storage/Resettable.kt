@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.storage
+package at.hannibal2.hanni.config.storage
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.removeIf
 import io.github.notenoughupdates.moulconfig.observer.Property
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass

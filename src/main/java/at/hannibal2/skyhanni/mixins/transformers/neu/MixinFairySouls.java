@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers.neu;
+package at.hannibal2.hanni.mixins.transformers.neu;
 
-import at.hannibal2.skyhanni.features.misc.NeuSoulPathFind;
+import at.hannibal2.hanni.features.misc.NeuSoulPathFind;
 import io.github.moulberry.notenoughupdates.miscfeatures.FairySouls;
 import net.minecraft.util.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,7 +40,7 @@ public class MixinFairySouls {
     private String currentLocation;
 
     @Inject(method = "onRenderLast", at = @At(value = "TAIL"))
-    public void onRenderLast_skyhanni(CallbackInfo ci) {
+    public void onRenderLast_hanni(CallbackInfo ci) {
         if (!showSouls || !trackSouls || currentLocation == null || closestMissingSouls.isEmpty()) {
             return;
         }
@@ -48,7 +48,7 @@ public class MixinFairySouls {
     }
 
     @Inject(method = "refreshMissingSoulInfo", at = @At(value = "TAIL"))
-    public void refreshMissingSoulInfo_skyhanni(CallbackInfo ci) {
+    public void refreshMissingSoulInfo_hanni(CallbackInfo ci) {
         NeuSoulPathFind.updateList(allSoulsInCurrentLocation, missingSoulsDistanceSqMap);
     }
 }

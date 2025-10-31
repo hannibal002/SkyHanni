@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.mining.glacitemineshaft
+package at.hannibal2.hanni.features.mining.glacitemineshaft
 
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
 
 enum class MineshaftWaypointType(
     val displayText: String,

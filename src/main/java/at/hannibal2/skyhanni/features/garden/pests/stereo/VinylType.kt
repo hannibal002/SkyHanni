@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.garden.pests.stereo
+package at.hannibal2.hanni.features.garden.pests.stereo
 
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
 
 enum class VinylType(val displayName: String, internalNameOverride: String? = null) {
     PRETTY_FLY("Pretty Fly"),

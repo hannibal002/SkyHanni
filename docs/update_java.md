@@ -1,23 +1,26 @@
 # Optimize Minecraft Performance by Updating Java
 
 ## Background
+
 The Vanilla Minecraft Launcher uses Java 8 Update 51. This version is over nine years old and lacks modern optimizations. Upgrading to a newer Java 8 build or an optimized open-source distribution can boost FPS and reduce lag.
 
 ## Recommended Java Distributions
+
 Choose one of these Java 8 options:
 
-- [Oracle Java](https://www.java.com/download/ie_manual.jsp)  
-  *The original distribution from Oracle.*
-- [Eclipse Temurin (Adoptium)](https://adoptium.net/temurin/releases/?version=8)  
-  *A free, open-source build with performance optimizations.*
-- [Zulu OpenJDK](https://www.azul.com/downloads/?version=java-8-lts&package=jdk#zulu)  
-  *Reliable builds maintained by Azul Systems.*
-- [Amazon Corretto](https://docs.aws.amazon.com/corretto/latest/corretto-8-ug/downloads-list.html)  
-  *A production-ready build supported by Amazon.*
+-   [Oracle Java](https://www.java.com/download/ie_manual.jsp)  
+    _The original distribution from Oracle._
+-   [Eclipse Temurin (Adoptium)](https://adoptium.net/temurin/releases/?version=8)  
+    _A free, open-source build with performance optimizations._
+-   [Zulu OpenJDK](https://www.azul.com/downloads/?version=java-8-lts&package=jdk#zulu)  
+    _Reliable builds maintained by Azul Systems._
+-   [Amazon Corretto](https://docs.aws.amazon.com/corretto/latest/corretto-8-ug/downloads-list.html)  
+    _A production-ready build supported by Amazon._
 
 ## Instructions
 
 ### 1. Download and Install Java 8
+
 1. Choose a distribution from the list above.
 2. Download the installer or package for your operating system.
 3. Follow the provided instructions to install the latest Java 8 update.
@@ -25,6 +28,7 @@ Choose one of these Java 8 options:
 ## Configuring the Launcher
 
 ### A. [Vanilla Minecraft Launcher](https://www.minecraft.net/en-us/download)
+
 1. **Open the Minecraft Launcher.**
 2. **Go to "Installations":** Click the "Installations" tab.
 3. **Edit Your Profile:** Select your profile and click **"More Options"**.
@@ -40,6 +44,7 @@ Choose one of these Java 8 options:
 5. **Save and Launch:** Click "Save" and start Minecraft.
 
 ### B. [Prism Launcher](https://prismlauncher.org/)
+
 1. **Open Prism Launcher.**
 2. **Select or Create an Instance:**
     - To edit an existing instance, select it.
@@ -58,4 +63,4 @@ Choose one of these Java 8 options:
           `/Library/Java/JavaVirtualMachines/<your-java-version>/Contents/Home/bin/java`
 5. **Save and Launch:** Save your settings and launch the instance.
 
-For additional support, join our [Discord](https://discord.gg/skyhanni-997079228510117908).
+For additional support, join our [Discord](https://discord.gg/hanni-997079228510117908).

@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard
+package at.hannibal2.hanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -12,7 +12,7 @@ interface CustomScoreboardNumberTrackingElement {
     var currentJob: Job?
 
     fun checkDifference(currentAmount: Long) {
-        if (!SkyHanniMod.feature.gui.customScoreboard.display.showNumberDifference) return
+        if (!HanniMod.feature.gui.customScoreboard.display.showNumberDifference) return
         if (currentAmount != previousAmount) {
             val changeAmount = currentAmount - previousAmount
             showTemporaryChange(changeAmount)
@@ -27,7 +27,7 @@ interface CustomScoreboardNumberTrackingElement {
         } else {
             " §7($numberColor${formatNumber(changeAmount)}§7)$numberColor"
         }
-        currentJob = SkyHanniMod.launchCoroutine("custom scoreboard number show temporary change") {
+        currentJob = HanniMod.launchCoroutine("custom scoreboard number show temporary change") {
             delay(durationMillis)
             temporaryChangeDisplay = null
             currentJob = null

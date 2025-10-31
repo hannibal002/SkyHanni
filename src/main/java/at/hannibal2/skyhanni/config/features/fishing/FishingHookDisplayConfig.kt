@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.fishing
+package at.hannibal2.hanni.config.features.fishing
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
@@ -29,7 +29,7 @@ class FishingHookDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Hide Armor Stand",
-        desc = "Hide the original armor stand from Hypixel when the SkyHanni display is enabled."
+        desc = "Hide the original armor stand from Hypixel when the Hanni display is enabled."
     )
     @ConfigEditorBoolean
     var hideArmorStand: Boolean = true

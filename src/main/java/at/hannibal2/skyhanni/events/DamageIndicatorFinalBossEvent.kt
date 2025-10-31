@@ -1,5 +1,5 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 
-class DamageIndicatorFinalBossEvent(val id: Int) : SkyHanniEvent()
+class DamageIndicatorFinalBossEvent(val id: Int) : HanniEvent()

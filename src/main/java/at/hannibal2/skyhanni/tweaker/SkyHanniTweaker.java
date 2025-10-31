@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.tweaker;
+package at.hannibal2.hanni.tweaker;
 
 import net.hypixel.modapi.tweaker.HypixelModAPITweaker;
 import net.minecraft.launchwrapper.ITweaker;
@@ -10,7 +10,7 @@ import java.io.File;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class SkyHanniTweaker implements ITweaker {
+public class HanniTweaker implements ITweaker {
 
     @Override
     @SuppressWarnings("unchecked")

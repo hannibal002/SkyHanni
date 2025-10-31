@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.utils.NeuInternalName
 
-class ItemInHandChangeEvent(val newItem: NeuInternalName, val oldItem: NeuInternalName) : SkyHanniEvent()
+class ItemInHandChangeEvent(val newItem: NeuInternalName, val oldItem: NeuInternalName) : HanniEvent()

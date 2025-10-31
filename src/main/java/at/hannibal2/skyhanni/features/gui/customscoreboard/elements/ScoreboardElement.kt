@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementsFromAny
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementsFromAny
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardLine
 import java.util.regex.Pattern
 
 abstract class ScoreboardElement {

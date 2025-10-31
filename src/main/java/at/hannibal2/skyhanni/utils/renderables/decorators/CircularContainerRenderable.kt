@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.utils.renderables.decorators
+package at.hannibal2.hanni.utils.renderables.decorators
 
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.renderables.primitives.CircularRenderable
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.hanni.utils.renderables.primitives.CircularRenderable
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 import kotlin.math.max

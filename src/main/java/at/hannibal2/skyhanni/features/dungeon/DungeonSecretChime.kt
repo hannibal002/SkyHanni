@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.hanni.features.dungeon
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickedBlockType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent
-import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ClickedBlockType
+import at.hannibal2.hanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.PlaySoundEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.dungeon.DungeonBlockClickEvent
+import at.hannibal2.hanni.events.entity.EntityRemovedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.SoundUtils.playSound
 import net.minecraft.entity.item.EntityItem
 
-@SkyHanniModule
+@HanniModule
 object DungeonSecretChime {
-    private val config get() = SkyHanniMod.feature.dungeon.secretChime
+    private val config get() = HanniMod.feature.dungeon.secretChime
     private var dungeonSecretItems = setOf<NeuInternalName>()
 
     @HandleEvent

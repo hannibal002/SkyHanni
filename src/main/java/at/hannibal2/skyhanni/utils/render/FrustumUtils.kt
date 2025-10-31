@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.culling.Frustum
 import net.minecraft.util.AxisAlignedBB
 
-@SkyHanniModule
+@HanniModule
 object FrustumUtils {
 
     //#if MC < 1.21
@@ -31,7 +31,7 @@ object FrustumUtils {
      * We want to account for the render entity's position which is affected by partial ticks.
      */
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         val pos = WorldRenderUtils.exactLocation(Minecraft.getMinecraft().renderViewEntity, event.partialTicks)
         frustum = Frustum().also { it.setPosition(pos.x, pos.y, pos.z) }
     }

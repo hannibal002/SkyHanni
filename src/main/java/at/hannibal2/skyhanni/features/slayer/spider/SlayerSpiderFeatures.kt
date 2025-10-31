@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.features.slayer.spider
+package at.hannibal2.hanni.features.slayer.spider
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.MobUtils.mob
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.EntityMovementData
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.entity.EntityClickEvent
+import at.hannibal2.hanni.events.entity.EntityMoveEvent
+import at.hannibal2.hanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.MobUtils.mob
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.network.play.client.C02PacketUseEntity
 
-@SkyHanniModule
+@HanniModule
 object SlayerSpiderFeatures {
     private val config get() = SlayerApi.config.spider
     private val allTier5 = mutableSetOf<Mob>()

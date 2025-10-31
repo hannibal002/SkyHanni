@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.events
+package at.hannibal2.hanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.features.combat.SpidersDenApi
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.features.combat.SpidersDenApi
 
 // scoreboard
 // widget update event

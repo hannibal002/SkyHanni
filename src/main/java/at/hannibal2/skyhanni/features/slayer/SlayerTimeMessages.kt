@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.slayer
+package at.hannibal2.hanni.features.slayer
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
-import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
-import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
-import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.data.mob.Mob.Companion.belongsToPlayer
+import at.hannibal2.hanni.events.DamageIndicatorDeathEvent
+import at.hannibal2.hanni.events.SlayerQuestCompleteEvent
+import at.hannibal2.hanni.features.combat.damageindicator.BossType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.TimeUtils.format
 
-@SkyHanniModule
+@HanniModule
 object SlayerTimeMessages {
 
     private val config get() = SlayerApi.config

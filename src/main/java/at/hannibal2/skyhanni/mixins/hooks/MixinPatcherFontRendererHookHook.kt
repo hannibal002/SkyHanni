@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.features.chroma.ChromaManager
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.features.chroma.ChromaManager
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 object MixinPatcherFontRendererHookHook {

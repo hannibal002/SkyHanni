@@ -4,7 +4,7 @@ const float pi = 3.14159265f;
 
 in vec4 vertexColor;
 
-layout(std140) uniform SkyHanniRoundedUniforms {
+layout(std140) uniform HanniRoundedUniforms {
     float scaleFactor;
     float radius;
     float smoothness;
@@ -13,7 +13,7 @@ layout(std140) uniform SkyHanniRoundedUniforms {
     mat4 modelViewMatrix;
 };
 
-layout(std140) uniform SkyHanniCircleUniforms {
+layout(std140) uniform HanniCircleUniforms {
     float angle1;
     float angle2;
 };

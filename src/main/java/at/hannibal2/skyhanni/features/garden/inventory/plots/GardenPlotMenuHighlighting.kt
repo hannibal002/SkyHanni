@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.features.garden.inventory.plots
+package at.hannibal2.hanni.features.garden.inventory.plots
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.garden.PlotMenuHighlightingConfig.PlotStatusType
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBeingPasted
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.locked
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.garden.PlotMenuHighlightingConfig.PlotStatusType
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryUpdatedEvent
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.features.garden.GardenPlotApi
+import at.hannibal2.hanni.features.garden.GardenPlotApi.currentSpray
+import at.hannibal2.hanni.features.garden.GardenPlotApi.isBeingPasted
+import at.hannibal2.hanni.features.garden.GardenPlotApi.locked
+import at.hannibal2.hanni.features.garden.GardenPlotApi.pests
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.RenderUtils.highlight
 
-@SkyHanniModule
+@HanniModule
 object GardenPlotMenuHighlighting {
 
     private val config get() = GardenApi.config.plotMenuHighlighting

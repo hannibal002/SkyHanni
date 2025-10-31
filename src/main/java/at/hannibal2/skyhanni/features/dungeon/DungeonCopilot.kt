@@ -1,26 +1,26 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.hanni.features.dungeon
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
-import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.dungeon.DungeonBossRoomEnterEvent
+import at.hannibal2.hanni.events.dungeon.DungeonEnterEvent
+import at.hannibal2.hanni.events.dungeon.DungeonStartEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RenderUtils.renderString
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 
-@SkyHanniModule
+@HanniModule
 object DungeonCopilot {
 
-    private val config get() = SkyHanniMod.feature.dungeon.dungeonCopilot
+    private val config get() = HanniMod.feature.dungeon.dungeonCopilot
 
     private val patternGroup = RepoPattern.group("dungeon.copilot")
     private val countdownPattern by patternGroup.pattern(
@@ -49,7 +49,7 @@ object DungeonCopilot {
     private var searchForKey = false
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
 
         copilot(event.message)?.let {
@@ -87,7 +87,7 @@ object DungeonCopilot {
             foundKeyOrDoor = true
         }
 
-        if (foundKeyOrDoor && SkyHanniMod.feature.dungeon.messageFilter.keysAndDoors) return "dungeon_keys_and_doors"
+        if (foundKeyOrDoor && HanniMod.feature.dungeon.messageFilter.keysAndDoors) return "dungeon_keys_and_doors"
 
         if (message == "§c[BOSS] The Watcher§r§f: That will be enough for now.") changeNextStep("Clear Blood Room")
 

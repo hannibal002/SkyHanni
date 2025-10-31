@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
-import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers;
+import at.hannibal2.hanni.features.chroma.ChromaFontManagerKt;
+import at.hannibal2.hanni.utils.render.HanniRenderLayers;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.font.TextRenderLayerSet;
@@ -17,18 +17,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinTextRenderLayerSet {
 
     @Unique
-    private Identifier skyhanni$identifier;
+    private Identifier hanni$identifier;
 
     @ModifyReturnValue(method = {"of", "ofIntensity"}, at = @At("RETURN"))
     private static TextRenderLayerSet ofMethods(TextRenderLayerSet original, @Local(argsOnly = true) Identifier identifier) {
-        ((MixinTextRenderLayerSet) (Object) original).skyhanni$identifier = identifier;
+        ((MixinTextRenderLayerSet) (Object) original).hanni$identifier = identifier;
         return original;
     }
 
     @Inject(method = "getRenderLayer", at = @At("HEAD"), cancellable = true)
     private void getRenderLayer(CallbackInfoReturnable<RenderLayer> cir) {
         if (ChromaFontManagerKt.getGlyphIsChroma()) {
-            cir.setReturnValue(SkyHanniRenderLayers.INSTANCE.getChromaTexturedWithIdentifier(skyhanni$identifier));
+            cir.setReturnValue(HanniRenderLayers.INSTANCE.getChromaTexturedWithIdentifier(hanni$identifier));
         }
     }
 

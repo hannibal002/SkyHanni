@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo
+package at.hannibal2.hanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.hanni.features.fishing.trophy.TrophyRarity
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 

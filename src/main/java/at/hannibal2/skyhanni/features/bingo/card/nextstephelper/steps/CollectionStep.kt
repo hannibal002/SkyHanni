@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps
+package at.hannibal2.hanni.features.bingo.card.nextstephelper.steps
 
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
 
 class CollectionStep(collectionName: String, amountNeeded: Int) :
     ProgressionStep(amountNeeded.shortFormat() + " $collectionName Collection", amountNeeded.toLong()) {

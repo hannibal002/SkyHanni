@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.hanni.test.command.ErrorManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.AddressMode
 import com.mojang.blaze3d.textures.FilterMode
@@ -19,9 +19,9 @@ import net.minecraft.client.render.VertexConsumerProvider
 // This implementation has been modified from the original SkyBlocker code to work across multiple versions.
 
 //#if MC < 1.21.9
-class SkyHanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immediate) : OutlineVertexConsumerProvider(parent) {
+class HanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immediate) : OutlineVertexConsumerProvider(parent) {
     //#else
-    //$$ class SkyHanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immediate) : OutlineVertexConsumerProvider() {
+    //$$ class HanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immediate) : OutlineVertexConsumerProvider() {
     //#endif
 
     override fun draw() {
@@ -40,7 +40,7 @@ class SkyHanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immed
     companion object {
 
         @JvmStatic
-        val vertexConsumers by lazy { SkyHanniOutlineVertexConsumerProvider(MinecraftClient.getInstance().bufferBuilders.entityVertexConsumers) }
+        val vertexConsumers by lazy { HanniOutlineVertexConsumerProvider(MinecraftClient.getInstance().bufferBuilders.entityVertexConsumers) }
 
         private var customDepthAttachment: GpuTexture? = null
 
@@ -103,7 +103,7 @@ class SkyHanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immed
                 }
                 val device = RenderSystem.getDevice()
                 val depthAttachment = device.createTexture(
-                    "SkyHanni Custom Depth",
+                    "Hanni Custom Depth",
                     //#if MC < 1.21.6
                     TextureFormat.DEPTH32, lastWidth, lastHeight, 1,
                     //#else

@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.config
+package at.hannibal2.hanni.config
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.core.config.PositionList
-import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
-import at.hannibal2.skyhanni.data.PetDataStorage
-import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.IdentityCharacteristics
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringFileHandler
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.config.core.config.PositionList
+import at.hannibal2.hanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.hanni.data.PetDataStorage
+import at.hannibal2.hanni.data.jsonobjects.local.FriendsJson
+import at.hannibal2.hanni.data.jsonobjects.local.JacobContestsJson
+import at.hannibal2.hanni.data.jsonobjects.local.KnownFeaturesJson
+import at.hannibal2.hanni.data.jsonobjects.local.VisualWordsJson
+import at.hannibal2.hanni.features.misc.update.UpdateManager
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.IdentityCharacteristics
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringFileHandler
+import at.hannibal2.hanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.hanni.utils.json.BaseGsonBuilder
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapterFactory
@@ -45,7 +45,7 @@ import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.days
 
 private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
-    return if (SkyHanniMod.isBetaVersion) {
+    return if (HanniMod.isBetaVersion) {
         registerTypeAdapterFactory(create)
     } else this
 }
@@ -57,7 +57,7 @@ class ConfigManager {
 //             .registerIfBeta(FeatureTogglesByDefaultAdapter)
             .create()
 
-        val configDirectory = File("config/skyhanni")
+        val configDirectory = File("config/hanni")
     }
 
     private val logger = LorenzLogger("config_manager")
@@ -86,11 +86,11 @@ class ConfigManager {
         }
 
         // TODO use SecondPassedEvent
-        fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
+        fixedRateTimer(name = "hanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
             saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
         }
 
-        val features = SkyHanniMod.feature
+        val features = HanniMod.feature
         recreateConfig()
 
         try {
@@ -103,12 +103,12 @@ class ConfigManager {
     }
 
     private fun deleteOldBackups() {
-        OSUtils.deleteExpiredFiles(File("skyhanni/config/backup"), SkyHanniMod.feature.dev.configBackupExpiryTime.days)
+        OSUtils.deleteExpiredFiles(File("hanni/config/backup"), HanniMod.feature.dev.configBackupExpiryTime.days)
     }
 
     private fun findPositionLinks(obj: Any?, slog: MutableSet<IdentityCharacteristics<Any>>) {
         if (obj == null) return
-        if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
+        if (!obj.javaClass.name.startsWith("at.hannibal2.hanni.")) return
         val ic = IdentityCharacteristics(obj)
         if (ic in slog) return
         slog.add(ic)
@@ -122,7 +122,7 @@ class ConfigManager {
             if (configLink == null) {
                 if (PlatformUtils.isDevEnvironment) {
                     var name = "${field.declaringClass.name}.${field.name}"
-                    name = name.replace("at.hannibal2.skyhanni.config.", "")
+                    name = name.replace("at.hannibal2.hanni.config.", "")
                     val hasExplanatoryAnnotation = field.getAnnotation(NoConfigLink::class.java) != null
                     if (!hasExplanatoryAnnotation) {
                         println("WEE WOO WEE WOO HIER FEHLT EIN @CONFIGLINK: $name")
@@ -245,7 +245,7 @@ class ConfigManager {
 
     fun recreateConfig() {
         ConfigGuiManager.editor = null
-        val features = SkyHanniMod.feature
+        val features = HanniMod.feature
         processor = BlockingMoulConfigProcessor()
         BuiltinMoulConfigGuis.addProcessors(processor)
         UpdateManager.injectConfigProcessor(processor)
@@ -265,26 +265,26 @@ private fun getBackupFile(file: File): File {
 
     val directory = File(parent, "backup/$year/$month")
 
-    return File(directory, "$year-$month-$day-${SkyHanniMod.VERSION}-$fileName.json")
+    return File(directory, "$year-$month-$day-${HanniMod.VERSION}-$fileName.json")
 }
 
 enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val property: KMutableProperty0<*>) {
-    FEATURES("config", Features::class.java, SkyHanniMod::feature),
-    SACKS("sacks", SackData::class.java, SkyHanniMod::sackData),
-    FRIENDS("friends", FriendsJson::class.java, SkyHanniMod::friendsData),
-    KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
-    JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
-    VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
-    PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
-    STORAGE("storage", StorageData::class.java, SkyHanniMod::storageData),
-    ROUTES("routes", OrderedWaypointsRoutes::class.java, SkyHanniMod::orderedWaypointsRoutesData),
+    FEATURES("config", Features::class.java, HanniMod::feature),
+    SACKS("sacks", SackData::class.java, HanniMod::sackData),
+    FRIENDS("friends", FriendsJson::class.java, HanniMod::friendsData),
+    KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, HanniMod::knownFeaturesData),
+    JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, HanniMod::jacobContestsData),
+    VISUAL_WORDS("visual_words", VisualWordsJson::class.java, HanniMod::visualWordsData),
+    PETS("pets", PetDataStorage::class.java, HanniMod::petData),
+    STORAGE("storage", StorageData::class.java, HanniMod::storageData),
+    ROUTES("routes", OrderedWaypointsRoutes::class.java, HanniMod::orderedWaypointsRoutesData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
     val backupFile get() = getBackupFile(file)
 }
 
-class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.feature) {
+class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(HanniMod.feature) {
     override fun createOptionGui(
         processedOption: ProcessedOption,
         field: Field,

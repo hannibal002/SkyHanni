@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.system
+package at.hannibal2.hanni.utils.system
 
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty

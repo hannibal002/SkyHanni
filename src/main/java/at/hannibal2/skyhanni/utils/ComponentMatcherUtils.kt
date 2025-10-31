@@ -1,16 +1,16 @@
 /**
  * @author Linnea Gräf
  */
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.findStyledMatcher
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.appendComponent
-import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
+import at.hannibal2.hanni.utils.ComponentMatcherUtils.findStyledMatcher
+import at.hannibal2.hanni.utils.ComponentMatcherUtils.intoSpan
+import at.hannibal2.hanni.utils.ComponentMatcherUtils.matchStyledMatcher
+import at.hannibal2.hanni.utils.RegexUtils.findMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.compat.appendComponent
+import at.hannibal2.hanni.utils.compat.defaultStyleConstructor
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import java.util.Stack

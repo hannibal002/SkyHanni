@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig.ArrowAmountDisplay
-import at.hannibal2.skyhanni.data.QuiverApi
-import at.hannibal2.skyhanni.data.QuiverApi.NONE_ARROW_TYPE
-import at.hannibal2.skyhanni.data.QuiverApi.asArrowPercentage
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
+import at.hannibal2.hanni.config.features.gui.customscoreboard.ArrowConfig.ArrowAmountDisplay
+import at.hannibal2.hanni.data.QuiverApi
+import at.hannibal2.hanni.data.QuiverApi.NONE_ARROW_TYPE
+import at.hannibal2.hanni.data.QuiverApi.asArrowPercentage
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.percentageColor
 
 // internal and item in hand
 // quiver update event and item in hand event

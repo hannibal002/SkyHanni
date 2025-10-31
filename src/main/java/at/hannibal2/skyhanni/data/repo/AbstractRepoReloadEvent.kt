@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.data.repo
+package at.hannibal2.hanni.data.repo
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 import com.google.gson.Gson
 import java.lang.reflect.Type
 
 abstract class AbstractRepoReloadEvent(
     open val manager: AbstractRepoManager<*>,
-) : SkyHanniEvent() {
+) : HanniEvent() {
     val repoDirectory by lazy { manager.repoDirectory }
     val gson by lazy { manager.getGson() }
 

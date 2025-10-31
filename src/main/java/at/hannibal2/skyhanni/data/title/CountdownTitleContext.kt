@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.data.title
+package at.hannibal2.hanni.data.title
 
-import at.hannibal2.skyhanni.data.title.TitleManager.CountdownTitleDisplayType
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.inPartialSeconds
+import at.hannibal2.hanni.data.title.TitleManager.CountdownTitleDisplayType
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.now
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.inPartialSeconds
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds

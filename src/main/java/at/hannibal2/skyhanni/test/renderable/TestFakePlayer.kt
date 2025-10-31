@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.test.renderable
+package at.hannibal2.hanni.test.renderable
 
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.FakePlayer
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.fakePlayer
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.FakePlayer
+import at.hannibal2.hanni.utils.compat.EnchantmentsCompat
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.fakePlayer
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -14,7 +14,7 @@ import kotlin.random.Random
 //$$ import net.minecraft.entity.player.PlayerInventory
 //#endif
 
-@SkyHanniModule(devOnly = true)
+@HanniModule(devOnly = true)
 object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {
 
 

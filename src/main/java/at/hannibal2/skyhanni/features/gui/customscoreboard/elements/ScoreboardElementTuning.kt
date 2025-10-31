@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.MaxwellApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.NumberDisplayFormat
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.utils.StringUtils.pluralize
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.data.MaxwellApi
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.NumberDisplayFormat
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.utils.StringUtils.pluralize
 
 // internal
 // power update event
 object ScoreboardElementTuning : ScoreboardElement() {
-    private val config get() = SkyHanniMod.feature.gui.customScoreboard
+    private val config get() = HanniMod.feature.gui.customScoreboard
     private val displayConfig get() = config.display
     private val maxwellConfig get() = config.display.maxwell
 

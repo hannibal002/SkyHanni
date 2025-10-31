@@ -1,31 +1,31 @@
-package at.hannibal2.skyhanni.data.hypixel.chat
+package at.hannibal2.hanni.data.hypixel.chat
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractSourcedChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.NpcChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ComponentMatcher
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
-import at.hannibal2.skyhanni.utils.ComponentSpan
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.data.hypixel.chat.event.AbstractSourcedChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.CoopChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.GuildChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.NpcChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.PartyChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.PlayerAllChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.PlayerShowItemChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.PrivateMessageChatEvent
+import at.hannibal2.hanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ComponentMatcher
+import at.hannibal2.hanni.utils.ComponentMatcherUtils.intoSpan
+import at.hannibal2.hanni.utils.ComponentMatcherUtils.matchStyledMatcher
+import at.hannibal2.hanni.utils.ComponentSpan
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
 
 /**
  * Reading normal chat events, and splitting them up into many different player chat events, with all available extra information
  */
-@SkyHanniModule
+@HanniModule
 object PlayerChatManager {
 
     private val patternGroup = RepoPattern.group("data.chat.player")
@@ -118,7 +118,7 @@ object PlayerChatManager {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         val chatComponent = event.chatComponent.intoSpan().stripHypixelMessage()
         coopPattern.matchStyledMatcher(chatComponent) {
             val author = groupOrThrow("author")
@@ -170,7 +170,7 @@ object PlayerChatManager {
         sendSystemMessage(event)
     }
 
-    private fun ComponentMatcher.isGlobalChat(event: SkyHanniChatEvent): Boolean {
+    private fun ComponentMatcher.isGlobalChat(event: HanniChatEvent): Boolean {
         var author = groupOrThrow("author")
         val chatColor = groupOrThrow("chatColor")
         if (chatColor.length == 0 && !author.getText().removeColor().endsWith(PlayerUtils.getName())) {
@@ -212,19 +212,19 @@ object PlayerChatManager {
         return true
     }
 
-    private fun sendSystemMessage(event: SkyHanniChatEvent) {
+    private fun sendSystemMessage(event: HanniChatEvent) {
         with(SystemMessageEvent(event.message, event.chatComponent)) {
             post()
             event.handleChat(blockedReason, chatComponent)
         }
     }
 
-    private fun AbstractSourcedChatEvent.postChat(event: SkyHanniChatEvent) {
+    private fun AbstractSourcedChatEvent.postChat(event: HanniChatEvent) {
         post()
         event.handleChat(blockedReason, chatComponent)
     }
 
-    private fun SkyHanniChatEvent.handleChat(
+    private fun HanniChatEvent.handleChat(
         blockedReason: String?,
         chatComponent: IChatComponent,
     ) {

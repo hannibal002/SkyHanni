@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.skillprogress
+package at.hannibal2.hanni.config.features.skillprogress
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -50,11 +50,11 @@ class SkillProgressBarConfig {
 
         enum class UsedTexture(private val displayName: String, val path: String) {
             MATCH_PACK("Match Resource Pack", "minecraft:textures/gui/icons.png"),
-            CUSTOM_1("Texture 1", SkyHanniMod.MODID + ":bars/1.png"),
-            CUSTOM_2("Texture 2", SkyHanniMod.MODID + ":bars/2.png"),
-            CUSTOM_3("Texture 3", SkyHanniMod.MODID + ":bars/3.png"),
-            CUSTOM_4("Texture 4", SkyHanniMod.MODID + ":bars/4.png"),
-            CUSTOM_5("Texture 5", SkyHanniMod.MODID + ":bars/5.png"),
+            CUSTOM_1("Texture 1", HanniMod.MODID + ":bars/1.png"),
+            CUSTOM_2("Texture 2", HanniMod.MODID + ":bars/2.png"),
+            CUSTOM_3("Texture 3", HanniMod.MODID + ":bars/3.png"),
+            CUSTOM_4("Texture 4", HanniMod.MODID + ":bars/4.png"),
+            CUSTOM_5("Texture 5", HanniMod.MODID + ":bars/5.png"),
             ;
 
             override fun toString() = displayName

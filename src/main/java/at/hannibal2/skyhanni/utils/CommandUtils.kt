@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NeuItems.isGenerator
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.hanni.utils.NeuItems.isGenerator
+import at.hannibal2.hanni.utils.RegexUtils.matches
 
 object CommandUtils {
 

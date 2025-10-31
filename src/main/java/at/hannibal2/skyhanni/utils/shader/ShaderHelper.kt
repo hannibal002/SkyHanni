@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.shader
+package at.hannibal2.hanni.utils.shader
 
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ChatUtils
 import org.lwjgl.opengl.ARBFragmentShader
 import org.lwjgl.opengl.ARBShaderObjects
 import org.lwjgl.opengl.ARBVertexShader

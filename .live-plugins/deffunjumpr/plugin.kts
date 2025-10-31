@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.psi.KtVisitorVoid
 // depends-on-plugin org.jetbrains.kotlin
 // depends-on-plugin com.intellij.java
 
-val skyhanniEventFQN = "at.hannibal2.skyhanni.api.event.SkyHanniEvent"
+val hanniEventFQN = "at.hannibal2.hanni.api.event.HanniEvent"
 val primaryAnnotationName = "PrimaryFunction"
 
 registerInspection(EventLinkingInspection())
@@ -52,7 +52,7 @@ class EventLinkingInspection : AbstractKotlinInspection() {
 
     override fun getDisplayName() = "Link event handler to event declaration"
     override fun getShortName() = "EventLinkingInspection"
-    override fun getGroupDisplayName() = "SkyHanni"
+    override fun getGroupDisplayName() = "Hanni"
     override fun isEnabledByDefault() = true
 }
 
@@ -75,19 +75,19 @@ class NavigateToEventQuickFix(private val eventClassFQN: String?) : LocalQuickFi
 
 /**
  * Builds a PSI-based map of primary function names (keys) to the fully-qualified names
- * of event classes (values). It searches for all classes that inherit from SkyHanniEvent
+ * of event classes (values). It searches for all classes that inherit from HanniEvent
  * and then looks for a @PrimaryFunction annotation (or falls back to constructor/property values).
  */
 fun buildPrimaryNameMap(project: Project): Map<String, String> {
     val result = mutableMapOf<String, String>()
     val facade = JavaPsiFacade.getInstance(project)
-    val skyhanniEventPsiClass: PsiClass = facade.findClass(
-        skyhanniEventFQN,
+    val hanniEventPsiClass: PsiClass = facade.findClass(
+        hanniEventFQN,
         GlobalSearchScope.allScope(project)
     ) ?: return emptyMap()
 
     val inheritors = ClassInheritorsSearch.search(
-        skyhanniEventPsiClass,
+        hanniEventPsiClass,
         GlobalSearchScope.allScope(project),
         true,
         true,

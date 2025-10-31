@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide
+package at.hannibal2.hanni.features.garden.fortuneguide
 
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumOfPair
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sumOfPair
 
 enum class FortuneStats(
     private val label0: (CropType) -> String,

@@ -1,4 +1,4 @@
-package at.skyhanni.sharedvariables
+package at.hanni.sharedvariables
 
 private fun yarn(version: String): String = "net.fabricmc:yarn:${version}:v2"
 

@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.features.rift.area.mirrorverse
+package at.hannibal2.hanni.features.rift.area.mirrorverse
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.HolographicEntities
-import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
-import at.hannibal2.skyhanni.utils.LocationUtils.isInside
-import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.CheckRenderEntityEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.HolographicEntities
+import at.hannibal2.hanni.utils.HolographicEntities.renderHolographicEntity
+import at.hannibal2.hanni.utils.LocationUtils.isInside
+import at.hannibal2.hanni.utils.LocationUtils.isPlayerInside
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCaveSpider
@@ -24,10 +24,10 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
 
 // TODO fix looking at direction, slime size, helmet/skull of zombie
-@SkyHanniModule
+@HanniModule
 object CraftRoomHolographicMob {
 
-    private val config get() = SkyHanniMod.feature.rift.area.mirrorverse.craftingRoom
+    private val config get() = HanniMod.feature.rift.area.mirrorverse.craftingRoom
     private val craftRoomArea = AxisAlignedBB(
         -108.0, 58.0, -106.0,
         -117.0, 51.0, -128.0,
@@ -75,7 +75,7 @@ object CraftRoomHolographicMob {
     }.trim().takeIf { it.isNotEmpty() }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!enabled) return
         for ((mob, string) in holograms) {
             event.renderHolographicEntity(mob)

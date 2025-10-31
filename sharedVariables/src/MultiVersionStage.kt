@@ -1,4 +1,4 @@
-package at.skyhanni.sharedvariables
+package at.hanni.sharedvariables
 
 import java.io.File
 import java.util.Properties
@@ -31,9 +31,9 @@ enum class MultiVersionStage(val label: String) {
             if (file.exists()) {
                 file.inputStream().use(prop::load)
             }
-            val multiVersion = prop["skyhanni.multi-version"]
+            val multiVersion = prop["hanni.multi-version"]
             activeState = MultiVersionStage.values().find { it.label == multiVersion } ?: OFF
-            println("SkyHanni multi version stage loaded: $activeState")
+            println("Hanni multi version stage loaded: $activeState")
         }
     }
 }

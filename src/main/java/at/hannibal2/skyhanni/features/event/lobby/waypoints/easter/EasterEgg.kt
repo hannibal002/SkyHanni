@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.event.lobby.waypoints.easter
+package at.hannibal2.hanni.features.event.lobby.waypoints.easter
 
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.LorenzVec
 
 enum class EasterEgg(val eggName: String, val waypoint: LorenzVec) {
     EASTER_EGG_1("#1", LorenzVec(-34, 92, -20)),

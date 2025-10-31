@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.contest
+package at.hannibal2.hanni.features.garden.contest
 
 enum class FarmingContestPhase {
     START,

@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.events.bazaar
+package at.hannibal2.hanni.events.bazaar
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 
 class BazaarTransactionEvent(
     val transactionType: TransactionType,
     val coinAmount: Double,
     val coinAmountAfterTax: Double,
-) : SkyHanniEvent() {
+) : HanniEvent() {
     enum class TransactionType(private val message: String) {
         INSTANT_BUY("Bought"),
         BUY_ORDER("Buy Order Setup!"),

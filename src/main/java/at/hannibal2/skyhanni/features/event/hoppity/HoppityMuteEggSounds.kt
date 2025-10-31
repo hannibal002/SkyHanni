@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.hanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.event.hoppity.HoppityEggsConfig
+import at.hannibal2.hanni.events.PlaySoundEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object HoppityMuteEggSounds {
 
     private var lastInInventory: SimpleTimeMark = SimpleTimeMark.farPast()
-    private val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val config get() = HanniMod.feature.event.hoppityEggs
     private val eggInventory = InventoryDetector(
         pattern = HoppityRabbitTheFishChecker.mealEggInventoryPattern,
         onCloseInventory = {

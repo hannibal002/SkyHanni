@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.utils.api
+package at.hannibal2.hanni.utils.api
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.json.fromJson
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,13 +32,13 @@ import javax.net.ssl.TrustManagerFactory
 @Suppress("InjectDispatcher")
 object ApiInternalUtils {
 
-    private val debugConfig get() = SkyHanniMod.feature.dev.debug
+    private val debugConfig get() = HanniMod.feature.dev.debug
     val neverSilent get() = debugConfig.apiUtilsNeverSilent
 
     private val ctx: SSLContext? = runCatching {
         val ks = KeyStore.getInstance("JKS")
         ks.load(
-            ApiUtils.javaClass.getResourceAsStream("/skyhanni-keystore.jks"),
+            ApiUtils.javaClass.getResourceAsStream("/hanni-keystore.jks"),
             "changeit".toCharArray()
         )
         val kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
@@ -69,7 +69,7 @@ object ApiInternalUtils {
 
     @PublishedApi
     internal val httpClient: CloseableHttpClient = HttpClients.custom()
-        .setUserAgent("SkyHanni/${SkyHanniMod.VERSION}-${PlatformUtils.MC_VERSION}")
+        .setUserAgent("Hanni/${HanniMod.VERSION}-${PlatformUtils.MC_VERSION}")
         .setDefaultHeaders(defaultHeaders)
         .setDefaultRequestConfig(gatedConnectionConfig)
         .useSystemProperties()

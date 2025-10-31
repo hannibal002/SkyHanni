@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.hanni.api.event.RenderingHanniEvent
+import at.hannibal2.hanni.utils.compat.DrawContext
 
-open class GuiRenderEvent(context: DrawContext) : RenderingSkyHanniEvent(context) {
+open class GuiRenderEvent(context: DrawContext) : RenderingHanniEvent(context) {
 
     /**
      * Renders only while inside an inventory
@@ -21,6 +21,6 @@ open class GuiRenderEvent(context: DrawContext) : RenderingSkyHanniEvent(context
     /**
      * Renders as [GuiOverlayRenderEvent] if not inside an inventory and runs as [ChestGuiOverlayRenderEvent] when inside an inventory
      */
-    class GuiOnTopRenderEvent(context: DrawContext) : RenderingSkyHanniEvent(context)
+    class GuiOnTopRenderEvent(context: DrawContext) : RenderingHanniEvent(context)
     // This is intentional not an [GuiRenderEvent] since it will cause double renders
 }

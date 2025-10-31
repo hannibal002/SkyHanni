@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.inventory.helper
+package at.hannibal2.hanni.config.features.inventory.helper
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest
+package at.hannibal2.hanni.features.nether.reputationhelper.dailyquest.quest
 
 enum class QuestCategory(val displayName: String) {
     FISHING("Trophy Fish"),

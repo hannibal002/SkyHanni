@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.config.commands
+package at.hannibal2.hanni.config.commands
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.config.commands.CommandsRegistry.addToRegister
-import at.hannibal2.skyhanni.config.commands.CommandsRegistry.hasUniqueName
-import at.hannibal2.skyhanni.config.commands.brigadier.BaseBrigadierBuilder
-import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
-import at.hannibal2.skyhanni.utils.CommandArgument
-import at.hannibal2.skyhanni.utils.CommandContextAwareObject
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.config.commands.CommandsRegistry.addToRegister
+import at.hannibal2.hanni.config.commands.CommandsRegistry.hasUniqueName
+import at.hannibal2.hanni.config.commands.brigadier.BaseBrigadierBuilder
+import at.hannibal2.hanni.config.commands.brigadier.CommandData
+import at.hannibal2.hanni.utils.CommandArgument
+import at.hannibal2.hanni.utils.CommandContextAwareObject
 import com.mojang.brigadier.CommandDispatcher
 
 class CommandRegistrationEvent(
     val dispatcher: CommandDispatcher<Any?>,
-) : SkyHanniEvent() {
+) : HanniEvent() {
     private val builders = mutableListOf<CommandData>()
 
     val commands: List<CommandData> get() = builders

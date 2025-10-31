@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.test.command.track
+package at.hannibal2.hanni.test.command.track
 
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
-import at.hannibal2.skyhanni.config.features.dev.TrackCommandConfig
-import at.hannibal2.skyhanni.events.CancellableWorldEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.LiteralCommandBuilder
+import at.hannibal2.hanni.config.features.dev.TrackCommandConfig
+import at.hannibal2.hanni.events.CancellableWorldEvent
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration.Companion.seconds
 
@@ -135,7 +135,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         isRecording = false
     }
 
-    private fun SkyHanniRenderWorldEvent.drawSingleInWorld(vec: LorenzVec, event: T) {
+    private fun HanniRenderWorldEvent.drawSingleInWorld(vec: LorenzVec, event: T) {
         drawDynamicText(vec, "§7§l${event.getTypeIdentifier()}", 0.8)
         drawDynamicText(
             vec.down(0.2),
@@ -144,7 +144,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         )
     }
 
-    private fun SkyHanniRenderWorldEvent.drawMultipleInWorld(vec: LorenzVec, events: List<T>) {
+    private fun HanniRenderWorldEvent.drawMultipleInWorld(vec: LorenzVec, events: List<T>) {
         drawDynamicText(vec, "§e${events.size} $commonNamePlural", 0.8)
         var offset = 0.2
         events.groupBy { it.getTypeIdentifier() }.forEach { (groupName, events) ->
@@ -154,7 +154,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
     }
 
     // Functions below are event handlers that will be called by
-    // extending objects that are SkyHanniModules
+    // extending objects that are HanniModules
     // <editor-fold desc="Event Handlers">
     open fun onTrackableEvent(event: T) {
         if (cutOffTime.isInPast()) return
@@ -173,7 +173,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         lastKeyToggle = SimpleTimeMark.now()
     }
 
-    open fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    open fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (cutOffTime.isInPast()) return
         for ((vec, eventList) in worldTracked) {
             if (eventList.isEmpty()) continue

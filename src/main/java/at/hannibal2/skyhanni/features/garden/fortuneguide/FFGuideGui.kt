@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide
+package at.hannibal2.hanni.features.garden.fortuneguide
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.CropPage
-import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
-import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.guide.GuideGui
-import at.hannibal2.skyhanni.utils.guide.GuideTab
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.fortuneguide.pages.CropPage
+import at.hannibal2.hanni.features.garden.fortuneguide.pages.OverviewPage
+import at.hannibal2.hanni.features.garden.fortuneguide.pages.UpgradePage
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.guide.GuideGui
+import at.hannibal2.hanni.utils.guide.GuideTab
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -24,7 +24,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
     override val sizeX = 360
     override val sizeY = 225
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
         @JvmStatic
@@ -41,7 +41,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
         fun open() {
             CaptureFarmingGear.captureFarmingGear()
             CaptureFarmingGear.removeInvalidItems()
-            SkyHanniMod.screenToOpen = FFGuideGui()
+            HanniMod.screenToOpen = FFGuideGui()
         }
 
         fun updateDisplay() {

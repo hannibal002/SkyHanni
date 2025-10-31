@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.compat
+package at.hannibal2.hanni.utils.compat
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.hanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.multiplayer.WorldClient
@@ -8,7 +8,7 @@ import net.minecraft.entity.Entity
 
 object MinecraftCompat {
 
-    val localPlayer get(): EntityPlayerSP = localPlayerOrNull ?: ErrorManager.skyHanniError("thePlayer is null")
+    val localPlayer get(): EntityPlayerSP = localPlayerOrNull ?: ErrorManager.hanniError("thePlayer is null")
 
     val localPlayerOrNull get(): EntityPlayerSP? = Minecraft.getMinecraft().thePlayer
 
@@ -16,7 +16,7 @@ object MinecraftCompat {
 
     val localPlayerExists get(): Boolean = localPlayerOrNull != null
 
-    val localWorld get(): WorldClient = localWorldOrNull ?: ErrorManager.skyHanniError("theWorld is null")
+    val localWorld get(): WorldClient = localWorldOrNull ?: ErrorManager.hanniError("theWorld is null")
 
     val localWorldOrNull get(): WorldClient? = Minecraft.getMinecraft().theWorld
 

@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.features.commands
+package at.hannibal2.hanni.features.commands
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BaseBrigadierBuilder
-import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.StringUtils.splitLines
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.compat.suggest
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BaseBrigadierBuilder
+import at.hannibal2.hanni.config.commands.brigadier.CommandData
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.StringUtils.splitLines
+import at.hannibal2.hanni.utils.chat.TextHelper
+import at.hannibal2.hanni.utils.compat.hover
+import at.hannibal2.hanni.utils.compat.suggest
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.util.IChatComponent
 
-@SkyHanniModule
+@HanniModule
 object HelpCommand {
 
     private const val COMMANDS_PER_PAGE = 15
@@ -63,7 +63,7 @@ object HelpCommand {
                 cmd.descriptor.contains(search, ignoreCase = true)
         }
 
-        val title = if (search.isBlank()) "SkyHanni Commands" else "SkyHanni Commands Matching: \"$search\""
+        val title = if (search.isBlank()) "Hanni Commands" else "Hanni Commands Matching: \"$search\""
 
         TextHelper.displayPaginatedList(
             title,

@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.combat.damageindicator
+package at.hannibal2.hanni.features.combat.damageindicator
 
-import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory
+import at.hannibal2.hanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory
 
 typealias Type = BossCategory
 

@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
+package at.hannibal2.hanni.config.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.OSUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -39,8 +39,8 @@ class CFStrayRabbitWarningConfig {
     @ConfigOption(
         name = "Warning Sound",
         desc = "The sound that plays for a special rabbit.\n" +
-            "§eYou can use custom sounds, put it in the §bskyhanni/sounds §efolder in your resource pack.\n" +
-            "§eThen write §bskyhanni:yourfilename\n" +
+            "§eYou can use custom sounds, put it in the §bhanni/sounds §efolder in your resource pack.\n" +
+            "§eThen write §bhanni:yourfilename\n" +
             "§cMust be a .ogg file"
     )
     @ConfigEditorText

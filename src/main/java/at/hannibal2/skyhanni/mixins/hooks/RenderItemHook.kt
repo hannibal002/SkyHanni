@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.data.GlobalRender
-import at.hannibal2.skyhanni.events.GuiRenderItemEvent
-import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.hanni.data.GlobalRender
+import at.hannibal2.hanni.events.GuiRenderItemEvent
+import at.hannibal2.hanni.events.RenderGuiItemOverlayEvent
+import at.hannibal2.hanni.utils.compat.DrawContext
 import net.minecraft.item.ItemStack
 
 fun renderItemOverlayPost(

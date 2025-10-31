@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils.renderables.primitives
+package at.hannibal2.hanni.utils.renderables.primitives
 
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.hanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.hanni.utils.renderables.Renderable
 
 fun Renderable.Companion.placeholder(width: Int, height: Int = 10) = object : Renderable {
     override val width = width

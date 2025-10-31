@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.features.inventory.wardrobe
+package at.hannibal2.hanni.features.inventory.wardrobe
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
-import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe.clickSlot
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiKeyPressEvent
+import at.hannibal2.hanni.events.render.gui.GuiMouseInputEvent
+import at.hannibal2.hanni.features.inventory.wardrobe.CustomWardrobe.clickSlot
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object CustomWardrobeKeybinds {
 
-    private val config get() = SkyHanniMod.feature.inventory.customWardrobe
+    private val config get() = HanniMod.feature.inventory.customWardrobe
     private val keybinds
         get() = listOf(
             config.keybinds.slot1,

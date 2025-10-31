@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.fishing.LavaReplacement;
+import at.hannibal2.hanni.features.fishing.LavaReplacement;
 import net.minecraft.client.renderer.BlockFluidRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.spongepowered.asm.mixin.Mixin;

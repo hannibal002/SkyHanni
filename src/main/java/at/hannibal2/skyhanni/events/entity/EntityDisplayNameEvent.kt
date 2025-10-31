@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.events.entity
+package at.hannibal2.hanni.events.entity
 
-import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
+import at.hannibal2.hanni.api.event.GenericHanniEvent
 import net.minecraft.entity.Entity
 import net.minecraft.util.ChatComponentText
 
-class EntityDisplayNameEvent<T : Entity>(val entity: T, var chatComponent: ChatComponentText) : GenericSkyHanniEvent<T>(entity.javaClass)
+class EntityDisplayNameEvent<T : Entity>(val entity: T, var chatComponent: ChatComponentText) : GenericHanniEvent<T>(entity.javaClass)

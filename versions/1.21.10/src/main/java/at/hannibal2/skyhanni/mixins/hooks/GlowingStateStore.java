@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.mixins.hooks;
+package at.hannibal2.hanni.mixins.hooks;
 
 public interface GlowingStateStore {
 
-    void skyhanni$setUsingCustomOutline();
-    boolean skyhanni$isUsingCustomOutline();
+    void hanni$setUsingCustomOutline();
+    boolean hanni$isUsingCustomOutline();
 
 }

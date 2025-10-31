@@ -1,47 +1,47 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.ElectionCandidate.Companion.getMayorFromPerk
-import at.hannibal2.skyhanni.data.ElectionCandidate.Companion.setAssumeMayorJson
-import at.hannibal2.skyhanni.data.Perk.Companion.getPerkFromName
-import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
-import at.hannibal2.skyhanni.data.jsonobjects.other.MayorElection
-import at.hannibal2.skyhanni.data.jsonobjects.other.MayorJson
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_YEAR_MILLIS
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
-import at.hannibal2.skyhanni.utils.api.ApiUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
-import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.data.ElectionCandidate.Companion.getMayorFromPerk
+import at.hannibal2.hanni.data.ElectionCandidate.Companion.setAssumeMayorJson
+import at.hannibal2.hanni.data.Perk.Companion.getPerkFromName
+import at.hannibal2.hanni.data.jsonobjects.other.MayorCandidate
+import at.hannibal2.hanni.data.jsonobjects.other.MayorElection
+import at.hannibal2.hanni.data.jsonobjects.other.MayorJson
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.fame.ReminderUtils
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.SkyBlockTime.Companion.SKYBLOCK_YEAR_MILLIS
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.api.ApiStaticGetPath
+import at.hannibal2.hanni.utils.api.ApiUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.hanni.utils.collection.CollectionUtils.put
+import at.hannibal2.hanni.utils.json.fromJson
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
-@SkyHanniModule
+@HanniModule
 object ElectionApi {
     private val group = RepoPattern.group("mayorapi")
-    private val config get() = SkyHanniMod.feature.dev.debug
+    private val config get() = HanniMod.feature.dev.debug
     private val assumeMayorConfig get() = config.assumeMayor
 
     /**
@@ -148,7 +148,7 @@ object ElectionApi {
                 onClick = { HypixelCommands.calendar() },
             )
         }
-        val misc = SkyHanniMod.feature.misc
+        val misc = HanniMod.feature.misc
         if (jerryExtraMayor.first == null && misc.unknownPerkpocalypseMayorWarning) {
             if (lastJerryExtraMayorReminder.passedSince() < 5.minutes) return
             if (ReminderUtils.isBusy()) return
@@ -162,7 +162,7 @@ object ElectionApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (electionOverPattern.matches(event.message)) {
             lastMayor = currentMayor
             currentMayor = ElectionCandidate.UNKNOWN
@@ -229,7 +229,7 @@ object ElectionApi {
         lastUpdate = SimpleTimeMark.now()
         if (assumeMayorConfig.get() != ElectionCandidate.DISABLED) return
 
-        SkyHanniMod.launchIOCoroutine("election api fetch", timeout = 1.minutes) {
+        HanniMod.launchIOCoroutine("election api fetch", timeout = 1.minutes) {
             val (_, jsonObject) = ApiUtils.getJsonResponse(hypixelElectionApiStatic).assertSuccessWithData() ?: return@launchIOCoroutine
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launchIOCoroutine

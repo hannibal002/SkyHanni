@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.features.inventory.bazaar
+package at.hannibal2.hanni.features.inventory.bazaar
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object BazaarOpenPriceWebsite {
 
-    private val config get() = SkyHanniMod.feature.inventory.bazaar
+    private val config get() = HanniMod.feature.inventory.bazaar
     private var lastClick = SimpleTimeMark.farPast()
 
     private val item by lazy {
         ItemUtils.createItemStack(
             Items.paper,
             "§bPrice History",
-            "§8(From SkyHanni)",
+            "§8(From Hanni)",
             "",
             "§7Click here to open",
             "§7the price history",

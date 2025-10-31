@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.rift.area.colosseum
+package at.hannibal2.hanni.features.rift.area.colosseum
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.StringUtils.pluralize
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
-import at.hannibal2.skyhanni.utils.compat.DamageSourceCompat
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.StringUtils.pluralize
+import at.hannibal2.hanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.hanni.utils.compat.DamageSourceCompat
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntitySlime
 import java.awt.Color
 import kotlin.math.ceil
 
-@SkyHanniModule
+@HanniModule
 object TentacleWaypoint {
 
-    private val config get() = SkyHanniMod.feature.rift.area.colosseum
+    private val config get() = HanniMod.feature.rift.area.colosseum
     private val tentacleHits = mutableMapOf<EntityLivingBase, Int>()
 
     private val VALID_SLIME_SIZES = 4..8
@@ -53,7 +53,7 @@ object TentacleWaypoint {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRender(event: SkyHanniRenderWorldEvent) {
+    fun onRender(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         tentacleHits.removeIfKey { it.isDead || it.health == 0f }
 

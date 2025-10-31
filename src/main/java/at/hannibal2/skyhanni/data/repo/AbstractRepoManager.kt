@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.data.repo
+package at.hannibal2.hanni.data.repo
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.GitHubUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.json.getJson
-import at.hannibal2.skyhanni.utils.system.LazyVar
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.GitHubUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.chat.TextHelper
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.send
+import at.hannibal2.hanni.utils.json.fromJson
+import at.hannibal2.hanni.utils.json.getJson
+import at.hannibal2.hanni.utils.system.LazyVar
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.mojang.brigadier.arguments.BoolArgumentType
@@ -41,7 +41,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     /**
-     * Should be user-friendly, e.g. "SkyHanni" or "NotEnoughUpdates".
+     * Should be user-friendly, e.g. "Hanni" or "NotEnoughUpdates".
      * Gets used in error messages and logging.
      */
     abstract val commonName: String
@@ -54,12 +54,12 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private val commonShortName by lazy { commonShortNameCased.lowercase() }
 
     /**
-     * The resource path of the backup repo. (e.g., "assets/skyhanni/repo.zip")
+     * The resource path of the backup repo. (e.g., "assets/hanni/repo.zip")
      * This MUST be provided for the backup repo to work.
      */
     open val backupRepoResourcePath: String? = null
 
-    private val debugConfig get() = SkyHanniMod.feature.dev.debug
+    private val debugConfig get() = HanniMod.feature.dev.debug
     abstract val config: AbstractRepoConfig<*>
     abstract val configDirectory: File
 
@@ -186,7 +186,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             resetRepositoryLocation()
         }
 
-        SkyHanniMod.launchIOCoroutine("$commonName updateRepo", timeout = 2.minutes) {
+        HanniMod.launchIOCoroutine("$commonName updateRepo", timeout = 2.minutes) {
             if (!fetchAndUnpackRepo(progress, command = true, forceReset = forceReset).canContinue) {
                 logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
                 return@launchIOCoroutine
@@ -225,7 +225,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.start("auto loading $commonName repo on init")
         shouldManuallyReload = true
         val loaded = AtomicBoolean(false)
-        val job = SkyHanniMod.launchIOCoroutine("$commonName repo init", timeout = 2.minutes) {
+        val job = HanniMod.launchIOCoroutine("$commonName repo init", timeout = 2.minutes) {
             if (config.repoAutoUpdate && !fetchAndUnpackRepo(progress, command = false).canContinue) {
                 progress.end("Failed to fetch & unpack repo - aborting repository reload.")
                 logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
@@ -344,7 +344,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (unsuccessfulConstants.isEmpty() || isRepeatErrorOrFixed(progress)) return
         // Last sanity check, we want to make sure repo is up to date before displaying
         val text = buildList {
-            add("§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName repo Issue!")
+            add("§c[Hanni-${HanniMod.VERSION}] §7$commonName repo Issue!")
             add("§cSome features may not work. Please report this error on the Discord if it persists!")
             add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}")
             add("§7Backup repo Value: §c$isUsingBackup")
@@ -459,7 +459,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun reloadLocalRepo(progress: ChatProgressUpdates, answerMessage: String = "$commonName repo loaded from local files successfully.") {
         progress.update("reloadLocalRepo")
         shouldManuallyReload = true
-        SkyHanniMod.launchIOCoroutine("$commonName reloadLocalRepo", timeout = 2.minutes) {
+        HanniMod.launchIOCoroutine("$commonName reloadLocalRepo", timeout = 2.minutes) {
             reloadRepository(progress, answerMessage)
         }
     }

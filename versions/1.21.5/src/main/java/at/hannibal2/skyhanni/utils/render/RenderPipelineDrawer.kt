@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.RenderCompat.createRenderPass
-import at.hannibal2.skyhanni.utils.compat.RenderCompat.drawIndexed
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.RenderCompat.createRenderPass
+import at.hannibal2.hanni.utils.compat.RenderCompat.drawIndexed
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
@@ -39,7 +39,7 @@ object RenderPipelineDrawer {
         val framebuffer = MinecraftClient.getInstance().framebuffer
 
         RenderSystem.getDevice().createRenderPass(
-            "SkyHanni Immediate Pipeline Draw",
+            "Hanni Immediate Pipeline Draw",
             framebuffer,
         ).use { renderPass ->
             pass.invoke(renderPass)

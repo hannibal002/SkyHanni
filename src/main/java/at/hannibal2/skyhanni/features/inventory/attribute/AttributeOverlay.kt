@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.inventory.attribute
+package at.hannibal2.hanni.features.inventory.attribute
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderItemEvent
-import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.getAttributesLevels
-import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.getRollType
-import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.isPartialRoll
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.width
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiRenderItemEvent
+import at.hannibal2.hanni.features.inventory.attribute.AttributeApi.getAttributesLevels
+import at.hannibal2.hanni.features.inventory.attribute.AttributeApi.getRollType
+import at.hannibal2.hanni.features.inventory.attribute.AttributeApi.isPartialRoll
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.RenderUtils.drawSlotText
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.width
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object AttributeOverlay {
 
     private const val SCALE = 0.5714286f
     private const val VERTICAL_OFFSET = (10 * SCALE).toInt()
 
-    private val config get() = SkyHanniMod.feature.inventory.attributeOverlay
+    private val config get() = HanniMod.feature.inventory.attributeOverlay
 
     private data class CachedData(
         val attributes: List<Attribute>,

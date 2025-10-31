@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.api
+package at.hannibal2.hanni.api
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.hotx.HotmData
-import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
-import at.hannibal2.skyhanni.data.hotx.RotatingPerk
-import at.hannibal2.skyhanni.events.mining.PowderEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.hotx.HotmData
+import at.hannibal2.hanni.data.hotx.HotxPatterns.asPatternId
+import at.hannibal2.hanni.data.hotx.RotatingPerk
+import at.hannibal2.hanni.events.mining.PowderEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemCategory
+import at.hannibal2.hanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import org.intellij.lang.annotations.Language
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object HotmApi {
 
     fun copyCurrentTree() = HotmData.storage?.deepCopy()
@@ -99,7 +99,7 @@ object HotmApi {
         }
 
         companion object {
-            private val shouldSendDebug: Boolean get() = SkyHanniMod.feature.dev.debug.powderMessages
+            private val shouldSendDebug: Boolean get() = HanniMod.feature.dev.debug.powderMessages
         }
     }
 

@@ -1,41 +1,41 @@
-package at.hannibal2.skyhanni.features.event.yearofthepig
+package at.hannibal2.hanni.features.event.yearofthepig
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbChargedEvent
-import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbLootedEvent
-import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbUsedEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.entity.EntityClickEvent
+import at.hannibal2.hanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.hanni.events.yearofthepig.ShinyOrbChargedEvent
+import at.hannibal2.hanni.events.yearofthepig.ShinyOrbLootedEvent
+import at.hannibal2.hanni.events.yearofthepig.ShinyOrbUsedEvent
+import at.hannibal2.hanni.features.skillprogress.SkillType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceTo
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.MobUtils.mob
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkullTextureHolder
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.passive.EntityPig
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object PigFeaturesApi {
 
     class ShinyOrbData(
@@ -111,7 +111,7 @@ object PigFeaturesApi {
     fun isYearOfThePig(): Boolean {
         val sbYear = SkyBlockTime.now().year
         val yearOffset = sbYear % 12
-        return yearOffset == YEAR_OF_THE_PIG_OFFSET || SkyHanniMod.feature.dev.debug.alwaysYearOfThePig
+        return yearOffset == YEAR_OF_THE_PIG_OFFSET || HanniMod.feature.dev.debug.alwaysYearOfThePig
     }
 
     @HandleEvent
@@ -120,7 +120,7 @@ object PigFeaturesApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isYearOfThePig()) return
         val message = event.message
 
@@ -169,7 +169,7 @@ object PigFeaturesApi {
 
         val (lootName, lootAmount) = ItemUtils.readItemAmount(reward) ?: return
         val lootInternalName = NeuInternalName.fromItemNameOrNull(lootName) ?: run {
-            ErrorManager.skyHanniError("Could not find internal name for §c\"$lootName§c\"")
+            ErrorManager.hanniError("Could not find internal name for §c\"$lootName§c\"")
         }
         ShinyOrbLootedEvent(loot = lootInternalName to lootAmount).post()
         tryToRemoveOrb()

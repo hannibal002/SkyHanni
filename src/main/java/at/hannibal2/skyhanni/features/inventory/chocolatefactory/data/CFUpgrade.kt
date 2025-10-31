@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory.data
+package at.hannibal2.hanni.features.inventory.chocolatefactory.data
 
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.utils.SimpleTimeMark
 
 data class CFUpgrade(
     val slotIndex: Int,

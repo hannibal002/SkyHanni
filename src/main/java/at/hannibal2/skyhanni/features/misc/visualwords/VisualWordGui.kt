@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.misc.visualwords
+package at.hannibal2.hanni.features.misc.visualwords
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.chat
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
-import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigFileType
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ChatUtils.chat
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SkullTextureHolder
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SoundUtils
+import at.hannibal2.hanni.utils.StringUtils.convertToFormatted
+import at.hannibal2.hanni.utils.compat.ColoredBlockCompat
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.compat.MouseCompat
+import at.hannibal2.hanni.utils.compat.HanniBaseScreen
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.util.MathHelper
@@ -32,7 +32,7 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-open class VisualWordGui : SkyhanniBaseScreen() {
+open class VisualWordGui : HanniBaseScreen() {
 
     private var guiLeft = 0
     private var guiTop = 0
@@ -63,9 +63,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
     private var modifiedWords = mutableListOf<VisualWord>()
 
-    private val shouldDrawImport get() = drawImport && !SkyHanniMod.feature.storage.visualWordsImported
+    private val shouldDrawImport get() = drawImport && !HanniMod.feature.storage.visualWordsImported
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
         @JvmStatic
@@ -74,7 +74,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 ChatUtils.userError("You need to join Hypixel to use this feature!")
             } else {
                 if (sbeConfigPath.exists()) drawImport = true
-                SkyHanniMod.screenToOpen = VisualWordGui()
+                HanniMod.screenToOpen = VisualWordGui()
             }
         }
 
@@ -504,7 +504,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         }
 
         if (KeyboardManager.isPastingKeysDown()) {
-            SkyHanniMod.launchCoroutine("visual word pasting") {
+            HanniMod.launchCoroutine("visual word pasting") {
                 val clipboard = OSUtils.readFromClipboard().orEmpty()
                 for (char in clipboard) {
                     if (currentText.length < maxTextLength && !Character.isISOControl(char)) {
@@ -558,7 +558,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         //#endif
         ModifyVisualWords.update()
 
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")
+        HanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")
     }
 
     private fun tryImportFromSbe() {
@@ -589,7 +589,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 chat(
                     "§aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !",
                 )
-                SkyHanniMod.feature.storage.visualWordsImported = true
+                HanniMod.feature.storage.visualWordsImported = true
                 drawImport = false
             }
         } catch (e: Throwable) {

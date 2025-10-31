@@ -1,44 +1,44 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.hanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.EliteDevApi
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.UpcomingLeaderboardPlayer
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
-import at.hannibal2.skyhanni.utils.api.ApiUtils
-import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.EliteDevApi
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.enums.OutsideSBFeature
+import at.hannibal2.hanni.config.features.garden.EliteFarmingWeightConfig
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteWeightsJson
+import at.hannibal2.hanni.data.jsonobjects.elitedev.UpcomingLeaderboardPlayer
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.ProfileJoinEvent
+import at.hannibal2.hanni.events.garden.GardenToolChangeEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.RenderDisplayHelper
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.api.ApiStaticGetPath
+import at.hannibal2.hanni.utils.api.ApiUtils
+import at.hannibal2.hanni.utils.json.fromJson
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.math.abs
@@ -46,7 +46,7 @@ import kotlin.math.min
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object FarmingWeightDisplay {
 
     init {
@@ -88,11 +88,11 @@ object FarmingWeightDisplay {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
-        SkyHanniMod.launchIOCoroutine("farming weight update tick") {
+        HanniMod.launchIOCoroutine("farming weight update tick") {
             update()
             getCropWeights()
         }
@@ -405,7 +405,7 @@ object FarmingWeightDisplay {
 
     private fun loadLeaderboardIfAble() {
         if (loadingLeaderboardMutex.isLocked) return
-        SkyHanniMod.launchIOCoroutine("farming weight display loadLeaderboardPosition") {
+        HanniMod.launchIOCoroutine("farming weight display loadLeaderboardPosition") {
             loadingLeaderboardMutex.withLock {
                 val wasNotLoaded = leaderboardPosition == -1
                 leaderboardPosition = loadLeaderboardPosition()
@@ -486,7 +486,7 @@ object FarmingWeightDisplay {
         return if (newData) apiData.rank else leaderboardPosition
     }
 
-    private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine("farming weight display load weight") {
+    private fun loadWeight(localProfile: String) = HanniMod.launchIOCoroutine("farming weight display load weight") {
         val apiData = EliteDevApi.fetchWeightProfile(localProfile) ?: run {
             apiError = true
             return@launchIOCoroutine

@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
-import at.hannibal2.skyhanni.utils.compat.value
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ChatUtils.chatMessage
+import at.hannibal2.hanni.utils.compat.value
 
-@SkyHanniModule
+@HanniModule
 object CompactBestiaryChatMessage {
 
     private var inBestiary = false
@@ -25,8 +25,8 @@ object CompactBestiaryChatMessage {
     private const val TITLE_MESSAGE = "§f                                  §6§lBESTIARY"
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
-        if (!SkyHanniMod.feature.chat.compactBestiaryMessage) return
+    fun onChat(event: HanniChatEvent) {
+        if (!HanniMod.feature.chat.compactBestiaryMessage) return
 
         val message = event.message
 

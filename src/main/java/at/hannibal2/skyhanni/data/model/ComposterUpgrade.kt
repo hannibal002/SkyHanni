@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.model
+package at.hannibal2.hanni.data.model
 
 enum class ComposterUpgrade(val displayName: String, val slotNumber: Int) {
     COMPOSTER_SPEED("Composter Speed", 20),

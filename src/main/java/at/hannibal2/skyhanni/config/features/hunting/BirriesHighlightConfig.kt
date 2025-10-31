@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.hunting
+package at.hannibal2.hanni.config.features.hunting
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyModern
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.OnlyModern
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

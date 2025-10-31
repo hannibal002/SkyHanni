@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
 import net.minecraft.client.Minecraft
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object NotificationManager {
 
-    private val notificationQueue = mutableListOf<SkyHanniNotification>()
+    private val notificationQueue = mutableListOf<HanniNotification>()
 
-    private var currentNotification: SkyHanniNotification? = null
+    private var currentNotification: HanniNotification? = null
     private var lastNotificationClosed = SimpleTimeMark.farPast()
 
     private const val CLOSE_TEXT = "§c[X] Close"
@@ -60,7 +60,7 @@ object NotificationManager {
         }
     }
 
-    private fun getCurrentNotification(): SkyHanniNotification? {
+    private fun getCurrentNotification(): HanniNotification? {
         currentNotification?.let {
             if (it.endTime.isInPast()) currentNotification = null
         }
@@ -71,7 +71,7 @@ object NotificationManager {
         return currentNotification
     }
 
-    fun queueNotification(notification: SkyHanniNotification) {
+    fun queueNotification(notification: HanniNotification) {
         notificationQueue.add(notification)
     }
 
@@ -83,14 +83,14 @@ object NotificationManager {
             arg("notification", BrigadierArguments.greedyString()) {
                 callback {
                     val testingText = getArg(it).replace("\\n", "\n")
-                    queueNotification(SkyHanniNotification(testingText, Duration.INFINITE))
+                    queueNotification(HanniNotification(testingText, Duration.INFINITE))
                 }
             }
         }
     }
 }
 
-data class SkyHanniNotification(
+data class HanniNotification(
     val message: List<String>,
     val length: Duration,
     val showOverInventory: Boolean = false,

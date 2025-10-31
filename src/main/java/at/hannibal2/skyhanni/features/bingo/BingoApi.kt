@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.features.bingo
+package at.hannibal2.hanni.features.bingo
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.BingoSession
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
-import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.storage.PlayerSpecificStorage.BingoSession
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.jsonobjects.repo.BingoData
+import at.hannibal2.hanni.data.jsonobjects.repo.BingoJson
+import at.hannibal2.hanni.data.jsonobjects.repo.BingoRanksJson
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.features.bingo.card.goals.BingoGoal
+import at.hannibal2.hanni.features.bingo.card.goals.GoalType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.TimeUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
-@SkyHanniModule
+@HanniModule
 object BingoApi {
 
     private var ranks = mapOf<String, Int>()
@@ -97,7 +97,7 @@ object BingoApi {
 
     fun getIcon(searchRank: Int) = ranks.entries.find { it.value == searchRank }?.key
 
-    // We added the suffix (Community Goal) so that older skyhanni versions don't crash with the new repo data.
+    // We added the suffix (Community Goal) so that older hanni versions don't crash with the new repo data.
     fun getData(itemName: String) =
         data.filter { itemName.startsWith(it.key.split(" (Community Goal)")[0]) }.values.firstOrNull()
 

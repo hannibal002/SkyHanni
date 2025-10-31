@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -20,7 +20,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
     /* onMismatch = */ Filter.Result.DENY,
 ) {
 
-    private val config get() = SkyHanniMod.feature.dev.minecraftConsoles
+    private val config get() = HanniMod.feature.dev.minecraftConsoles
     private val filterConfig get() = config.consoleFilter
 
     private val loggerFiltered = LorenzLogger("debug/mc_console/filtered")
@@ -44,7 +44,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
         if (event == null) return Filter.Result.ACCEPT
 
         val loggerName = event.loggerName
-        if (loggerName == "SkyHanni") return Filter.Result.ACCEPT
+        if (loggerName == "Hanni") return Filter.Result.ACCEPT
 
         val message = event.message
         val formattedMessage = message.formattedMessage

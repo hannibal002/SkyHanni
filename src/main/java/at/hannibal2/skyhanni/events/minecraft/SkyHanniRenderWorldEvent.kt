@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events.minecraft
+package at.hannibal2.hanni.events.minecraft
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.compat.WorldRenderContext
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.utils.compat.WorldRenderContext
 
-class SkyHanniRenderWorldEvent(val context: WorldRenderContext, val partialTicks: Float) : SkyHanniEvent()
+class HanniRenderWorldEvent(val context: WorldRenderContext, val partialTicks: Float) : HanniEvent()

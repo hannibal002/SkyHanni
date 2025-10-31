@@ -1,31 +1,31 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AbiphoneContactInfo
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAbiphoneJson
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
-import at.hannibal2.skyhanni.utils.StringUtils.removeAllNonLettersAndNumbers
-import at.hannibal2.skyhanni.utils.compat.value
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.AbiphoneContactInfo
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuAbiphoneJson
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.chat.TabCompletionEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.StringUtils.isValidUuid
+import at.hannibal2.hanni.utils.StringUtils.removeAllNonLettersAndNumbers
+import at.hannibal2.hanni.utils.compat.value
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object AbiphoneFeatures {
 
-    val config get() = SkyHanniMod.feature.misc
+    val config get() = HanniMod.feature.misc
     val patternGroup = RepoPattern.group("misc.abiphone")
     private var acceptUUID: String? = null
 
@@ -41,7 +41,7 @@ object AbiphoneFeatures {
     )
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (callRingPattern.matches(event.message) && acceptUUID == null) readPickupUuid(event)
     }
 
@@ -81,7 +81,7 @@ object AbiphoneFeatures {
         event.move(76, "event.hoppityEggs.hoppityCallWarning.acceptHotkey", "misc.abiphoneAcceptKey")
     }
 
-    private fun readPickupUuid(event: SkyHanniChatEvent) {
+    private fun readPickupUuid(event: HanniChatEvent) {
         val siblings = event.chatComponent.siblings.takeIf { it.size >= 3 } ?: return
         val clickEvent = siblings[2]?.chatStyle?.chatClickEvent ?: return
         if (clickEvent.action.name.lowercase() != "run_command" || !clickEvent.value().lowercase().startsWith("/cb")) return

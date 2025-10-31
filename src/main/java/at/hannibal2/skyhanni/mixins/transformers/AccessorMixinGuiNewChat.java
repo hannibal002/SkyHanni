@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
 import net.minecraft.client.gui.ChatLine;
 import net.minecraft.client.gui.GuiNewChat;
@@ -12,20 +12,20 @@ import java.util.List;
 public interface AccessorMixinGuiNewChat {
 
     @Accessor("chatLines")
-    List<ChatLine> getChatLines_skyhanni();
+    List<ChatLine> getChatLines_hanni();
 
     @Accessor("chatLines")
-    void setChatLines_skyhanni(List<ChatLine> chatLines);
+    void setChatLines_hanni(List<ChatLine> chatLines);
 
     @Accessor("drawnChatLines")
-    List<ChatLine> getDrawnChatLines_skyhanni();
+    List<ChatLine> getDrawnChatLines_hanni();
 
     @Accessor("drawnChatLines")
-    void setDrawnChatLines_skyhanni(List<ChatLine> drawnChatLines);
+    void setDrawnChatLines_hanni(List<ChatLine> drawnChatLines);
 
     @Accessor("scrollPos")
-    int getScrollPos_skyhanni();
+    int getScrollPos_hanni();
 
     @Invoker("refreshChat")
-    void refreshChat_skyhanni();
+    void refreshChat_hanni();
 }

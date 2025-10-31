@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.combat.broodmother
+package at.hannibal2.hanni.config.features.combat.broodmother
 
-import at.hannibal2.skyhanni.features.combat.BroodmotherFeatures
-import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.hanni.features.combat.BroodmotherFeatures
+import at.hannibal2.hanni.utils.OSUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider

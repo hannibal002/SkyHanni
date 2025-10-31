@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.detektrules.repo
+package at.hannibal2.hanni.detektrules.repo
 
-import at.hannibal2.skyhanni.detektrules.RepoPatternElement.Companion.asRepoPatternElement
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import at.hannibal2.hanni.detektrules.RepoPatternElement.Companion.asRepoPatternElement
+import at.hannibal2.hanni.detektrules.HanniRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 
-class RepoPatternRegexTestMissing(config: Config) : SkyHanniRule(config) {
+class RepoPatternRegexTestMissing(config: Config) : HanniRule(config) {
     override val issue = Issue(
         "RepoPatternRegexTestMissing",
         Severity.Style,

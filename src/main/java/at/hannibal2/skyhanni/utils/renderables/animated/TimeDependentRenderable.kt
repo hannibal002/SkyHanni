@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils.renderables.animated
+package at.hannibal2.hanni.utils.renderables.animated
 
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.renderables.Renderable
 import kotlin.time.Duration
 
 /**

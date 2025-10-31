@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.features.garden.pests
+package at.hannibal2.hanni.config.features.garden.pests
 
-import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.hanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown

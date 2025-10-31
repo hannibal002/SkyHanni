@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.chroma
+package at.hannibal2.hanni.features.chroma
 
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
+import at.hannibal2.hanni.utils.shader.ShaderManager
 
 /**
  * Object to handle enabling / disabling the chroma shader when rendering text

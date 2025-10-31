@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.SkyBlockUtils
 
 // internal
 // update on island change event

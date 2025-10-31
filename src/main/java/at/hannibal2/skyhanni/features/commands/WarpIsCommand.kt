@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.features.commands
+package at.hannibal2.hanni.features.commands
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.HypixelCommands
 
-@SkyHanniModule
+@HanniModule
 object WarpIsCommand {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
-        if (!SkyHanniMod.feature.misc.commands.replaceWarpIs) return
+        if (!HanniMod.feature.misc.commands.replaceWarpIs) return
 
         if (event.message.lowercase() == "/warp is") {
             event.cancel()

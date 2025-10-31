@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.ColorUtils.component1
-import at.hannibal2.skyhanni.utils.ColorUtils.component2
-import at.hannibal2.skyhanni.utils.ColorUtils.component3
-import at.hannibal2.skyhanni.utils.ColorUtils.component4
-import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
-import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
-import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.utils.ColorUtils.component1
+import at.hannibal2.hanni.utils.ColorUtils.component2
+import at.hannibal2.hanni.utils.ColorUtils.component3
+import at.hannibal2.hanni.utils.ColorUtils.component4
+import at.hannibal2.hanni.utils.ItemBlink.checkBlinkItem
+import at.hannibal2.hanni.utils.ItemUtils.isSkull
+import at.hannibal2.hanni.utils.NumberUtil.fractionOf
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.hanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
@@ -35,7 +35,7 @@ import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
 import java.nio.FloatBuffer
 //#else
-//$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
+//$$ import at.hannibal2.hanni.utils.compat.RenderCompat
 //$$ import com.mojang.blaze3d.systems.RenderSystem
 //$$ import net.minecraft.text.Text
 //$$ import org.joml.Matrix4f
@@ -50,7 +50,7 @@ import java.nio.FloatBuffer
 //$$ import kotlin.math.sqrt
 //$$ import net.minecraft.client.render.LightmapTextureManager
 //$$ import net.minecraft.client.render.item.ItemRenderState
-//$$ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+//$$ import at.hannibal2.hanni.utils.compat.MinecraftCompat
 //#endif
 
 // todo 1.21 impl needed
@@ -403,7 +403,7 @@ object GuiRenderUtils {
     //  see if we can adjust this to maybe 100f -> 200f.
     //  if we do change this, the 1.21.6 zT below will need to be adjusted as well.
     //#if MC > 1.21.6
-    //$$ private val projectionMatrix by lazy { ProjectionMatrix2("SkyHanni Item Rendering", 1000f, 11000f, true) }
+    //$$ private val projectionMatrix by lazy { ProjectionMatrix2("Hanni Item Rendering", 1000f, 11000f, true) }
     //$$ private val itemRenderStateButCool by lazy { ItemRenderState() }
     //#endif
 

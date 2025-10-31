@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementsFromAny
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigEventElement
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementsFromAny
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardConfigEventElement
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardLine
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeIfNotEmpty
 
 // everything
 // whenever an event gets updated

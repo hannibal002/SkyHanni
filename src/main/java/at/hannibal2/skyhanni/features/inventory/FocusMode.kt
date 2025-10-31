@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.hanni.features.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.InventoryOpenEvent
+import at.hannibal2.hanni.events.minecraft.KeyDownEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.InventoryUtils.isTopInventory
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sublistAfter
 
-@SkyHanniModule
+@HanniModule
 object FocusMode {
 
-    private val config get() = SkyHanniMod.feature.inventory.focusMode
+    private val config get() = HanniMod.feature.inventory.focusMode
 
     private var active = false
     private var inAuctionHouse = false
@@ -42,7 +42,7 @@ object FocusMode {
             event.toolTip = buildList {
                 add(event.toolTip.first())
                 if (hint) {
-                    add("§7Focus Mode from SkyHanni active!")
+                    add("§7Focus Mode from Hanni active!")
                     add("Press $keyName to disable!")
                 }
                 val separator = "§5§o§8§m-----------------"
@@ -54,7 +54,7 @@ object FocusMode {
             }.toMutableList()
         } else {
             if (hint) {
-                event.toolTip.add(1, "§7Press $keyName to enable Focus Mode from SkyHanni!")
+                event.toolTip.add(1, "§7Press $keyName to enable Focus Mode from Hanni!")
             }
         }
     }

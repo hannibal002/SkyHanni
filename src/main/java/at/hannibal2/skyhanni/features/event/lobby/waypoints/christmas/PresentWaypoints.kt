@@ -1,30 +1,30 @@
-package at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas
+package at.hannibal2.hanni.features.event.lobby.waypoints.christmas
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.WinterApi
-import at.hannibal2.skyhanni.data.jsonobjects.repo.EventWaypointsJson
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.event.lobby.waypoints.EventWaypoint
-import at.hannibal2.skyhanni.features.event.lobby.waypoints.loadEventWaypoints
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.WinterApi
+import at.hannibal2.hanni.data.jsonobjects.repo.EventWaypointsJson
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.features.event.lobby.waypoints.EventWaypoint
+import at.hannibal2.hanni.features.event.lobby.waypoints.loadEventWaypoints
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
 // todo: create abstract class for this and BasketWaypoints
-@SkyHanniModule
+@HanniModule
 object PresentWaypoints {
 
-    private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.christmasPresent
+    private val config get() = HanniMod.feature.event.lobbyWaypoints.christmasPresent
     private var presentLocations = mapOf<String, MutableSet<EventWaypoint>>()
     private var presentEntranceLocations = mapOf<String, MutableSet<EventWaypoint>>()
     private var closest: EventWaypoint? = null
@@ -53,7 +53,7 @@ object PresentWaypoints {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
         processChatMessage(event.message)
     }
@@ -96,13 +96,13 @@ object PresentWaypoints {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
         presentSet?.let { event.drawWaypoints(it, config.allWaypoints, LorenzColor.GOLD, "§6") }
         presentEntranceSet?.let { event.drawWaypoints(it, config.allEntranceWaypoints, LorenzColor.YELLOW, "§e") }
     }
 
-    private fun SkyHanniRenderWorldEvent.drawWaypoints(
+    private fun HanniRenderWorldEvent.drawWaypoints(
         waypoints: Set<EventWaypoint>, shouldDraw: Boolean, color: LorenzColor, prefix: String,
     ) {
         if (!shouldDraw) return

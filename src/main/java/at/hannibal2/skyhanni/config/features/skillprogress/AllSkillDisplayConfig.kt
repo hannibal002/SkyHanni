@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.skillprogress
+package at.hannibal2.hanni.config.features.skillprogress
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.features.skillprogress.SkillType
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.features.skillprogress.SkillType
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList

@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.garden.pests
+package at.hannibal2.hanni.config.features.garden.pests
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
@@ -21,7 +21,7 @@ class PestTrapConfig {
         desc = "Display the status of pest traps in a GUI element.\nWill take you to Tab Widget Display to enable.",
     )
     @ConfigEditorButton(buttonText = "Go")
-    val displayRunnable = Runnable { SkyHanniMod.feature.gui.tabWidget::display.jumpToEditor() }
+    val displayRunnable = Runnable { HanniMod.feature.gui.tabWidget::display.jumpToEditor() }
 
     @Expose
     @ConfigOption(

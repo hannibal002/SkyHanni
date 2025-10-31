@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.combat.end
+package at.hannibal2.hanni.config.features.combat.end
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -41,8 +41,8 @@ class DragonConfig {
     var chat: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Skyhanni Prefix", desc = "Displays the Skyhanni prefix in the dragon weight message.")
+    @ConfigOption(name = "Hanni Prefix", desc = "Displays the Hanni prefix in the dragon weight message.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var skyhanniMessagePrefix: Boolean = true
+    var hanniMessagePrefix: Boolean = true
 }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.commands.brigadier
+package at.hannibal2.hanni.config.commands.brigadier
 
 import com.mojang.brigadier.context.CommandContext
 

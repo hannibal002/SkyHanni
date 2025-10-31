@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.hanni.features.dungeon
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
 
-@SkyHanniModule
+@HanniModule
 object DungeonBossMessages {
 
-    private val config get() = SkyHanniMod.feature.chat
+    private val config get() = HanniMod.feature.chat
     private val bossPattern = "§([cd4])\\[BOSS] (.*)".toPattern()
 
     private val excludedMessages = listOf(
@@ -46,7 +46,7 @@ object DungeonBossMessages {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isBoss(event.message)) return
 
         DungeonApi.handleBossMessage(event.message)

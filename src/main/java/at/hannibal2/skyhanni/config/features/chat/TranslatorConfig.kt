@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.chat
+package at.hannibal2.hanni.config.features.chat
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.features.chat.translation.TranslatableLanguage
-import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.features.chat.translation.TranslatableLanguage
+import at.hannibal2.hanni.utils.OSUtils.openBrowser
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton

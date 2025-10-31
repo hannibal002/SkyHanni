@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.jsonobjects.other
+package at.hannibal2.hanni.data.jsonobjects.other
 
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose

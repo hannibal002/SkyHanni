@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.ChatLineData;
-import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
+import at.hannibal2.hanni.mixins.hooks.ChatLineData;
+import at.hannibal2.hanni.mixins.hooks.GuiChatHook;
 import net.minecraft.client.gui.ChatLine;
 import net.minecraft.util.IChatComponent;
 import org.jetbrains.annotations.NotNull;
@@ -19,19 +19,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinChatLine implements ChatLineData {
 
     @Unique
-    private IChatComponent skyHanni$fullComponent;
+    private IChatComponent hanni$fullComponent;
 
     @Unique
     @NotNull
     @Override
-    public IChatComponent getSkyHanni_fullComponent() {
-        return skyHanni$fullComponent;
+    public IChatComponent getHanni_fullComponent() {
+        return hanni$fullComponent;
     }
 
     @Unique
     @Override
-    public void setSkyHanni_fullComponent(@NotNull IChatComponent fullComponent) {
-        skyHanni$fullComponent = fullComponent;
+    public void setHanni_fullComponent(@NotNull IChatComponent fullComponent) {
+        hanni$fullComponent = fullComponent;
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -43,7 +43,7 @@ public class MixinChatLine implements ChatLineData {
         //#endif
     ) {
         IChatComponent component = GuiChatHook.getCurrentComponent();
-        skyHanni$fullComponent = component == null ? line : component;
+        hanni$fullComponent = component == null ? line : component;
     }
 
 }

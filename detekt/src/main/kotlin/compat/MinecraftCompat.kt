@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.detektrules.compat
+package at.hannibal2.hanni.detektrules.compat
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import at.hannibal2.hanni.detektrules.HanniRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtProperty
 
-class MinecraftCompat(config: Config) : SkyHanniRule(config) {
+class MinecraftCompat(config: Config) : HanniRule(config) {
     override val issue = Issue(
         "MinecraftCompat",
         Severity.Style,
@@ -33,8 +33,8 @@ class MinecraftCompat(config: Config) : SkyHanniRule(config) {
 
     private fun shouldIgnore(element: KtExpression): Boolean {
         val filePath = element.containingFile.virtualFile.path
-        return filePath.contains("at\\hannibal2\\skyhanni\\utils\\compat") ||
-            filePath.contains("at/hannibal2/skyhanni/utils/compat")
+        return filePath.contains("at\\hannibal2\\hanni\\utils\\compat") ||
+            filePath.contains("at/hannibal2/hanni/utils/compat")
     }
 
     private fun checkForMinecraftPlayer(element: KtExpression?): Boolean {

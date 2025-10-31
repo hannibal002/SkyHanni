@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.test.renderable
+package at.hannibal2.hanni.test.renderable
 
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.animated.OrbitSystemRenderable.Companion.orbitalSystem
-import at.hannibal2.skyhanni.utils.renderables.primitives.CircularRenderable.Companion.circular
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.animated.OrbitSystemRenderable.Companion.orbitalSystem
+import at.hannibal2.hanni.utils.renderables.primitives.CircularRenderable.Companion.circular
 import java.awt.Color
 
-@SkyHanniModule(devOnly = true)
+@HanniModule(devOnly = true)
 object TestOrbital : RenderableTestSuite.TestRenderable("orbital") {
 
     private val orbitalRenderable by lazy {

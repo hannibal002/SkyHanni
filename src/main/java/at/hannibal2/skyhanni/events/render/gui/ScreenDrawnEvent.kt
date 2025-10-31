@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.events.render.gui
+package at.hannibal2.hanni.events.render.gui
 
-import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.hanni.api.event.RenderingHanniEvent
+import at.hannibal2.hanni.utils.compat.DrawContext
 import net.minecraft.client.gui.GuiScreen
 
-class ScreenDrawnEvent(context: DrawContext, val gui: GuiScreen?) : RenderingSkyHanniEvent(context)
+class ScreenDrawnEvent(context: DrawContext, val gui: GuiScreen?) : RenderingHanniEvent(context)

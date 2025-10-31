@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.data.model.waypoints
+package at.hannibal2.hanni.data.model.waypoints
 
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.LorenzVec
 import com.google.auto.service.AutoService
 import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
@@ -28,7 +28,7 @@ class ColeweightWaypointFormat : WaypointFormat {
         override fun copy() = ColeweightWaypoint(x, y, z, r, g, b, options)
     }
 
-    override fun load(string: String): Waypoints<SkyhanniWaypoint>? {
+    override fun load(string: String): Waypoints<HanniWaypoint>? {
         val type = object : TypeToken<Waypoints<ColeweightWaypoint>>() {}.type
         return try {
             ConfigManager.gson.fromJson<Waypoints<ColeweightWaypoint>>(string, type).transform { it.load() }
@@ -38,7 +38,7 @@ class ColeweightWaypointFormat : WaypointFormat {
         }
     }
 
-    private fun ColeweightWaypoint.load() = SkyhanniWaypoint(
+    private fun ColeweightWaypoint.load() = HanniWaypoint(
         LorenzVec(x, y, z),
         @Suppress("UnsafeCallOnNullableType")
         options["name"]!!.toInt(),
@@ -49,11 +49,11 @@ class ColeweightWaypointFormat : WaypointFormat {
         return load(string) != null
     }
 
-    override fun export(waypoints: Waypoints<SkyhanniWaypoint>): String {
+    override fun export(waypoints: Waypoints<HanniWaypoint>): String {
         return ConfigManager.gson.toJson(waypoints.transform { it.export() }, Waypoints<ColeweightWaypoint>()::class.java)
     }
 
-    private fun SkyhanniWaypoint.export(): ColeweightWaypoint = with(location) {
+    private fun HanniWaypoint.export(): ColeweightWaypoint = with(location) {
         ColeweightWaypoint(
             x.toInt(),
             y.toInt(),

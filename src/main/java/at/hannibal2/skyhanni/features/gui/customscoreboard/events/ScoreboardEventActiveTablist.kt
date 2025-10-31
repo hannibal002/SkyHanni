@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.events
+package at.hannibal2.hanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getTablistEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getTablistEvent
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.StringUtils.removeColor
 
 // widget
 // widget update event

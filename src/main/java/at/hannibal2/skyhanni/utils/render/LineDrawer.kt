@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.utils.LocationUtils.calculateEdges
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.collection.CollectionUtils.zipWithNext3
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -114,7 +114,7 @@ class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator
 
     companion object {
         inline fun draw3D(
-            event: SkyHanniRenderWorldEvent,
+            event: HanniRenderWorldEvent,
             lineWidth: Int,
             depth: Boolean,
             crossinline draws: LineDrawer.() -> Unit,

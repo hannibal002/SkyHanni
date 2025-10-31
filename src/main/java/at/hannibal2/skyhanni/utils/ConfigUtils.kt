@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.ConfigGuiManager
+import at.hannibal2.hanni.test.command.ErrorManager
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
@@ -62,9 +62,9 @@ object ConfigUtils {
 
     fun openEditor(editor: MoulConfigEditor<*>) {
         //#if FORGE
-        SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
+        HanniMod.screenToOpen = GuiScreenElementWrapper(editor)
         //#else
-        //$$ SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Text.empty(), GuiContext(GuiElementComponent(editor)), null)
+        //$$ HanniMod.screenToOpen = MoulConfigScreenComponent(Text.empty(), GuiContext(GuiElementComponent(editor)), null)
         //#endif
     }
 

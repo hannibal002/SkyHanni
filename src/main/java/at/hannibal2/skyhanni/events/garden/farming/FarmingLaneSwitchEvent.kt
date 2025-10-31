@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events.garden.farming
+package at.hannibal2.hanni.events.garden.farming
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.features.garden.farming.lane.FarmingLane
 
-class FarmingLaneSwitchEvent(val lane: FarmingLane?) : SkyHanniEvent()
+class FarmingLaneSwitchEvent(val lane: FarmingLane?) : HanniEvent()

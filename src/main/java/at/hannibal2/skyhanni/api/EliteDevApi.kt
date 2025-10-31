@@ -1,36 +1,36 @@
-package at.hannibal2.skyhanni.api
+package at.hannibal2.hanni.api
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteAuctionsResponse
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteBazaarResponse
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteContestsRequest
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteContestsResponse
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteItemResponse
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.ElitePlayerWeightJson
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.WeightProfile
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.api.ApiStaticPath
-import at.hannibal2.skyhanni.utils.api.ApiStaticPostPath
-import at.hannibal2.skyhanni.utils.api.ApiUtils
-import at.hannibal2.skyhanni.utils.api.JsonApiResponse
-import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.arguments.EnumArgumentType
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteAuctionsResponse
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteBazaarResponse
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteContestsRequest
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteContestsResponse
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteFarmingContest
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteItemResponse
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteLeaderboard
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.hanni.data.jsonobjects.elitedev.ElitePlayerWeightJson
+import at.hannibal2.hanni.data.jsonobjects.elitedev.EliteWeightsJson
+import at.hannibal2.hanni.data.jsonobjects.elitedev.WeightProfile
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.api.ApiStaticPath
+import at.hannibal2.hanni.utils.api.ApiStaticPostPath
+import at.hannibal2.hanni.utils.api.ApiUtils
+import at.hannibal2.hanni.utils.api.JsonApiResponse
+import at.hannibal2.hanni.utils.json.fromJson
 import com.google.gson.JsonObject
 
-@SkyHanniModule
+@HanniModule
 object EliteDevApi {
 
     enum class EliteResourceType(private val displayName: String) {
@@ -48,7 +48,7 @@ object EliteDevApi {
             description = "Fetches the specified Elite resource from elitebot.dev"
             category = CommandCategory.DEVELOPER_DEBUG
             argCallback("resource", EnumArgumentType.lowercase<EliteResourceType>()) { resource ->
-                SkyHanniMod.launchIOCoroutine("shfetcheliteresource command") {
+                HanniMod.launchIOCoroutine("shfetcheliteresource command") {
                     fetchResourceCommand(resource)
                 }
             }
@@ -95,7 +95,7 @@ object EliteDevApi {
     // <editor-fold desc="Upcoming Contests">
     suspend fun fetchUpcomingContests(): List<EliteFarmingContest>? {
         val apiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(contestStatic.toGet())
-        val (_, apiData) = apiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
+        val (_, apiData) = apiResponse.assertSuccessWithData() ?: ErrorManager.hanniError(
             "Failed to fetch upcoming contests. Please report this error if it continues to occur",
             "apiResponse" to apiResponse,
         )
@@ -148,7 +148,7 @@ object EliteDevApi {
 
     suspend fun fetchApiWeights(): EliteWeightsJson? {
         val apiWeightsResponse = ApiUtils.getTypedJsonResponse<JsonObject>(apiWeightsStatic.toGet())
-        val (_, apiData) = apiWeightsResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
+        val (_, apiData) = apiWeightsResponse.assertSuccessWithData() ?: ErrorManager.hanniError(
             "Error getting crop weights from elitebot.dev",
             "apiWeightsResponse" to apiWeightsResponse,
         )
@@ -176,7 +176,7 @@ object EliteDevApi {
         val lbUrl = "$WEIGHT_LEADERBOARD_URL$lbSuffix/$uuid/$profileId$paramString"
 
         val lbApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(lbUrl, apiName = WEIGHT_LEADERBOARD_API_NAME)
-        val (_, apiData) = lbApiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
+        val (_, apiData) = lbApiResponse.assertSuccessWithData() ?: ErrorManager.hanniError(
             "Error getting weight leaderboard position",
             "url" to lbUrl,
             "apiResponse" to lbApiResponse,
@@ -189,7 +189,7 @@ object EliteDevApi {
     private suspend inline fun <reified T : Any> fetchResources(subUrl: String): T {
         val resourceUrl = "$RESOURCE_API_URL/$subUrl"
         val resourceApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(resourceUrl, apiName = RESOURCE_API_NAME)
-        val (_, apiData) = resourceApiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
+        val (_, apiData) = resourceApiResponse.assertSuccessWithData() ?: ErrorManager.hanniError(
             "Error getting resources from elitebot.dev",
             "resourceUrl" to resourceUrl,
             "resourceApiResponse" to resourceApiResponse,

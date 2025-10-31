@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.config.commands
+package at.hannibal2.hanni.config.commands
 
 enum class CommandCategory(val color: String, val categoryName: String, val description: String) {
     MAIN(
         "§6",
         "Main Command",
-        "Most useful commands of SkyHanni",
+        "Most useful commands of Hanni",
     ),
     USERS_ACTIVE(
         "§e",

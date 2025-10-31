@@ -1,5 +1,5 @@
-package at.hannibal2.skyhanni.events.yearofthepig
+package at.hannibal2.hanni.events.yearofthepig
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 
-class ShinyOrbUsedEvent : SkyHanniEvent()
+class ShinyOrbUsedEvent : HanniEvent()

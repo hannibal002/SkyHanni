@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.system.PlatformUtils
 //#if MC == 1.8.9
 import net.minecraftforge.fml.client.FMLClientHandler
 import net.minecraftforge.fml.common.Loader
@@ -20,7 +20,7 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
+@HanniModule
 object ComputerEnvDebug {
 
     @HandleEvent
@@ -104,7 +104,7 @@ object ComputerEnvDebug {
                     event.addData {
                         add("Old java version: $it")
                         add("Update to a newer version if you have performance issues.")
-                        add("For more infos: https://github.com/hannibal002/SkyHanni/blob/beta/docs/update_java.md")
+                        add("For more infos: https://github.com/hannibal002/Hanni/blob/beta/docs/update_java.md")
                     }
                 } else {
                     if (devEnvironment) {

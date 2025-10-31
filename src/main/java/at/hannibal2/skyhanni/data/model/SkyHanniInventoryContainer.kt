@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.data.model
+package at.hannibal2.hanni.data.model
 
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.RenderableInventory.fakeInventory
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.utils.ItemUtils.repoItemName
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.RenderableInventory.fakeInventory
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 
-class SkyHanniInventoryContainer(
+class HanniInventoryContainer(
     @Expose val internalName: String,
     @Expose val rowSize: Int,
     @Expose var items: List<ItemStack?>,
@@ -32,7 +32,7 @@ class SkyHanniInventoryContainer(
     override fun toString() = internalName
 
     override fun equals(other: Any?): Boolean {
-        if (other !is SkyHanniInventoryContainer) return false
+        if (other !is HanniInventoryContainer) return false
         return internalName == other.internalName
     }
 

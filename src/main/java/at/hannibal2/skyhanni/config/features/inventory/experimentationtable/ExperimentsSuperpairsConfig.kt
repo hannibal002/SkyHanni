@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
+package at.hannibal2.hanni.config.features.inventory.experimentationtable
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion

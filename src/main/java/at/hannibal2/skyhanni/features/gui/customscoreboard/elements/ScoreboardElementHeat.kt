@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.MiningApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
+import at.hannibal2.hanni.data.MiningApi
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
 
 // scoreboard
 // scoreboard update event

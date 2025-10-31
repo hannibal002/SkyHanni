@@ -14,8 +14,8 @@ import org.jetbrains.kotlin.psi.*
 
 registerIntention(NavigateToConfigIntention())
 
-val baseConfigPkg = "at.hannibal2.skyhanni.config"
-val baseConfigClass = "at.hannibal2.skyhanni.config.Features"
+val baseConfigPkg = "at.hannibal2.hanni.config"
+val baseConfigClass = "at.hannibal2.hanni.config.Features"
 
 val baseStoragePkg = "$baseConfigPkg.storage"
 val profileStorageClass = "$baseStoragePkg.ProfileSpecificStorage"

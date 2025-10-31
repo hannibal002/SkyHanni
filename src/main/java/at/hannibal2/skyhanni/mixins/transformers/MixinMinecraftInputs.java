@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.MinecraftInputHook;
+import at.hannibal2.hanni.mixins.hooks.MinecraftInputHook;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.MovingObjectPosition;
@@ -70,7 +70,7 @@ public class MixinMinecraftInputs {
         if (isLeftClick && this.leftClickCounter <= 0) {
             if (MinecraftInputHook.shouldCancelContinuedBlockBreak(
                 this.objectMouseOver,
-                ((AccessorPlayerControllerMP) this.playerController).skyhanni_getCurrentBlock()
+                ((AccessorPlayerControllerMP) this.playerController).hanni_getCurrentBlock()
             )) return false;
         }
         return isLeftClick;

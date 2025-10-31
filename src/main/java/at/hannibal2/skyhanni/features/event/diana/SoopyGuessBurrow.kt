@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.hanni.features.event.diana
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.GuessLogic
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.event.diana.DianaConfig.GuessLogic
+import at.hannibal2.hanni.events.PlaySoundEvent
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.events.diana.BurrowGuessEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.toLorenzVec
 import net.minecraft.util.EnumParticleTypes
 import kotlin.math.abs
 import kotlin.math.atan
@@ -22,9 +22,9 @@ import kotlin.math.sin
 /**
  * Taken and ported from Soopyboo32's javascript module SoopyV2
  */
-@SkyHanniModule
+@HanniModule
 object SoopyGuessBurrow {
-    private val config get() = SkyHanniMod.feature.event.diana
+    private val config get() = HanniMod.feature.event.diana
 
     private var dingIndex = 0
     private var hasDinged = false

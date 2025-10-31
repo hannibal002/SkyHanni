@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.data.jsonobjects.elitedev
+package at.hannibal2.hanni.data.jsonobjects.elitedev
 
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.utils.KSerializable
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.utils.KSerializable
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.asTimeMark
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.minutes
 

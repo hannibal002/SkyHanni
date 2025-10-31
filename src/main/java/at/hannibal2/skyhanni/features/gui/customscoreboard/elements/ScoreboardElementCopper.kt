@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.hanni.utils.NumberUtil.formatLong
 import kotlinx.coroutines.Job
 
 // scoreboard

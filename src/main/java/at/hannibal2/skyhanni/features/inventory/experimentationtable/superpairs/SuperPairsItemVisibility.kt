@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable.superpairs
+package at.hannibal2.hanni.features.inventory.experimentationtable.superpairs
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.ExperimentationTableApi
-import at.hannibal2.skyhanni.api.TaskType
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.ExperimentationTableApi
+import at.hannibal2.hanni.api.TaskType
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryOpenEvent
+import at.hannibal2.hanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RegexUtils.matches
 import net.minecraft.item.ItemStack
 
 // Todo: Merge this with SuperpairDataDisplay
 //  Store slots over there
 //  Have the rendered text of superpairdatadisplay highlight the slots the items are in
-@SkyHanniModule
+@HanniModule
 object SuperPairsItemVisibility {
 
-    private val config get() = SkyHanniMod.feature.inventory.experimentationTable.superpairs.clickedItemsVisible
+    private val config get() = HanniMod.feature.inventory.experimentationTable.superpairs.clickedItemsVisible
     private val superpairsSlotMap: MutableMap<Int, ItemStack> = mutableMapOf()
     private val superpairsSlotsToRead: MutableSet<Int> = mutableSetOf()
 

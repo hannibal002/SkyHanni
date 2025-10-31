@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.utils.renderables.primitives
+package at.hannibal2.hanni.utils.renderables.primitives
 
-import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItemStackProvider
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.GuiRenderUtils.renderOnScreen
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuItemStackProvider
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.hanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.hanni.utils.compat.getTooltipCompat
+import at.hannibal2.hanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
 
 open class ItemStackRenderable protected constructor(

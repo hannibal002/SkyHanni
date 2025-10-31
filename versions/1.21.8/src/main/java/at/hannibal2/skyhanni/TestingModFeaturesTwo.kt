@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni
+package at.hannibal2.hanni
 
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.hannimodule.HanniModule
 
-@SkyHanniModule
+@HanniModule
 object TestingModFeaturesTwo {
 
 }

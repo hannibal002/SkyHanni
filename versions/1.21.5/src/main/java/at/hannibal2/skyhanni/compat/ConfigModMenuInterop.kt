@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.compat
+package at.hannibal2.hanni.compat
 
-import at.hannibal2.skyhanni.config.ConfigGuiManager
+import at.hannibal2.hanni.config.ConfigGuiManager
 import com.terraformersmc.modmenu.api.ConfigScreenFactory
 import com.terraformersmc.modmenu.api.ModMenuApi
 import io.github.notenoughupdates.moulconfig.gui.GuiContext

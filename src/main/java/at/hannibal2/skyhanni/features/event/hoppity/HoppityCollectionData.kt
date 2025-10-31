@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.hanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuHoppityJson
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.RabbitCollectionRarity
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuHoppityJson
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.features.event.hoppity.HoppityCollectionStats.RabbitCollectionRarity
+import at.hannibal2.hanni.hannimodule.HanniModule
 
-@SkyHanniModule
+@HanniModule
 object HoppityCollectionData {
     val rabbitRarities = mutableMapOf<String, RabbitCollectionRarity>()
     private val rarityBonuses = mutableMapOf<RabbitCollectionRarity, ChocolateBonuses>()

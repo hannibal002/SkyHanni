@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
-import at.hannibal2.skyhanni.mixins.hooks.FontRendererHook;
+import at.hannibal2.hanni.features.misc.visualwords.ModifyVisualWords;
+import at.hannibal2.hanni.mixins.hooks.FontRendererHook;
 import net.minecraft.client.gui.FontRenderer;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;

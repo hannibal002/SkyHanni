@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.compat
+package at.hannibal2.hanni.utils.compat
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.hanni.test.command.ErrorManager
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import java.nio.FloatBuffer
@@ -40,7 +40,7 @@ object DrawContextUtils {
             ErrorManager.logErrorStateWithData("drawContext is null", "drawContext is null, renderDepth: $renderDepth")
             DrawContext()
             //#else
-            //$$ ErrorManager.skyHanniError("drawContext is null")
+            //$$ ErrorManager.hanniError("drawContext is null")
             //#endif
         }
 

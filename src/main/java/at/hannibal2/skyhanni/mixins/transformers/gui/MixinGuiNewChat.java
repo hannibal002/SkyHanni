@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.mixins.transformers.gui;
+package at.hannibal2.hanni.mixins.transformers.gui;
 
-import at.hannibal2.skyhanni.features.chat.ChatPeek;
-import at.hannibal2.skyhanni.mixins.hooks.FontRendererHook;
-import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
+import at.hannibal2.hanni.features.chat.ChatPeek;
+import at.hannibal2.hanni.mixins.hooks.FontRendererHook;
+import at.hannibal2.hanni.mixins.hooks.GuiChatHook;
 import net.minecraft.client.gui.GuiNewChat;
 import net.minecraft.util.IChatComponent;
 import org.spongepowered.asm.mixin.Mixin;

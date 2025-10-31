@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.features.inventory.attribute
+package at.hannibal2.hanni.features.inventory.attribute
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object FusionData {
 
     private const val FIRST_SHARD_SLOT = 12

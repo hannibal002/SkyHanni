@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.config.storage.NoReset
-import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.hanni.config.storage.NoReset
+import at.hannibal2.hanni.config.storage.Resettable
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.LorenzRarity
 import io.github.notenoughupdates.moulconfig.observer.Property
 import io.mockk.Runs
 import io.mockk.every

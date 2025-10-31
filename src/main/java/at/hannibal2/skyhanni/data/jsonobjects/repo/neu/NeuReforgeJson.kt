@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo.neu
+package at.hannibal2.hanni.data.jsonobjects.repo.neu
 
-import at.hannibal2.skyhanni.data.model.SkyblockStatList
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.compat.getVanillaItem
+import at.hannibal2.hanni.data.model.SkyblockStatList
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalNames
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.compat.getVanillaItem
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 

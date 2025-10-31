@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
 import net.minecraft.client.resource.SplashTextResourceSupplier;
 import net.minecraft.resource.ResourceManager;
@@ -21,6 +21,6 @@ public class MixinSplashTextResourceSupplier {
 
     @Inject(method = "apply(Ljava/util/List;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V", at = @At("TAIL"))
     public void addSplash(List<String> list, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {
-        splashTexts.add("Skyhanni!");
+        splashTexts.add("Hanni!");
     }
 }

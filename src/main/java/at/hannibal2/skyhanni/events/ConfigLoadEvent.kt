@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.hannimodule.PrimaryFunction
 
 @PrimaryFunction("onConfigLoad")
-class ConfigLoadEvent(val firstLoad: Boolean) : SkyHanniEvent()
+class ConfigLoadEvent(val firstLoad: Boolean) : HanniEvent()

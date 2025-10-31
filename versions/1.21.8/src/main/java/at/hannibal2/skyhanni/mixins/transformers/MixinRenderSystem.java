@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
-import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer;
+import at.hannibal2.hanni.mixins.hooks.GuiRendererHook;
+import at.hannibal2.hanni.utils.render.RoundedShapeDrawer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

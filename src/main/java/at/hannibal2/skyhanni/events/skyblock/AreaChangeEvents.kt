@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.events.skyblock
+package at.hannibal2.hanni.events.skyblock
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 
 // Detect area changes by looking at the scoreboard.
-class ScoreboardAreaChangeEvent(val area: String, val previousArea: String?) : SkyHanniEvent()
-class GraphAreaChangeEvent(val area: String, val previousArea: String?, val onlyInternal: Boolean) : SkyHanniEvent()
+class ScoreboardAreaChangeEvent(val area: String, val previousArea: String?) : HanniEvent()
+class GraphAreaChangeEvent(val area: String, val previousArea: String?, val onlyInternal: Boolean) : HanniEvent()

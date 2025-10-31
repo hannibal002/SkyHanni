@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.hanni.utils.RegexUtils.matches
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
@@ -12,7 +12,7 @@ import kotlin.math.pow
 
 object NumberUtil {
 
-    private val config get() = SkyHanniMod.feature
+    private val config get() = HanniMod.feature
 
     private val suffixes = TreeMap<Long, String>().apply {
         this[1000L] = "k"

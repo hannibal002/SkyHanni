@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.BitsApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.hanni.data.BitsApi
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.hanni.utils.TimeUtils.format
 
 // internal
 // 1s timer

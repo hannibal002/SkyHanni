@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.features.foraging
+package at.hannibal2.hanni.features.foraging
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
-import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.storage.Resettable
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.onClick
+import at.hannibal2.hanni.utils.compat.hover
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object CompactStarlynSisters {
 
-    private val config get() = SkyHanniMod.feature.foraging.starlynContest
+    private val config get() = HanniMod.feature.foraging.starlynContest
     private val patternGroup = RepoPattern.group("foraging.agatha")
 
     /**
@@ -142,7 +142,7 @@ object CompactStarlynSisters {
     private var collectionPB = StarlynCollectionPersonalBests()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isInIsland()) return
         event.blockAndCompact()
     }
@@ -154,7 +154,7 @@ object CompactStarlynSisters {
         resetPersonalBestVariables()
     }
 
-    private fun SkyHanniChatEvent.blockAndCompact() {
+    private fun HanniChatEvent.blockAndCompact() {
         val message = this.message
         if (config.compactPersonalBest)
             compactCollectionPB(message)
@@ -162,7 +162,7 @@ object CompactStarlynSisters {
             compactContestResults(message)
     }
 
-    private fun SkyHanniChatEvent.compactCollectionPB(message: String) {
+    private fun HanniChatEvent.compactCollectionPB(message: String) {
         sisterCollPBDuringContestPattern.matchMatcher(message) {
             val foragingSister = group("foragingSister")
             val previousRecord = group("previousRecord")
@@ -222,7 +222,7 @@ object CompactStarlynSisters {
         }
     }
 
-    private fun SkyHanniChatEvent.compactContestResults(message: String) {
+    private fun HanniChatEvent.compactContestResults(message: String) {
         if (!isInResults) {
             startContestResultsPattern.matchMatcher(message) {
                 isInResults = true

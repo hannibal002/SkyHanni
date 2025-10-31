@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events.diana
+package at.hannibal2.hanni.events.diana
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.utils.LorenzVec
 
-class BurrowDugEvent(val burrowLocation: LorenzVec) : SkyHanniEvent()
+class BurrowDugEvent(val burrowLocation: LorenzVec) : HanniEvent()

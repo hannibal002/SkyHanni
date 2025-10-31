@@ -1,26 +1,26 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig
-import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig.ModeEntry
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
-import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
-import at.hannibal2.skyhanni.utils.FakePlayer
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.EffectsCompat
-import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.features.misc.HideArmorConfig
+import at.hannibal2.hanni.config.features.misc.HideArmorConfig.ModeEntry
+import at.hannibal2.hanni.events.HanniRenderEntityEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils.getArmorInventory
+import at.hannibal2.hanni.utils.EntityUtils.isNpc
+import at.hannibal2.hanni.utils.FakePlayer
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.compat.EffectsCompat
+import at.hannibal2.hanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object HideArmor {
 
-    val config: HideArmorConfig get() = SkyHanniMod.feature.misc.hideArmor
+    val config: HideArmorConfig get() = HanniMod.feature.misc.hideArmor
     private var armor = mapOf<Int, ItemStack>()
 
     fun shouldHideArmor(entity: EntityPlayer): Boolean {
@@ -40,7 +40,7 @@ object HideArmor {
     }
 
     @HandleEvent
-    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityPlayer>) {
+    fun onRenderLivingPre(event: HanniRenderEntityEvent.Pre<EntityPlayer>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
         val armorInventory = entity.getArmorInventory() ?: return
@@ -58,7 +58,7 @@ object HideArmor {
     }
 
     @HandleEvent
-    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityPlayer>) {
+    fun onRenderLivingPost(event: HanniRenderEntityEvent.Post<EntityPlayer>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
         val armorInventory = entity.getArmorInventory() ?: return

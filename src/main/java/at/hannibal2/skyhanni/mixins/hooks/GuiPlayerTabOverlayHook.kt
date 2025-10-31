@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.events.TabListLineRenderEvent
+import at.hannibal2.hanni.events.TabListLineRenderEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.reflect.KProperty
 

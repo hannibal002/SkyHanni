@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer
+import at.hannibal2.hanni.utils.render.layers.ChromaRenderLayer
 import java.util.OptionalDouble
 import java.util.concurrent.ConcurrentHashMap
 import net.minecraft.client.render.RenderLayer
@@ -11,99 +11,99 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.TriState
 import net.minecraft.util.Util
 
-object SkyHanniRenderLayers {
+object HanniRenderLayers {
 
     private val linesCache = ConcurrentHashMap<Int, MultiPhase>()
     private val linesThroughWallsCache = ConcurrentHashMap<Int, MultiPhase>()
 
     private val FILLED: MultiPhase = RenderLayer.of(
-        "skyhanni_filled",
+        "hanni_filled",
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipeline.FILLED(),
+        HanniRenderPipeline.FILLED(),
         MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
     )
 
     private val FILLED_XRAY: MultiPhase = RenderLayer.of(
-        "skyhanni_filled_xray",
+        "hanni_filled_xray",
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipeline.FILLED_XRAY(),
+        HanniRenderPipeline.FILLED_XRAY(),
         MultiPhaseParameters.builder().build(false),
     )
 
     private val TRIANGLES: MultiPhase = RenderLayer.of(
-        "skyhanni_triangles",
+        "hanni_triangles",
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipeline.TRIANGLES(),
+        HanniRenderPipeline.TRIANGLES(),
         MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
     )
 
     private val TRIANGLES_XRAY: MultiPhase = RenderLayer.of(
-        "skyhanni_triangles_xray",
+        "hanni_triangles_xray",
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipeline.TRIANGLES_XRAY(),
+        HanniRenderPipeline.TRIANGLES_XRAY(),
         MultiPhaseParameters.builder().build(false),
     )
 
     private val TRIANGLE_FAN: MultiPhase = RenderLayer.of(
-        "skyhanni_triangle_fan",
+        "hanni_triangle_fan",
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipeline.TRIANGLE_FAN(),
+        HanniRenderPipeline.TRIANGLE_FAN(),
         MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
     )
 
     private val TRIANGLE_FAN_XRAY: MultiPhase = RenderLayer.of(
-        "skyhanni_triangle_fan_xray",
+        "hanni_triangle_fan_xray",
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipeline.TRIANGLE_FAN_XRAY(),
+        HanniRenderPipeline.TRIANGLE_FAN_XRAY(),
         MultiPhaseParameters.builder().build(false),
     )
 
     private val QUADS: MultiPhase = RenderLayer.of(
-        "skyhanni_quads",
+        "hanni_quads",
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipeline.QUADS(),
+        HanniRenderPipeline.QUADS(),
         MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
     )
 
     private val QUADS_XRAY: MultiPhase = RenderLayer.of(
-        "skyhanni_quads_xray",
+        "hanni_quads_xray",
         RenderLayer.DEFAULT_BUFFER_SIZE,
         false,
         true,
-        SkyHanniRenderPipeline.QUADS_XRAY(),
+        HanniRenderPipeline.QUADS_XRAY(),
         MultiPhaseParameters.builder().build(false),
     )
 
     private val CHROMA_STANDARD: MultiPhase = ChromaRenderLayer(
-        "skyhanni_standard_chroma",
+        "hanni_standard_chroma",
         RenderLayer.CUTOUT_BUFFER_SIZE,
         false,
         false,
-        SkyHanniRenderPipeline.CHROMA_STANDARD(),
+        HanniRenderPipeline.CHROMA_STANDARD(),
         MultiPhaseParameters.builder().build(false),
     )
 
     private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderLayer> = Util.memoize { texture ->
         ChromaRenderLayer(
-            "skyhanni_text_chroma",
+            "hanni_text_chroma",
             RenderLayer.CUTOUT_BUFFER_SIZE,
             false,
             false,
-            SkyHanniRenderPipeline.CHROMA_TEXT(),
+            HanniRenderPipeline.CHROMA_TEXT(),
             MultiPhaseParameters.builder()
                 //#if MC < 1.21.6
                 .texture(RenderPhase.Texture(texture, TriState.FALSE, false))
@@ -115,9 +115,9 @@ object SkyHanniRenderLayers {
     }
 
     private fun createLineRenderLayer(lineWidth: Double, throughWalls: Boolean): MultiPhase {
-        val pipeLine = if (throughWalls) SkyHanniRenderPipeline.LINES_XRAY() else SkyHanniRenderPipeline.LINES()
+        val pipeLine = if (throughWalls) HanniRenderPipeline.LINES_XRAY() else HanniRenderPipeline.LINES()
         return RenderLayer.of(
-            "skyhanni_lines_${lineWidth}${if (throughWalls) "_xray" else ""}",
+            "hanni_lines_${lineWidth}${if (throughWalls) "_xray" else ""}",
             RenderLayer.DEFAULT_BUFFER_SIZE,
             false,
             true,
@@ -156,10 +156,10 @@ object SkyHanniRenderLayers {
 
     //#if MC < 1.21.6
     fun getChromaStandard() = CHROMA_STANDARD
-    fun getChromaTextured() = SkyHanniRenderLayers::getChromaTexturedWithIdentifier
+    fun getChromaTextured() = HanniRenderLayers::getChromaTexturedWithIdentifier
     //#else
-    //$$ fun getChromaStandard(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
-    //$$ fun getChromaTextured(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()
+    //$$ fun getChromaStandard(): com.mojang.blaze3d.pipeline.RenderPipeline = HanniRenderPipeline.CHROMA_STANDARD()
+    //$$ fun getChromaTextured(): com.mojang.blaze3d.pipeline.RenderPipeline = HanniRenderPipeline.CHROMA_TEXT()
     //#endif
 
 }

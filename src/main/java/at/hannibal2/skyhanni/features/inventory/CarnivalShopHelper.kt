@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.hanni.features.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuCarnivalTokenCostJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuMiscJson
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EssenceUtils
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuCarnivalTokenCostJson
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuMiscJson
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryOpenEvent
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EssenceUtils
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.ItemUtils.createItemStack
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object CarnivalShopHelper {
 
     // Where the informational item stack will be placed in the GUI
@@ -158,7 +158,7 @@ object CarnivalShopHelper {
         if (repoEventShops.isEmpty()) return
         val storage = ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress ?: return
         val lore = buildList {
-            add("§8(From SkyHanni)")
+            add("§8(From Hanni)")
             add("")
             var sumTokensNeeded = 0
             var foundShops = 0
@@ -188,7 +188,7 @@ object CarnivalShopHelper {
     private fun regenerateShopSpecificItemStack() {
         val progress = currentProgress ?: return
         val lore = buildList {
-            add("§8(From SkyHanni)")
+            add("§8(From Hanni)")
             add("")
             val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
             if (remaining.isEmpty()) {
@@ -253,5 +253,5 @@ object CarnivalShopHelper {
         currentProgress = EventShopProgress(currentEventType, purchasedUpgrades)
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.event.carnival.tokenShopHelper
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && HanniMod.feature.event.carnival.tokenShopHelper
 }

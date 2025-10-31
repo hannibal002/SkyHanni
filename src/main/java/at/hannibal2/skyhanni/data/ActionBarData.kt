@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.events.ActionBarUpdateEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.StringUtils.stripHypixelMessage
 import net.minecraft.util.IChatComponent
 
-@SkyHanniModule
+@HanniModule
 object ActionBarData {
     private var actionBar = ""
     private var debugActionBar: String? = null
@@ -29,7 +29,7 @@ object ActionBarData {
     }
 
     private fun debugCommand() {
-        SkyHanniMod.launchCoroutine("action bar debug command") {
+        HanniMod.launchCoroutine("action bar debug command") {
             val clipboard = OSUtils.readFromClipboard()
             if (debugActionBar == clipboard) {
                 debugActionBar = null

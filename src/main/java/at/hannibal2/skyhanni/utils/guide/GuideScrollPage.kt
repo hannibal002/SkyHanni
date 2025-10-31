@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.utils.guide
+package at.hannibal2.hanni.utils.guide
 
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.tableStretchXPadding
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
-import at.hannibal2.skyhanni.utils.renderables.container.table.ScrollTable.Companion.scrollTable
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.tableStretchXPadding
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.ScrollValue
+import at.hannibal2.hanni.utils.renderables.container.table.ScrollTable.Companion.scrollTable
 
 abstract class GuideScrollPage(
     val sizeX: Int,

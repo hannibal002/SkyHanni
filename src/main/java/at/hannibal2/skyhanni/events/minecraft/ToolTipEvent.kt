@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.events.minecraft
+package at.hannibal2.hanni.events.minecraft
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
+import at.hannibal2.hanni.api.event.CancellableHanniEvent
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
-class ToolTipEvent(val slot: Slot, val itemStack: ItemStack, private val toolTip0: MutableList<String>) : CancellableSkyHanniEvent() {
+class ToolTipEvent(val slot: Slot, val itemStack: ItemStack, private val toolTip0: MutableList<String>) : CancellableHanniEvent() {
 
     var toolTip: MutableList<String>
         set(value) {

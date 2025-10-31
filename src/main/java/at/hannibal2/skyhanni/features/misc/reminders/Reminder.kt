@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.misc.reminders
+package at.hannibal2.hanni.features.misc.reminders
 
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
 import java.time.Instant
 import java.time.LocalDate

@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.compat
+package at.hannibal2.hanni.utils.compat
 
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.hanni.utils.collection.TimeLimitedCache
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Style
 import net.minecraft.text.TextVisitFactory

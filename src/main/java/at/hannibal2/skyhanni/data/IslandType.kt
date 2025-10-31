@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
-import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LocationUtils.isInside
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.event.HandleEvent.Companion.HIGHEST
+import at.hannibal2.hanni.data.jsonobjects.repo.IslandTypeJson
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LocationUtils.isInside
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import net.minecraft.util.AxisAlignedBB
 
 enum class IslandType(private val nameFallback: String) {
@@ -69,7 +69,7 @@ enum class IslandType(private val nameFallback: String) {
 
     fun isInBounds(vec: LorenzVec): Boolean = islandData?.boundingBox?.isInside(vec) ?: true
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
         /**
          * The maximum amount of players that can be on an island.

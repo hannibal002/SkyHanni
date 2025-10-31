@@ -2,7 +2,7 @@
 
 in vec4 vertexColor;
 
-layout(std140) uniform SkyHanniChromaUniforms {
+layout(std140) uniform HanniChromaUniforms {
     float chromaSize;
     float timeOffset;
     float saturation;

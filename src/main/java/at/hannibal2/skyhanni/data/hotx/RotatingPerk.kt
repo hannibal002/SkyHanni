@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.hotx
+package at.hannibal2.hanni.data.hotx
 
 import java.util.regex.Pattern
 

@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils.renderables.decorators
+package at.hannibal2.hanni.utils.renderables.decorators
 
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
 
 interface RenderableDecorator : Renderable {
     val root: Renderable

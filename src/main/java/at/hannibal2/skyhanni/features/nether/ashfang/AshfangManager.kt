@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.features.nether.ashfang
+package at.hannibal2.hanni.features.nether.ashfang
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.crimsonisle.ashfang.AshfangConfig
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.features.crimsonisle.ashfang.AshfangConfig
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.HanniRenderEntityEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.addAlpha
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.utils.EntityUtils.isAtFullHealth
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.MobUtils.mob
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import net.minecraft.entity.item.EntityArmorStand
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object AshfangManager {
 
-    val config: AshfangConfig get() = SkyHanniMod.feature.crimsonIsle.ashfang
+    val config: AshfangConfig get() = HanniMod.feature.crimsonIsle.ashfang
 
     private val ashfangMobs = mutableSetOf<Mob>()
     var ashfang: Mob? = null
@@ -68,7 +68,7 @@ object AshfangManager {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onRenderLiving(event: HanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
         if (!active || !config.hide.fullNames) return
         val mob = event.entity.mob ?: return
         if (mob !in ashfangMobs) return

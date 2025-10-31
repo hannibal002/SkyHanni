@@ -1,30 +1,30 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.hanni.features.rift
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.rift.RiftConfig
-import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.rift.RiftConfig
+import at.hannibal2.hanni.data.IslandGraphs
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.isRiftExportable
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.getLorenzVec
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object RiftApi {
 
     fun inRift() = IslandType.THE_RIFT.isCurrent()
 
-    val config: RiftConfig get() = SkyHanniMod.feature.rift
+    val config: RiftConfig get() = HanniMod.feature.rift
 
     // internal name -> motes
     var motesPrice = emptyMap<NeuInternalName, Double>()

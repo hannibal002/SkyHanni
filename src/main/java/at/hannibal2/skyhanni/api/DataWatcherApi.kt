@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.api
+package at.hannibal2.hanni.api
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ElectionApi.derpy
-import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent
-import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
-import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ElectionApi.derpy
+import at.hannibal2.hanni.events.DataWatcherUpdatedEvent
+import at.hannibal2.hanni.events.entity.EntityCustomNameUpdateEvent
+import at.hannibal2.hanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.Entity
@@ -17,7 +17,7 @@ import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.entity.item.EntityXPOrb
 
-@SkyHanniModule
+@HanniModule
 object DataWatcherApi {
 
     private val ignoredEntities = setOf(

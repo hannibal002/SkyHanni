@@ -1,18 +1,18 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.chat.CrystalNucleusConfig.CrystalNucleusMessageTypes
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.features.chat.CrystalNucleusConfig.CrystalNucleusMessageTypes
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.RegexUtils.findMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object CrystalNucleusChatFilter {
 
     // TODO add docs for this class
@@ -22,7 +22,7 @@ object CrystalNucleusChatFilter {
         }
     }
 
-    private val config get() = SkyHanniMod.feature.chat.filterType.crystalNucleus
+    private val config get() = HanniMod.feature.chat.filterType.crystalNucleus
     private val patternGroup = RepoPattern.group("filter.crystalnucleus")
 
     private var unclosedRunCompleted = false

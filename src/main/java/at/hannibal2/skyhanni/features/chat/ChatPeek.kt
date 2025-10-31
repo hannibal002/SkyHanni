@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
-import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
-import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.data.GuiEditManager
+import at.hannibal2.hanni.features.garden.fortuneguide.FFGuideGui
+import at.hannibal2.hanni.features.misc.visualwords.VisualWordGui
+import at.hannibal2.hanni.utils.ConfigUtils
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import org.lwjgl.input.Keyboard
@@ -16,7 +16,7 @@ object ChatPeek {
 
     @JvmStatic
     fun peek(): Boolean {
-        val key = SkyHanniMod.feature.chat.peekChat
+        val key = HanniMod.feature.chat.peekChat
 
         if (!MinecraftCompat.localPlayerExists) return false
         if (key <= Keyboard.KEY_NONE) return false

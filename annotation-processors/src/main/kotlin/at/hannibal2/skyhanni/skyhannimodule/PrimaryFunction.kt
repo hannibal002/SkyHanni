@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.skyhannimodule
+package at.hannibal2.hanni.hannimodule
 
 /**
  * This is used in parameterless @HandleEvent annotations.

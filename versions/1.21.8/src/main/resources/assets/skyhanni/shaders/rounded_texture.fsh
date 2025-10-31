@@ -2,7 +2,7 @@
 
 in vec2 texCoord;
 
-layout(std140) uniform SkyHanniRoundedUniforms {
+layout(std140) uniform HanniRoundedUniforms {
     float scaleFactor;
     float radius;
     float smoothness;

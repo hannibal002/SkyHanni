@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.entity.slayer.SlayerDeathEvent
-import at.hannibal2.skyhanni.features.slayer.SlayerType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.entity.slayer.SlayerDeathEvent
+import at.hannibal2.hanni.features.slayer.SlayerType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
 
-@SkyHanniModule
+@HanniModule
 object OtherPlayersSlayerApi {
 
     @HandleEvent

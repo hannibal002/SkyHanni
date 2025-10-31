@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.features.fishing.trophy
+package at.hannibal2.hanni.features.fishing.trophy
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.fishing.FishingApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.features.fishing.FishingApi
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LocationUtils.distanceTo
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayerIgnoreY
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
 
-@SkyHanniModule
+@HanniModule
 object GeyserFishing {
-    private val config get() = SkyHanniMod.feature.fishing.trophyFishing.geyserOptions
+    private val config get() = HanniMod.feature.fishing.trophyFishing.geyserOptions
 
     private val geyserOffset = LorenzVec(0.1f, 0.6f, 0.1f)
 
@@ -50,7 +50,7 @@ object GeyserFishing {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!config.drawBox) return
         val geyserBox = geyserBox ?: return
         val geyser = geyser ?: return

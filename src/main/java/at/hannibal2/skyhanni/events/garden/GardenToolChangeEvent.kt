@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.events.garden
+package at.hannibal2.hanni.events.garden
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.features.garden.CropType
 import net.minecraft.item.ItemStack
 
-class GardenToolChangeEvent(val crop: CropType?, val toolItem: ItemStack?) : SkyHanniEvent()
+class GardenToolChangeEvent(val crop: CropType?, val toolItem: ItemStack?) : HanniEvent()

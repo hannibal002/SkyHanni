@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.features.misc
+package at.hannibal2.hanni.config.features.misc
 
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.hanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink

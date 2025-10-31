@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.features.garden.sensitivity
+package at.hannibal2.hanni.features.garden.sensitivity
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 
-@SkyHanniModule
+@HanniModule
 object MouseSensitivityManager {
-    private val config get() = SkyHanniMod.feature.garden.sensitivityReducer
+    private val config get() = HanniMod.feature.garden.sensitivityReducer
 
     private var lastIn: Float = Float.NaN
     private var lastOut: Float = Float.NaN

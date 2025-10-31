@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.StorageData
-import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
-import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.SackData
+import at.hannibal2.hanni.config.StorageData
+import at.hannibal2.hanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.hanni.config.storage.PlayerSpecificStorage
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.ProfileJoinEvent
+import at.hannibal2.hanni.events.WidgetUpdateEvent
+import at.hannibal2.hanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object ProfileStorageData {
 
     var playerSpecific: PlayerSpecificStorage? = null
@@ -59,16 +59,16 @@ object ProfileStorageData {
             return
         }
         if (sackPlayers == null) {
-            ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
+            ErrorManager.hanniError("sackPlayers is null in ProfileJoinEvent!")
         }
         if (storagePlayer == null) {
-            ErrorManager.skyHanniError("storagePlayer is null in ProfileJoinEvent!")
+            ErrorManager.hanniError("storagePlayer is null in ProfileJoinEvent!")
         }
         if (petPlayers == null) {
-            ErrorManager.skyHanniError("petPlayers is null in ProfileJoinEvent!")
+            ErrorManager.hanniError("petPlayers is null in ProfileJoinEvent!")
         }
         if (orderedWaypointsRoutes == null) {
-            ErrorManager.skyHanniError("orderedWaypointRoutes is null in ProfileJoinEvent!")
+            ErrorManager.hanniError("orderedWaypointRoutes is null in ProfileJoinEvent!")
         }
         loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, petPlayers, profileName)
         postConfigLoadEvent()
@@ -83,7 +83,7 @@ object ProfileStorageData {
         val orderedWaypointsRoutes = orderedWaypointsRoutes
 
         if (playerSpecific == null) {
-            ErrorManager.skyHanniError(
+            ErrorManager.hanniError(
                 "failed to load your profile data delayed ",
                 "onHypixel" to SkyBlockUtils.onHypixel,
                 "HypixelData.hypixelLive" to HypixelData.hypixelLive,
@@ -92,16 +92,16 @@ object ProfileStorageData {
             )
         }
         if (sackPlayers == null) {
-            ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
+            ErrorManager.hanniError("sackPlayers is null in ProfileJoinEvent!")
         }
         if (storagePlayer == null) {
-            ErrorManager.skyHanniError("storagePlayer is null in ProfileJoinEvent!")
+            ErrorManager.hanniError("storagePlayer is null in ProfileJoinEvent!")
         }
         if (petPlayers == null) {
-            ErrorManager.skyHanniError("petPlayers is null in ProfileJoinEvent!")
+            ErrorManager.hanniError("petPlayers is null in ProfileJoinEvent!")
         }
         if (orderedWaypointsRoutes == null) {
-            ErrorManager.skyHanniError("orderedWaypointRoutes is null in ProfileJoinEvent!")
+            ErrorManager.hanniError("orderedWaypointRoutes is null in ProfileJoinEvent!")
         }
 
         loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, petPlayers, profileName)
@@ -170,11 +170,11 @@ object ProfileStorageData {
     @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = PlayerUtils.getRawUuid()
-        playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
-        sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
-        storagePlayer = SkyHanniMod.storageData.players.getOrPut(playerUuid) { StorageData.PlayerSpecific() }
-        petPlayers = SkyHanniMod.petData.players.getOrPut(playerUuid) { PetDataStorage.PlayerSpecific() }
-        orderedWaypointsRoutes = SkyHanniMod.orderedWaypointsRoutesData
+        playerSpecific = HanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
+        sackPlayers = HanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
+        storagePlayer = HanniMod.storageData.players.getOrPut(playerUuid) { StorageData.PlayerSpecific() }
+        petPlayers = HanniMod.petData.players.getOrPut(playerUuid) { PetDataStorage.PlayerSpecific() }
+        orderedWaypointsRoutes = HanniMod.orderedWaypointsRoutesData
         postConfigLoadEvent()
     }
 

@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.api.enoughupdates
+package at.hannibal2.hanni.api.enoughupdates
 
-import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
-import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
-import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
-import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.NumberUtil.isInt
-import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
-import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.hanni.data.jsonobjects.other.HypixelApiTrophyFish
+import at.hannibal2.hanni.data.jsonobjects.other.HypixelPlayerApiJson
+import at.hannibal2.hanni.data.repo.ChatProgressUpdates
+import at.hannibal2.hanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.NumberUtil.isInt
+import at.hannibal2.hanni.utils.json.BaseGsonBuilder
+import at.hannibal2.hanni.utils.json.fromJson
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -17,7 +17,7 @@ import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-@SkyHanniModule(neuRequired = true)
+@HanniModule(neuRequired = true)
 object NeuEventWrappers {
 
     private val hypixelApiGson by lazy {

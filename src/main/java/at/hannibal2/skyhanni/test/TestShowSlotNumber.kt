@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
 
-@SkyHanniModule
+@HanniModule
 object TestShowSlotNumber {
 
     @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (SkyHanniMod.feature.dev.showSlotNumberKey.isKeyHeld()) {
+        if (HanniMod.feature.dev.showSlotNumberKey.isKeyHeld()) {
             val slotIndex = event.slot.slotIndex
             event.stackTip = "$slotIndex"
         }

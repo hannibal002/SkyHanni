@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.hanni.events.item.ItemHoverEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.compat.DrawContext
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.mixins.hooks.renderToolTip
-//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+//$$ import at.hannibal2.hanni.mixins.hooks.renderToolTip
+//$$ import at.hannibal2.hanni.utils.compat.formattedTextCompatLessResets
 //$$ import net.minecraft.text.Text
 //#endif
 

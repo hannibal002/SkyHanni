@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.api.minecraftevents
+package at.hannibal2.hanni.api.minecraftevents
 
-import at.hannibal2.skyhanni.data.GlobalRender
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent
-import at.hannibal2.skyhanni.events.render.OverlayType
-import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
-import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
-import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
-import at.hannibal2.skyhanni.events.render.gui.GuiActionPerformedEvent
-import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
-import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
-import at.hannibal2.skyhanni.events.render.gui.InitializeGuiEvent
-import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent
-import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.compat.DrawContext
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.WorldRenderContext
+import at.hannibal2.hanni.data.GlobalRender
+import at.hannibal2.hanni.events.GuiKeyPressEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.render.BlockOverlayRenderEvent
+import at.hannibal2.hanni.events.render.OverlayType
+import at.hannibal2.hanni.events.render.gui.DrawBackgroundEvent
+import at.hannibal2.hanni.events.render.gui.GameOverlayRenderPostEvent
+import at.hannibal2.hanni.events.render.gui.GameOverlayRenderPreEvent
+import at.hannibal2.hanni.events.render.gui.GuiActionPerformedEvent
+import at.hannibal2.hanni.events.render.gui.GuiMouseInputEvent
+import at.hannibal2.hanni.events.render.gui.GuiScreenOpenEvent
+import at.hannibal2.hanni.events.render.gui.InitializeGuiEvent
+import at.hannibal2.hanni.events.render.gui.RenderingTickEvent
+import at.hannibal2.hanni.events.render.gui.ScreenDrawnEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.compat.DrawContext
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.compat.WorldRenderContext
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -30,14 +30,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
 
-@SkyHanniModule
+@HanniModule
 object RenderEvents {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (GlobalRender.renderDisabled) return
         if (!canRender()) return
-        SkyHanniRenderWorldEvent(WorldRenderContext(), event.partialTicks).post()
+        HanniRenderWorldEvent(WorldRenderContext(), event.partialTicks).post()
     }
 
     @SubscribeEvent

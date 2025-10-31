@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.ChatHoverEvent;
-import at.hannibal2.skyhanni.events.chat.TabCompletionEvent;
-import at.hannibal2.skyhanni.features.chat.CopyChat;
-import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay;
-import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
+import at.hannibal2.hanni.events.ChatHoverEvent;
+import at.hannibal2.hanni.events.chat.TabCompletionEvent;
+import at.hannibal2.hanni.features.chat.CopyChat;
+import at.hannibal2.hanni.features.chat.CurrentChatDisplay;
+import at.hannibal2.hanni.mixins.hooks.GuiChatHook;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.ChatComponentText;
@@ -29,7 +29,7 @@ public class MixinGuiChat {
     @ModifyVariable(
         method = "onAutocompleteResponse",
         at = @At(
-            value = "SKYHANNI_FORLOOP_LOCAL_VAR",
+            value = "HANNI_FORLOOP_LOCAL_VAR",
             shift = At.Shift.BEFORE,
             args = "lvIndex=1"
         ),

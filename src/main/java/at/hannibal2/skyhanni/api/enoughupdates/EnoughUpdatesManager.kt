@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.api.enoughupdates
+package at.hannibal2.hanni.api.enoughupdates
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
-import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.PrimitiveRecipe
-import at.hannibal2.skyhanni.utils.StringUtils.cleanString
-import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
-import at.hannibal2.skyhanni.utils.compat.getIdentifierString
-import at.hannibal2.skyhanni.utils.compat.getVanillaItem
-import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.data.jsonobjects.other.NeuNbtInfoJson
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuPetsJson
+import at.hannibal2.hanni.data.repo.ChatProgressUpdates
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ItemUtils.extraAttributes
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.PrimitiveRecipe
+import at.hannibal2.hanni.utils.StringUtils.cleanString
+import at.hannibal2.hanni.utils.StringUtils.removeUnusedDecimal
+import at.hannibal2.hanni.utils.collection.CollectionUtils.mapNotNullAsync
+import at.hannibal2.hanni.utils.compat.getIdentifierString
+import at.hannibal2.hanni.utils.compat.getVanillaItem
+import at.hannibal2.hanni.utils.compat.setCustomItemName
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -43,15 +43,15 @@ import kotlin.math.floor
 //$$ import net.minecraft.text.Text
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.LoreComponent
-//$$ import at.hannibal2.skyhanni.utils.ComponentUtils
-//$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+//$$ import at.hannibal2.hanni.utils.ComponentUtils
+//$$ import at.hannibal2.hanni.utils.ItemUtils.setLore
 //#else
 import net.minecraft.nbt.NBTTagString
 
 //#endif
 
 // Most functions are taken from NotEnoughUpdates
-@SkyHanniModule
+@HanniModule
 object EnoughUpdatesManager {
 
     val configDirectory = File("config/notenoughupdates")
@@ -456,7 +456,7 @@ object EnoughUpdatesManager {
         return displayNameCache.getOrPut(internalName) {
             val itemInfo = getItemById(internalName) ?: return@getOrPut internalName
             itemInfo["displayname"]?.asString ?: run {
-                ErrorManager.skyHanniError("No displayname for $internalName")
+                ErrorManager.hanniError("No displayname for $internalName")
             }
         }
     }

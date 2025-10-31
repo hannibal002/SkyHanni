@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.features.inventory.FixIronman
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.hanni.features.inventory.FixIronman
+import at.hannibal2.hanni.utils.StringUtils.firstLetterUppercase
 
 // internal and scoreboard
 // island change event

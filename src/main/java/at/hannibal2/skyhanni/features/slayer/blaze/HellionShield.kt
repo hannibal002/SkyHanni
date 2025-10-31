@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.slayer.blaze
+package at.hannibal2.hanni.features.slayer.blaze
 
-import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.LorenzColor
 
 enum class HellionShield(
     val formattedName: String,

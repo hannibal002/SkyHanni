@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.features.inventory.customwardrobe
+package at.hannibal2.hanni.config.features.inventory.customwardrobe
 
-import at.hannibal2.skyhanni.config.storage.Resettable
+import at.hannibal2.hanni.config.storage.Resettable
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider

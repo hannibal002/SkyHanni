@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
+package at.hannibal2.hanni.config.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStats.CFStat
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFStats.CFStat
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -92,7 +92,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Contributor Rabbit Name",
-        desc = "Replaces the rabbit names in the rabbit collection menu with SkyHanni contributor names.",
+        desc = "Replaces the rabbit names in the rabbit collection menu with Hanni contributor names.",
     )
     @ConfigEditorBoolean
     var contributorRabbitName: Boolean = false
@@ -258,7 +258,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "§6CF §zParty Mode",
-        desc = "Don't turn this on. Epilepsy Warning.\n§cRequires SkyHanni Chroma to be enabled to fully function.",
+        desc = "Don't turn this on. Epilepsy Warning.\n§cRequires Hanni Chroma to be enabled to fully function.",
     )
     @ConfigEditorBoolean
     val partyMode: Property<Boolean> = Property.of(false)

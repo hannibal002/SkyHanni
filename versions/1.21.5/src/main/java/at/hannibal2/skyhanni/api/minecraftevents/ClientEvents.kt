@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.api.minecraftevents
+package at.hannibal2.hanni.api.minecraftevents
 
-import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
-import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.hanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.hanni.events.minecraft.ResourcePackReloadEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.events.minecraft.WorldChangeEvent
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
-@SkyHanniModule
+@HanniModule
 object ClientEvents {
 
     var totalTicks = 0
@@ -34,7 +34,7 @@ object ClientEvents {
 
                 DelayedRun.checkRuns()
                 totalTicks++
-                SkyHanniTickEvent(totalTicks).post()
+                HanniTickEvent(totalTicks).post()
             },
         )
 
@@ -55,7 +55,7 @@ object ClientEvents {
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
             object : IdentifiableResourceReloadListener {
 
-                override fun getFabricId(): Identifier = Identifier.of("skyhanni", "resources")
+                override fun getFabricId(): Identifier = Identifier.of("hanni", "resources")
 
                 //#if MC < 1.21.9
                 override fun reload(

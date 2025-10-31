@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.utils.compat
+package at.hannibal2.hanni.utils.compat
 
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.hanni.mixins.transformers.gui.AccessorGuiContainer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiChest
@@ -12,7 +12,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 //#if FABRIC
 //$$ import net.minecraft.screen.slot.SlotActionType
-//$$ import at.hannibal2.skyhanni.compat.ReiCompat
+//$$ import at.hannibal2.hanni.compat.ReiCompat
 //$$ import net.minecraft.client.gui.screen.ingame.HandledScreen
 //#endif
 
@@ -75,14 +75,14 @@ object InventoryCompat {
         if (gui is GuiContainer) {
             val accessor = gui as AccessorGuiContainer
             val slotObj = gui.inventorySlots.getSlot(slot)
-            accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, mode)
+            accessor.handleMouseClick_hanni(slotObj, slot, mouseButton, mode)
         }
         //#else
         //$$ if (gui is HandledScreen<*>) {
         //$$ val accessor = gui as AccessorHandledScreen
         //$$ val slotObj = gui.screenHandler.getSlot(slot)
         //$$ val actionType = SlotActionType.entries[mode]
-        //$$ accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, actionType)
+        //$$ accessor.handleMouseClick_hanni(slotObj, slot, mouseButton, actionType)
         //$$ }
         //#endif
     }

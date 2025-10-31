@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.features.chroma
+package at.hannibal2.hanni.features.chroma
 
-import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
-import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
-import at.hannibal2.skyhanni.mixins.transformers.AccessorMinecraft
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.shader.Shader
-import at.hannibal2.skyhanni.utils.shader.Uniform
+import at.hannibal2.hanni.api.minecraftevents.ClientEvents
+import at.hannibal2.hanni.config.features.chroma.ChromaConfig.Direction
+import at.hannibal2.hanni.mixins.transformers.AccessorMinecraft
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.shader.Shader
+import at.hannibal2.hanni.utils.shader.Uniform
 import net.minecraft.client.Minecraft
 
 /**

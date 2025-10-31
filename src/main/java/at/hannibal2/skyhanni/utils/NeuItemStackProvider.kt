@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
 import net.minecraft.item.ItemStack
 import java.util.WeakHashMap
 import kotlin.reflect.KProperty
@@ -19,7 +19,7 @@ class NeuItemStackProvider(
         internalName.getItemStack().also { extraOps?.invoke(it) }
     }
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
         private val providerCache = WeakHashMap<NeuItemStackProvider, ItemStack>()
 

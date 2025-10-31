@@ -1,24 +1,24 @@
-package at.hannibal2.skyhanni.features.pets
+package at.hannibal2.hanni.features.pets
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.entity.EntityDisplayNameEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.RegexUtils.groupOrEmpty
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 //#if MC > 1.16
-//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+//$$ import at.hannibal2.hanni.utils.compat.formattedTextCompatLessResets
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object PetNametag {
 
-    private val config get() = SkyHanniMod.feature.misc.pets.nametag
+    private val config get() = HanniMod.feature.misc.pets.nametag
 
     /**
      * REGEX-TEST: §8[§7Lv99§8] §6Ammonite

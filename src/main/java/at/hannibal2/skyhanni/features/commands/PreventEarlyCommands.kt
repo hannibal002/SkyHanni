@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.features.commands
+package at.hannibal2.hanni.features.commands
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ChatUtils.senderIsHanni
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import kotlin.math.ceil
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-@SkyHanniModule
+@HanniModule
 object PreventEarlyCommands {
-    private val config get() = SkyHanniMod.feature.misc.commands
+    private val config get() = HanniMod.feature.misc.commands
 
     private var commandExecuted: SimpleTimeMark = SimpleTimeMark.farPast()
     private var worldChanged: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -40,7 +40,7 @@ object PreventEarlyCommands {
         if (!config.preventEarlyExecution) return
         if (!SkyBlockUtils.onHypixel) return
         if (!event.isCommand) return
-        if (event.senderIsSkyhanni()) return
+        if (event.senderIsHanni()) return
         val command = event.message.removePrefix("/").lowercase()
         if (command == "locraw") return // Ignore locraw commands
         lastCommand = command
@@ -55,7 +55,7 @@ object PreventEarlyCommands {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!SkyBlockUtils.onHypixel) return
         if (!config.preventEarlyExecution) return
         val lastCommand = lastCommand ?: return

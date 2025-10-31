@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.features.gui.customscoreboard
+package at.hannibal2.hanni.config.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.RenderUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider

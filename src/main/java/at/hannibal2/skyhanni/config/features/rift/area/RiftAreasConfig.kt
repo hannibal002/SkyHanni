@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.config.features.rift.area
+package at.hannibal2.hanni.config.features.rift.area
 
-import at.hannibal2.skyhanni.config.features.rift.area.colosseum.ColosseumConfig
-import at.hannibal2.skyhanni.config.features.rift.area.dreadfarm.DreadfarmConfig
-import at.hannibal2.skyhanni.config.features.rift.area.livingcave.LivingCaveConfig
-import at.hannibal2.skyhanni.config.features.rift.area.mirrorverse.MirrorVerseConfig
-import at.hannibal2.skyhanni.config.features.rift.area.mountaintop.MountaintopConfig
-import at.hannibal2.skyhanni.config.features.rift.area.stillgorechateau.StillgoreChateauConfig
-import at.hannibal2.skyhanni.config.features.rift.area.westvillage.WestVillageConfig
-import at.hannibal2.skyhanni.config.features.rift.area.wyldwoods.WyldWoodsConfig
+import at.hannibal2.hanni.config.features.rift.area.colosseum.ColosseumConfig
+import at.hannibal2.hanni.config.features.rift.area.dreadfarm.DreadfarmConfig
+import at.hannibal2.hanni.config.features.rift.area.livingcave.LivingCaveConfig
+import at.hannibal2.hanni.config.features.rift.area.mirrorverse.MirrorVerseConfig
+import at.hannibal2.hanni.config.features.rift.area.mountaintop.MountaintopConfig
+import at.hannibal2.hanni.config.features.rift.area.stillgorechateau.StillgoreChateauConfig
+import at.hannibal2.hanni.config.features.rift.area.westvillage.WestVillageConfig
+import at.hannibal2.hanni.config.features.rift.area.wyldwoods.WyldWoodsConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption

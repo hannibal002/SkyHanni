@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.config.features.slayer
+package at.hannibal2.hanni.config.features.slayer
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig
-import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig
-import at.hannibal2.skyhanni.config.features.slayer.spider.SpiderConfig
-import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireConfig
-import at.hannibal2.skyhanni.features.slayer.HideSlayerSpawnParticles.SpawnParticles
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.features.slayer.blaze.BlazeConfig
+import at.hannibal2.hanni.config.features.slayer.endermen.EndermanConfig
+import at.hannibal2.hanni.config.features.slayer.spider.SpiderConfig
+import at.hannibal2.hanni.config.features.slayer.vampire.VampireConfig
+import at.hannibal2.hanni.features.slayer.HideSlayerSpawnParticles.SpawnParticles
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category

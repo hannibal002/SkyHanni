@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern

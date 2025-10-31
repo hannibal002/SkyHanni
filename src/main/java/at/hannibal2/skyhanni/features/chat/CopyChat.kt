@@ -1,30 +1,30 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
-import at.hannibal2.skyhanni.utils.ChatUtils.fullComponent
-import at.hannibal2.skyhanni.utils.ClipboardUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ChatUtils.chatMessage
+import at.hannibal2.hanni.utils.ChatUtils.fullComponent
+import at.hannibal2.hanni.utils.ClipboardUtils
+import at.hannibal2.hanni.utils.KeyboardManager
+import at.hannibal2.hanni.utils.ReflectionUtils.getDeclaredFieldOrNull
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.compat.MouseCompat
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.MathHelper
 //#if MC < 1.21
-import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
+import at.hannibal2.hanni.mixins.transformers.AccessorMixinGuiNewChat
 //#else
-//$$ import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
+//$$ import at.hannibal2.hanni.utils.compat.OrderedTextUtils
 //#endif
 
 object CopyChat {
-    private val config get() = SkyHanniMod.feature.chat.copyChat
+    private val config get() = HanniMod.feature.chat.copyChat
 
     @JvmStatic
     fun handleCopyChat(mouseX: Int, mouseY: Int) {
@@ -81,10 +81,10 @@ object CopyChat {
         if (x < 0 || y < 0) return null
 
         val fontHeight = mc.fontRendererObj.FONT_HEIGHT
-        val chatLines = access.drawnChatLines_skyhanni
+        val chatLines = access.drawnChatLines_hanni
         val maxLines = chatGui.lineCount.coerceAtMost(chatLines.size)
         if (x <= MathHelper.floor_float(chatGui.chatWidth.toFloat() / chatGui.chatScale) && y < fontHeight * maxLines + maxLines) {
-            val lineIndex = y / fontHeight + access.scrollPos_skyhanni
+            val lineIndex = y / fontHeight + access.scrollPos_hanni
             if (lineIndex in 0 until chatLines.size) {
                 return chatLines[lineIndex]
             }

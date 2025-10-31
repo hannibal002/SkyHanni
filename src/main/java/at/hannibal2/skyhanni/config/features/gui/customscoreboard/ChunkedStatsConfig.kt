@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.features.gui.customscoreboard
+package at.hannibal2.hanni.config.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsLine
+import at.hannibal2.hanni.features.gui.customscoreboard.ChunkedStatsLine
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider

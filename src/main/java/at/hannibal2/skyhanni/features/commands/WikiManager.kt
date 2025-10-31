@@ -1,32 +1,32 @@
-package at.hannibal2.skyhanni.features.commands
+package at.hannibal2.hanni.features.commands
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.events.GuiKeyPressEvent
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.compat.stackUnderCursor
 import net.minecraft.item.ItemStack
 import java.net.URLEncoder
 
-@SkyHanniModule
+@HanniModule
 object WikiManager {
     private const val OFFICIAL_URL_PREFIX = "https://wiki.hypixel.net/"
     private const val OFFICIAL_SEARCH_PREFIX = "index.php?search="
     private const val FANDOM_URL_PREFIX = "https://hypixel-skyblock.fandom.com/wiki/"
     private const val FANDOM_SEARCH_PREFIX = "Special:Search?query="
 
-    private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
+    private val config get() = HanniMod.feature.misc.commands.betterWiki
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -128,22 +128,22 @@ object WikiManager {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shfandomwiki") {
-            description = "Searches the fandom wiki with SkyHanni's own method."
+            description = "Searches the fandom wiki with Hanni's own method."
             category = CommandCategory.USERS_ACTIVE
             legacyCallbackArgs { otherWikiCommands(it, true) }
         }
         event.registerBrigadier("shfandomwikithis") {
-            description = "Searches the fandom wiki with SkyHanni's own method."
+            description = "Searches the fandom wiki with Hanni's own method."
             category = CommandCategory.USERS_ACTIVE
             legacyCallbackArgs { otherWikiCommands(it, useFandom = true, wikithis = true) }
         }
         event.registerBrigadier("shofficialwiki") {
-            description = "Searches the official wiki with SkyHanni's own method."
+            description = "Searches the official wiki with Hanni's own method."
             category = CommandCategory.USERS_ACTIVE
             legacyCallbackArgs { otherWikiCommands(it, false) }
         }
         event.registerBrigadier("shofficialwikithis") {
-            description = "Searches the official wiki with SkyHanni's own method."
+            description = "Searches the official wiki with Hanni's own method."
             category = CommandCategory.USERS_ACTIVE
             legacyCallbackArgs { otherWikiCommands(it, useFandom = false, wikithis = true) }
         }

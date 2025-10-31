@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.hanni.features.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.SkyBlockXPApi
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
-import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.SkyBlockXPApi
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.minecraftevents.RenderLayer
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.render.gui.GameOverlayRenderPostEvent
+import at.hannibal2.hanni.events.render.gui.GameOverlayRenderPreEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
 
-@SkyHanniModule
+@HanniModule
 object SkyBlockXPBar {
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = HanniMod.feature.misc
     private var cache: OriginalValues? = null
 
     private class OriginalValues(val currentXP: Float, val maxXP: Int, val level: Int)

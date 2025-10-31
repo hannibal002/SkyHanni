@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.fishing.trophy
+package at.hannibal2.hanni.features.fishing.trophy
 
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.hanni.utils.StringUtils.firstLetterUppercase
 
 enum class TrophyRarity(val formatCode: String) {
     BRONZE("§8"),

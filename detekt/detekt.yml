@@ -33,7 +33,7 @@ ImportRules:
     PreprocessingImportOrdering:
         active: true
 
-SkyHanniStyle:
+HanniStyle:
     InSkyBlockEarlyReturn:
         active: true
     IsInIslandEarlyReturn:
@@ -130,7 +130,7 @@ complexity:
         thresholdInObjects: 20
         thresholdInEnums: 11
         ignoreAnnotated:
-            - 'SkyHanniModule'
+            - 'HanniModule'
     ComplexCondition: # aggressive by default, at a complexity of 4
         active: true
         threshold: 6

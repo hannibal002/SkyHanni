@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EnumUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EnumUtils
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import com.google.gson.reflect.TypeToken
 import java.util.EnumSet
 
@@ -40,7 +40,7 @@ class IslandTypeTag internal constructor(name: String, private val types: EnumSe
 
     fun inAny() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland in types
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
         private val type = object : TypeToken<Map<String, List<String>>>() {}.type

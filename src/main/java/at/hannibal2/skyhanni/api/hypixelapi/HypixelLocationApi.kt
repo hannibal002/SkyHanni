@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.api.hypixelapi
+package at.hannibal2.hanni.api.hypixelapi
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiJoinEvent
-import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
-import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.hypixel.modapi.HypixelApiJoinEvent
+import at.hannibal2.hanni.events.hypixel.modapi.HypixelApiServerChangeEvent
+import at.hannibal2.hanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.hanni.events.minecraft.ScoreboardTitleUpdateEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.LorenzLogger
+import at.hannibal2.hanni.utils.StringUtils.removeColor
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.ServerType
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("MemberVisibilityCanBePrivate")
-@SkyHanniModule
+@HanniModule
 object HypixelLocationApi {
 
     var inHypixel: Boolean = false
@@ -50,7 +50,7 @@ object HypixelLocationApi {
         private set
 
     // TODO reenable the setting once the hypixel mod api works fine
-//     val config get() = SkyHanniMod.feature.dev.hypixelModApi
+//     val config get() = HanniMod.feature.dev.hypixelModApi
     val config get() = false
 
     private val logger = LorenzLogger("debug/hypixel_api")

@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo
+package at.hannibal2.hanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.pests.PestType
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.pests.PestType
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NeuInternalName
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 

@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.findAll
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
-import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.compat.value
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.hanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.hanni.utils.ConfigUtils.asStructuredText
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.RegexUtils.findAll
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.compat.command
+import at.hannibal2.hanni.utils.compat.defaultStyleConstructor
+import at.hannibal2.hanni.utils.compat.hover
+import at.hannibal2.hanni.utils.compat.value
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -30,7 +30,7 @@ import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //#else
 //$$ import net.minecraft.client.util.ChatMessages
 //$$ import net.minecraft.text.TextColor
-//$$ import at.hannibal2.skyhanni.utils.compat.toChatFormatting
+//$$ import at.hannibal2.hanni.utils.compat.toChatFormatting
 //#endif
 
 @Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
@@ -177,7 +177,7 @@ object StringUtils {
 
     fun String.cleanPlayerName(displayName: Boolean = false): String {
         return if (displayName) {
-            if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
+            if (HanniMod.feature.chat.playerMessage.playerRankHider) {
                 // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this

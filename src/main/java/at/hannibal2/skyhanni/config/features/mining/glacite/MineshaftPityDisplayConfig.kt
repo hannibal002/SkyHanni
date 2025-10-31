@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.mining.glacite
+package at.hannibal2.hanni.config.features.mining.glacite
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.MineshaftPityLine
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.features.mining.MineshaftPityDisplay.MineshaftPityLine
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList

@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.fishing
+package at.hannibal2.hanni.config.features.fishing
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingConfig
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.config.features.fishing.trophyfishing.TrophyFishingConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category

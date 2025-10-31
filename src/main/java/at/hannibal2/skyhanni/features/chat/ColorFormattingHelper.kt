@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.hanni.features.chat
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
-import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.chat.TextHelper
+import at.hannibal2.hanni.utils.chat.TextHelper.onClick
+import at.hannibal2.hanni.utils.chat.TextHelper.onHover
+import at.hannibal2.hanni.utils.chat.TextHelper.send
 
-@SkyHanniModule
+@HanniModule
 object ColorFormattingHelper {
     private fun printColorCodeList() {
         val text = mutableListOf<String>()
@@ -48,7 +48,7 @@ object ColorFormattingHelper {
             prefix = false,
         )
         ChatUtils.chat(
-            "§eYou can also uses SkyHanni's system for any colors. " +
+            "§eYou can also uses Hanni's system for any colors. " +
                 "This is different from chroma. " +
                 "Simply type §6&#&f&f&9&a&2&e&/ §efor color §#§f§f§9§a§2§e§/#ff9a2e§e " +
                 "(adds §6& §ebefore every characters including §6#§e, ends with '§6&/§e').",

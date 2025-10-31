@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.data.hotx
+package at.hannibal2.hanni.data.hotx
 
-import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
+import at.hannibal2.hanni.data.jsonobjects.local.HotxTree
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import java.util.regex.Pattern

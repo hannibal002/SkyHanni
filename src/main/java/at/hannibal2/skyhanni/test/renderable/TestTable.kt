@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.test.renderable
+package at.hannibal2.hanni.test.renderable
 
-import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.container.table.ScrollTable.Companion.scrollTable
-import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableScrollTable.Companion.searchableScrollTable
-import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableTable.Companion.searchableTable
-import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.empty
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.data.model.TextInput
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.addAlpha
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.ScrollValue
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.container.table.ScrollTable.Companion.scrollTable
+import at.hannibal2.hanni.utils.renderables.container.table.SearchableScrollTable.Companion.searchableScrollTable
+import at.hannibal2.hanni.utils.renderables.container.table.SearchableTable.Companion.searchableTable
+import at.hannibal2.hanni.utils.renderables.container.table.TableRenderable.Companion.table
+import at.hannibal2.hanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.hanni.utils.renderables.primitives.empty
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import java.awt.Color
 
-@SkyHanniModule(devOnly = true)
+@HanniModule(devOnly = true)
 object TestTable : RenderableTestSuite.TestRenderable("table") {
 
     private val scrollValues = mutableMapOf<Int, ScrollValue>()

@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils.renderables.container
+package at.hannibal2.hanni.utils.renderables.container
 
-import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.hanni.data.model.TextInput
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
 
 // TODO
 class SearchableVerticalContainer(

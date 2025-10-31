@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.rift.area.livingcave
+package at.hannibal2.hanni.config.features.rift.area.livingcave
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion

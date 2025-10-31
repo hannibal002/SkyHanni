@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events.entity
+package at.hannibal2.hanni.events.entity
 
-import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
+import at.hannibal2.hanni.api.event.GenericHanniEvent
 import net.minecraft.entity.EntityLivingBase
 
 /**
@@ -8,7 +8,7 @@ import net.minecraft.entity.EntityLivingBase
  * Requires [EntityOpacityActiveEvent] set to active.
  */
 // TODO rename to transparency
-class EntityOpacityEvent<T : EntityLivingBase>(val entity: T) : GenericSkyHanniEvent<T>(entity.javaClass) {
+class EntityOpacityEvent<T : EntityLivingBase>(val entity: T) : GenericHanniEvent<T>(entity.javaClass) {
 
     var opacity: Int? = null
 }

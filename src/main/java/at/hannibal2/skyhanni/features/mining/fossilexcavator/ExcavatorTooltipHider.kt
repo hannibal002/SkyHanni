@@ -1,17 +1,17 @@
-package at.hannibal2.skyhanni.features.mining.fossilexcavator
+package at.hannibal2.hanni.features.mining.fossilexcavator
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 
-@SkyHanniModule
+@HanniModule
 object ExcavatorTooltipHider {
 
-    private val config get() = SkyHanniMod.feature.mining.fossilExcavator.tooltipHider
+    private val config get() = HanniMod.feature.mining.fossilExcavator.tooltipHider
 
     /**
      * REGEX-TEST: §6Dirt

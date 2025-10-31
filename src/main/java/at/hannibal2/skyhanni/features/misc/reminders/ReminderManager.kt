@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.misc.reminders
+package at.hannibal2.hanni.features.misc.reminders
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.TimeUtils.minutes
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.chat.TextHelper.wrap
-import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.compat.suggest
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.TimeUtils
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.TimeUtils.minutes
+import at.hannibal2.hanni.utils.chat.TextHelper
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.utils.chat.TextHelper.send
+import at.hannibal2.hanni.utils.chat.TextHelper.wrap
+import at.hannibal2.hanni.utils.compat.command
+import at.hannibal2.hanni.utils.compat.hover
+import at.hannibal2.hanni.utils.compat.suggest
 import net.minecraft.util.IChatComponent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object ReminderManager {
 
     private const val REMINDERS_PER_PAGE = 10
@@ -32,8 +32,8 @@ object ReminderManager {
     private val REMINDERS_ACTION_ID = ChatUtils.getUniqueMessageId()
     private val REMINDERS_MESSAGE_ID = ChatUtils.getUniqueMessageId()
 
-    private val storage get() = SkyHanniMod.feature.storage.reminders
-    private val config get() = SkyHanniMod.feature.misc.reminders
+    private val storage get() = HanniMod.feature.storage.reminders
+    private val config get() = HanniMod.feature.misc.reminders
 
     private fun getSortedReminders() = storage.entries.sortedBy { it.value.remindAt }
 
@@ -48,7 +48,7 @@ object ReminderManager {
 
     private fun listReminders(page: Int) {
         TextHelper.displayPaginatedList(
-            "SkyHanni Reminders",
+            "Hanni Reminders",
             getSortedReminders(),
             chatLineId = REMINDERS_LIST_ID,
             emptyMessage = "No reminders found.",
@@ -143,7 +143,7 @@ object ReminderManager {
 
     private fun help() {
         TextHelper.createDivider().send()
-        "§6SkyHanni Reminder Commands:".asComponent().send()
+        "§6Hanni Reminder Commands:".asComponent().send()
         "§e/shremind <time> <reminder> - §bCreates a new reminder".asComponent().send()
         "§e/shremind list <page> - §bLists all reminders".asComponent().send()
         "§e/shremind remove <id> - §bRemoves a reminder".asComponent().send()
@@ -182,7 +182,7 @@ object ReminderManager {
             remindersToSend.add(
                 TextHelper.join(
                     "§e[Reminder]".asComponent {
-                        hover = "§7Reminders by SkyHanni".asComponent()
+                        hover = "§7Reminders by Hanni".asComponent()
                     },
                     actionsComponent,
                     " ",

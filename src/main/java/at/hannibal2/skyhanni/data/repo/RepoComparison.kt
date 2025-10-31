@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.data.repo
+package at.hannibal2.hanni.data.repo
 
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.TimeUtils.format
 
 data class RepoComparison(
     val repoName: String,

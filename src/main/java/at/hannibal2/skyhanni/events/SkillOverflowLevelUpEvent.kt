@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillType
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.features.skillprogress.SkillType
 
-class SkillOverflowLevelUpEvent(val skill: SkillType, val oldLevel: Int, val newLevel: Int) : SkyHanniEvent()
+class SkillOverflowLevelUpEvent(val skill: SkillType, val oldLevel: Int, val newLevel: Int) : HanniEvent()

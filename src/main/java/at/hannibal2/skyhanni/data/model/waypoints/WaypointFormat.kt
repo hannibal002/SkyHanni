@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.data.model.waypoints
+package at.hannibal2.hanni.data.model.waypoints
 
 interface WaypointFormat {
-    fun load(string: String): Waypoints<SkyhanniWaypoint>?
+    fun load(string: String): Waypoints<HanniWaypoint>?
     fun canLoad(string: String): Boolean
-    fun export(waypoints: Waypoints<SkyhanniWaypoint>): String
+    fun export(waypoints: Waypoints<HanniWaypoint>): String
     val name: String
 }

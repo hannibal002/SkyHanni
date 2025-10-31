@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.utils.guide
+package at.hannibal2.hanni.utils.guide
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.HanniBaseScreen
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import net.minecraft.item.ItemStack
 
-abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniBaseScreen() {
+abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : HanniBaseScreen() {
     companion object {
         const val SELECTED_COLOR = 0x50000000
         const val NOT_SELECTED_COLOR = 0x50303030
@@ -93,7 +93,7 @@ abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
             renderVerticalTabs()
 
             Renderable.text(
-                "§7SkyHanni ",
+                "§7Hanni ",
                 horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
             ).renderXYAligned(0, 0, sizeX, sizeY)

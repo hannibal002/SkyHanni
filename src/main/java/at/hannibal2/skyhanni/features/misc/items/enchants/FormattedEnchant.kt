@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.misc.items.enchants
+package at.hannibal2.hanni.features.misc.items.enchants
 
-import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.hanni.utils.NumberUtil.toRoman
 import net.minecraft.item.ItemStack
 
 data class FormattedEnchant(

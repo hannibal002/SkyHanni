@@ -1,4 +1,4 @@
-<templateSet group="SkyHanni">
+<templateSet group="Hanni">
     <template name="configBool" value="@Expose&#10;@ConfigOption(name = &quot;$Name$&quot;, desc = &quot;$Desc$.&quot;)&#10;@ConfigEditorBoolean&#10;var $internalName$: Boolean = $default$" description="boolean config value" toReformat="false" toShortenFQNames="true">
         <variable name="Name" expression="" defaultValue="" alwaysStopAt="true" />
         <variable name="Desc" expression="" defaultValue="" alwaysStopAt="true" />
@@ -107,7 +107,7 @@
 
     <template name="eFun" value="@HandleEvent&#10;fun on$EventPre$(event: $Event$) {&#10;    // TODO&#10;}" description="event handler receiver" toReformat="true" toShortenFQNames="true">
         <variable name="Event" expression="completeSmart()" defaultValue="" alwaysStopAt="true" />
-        <variable name="EventPre" expression="capitalize(regularExpression(Event, &quot;SkyHanni|Event|\\.|&lt;.*?&gt;&quot;, &quot;&quot;))" defaultValue="" alwaysStopAt="false" />
+        <variable name="EventPre" expression="capitalize(regularExpression(Event, &quot;Hanni|Event|\\.|&lt;.*?&gt;&quot;, &quot;&quot;))" defaultValue="" alwaysStopAt="false" />
         <context>
             <option name="KOTLIN_OBJECT_DECLARATION" value="true" />
             <option name="KOTLIN_STATEMENT" value="true" />
@@ -121,7 +121,7 @@
         </context>
     </template>
 
-    <template name="fconfig" value="private val config get() = SkyHanniMod.feature" description="feature config getter" toReformat="true" toShortenFQNames="true">
+    <template name="fconfig" value="private val config get() = HanniMod.feature" description="feature config getter" toReformat="true" toShortenFQNames="true">
         <context>
             <option name="KOTLIN_OBJECT_DECLARATION" value="true" />
         </context>

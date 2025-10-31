@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.config.features.inventory
+package at.hannibal2.hanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyLegacy
-import at.hannibal2.skyhanni.config.OnlyModern
-import at.hannibal2.skyhanni.features.inventory.LegacyBetterContainers
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.OnlyLegacy
+import at.hannibal2.hanni.config.OnlyModern
+import at.hannibal2.hanni.features.inventory.LegacyBetterContainers
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -14,7 +14,7 @@ class ImprovedSBMenusConfig {
 
     @ConfigOption(
         name = "§cUse NEU!",
-        desc = "§eThis feature originally comes from NEU, and was ported to SkyHanni for 1.21+. Enable it in /neu if you want to use it."
+        desc = "§eThis feature originally comes from NEU, and was ported to Hanni for 1.21+. Enable it in /neu if you want to use it."
     )
     @ConfigEditorInfoText
     @OnlyLegacy

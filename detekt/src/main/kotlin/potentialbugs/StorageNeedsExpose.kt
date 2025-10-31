@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.detektrules.potentialbugs
+package at.hannibal2.hanni.detektrules.potentialbugs
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import at.hannibal2.skyhanni.detektrules.utils.DetektUtils.doWeNeedToCheckConfigProp
+import at.hannibal2.hanni.detektrules.HanniRule
+import at.hannibal2.hanni.detektrules.utils.DetektUtils.doWeNeedToCheckConfigProp
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
@@ -10,7 +10,7 @@ import io.gitlab.arturbosch.detekt.rules.hasAnnotation
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
 
-class StorageNeedsExpose(config: Config) : SkyHanniRule(config) {
+class StorageNeedsExpose(config: Config) : HanniRule(config) {
     override val issue = Issue(
         "StorageNeedsExpose",
         Severity.Defect,
@@ -19,8 +19,8 @@ class StorageNeedsExpose(config: Config) : SkyHanniRule(config) {
     )
 
     companion object {
-        const val STORAGE_PACKAGE = "at.hannibal2.skyhanni.config.storage"
-        const val CONFIG_PACKAGE = "at.hannibal2.skyhanni.config.features"
+        const val STORAGE_PACKAGE = "at.hannibal2.hanni.config.storage"
+        const val CONFIG_PACKAGE = "at.hannibal2.hanni.config.features"
     }
 
     override fun visitKtFile(file: KtFile) {

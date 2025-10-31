@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.hanni.features.inventory
 
 //#if MC > 1.21
 //$$ import net.minecraft.util.Identifier
@@ -20,10 +20,10 @@ object LegacyBetterContainers {
         private val resourceIndex = ordinal + 1
 
         //#if MC > 1.21
-        //$$ val configId: Identifier = Identifier.of("skyhanni", "dynamic_54/style$resourceIndex/dynamic_config.json")
-        //$$ val baseId: Identifier = Identifier.of("skyhanni", "dynamic_54/style$resourceIndex/dynamic_54.png")
-        //$$ val slotId: Identifier = Identifier.of("skyhanni", "dynamic_54/style$resourceIndex/dynamic_54_slot_ctm.png")
-        //$$ val buttonId: Identifier = Identifier.of("skyhanni", "dynamic_54/style$resourceIndex/dynamic_54_button_ctm.png")
+        //$$ val configId: Identifier = Identifier.of("hanni", "dynamic_54/style$resourceIndex/dynamic_config.json")
+        //$$ val baseId: Identifier = Identifier.of("hanni", "dynamic_54/style$resourceIndex/dynamic_54.png")
+        //$$ val slotId: Identifier = Identifier.of("hanni", "dynamic_54/style$resourceIndex/dynamic_54_slot_ctm.png")
+        //$$ val buttonId: Identifier = Identifier.of("hanni", "dynamic_54/style$resourceIndex/dynamic_54_button_ctm.png")
         //#endif
     }
 

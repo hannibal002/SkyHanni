@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.mixins.transformers.gui;
+package at.hannibal2.hanni.mixins.transformers.gui;
 
-import at.hannibal2.skyhanni.data.ToolTipData;
-import at.hannibal2.skyhanni.data.model.TextInput;
-import at.hannibal2.skyhanni.mixins.hooks.GuiScreenHookKt;
-import at.hannibal2.skyhanni.utils.compat.DrawContext;
+import at.hannibal2.hanni.data.ToolTipData;
+import at.hannibal2.hanni.data.model.TextInput;
+import at.hannibal2.hanni.mixins.hooks.GuiScreenHookKt;
+import at.hannibal2.hanni.utils.compat.DrawContext;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;

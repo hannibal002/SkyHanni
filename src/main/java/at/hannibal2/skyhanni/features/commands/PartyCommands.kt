@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.commands
+package at.hannibal2.hanni.features.commands
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.data.PartyApi.partyLeader
-import at.hannibal2.skyhanni.data.PartyApi.transferVoluntaryPattern
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.PartyApi
+import at.hannibal2.hanni.data.PartyApi.partyLeader
+import at.hannibal2.hanni.data.PartyApi.transferVoluntaryPattern
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.misc.limbo.LimboTimeTracker
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.trimWhiteSpace
 
-@SkyHanniModule
+@HanniModule
 object PartyCommands {
 
-    private val config get() = SkyHanniMod.feature.misc.commands
+    private val config get() = HanniMod.feature.misc.commands
 
     private fun kickOffline() {
         if (!config.shortCommands) return
@@ -116,7 +116,7 @@ object PartyCommands {
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!config.reversePT.clickable) return
         if (!transferVoluntaryPattern.matches(event.message.trimWhiteSpace().removeColor())) return
         if (partyLeader != PlayerUtils.getName()) return

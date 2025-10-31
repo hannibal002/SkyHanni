@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.commands.tabcomplete
+package at.hannibal2.hanni.features.commands.tabcomplete
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackApi.commands
-import at.hannibal2.skyhanni.data.SackApi
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.utils.ChatUtils.eventWithNewMessage
-import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.GetFromSackApi.commands
+import at.hannibal2.hanni.data.SackApi
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.utils.ChatUtils.eventWithNewMessage
+import at.hannibal2.hanni.utils.ChatUtils.senderIsHanni
+import at.hannibal2.hanni.utils.SkyBlockUtils
 
 object GetFromSacksTabComplete {
 
-    private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
+    private val config get() = HanniMod.feature.misc.commands.tabComplete
 
     fun handleTabComplete(command: String): List<String>? {
         if (!isEnabled()) return null
@@ -23,7 +23,7 @@ object GetFromSacksTabComplete {
     fun handleUnderlineReplace(event: MessageSendToServerEvent): MessageSendToServerEvent {
         if (!isEnabled()) return event
 
-        if (event.senderIsSkyhanni()) return event
+        if (event.senderIsHanni()) return event
 
         if (event.splitMessage.size < 3) return event
 

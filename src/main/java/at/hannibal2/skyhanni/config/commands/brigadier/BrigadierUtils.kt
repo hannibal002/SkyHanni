@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.config.commands.brigadier
+package at.hannibal2.hanni.config.commands.brigadier
 
-import at.hannibal2.skyhanni.config.commands.brigadier.arguments.InternalNameArgumentType
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.StringUtils.hasWhitespace
+import at.hannibal2.hanni.config.commands.brigadier.arguments.InternalNameArgumentType
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuItems
+import at.hannibal2.hanni.utils.StringUtils.hasWhitespace
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType

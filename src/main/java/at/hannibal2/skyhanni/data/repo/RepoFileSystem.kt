@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.data.repo
+package at.hannibal2.hanni.data.repo
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.utils.json.fromJson
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import kotlinx.coroutines.DisposableHandle
@@ -58,8 +58,8 @@ sealed interface RepoFileSystem {
                     val outPath = root.toPath().resolve(relative).normalize()
                     if (!outPath.startsWith(root.toPath())) {
                         throw RuntimeException(
-                            "SkyHanni detected an invalid zip file. This is a potential security risk, " +
-                                "please report this on the SkyHanni discord."
+                            "Hanni detected an invalid zip file. This is a potential security risk, " +
+                                "please report this on the Hanni discord."
                         )
                     }
                 }
@@ -129,7 +129,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         val success = super.loadFromZip(progress, zipFile, logger)
         if (flushJob == null) {
             progress.update("start new launchIOCoroutine task")
-            flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk", timeout = 2.minutes) {
+            flushJob = HanniMod.launchIOCoroutine("repo file saveToDisk", timeout = 2.minutes) {
                 saveToDisk(diskRoot)
             }
         }

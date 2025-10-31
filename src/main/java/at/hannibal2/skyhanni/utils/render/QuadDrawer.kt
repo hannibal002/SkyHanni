@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.hanni.utils.render
 
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.pos
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.pos
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -30,7 +30,7 @@ class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator
 
     companion object {
         inline fun draw3D(
-            event: SkyHanniRenderWorldEvent,
+            event: HanniRenderWorldEvent,
             crossinline quads: QuadDrawer.() -> Unit,
         ) {
             GlStateManager.enableBlend()

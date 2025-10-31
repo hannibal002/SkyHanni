@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.api
+package at.hannibal2.hanni.api
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeJson
-import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.data.model.SkyblockStatList
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.EnumUtils
-import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
-import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.neu.NeuReforgeJson
+import at.hannibal2.hanni.data.model.SkyblockStat
+import at.hannibal2.hanni.data.model.SkyblockStatList
+import at.hannibal2.hanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.EnumUtils
+import at.hannibal2.hanni.utils.ItemCategory
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.hanni.utils.ItemUtils.itemNameWithoutColor
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.json.BaseGsonBuilder
+import at.hannibal2.hanni.utils.json.HanniTypeAdapters
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object ReforgeApi {
     var reforges: List<Reforge> = emptyList()
         private set(value) {
@@ -155,7 +155,7 @@ object ReforgeApi {
     }
 
     private val reforgeGson: Gson = BaseGsonBuilder.gson()
-        .registerTypeAdapter(SkyblockStat::class.java, SkyHanniTypeAdapters.SKYBLOCK_STAT.nullSafe())
+        .registerTypeAdapter(SkyblockStat::class.java, HanniTypeAdapters.SKYBLOCK_STAT.nullSafe())
         .registerTypeAdapter(
             SkyblockStatList::class.java,
             object : TypeAdapter<SkyblockStatList>() {

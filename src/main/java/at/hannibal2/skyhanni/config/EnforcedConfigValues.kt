@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.config
+package at.hannibal2.hanni.config
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.NotificationManager
-import at.hannibal2.skyhanni.data.SkyHanniNotification
-import at.hannibal2.skyhanni.data.jsonobjects.repo.EnforcedConfigValuesJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.EnforcedValueData
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.json.Shimmy
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.NotificationManager
+import at.hannibal2.hanni.data.HanniNotification
+import at.hannibal2.hanni.data.jsonobjects.repo.EnforcedConfigValuesJson
+import at.hannibal2.hanni.data.jsonobjects.repo.EnforcedValueData
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.events.render.gui.GuiScreenOpenEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.json.Shimmy
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import kotlin.time.Duration.Companion.INFINITE
 
-@SkyHanniModule
+@HanniModule
 object EnforcedConfigValues {
 
     private var enforcedConfigValuesData: List<EnforcedValueData> = listOf()
@@ -27,8 +27,8 @@ object EnforcedConfigValues {
         val constant = event.getConstant<EnforcedConfigValuesJson>("misc/EnforcedConfigValues").enforcedConfigValues
         val oldEnforcedValues = enforcedConfigValuesData
         enforcedConfigValuesData = constant.filter {
-            SkyHanniMod.modVersion <= it.affectedVersion &&
-                (it.minimumAffectedVersion?.let { minVersion -> SkyHanniMod.modVersion >= minVersion } ?: true)
+            HanniMod.modVersion <= it.affectedVersion &&
+                (it.minimumAffectedVersion?.let { minVersion -> HanniMod.modVersion >= minVersion } ?: true)
         }.filter {
             it.affectedMinecraftVersions?.contains(PlatformUtils.MC_VERSION) ?: true
         }
@@ -36,27 +36,27 @@ object EnforcedConfigValues {
         hasSentPSAsOnce = false
         // we have to recreate the whole config when a value changes
         // so that the option is blocked off inside the config
-        SkyHanniMod.configManager.recreateConfig()
+        HanniMod.configManager.recreateConfig()
     }
 
     @HandleEvent
     fun onGuiOpen(event: GuiScreenOpenEvent) {
-        enforceOntoConfig(SkyHanniMod.feature)
+        enforceOntoConfig(HanniMod.feature)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(tickEvent: SkyHanniTickEvent) {
+    fun onTick(tickEvent: HanniTickEvent) {
         if (hasSentPSAsOnce) return
         hasSentPSAsOnce = true
         sendPSAs()
-        enforceOntoConfig(SkyHanniMod.feature)
+        enforceOntoConfig(HanniMod.feature)
     }
 
     private fun sendPSAs() {
         val notifications = enforcedConfigValuesData.mapNotNull { it.notificationPSA }
         for (notification in notifications) {
             if (notification.isNotEmpty()) {
-                NotificationManager.queueNotification(SkyHanniNotification(notification, INFINITE, true))
+                NotificationManager.queueNotification(HanniNotification(notification, INFINITE, true))
             }
         }
         val chat = enforcedConfigValuesData.flatMap { it.chatPSA.orEmpty() }
@@ -74,7 +74,7 @@ object EnforcedConfigValues {
             val shimmy = Shimmy.makeShimmy(config, enforcedValue.path.split("."))
             if (shimmy == null) {
                 try {
-                    ErrorManager.skyHanniError("Could not create shimmy for path ${enforcedValue.path}")
+                    ErrorManager.hanniError("Could not create shimmy for path ${enforcedValue.path}")
                 } catch (_: Exception) {
                     continue
                 }

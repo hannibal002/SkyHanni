@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.hanni.api.event.RenderingHanniEvent
+import at.hannibal2.hanni.utils.compat.DrawContext
 import net.minecraft.item.ItemStack
 
-class RenderItemTooltipEvent(context: DrawContext, val stack: ItemStack) : RenderingSkyHanniEvent(context)
+class RenderItemTooltipEvent(context: DrawContext, val stack: ItemStack) : RenderingHanniEvent(context)

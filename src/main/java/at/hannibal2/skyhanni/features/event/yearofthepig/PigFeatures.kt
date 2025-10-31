@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.features.event.yearofthepig
+package at.hannibal2.hanni.features.event.yearofthepig
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.yearofthepig.YearOfThePigConfig
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.event.yearofthepig.YearOfThePigConfig
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.render.WorldRenderUtils
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawLineToEye
 import java.awt.Color
 
-@SkyHanniModule
+@HanniModule
 object PigFeatures {
 
-    private val config get() = SkyHanniMod.feature.event.yearOfThePig
+    private val config get() = HanniMod.feature.event.yearOfThePig
     private val dataSetList get() = PigFeaturesApi.dataSetList
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!config.linesToDraw.any()) return
 
         dataSetList.forEach { dataSet ->
@@ -28,7 +28,7 @@ object PigFeatures {
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.tryRenderLineToPig(dataSet: PigFeaturesApi.ShinyOrbData) {
+    private fun HanniRenderWorldEvent.tryRenderLineToPig(dataSet: PigFeaturesApi.ShinyOrbData) {
         val pigEntity = EntityUtils.getEntityByID(dataSet.pigEntityId) ?: return
 
         val lineToPigEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_PIG)
@@ -43,7 +43,7 @@ object PigFeatures {
         )
     }
 
-    private fun SkyHanniRenderWorldEvent.tryRenderLinePigToOrb(dataSet: PigFeaturesApi.ShinyOrbData) {
+    private fun HanniRenderWorldEvent.tryRenderLinePigToOrb(dataSet: PigFeaturesApi.ShinyOrbData) {
         val pigEntity = EntityUtils.getEntityByID(dataSet.pigEntityId) ?: return
 
         val lineToOrbEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_ORB)

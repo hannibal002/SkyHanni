@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.event.hoppity
+package at.hannibal2.hanni.config.features.event.hoppity
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.utils.OSUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -23,8 +23,8 @@ class HoppityCallWarningConfig {
     @ConfigOption(
         name = "Warning Sound",
         desc = "The sound that plays when hoppity calls.\n" +
-            "§eYou can use custom sounds, put it in the §bskyhanni/sounds §efolder in your resource pack.\n" +
-            "§eThen write §bskyhanni:yourfilename\n" +
+            "§eYou can use custom sounds, put it in the §bhanni/sounds §efolder in your resource pack.\n" +
+            "§eThen write §bhanni:yourfilename\n" +
             "§cMust be a .ogg file",
     )
     @ConfigEditorText

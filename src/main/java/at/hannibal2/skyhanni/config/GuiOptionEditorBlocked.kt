@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config
+package at.hannibal2.hanni.config
 
-import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
+import at.hannibal2.hanni.utils.ConfigUtils.asStructuredText
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
@@ -49,7 +49,7 @@ class GuiOptionEditorBlocked(private val base: GuiOptionEditor, private val extr
 
     companion object {
         val blockedTexture: MyResourceLocation = MyResourceLocation(
-            "skyhanni", "config_blocked.png",
+            "hanni", "config_blocked.png",
         )
     }
 }

@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.slayer
+package at.hannibal2.hanni.features.slayer
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.entity.EntityOpacityActiveEvent
-import at.hannibal2.skyhanni.events.entity.EntityOpacityEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.SlayerApi
+import at.hannibal2.hanni.events.entity.EntityOpacityActiveEvent
+import at.hannibal2.hanni.events.entity.EntityOpacityEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.MobUtils.mob
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import net.minecraft.entity.EntityLivingBase
 
-@SkyHanniModule
+@HanniModule
 object HideIrrelevantMobsInSlayerArea {
 
     private val config get() = SlayerApi.config

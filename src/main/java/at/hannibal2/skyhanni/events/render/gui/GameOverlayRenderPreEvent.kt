@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.events.render.gui
+package at.hannibal2.hanni.events.render.gui
 
-import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.hanni.api.event.RenderingHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.api.minecraftevents.RenderLayer
+import at.hannibal2.hanni.utils.compat.DrawContext
 
 class GameOverlayRenderPreEvent(context: DrawContext, val type: RenderLayer) :
-    RenderingSkyHanniEvent(context), SkyHanniEvent.Cancellable
+    RenderingHanniEvent(context), HanniEvent.Cancellable

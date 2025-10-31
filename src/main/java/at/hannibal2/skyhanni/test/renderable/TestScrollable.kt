@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.test.renderable
+package at.hannibal2.hanni.test.renderable
 
-import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.data.model.TextInput
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.ScrollValue
+import at.hannibal2.hanni.utils.renderables.primitives.text
 
-@SkyHanniModule(devOnly = true)
+@HanniModule(devOnly = true)
 object TestScrollable : RenderableTestSuite.TestRenderable("scrollable") {
 
     private val scroll = ScrollValue()

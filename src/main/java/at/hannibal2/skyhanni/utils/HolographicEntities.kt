@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity
-import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
-import at.hannibal2.skyhanni.utils.compat.createWitherSkeleton
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.mixins.transformers.AccessorRendererLivingEntity
+import at.hannibal2.hanni.utils.TimeUtils.inWholeTicks
+import at.hannibal2.hanni.utils.compat.createWitherSkeleton
+import at.hannibal2.hanni.utils.render.WorldRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.entity.RendererLivingEntity
@@ -150,7 +150,7 @@ object HolographicEntities {
     /**
      * Render a fake [HolographicEntity]. In order to render a fully opaque entity, set [holographicness] to `1F`.
      */
-    fun <T : EntityLivingBase> SkyHanniRenderWorldEvent.renderHolographicEntity(
+    fun <T : EntityLivingBase> HanniRenderWorldEvent.renderHolographicEntity(
         holographicEntity: HolographicEntity<T>,
         holographicness: Float = 0.3f,
     ) {
@@ -165,7 +165,7 @@ object HolographicEntities {
         renderer as? AccessorRendererLivingEntity<T> ?: error("can not cast to AccessorRendererLivingEntity")
 
         renderer.setRenderOutlines(false)
-        if (!renderer.bindEntityTexture_skyhanni(entity)) return
+        if (!renderer.bindEntityTexture_hanni(entity)) return
 
         GlStateManager.pushMatrix()
         val viewerPosition = WorldRenderUtils.getViewerPos(partialTicks)
@@ -182,7 +182,7 @@ object HolographicEntities {
         val netHeadYaw = holographicEntity.interpolatedYaw(partialTicks)
         val headPitch = 0F
         val scaleFactor = 0.0625f
-        renderer.setBrightness_skyhanni(entity, 0f, true)
+        renderer.setBrightness_hanni(entity, 0f, true)
         GlStateManager.color(1f, 1f, 1f, holographicness)
         GlStateManager.depthMask(false)
         GlStateManager.enableBlend()
@@ -207,7 +207,7 @@ object HolographicEntities {
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.depthMask(true)
         GlStateManager.disableBlend()
-        renderer.unsetBrightness_skyhanni()
+        renderer.unsetBrightness_hanni()
         GlStateManager.popMatrix()
     }
 

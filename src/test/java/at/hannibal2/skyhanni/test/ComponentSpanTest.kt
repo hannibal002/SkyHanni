@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.findStyledMatcher
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
+import at.hannibal2.hanni.utils.ComponentMatcherUtils.findStyledMatcher
+import at.hannibal2.hanni.utils.ComponentMatcherUtils.intoSpan
+import at.hannibal2.hanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting

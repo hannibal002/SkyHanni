@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent;
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.hanni.events.HanniRenderEntityEvent;
+import at.hannibal2.hanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.state.EntityRenderState;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#if MC > 1.21.8
-//$$ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
+//$$ import at.hannibal2.hanni.mixins.hooks.RenderLivingEntityHelper;
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 //$$ import com.llamalad7.mixinextras.sugar.Local;
@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 //$$ import net.minecraft.client.render.state.CameraRenderState;
 //$$ import net.minecraft.entity.Entity;
-//$$ import at.hannibal2.skyhanni.mixins.hooks.EntityRenderStateStore;
+//$$ import at.hannibal2.hanni.mixins.hooks.EntityRenderStateStore;
 //#endif
 
 @Mixin(EntityRenderer.class)
@@ -34,7 +34,7 @@ public class MixinEntityRenderer {
         //$$ public void onRenderLabelHead(EntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState, CallbackInfo ci) {
         //#endif
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
-            if (new SkyHanniRenderEntityEvent.Specials.Pre<>(livingEntity, state.x, state.y, state.z).post()) {
+            if (new HanniRenderEntityEvent.Specials.Pre<>(livingEntity, state.x, state.y, state.z).post()) {
                 ci.cancel();
             }
         }
@@ -47,7 +47,7 @@ public class MixinEntityRenderer {
         //$$ public void onRenderLabelTail(EntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState, CallbackInfo ci) {
         //#endif
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
-            new SkyHanniRenderEntityEvent.Specials.Post<>(livingEntity, state.x, state.y, state.z).post();
+            new HanniRenderEntityEvent.Specials.Post<>(livingEntity, state.x, state.y, state.z).post();
         }
     }
 
@@ -58,7 +58,7 @@ public class MixinEntityRenderer {
     //$$     if (glowColor == null) {
     //$$         return original.call(client, entity);
     //$$     }
-    //$$     ((EntityRenderStateStore) state).skyhanni$setUsingCustomOutline();
+    //$$     ((EntityRenderStateStore) state).hanni$setUsingCustomOutline();
     //$$     return true;
     //$$ }
     //$$
@@ -73,7 +73,7 @@ public class MixinEntityRenderer {
     //$$
     //$$ @Inject(method = "updateRenderState", at = @At("TAIL"))
     //$$ public void setEntity(Entity entity, EntityRenderState state, float tickProgress, CallbackInfo ci) {
-    //$$     ((EntityRenderStateStore) state).skyhanni$setEntity(entity);
+    //$$     ((EntityRenderStateStore) state).hanni$setEntity(entity);
     //$$ }
     //#endif
 

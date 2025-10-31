@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.api.GetFromSackApi
-import at.hannibal2.skyhanni.utils.ChatUtils.debug
-import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
+import at.hannibal2.hanni.api.GetFromSackApi
+import at.hannibal2.hanni.utils.ChatUtils.debug
+import at.hannibal2.hanni.utils.ChatUtils.sendMessageToServer
 
 @Suppress("TooManyFunctions")
 object HypixelCommands {
@@ -160,7 +160,7 @@ object HypixelCommands {
     fun partyChat(message: String, prefix: Boolean = false) {
         when (prefix) {
             false -> send("pc $message")
-            true -> send("pc [SkyHanni] $message")
+            true -> send("pc [Hanni] $message")
         }
     }
 

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.markedplayer
+package at.hannibal2.hanni.config.features.markedplayer
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -23,7 +23,7 @@ class JoinLeaveMessageConfig {
     val playersList: Property<String> = Property.of("hannibal2,Minikloon")
 
     @Expose
-    @ConfigOption(name = "Use Prefix", desc = "Should the [SkyHanni] prefix be included in the join/leave message?")
+    @ConfigOption(name = "Use Prefix", desc = "Should the [Hanni] prefix be included in the join/leave message?")
     @ConfigEditorBoolean
     var usePrefix: Boolean = true
 

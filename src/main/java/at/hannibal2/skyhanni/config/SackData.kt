@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config
+package at.hannibal2.hanni.config
 
-import at.hannibal2.skyhanni.data.SackItem
-import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.hanni.data.SackItem
+import at.hannibal2.hanni.utils.NeuInternalName
 import com.google.gson.annotations.Expose
 import java.util.UUID
 

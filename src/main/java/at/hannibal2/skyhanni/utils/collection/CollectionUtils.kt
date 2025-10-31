@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils.collection
+package at.hannibal2.hanni.utils.collection
 
-import at.hannibal2.skyhanni.utils.MinMaxNumber
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.MinMaxNumber
+import at.hannibal2.hanni.utils.SimpleTimeMark
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope

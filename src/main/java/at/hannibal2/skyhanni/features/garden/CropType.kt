@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.hanni.features.garden
 
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
-import at.hannibal2.skyhanni.utils.compat.DyeCompat
+import at.hannibal2.hanni.features.garden.fortuneguide.FarmingItemType
+import at.hannibal2.hanni.utils.compat.DyeCompat
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items

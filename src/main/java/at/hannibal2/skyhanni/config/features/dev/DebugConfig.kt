@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.dev
+package at.hannibal2.hanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.ElectionCandidate
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.data.ElectionCandidate
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -64,7 +64,7 @@ class DebugConfig {
     var showItemCategory: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Show Item Name", desc = "Show the SkyHanni item name for an item.")
+    @ConfigOption(name = "Show Item Name", desc = "Show the Hanni item name for an item.")
     @ConfigEditorBoolean
     var showItemName: Boolean = false
 
@@ -157,8 +157,8 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(
-        name = "SkyHanni Event Counter",
-        desc = "Count once per second how many skyhanni events gets triggered, show the total amount in console output.",
+        name = "Hanni Event Counter",
+        desc = "Count once per second how many hanni events gets triggered, show the total amount in console output.",
     )
     @ConfigEditorBoolean
     var eventCounter: Boolean = false

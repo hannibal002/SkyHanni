@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.events.hypixel
+package at.hannibal2.hanni.events.hypixel
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 
 /**
- * TODO: replace with [HypixelAPIJoinEvent](at.hannibal2.skyhanni.events.hypixel.modapi.HypixelAPIJoinEvent)
+ * TODO: replace with [HypixelAPIJoinEvent](at.hannibal2.hanni.events.hypixel.modapi.HypixelAPIJoinEvent)
  * */
-object HypixelJoinEvent : SkyHanniEvent()
+object HypixelJoinEvent : HanniEvent()

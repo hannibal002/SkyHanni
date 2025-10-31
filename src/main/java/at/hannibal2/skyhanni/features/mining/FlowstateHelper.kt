@@ -1,44 +1,44 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.hanni.features.mining
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
-import at.hannibal2.skyhanni.events.mining.OreMinedEvent
-import at.hannibal2.skyhanni.features.mining.FlowstateHelper.blockBreakStreak
-import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getSpeedBonus
-import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getStreakColor
-import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getTimerColor
-import at.hannibal2.skyhanni.features.mining.FlowstateHelper.personalBest
-import at.hannibal2.skyhanni.features.mining.FlowstateHelper.streakEndTimer
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ExtendedChatColor
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.TimeUnit
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.Text
-import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.empty
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.ItemInHandChangeEvent
+import at.hannibal2.hanni.events.UserLuckCalculateEvent
+import at.hannibal2.hanni.events.mining.OreMinedEvent
+import at.hannibal2.hanni.features.mining.FlowstateHelper.blockBreakStreak
+import at.hannibal2.hanni.features.mining.FlowstateHelper.getSpeedBonus
+import at.hannibal2.hanni.features.mining.FlowstateHelper.getStreakColor
+import at.hannibal2.hanni.features.mining.FlowstateHelper.getTimerColor
+import at.hannibal2.hanni.features.mining.FlowstateHelper.personalBest
+import at.hannibal2.hanni.features.mining.FlowstateHelper.streakEndTimer
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ExtendedChatColor
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.hanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.hanni.utils.TimeUnit
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.compat.Text
+import at.hannibal2.hanni.utils.compat.append
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.primitives.empty
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import net.minecraft.init.Items
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object FlowstateHelper {
-    private val config get() = SkyHanniMod.feature.mining.flowstateHelper
+    private val config get() = HanniMod.feature.mining.flowstateHelper
     var personalBest
         get() = ProfileStorageData.profileSpecific?.mining?.flowstatePersonalBest ?: 0
         private set(value) {
@@ -85,7 +85,7 @@ object FlowstateHelper {
             if (personalBest > 200 && config.personalBestMessage) {
                 val newLuck = calculateFlowstateLuck(blockBreakStreak)
                 val oldLuck = calculateFlowstateLuck(personalBest)
-                val userLuckSegment = if (personalBest > 500) " §aYou Gained +${newLuck - oldLuck}✴ SkyHanni User Luck" else ""
+                val userLuckSegment = if (personalBest > 500) " §aYou Gained +${newLuck - oldLuck}✴ Hanni User Luck" else ""
                 ChatUtils.chat(
                     "§d§lNEW FLOWSTATE PERSONAL BEST!§f Streak: $blockBreakStreak." +
                         " You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!" + userLuckSegment,
@@ -289,7 +289,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
     }
 
     companion object {
-        private val config get() = SkyHanniMod.feature.mining.flowstateHelper
+        private val config get() = HanniMod.feature.mining.flowstateHelper
 
         private fun Duration.formatTime(): Text {
             return getTimerColor(this).append(format(TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true))

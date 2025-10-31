@@ -1,36 +1,36 @@
-package at.hannibal2.skyhanni.features.minion
+package at.hannibal2.hanni.features.minion
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.MinionCloseEvent
-import at.hannibal2.skyhanni.events.MinionOpenEvent
-import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.PrimitiveItemStack
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.Perk
+import at.hannibal2.hanni.data.jsonobjects.repo.MinionXPJson
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.MinionCloseEvent
+import at.hannibal2.hanni.events.MinionOpenEvent
+import at.hannibal2.hanni.events.MinionStorageOpenEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.features.skillprogress.SkillType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.PrimitiveItemStack
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
 import net.minecraft.block.BlockChest
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import java.util.EnumMap
 
-@SkyHanniModule
+@HanniModule
 object MinionXP {
 
-    private val config get() = SkyHanniMod.feature.misc.minions
+    private val config get() = HanniMod.feature.misc.minions
 
     private val xpItemMap: MutableMap<PrimitiveItemStack, String> = mutableMapOf()
     private val collectItemXPList: MutableList<String> = mutableListOf()

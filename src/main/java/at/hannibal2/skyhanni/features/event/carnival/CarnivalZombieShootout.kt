@@ -1,36 +1,36 @@
-package at.hannibal2.skyhanni.features.event.carnival
+package at.hannibal2.hanni.features.event.carnival
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.empty
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.ServerBlockChangeEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.compat.getEntityHelmet
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawHitbox
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.hanni.utils.renderables.primitives.empty
+import at.hannibal2.hanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -45,10 +45,10 @@ import kotlin.time.DurationUnit
 //$$ import net.minecraft.state.property.Properties
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object CarnivalZombieShootout {
 
-    private val config get() = SkyHanniMod.feature.event.carnival.zombieShootout
+    private val config get() = HanniMod.feature.event.carnival.zombieShootout
 
     private data class ShootoutLamp(var pos: LorenzVec, var time: SimpleTimeMark)
     private data class ShootoutZombie(val entity: EntityZombie, val type: ZombieType)
@@ -86,7 +86,7 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled() || (!config.coloredHitboxes && !config.coloredLines && !config.zombieTimer)) return
 
         if (config.zombieTimer) event.renderZombieTimer()
@@ -94,7 +94,7 @@ object CarnivalZombieShootout {
         if (config.coloredLines) event.renderLines()
     }
 
-    private fun SkyHanniRenderWorldEvent.renderZombieTimer() {
+    private fun HanniRenderWorldEvent.renderZombieTimer() {
         val zombiesToRemove = mutableListOf<ShootoutZombie>()
 
         for ((zombie, time) in zombieTimes) {
@@ -126,7 +126,7 @@ object CarnivalZombieShootout {
         zombiesToRemove.forEach { zombieTimes.remove(it) }
     }
 
-    private fun SkyHanniRenderWorldEvent.renderHitBoxes() {
+    private fun HanniRenderWorldEvent.renderHitBoxes() {
         lamp?.let {
             drawWaypointFilled(it.pos, Color.RED, minimumAlpha = 1.0f)
         }
@@ -152,7 +152,7 @@ object CarnivalZombieShootout {
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.renderLines() = lamp?.let {
+    private fun HanniRenderWorldEvent.renderLines() = lamp?.let {
         draw3DLine(
             exactPlayerEyeLocation(),
             it.pos.add(0.5, 0.5, 0.5),
@@ -198,7 +198,7 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!config.enabled || HypixelData.skyBlockArea != "Carnival") return
 
         val message = event.message.removeColor()
@@ -211,7 +211,7 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (!isEnabled() || (!config.coloredHitboxes && !config.zombieTimer && !config.lampTimer) || !event.isMod(2)) return
 
         if (config.coloredHitboxes || config.zombieTimer) {

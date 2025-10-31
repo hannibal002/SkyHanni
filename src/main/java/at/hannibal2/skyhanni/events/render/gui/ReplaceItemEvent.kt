@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.events.render.gui
+package at.hannibal2.hanni.events.render.gui
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.hanni.api.event.HanniEvent
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack?, val slot: Int) : SkyHanniEvent() {
+class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack?, val slot: Int) : HanniEvent() {
     var replacement: ItemStack? = null
         private set
     var shouldRemove = false

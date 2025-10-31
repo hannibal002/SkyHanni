@@ -1,32 +1,32 @@
-package at.hannibal2.skyhanni.test.command
+package at.hannibal2.hanni.test.command
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
-import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
-import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
-import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
-import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
-import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
-import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
-import at.hannibal2.skyhanni.utils.compat.getInventoryItems
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.data.mob.Mob
+import at.hannibal2.hanni.data.mob.MobData
+import at.hannibal2.hanni.data.mob.MobFilter.isDisplayNpc
+import at.hannibal2.hanni.data.mob.MobFilter.isRealPlayer
+import at.hannibal2.hanni.data.mob.MobFilter.isSkyBlockMob
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.EntityUtils.baseMaxHealth
+import at.hannibal2.hanni.utils.EntityUtils.cleanName
+import at.hannibal2.hanni.utils.EntityUtils.getArmorInventory
+import at.hannibal2.hanni.utils.EntityUtils.getBlockInHand
+import at.hannibal2.hanni.utils.EntityUtils.getSkinTexture
+import at.hannibal2.hanni.utils.EntityUtils.isNpc
+import at.hannibal2.hanni.utils.ItemUtils.cleanName
+import at.hannibal2.hanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.hanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.OSUtils
+import at.hannibal2.hanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.hanni.utils.compat.getFirstPassenger
+import at.hannibal2.hanni.utils.compat.getInventoryItems
+import at.hannibal2.hanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -39,7 +39,7 @@ import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object CopyNearbyEntitiesCommand {
 
     private fun command(args: Array<String>) {

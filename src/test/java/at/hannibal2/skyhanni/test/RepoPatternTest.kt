@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternDump
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.repopatterns.RepoPatternDump
+import at.hannibal2.hanni.utils.repopatterns.RepoPatternManager
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows

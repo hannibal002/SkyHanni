@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard
+package at.hannibal2.hanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.data.MiningApi
-import at.hannibal2.skyhanni.data.PurseApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBits
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsAvailable
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGems
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementBank
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementBits
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementCold
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementCopper
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementGems
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementHeat
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementMotes
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementNorthStars
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementPurse
+import at.hannibal2.hanni.data.MiningApi
+import at.hannibal2.hanni.data.PurseApi
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getBits
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsAvailable
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getGems
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
+import at.hannibal2.hanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
+import at.hannibal2.hanni.features.gui.customscoreboard.elements.ScoreboardElementBank
+import at.hannibal2.hanni.features.gui.customscoreboard.elements.ScoreboardElementBits
+import at.hannibal2.hanni.features.gui.customscoreboard.elements.ScoreboardElementCold
+import at.hannibal2.hanni.features.gui.customscoreboard.elements.ScoreboardElementCopper
+import at.hannibal2.hanni.features.gui.customscoreboard.elements.ScoreboardElementGems
+import at.hannibal2.hanni.features.gui.customscoreboard.elements.ScoreboardElementHeat
+import at.hannibal2.hanni.features.gui.customscoreboard.elements.ScoreboardElementMotes
+import at.hannibal2.hanni.features.gui.customscoreboard.elements.ScoreboardElementNorthStars
+import at.hannibal2.hanni.features.gui.customscoreboard.elements.ScoreboardElementPurse
 
 private val hideEmptyLines get() = informationFilteringConfig.hideEmptyLines
 

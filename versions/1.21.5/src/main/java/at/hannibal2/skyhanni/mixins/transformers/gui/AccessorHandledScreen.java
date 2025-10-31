@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers.gui;
+package at.hannibal2.hanni.mixins.transformers.gui;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -15,13 +15,13 @@ public interface AccessorHandledScreen {
     int getGuiLeft();
 
     @Invoker("onMouseClick")
-    void handleMouseClick_skyhanni(Slot slot, int slotId, int button, SlotActionType actionType);
+    void handleMouseClick_hanni(Slot slot, int slotId, int button, SlotActionType actionType);
 
     @Accessor("y")
     int getGuiTop();
 
     @Invoker("drawBackground")
-    void invokeDrawGuiContainerBackgroundLayer_skyhanni(DrawContext context, float deltaTicks, int mouseX, int mouseY);
+    void invokeDrawGuiContainerBackgroundLayer_hanni(DrawContext context, float deltaTicks, int mouseX, int mouseY);
 
     @Accessor("backgroundWidth")
     int getWidth();

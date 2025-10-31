@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
+package at.hannibal2.hanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.hanni.data.ScoreboardData
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.hanni.utils.RegexUtils.firstMatches
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addNotNull
+import at.hannibal2.hanni.utils.collection.CollectionUtils.nextAfter
 
 // scoreboard
 // scoreboard update event
@@ -23,7 +23,7 @@ object ScoreboardElementObjective : ScoreboardElement() {
         }
     }
 
-    override val configLine = "Objective:\n§eStar SkyHanni on Github"
+    override val configLine = "Objective:\n§eStar Hanni on Github"
 
     override val elementPatterns = listOf(
         ScoreboardPattern.objectivePattern,

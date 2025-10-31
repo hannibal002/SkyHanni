@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.events.render
+package at.hannibal2.hanni.events.render
 
-import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
+import at.hannibal2.hanni.api.event.GenericHanniEvent
 import net.minecraft.entity.Entity
 
 open class EntityRenderLayersEvent<T : Entity>(
     val entity: T,
-) : GenericSkyHanniEvent<T>(entity.javaClass) {
+) : GenericHanniEvent<T>(entity.javaClass) {
 
     class Pre<T : Entity>(
         entity: T,

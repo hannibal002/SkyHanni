@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.repo
+package at.hannibal2.hanni.data.repo
 
 abstract class AbstractRepoConfig<RLC : AbstractRepoLocationConfig> {
     abstract var repoAutoUpdate: Boolean

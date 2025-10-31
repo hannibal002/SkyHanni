@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.config.storage
+package at.hannibal2.hanni.config.storage
 
-import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
-import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay
-import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
-import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import at.hannibal2.hanni.features.bingo.card.goals.BingoGoal
+import at.hannibal2.hanni.features.chat.CurrentChatDisplay
+import at.hannibal2.hanni.features.fame.UpgradeReminder.CommunityShopUpgrade
+import at.hannibal2.hanni.features.misc.UserLuckBreakdown
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
 import java.time.LocalDate
 

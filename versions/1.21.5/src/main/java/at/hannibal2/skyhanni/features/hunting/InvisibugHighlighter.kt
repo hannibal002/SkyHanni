@@ -1,29 +1,29 @@
-package at.hannibal2.skyhanni.features.hunting
+package at.hannibal2.hanni.features.hunting
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.MobUtils.isCompletelyDefault
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.EntityUtils.canBeSeen
+import at.hannibal2.hanni.utils.LocationUtils.distanceTo
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.MobUtils.isCompletelyDefault
+import at.hannibal2.hanni.utils.getLorenzVec
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.particle.ParticleTypes
 
-@SkyHanniModule
+@HanniModule
 object InvisibugHighlighter {
-    private val config get() = SkyHanniMod.feature.hunting.mobHighlight.invisibug
+    private val config get() = HanniMod.feature.hunting.mobHighlight.invisibug
 
     private val invisibugEntities = mutableListOf<LivingEntity>()
     private var locationsToRender = setOf<LorenzVec>()
@@ -43,14 +43,14 @@ object InvisibugHighlighter {
         invisibugEntities.add(nearestArmorStand)
     }
 
-    @HandleEvent(SkyHanniTickEvent::class, onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(HanniTickEvent::class, onlyOnIsland = IslandType.GALATEA)
     fun onTick() {
         if (!config.enabled) return
         locationsToRender = invisibugEntities.filter { it.canBeSeen(32) }.map { it.getLorenzVec() }.toSet()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!config.enabled) return
 
         for (location in locationsToRender) {

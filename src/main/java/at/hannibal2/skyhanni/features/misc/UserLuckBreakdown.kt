@@ -1,31 +1,31 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.hanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillType
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.Perk
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryOpenEvent
+import at.hannibal2.hanni.events.UserLuckCalculateEvent
+import at.hannibal2.hanni.events.minecraft.ToolTipEvent
+import at.hannibal2.hanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.hanni.features.skillprogress.SkillType
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.InventoryUtils.isTopInventory
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -33,7 +33,7 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object UserLuckBreakdown {
     private var inMiscStats = false
     private var replaceSlot: Int? = null
@@ -41,10 +41,10 @@ object UserLuckBreakdown {
     private var skillCalcCoolDown = SimpleTimeMark.farPast()
 
     private val storage get() = ProfileStorageData.playerSpecific
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = HanniMod.feature.misc
 
     private val mainLuckID = Items.ender_pearl
-    private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
+    private const val MAIN_LUCK_NAME = "§a✴ Hanni User Luck"
 
     private var fillerItem: ItemStack? = null
     //#if MC < 1.21
@@ -64,7 +64,7 @@ object UserLuckBreakdown {
         "§7Show all stats: §.(?<toggle>.*)",
     )
 
-    private const val LUCK_TOOLTIP = "§5§o §a✴ SkyHanni User Luck §f"
+    private const val LUCK_TOOLTIP = "§5§o §a✴ Hanni User Luck §f"
     private var inCustomBreakdown = false
 
     private val validItemSlots = (10..53).filter { it !in listOf(17, 18, 26, 27, 35, 36) && it !in 44..53 }
@@ -253,7 +253,7 @@ object UserLuckBreakdown {
                 val luckString = tryTruncateFloat(luckInput.roundTo(2))
                 if (luckInput == 0f) {
                     arrayOf(
-                        "§7SkyHanni User Luck is the best stat.",
+                        "§7Hanni User Luck is the best stat.",
                         "",
                         "§7Flat: §a+$luckString✴",
                         "",
@@ -262,7 +262,7 @@ object UserLuckBreakdown {
                     )
                 } else {
                     arrayOf(
-                        "§7SkyHanni User Luck increases your",
+                        "§7Hanni User Luck increases your",
                         "§7overall fortune around Hypixel SkyBlock.",
                         "",
                         "§7(Disclaimer: May not affect real drop chances)",
@@ -393,7 +393,7 @@ object UserLuckBreakdown {
         //$$         "",
         //$$         "§7Value: §a+5✴",
         //$$         "",
-        //$$         "§8We put a lot of effort into updating SkyHanni.",
+        //$$         "§8We put a lot of effort into updating Hanni.",
         //$$         "§8This is a small bonus for using modern Minecraft.",
         //$$     ),
         //$$ )

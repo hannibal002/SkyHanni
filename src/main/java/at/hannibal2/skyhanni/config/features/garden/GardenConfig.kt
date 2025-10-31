@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.config.features.garden
+package at.hannibal2.hanni.config.features.garden
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.NoConfigLink
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
-import at.hannibal2.skyhanni.config.features.garden.contest.JacobContestConfig
-import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig
-import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig
-import at.hannibal2.skyhanni.config.features.garden.optimalAngles.OptimalAnglesConfig
-import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig
-import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig
-import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.config.NoConfigLink
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.config.features.garden.composter.ComposterConfig
+import at.hannibal2.hanni.config.features.garden.contest.JacobContestConfig
+import at.hannibal2.hanni.config.features.garden.cropmilestones.CropMilestonesConfig
+import at.hannibal2.hanni.config.features.garden.laneswitch.FarmingLaneConfig
+import at.hannibal2.hanni.config.features.garden.optimalAngles.OptimalAnglesConfig
+import at.hannibal2.hanni.config.features.garden.optimalspeed.OptimalSpeedConfig
+import at.hannibal2.hanni.config.features.garden.pests.PestsConfig
+import at.hannibal2.hanni.config.features.garden.visitor.VisitorConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -197,7 +197,7 @@ class GardenConfig {
     @ConfigOption(
         name = "Copy Milestone Data",
         desc = "Copy wrong crop milestone data in clipboard when opening the crop milestone menu. " +
-            "Please share this data in SkyHanni discord.",
+            "Please share this data in Hanni discord.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.features.slayer.vampire
+package at.hannibal2.hanni.config.features.slayer.vampire
 
-import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.hanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

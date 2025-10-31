@@ -1,39 +1,39 @@
-package at.hannibal2.skyhanni.features.event.yearoftheseal
+package at.hannibal2.hanni.features.event.yearoftheseal
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.DisplayTableEntry
-import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.DisplayTableEntry
+import at.hannibal2.hanni.utils.InventoryDetector
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.ItemCategory
+import at.hannibal2.hanni.utils.ItemPriceUtils.getPriceName
+import at.hannibal2.hanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.ItemUtils.repoItemName
+import at.hannibal2.hanni.utils.NeuInternalName
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RenderDisplayHelper
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.collection.CollectionUtils.add
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.RenderableUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.tracker.HanniTracker
 import net.minecraft.item.ItemStack
 
-@SkyHanniModule
+@HanniModule
 object FishyTreatProfit {
 
-    private val config get() = SkyHanniMod.feature.event.yearOfTheSeal
+    private val config get() = HanniMod.feature.event.yearOfTheSeal
     private var display = emptyList<Renderable>()
     private val inventory = InventoryDetector { name -> name == "Lukas the Aquarist" }
     private val FISHY_TREAT = "FISHY_TREAT".toInternalName()
@@ -100,7 +100,7 @@ object FishyTreatProfit {
             internalName = item.getInternalName()
         }
 
-        val itemPrice = SkyHanniTracker.getPricePer(internalName) * amount
+        val itemPrice = HanniTracker.getPricePer(internalName) * amount
         if (itemPrice < 0) return
 
         val profitPerSell = itemPrice - additionalCost
@@ -140,7 +140,7 @@ object FishyTreatProfit {
 
     private fun MutableList<String>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
         for ((internalName, amount) in additionalMaterials) {
-            add(internalName.getPriceName(amount, SkyHanniTracker.getPricePer(internalName)))
+            add(internalName.getPriceName(amount, HanniTracker.getPricePer(internalName)))
         }
     }
 
@@ -167,7 +167,7 @@ object FishyTreatProfit {
     private fun getAdditionalCost(requiredItems: Map<NeuInternalName, Int>): Double {
         var otherItemsPrice = 0.0
         for ((name, amount) in requiredItems) {
-            otherItemsPrice += SkyHanniTracker.getPricePer(name) * amount
+            otherItemsPrice += HanniTracker.getPricePer(name) * amount
         }
         return otherItemsPrice
     }

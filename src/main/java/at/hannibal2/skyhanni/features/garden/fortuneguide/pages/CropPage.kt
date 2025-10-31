@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
+package at.hannibal2.hanni.features.garden.fortuneguide.pages
 
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneStats
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.split
-import at.hannibal2.skyhanni.utils.guide.GuideTablePage
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.features.garden.CropType
+import at.hannibal2.hanni.features.garden.fortuneguide.FFStats
+import at.hannibal2.hanni.features.garden.fortuneguide.FarmingItemType
+import at.hannibal2.hanni.features.garden.fortuneguide.FortuneStats
+import at.hannibal2.hanni.utils.GuiRenderUtils
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.split
+import at.hannibal2.hanni.utils.guide.GuideTablePage
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 
 class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) :
     GuideTablePage(

@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.mixins.transformers.gui;
+package at.hannibal2.hanni.mixins.transformers.gui;
 
-import at.hannibal2.skyhanni.data.ToolTipData;
-import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
-import at.hannibal2.skyhanni.utils.compat.DrawContext;
-import at.hannibal2.skyhanni.utils.KeyboardManager;
+import at.hannibal2.hanni.data.ToolTipData;
+import at.hannibal2.hanni.mixins.hooks.GuiContainerHook;
+import at.hannibal2.hanni.utils.compat.DrawContext;
+import at.hannibal2.hanni.utils.KeyboardManager;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
@@ -19,14 +19,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinGuiContainer extends GuiScreen {
 
     @Unique
-    private final GuiContainerHook skyHanni$hook = new GuiContainerHook(this);
+    private final GuiContainerHook hanni$hook = new GuiContainerHook(this);
 
     @Shadow
     private Slot theSlot;
 
     @Inject(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;closeScreen()V", shift = At.Shift.BEFORE), cancellable = true)
     private void closeWindowPressed(CallbackInfo ci) {
-        skyHanni$hook.closeWindowPressed(ci);
+        hanni$hook.closeWindowPressed(ci);
     }
 
     @Inject(method = "keyTyped", at = @At("HEAD"), cancellable = true)
@@ -38,38 +38,38 @@ public abstract class MixinGuiContainer extends GuiScreen {
 
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V", ordinal = 1))
     private void backgroundDrawn(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.backgroundDrawn(new DrawContext(), mouseX, mouseY, partialTicks);
+        hanni$hook.backgroundDrawn(new DrawContext(), mouseX, mouseY, partialTicks);
     }
 
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
     private void preDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.preDraw(new DrawContext(), mouseX, mouseY, partialTicks, ci);
+        hanni$hook.preDraw(new DrawContext(), mouseX, mouseY, partialTicks, ci);
     }
 
     @Inject(method = "drawScreen", at = @At("TAIL"))
     private void postDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.postDraw(new DrawContext(), mouseX, mouseY, partialTicks);
+        hanni$hook.postDraw(new DrawContext(), mouseX, mouseY, partialTicks);
     }
 
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/inventory/GuiContainer;drawGuiContainerForegroundLayer(II)V", shift = At.Shift.AFTER))
     private void onForegroundDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.foregroundDrawn(new DrawContext(), mouseX, mouseY, partialTicks);
+        hanni$hook.foregroundDrawn(new DrawContext(), mouseX, mouseY, partialTicks);
     }
 
     @Inject(method = "drawSlot", at = @At("HEAD"), cancellable = true)
     private void onDrawSlot(Slot slot, CallbackInfo ci) {
-        skyHanni$hook.onDrawSlot(slot, ci);
+        hanni$hook.onDrawSlot(slot, ci);
     }
 
     @Inject(method = "drawSlot", at = @At("RETURN"))
     private void onDrawSlotPost(Slot slot, CallbackInfo ci) {
-        skyHanni$hook.onDrawSlotPost(slot);
+        hanni$hook.onDrawSlotPost(slot);
     }
 
     @Inject(method = "handleMouseClick", at = @At(value = "HEAD"), cancellable = true)
     private void onMouseClick(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
         if (slot == null) return;
-        skyHanni$hook.onMouseClick(slot, slotId, clickedButton, clickType, ci);
+        hanni$hook.onMouseClick(slot, slotId, clickedButton, clickType, ci);
     }
 
     @Inject(method = "drawScreen",
@@ -81,7 +81,7 @@ public abstract class MixinGuiContainer extends GuiScreen {
         )
     )
     public void drawScreen_after(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.onDrawScreenAfter(new DrawContext(), mouseX, mouseY, ci);
+        hanni$hook.onDrawScreenAfter(new DrawContext(), mouseX, mouseY, ci);
         ToolTipData.INSTANCE.setLastSlot(this.theSlot);
     }
 }

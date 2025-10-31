@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent;
-import at.hannibal2.skyhanni.events.render.OverlayType;
+import at.hannibal2.hanni.events.render.BlockOverlayRenderEvent;
+import at.hannibal2.hanni.events.render.OverlayType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;

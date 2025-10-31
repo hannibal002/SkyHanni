@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config
+package at.hannibal2.hanni.config
 
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
@@ -16,13 +16,13 @@ class ConfigGuiForgeInterop : IModGuiFactory {
     override fun initialize(minecraft: Minecraft) {
     }
 
-    override fun mainConfigGuiClass() = WrappedSkyHanniConfig::class.java
+    override fun mainConfigGuiClass() = WrappedHanniConfig::class.java
 
     override fun runtimeGuiCategories(): Set<RuntimeOptionCategoryElement>? = null
 
     override fun getHandlerFor(element: RuntimeOptionCategoryElement): RuntimeOptionGuiHandler? = null
 
-    class WrappedSkyHanniConfig(private val parent: GuiScreen) : GuiScreenElementWrapper(ConfigGuiManager.getEditorInstance()) {
+    class WrappedHanniConfig(private val parent: GuiScreen) : GuiScreenElementWrapper(ConfigGuiManager.getEditorInstance()) {
 
         @Throws(IOException::class)
         override fun handleKeyboardInput() {

@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.utils.renderables
+package at.hannibal2.hanni.utils.renderables
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.model.TextInput
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.SkyBlockUtils
 
 class SearchTextInput : TextInput() {
 
@@ -13,10 +13,10 @@ class SearchTextInput : TextInput() {
         searchTextInputs.add(this)
     }
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
-        private val config get() = SkyHanniMod.feature.misc
+        private val config get() = HanniMod.feature.misc
 
         val searchTextInputs = mutableListOf<SearchTextInput>()
 

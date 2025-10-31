@@ -1,9 +1,9 @@
-package at.hannibal2.skyhanni.features.inventory.tiarelay
+package at.hannibal2.hanni.features.inventory.tiarelay
 
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
 enum class Relay(
     val relayName: String,

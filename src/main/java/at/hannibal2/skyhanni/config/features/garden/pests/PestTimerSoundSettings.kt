@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.garden.pests
+package at.hannibal2.hanni.config.features.garden.pests
 
-import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
-import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.hanni.features.garden.pests.PestSpawnTimer
+import at.hannibal2.hanni.utils.OSUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider

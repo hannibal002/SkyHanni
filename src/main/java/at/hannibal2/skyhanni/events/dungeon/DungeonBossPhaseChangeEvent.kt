@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.events.dungeon
+package at.hannibal2.hanni.events.dungeon
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonBossApi
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.features.dungeon.DungeonBossApi
 
-class DungeonBossPhaseChangeEvent(val newPhase: DungeonBossApi.DungeonBossPhase) : SkyHanniEvent()
+class DungeonBossPhaseChangeEvent(val newPhase: DungeonBossApi.DungeonBossPhase) : HanniEvent()

@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
-import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.TabListUpdateEvent
+import at.hannibal2.hanni.events.TablistFooterUpdateEvent
+import at.hannibal2.hanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.hanni.mixins.hooks.tabListGuard
+import at.hannibal2.hanni.mixins.transformers.AccessorGuiPlayerTabOverlay
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ConditionalUtils.conditionalTransform
+import at.hannibal2.hanni.utils.ConditionalUtils.transformIf
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import net.minecraft.client.Minecraft
@@ -32,7 +32,7 @@ import net.minecraft.world.WorldSettings
 //$$ import net.minecraft.world.level.GameType
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object TabListData {
     private var tablistCache = emptyList<String>()
     private var debugCache: List<String>? = null
@@ -68,7 +68,7 @@ object TabListData {
             debugCache = null
             return
         }
-        SkyHanniMod.launchCoroutine("tab list toggle debug") {
+        HanniMod.launchCoroutine("tab list toggle debug") {
             val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
             debugCache = clipboard.lines()
             ChatUtils.chat("Enabled tab list debug with your clipboard.")
@@ -174,9 +174,9 @@ object TabListData {
         }
 
         val tabListOverlay = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
-        header = tabListOverlay.header_skyhanni?.formattedText.orEmpty()
+        header = tabListOverlay.header_hanni?.formattedText.orEmpty()
 
-        val tabFooter = tabListOverlay.footer_skyhanni?.formattedText.orEmpty()
+        val tabFooter = tabListOverlay.footer_hanni?.formattedText.orEmpty()
         if (tabFooter != footer && tabFooter != "") {
             TablistFooterUpdateEvent(tabFooter).post()
         }

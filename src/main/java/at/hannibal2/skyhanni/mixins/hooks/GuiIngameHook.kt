@@ -1,12 +1,12 @@
-package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.hanni.mixins.hooks
 
-import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.hanni.data.ScoreboardData
 import net.minecraft.client.gui.FontRenderer
 
 //#if MC > 1.21
 //$$ import net.minecraft.text.Text
 //$$ import net.minecraft.client.gui.DrawContext
-//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+//$$ import at.hannibal2.hanni.utils.compat.formattedTextCompatLessResets
 //#endif
 
 object GuiIngameHook {

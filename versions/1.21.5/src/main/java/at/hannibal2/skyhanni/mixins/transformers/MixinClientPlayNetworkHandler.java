@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent;
-import at.hannibal2.skyhanni.features.misc.CurrentPing;
+import at.hannibal2.hanni.events.entity.EntityEquipmentChangeEvent;
+import at.hannibal2.hanni.features.misc.CurrentPing;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;

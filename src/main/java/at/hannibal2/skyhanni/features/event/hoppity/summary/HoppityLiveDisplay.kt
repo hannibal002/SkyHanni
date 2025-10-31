@@ -1,53 +1,53 @@
-package at.hannibal2.skyhanni.features.event.hoppity.summary
+package at.hannibal2.hanni.features.event.hoppity.summary
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig.HoppityStat
-import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig
-import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig.HoppityDateTimeFormat.RELATIVE
-import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig.HoppityLiveDisplayInventoryType
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventEndMark
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventStartMark
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getHoppityEventNumber
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.StatString
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.buildEmptyFallback
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.dropConsecutiveEmpties
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getMealEggCounts
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getSpawnedEggCountsWithInfPossible
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getYearStats
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFShopPrice.menuNamePattern
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.TimeUtils.getCountdownFormat
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
-import at.hannibal2.skyhanni.utils.renderables.container.ContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig.HoppityStat
+import at.hannibal2.hanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig
+import at.hannibal2.hanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig.HoppityDateTimeFormat.RELATIVE
+import at.hannibal2.hanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig.HoppityLiveDisplayInventoryType
+import at.hannibal2.hanni.config.storage.ProfileSpecificStorage.HoppityEventStats
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi.getEventEndMark
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi.getEventStartMark
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi.getHoppityEventNumber
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggLocator
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType
+import at.hannibal2.hanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
+import at.hannibal2.hanni.features.event.hoppity.summary.HoppityEventSummary.StatString
+import at.hannibal2.hanni.features.event.hoppity.summary.HoppityEventSummary.buildEmptyFallback
+import at.hannibal2.hanni.features.event.hoppity.summary.HoppityEventSummary.dropConsecutiveEmpties
+import at.hannibal2.hanni.features.event.hoppity.summary.HoppityEventSummary.getMealEggCounts
+import at.hannibal2.hanni.features.event.hoppity.summary.HoppityEventSummary.getSpawnedEggCountsWithInfPossible
+import at.hannibal2.hanni.features.event.hoppity.summary.HoppityEventSummary.getYearStats
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFShopPrice.menuNamePattern
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.RenderUtils
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockTime
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.TimeUtils.getCountdownFormat
+import at.hannibal2.hanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.hanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.RenderableUtils.addCenteredString
+import at.hannibal2.hanni.utils.renderables.container.ContainerRenderable
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -59,7 +59,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 private typealias DTType = HoppityLiveDisplayConfig.HoppityDateTimeDisplayType
 
-@SkyHanniModule
+@HanniModule
 object HoppityLiveDisplay {
 
     /**
@@ -73,7 +73,7 @@ object HoppityLiveDisplay {
         "(?:\\(\\d*\\/\\d*\\) )?Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman",
     )
 
-    private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
+    private val eventConfig get() = HanniMod.feature.event.hoppityEggs
     private val config get() = eventConfig.eventSummary.liveDisplay
     private val storage get() = ProfileStorageData.profileSpecific
     private val currentSbYear get() = SkyBlockTime.now().year
@@ -315,7 +315,7 @@ object HoppityLiveDisplay {
     }
 
     private fun SimpleTimeMark.formatForHoppity(): Pair<String, Boolean> =
-        if (SkyHanniMod.feature.event.hoppityEggs.eventSummary.liveDisplay.dateTimeFormat == RELATIVE)
+        if (HanniMod.feature.event.hoppityEggs.eventSummary.liveDisplay.dateTimeFormat == RELATIVE)
             Pair(passedSince().absoluteValue.format(maxUnits = 2), false)
         else {
             val countDownFormat = toLocalDateTime().getCountdownFormat()

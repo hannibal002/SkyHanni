@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.test.renderable
+package at.hannibal2.hanni.test.renderable
 
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LorenzColor
+import at.hannibal2.hanni.utils.chat.TextHelper
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.primitives.text
 import java.awt.Color
 
-@SkyHanniModule(devOnly = true)
+@HanniModule(devOnly = true)
 object TestText : RenderableTestSuite.TestRenderable("text") {
 
     override fun renderable() = Renderable.text(

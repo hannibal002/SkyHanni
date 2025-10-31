@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.gui
+package at.hannibal2.hanni.features.gui
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
-import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
-import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.transform
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.api.minecraftevents.RenderLayer
+import at.hannibal2.hanni.data.GuiEditManager
+import at.hannibal2.hanni.events.render.gui.GameOverlayRenderPostEvent
+import at.hannibal2.hanni.events.render.gui.GameOverlayRenderPreEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RenderUtils.transform
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.compat.GuiScreenUtils
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
 
-@SkyHanniModule
+@HanniModule
 object MovableHotBar {
 
-    private val config get() = SkyHanniMod.feature.gui.hotbar
+    private val config get() = HanniMod.feature.gui.hotbar
 
     private var post = false
 

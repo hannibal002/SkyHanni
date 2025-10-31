@@ -1,32 +1,32 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.hanni.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getHitmanTimeToAll
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getOpenSlots
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getTimeToFull
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ClipboardUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi
+import at.hannibal2.hanni.features.event.hoppity.summary.HoppityEventSummary
+import at.hannibal2.hanni.features.inventory.chocolatefactory.data.ChocolateAmount
+import at.hannibal2.hanni.features.inventory.chocolatefactory.hitman.HitmanApi.getHitmanTimeToAll
+import at.hannibal2.hanni.features.inventory.chocolatefactory.hitman.HitmanApi.getOpenSlots
+import at.hannibal2.hanni.features.inventory.chocolatefactory.hitman.HitmanApi.getTimeToFull
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ClipboardUtils
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.toRoman
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.primitives.StringRenderable
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import kotlin.time.Duration
 
-@SkyHanniModule
+@HanniModule
 object CFStats {
 
     private val config get() = CFApi.config

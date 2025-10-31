@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourShortCut
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.outlineTopFace
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.data.jsonobjects.repo.ParkourShortCut
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.hanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.hanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.expandBlock
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.outlineTopFace
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
@@ -47,7 +47,7 @@ class ParkourHelper(
     }
 
     // Todo change this please for the love of god
-    fun render(event: SkyHanniRenderWorldEvent) {
+    fun render(event: HanniRenderWorldEvent) {
         if (locations.isEmpty()) {
             ErrorManager.logErrorWithData(
                 IllegalArgumentException("locations is empty"),
@@ -106,7 +106,7 @@ class ParkourHelper(
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.renderShortCuts() {
+    private fun HanniRenderWorldEvent.renderShortCuts() {
         val nextShortcuts = current until current + lookAhead
         for (shortCut in shortCuts) {
             if (shortCut.from in nextShortcuts && shortCut.to in locations.indices) {
@@ -123,7 +123,7 @@ class ParkourHelper(
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.renderSteps(
+    private fun HanniRenderWorldEvent.renderSteps(
         inProgressVec: List<Pair<IndexedValue<LorenzVec>, IndexedValue<LorenzVec>>>,
     ) {
         for ((index, location) in locations.asSequence().withIndex().drop(current)
@@ -138,7 +138,7 @@ class ParkourHelper(
                 drawFilledBoundingBox(aabb, colorForIndex(index), 1f)
                 if (outline) outlineTopFace(aabb, 2, Color.BLACK, depth)
             }
-            if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
+            if (HanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
                 drawString(location.offsetCenter().up(1), "§a§l$index", seeThroughBlocks = true)
             }
         }

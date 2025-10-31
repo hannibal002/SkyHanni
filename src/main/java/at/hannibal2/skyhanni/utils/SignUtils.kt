@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
-import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.mixins.transformers.AccessorGuiEditSign
+import at.hannibal2.hanni.utils.StringUtils.capAtMinecraftLength
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.chat.TextHelper.asComponent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -40,7 +40,7 @@ object SignUtils {
     fun checkDeleting(gui: GuiScreen?) {
         val deleteClicked = KeyboardManager.isDeleteWordDown() || KeyboardManager.isDeleteLineDown()
         if (!deleteLastClicked && deleteClicked && gui is AccessorGuiEditSign) {
-            SkyHanniMod.launchCoroutine("sign utils check deleting") {
+            HanniMod.launchCoroutine("sign utils check deleting") {
                 val newLine = if (KeyboardManager.isDeleteLineDown()) ""
                 else if (KeyboardManager.isDeleteWordDown()) {
                     val currentLine = gui.signText[gui.currentRow].unformattedText
@@ -57,7 +57,7 @@ object SignUtils {
     fun checkCopying(gui: GuiScreen?) {
         val copyClicked = KeyboardManager.isCopyingKeysDown()
         if (!copyLastClicked && copyClicked && gui is AccessorGuiEditSign) {
-            SkyHanniMod.launchCoroutine("sign utils copy copying") {
+            HanniMod.launchCoroutine("sign utils copy copying") {
                 ClipboardUtils.copyToClipboard(gui.signText[gui.currentRow].unformattedText)
             }
         }
@@ -67,7 +67,7 @@ object SignUtils {
     fun checkPaste() {
         val pasteClicked = KeyboardManager.isPastingKeysDown()
         if (!pasteLastClicked && pasteClicked) {
-            SkyHanniMod.launchCoroutine("sign utils check pasting") {
+            HanniMod.launchCoroutine("sign utils check pasting") {
                 OSUtils.readFromClipboard()?.let {
                     addTextIntoSign(it)
                 }

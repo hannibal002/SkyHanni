@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.RenderGlobalHook;
+import at.hannibal2.hanni.mixins.hooks.RenderGlobalHook;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.culling.ICamera;
@@ -21,16 +21,16 @@ public abstract class MixinRenderGlobal {
     abstract boolean isRenderEntityOutlines();
 
     @Unique
-    private final RenderGlobalHook skyHanni$hook = new RenderGlobalHook();
+    private final RenderGlobalHook hanni$hook = new RenderGlobalHook();
 
     @Redirect(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderGlobal;isRenderEntityOutlines()Z"))
     public boolean renderEntitiesOutlines(RenderGlobal self, Entity renderViewEntity, ICamera camera, float partialTicks) {
-        return skyHanni$hook.renderEntitiesOutlines(camera, partialTicks) && this.isRenderEntityOutlines();
+        return hanni$hook.renderEntitiesOutlines(camera, partialTicks) && this.isRenderEntityOutlines();
     }
 
     @Inject(method = "isRenderEntityOutlines", at = @At(value = "HEAD"), cancellable = true)
     public void isRenderEntityOutlinesWrapper(CallbackInfoReturnable<Boolean> cir) {
-        skyHanni$hook.shouldRenderEntityOutlines(cir);
+        hanni$hook.shouldRenderEntityOutlines(cir);
     }
 
     @Inject(method = "renderEntityOutlineFramebuffer", at = @At(value = "RETURN"))

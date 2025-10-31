@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.garden.contest
+package at.hannibal2.hanni.features.garden.contest
 
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
 enum class ContestBracket(val color: String) {
     DIAMOND("b"),

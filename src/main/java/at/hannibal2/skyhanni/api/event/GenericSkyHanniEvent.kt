@@ -1,3 +1,3 @@
-package at.hannibal2.skyhanni.api.event
+package at.hannibal2.hanni.api.event
 
-abstract class GenericSkyHanniEvent<T>(val type: Class<T>) : SkyHanniEvent(), SkyHanniEvent.Cancellable
+abstract class GenericHanniEvent<T>(val type: Class<T>) : HanniEvent(), HanniEvent.Cancellable

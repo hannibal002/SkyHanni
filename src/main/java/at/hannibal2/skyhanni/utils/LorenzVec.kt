@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.utils.LocationUtils.calculateEdges
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
 import com.google.gson.annotations.Expose
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles

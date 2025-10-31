@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.features.misc.cosmetic
+package at.hannibal2.hanni.config.features.misc.cosmetic
 
-import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.hanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

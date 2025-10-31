@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.hanni.test
 
-import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.hanni.utils.ItemUtils
 import org.junit.jupiter.api.Test
 
 class ItemUtilsTest {

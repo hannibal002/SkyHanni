@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.misc.update
+package at.hannibal2.hanni.features.misc.update
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.config.core.elements.GuiElementButton
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ConfigUtils.asStructuredText
+import at.hannibal2.hanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
@@ -15,7 +15,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
     val button = GuiElementButton()
     val changelog = GuiElementButton().apply { text = "Show Changelog" }
 
-    val currentVersion = SkyHanniMod.VERSION
+    val currentVersion = HanniMod.VERSION
 
     override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
         val fr = context.minecraft.defaultFontRenderer

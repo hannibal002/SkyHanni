@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.hanni.features.fishing
 
-import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.LorenzRarity
 
 data class SeaCreature(
     val name: String,

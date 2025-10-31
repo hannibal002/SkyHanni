@@ -1,8 +1,8 @@
-import at.skyhanni.sharedvariables.MinecraftVersion
-import at.skyhanni.sharedvariables.MultiVersionStage
-import at.skyhanni.sharedvariables.ProjectTarget
-import at.skyhanni.sharedvariables.SHVersionInfo
-import at.skyhanni.sharedvariables.versionString
+import at.hanni.sharedvariables.MinecraftVersion
+import at.hanni.sharedvariables.MultiVersionStage
+import at.hanni.sharedvariables.ProjectTarget
+import at.hanni.sharedvariables.SHVersionInfo
+import at.hanni.sharedvariables.versionString
 import com.google.devtools.ksp.gradle.KspTaskJvm
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
@@ -14,10 +14,10 @@ import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import skyhannibuildsystem.ChangelogVerification
-import skyhannibuildsystem.CleanupMappingFiles
-import skyhannibuildsystem.DownloadBackupRepo
-import skyhannibuildsystem.PublishToModrinth
+import hannibuildsystem.ChangelogVerification
+import hannibuildsystem.CleanupMappingFiles
+import hannibuildsystem.DownloadBackupRepo
+import hannibuildsystem.PublishToModrinth
 import java.io.Serializable
 import java.nio.file.Path
 import java.util.zip.ZipFile
@@ -30,7 +30,7 @@ plugins {
     java
     id("com.gradleup.shadow") version "8.3.4"
     id("gg.essential.loom")
-    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor")
+    id("com.github.HanniStudios.Hanni-Preprocessor")
     kotlin("jvm")
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
@@ -61,11 +61,11 @@ loom {
                 dev.architectury.pack200.java
                     .Pack200Adapter(),
             )
-            mixinConfig("mixins.skyhanni.json")
+            mixinConfig("mixins.hanni.json")
         }
     }
     if (target.isModern) {
-        val accessWidenerFile = file("src/main/resources/skyhanni.accesswidener")
+        val accessWidenerFile = file("src/main/resources/hanni.accesswidener")
         if (accessWidenerFile.exists()) {
             accessWidenerPath = accessWidenerFile
         }
@@ -73,7 +73,7 @@ loom {
     @Suppress("UnstableApiUsage")
     mixin {
         useLegacyMixinAp.set(true)
-        defaultRefmapName.set("mixins.skyhanni.refmap.json")
+        defaultRefmapName.set("mixins.hanni.refmap.json")
     }
     runs {
         named("client") {
@@ -91,7 +91,7 @@ loom {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
             vmArgs("-Xmx4G")
-            programArgs("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
+            programArgs("--tweakClass", "at.hannibal2.hanni.tweaker.HanniTweaker")
             programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
         }
         removeIf { it.name == "server" }
@@ -125,9 +125,9 @@ val headlessLwjgl: Configuration by configurations.creating {
 
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.user = "hannibal002"
-    this.repo = "SkyHanni-Repo"
+    this.repo = "Hanni-Repo"
     this.branch = "main"
-    this.resourcePath = "assets/skyhanni/repo.zip"
+    this.resourcePath = "assets/hanni/repo.zip"
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
 }
 
@@ -135,7 +135,7 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
     this.user = "NotEnoughUpdates"
     this.repo = "NotEnoughUpdates-Repo"
     this.branch = "master"
-    this.resourcePath = "assets/skyhanni/neu-repo.zip"
+    this.resourcePath = "assets/hanni/neu-repo.zip"
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedNeuRepo"))
 }
 
@@ -292,9 +292,9 @@ afterEvaluate {
         }
     }
     tasks.named("kspKotlin", KspTaskJvm::class) {
-        this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths-excluded.txt").absolutePath}"))
+        this.options.add(SubpluginOption("apoption", "hanni.modver=$version"))
+        this.options.add(SubpluginOption("apoption", "hanni.mcver=${target.minecraftVersion.versionName}"))
+        this.options.add(SubpluginOption("apoption", "hanni.buildpaths=${project.file("buildpaths-excluded.txt").absolutePath}"))
     }
 }
 
@@ -337,8 +337,8 @@ if (target == ProjectTarget.MAIN) {
             "-javaagent:${headlessLwjgl.singleFile.absolutePath}",
         )
         val outputFile = project.file("build/regexes/constants.json")
-        environment("SKYHANNI_DUMP_REGEXES", "${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
-        environment("SKYHANNI_DUMP_REGEXES_EXIT", "true")
+        environment("HANNI_DUMP_REGEXES", "${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
+        environment("HANNI_DUMP_REGEXES_EXIT", "true")
     }
 }
 
@@ -382,16 +382,16 @@ tasks.withType(JavaCompile::class) {
 }
 
 tasks.withType(org.gradle.jvm.tasks.Jar::class) {
-    archiveBaseName.set("SkyHanni")
+    archiveBaseName.set("Hanni")
     archiveVersion.set("$version-mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
-        this["Main-Class"] = "SkyHanniInstallerFrame"
+        this["Main-Class"] = "HanniInstallerFrame"
         if (target == ProjectTarget.MAIN) {
             this["FMLCorePluginContainsFMLMod"] = "true"
             this["ForceLoadAsMod"] = "true"
-            this["TweakClass"] = "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker"
-            this["MixinConfigs"] = "mixins.skyhanni.json"
+            this["TweakClass"] = "at.hannibal2.hanni.tweaker.HanniTweaker"
+            this["MixinConfigs"] = "mixins.hanni.json"
         }
     }
 }
@@ -414,11 +414,11 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
-    relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
-    relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
-    relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
-    relocate("org.apache.commons.net", "at.hannibal2.skyhanni.deps.commons.net")
-    relocate("net.hypixel.modapi.tweaker", "at.hannibal2.skyhanni.deps.hypixel.modapi.tweaker")
+    relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.hanni.deps.moulconfig")
+    relocate("moe.nea.libautoupdate", "at.hannibal2.hanni.deps.libautoupdate")
+    relocate("com.jagrosh.discordipc", "at.hannibal2.hanni.deps.discordipc")
+    relocate("org.apache.commons.net", "at.hannibal2.hanni.deps.commons.net")
+    relocate("net.hypixel.modapi.tweaker", "at.hannibal2.hanni.deps.hypixel.modapi.tweaker")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
@@ -466,16 +466,16 @@ publishing.publications {
         artifact(tasks.remapJar)
         artifact(sourcesJar) { classifier = "sources" }
         pom {
-            name.set("SkyHanni")
+            name.set("Hanni")
             licenses {
                 license {
                     name.set("GNU Lesser General Public License")
-                    url.set("https://github.com/hannibal002/SkyHanni/blob/HEAD/LICENSE")
+                    url.set("https://github.com/hannibal002/Hanni/blob/HEAD/LICENSE")
                 }
             }
             developers {
                 developer { name.set("hannibal002") }
-                developer { name.set("The SkyHanni contributors") }
+                developer { name.set("The Hanni contributors") }
             }
         }
     }

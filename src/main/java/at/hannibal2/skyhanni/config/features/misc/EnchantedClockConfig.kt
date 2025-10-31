@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.config.features.misc
+package at.hannibal2.hanni.config.features.misc
 
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper.SimpleBoostType
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.features.misc.EnchantedClockHelper.SimpleBoostType
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList

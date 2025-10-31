@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.detektrules.repo
+package at.hannibal2.hanni.detektrules.repo
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import at.hannibal2.hanni.detektrules.HanniRule
 import io.gitlab.arturbosch.detekt.api.CodeSmell
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 /**
  * This rule reports all instances of hard-coded skull textures in the codebase.
  */
-class SkullTexturesUseRepo(config: Config) : SkyHanniRule(config) {
+class SkullTexturesUseRepo(config: Config) : HanniRule(config) {
     override val issue = Issue(
         "SkullTexturesUseRepo",
         Severity.Style,

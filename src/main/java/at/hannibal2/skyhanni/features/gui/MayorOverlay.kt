@@ -1,23 +1,23 @@
-package at.hannibal2.skyhanni.features.gui
+package at.hannibal2.hanni.features.gui
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.data.ElectionApi
-import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.Perk.Companion.toPerk
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.enums.OutsideSBFeature
+import at.hannibal2.hanni.data.ElectionApi
+import at.hannibal2.hanni.data.Perk
+import at.hannibal2.hanni.data.Perk.Companion.toPerk
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
+import at.hannibal2.hanni.utils.renderables.primitives.text
 
-private val config get() = SkyHanniMod.feature.gui.mayorOverlay
+private val config get() = HanniMod.feature.gui.mayorOverlay
 
 enum class MayorOverlay(private val configLine: String, private val createLines: () -> Renderable) {
     TITLE(
@@ -73,7 +73,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
 
     override fun toString() = configLine
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
         var display: Renderable? = null
 

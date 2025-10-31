@@ -1,38 +1,38 @@
-package at.hannibal2.skyhanni.features.mining.eventtracker
+package at.hannibal2.hanni.features.mining.eventtracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.BossbarData
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.BossbarUpdateEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
-import at.hannibal2.skyhanni.utils.api.ApiStaticPostPath
-import at.hannibal2.skyhanni.utils.api.ApiUtils
-import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.BossbarData
+import at.hannibal2.hanni.data.HypixelData
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.events.BossbarUpdateEvent
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.SecondPassedEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.TimeUtils
+import at.hannibal2.hanni.utils.api.ApiStaticGetPath
+import at.hannibal2.hanni.utils.api.ApiStaticPostPath
+import at.hannibal2.hanni.utils.api.ApiUtils
+import at.hannibal2.hanni.utils.json.fromJson
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object MiningEventTracker {
 
-    private val config get() = SkyHanniMod.feature.mining.miningEvent
+    private val config get() = HanniMod.feature.mining.miningEvent
     private val patternGroup = RepoPattern.group("mining.eventtracker")
     private const val MINING_API_NAME = "Soopy Mining Events"
     private const val MINING_URL = "https://api.soopy.dev/skyblock/chevents"
@@ -107,7 +107,7 @@ object MiningEventTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isMiningIsland()) return
 
         eventStartedPattern.matchMatcher(event.message) {
@@ -124,7 +124,7 @@ object MiningEventTracker {
         if (!config.outsideMining && !isMiningIsland()) return
         if (!canRequestAt.isInPast()) return
 
-        SkyHanniMod.launchIOCoroutine("mining event tracker fetch data") {
+        HanniMod.launchIOCoroutine("mining event tracker fetch data") {
             fetchData()
         }
     }
@@ -177,7 +177,7 @@ object MiningEventTracker {
             ChatUtils.debug("blocked sending mining event data: api error")
             return
         }
-        SkyHanniMod.launchIOCoroutine("mining event tracker send data") {
+        HanniMod.launchIOCoroutine("mining event tracker send data") {
             sendData(miningEventJson)
         }
     }

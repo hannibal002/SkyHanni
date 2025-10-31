@@ -1,32 +1,32 @@
-package at.hannibal2.skyhanni.data.hotx
+package at.hannibal2.hanni.data.hotx
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.HotmApi
-import at.hannibal2.skyhanni.api.HotmApi.MayhemPerk
-import at.hannibal2.skyhanni.api.HotmApi.SkymallPerk
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.HotmApi
+import at.hannibal2.hanni.api.HotmApi.MayhemPerk
+import at.hannibal2.hanni.api.HotmApi.SkymallPerk
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.jsonobjects.local.HotxTree
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.IslandChangeEvent
+import at.hannibal2.hanni.events.ScoreboardUpdateEvent
+import at.hannibal2.hanni.events.WidgetUpdateEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ConditionalUtils.transformIf
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.NumberUtil.formatLong
+import at.hannibal2.hanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import java.util.regex.Matcher
@@ -419,7 +419,7 @@ enum class HotmData(
     override fun getStorage(): HotxTree? = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
     // TODO move all object functions into hotm api?
-    @SkyHanniModule
+    @HanniModule
     companion object : HotxHandler<HotmData, HotmReward, SkymallPerk>(entries) {
 
         override val name: String = "HotM"
@@ -631,14 +631,14 @@ enum class HotmData(
         }
 
         @HandleEvent(onlyOnSkyblock = true)
-        override fun onChat(event: SkyHanniChatEvent) = super.onChat(event)
+        override fun onChat(event: HanniChatEvent) = super.onChat(event)
 
-        override fun tryBlock(event: SkyHanniChatEvent) {
+        override fun tryBlock(event: HanniChatEvent) {
             if (!chatConfig.hideSkyMall || IslandTypeTags.MINING.inAny()) return
             event.blockedReason = "skymall"
         }
 
-        override fun extraChatHandling(event: SkyHanniChatEvent) {
+        override fun extraChatHandling(event: HanniChatEvent) {
             DelayedRun.runNextTick {
                 mayhemChatPattern.matchMatcher(event.message) {
                     val perk = group("perk")
@@ -681,7 +681,7 @@ enum class HotmData(
     }
 }
 
-private val chatConfig get() = SkyHanniMod.feature.chat
+private val chatConfig get() = HanniMod.feature.chat
 
 private val coreOfTheMountainPerks = mutableMapOf<Int, Map<HotmReward, Double>>()
 

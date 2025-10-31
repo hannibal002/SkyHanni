@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.GuiContainerEvent
+import at.hannibal2.hanni.events.InventoryCloseEvent
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.InventoryUpdatedEvent
+import at.hannibal2.hanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.compat.InventoryCompat.isNotEmpty
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-//$$ import at.hannibal2.skyhanni.test.command.ErrorManager
+//$$ import at.hannibal2.hanni.events.minecraft.packet.PacketSentEvent
+//$$ import at.hannibal2.hanni.test.command.ErrorManager
 //$$ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket
 //$$ import net.minecraft.screen.ScreenHandlerType
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object OtherInventoryData {
 
     private var currentInventory: Inventory? = null
@@ -100,7 +100,7 @@ object OtherInventoryData {
             val slotCount = packet.slotCount
             //#else
             //$$ val handlerType = packet.screenHandlerType
-            //$$ val slotCount = slotCountMap[handlerType] ?: ErrorManager.skyHanniError("Unknown screen handler type!", "screenName" to title)
+            //$$ val slotCount = slotCountMap[handlerType] ?: ErrorManager.hanniError("Unknown screen handler type!", "screenName" to title)
             //#endif
             close(reopenSameName = title == currentInventory?.title)
 

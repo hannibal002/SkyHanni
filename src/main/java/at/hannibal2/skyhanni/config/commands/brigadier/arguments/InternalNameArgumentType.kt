@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.config.commands.brigadier.arguments
+package at.hannibal2.hanni.config.commands.brigadier.arguments
 
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.escapeDoubleQuote
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.readGreedyString
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.readOptionalDoubleQuotedString
-import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierUtils
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierUtils.escapeDoubleQuote
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierUtils.readGreedyString
+import at.hannibal2.hanni.config.commands.brigadier.BrigadierUtils.readOptionalDoubleQuotedString
+import at.hannibal2.hanni.utils.NeuInternalName
 import com.mojang.brigadier.LiteralMessage
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType

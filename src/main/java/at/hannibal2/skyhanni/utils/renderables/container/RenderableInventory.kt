@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.utils.renderables.container
+package at.hannibal2.hanni.utils.renderables.container
 
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.empty
-import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
+import at.hannibal2.hanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.hanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.hanni.utils.compat.createResourceLocation
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.hanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.hanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.hanni.utils.renderables.primitives.empty
+import at.hannibal2.hanni.utils.renderables.primitives.placeholder
 import net.minecraft.item.ItemStack
 import kotlin.math.ceil
 
 object RenderableInventory {
 
-    private val inventoryTextures = createResourceLocation("skyhanni", "gui/slot.png")
+    private val inventoryTextures = createResourceLocation("hanni", "gui/slot.png")
     private const val TEXTURE_WIDTH = 90
     private const val TEXTURE_HEIGHT = 54
 

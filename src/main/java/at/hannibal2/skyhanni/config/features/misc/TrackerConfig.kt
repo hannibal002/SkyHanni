@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.config.features.misc
+package at.hannibal2.hanni.config.features.misc
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DefaultDisplayMode
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.FeatureToggle
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ItemPriceSource
+import at.hannibal2.hanni.utils.tracker.HanniTracker.DefaultDisplayMode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -119,8 +119,8 @@ class TrackerConfig {
         override fun toString() = displayName
     }
 
-    // Doing this here since SkyHanniTracker isn't a SkyHanniModule
-    @SkyHanniModule
+    // Doing this here since HanniTracker isn't a HanniModule
+    @HanniModule
     companion object {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

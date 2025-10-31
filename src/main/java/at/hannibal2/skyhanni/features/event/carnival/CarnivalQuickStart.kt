@@ -1,25 +1,25 @@
-package at.hannibal2.skyhanni.features.event.carnival
+package at.hannibal2.hanni.features.event.carnival
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.Perk
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.events.entity.EntityClickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.MobUtils.mob
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.ChatComponentText
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object CarnivalQuickStart {
 
-    private val config get() = SkyHanniMod.feature.event.carnival.doubleClickToStart
+    private val config get() = HanniMod.feature.event.carnival.doubleClickToStart
 
     /** REGEX-TEST: §eSelect an option: §r\n§e ➜ §a[Sure thing, partner!] §r\n§e ➜ §b[Could ya tell me the rules again?] §r\n§e ➜ §c[I'd like to do somthin' else fer now.]
      * */
@@ -52,7 +52,7 @@ object CarnivalQuickStart {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!isEnabled()) return
         // IDK what is wrong here, but it does not work with event.message
         if (!chatPattern.matches((event.chatComponent as? ChatComponentText)?.unformattedTextForChat)) return

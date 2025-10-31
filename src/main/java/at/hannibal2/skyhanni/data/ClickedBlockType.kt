@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.hanni.data
 
 enum class ClickedBlockType {
     LEVER,

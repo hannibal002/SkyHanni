@@ -1,21 +1,21 @@
-package at.hannibal2.skyhanni.features.commands
+package at.hannibal2.hanni.features.commands
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.MessageSendToServerEvent
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ChatUtils.senderIsHanni
+import at.hannibal2.hanni.utils.HypixelCommands
+import at.hannibal2.hanni.utils.RegexUtils.findMatcher
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
 
-@SkyHanniModule
+@HanniModule
 object AcceptLastPartyInvite {
 
-    private val config get() = SkyHanniMod.feature.misc.commands
+    private val config get() = HanniMod.feature.misc.commands
 
     private val patternGroup = RepoPattern.group("party.invite")
 
@@ -43,7 +43,7 @@ object AcceptLastPartyInvite {
     private var lastInviter = ""
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: HanniChatEvent) {
         if (!config.acceptLastInvite) return
         inviteReceivedPattern.findMatcher(event.message) {
             lastInviter = group("player")
@@ -62,7 +62,7 @@ object AcceptLastPartyInvite {
     @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.acceptLastInvite) return
-        if (event.senderIsSkyhanni()) return
+        if (event.senderIsHanni()) return
         val message = event.message.lowercase()
         if (message != "/party accept" && message != "/p accept") return
 

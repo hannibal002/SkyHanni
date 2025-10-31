@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.rift.area.colosseum
+package at.hannibal2.hanni.features.rift.area.colosseum
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.entity.EntityDeathEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.events.entity.EntityDeathEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.features.rift.RiftApi
+import at.hannibal2.hanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.addAlpha
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.SkyBlockUtils
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import java.awt.Color
 
-@SkyHanniModule
+@HanniModule
 object BlobbercystsHighlight {
 
-    private val config get() = SkyHanniMod.feature.rift.area.colosseum
+    private val config get() = HanniMod.feature.rift.area.colosseum
     private val entityList = mutableListOf<EntityOtherPlayerMP>()
     private const val BLOBBER_NAME = "Blobbercyst "
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         val color = Color.RED.addAlpha(80)

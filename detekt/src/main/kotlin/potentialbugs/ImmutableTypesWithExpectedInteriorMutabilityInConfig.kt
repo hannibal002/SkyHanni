@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.detektrules.potentialbugs
+package at.hannibal2.hanni.detektrules.potentialbugs
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import at.hannibal2.hanni.detektrules.HanniRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.immediateSupertypes
 
 @RequiresTypeResolution
-class ImmutableTypesWithExpectedInteriorMutabilityInConfig(config: Config) : SkyHanniRule(config) {
+class ImmutableTypesWithExpectedInteriorMutabilityInConfig(config: Config) : HanniRule(config) {
     override val issue: Issue
         get() = Issue(
             "ImmutableTypesWithExpectedInteriorMutabilityInConfig",
@@ -28,7 +28,7 @@ class ImmutableTypesWithExpectedInteriorMutabilityInConfig(config: Config) : Sky
         )
 
     companion object {
-        val configPackage = FqName("at.hannibal2.skyhanni.config")
+        val configPackage = FqName("at.hannibal2.hanni.config")
         val configOption = FqName("io.github.notenoughupdates.moulconfig.annotations.ConfigOption")
         val propertyType = FqName("io.github.notenoughupdates.moulconfig.observer.Property")
         val immutableCollectionTypes = setOf(

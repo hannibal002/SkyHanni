@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.utils.repopatterns
+package at.hannibal2.hanni.utils.repopatterns
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
-import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.config.features.dev.RepoPatternConfig
+import at.hannibal2.hanni.data.repo.HanniRepoManager
+import at.hannibal2.hanni.events.ConfigLoadEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.events.utils.PreInitFinishedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.hanni.utils.RegexUtils.matches
+import at.hannibal2.hanni.utils.StringUtils
+import at.hannibal2.hanni.utils.StringUtils.substringBeforeLastOrNull
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
@@ -29,7 +29,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler
 /**
  * Manages [RepoPattern]s.
  */
-@SkyHanniModule
+@HanniModule
 object RepoPatternManager {
 
     val allPatterns: Collection<CommonPatternInfo<*, *>> get() = usedKeys.values
@@ -72,7 +72,7 @@ object RepoPatternManager {
 
     private val config
         get() = if (!insideTest) {
-            SkyHanniMod.feature.dev.repoPattern
+            HanniMod.feature.dev.repoPattern
         } else {
             RepoPatternConfig().apply {
                 tolerateDuplicateUsage = inTestDuplicateUsage
@@ -80,9 +80,9 @@ object RepoPatternManager {
         }
 
     private val localLoading: Boolean
-        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || SkyHanniRepoManager.isUsingBackup
+        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || HanniRepoManager.isUsingBackup
 
-    private val logger = LogManager.getLogger("SkyHanni")
+    private val logger = LogManager.getLogger("Hanni")
 
     /**
      * Crash if in a development environment.
@@ -273,11 +273,11 @@ object RepoPatternManager {
         wasPreInitialized = true
         // no reason to do this on 1.21
         //#if FORGE
-        val dumpDirective = System.getenv("SKYHANNI_DUMP_REGEXES")
+        val dumpDirective = System.getenv("HANNI_DUMP_REGEXES")
         if (dumpDirective.isNullOrBlank()) return
         val (sourceLabel, path) = dumpDirective.split(":", limit = 2)
         dump(sourceLabel, File(path))
-        if (System.getenv("SKYHANNI_DUMP_REGEXES_EXIT") != null) {
+        if (System.getenv("HANNI_DUMP_REGEXES_EXIT") != null) {
             logger.info("Exiting after dumping RepoPattern regex patterns to $path")
             FMLCommonHandler.instance().exitJava(0, false)
         }

@@ -1,27 +1,27 @@
-package at.hannibal2.skyhanni.data.mob
+package at.hannibal2.hanni.data.mob
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
-import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.refreshReference
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.IslandType
+import at.hannibal2.hanni.data.mob.MobFilter.isDisplayNpc
+import at.hannibal2.hanni.data.mob.MobFilter.isRealPlayer
+import at.hannibal2.hanni.data.mob.MobFilter.isSkyBlockMob
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.MobEvent
+import at.hannibal2.hanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.hanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.hanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.EntityUtils
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.drainForEach
+import at.hannibal2.hanni.utils.collection.CollectionUtils.drainTo
+import at.hannibal2.hanni.utils.collection.CollectionUtils.put
+import at.hannibal2.hanni.utils.collection.CollectionUtils.refreshReference
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -40,7 +40,7 @@ import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
 //#endif
 
-@SkyHanniModule
+@HanniModule
 object MobDetection {
 
     /* Unsupported Entities
@@ -59,7 +59,7 @@ object MobDetection {
 
     private const val MAX_RETRIES = 20 * 5
 
-    private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
+    private val forceReset get() = !HanniMod.feature.dev.mobDebug.enable
 
     private val shouldClear: AtomicBoolean = AtomicBoolean(false)
 

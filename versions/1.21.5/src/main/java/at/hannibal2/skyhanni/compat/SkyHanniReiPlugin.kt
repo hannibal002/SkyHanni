@@ -1,14 +1,14 @@
-package at.hannibal2.skyhanni.compat
+package at.hannibal2.hanni.compat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.features.inventory.wardrobe.CustomWardrobe
+import at.hannibal2.hanni.features.inventory.wardrobe.WardrobeApi
 import me.shedaniel.math.Rectangle
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin
 import me.shedaniel.rei.api.client.registry.screen.ExclusionZones
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 
-class SkyHanniReiPlugin : REIClientPlugin {
+class HanniReiPlugin : REIClientPlugin {
 
     override fun registerExclusionZones(zones: ExclusionZones) {
         zones.register(GenericContainerScreen::class.java) { screen ->
@@ -29,7 +29,7 @@ class SkyHanniReiPlugin : REIClientPlugin {
     }
 
     private fun GenericContainerScreen.customWardrobeExclusionRect(): Rectangle {
-        val showReiItems = SkyHanniMod.feature.inventory.customWardrobe.showReiItems
+        val showReiItems = HanniMod.feature.inventory.customWardrobe.showReiItems
         if (!showReiItems) {
             return fullRectangle()
         }

@@ -1,6 +1,6 @@
-package skyhannibuildsystem
+package hannibuildsystem
 
-import at.hannibal2.changelog.SkyHanniChangelogBuilder
+import at.hannibal2.changelog.HanniChangelogBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
@@ -25,7 +25,7 @@ abstract class ChangelogVerification : DefaultTask() {
     val prBodyLines get() = prBody.lines()
 
     private val prLink = "ignored"
-    private val templateLocation = "https://github.com/hannibal002/SkyHanni/blob/beta/pull_request_template.md?plain=1"
+    private val templateLocation = "https://github.com/hannibal002/Hanni/blob/beta/pull_request_template.md?plain=1"
 
     @TaskAction
     fun scanChangelog() {
@@ -34,8 +34,8 @@ abstract class ChangelogVerification : DefaultTask() {
             return
         }
 
-        val (changes, bodyErrors) = SkyHanniChangelogBuilder.findChanges(prBodyLines, prLink)
-        val titleErrors = SkyHanniChangelogBuilder.findPullRequestNameErrors(prTitle, changes)
+        val (changes, bodyErrors) = HanniChangelogBuilder.findChanges(prBodyLines, prLink)
+        val titleErrors = HanniChangelogBuilder.findPullRequestNameErrors(prTitle, changes)
 
         if (bodyErrors.isEmpty() && titleErrors.isEmpty()) {
             println("Changelog and title verification successful")

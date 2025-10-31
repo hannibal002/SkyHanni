@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.test.renderable
+package at.hannibal2.hanni.test.renderable
 
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.animated.DVDLogoRenderable.Companion.dvdLogo
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.renderables.animated.DVDLogoRenderable.Companion.dvdLogo
+import at.hannibal2.hanni.utils.renderables.primitives.text
 
-@SkyHanniModule(devOnly = true)
+@HanniModule(devOnly = true)
 object TestDVD : RenderableTestSuite.TestRenderable("dvd") {
 
     private val dvdRenderable by lazy {

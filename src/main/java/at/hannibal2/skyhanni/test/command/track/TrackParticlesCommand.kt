@@ -1,30 +1,30 @@
-package at.hannibal2.skyhanni.test.command.track
+package at.hannibal2.hanni.test.command.track
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.hanni.config.commands.brigadier.LiteralCommandBuilder
 //#if MC < 1.21
-import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
+import at.hannibal2.hanni.config.commands.brigadier.arguments.EnumArgumentType
 //#else
-//$$ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+//$$ import at.hannibal2.hanni.config.commands.brigadier.BrigadierArguments
 //#endif
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.ReceiveParticleEvent
+import at.hannibal2.hanni.events.minecraft.KeyPressEvent
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.NumberUtil.roundTo
 //#if MC < 1.21
 import net.minecraft.util.EnumParticleTypes
 //#else
-//$$ import at.hannibal2.skyhanni.utils.ParticleUtils
+//$$ import at.hannibal2.hanni.utils.ParticleUtils
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.util.Identifier
 //#endif
 
-@SkyHanniModule
+@HanniModule
 //#if MC < 1.21
 object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTypes>(
 //#else
@@ -32,7 +32,7 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
 //#endif
     commonName = "particle",
 ) {
-    override val config get() = SkyHanniMod.feature.dev.debug.trackParticle
+    override val config get() = HanniMod.feature.dev.debug.trackParticle
 
     // todo add suggestion provider for particle types, maybe when we're fully in 1.21
     override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
@@ -69,7 +69,7 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, EnumParticleTy
     override fun onKeyPress(event: KeyPressEvent) = super.onKeyPress(event)
 
     @HandleEvent
-    override fun onRenderWorld(event: SkyHanniRenderWorldEvent) = super.onRenderWorld(event)
+    override fun onRenderWorld(event: HanniRenderWorldEvent) = super.onRenderWorld(event)
 
     @HandleEvent
     override fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) = super.onRenderOverlay(event)

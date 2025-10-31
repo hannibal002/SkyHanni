@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.garden.composter
+package at.hannibal2.hanni.features.garden.composter
 
-import at.hannibal2.skyhanni.data.model.ComposterUpgrade
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.hanni.data.model.ComposterUpgrade
+import at.hannibal2.hanni.features.garden.GardenApi
+import at.hannibal2.hanni.utils.NumberUtil.formatLong
+import at.hannibal2.hanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.utils.TimeUtils
 import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes

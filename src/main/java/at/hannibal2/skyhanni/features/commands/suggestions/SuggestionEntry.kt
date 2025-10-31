@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.commands.suggestions
+package at.hannibal2.hanni.features.commands.suggestions
 
 interface SuggestionEntry {
 

@@ -1,22 +1,22 @@
-package at.hannibal2.skyhanni.features.commands.tabcomplete
+package at.hannibal2.hanni.features.commands.tabcomplete
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.FriendApi
-import at.hannibal2.skyhanni.data.GuildApi
-import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.data.jsonobjects.repo.VipVisitsJson
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.commands.suggestions.LazySuggestionEntry
-import at.hannibal2.skyhanni.features.commands.suggestions.SuggestionProvider
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.data.FriendApi
+import at.hannibal2.hanni.data.GuildApi
+import at.hannibal2.hanni.data.PartyApi
+import at.hannibal2.hanni.data.jsonobjects.repo.VipVisitsJson
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.features.commands.suggestions.LazySuggestionEntry
+import at.hannibal2.hanni.features.commands.suggestions.SuggestionProvider
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.EntityUtils
 
-@SkyHanniModule
+@HanniModule
 object PlayerTabComplete {
 
-    private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
+    private val config get() = HanniMod.feature.misc.commands.tabComplete
     private var vipVisits = listOf<String>()
 
     private val friendsEntry = lazyEntry { FriendApi.getAllFriends().map { it.name } }

@@ -1,11 +1,11 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.test.command.ErrorManager
 import net.minecraft.item.ItemStack
 
 // gets fired when we want to calculate what the current player user luck values are
-class UserLuckCalculateEvent : SkyHanniEvent() {
+class UserLuckCalculateEvent : HanniEvent() {
 
     private var totalLuck = 0f
     lateinit var mainLuckStack: ItemStack
@@ -29,7 +29,7 @@ class UserLuckCalculateEvent : SkyHanniEvent() {
             }
         }
         if (slot == -1) {
-            ErrorManager.skyHanniError(
+            ErrorManager.hanniError(
                 "Looks like we ran out of space in the user luck menu! This means *someone* has to add pages to it :)"
             )
         }

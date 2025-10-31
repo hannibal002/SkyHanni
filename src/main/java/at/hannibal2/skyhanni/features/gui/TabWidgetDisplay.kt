@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.features.gui
+package at.hannibal2.hanni.features.gui
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.core.config.Position
+import at.hannibal2.hanni.data.model.TabWidget
+import at.hannibal2.hanni.events.GuiRenderEvent
+import at.hannibal2.hanni.events.ProfileJoinEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.RenderUtils.renderStrings
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.StringUtils.allLettersFirstUppercase
 
 enum class TabWidgetDisplay(
     private val configName: String?,
@@ -64,10 +64,10 @@ enum class TabWidgetDisplay(
         return configName ?: name.lowercase().allLettersFirstUppercase()
     }
 
-    @SkyHanniModule
+    @HanniModule
     companion object {
 
-        private val config get() = SkyHanniMod.feature.gui.tabWidget
+        private val config get() = HanniMod.feature.gui.tabWidget
         private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
         @HandleEvent
@@ -90,7 +90,7 @@ enum class TabWidgetDisplay(
             val sizeDiff = TabWidgetDisplay.entries.size - config.displayPositions.size
             if (sizeDiff == 0) return
             if (sizeDiff < 0) {
-                ErrorManager.skyHanniError(
+                ErrorManager.hanniError(
                     "Invalid State of config.displayPositions",
                     "Display" to TabWidgetDisplay.entries,
                     "Positions" to config.displayPositions,

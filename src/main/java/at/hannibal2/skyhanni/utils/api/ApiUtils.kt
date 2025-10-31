@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.utils.api
+package at.hannibal2.hanni.utils.api
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledApiJson
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.api.ApiInternalUtils.internalGetJsonResponse
-import at.hannibal2.skyhanni.utils.api.ApiInternalUtils.internalGetZipResponse
-import at.hannibal2.skyhanni.utils.api.ApiInternalUtils.internalPostJson
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.jsonobjects.repo.DisabledApiJson
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.api.ApiInternalUtils.internalGetJsonResponse
+import at.hannibal2.hanni.utils.api.ApiInternalUtils.internalGetZipResponse
+import at.hannibal2.hanni.utils.api.ApiInternalUtils.internalPostJson
 import com.google.gson.JsonElement
 import java.io.File
 
-@SkyHanniModule
+@HanniModule
 object ApiUtils {
 
     // <editor-fold desc="GETs">

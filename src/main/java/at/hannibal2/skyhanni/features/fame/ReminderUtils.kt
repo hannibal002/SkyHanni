@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.fame
+package at.hannibal2.hanni.features.fame
 
-import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
-import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.hanni.data.IslandTypeTags
+import at.hannibal2.hanni.features.dungeon.DungeonApi
+import at.hannibal2.hanni.features.garden.contest.FarmingContestApi
+import at.hannibal2.hanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.hanni.features.rift.RiftApi
 
 object ReminderUtils {
 

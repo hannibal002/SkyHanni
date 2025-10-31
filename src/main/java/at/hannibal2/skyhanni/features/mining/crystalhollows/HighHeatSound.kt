@@ -1,15 +1,15 @@
-package at.hannibal2.skyhanni.features.mining.crystalhollows
+package at.hannibal2.hanni.features.mining.crystalhollows
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.MiningApi
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.MiningApi
+import at.hannibal2.hanni.events.PlaySoundEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.LocationUtils
 
-@SkyHanniModule
+@HanniModule
 object HighHeatSound {
-    private val config get() = SkyHanniMod.feature.mining
+    private val config get() = HanniMod.feature.mining
 
     @HandleEvent
     fun onSound(event: PlaySoundEvent) {

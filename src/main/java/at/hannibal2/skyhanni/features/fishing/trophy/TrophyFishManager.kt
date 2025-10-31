@@ -1,28 +1,28 @@
-package at.hannibal2.skyhanni.features.fishing.trophy
+package at.hannibal2.hanni.features.fishing.trophy
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishInfo
-import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
-import at.hannibal2.skyhanni.utils.compat.setHoverShowText
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.data.jsonobjects.repo.TrophyFishInfo
+import at.hannibal2.hanni.data.jsonobjects.repo.TrophyFishJson
+import at.hannibal2.hanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.hanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.hanni.events.RepositoryReloadEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.NumberUtil.formatInt
+import at.hannibal2.hanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.hanni.utils.compat.defaultStyleConstructor
+import at.hannibal2.hanni.utils.compat.setHoverShowText
+import at.hannibal2.hanni.utils.repopatterns.RepoPattern
+import at.hannibal2.hanni.utils.system.PlatformUtils
 import net.minecraft.util.ChatStyle
 
-@SkyHanniModule
+@HanniModule
 object TrophyFishManager {
-    private val config get() = SkyHanniMod.feature.fishing.trophyFishing
+    private val config get() = HanniMod.feature.fishing.trophyFishing
 
     private val patternGroup = RepoPattern.group("fishing.trophyfish")
 
@@ -117,7 +117,7 @@ object TrophyFishManager {
             val internalName = TrophyFishApi.getInternalName(stack.displayName.replace("§k", ""))
 
             fun getRarity(rawRarity: String, line: String): TrophyRarity =
-                TrophyRarity.getByName(rawRarity) ?: ErrorManager.skyHanniError(
+                TrophyRarity.getByName(rawRarity) ?: ErrorManager.hanniError(
                     "unknown trophy fish rarity in odger inventory",
                     "rawRarity" to rawRarity,
                     "line" to line,

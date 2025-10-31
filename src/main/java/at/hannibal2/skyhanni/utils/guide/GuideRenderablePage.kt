@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.utils.guide
+package at.hannibal2.hanni.utils.guide
 
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.hanni.utils.compat.DrawContextUtils
+import at.hannibal2.hanni.utils.renderables.Renderable
 
 abstract class GuideRenderablePage(
     val paddingX: Int = 0,

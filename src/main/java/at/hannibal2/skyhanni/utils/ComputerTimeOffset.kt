@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
-import at.hannibal2.skyhanni.utils.EnumUtils.next
-import at.hannibal2.skyhanni.utils.EnumUtils.previous
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.events.DebugDataCollectEvent
+import at.hannibal2.hanni.events.ProfileJoinEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.ConfigUtils.jumpToEditor
+import at.hannibal2.hanni.utils.EnumUtils.next
+import at.hannibal2.hanni.utils.EnumUtils.previous
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.collection.CollectionUtils.addOrPut
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import org.apache.commons.net.ntp.NTPUDPClient
@@ -24,11 +24,11 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
-@SkyHanniModule
+@HanniModule
 object ComputerTimeOffset {
 
-    private val devConfig get() = SkyHanniMod.feature.dev
-    private val config get() = SkyHanniMod.feature.misc
+    private val devConfig get() = HanniMod.feature.dev
+    private val config get() = HanniMod.feature.misc
     private val timeoutMap: MutableMap<String, Int> = mutableMapOf()
     private val offsetFixLink by lazy {
         when {
@@ -54,7 +54,7 @@ object ComputerTimeOffset {
     }
 
     init {
-        SkyHanniMod.launchIOCoroutine("computer time offset init", timeout = INFINITE) {
+        HanniMod.launchIOCoroutine("computer time offset init", timeout = INFINITE) {
             while (state != State.TOTALLY_OFF) {
                 delay(state.duration)
                 detectTimeChange()
@@ -80,7 +80,7 @@ object ComputerTimeOffset {
         }
 
         val wasOffsetBefore = (offsetDuration?.absoluteValue ?: 0.seconds) > 5.seconds
-        checkJob = SkyHanniMod.launchIOCoroutine("computer time offset calculation") {
+        checkJob = HanniMod.launchIOCoroutine("computer time offset calculation") {
             offsetDuration = getNtpOffset(devConfig.ntpServer)
             offsetDuration?.let {
                 tryDisplayOffset(wasOffsetBefore)
@@ -119,7 +119,7 @@ object ComputerTimeOffset {
             e,
             "Failed to get NTP offset",
             "server" to ntpServer,
-        ) else SkyHanniMod.logger.error(e.stackTraceToString())
+        ) else HanniMod.logger.error(e.stackTraceToString())
     }.getOrNull()
 
     private fun detectTimeChange() {

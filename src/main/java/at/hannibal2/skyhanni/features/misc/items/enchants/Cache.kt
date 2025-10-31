@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.items.enchants
+package at.hannibal2.hanni.features.misc.items.enchants
 
 class Cache {
     var cachedLoreBefore: List<String> = listOf()

@@ -1,30 +1,30 @@
-package at.hannibal2.skyhanni.features.cosmetics
+package at.hannibal2.hanni.features.cosmetics
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import at.hannibal2.hanni.HanniMod
+import at.hannibal2.hanni.api.event.HandleEvent
+import at.hannibal2.hanni.config.ConfigUpdaterMigrator
+import at.hannibal2.hanni.config.enums.OutsideSBFeature
+import at.hannibal2.hanni.events.minecraft.HanniRenderWorldEvent
+import at.hannibal2.hanni.events.minecraft.HanniTickEvent
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ColorUtils.toColor
+import at.hannibal2.hanni.utils.LocationUtils
+import at.hannibal2.hanni.utils.LorenzVec
+import at.hannibal2.hanni.utils.PlayerUtils
+import at.hannibal2.hanni.utils.SimpleTimeMark
+import at.hannibal2.hanni.utils.SkyBlockUtils
+import at.hannibal2.hanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.hanni.utils.compat.MinecraftCompat
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.hanni.utils.render.WorldRenderUtils.exactLocation
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@HanniModule
 object CosmeticFollowingLine {
 
-    private val config get() = SkyHanniMod.feature.gui.cosmetic.followingLine
+    private val config get() = HanniMod.feature.gui.cosmetic.followingLine
 
     private var locations = mapOf<LorenzVec, LocationSpot>()
     private var latestLocations = mapOf<LorenzVec, LocationSpot>()
@@ -37,7 +37,7 @@ object CosmeticFollowingLine {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: HanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         updateClose(event)
@@ -50,7 +50,7 @@ object CosmeticFollowingLine {
     }
 
     private fun renderFar(
-        event: SkyHanniRenderWorldEvent,
+        event: HanniRenderWorldEvent,
         firstPerson: Boolean,
         color: Color,
     ) {
@@ -72,7 +72,7 @@ object CosmeticFollowingLine {
         }
     }
 
-    private fun updateClose(event: SkyHanniRenderWorldEvent) {
+    private fun updateClose(event: HanniRenderWorldEvent) {
         val playerLocation = event.exactLocation(MinecraftCompat.localPlayer).up(0.3)
 
         latestLocations = latestLocations.editCopy {
@@ -82,7 +82,7 @@ object CosmeticFollowingLine {
         }
     }
 
-    private fun renderClose(event: SkyHanniRenderWorldEvent, firstPerson: Boolean, color: Color) {
+    private fun renderClose(event: HanniRenderWorldEvent, firstPerson: Boolean, color: Color) {
         if (firstPerson && latestLocations.any { !it.value.onGround }) return
 
 
@@ -102,7 +102,7 @@ object CosmeticFollowingLine {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: HanniTickEvent) {
         if (!isEnabled()) return
 
         if (event.isMod(5)) {

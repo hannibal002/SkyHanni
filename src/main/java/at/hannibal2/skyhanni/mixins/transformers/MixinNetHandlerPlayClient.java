@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.hanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent;
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent;
+import at.hannibal2.hanni.events.entity.EntityEquipmentChangeEvent;
+import at.hannibal2.hanni.events.minecraft.packet.PacketSentEvent;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;

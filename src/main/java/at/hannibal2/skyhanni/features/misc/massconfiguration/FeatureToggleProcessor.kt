@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.misc.massconfiguration
+package at.hannibal2.hanni.features.misc.massconfiguration
 
-import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.hanni.config.FeatureToggle
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property

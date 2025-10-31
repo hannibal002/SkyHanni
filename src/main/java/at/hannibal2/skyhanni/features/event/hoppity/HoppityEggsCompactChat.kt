@@ -1,30 +1,30 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.hanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityChatConfig
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.HoppityStateDataSet
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getRabbitsFormat
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFTimeTowerManager
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.hanni.config.features.event.hoppity.HoppityChatConfig
+import at.hannibal2.hanni.data.ProfileStorageData
+import at.hannibal2.hanni.events.chat.HanniChatEvent
+import at.hannibal2.hanni.features.event.hoppity.HoppityApi.HoppityStateDataSet
+import at.hannibal2.hanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
+import at.hannibal2.hanni.features.event.hoppity.summary.HoppityEventSummary.getRabbitsFormat
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.hanni.features.inventory.chocolatefactory.CFTimeTowerManager
+import at.hannibal2.hanni.hannimodule.HanniModule
+import at.hannibal2.hanni.utils.ChatUtils
+import at.hannibal2.hanni.utils.DelayedRun
+import at.hannibal2.hanni.utils.InventoryUtils
+import at.hannibal2.hanni.utils.LorenzRarity
+import at.hannibal2.hanni.utils.NumberUtil.addSeparators
+import at.hannibal2.hanni.utils.NumberUtil.shortFormat
+import at.hannibal2.hanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.hanni.utils.TimeUtils.format
+import at.hannibal2.hanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 private typealias RarityType = HoppityChatConfig.CompactRarityTypes
 
-@SkyHanniModule
+@HanniModule
 object HoppityEggsCompactChat {
 
     private var lockedHitmanClaimCount: Int? = null
@@ -40,7 +40,7 @@ object HoppityEggsCompactChat {
         hitmanCompactDataSets.clear()
     }
 
-    fun compactChat(event: SkyHanniChatEvent?, dataSet: HoppityStateDataSet) {
+    fun compactChat(event: HanniChatEvent?, dataSet: HoppityStateDataSet) {
         if (!chatConfig.compact) return
         hoppityDataSet = dataSet.copy()
         event?.let { it.blockedReason = "compact_hoppity" }

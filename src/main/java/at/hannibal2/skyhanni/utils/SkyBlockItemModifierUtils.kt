@@ -1,19 +1,19 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.hanni.utils
 
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.features.fishing.FishingApi
-import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
-import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
-import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.hanni.config.ConfigManager
+import at.hannibal2.hanni.features.fishing.FishingApi
+import at.hannibal2.hanni.features.fishing.FishingApi.getFishingRodPart
+import at.hannibal2.hanni.test.command.ErrorManager
+import at.hannibal2.hanni.utils.CachedItemData.Companion.cachedData
+import at.hannibal2.hanni.utils.ItemUtils.containsCompound
+import at.hannibal2.hanni.utils.ItemUtils.extraAttributes
+import at.hannibal2.hanni.utils.ItemUtils.getInternalName
+import at.hannibal2.hanni.utils.ItemUtils.getLore
+import at.hannibal2.hanni.utils.ItemUtils.getStringList
+import at.hannibal2.hanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.hanni.utils.NumberUtil.isPositive
+import at.hannibal2.hanni.utils.RegexUtils.anyMatches
+import at.hannibal2.hanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import net.minecraft.item.Item
@@ -152,7 +152,7 @@ object SkyBlockItemModifierUtils {
             val added = warnedAboutPetParseFailure.add(colorlessName)
             if (!added || lastWarnedParseFailure.passedSince() <= 1.minutes) return null
             lastWarnedParseFailure = SimpleTimeMark.now()
-            ErrorManager.skyHanniError(
+            ErrorManager.hanniError(
                 "Failed to parse pet info for item: $colorlessName",
                 "exception" to e.message,
                 "extraAttributes" to extraAttributes.toString(),

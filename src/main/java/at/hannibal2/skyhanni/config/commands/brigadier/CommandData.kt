@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.config.commands.brigadier
+package at.hannibal2.hanni.config.commands.brigadier
 
-import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.hanni.config.commands.CommandCategory
 import com.mojang.brigadier.CommandDispatcher
 //#if MC < 1.21
 import net.minecraft.command.ICommand

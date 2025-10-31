@@ -1,16 +1,16 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.hanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.hanni.api.event.HanniEvent
+import at.hannibal2.hanni.test.command.ErrorManager
 
-class DebugDataCollectEvent(private val list: MutableList<String>, private val search: String) : SkyHanniEvent() {
+class DebugDataCollectEvent(private val list: MutableList<String>, private val search: String) : HanniEvent() {
 
     var empty = true
     private var currentTitle = ""
     private var irrelevant = false
 
     fun title(title: String) {
-        if (currentTitle != "") ErrorManager.skyHanniError(
+        if (currentTitle != "") ErrorManager.hanniError(
             "DebugDataCollectEvent duplicate titles and no data in between",
             "current title" to currentTitle,
             "new title" to title,
