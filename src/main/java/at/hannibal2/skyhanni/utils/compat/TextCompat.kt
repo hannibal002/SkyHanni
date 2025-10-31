@@ -114,7 +114,7 @@ fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false, leadingW
 //$$             wasFormated = true
 //$$         } else if (component == Text.empty()) sb.append("§r")
 //$$     }
-//$$     return sb.removeSuffix("§r").removeSuffix("§r").toString()
+//$$     return sb.removeSuffix("§r").removePrefix("§r").toString()
 //$$ }
 //$$
 //$$ private val textColorLUT = ChatFormatting.entries
