@@ -106,7 +106,7 @@ fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false, leadingW
 //$$         val chatStyle = component.style.chatStyle()
 //$$         if (leadingWhite || (wasFormatted && sb.length == 2 && sb.get(0) == '§' && sb.get(1) == 'r') || chatStyle != "§f") {
 //$$             sb.append(chatStyle)
-//$$             wasFormated = true
+//$$             wasFormatted = true
 //$$         }
 //$$         sb.append(component.unformattedTextForChatCompat())
 //$$         if (!noExtraResets) {
