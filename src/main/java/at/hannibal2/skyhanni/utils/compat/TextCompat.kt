@@ -111,7 +111,7 @@ fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false, leadingW
 //$$         sb.append(component.unformattedTextForChatCompat())
 //$$         if (!noExtraResets) {
 //$$             sb.append("§r")
-//$$             wasFormated = true
+//$$             wasFormatted = true
 //$$         } else if (component == Text.empty()) sb.append("§r")
 //$$     }
 //$$     return sb.removeSuffix("§r").removePrefix("§r").toString()
