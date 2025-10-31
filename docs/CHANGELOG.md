@@ -134,6 +134,8 @@
 + Added Title/Sound when a Slayer is cocooned. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4569)
 + Added Active Boss Transparency. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4744)
     + Reduces transparency of other mobs while fighting a Slayer boss.
++ Added option to hide Damage Splashes near Slayer Bosses. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4721)
++ Added option to hide Slayer Spawn particles. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4721)
 
 ### Improvements
 
@@ -221,6 +223,7 @@
 + Added Pity and Pickaxe Cooldown Widgets to Tab Widget display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4756)
 + Clarified profile name widget warning. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4784)
 + Made more options configurable through /shdefaultoptions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4779)
++ Made Great Spook-related Garden features easier to find. - Luna (https://github.com/hannibal002/SkyHanni/pull/4795)
 
 #### Foraging
 
@@ -318,6 +321,7 @@
 + Fixed Sun Gecko Helper always showing no active modifiers on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4682)
 + Fixed Sun Gecko Helper showing the wrong combo timer if you don't have the Combo Mania accessory. - Luna (https://github.com/hannibal002/SkyHanni/pull/4709)
 + Fixed Ubik Reminder not working. - nopo & Luna (https://github.com/hannibal002/SkyHanni/pull/4735)
++ Fixed major performance issues in the Rift caused by Mirrorverse Holographic Entities. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4803)
 
 #### Crimson Isle
 
@@ -388,6 +392,10 @@
 + Fixed unnecessary Fairy Soul Helper error message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4766)
 + Fixed Skyblock detection on stranded and bingo. - nopo (https://github.com/hannibal002/SkyHanni/pull/4789)
 + Fixed config wipe. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4793)
++ Fixed chat errors when Zombie Shootout Helper cannot find zombies. - Luna (https://github.com/hannibal002/SkyHanni/pull/4797)
++ Fixed Lobby Halloween Basket occasionally not loading. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4817)
++ Fixed not being able to hide network and ping charts on the F3 Debug Screen in 1.21.9/1.21.10. - Luna (https://github.com/hannibal002/SkyHanni/pull/4811)
++ Fixed Weird Tuba ability cooldown in 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4807)
 
 #### Chat
 
@@ -401,7 +409,7 @@
 + Fixed Slayer books showing both Hypixel and SkyHanni messages. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4521)
 + Fixed Pet Drop Rarity on messages without Magic Find or Farming Fortune. - Luna (https://github.com/hannibal002/SkyHanni/pull/4566)
 + Fixed some tab-completion features working outside SkyBlock. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4654)
-+ Fixed new error chat messages messages around coroutine. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4720)
++ Fixed new error chat messages around coroutine. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4720)
 
 #### Inventory
 
@@ -440,6 +448,7 @@
 + Fixed enchanting table click prevention, wardrobe hotkeys and some other click-related features. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4730)
 + Fixed custom wardrobe not working at all on 1.21.8. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4763)
 + Fixed wardrobe spacing options not working properly on 1.21.5. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4763)
++ Fixed Dungeon Spirit Leap Overlay keybinds triggering outside the Leap Menu. - Wapic (https://github.com/hannibal002/SkyHanni/pull/4804)
 
 #### Fishing
 
@@ -464,6 +473,8 @@
 + Prevented use of vacuums when a previous vacuum line is still being traced out. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4612)
 + Fixed issue in pest particle waypoints. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4649)
 + Fixed blocks being broken without releasing the mouse not being detected. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4787)
++ Fixed Replace Menu Icons in Stereo Harmony sometimes highlighting the wrong vinyl as active. - Luna (https://github.com/hannibal002/SkyHanni/pull/4820)
++ Fixed Stereo Harmony Display not updating the active vinyl when changed outside the Garden or when SkyHanni is not installed. - Luna (https://github.com/hannibal002/SkyHanni/pull/4820)
 
 #### Foraging
 
@@ -487,6 +498,7 @@
 + Fixed Skill detection not working when Show Percentages is off in /tab. - Twarug (https://github.com/hannibal002/SkyHanni/pull/4718)
 + Fixed Custom Scoreboard not showing the second objective line for item amounts >1k. - juna (https://github.com/hannibal002/SkyHanni/pull/4749)
 + Fixed Non-God Pot Display not detecting Pest Repellent consumption. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4739)
++ Fixed Non-God Pot Display not showing multiple Salts. - nopo (https://github.com/hannibal002/SkyHanni/pull/4816)
 
 #### Garden
 
@@ -718,6 +730,7 @@
 + Made the 1.21.7 step 1.21.8 instead. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4759)
 + Renamed `MineshaftDetection.MineshaftTypes` to `MineshaftDetection.MineshaftType`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4781)
 + Support preprocessing to snapshots and pre-releases. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4596)
++ Fixed `/shdebug skyblock` showing the graph area as the scoreboard area. - Luna (https://github.com/hannibal002/SkyHanni/pull/4808)
 
 ### Removed Features
 
