@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
+import at.hannibal2.skyhanni.data.model.waypoints.SkyHanniWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
 import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -38,7 +38,7 @@ object OrderedWaypoints {
     private val config get() = SkyHanniMod.feature.mining.orderedWaypoints
     private val storage get() = ProfileStorageData.orderedWaypointsRoutes
 
-    private var orderedWaypointsList = Waypoints<SkyhanniWaypoint>()
+    private var orderedWaypointsList = Waypoints<SkyHanniWaypoint>()
     private val renderWaypoints: MutableList<Int> = mutableListOf()
     private var currentOrderedWaypointIndex = 0
     private var lastCloser = 0
@@ -326,7 +326,7 @@ object OrderedWaypoints {
             return ChatUtils.userError("$number is not between 1 and ${orderedWaypointsList.size + 1}.")
         }
 
-        val newWaypoint = SkyhanniWaypoint(pos, number = number, options = mutableMapOf("name" to number.toString()))
+        val newWaypoint = SkyHanniWaypoint(pos, number = number, options = mutableMapOf("name" to number.toString()))
         if (number == orderedWaypointsList.size + 1) {
             orderedWaypointsList.add(newWaypoint)
         } else {
@@ -432,7 +432,7 @@ object OrderedWaypoints {
         currentOrderedWaypointIndex = Math.floorMod(currentOrderedWaypointIndex + increment, orderedWaypointsList.size)
     }
 
-    private fun loadWaypoints(data: String): Waypoints<SkyhanniWaypoint>? {
+    private fun loadWaypoints(data: String): Waypoints<SkyHanniWaypoint>? {
         return ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull {
             it.load(data)
         }?.let {
@@ -440,7 +440,7 @@ object OrderedWaypoints {
         }
     }
 
-    private fun exportWaypoints(waypoints: Waypoints<SkyhanniWaypoint>, name: String): String? {
+    private fun exportWaypoints(waypoints: Waypoints<SkyHanniWaypoint>, name: String): String? {
         return ServiceLoader.load(WaypointFormat::class.java).firstOrNull { it.name == name }?.export(waypoints)
     }
 

@@ -13,7 +13,7 @@ import net.minecraft.client.gui.GuiScreen
 //#endif
 
 @Suppress("UnusedParameter")
-abstract class SkyhanniBaseScreen : GuiScreen(
+abstract class SkyHanniBaseScreen : GuiScreen(
     //#if MC > 1.20
     //$$ net.minecraft.text.Text.empty()
     //#elseif MC > 1.16
