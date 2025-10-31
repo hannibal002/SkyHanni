@@ -78,6 +78,7 @@ object StereoHarmonyDisplay {
     private fun updateActiveVinyl(stack: ItemStack?) {
         PestApi.stereoPlayingPattern.firstMatcher(stack?.getLore() ?: return) {
             gardenStorage?.activeVinyl = VinylType.getByName(group("vinyl").trim()).takeIf { it != VinylType.NONE }
+            update()
         }
     }
 
