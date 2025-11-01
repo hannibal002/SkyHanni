@@ -682,7 +682,7 @@
 + Updated Graph Deserialization. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4600)
 + Added NPC names to the dictionary. - Motte (https://github.com/hannibal002/SkyHanni/pull/4616)
 + Changed part of the foundation of the Damage Indicator to utilize the Mob Detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4604)
-+ Stop including Kotlin on modern. - meowora, juna (https://github.com/hannibal002/SkyHanni/pull/4602)
++ Stop including Kotlin on modern. - mona, juna (https://github.com/hannibal002/SkyHanni/pull/4602)
 + Added 'ramp-up' for Computer Time Offset if in SLOW state, and performing stably. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4578)
 + Added a stopwatch util class. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4626)
 + Added function `fromAbsoluteDay()` in `SkyBlockTime.kt`. - penguin (https://github.com/hannibal002/SkyHanni/pull/4617)
