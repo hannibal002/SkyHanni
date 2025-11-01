@@ -50,7 +50,7 @@
 
 #### Misc
 
-+ Added SkyBlock Profile Viewer support for updating data from Pv. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
++ Added SkyBlock Profile Viewer support for updating data from Pv. - juna, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
 + Added support for 1.21.7. - Vixid & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4349)
 + Added Taming 60 helper. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4344)
     + Shows which pets are cheapest to unlock the next taming level.
@@ -531,7 +531,7 @@
 + Added ability to replace chat components on events with a reason. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4074)
     + Basically the same thing as block reason.
     + Made SkyHanniChatEvent extend SystemMessageEvent.
-+ Added SkyBlockAPIEventWrappers, to fire NeuProfileDataLoadedEvent when SbPv gets opened. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
++ Added SkyBlockAPIEventWrappers, to fire NeuProfileDataLoadedEvent when SbPv gets opened. - juna, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/4257)
 + Begin preparations for 1.21.6/7. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4324)
     + Currently, adds preprocessing for mixins to 1.21.7 and some of the more basic rendering changes.
     + Shaders and some other more niche rendering doesn't work on 1.21.7 yet.
@@ -682,7 +682,7 @@
 + Updated Graph Deserialization. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4600)
 + Added NPC names to the dictionary. - Motte (https://github.com/hannibal002/SkyHanni/pull/4616)
 + Changed part of the foundation of the Damage Indicator to utilize the Mob Detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4604)
-+ Stop including Kotlin on modern. - meowora, j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/4602)
++ Stop including Kotlin on modern. - meowora, juna (https://github.com/hannibal002/SkyHanni/pull/4602)
 + Added 'ramp-up' for Computer Time Offset if in SLOW state, and performing stably. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4578)
 + Added a stopwatch util class. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4626)
 + Added function `fromAbsoluteDay()` in `SkyBlockTime.kt`. - penguin (https://github.com/hannibal002/SkyHanni/pull/4617)
