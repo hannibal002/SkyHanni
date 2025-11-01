@@ -107,6 +107,7 @@ enum class PestType(
         "PEST_SLUG_MONSTER".toInternalName(),
         CropType.MUSHROOM,
     ),
+    // TODO replace with null
     // For use in the Pest Profit Tracker, in cases where an item cannot have an identified PestType
     // Display name intentionally omitted to aid in filtering out this entry.
     UNKNOWN(

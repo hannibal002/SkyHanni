@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.StringUtils.toUnDashedUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
@@ -41,12 +42,15 @@ object PlayerUtils {
         //#endif
     }
 
-    fun getWalkSpeed(): Int {
+    fun getWalkSpeed(): Float {
         //#if MC < 1.21
-        return (MinecraftCompat.localPlayer.capabilities.walkSpeed * 1000).toInt()
+        val speed = MinecraftCompat.localPlayer.capabilities.walkSpeed.toDouble()
         //#else
-        //$$ return (MinecraftCompat.localPlayer.getAttributeValue(EntityAttributes.MOVEMENT_SPEED) * 1000).toInt()
+        //$$ val speed = MinecraftCompat.localPlayer.getAttributeBaseValue(EntityAttributes.MOVEMENT_SPEED)
         //#endif
+
+        // Round to avoid floating point inaccuracies (in-game precision is at most 2 decimals anyway)
+        return (speed * 1000).roundTo(2).toFloat()
     }
 
     fun getUuid() = getRawUuid().toUnDashedUUID()

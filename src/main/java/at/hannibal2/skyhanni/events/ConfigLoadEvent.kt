@@ -4,4 +4,4 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 @PrimaryFunction("onConfigLoad")
-object ConfigLoadEvent : SkyHanniEvent()
+class ConfigLoadEvent(val firstLoad: Boolean) : SkyHanniEvent()
