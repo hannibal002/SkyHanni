@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhite
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.text.Style
 import net.minecraft.text.Text
@@ -52,6 +54,12 @@ class TestLegacyColorFormat {
     fun `test formatted text compat leading white less resets`() {
         Assertions.assertEquals("§8[§9302§8] §6♫ §b[MVP§d+§b] lrg89§f: test", testText1.formattedTextCompatLeadingWhiteLessResets())
         Assertions.assertEquals("§fTest §lExtra Resets §r§kDone", testText2.formattedTextCompatLeadingWhiteLessResets())
+    }
+
+    @Test
+    fun `test unformatted text`() {
+        Assertions.assertEquals("[302] ♫ [MVP+] lrg89: test", testText1.unformattedTextCompat())
+        Assertions.assertEquals("Test Extra Resets §rDone", testText2.unformattedTextCompat())
     }
 
 }
