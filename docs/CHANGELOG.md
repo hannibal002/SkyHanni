@@ -410,6 +410,7 @@
 + Fixed Pet Drop Rarity on messages without Magic Find or Farming Fortune. - Luna (https://github.com/hannibal002/SkyHanni/pull/4566)
 + Fixed some tab-completion features working outside SkyBlock. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4654)
 + Fixed new error chat messages around coroutine. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4720)
++ Fixed crash on 1.21.10 with chat heads. - nopo (https://github.com/hannibal002/SkyHanni/pull/4829)
 
 #### Inventory
 
@@ -475,6 +476,7 @@
 + Fixed blocks being broken without releasing the mouse not being detected. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4787)
 + Fixed Replace Menu Icons in Stereo Harmony sometimes highlighting the wrong vinyl as active. - Luna (https://github.com/hannibal002/SkyHanni/pull/4820)
 + Fixed Stereo Harmony Display not updating the active vinyl when changed outside the Garden or when SkyHanni is not installed. - Luna (https://github.com/hannibal002/SkyHanni/pull/4820)
++ Fixed Stereo Harmony Display not updating the active vinyl until you leave and rejoin the Garden. - Luna (https://github.com/hannibal002/SkyHanni/pull/4828)
 
 #### Foraging
 
@@ -731,6 +733,10 @@
 + Renamed `MineshaftDetection.MineshaftTypes` to `MineshaftDetection.MineshaftType`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4781)
 + Support preprocessing to snapshots and pre-releases. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4596)
 + Fixed `/shdebug skyblock` showing the graph area as the scoreboard area. - Luna (https://github.com/hannibal002/SkyHanni/pull/4808)
++ Added more tests for legacy chat formatting. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4830)
++ Changed internal names of some classes to match the naming conventions. - kathund (https://github.com/hannibal002/SkyHanni/pull/4826)
++ Stop BlockClickEvent from being posted twice. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4823)
++ TextCompat formated performance gain. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4827)
 
 ### Removed Features
 
