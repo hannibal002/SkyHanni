@@ -36,3 +36,7 @@ jobs:
               with:
                   name: changelog-errors-${{ github.event.pull_request.number }}
                   path: versions/1.8.9/build/changelog_errors.txt
+        
+            - name: Force failure if check failed
+              if: steps.run_check.outcome == 'failure'
+              run: exit 1
