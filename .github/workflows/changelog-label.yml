@@ -1,0 +1,60 @@
+name: "PR Changelog Labeling"
+
+on:
+    workflow_run:
+        workflows: ["PR Changelog Verification"]
+        types:
+            - completed
+
+permissions:
+    pull-requests: write
+
+jobs:
+    changelog-label:
+        if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.pull_requests[0]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Add 'Wrong Title/Changelog' label
+              if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+              uses: actions-ecosystem/action-add-labels@v1
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                number: ${{ steps.get_pr.outputs.PR_NUMBER }}
+                labels: 'Wrong Title/Changelog'
+
+            - name: Download changelog error artifact
+              if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+              uses: actions/download-artifact@v4
+              with:
+                name: changelog-errors-${{ steps.get_pr.outputs.PR_NUMBER }}
+                path: .
+
+            - name: Comment on PR with changelog errors
+              if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+              uses: actions/github-script@v7
+              with:
+                github-token: ${{ secrets.GITHUB_TOKEN }}
+                script: |
+                  const fs = require('fs');
+                  if (!fs.existsSync('changelog_errors.txt')) {
+                    console.log("Changelog error file not found, skipping comment.");
+                    return;
+                  }
+                  const commentBody = fs.readFileSync('changelog_errors.txt', 'utf8');
+                  github.rest.issues.createComment({
+                    issue_number: ${{ steps.get_pr.outputs.PR_NUMBER }},
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body: commentBody
+                  });
+
+            - name: Remove 'Wrong Title/Changelog' label
+              if: ${{ github.event.workflow_run.conclusion == 'success' }}
+              uses: actions-ecosystem/action-remove-labels@v1
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                number: ${{ steps.get_pr.outputs.PR_NUMBER }}
+                labels: 'Wrong Title/Changelog'
