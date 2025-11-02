@@ -31,10 +31,11 @@ object BingoCardTips {
 
     /**
      * REGEX-TEST: §7Reward
+     * REGEX-TEST: §7Reward§r
      */
     private val rewardPattern by patternGroup.pattern(
         "reward",
-        "(?:§.)+Reward",
+        "(?:§.)+Reward(?:§.)?",
     )
     private val contributionRewardsPattern by patternGroup.pattern(
         "reward.contribution",
