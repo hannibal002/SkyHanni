@@ -65,10 +65,6 @@ object SkyHanniMod {
         SkyHanniEvents.init(modules)
 
         PreInitFinishedEvent.post()
-
-        return
-
-        println("hi")
     }
 
     fun init() {
