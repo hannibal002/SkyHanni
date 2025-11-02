@@ -85,7 +85,7 @@ object GardenApi {
         "BASIC_GARDENING_AXE",
         "ADVANCED_GARDENING_HOE",
         "ROOKIE_HOE",
-        "BINGHOE",
+        "BINGHOE" 
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
