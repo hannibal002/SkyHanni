@@ -10,7 +10,7 @@ permissions:
     pull-requests: write
 
 jobs:
-    detekt:
+    detekt_label:
         name: Label and Comment on PR
         runs-on: ubuntu-latest
         # Only run this job for pull requests that failed the detekt check

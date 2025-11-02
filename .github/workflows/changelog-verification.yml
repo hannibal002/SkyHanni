@@ -24,6 +24,8 @@ jobs:
               env:
                   PR_TITLE: ${{ github.event.pull_request.title }}
                   PR_BODY: ${{ github.event.pull_request.body }}
+              continue-on-error: true
+              id: run_check
               uses: ./.github/actions/gradle-retry
               with:
                   gradle-command: checkPrDescription -PprTitle="${PR_TITLE}" -PprBody="${PR_BODY}"
