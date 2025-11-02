@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.RenderGlobalHook;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.renderer.culling.ICamera;
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager;
+import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.Frustum;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(RenderGlobal.class)
+@Mixin(WorldRenderer.class)
 public abstract class MixinRenderGlobal {
 
     @Shadow
@@ -23,8 +23,8 @@ public abstract class MixinRenderGlobal {
     @Unique
     private final RenderGlobalHook skyHanni$hook = new RenderGlobalHook();
 
-    @Redirect(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderGlobal;isRenderEntityOutlines()Z"))
-    public boolean renderEntitiesOutlines(RenderGlobal self, Entity renderViewEntity, ICamera camera, float partialTicks) {
+    @Redirect(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;isRenderEntityOutlines()Z"))
+    public boolean renderEntitiesOutlines(WorldRenderer self, Entity renderViewEntity, Frustum camera, float partialTicks) {
         return skyHanni$hook.renderEntitiesOutlines(camera, partialTicks) && this.isRenderEntityOutlines();
     }
 
@@ -35,6 +35,6 @@ public abstract class MixinRenderGlobal {
 
     @Inject(method = "renderEntityOutlineFramebuffer", at = @At(value = "RETURN"))
     public void afterFramebufferDraw(CallbackInfo callbackInfo) {
-        GlStateManager.enableDepth();
+        ModernGlStateManager.enableDepthTest();
     }
 }

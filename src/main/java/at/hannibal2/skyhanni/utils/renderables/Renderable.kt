@@ -34,24 +34,24 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableScrollT
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiIngameMenu
-import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.GameMenuScreen
+import net.minecraft.client.gui.screen.ingame.SignEditScreen
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
+import net.minecraft.util.Identifier
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
 //#if TODO
-import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
-import at.hannibal2.skyhanni.features.chroma.ChromaType
-import at.hannibal2.skyhanni.features.misc.DarkenShader
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
+//$$ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
+//$$ import at.hannibal2.skyhanni.features.chroma.ChromaType
+//$$ import at.hannibal2.skyhanni.features.misc.DarkenShader
+//$$ import at.hannibal2.skyhanni.utils.shader.ShaderManager
 //#endif
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
-//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
+import at.hannibal2.skyhanni.utils.compat.RenderCompat
+import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
 //#endif
 
 // todo 1.21 impl needed
@@ -307,16 +307,16 @@ interface Renderable {
         }
 
         internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
-            val guiScreen = Minecraft.getMinecraft().currentScreen.takeIf { it != null } ?: return false
+            val guiScreen = MinecraftClient.getInstance().currentScreen.takeIf { it != null } ?: return false
 
             // Never support grayed out inventories
             if (RenderData.outsideInventory) return false
 
             if (bypassChecks) return true
 
-            val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
+            val inMenu = MinecraftClient.getInstance().currentScreen !is GameMenuScreen
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGui<*>) {
+            val isNotInSignAndOnSlot = if (guiScreen !is SignEditScreen && guiScreen !is GuideGui<*>) {
                 ToolTipData.lastSlot == null
                     || GuiData.preDrawEventCancelled
             } else true
@@ -373,7 +373,7 @@ interface Renderable {
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 GuiRenderUtils.drawRect(0, height, width, 11, color.rgb)
-                GlStateManager.color(1F, 1F, 1F, 1F)
+                ModernGlStateManager.color(1F, 1F, 1F, 1F)
                 renderable.render(mouseOffsetX, mouseOffsetY)
             }
         }
@@ -439,12 +439,12 @@ interface Renderable {
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 //#if TODO
-                DarkenShader.darknessLevel = amount
-                ShaderManager.enableShader(ShaderManager.Shaders.DARKEN)
+                //$$ DarkenShader.darknessLevel = amount
+                //$$ ShaderManager.enableShader(ShaderManager.Shaders.DARKEN)
                 //#endif
                 this@darken.render(mouseOffsetX, mouseOffsetY)
                 //#if TODO
-                ShaderManager.disableShader()
+                //$$ ShaderManager.disableShader()
                 //#endif
             }
         }
@@ -489,9 +489,9 @@ interface Renderable {
 
             val searchWidth: Int
                 get() {
-                    val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+                    val fontRenderer = MinecraftClient.getInstance().textRenderer
                     val string = searchPrefix + textInput.editTextWithAlwaysCarriage()
-                    return (fontRenderer.getStringWidth(string) * scale).toInt() + 1
+                    return (fontRenderer.getWidth(string) * scale).toInt() + 1
                 }
 
             init {
@@ -592,24 +592,24 @@ interface Renderable {
                     GuiRenderUtils.drawRect(0, 0, width, height, 0xFF43464B.toInt())
 
                     //#if MC < 1.21
-                    if (useChroma) ChromaShaderManager.begin(ChromaType.STANDARD)
+                    //$$ if (useChroma) ChromaShaderManager.begin(ChromaType.STANDARD)
                     //#endif
 
                     val factor = 0.2
                     val bgColor = if (useChroma) Color.GRAY.darker() else color
                     GuiRenderUtils.drawRect(1, 1, width - 1, height - 1, bgColor.darker(factor).rgb)
                     //#if MC < 1.21
-                    GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
+                    //$$ GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
                     //#else
-                    //$$ if (useChroma) {
-                    //$$     DrawContextUtils.drawContext.fill(SkyHanniRenderLayers.getChromaStandard(), 1, 1, progress, height - 1, color.rgb)
-                    //$$ } else {
-                    //$$     GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
-                    //$$ }
+                    if (useChroma) {
+                        DrawContextUtils.drawContext.fill(SkyHanniRenderLayers.getChromaStandard(), 1, 1, progress, height - 1, color.rgb)
+                    } else {
+                        GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
+                    }
                     //#endif
 
                     //#if MC < 1.21
-                    if (useChroma) ChromaShaderManager.end()
+                    //$$ if (useChroma) ChromaShaderManager.end()
                     //#endif
                 } else {
                     val scale = 0.00390625f
@@ -619,59 +619,59 @@ interface Renderable {
                     val (uMax, vMax) = Pair(uMin + (width * scale), vMin + (height * scale))
 
                     //#if MC < 1.21
-                    GuiRenderUtils.drawTexturedRect(
-                        mouseOffsetX, mouseOffsetY, width, height, uMin, uMax, vMin, vMax, createResourceLocation(texture.path),
-                        alpha = 1f, filter = GL11.GL_NEAREST,
-                    )
+                    //$$ GuiRenderUtils.drawTexturedRect(
+                    //$$     mouseOffsetX, mouseOffsetY, width, height, uMin, uMax, vMin, vMax, createResourceLocation(texture.path),
+                    //$$     alpha = 1f, filter = GL11.GL_NEAREST,
+                    //$$ )
                     //#else
-                    //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                    //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
-                    //$$         mouseOffsetX, mouseOffsetY, width, height)
-                    //$$ } else {
-                    //$$     DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
-                    //$$         mouseOffsetX, mouseOffsetY, 0f, 0f, width, height, 182, 5, 256, 256, -1)
-                    //$$ }
+                    if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
+                        DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
+                            mouseOffsetX, mouseOffsetY, width, height)
+                    } else {
+                        DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                            mouseOffsetX, mouseOffsetY, 0f, 0f, width, height, 182, 5, 256, 256, -1)
+                    }
                     //#endif
 
                     if (useChroma) {
-                        GlStateManager.color(1f, 1f, 1f, 1f)
+                        ModernGlStateManager.color(1f, 1f, 1f, 1f)
                         //#if MC < 1.21
-                        ChromaShaderManager.begin(ChromaType.TEXTURED)
-                        GuiRenderUtils.drawTexturedRect(
-                            mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
-                            vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
-                            alpha = 1f, filter = GL11.GL_NEAREST,
-                        )
+                        //$$ ChromaShaderManager.begin(ChromaType.TEXTURED)
+                        //$$ GuiRenderUtils.drawTexturedRect(
+                        //$$     mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
+                        //$$     vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
+                        //$$     alpha = 1f, filter = GL11.GL_NEAREST,
+                        //$$ )
                         //#else
-                        //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                        //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
-                        //$$         width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
-                        //$$ } else {
-                        //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
-                        //$$         mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
-                        //$$ }
+                        if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
+                            DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
+                                width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
+                        } else {
+                            DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
+                                mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
+                        }
                         //#endif
                     } else {
-                        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
+                        ModernGlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                         //#if MC < 1.21
-                        GuiRenderUtils.drawTexturedRect(
-                            mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
-                            vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
-                            alpha = 1f, filter = GL11.GL_NEAREST,
-                        )
+                        //$$ GuiRenderUtils.drawTexturedRect(
+                        //$$     mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
+                        //$$     vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
+                        //$$     alpha = 1f, filter = GL11.GL_NEAREST,
+                        //$$ )
                         //#else
-                        //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                        //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
-                        //$$         width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
-                        //$$ } else {
-                        //$$     DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
-                        //$$         mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
-                        //$$ }
+                        if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
+                            DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
+                                width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
+                        } else {
+                            DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                                mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
+                        }
                         //#endif
                     }
 
                     //#if MC < 1.21
-                    if (useChroma) ChromaShaderManager.end()
+                    //$$ if (useChroma) ChromaShaderManager.end()
                     //#endif
                 }
             }
@@ -1147,7 +1147,7 @@ interface Renderable {
 
         fun drawInsideImage(
             input: Renderable,
-            texture: ResourceLocation,
+            texture: Identifier,
             alpha: Int = 255,
             padding: Int = 2,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
@@ -1181,7 +1181,7 @@ interface Renderable {
 
         fun drawInsideFixedSizedImage(
             input: Renderable,
-            texture: ResourceLocation,
+            texture: Identifier,
             width: Int = input.width,
             height: Int = input.height,
             alpha: Int = 255,

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.skyhanni.features.event.hoppity import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -57,7 +57,7 @@ object ReplaceHoppityWithContributor {
         val last = lore.lastOrNull() ?: return
         if (!last.endsWith(" RABBIT")) return
 
-        val realName = itemStack.displayName
+        val realName = itemStack.name.formattedTextCompatLeadingWhiteLessResets()
         val cleanName = realName.removeColor()
         val fakeName = replaceMap[cleanName] ?: return
 

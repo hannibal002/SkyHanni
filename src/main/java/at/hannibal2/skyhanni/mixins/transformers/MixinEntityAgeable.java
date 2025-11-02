@@ -15,7 +15,7 @@ public class MixinEntityAgeable {
 
 	@Inject(method = "getGrowingAge", cancellable = true, at = @At("HEAD"))
 	public void onGetGrowingAge(CallbackInfoReturnable<Integer> cir) {
-		if (((EntityAgeable) (Object) this).worldObj == null)
+		if (((EntityAgeable) (Object) this).level == null)
 			cir.setReturnValue(growingAge);
 	}
 }

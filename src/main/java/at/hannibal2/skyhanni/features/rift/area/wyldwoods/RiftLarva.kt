@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 
 @SkyHanniModule
 object RiftLarva {
@@ -40,7 +40,7 @@ object RiftLarva {
     }
 
     private fun findLarvas() {
-        for (stand in getEntities<EntityArmorStand>()) {
+        for (stand in getEntities<ArmorStandEntity>()) {
             if (stand.wearingSkullTexture(LARVA_SKULL_TEXTURE)) {
                 RenderLivingEntityHelper.setEntityColor(
                     stand,

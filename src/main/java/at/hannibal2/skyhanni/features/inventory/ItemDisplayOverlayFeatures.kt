@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
@@ -229,7 +229,7 @@ object ItemDisplayOverlayFeatures {
         if (COLLECTION_LEVEL.isSelected() && InventoryUtils.openInventoryName().endsWith(" Collections")) {
             if (lore.any { it.contains("Click to view!") }) {
                 if (CollectionApi.isCollectionTier0(lore)) return "0"
-                val name = item.displayName
+                val name = item.name.formattedTextCompatLeadingWhiteLessResets()
                 if (name.startsWith("§e")) {
                     val text = name.split(" ").last()
                     return "" + text.romanToDecimalIfNecessary()
@@ -263,7 +263,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
-            dungeonPotionPattern.matchMatcher(item.displayName.removeColor()) {
+            dungeonPotionPattern.matchMatcher(item.name.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
                 return when (val level = group("level").romanToDecimal()) {
                     in 1..2 -> "§f$level"
                     in 3..4 -> "§a$level"

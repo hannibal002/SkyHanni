@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 
 @SkyHanniModule
 object SensitivityReducer {
@@ -58,7 +58,7 @@ object SensitivityReducer {
 
     private fun updatePlayerStatus() {
         val newInBarn = GardenApi.onBarnPlot
-        val newOnGround = MinecraftCompat.localPlayer.onGround
+        val newOnGround = MinecraftCompat.localPlayer.isOnGround
 
         if (inBarn != newInBarn) {
             inBarn = newInBarn
@@ -157,5 +157,5 @@ object SensitivityReducer {
     }
 
     private fun isHoldingTool(): Boolean = GardenApi.toolInHand != null
-    private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && Minecraft.getMinecraft().currentScreen == null
+    private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && MinecraftClient.getInstance().currentScreen == null
 }

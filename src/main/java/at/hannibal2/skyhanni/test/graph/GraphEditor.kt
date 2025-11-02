@@ -45,8 +45,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import kotlinx.coroutines.runBlocking
-import net.minecraft.client.Minecraft
-import net.minecraft.client.settings.KeyBinding
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.option.KeyBinding
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
 import kotlin.math.min
@@ -160,12 +160,12 @@ object GraphEditor {
         }
 
         if (inEditMode) {
-            add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.keyCode)}")
-            add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.keyCode)}")
-            add("§ez+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.a.keyCode)}")
-            add("§ez- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.d.keyCode)}")
-            add("§ey+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.up.keyCode)}")
-            add("§ey- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.down.keyCode)}")
+            add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.boundKey.getCode())}")
+            add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.boundKey.getCode())}")
+            add("§ez+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.a.boundKey.getCode())}")
+            add("§ez- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.d.boundKey.getCode())}")
+            add("§ey+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.up.boundKey.getCode())}")
+            add("§ey- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.down.boundKey.getCode())}")
         }
         if (inTextMode) {
             add("§eFormat: ${textBox.finalText()}")
@@ -618,7 +618,7 @@ object GraphEditor {
     private var lastGuiTime = SimpleTimeMark.farPast()
 
     private fun isAnyGuiActive(): Boolean {
-        val gui = Minecraft.getMinecraft().currentScreen != null
+        val gui = MinecraftClient.getInstance().currentScreen != null
         if (gui) {
             lastGuiTime = 3.ticks.fromNow()
         }
@@ -637,7 +637,7 @@ object GraphEditor {
     }
 
     private fun KeyBinding.handleEditClicks(vector: LorenzVec) {
-        if (this.keyCode.isKeyClicked()) {
+        if (this.boundKey.getCode().isKeyClicked()) {
             activeNode?.let {
                 it.position += vector
             }

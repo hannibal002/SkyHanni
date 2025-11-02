@@ -2,29 +2,29 @@ package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.utils.ItemUtils
 import net.minecraft.block.Block
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
+import net.minecraft.block.Blocks
+import net.minecraft.item.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 
 enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
-    COMBAT("Combat", Items.golden_sword, 60),
-    FARMING("Farming", Items.golden_hoe, 60),
-    FISHING("Fishing", Items.fishing_rod, 50),
-    MINING("Mining", Items.golden_pickaxe, 60),
-    FORAGING("Foraging", Items.golden_axe, 54),
-    ENCHANTING("Enchanting", Blocks.enchanting_table, 60),
-    ALCHEMY("Alchemy", Items.brewing_stand, 50),
-    CARPENTRY("Carpentry", Blocks.crafting_table, 50),
+    COMBAT("Combat", Items.GOLDEN_SWORD, 60),
+    FARMING("Farming", Items.GOLDEN_HOE, 60),
+    FISHING("Fishing", Items.FISHING_ROD, 50),
+    MINING("Mining", Items.GOLDEN_PICKAXE, 60),
+    FORAGING("Foraging", Items.GOLDEN_AXE, 54),
+    ENCHANTING("Enchanting", Blocks.ENCHANTING_TABLE, 60),
+    ALCHEMY("Alchemy", Items.BREWING_STAND, 50),
+    CARPENTRY("Carpentry", Blocks.CRAFTING_TABLE, 50),
     //#if MC < 1.16
-    TAMING("Taming", Items.spawn_egg, 60),
+    //$$ TAMING("Taming", Items.spawn_egg, 60),
     //#else
-    //$$ TAMING("Taming", Items.POLAR_BEAR_SPAWN_EGG, 60),
+    TAMING("Taming", Items.POLAR_BEAR_SPAWN_EGG, 60),
     //#endif
-    HUNTING("Hunting", Items.lead, 25),
+    HUNTING("Hunting", Items.LEAD, 25),
     ;
 
-    constructor(displayName: String, block: Block, maxLevel: Int) : this(displayName, Item.getItemFromBlock(block), maxLevel)
+    constructor(displayName: String, block: Block, maxLevel: Int) : this(displayName, Item.fromBlock(block), maxLevel)
 
     val item: ItemStack by lazy { ItemUtils.createItemStack(icon, displayName) }
     val lowercaseName = displayName.lowercase()

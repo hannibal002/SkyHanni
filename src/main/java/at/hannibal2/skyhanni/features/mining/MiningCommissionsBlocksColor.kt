@@ -19,9 +19,9 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.block.state.IBlockState
-import net.minecraft.client.Minecraft
-import net.minecraft.item.EnumDyeColor
+import net.minecraft.block.BlockState
+import net.minecraft.client.MinecraftClient
+import net.minecraft.util.DyeColor
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -42,22 +42,22 @@ object MiningCommissionsBlocksColor {
         "§a§l(?<name>.*) §r§eCommission Complete! Visit the King §r§eto claim your rewards!",
     )
 
-    private var color = EnumDyeColor.RED
+    private var color = DyeColor.RED
 
-    private fun glass(state: IBlockState, result: Boolean): IBlockState {
-        val newColor = if (result) color else EnumDyeColor.GRAY
-        return ColoredBlockCompat.fromMeta(newColor.metadata).createGlassBlockState(state)
+    private fun glass(state: BlockState, result: Boolean): BlockState {
+        val newColor = if (result) color else DyeColor.GRAY
+        return ColoredBlockCompat.fromMeta(newColor.index).createGlassBlockState(state)
     }
 
 
-    private fun block(result: Boolean): IBlockState {
-        val newColor = if (result) color else EnumDyeColor.GRAY
-        return ColoredBlockCompat.fromMeta(newColor.metadata).createWoolBlockState()
+    private fun block(result: Boolean): BlockState {
+        val newColor = if (result) color else DyeColor.GRAY
+        return ColoredBlockCompat.fromMeta(newColor.index).createWoolBlockState()
     }
 
     private var oldSneakState = false
     private var dirty = false
-    private var replaceBlocksMapCache = mutableMapOf<IBlockState, IBlockState>()
+    private var replaceBlocksMapCache = mutableMapOf<BlockState, BlockState>()
 
     // TODO Commission API
     @HandleEvent
@@ -118,7 +118,7 @@ object MiningCommissionsBlocksColor {
 
         if (reload) {
             replaceBlocksMapCache = mutableMapOf()
-            Minecraft.getMinecraft().renderGlobal.loadRenderers()
+            MinecraftClient.getInstance().worldRenderer.reload()
             dirty = false
         }
     }
@@ -230,12 +230,12 @@ object MiningCommissionsBlocksColor {
         ;
 
         companion object {
-            fun CommissionBlock.onColor(state: IBlockState): IBlockState =
+            fun CommissionBlock.onColor(state: BlockState): BlockState =
                 if (oreType.isGemstone()) glass(state, highlight) else block(highlight)
         }
     }
 
-    fun processState(state: IBlockState?): IBlockState? {
+    fun processState(state: BlockState?): BlockState? {
         if (!enabled || !active) return state
         if (state == null) return null
         try {

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.skyhanni.features.fishing import at.hannibal2.skyhanni.utils.compat.deceased import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -11,14 +11,14 @@ import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 
 @SkyHanniModule
 object FishingHookDisplay {
 
     private val config get() = SkyHanniMod.feature.fishing.fishingHookDisplay
-    private var armorStand: EntityArmorStand? = null
-    private val potentialArmorStands = mutableListOf<EntityArmorStand>()
+    private var armorStand: ArmorStandEntity? = null
+    private val potentialArmorStands = mutableListOf<ArmorStandEntity>()
     private val pattern = "§e§l(\\d+(\\.\\d+)?)".toPattern()
 
     @HandleEvent
@@ -49,13 +49,13 @@ object FishingHookDisplay {
     }
 
     @HandleEvent
-    fun onJoinWorld(event: EntityEnterWorldEvent<EntityArmorStand>) {
+    fun onJoinWorld(event: EntityEnterWorldEvent<ArmorStandEntity>) {
         if (!isEnabled()) return
         potentialArmorStands.add(event.entity)
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStandEntity>) {
         if (!isEnabled()) return
         if (!config.hideArmorStand) return
 
@@ -69,12 +69,12 @@ object FishingHookDisplay {
         if (!isEnabled()) return
 
         val armorStand = armorStand ?: return
-        if (armorStand.isDead) {
+        if (armorStand.deceased) {
             reset()
             return
         }
         if (!armorStand.hasCustomName()) return
-        val alertText = if (armorStand.name == "§c§l!!!") config.customAlertText.replace("&", "§") else armorStand.name
+        val alertText = if (armorStand.name.formattedTextCompatLessResets() == "§c§l!!!") config.customAlertText.replace("&", "§") else armorStand.name.formattedTextCompatLessResets()
 
         config.position.renderString(alertText, posLabel = "Fishing Hook Display")
     }
@@ -84,11 +84,11 @@ object FishingHookDisplay {
         event.transform(72, "fishing.fishingHookDisplay.position", Position::migrate)
     }
 
-    private fun EntityArmorStand.hasCorrectName(): Boolean {
-        if (name == "§c§l!!!") {
+    private fun ArmorStandEntity.hasCorrectName(): Boolean {
+        if (name.formattedTextCompatLessResets() == "§c§l!!!") {
             return true
         }
-        return pattern.matcher(name).matches()
+        return pattern.matcher(name.formattedTextCompatLessResets()).matches()
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && FishingApi.holdingRod

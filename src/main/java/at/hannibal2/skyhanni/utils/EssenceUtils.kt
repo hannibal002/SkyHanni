@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuEssenceCostJson
@@ -146,7 +146,7 @@ object EssenceUtils {
         for (value in inventoryItems.values) {
             // Right now Carnival and Essence Upgrade patterns are 'in-sync'
             // This may change in the future, and this would then need its own pattern
-            essenceUpgradePattern.matchMatcher(value.displayName) {
+            essenceUpgradePattern.matchMatcher(value.name.formattedTextCompatLeadingWhiteLessResets()) {
                 val upgradeName = groupOrNull("upgrade") ?: continue
                 val nextUpgradeRoman = groupOrNull("tier") ?: continue
                 val nextUpgrade = nextUpgradeRoman.romanToDecimal()

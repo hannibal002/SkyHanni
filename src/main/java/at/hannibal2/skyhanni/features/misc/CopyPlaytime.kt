@@ -19,7 +19,7 @@ object CopyPlaytime {
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTooltip(event: ToolTipEvent) {
         if (InventoryUtils.openInventoryName() != "Detailed /playtime") return
-        if (event.slot.slotNumber != 4) return
+        if (event.slot.id != 4) return
 
         event.toolTip.add("")
         event.toolTip.add("§eClick to Copy!")

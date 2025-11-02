@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -200,7 +200,7 @@ object SackApi {
 
     private fun MutableMap.MutableEntry<Int, ItemStack>.processGemstoneItem(savingSacks: Boolean) {
         var gemTypeProp: GemstoneType? = null
-        gemstoneItemNamePattern.matchMatcher(value.displayName) {
+        gemstoneItemNamePattern.matchMatcher(value.name.formattedTextCompatLeadingWhiteLessResets()) {
             val gemName = group("gem") ?: return@matchMatcher
             gemTypeProp = GemstoneType.getByNameOrNull(gemName) ?: return@matchMatcher
         }
@@ -243,7 +243,7 @@ object SackApi {
             priceUpdater(price)
             gem.price += price
             if (savingSacks) setSackItem(internalName, stored)
-            if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.displayName] = gem
+            if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.name.formattedTextCompatLeadingWhiteLessResets()] = gem
         }
     }
 
@@ -261,7 +261,7 @@ object SackApi {
                 3 -> {
                     rune.slot = key
                     rune.lvl3 = stored
-                    runeItem[value.displayName] = rune
+                    runeItem[value.name.formattedTextCompatLeadingWhiteLessResets()] = rune
                 }
             }
             if (savingSacks) setSackItem(value.getInternalName(), stored)
@@ -325,12 +325,12 @@ object SackApi {
         if (!event.message.removeColor().startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.hover?.formattedText?.removeColor()?.takeIf {
+            sibling.hover?.formattedTextCompat()?.removeColor()?.takeIf {
                 it.startsWith("Added")
             }
         }.orEmpty()
         val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.hover?.formattedText?.removeColor()?.takeIf {
+            sibling.hover?.formattedTextCompat()?.removeColor()?.takeIf {
                 it.startsWith("Removed")
             }
         }.orEmpty()

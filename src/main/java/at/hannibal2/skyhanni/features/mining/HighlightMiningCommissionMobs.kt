@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.skyhanni.features.mining import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -14,11 +14,11 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.monster.EntityEndermite
-import net.minecraft.entity.monster.EntityIronGolem
-import net.minecraft.entity.monster.EntityMagmaCube
-import net.minecraft.entity.monster.EntitySlime
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.mob.EndermiteEntity
+import net.minecraft.entity.passive.IronGolemEntity
+import net.minecraft.entity.mob.MagmaCubeEntity
+import net.minecraft.entity.mob.SlimeEntity
 
 @SkyHanniModule
 object HighlightMiningCommissionMobs {
@@ -29,23 +29,23 @@ object HighlightMiningCommissionMobs {
     private var active = listOf<MobType>()
 
     // TODO Commission API
-    enum class MobType(val commissionName: String, val isMob: (EntityLivingBase) -> Boolean) {
+    enum class MobType(val commissionName: String, val isMob: (LivingEntity) -> Boolean) {
 
         // Dwarven Mines
-        DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Goblin " }),
-        STAR_PUNCHER("Star Sentry Puncher", { it.name == "Crystal Sentry" }),
-        ICE_WALKER("Glacite Walker Slayer", { it.name == "Ice Walker" }),
-        GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.contains("Golden Goblin") }),
-        TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name == "Treasuer Hunter" }), // typo is intentional
+        DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name.formattedTextCompatLessResets() == "Goblin " }),
+        STAR_PUNCHER("Star Sentry Puncher", { it.name.formattedTextCompatLessResets() == "Crystal Sentry" }),
+        ICE_WALKER("Glacite Walker Slayer", { it.name.formattedTextCompatLessResets() == "Ice Walker" }),
+        GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.formattedTextCompatLessResets().contains("Golden Goblin") }),
+        TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name.formattedTextCompatLessResets() == "Treasuer Hunter" }), // typo is intentional
 
         // Crystal Hollows
-        AUTOMATON("Automaton Slayer", { it is EntityIronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) }),
-        TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name == "Team Treasurite" }),
-        YOG("Yog Slayer", { it is EntityMagmaCube && it.hasMaxHealth(35_000) }),
-        THYST("Thyst Slayer", { it is EntityEndermite && it.hasMaxHealth(5_000) }),
-        CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name == "Team Treasurite" }),
-        SLUDGE("Sludge Slayer", { it is EntitySlime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000)) }),
-        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }),
+        AUTOMATON("Automaton Slayer", { it is IronGolemEntity && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) }),
+        TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name.formattedTextCompatLessResets() == "Team Treasurite" }),
+        YOG("Yog Slayer", { it is MagmaCubeEntity && it.hasMaxHealth(35_000) }),
+        THYST("Thyst Slayer", { it is EndermiteEntity && it.hasMaxHealth(5_000) }),
+        CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name.formattedTextCompatLessResets() == "Team Treasurite" }),
+        SLUDGE("Sludge Slayer", { it is SlimeEntity && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000)) }),
+        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name.formattedTextCompatLessResets() == "Weakling " }),
 
         // new commissions
     }
@@ -55,7 +55,7 @@ object HighlightMiningCommissionMobs {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
 
-        val entities = EntityUtils.getEntities<EntityLivingBase>()
+        val entities = EntityUtils.getEntities<LivingEntity>()
         for ((type, entity) in active.flatMap { type -> entities.map { type to it } }) {
             if (type.isMob(entity)) {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(

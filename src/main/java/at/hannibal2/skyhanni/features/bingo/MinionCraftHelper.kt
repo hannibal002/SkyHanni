@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bingo
+package at.hannibal2.skyhanni.features.bingo import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -64,7 +64,7 @@ object MinionCraftHelper {
         val mainInventory = InventoryUtils.getItemsInOwnInventory()
 
         if (event.isMod(10)) {
-            hasMinionInInventory = mainInventory.map { it.displayName }.any { isMinionName(it) }
+            hasMinionInInventory = mainInventory.map { it.name.formattedTextCompatLeadingWhiteLessResets() }.any { isMinionName(it) }
         }
 
         if (event.repeatSeconds(2)) {
@@ -107,7 +107,7 @@ object MinionCraftHelper {
         val otherItems = mutableMapOf<NeuInternalName, Int>()
 
         for (item in mainInventory) {
-            val name = item.displayName.removeColor()
+            val name = item.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
             val rawId = item.getInternalName()
             if (isMinionName(name)) {
                 minions[name] = rawId
@@ -118,7 +118,7 @@ object MinionCraftHelper {
         minions.values.mapTo(allMinions) { it.addOneToId() }
 
         for (item in mainInventory) {
-            val name = item.displayName.removeColor()
+            val name = item.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
             if (item.hasHypixelEnchantments()) continue
             val rawId = item.getInternalName()
             if (!isMinionName(name)) {
@@ -127,7 +127,7 @@ object MinionCraftHelper {
 
                 val (itemId, multiplier) = NeuItems.getPrimitiveMultiplier(rawId)
                 val old = otherItems.getOrDefault(itemId, 0)
-                otherItems[itemId] = old + item.stackSize * multiplier
+                otherItems[itemId] = old + item.count * multiplier
             }
         }
 
@@ -269,7 +269,7 @@ object MinionCraftHelper {
         if (event.inventoryName != "Crafted Minions") return
 
         for ((_, b) in event.inventoryItems) {
-            val name = b.displayName
+            val name = b.name.formattedTextCompatLeadingWhiteLessResets()
             if (!name.startsWith("§e")) continue
             val internalName = NeuInternalName.fromItemName("$name I")
                 .replace("MINION", "GENERATOR").replace(";", "_").replace("CAVE_SPIDER", "CAVESPIDER")

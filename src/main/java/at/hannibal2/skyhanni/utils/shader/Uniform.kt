@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils.shader
 
 import java.util.Objects
 //#if MC > 1.21
-//$$ import org.joml.Matrix4f
+import org.joml.Matrix4f
 //#endif
 
 /**
@@ -30,7 +30,7 @@ class Uniform<T>(
             val BOOL: UniformType<Boolean> = UniformType()
             val INT: UniformType<Int> = UniformType()
             //#if MC > 1.21
-            //$$ val MAT4: UniformType<Matrix4f> = UniformType()
+            val MAT4: UniformType<Matrix4f> = UniformType()
             //#endif
         }
     }
@@ -62,10 +62,10 @@ class Uniform<T>(
                 }
 
                 //#if MC > 1.21
-                //$$ UniformType.MAT4 -> {
-                //$$     val matrix = newUniformValue as Matrix4f
-                //$$     ShaderHelper.glUniformMatrix4f(uniformID, false, matrix)
-                //$$ }
+                UniformType.MAT4 -> {
+                    val matrix = newUniformValue as Matrix4f
+                    ShaderHelper.glUniformMatrix4f(uniformID, false, matrix)
+                }
                 //#endif
 
                 UniformType.BOOL -> ShaderHelper.glUniform1f(uniformID, if (newUniformValue as Boolean) 1f else 0f)

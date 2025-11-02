@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.items.enchants
+package at.hannibal2.skyhanni.features.misc.items.enchants import at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
@@ -128,7 +128,7 @@ open class Enchant : Comparable<Enchant> {
             val nbtKey = nbtNum ?: return ""
             val levels = stackLevel ?: return ""
             val label = statLabel?.splitCamelCase()?.replaceFirstChar { it.uppercase() }?.replace("Xp", "XP") ?: return ""
-            val progress = item.extraAttributes.getDouble(nbtKey).roundTo(0).toInt()
+            val progress = item.extraAttributes.getDoubleOrDefault(nbtKey).roundTo(0).toInt()
             if (progress == 0) return ""
             val nextLevel = levels.higher(progress)
             val tail = nextLevel?.shortFormat()?.insert(0, "/ ") ?: "(Maxed)"

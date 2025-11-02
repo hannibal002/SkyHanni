@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.skyhanni.features.mining import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -91,7 +91,7 @@ object HotxFeatures {
             else -> return
         }
         handler.data.firstOrNull {
-            event.stack.displayName == it.item?.displayName
+            event.stack.name.formattedTextCompatLeadingWhiteLessResets() == it.item?.name.formattedTextCompatLeadingWhiteLessResets()
         }?.let {
             event.stackTip = if (it.activeLevel == 0 || it.activeLevel == it.maxLevel) "" else "§e${it.activeLevel}"
             it.activeLevel.toString()
@@ -104,7 +104,7 @@ object HotxFeatures {
             HotfData.inInventory && configHotf.tokenStackSize -> HotfData
             else -> return
         }
-        if (event.stack.displayName != handler.heartItem?.stack?.displayName) return
+        if (event.stack.name.formattedTextCompatLeadingWhiteLessResets() != handler.heartItem?.stack?.name.formattedTextCompatLeadingWhiteLessResets()) return
         event.stackTip = handler.availableTokens.takeIf { it != 0 }?.let { "§b$it" }.orEmpty()
     }
 

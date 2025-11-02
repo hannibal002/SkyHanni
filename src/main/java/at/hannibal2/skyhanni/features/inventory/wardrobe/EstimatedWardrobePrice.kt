@@ -18,7 +18,7 @@ object EstimatedWardrobePrice {
         if (!isEnabled()) return
 
         val slot = WardrobeApi.slots.firstOrNull {
-            event.slot.slotNumber == it.inventorySlot && it.isInCurrentPage()
+            event.slot.id == it.inventorySlot && it.isInCurrentPage()
         } ?: return
 
         val lore = WardrobeApi.createPriceLore(slot)

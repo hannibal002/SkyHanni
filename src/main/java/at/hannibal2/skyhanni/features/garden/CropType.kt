@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
-import net.minecraft.block.state.IBlockState
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
+import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
+import net.minecraft.item.Items
 import net.minecraft.item.ItemStack
 
 enum class CropType(
@@ -21,28 +21,28 @@ enum class CropType(
 
     WHEAT(
         "Wheat", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0,
-        { ItemStack(Items.wheat) }, "wheat", FarmingItemType.WHEAT
+        { ItemStack(Items.WHEAT) }, "wheat", FarmingItemType.WHEAT
     ),
     CARROT(
         "Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0,
-        { ItemStack(Items.carrot) }, "carrot", FarmingItemType.CARROT, replenish = true
+        { ItemStack(Items.CARROT) }, "carrot", FarmingItemType.CARROT, replenish = true
     ),
     POTATO(
         "Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0,
-        { ItemStack(Items.potato) }, "potato", FarmingItemType.POTATO, replenish = true
+        { ItemStack(Items.POTATO) }, "potato", FarmingItemType.POTATO, replenish = true
     ),
     NETHER_WART(
         "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
-        { ItemStack(Items.nether_wart) }, "wart", FarmingItemType.NETHER_WART, replenish = true,
+        { ItemStack(Items.NETHER_WART) }, "wart", FarmingItemType.NETHER_WART, replenish = true,
         enchantName = "warts"
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
-        { ItemStack(Blocks.pumpkin) }, "pumpkin", FarmingItemType.PUMPKIN
+        { ItemStack(Blocks.CARVED_PUMPKIN) }, "pumpkin", FarmingItemType.PUMPKIN
     ),
     MELON(
         "Melon", "MELON_DICER", "SQUASH", 5.0,
-        { ItemStack(Items.melon) }, "melon", FarmingItemType.MELON
+        { ItemStack(Items.MELON_SLICE) }, "melon", FarmingItemType.MELON
     ),
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
@@ -51,15 +51,15 @@ enum class CropType(
     ),
     SUGAR_CANE(
         "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
-        { ItemStack(Items.reeds) }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane"
+        { ItemStack(Items.SUGAR_CANE) }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane"
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
-        { ItemStack(Blocks.cactus) }, "cactus", FarmingItemType.CACTUS
+        { ItemStack(Blocks.CACTUS) }, "cactus", FarmingItemType.CACTUS
     ),
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
-        { ItemStack(Blocks.red_mushroom_block) }, "mushroom", FarmingItemType.MUSHROOM,
+        { ItemStack(Blocks.RED_MUSHROOM_BLOCK) }, "mushroom", FarmingItemType.MUSHROOM,
         enchantName = "mushrooms"
     ),
     ;
@@ -88,18 +88,18 @@ enum class CropType(
 
         fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid crop type '$name'")
 
-        fun IBlockState.getCropType(): CropType? {
+        fun BlockState.getCropType(): CropType? {
             return when (block) {
-                Blocks.wheat -> WHEAT
-                Blocks.carrots -> CARROT
-                Blocks.potatoes -> POTATO
-                Blocks.pumpkin -> PUMPKIN
-                Blocks.reeds -> SUGAR_CANE
-                Blocks.melon_block -> MELON
-                Blocks.cactus -> CACTUS
-                Blocks.cocoa -> COCOA_BEANS
-                Blocks.red_mushroom, Blocks.brown_mushroom -> MUSHROOM
-                Blocks.nether_wart -> NETHER_WART
+                Blocks.WHEAT -> WHEAT
+                Blocks.CARROTS -> CARROT
+                Blocks.POTATOES -> POTATO
+                Blocks.CARVED_PUMPKIN -> PUMPKIN
+                Blocks.SUGAR_CANE -> SUGAR_CANE
+                Blocks.MELON -> MELON
+                Blocks.CACTUS -> CACTUS
+                Blocks.COCOA -> COCOA_BEANS
+                Blocks.RED_MUSHROOM, Blocks.BROWN_MUSHROOM -> MUSHROOM
+                Blocks.NETHER_WART -> NETHER_WART
                 else -> null
             }
         }

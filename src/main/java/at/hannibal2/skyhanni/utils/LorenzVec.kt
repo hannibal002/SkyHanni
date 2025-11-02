@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import com.google.gson.annotations.Expose
 import net.minecraft.entity.Entity
-import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
-import net.minecraft.util.Rotations
-import net.minecraft.util.Vec3
+import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
+import net.minecraft.util.math.Box
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.EulerAngle
+import net.minecraft.util.math.Vec3d
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.acos
@@ -38,7 +38,7 @@ data class LorenzVec(
 
     fun toBlockPos(): BlockPos = BlockPos(floor(x).toInt(), floor(y).toInt(), floor(z).toInt())
 
-    fun toVec3(): Vec3 = Vec3(x, y, z)
+    fun toVec3(): Vec3d = Vec3d(x, y, z)
 
     fun distanceIgnoreY(other: LorenzVec): Double = distanceSqIgnoreY(other).pow(0.5)
 
@@ -168,11 +168,11 @@ data class LorenzVec(
     }
 
     fun boundingToOffset(offX: Double, offY: Double, offZ: Double) =
-        AxisAlignedBB(x, y, z, x + offX, y + offY, z + offZ)
+        Box(x, y, z, x + offX, y + offY, z + offZ)
 
     fun scale(scalar: Double): LorenzVec = LorenzVec(scalar * x, scalar * y, scalar * z)
 
-    fun axisAlignedTo(other: LorenzVec) = AxisAlignedBB(x, y, z, other.x, other.y, other.z)
+    fun axisAlignedTo(other: LorenzVec) = Box(x, y, z, other.x, other.y, other.z)
 
     fun up(offset: Number = 1): LorenzVec = copy(y = y + offset.toDouble())
 
@@ -271,20 +271,20 @@ data class LorenzVec(
 
 fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
-fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
-fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
-fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(serverPosX, serverPosY, serverPosZ)
+fun Entity.getLorenzVec(): LorenzVec = LorenzVec(pos.x, pos.y, pos.z)
+fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(lastRenderX, lastRenderY, lastRenderZ)
+fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(trackedPosition.getPos().x, trackedPosition.getPos().y, trackedPosition.getPos().z)
 
-fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
+fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(velocity.x, velocity.y, velocity.z)
 
 fun Entity.getPositionLog() = PositionLog(
-    tick = ticksExisted,
+    tick = age,
     position = getLorenzVec(),
     prev = getPrevLorenzVec(),
     server = getServerLorenzVec(),
     motion = getMotionLorenzVec(),
-    yaw = rotationYaw,
-    pitch = rotationPitch,
+    yaw = yaw,
+    pitch = pitch,
 )
 
 data class PositionLog(
@@ -297,16 +297,16 @@ data class PositionLog(
     @Expose val pitch: Float,
 )
 
-fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
+fun Vec3d.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
-fun Rotations.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
+fun EulerAngle.toLorenzVec(): LorenzVec = LorenzVec(pitch, yaw, roll)
 
-fun S2APacketParticles.toLorenzVec() = LorenzVec(xCoordinate, yCoordinate, zCoordinate)
+fun ParticleS2CPacket.toLorenzVec() = LorenzVec(x, y, z)
 
 fun Array<Double>.toLorenzVec(): LorenzVec {
     return LorenzVec(this[0], this[1], this[2])
 }
 
-fun AxisAlignedBB.expand(vec: LorenzVec): AxisAlignedBB = expand(vec.x, vec.y, vec.z)
+fun Box.expand(vec: LorenzVec): Box = expand(vec.x, vec.y, vec.z)
 
-fun AxisAlignedBB.expand(amount: Double): AxisAlignedBB = expand(amount, amount, amount)
+fun Box.expand(amount: Double): Box = expand(amount, amount, amount)

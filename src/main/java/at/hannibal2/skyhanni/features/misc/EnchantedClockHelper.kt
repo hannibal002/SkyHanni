@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -108,7 +108,7 @@ object EnchantedClockHelper {
             private var entries = listOf<BoostType>()
 
             fun byUsageStringOrNull(usageString: String) = entries.firstOrNull { it.usageString == usageString }
-            fun byItemStackOrNull(stack: ItemStack) = entries.firstOrNull { it.formattedName == stack.displayName }
+            fun byItemStackOrNull(stack: ItemStack) = entries.firstOrNull { it.formattedName == stack.name.formattedTextCompatLeadingWhiteLessResets() }
             fun bySimpleBoostType(simple: SimpleBoostType) = entries.firstOrNull { it.name == simple.name }
 
             fun populateFromJson(json: EnchantedClockJson) {

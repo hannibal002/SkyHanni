@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.bazaar
+package at.hannibal2.skyhanni.features.inventory.bazaar import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -50,7 +50,7 @@ object BazaarCancelledBuyOrderClipboard {
         if (!isEnabled()) return
         if (!inventoryTitlePattern.matches(event.inventoryName)) return
         val stack = event.inventoryItems[11] ?: return
-        if (!stack.displayName.contains("Cancel Order")) return
+        if (!stack.name.formattedTextCompatLeadingWhiteLessResets().contains("Cancel Order")) return
 
         val lore = stack.getLore()
         lastAmountPattern.firstMatcher(lore) {

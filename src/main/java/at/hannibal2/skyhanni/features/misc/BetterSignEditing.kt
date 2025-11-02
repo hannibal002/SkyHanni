@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 
 @SkyHanniModule
 object BetterSignEditing {
@@ -18,7 +18,7 @@ object BetterSignEditing {
         if (!SkyHanniMod.feature.misc.betterSignEditing) return
         if (!PlatformUtils.IS_LEGACY) return
 
-        val gui = Minecraft.getMinecraft().currentScreen
+        val gui = MinecraftClient.getInstance().currentScreen
         SignUtils.checkPaste()
         SignUtils.checkCopying(gui)
         SignUtils.checkDeleting(gui)

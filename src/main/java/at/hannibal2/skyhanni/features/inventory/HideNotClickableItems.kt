@@ -47,9 +47,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.screen.GenericContainerScreenHandler
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
@@ -112,8 +112,8 @@ object HideNotClickableItems {
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (bypassActive()) return
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is GenericContainerScreen) return
+        val chest = event.container as GenericContainerScreenHandler
         val chestName = InventoryUtils.openInventoryName()
 
         for ((slot, stack) in chest.getLowerItems()) {
@@ -130,8 +130,8 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (bypassActive()) return
 
-        val guiChest = Minecraft.getMinecraft().currentScreen
-        if (guiChest !is GuiChest) return
+        val guiChest = MinecraftClient.getInstance().currentScreen
+        if (guiChest !is GenericContainerScreen) return
         val chestName = InventoryUtils.openInventoryName()
 
         val stack = event.itemStack
@@ -160,12 +160,12 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (!config.itemsBlockClicks) return
         if (bypassActive()) return
-        if (event.gui !is GuiChest) return
+        if (event.gui !is GenericContainerScreen) return
         val chestName = InventoryUtils.openInventoryName()
 
         val slot = event.slot ?: return
 
-        if (slot.slotNumber == slot.slotIndex) return
+        if (slot.id == slot.index) return
         val stack = slot.stack.orNull() ?: return
 
         if (hide(chestName, stack)) {
@@ -476,7 +476,7 @@ object HideNotClickableItems {
         showGreenLine = true
 
         var name = stack.cleanName()
-        val size = stack.stackSize
+        val size = stack.count
         val amountText = " x$size"
         if (name.endsWith(amountText)) {
             name = name.substring(0, name.length - amountText.length)
@@ -494,7 +494,7 @@ object HideNotClickableItems {
 
             if (hideNpcSellFilter.match(name)) return false
 
-            if (stack.isVanilla() && !stack.isEnchanted()) {
+            if (stack.isVanilla() && !stack.hasEnchantments()) {
                 return false
             }
         }

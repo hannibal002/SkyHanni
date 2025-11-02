@@ -15,30 +15,6 @@ enum class ProjectTarget(
     val modrinthInfo: ModrinthInfo? = null,
     linkTo: String?,
 ) {
-    MAIN(
-        "1.8.9",
-        MinecraftVersion.MC189,
-        "de.oceanlabs.mcp:mcp_stable:22-1.8.9@zip",
-        MappingStyle.SEARGE,
-        forgeDep = "net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9",
-        modrinthInfo = ModrinthInfo.FORGE_1_8_9,
-        linkTo = "BRIDGE116FORGE",
-    ),
-    BRIDGE116FORGE(
-        "1.16.5-forge",
-        MinecraftVersion.MC11605,
-        "official",
-        MappingStyle.SEARGE,
-        forgeDep = "net.minecraftforge:forge:1.16.5-36.2.39",
-        linkTo = "BRIDGE116FABRIC",
-    ),
-    BRIDGE116FABRIC(
-        "1.16.5-fabric",
-        MinecraftVersion.MC11605,
-        yarn("1.16.5+build.10"),
-        MappingStyle.YARN,
-        linkTo = "MODERN_12105",
-    ),
     MODERN_12105(
         "1.21.5",
         MinecraftVersion.MC12105,

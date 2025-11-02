@@ -42,7 +42,7 @@ object AnvilCombineHelper {
         return InventoryUtils.getSlotsInOwnInventory().filter { slot ->
             val name = slot.stack.getInternalName()
             name == leftStack || name == rightStack
-        }.map { it.slotNumber }.toSet()
+        }.map { it.id }.toSet()
 
     }
 
@@ -51,7 +51,7 @@ object AnvilCombineHelper {
         if (!isEnabled()) return
 
         for (slot in InventoryUtils.getSlotsInOwnInventory()) {
-            if (slot.slotNumber in highlightedSlots) {
+            if (slot.id in highlightedSlots) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }

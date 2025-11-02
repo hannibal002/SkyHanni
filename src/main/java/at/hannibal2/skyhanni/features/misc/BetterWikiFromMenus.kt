@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -29,7 +29,7 @@ object BetterWikiFromMenus {
         if (chestName.isEmpty()) return
 
         val itemClickedStack = event.slot?.stack ?: return
-        val itemClickedName = itemClickedStack.displayName
+        val itemClickedName = itemClickedStack.name.formattedTextCompatLeadingWhiteLessResets()
 
         val isWiki = event.slotId == 11 && itemClickedName.contains("Wiki Command")
         val isWikithis = event.slotId == 15 && itemClickedName.contains("Wikithis Command")

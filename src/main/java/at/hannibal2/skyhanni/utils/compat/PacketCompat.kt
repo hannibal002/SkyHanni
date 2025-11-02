@@ -2,30 +2,30 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.item.ItemStack
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraft.util.EnumFacing
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
+import net.minecraft.util.math.Direction
 //#if MC > 1.16
-//$$ import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 //#endif
 
-fun C08PacketPlayerBlockPlacement.getFacing(): EnumFacing =
+fun PlayerInteractBlockC2SPacket.getFacing(): Direction =
     //#if MC < 1.16
-    EnumFacing.getFront(placedBlockDirection)
+    //$$ EnumFacing.getFront(placedBlockDirection)
 //#else
-//$$ hitResult.direction
+blockHitResult.side
 //#endif
 
-fun C08PacketPlayerBlockPlacement.getUsedItem(): ItemStack? =
+fun PlayerInteractBlockC2SPacket.getUsedItem(): ItemStack? =
     //#if MC < 1.16
-    stack
+    //$$ stack
 //#else
-//$$ Minecraft.getInstance().player?.getItemInHand(hand)
+MinecraftClient.getInstance().player?.getStackInHand(hand)
 //#endif
 
-fun C03PacketPlayer.getLocation(): LorenzVec =
+fun PlayerMoveC2SPacket.getLocation(): LorenzVec =
     //#if MC < 1.16
-    LorenzVec(positionX, positionY, positionZ)
+    //$$ LorenzVec(positionX, positionY, positionZ)
 //#else
-//$$ LorenzVec(getX(0.0), getY(0.0), getZ(0.0))
+LorenzVec(getX(0.0), getY(0.0), getZ(0.0))
 //#endif

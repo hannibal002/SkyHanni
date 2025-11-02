@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CFStorage.HitmanStatsStorage
@@ -36,7 +36,7 @@ object HitmanApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val storage = storage ?: return
         if (event.inventoryName != "Rabbit Hitman") return
-        val summaryItem = event.inventoryItems[4].takeIf { it?.displayName == "§cRabbit Hitman" } ?: return
+        val summaryItem = event.inventoryItems[4].takeIf { it?.name.formattedTextCompatLeadingWhiteLessResets() == "§cRabbit Hitman" } ?: return
         val availableEggs = CFDataLoader.hitmanAvailableEggsPattern.firstMatcher(summaryItem.getLore()) {
             group("amount").toInt()
         } ?: return

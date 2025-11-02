@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.client.renderer.GlStateManager
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import net.minecraft.item.ItemStack
 import java.nio.FloatBuffer
 //#if MC > 1.21
-//$$ import com.mojang.blaze3d.systems.RenderSystem
-//$$ import net.minecraft.client.gui.DrawContext
-//$$ import org.joml.Matrix4f
-//$$ import org.joml.Quaternionf
+import com.mojang.blaze3d.systems.RenderSystem
+import net.minecraft.client.gui.DrawContext
+import org.joml.Matrix4f
+import org.joml.Quaternionf
 //#endif
 
 /**
@@ -37,10 +37,10 @@ object DrawContextUtils {
         get() = _drawContext ?: run {
             ErrorManager.crashInDevEnv("drawContext is null")
             //#if MC < 1.21
-            ErrorManager.logErrorStateWithData("drawContext is null", "drawContext is null, renderDepth: $renderDepth")
-            DrawContext()
+            //$$ ErrorManager.logErrorStateWithData("drawContext is null", "drawContext is null, renderDepth: $renderDepth")
+            //$$ DrawContext()
             //#else
-            //$$ ErrorManager.skyHanniError("drawContext is null")
+            ErrorManager.skyHanniError("drawContext is null")
             //#endif
         }
 
@@ -84,23 +84,23 @@ object DrawContextUtils {
     fun rotate(angle: Float, x: Number, y: Number, z: Number) {
         val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
         //#if MC < 1.21
-        GlStateManager.rotate(angle, xf, yf, zf)
+        //$$ RenderSystem.rotate(angle, xf, yf, zf)
         //#elseif MC < 1.21.6
-        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, xf, yf, zf))
+        drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, xf, yf, zf))
         //#endif
     }
 
     fun multMatrix(buffer: FloatBuffer) {
         //#if MC < 1.21
-        GlStateManager.multMatrix(buffer)
+        //$$ RenderSystem.multMatrix(buffer)
         //#elseif MC < 1.21.6
-        //$$ multMatrix(Matrix4f(buffer))
+        multMatrix(Matrix4f(buffer))
         //#endif
     }
 
     //#if MC > 1.21
     //#if MC < 1.21.6
-    //$$ fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
+    fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
     //#endif
     //#endif
 
@@ -115,7 +115,7 @@ object DrawContextUtils {
     @Deprecated("Use pushPop instead")
     fun pushMatrix() {
         //#if MC < 1.21.6
-        drawContext.matrices.pushMatrix()
+        drawContext.matrices.push()
         //#else
         //$$ drawContext.matrices.pushMatrix()
         //#endif
@@ -124,7 +124,7 @@ object DrawContextUtils {
     @Deprecated("Use pushPop instead")
     fun popMatrix() {
         //#if MC < 1.21.6
-        drawContext.matrices.popMatrix()
+        drawContext.matrices.pop()
         //#else
         //$$ drawContext.matrices.popMatrix()
         //#endif

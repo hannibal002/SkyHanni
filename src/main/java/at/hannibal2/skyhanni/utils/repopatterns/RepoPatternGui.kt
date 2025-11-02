@@ -13,10 +13,10 @@ import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.xml.Bind
 import io.github.notenoughupdates.moulconfig.xml.XMLUniverse
 //#if FORGE
-import io.github.notenoughupdates.moulconfig.gui.GuiComponentWrapper
+//$$ import io.github.notenoughupdates.moulconfig.gui.GuiComponentWrapper
 //#else
-//$$ import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
-//$$ import net.minecraft.text.Text
+import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
+import net.minecraft.text.Text
 //#endif
 
 /**
@@ -41,9 +41,9 @@ class RepoPatternGui private constructor() {
                     val universe = XMLUniverse.getDefaultUniverse()
                     val context = GuiContext(universe.load(RepoPatternGui(), location))
                     //#if FORGE
-                    SkyHanniMod.screenToOpen = GuiComponentWrapper(context)
+                    //$$ SkyHanniMod.screenToOpen = GuiComponentWrapper(context)
                     //#else
-                    //$$ SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Text.empty(), context, null)
+                    SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Text.empty(), context, null)
                     //#endif
                 }
             }

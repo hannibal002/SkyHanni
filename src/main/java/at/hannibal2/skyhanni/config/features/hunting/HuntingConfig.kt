@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 /**
  * Attention developers:
@@ -71,7 +71,7 @@ class HuntingConfig {
     @Expose
     @OnlyModern
     @ConfigOption(name = "Show next Hideonleaf", desc = "Press this key to show the next Hideonleaf.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var nextHideonleafKeybind: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var nextHideonleafKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
 }

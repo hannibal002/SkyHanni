@@ -13,12 +13,12 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import net.minecraft.entity.EntityLiving
+import net.minecraft.entity.mob.MobEntity
 
 @SkyHanniModule
 object HellionShieldHelper {
 
-    val hellionShieldMobs = mutableMapOf<EntityLiving, HellionShield>()
+    val hellionShieldMobs = mutableMapOf<MobEntity, HellionShield>()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -55,7 +55,7 @@ object HellionShieldHelper {
         hellionShieldMobs.clear()
     }
 
-    fun EntityLiving.setHellionShield(shield: HellionShield?) {
+    fun MobEntity.setHellionShield(shield: HellionShield?) {
         shield?.let {
             hellionShieldMobs[this] = it
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.visitor
+package at.hannibal2.skyhanni.features.garden.visitor import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -46,7 +46,7 @@ object NpcVisitorFix {
         }
     }
 
-    private fun saveStaticVisitor(name: String, entity: EntityArmorStand) {
+    private fun saveStaticVisitor(name: String, entity: ArmorStandEntity) {
         // clicked on the real visitor, ignoring
         if (lastVisitorOpen.passedSince() < 1.seconds) return
 
@@ -76,7 +76,7 @@ object NpcVisitorFix {
         }
     }
 
-    fun findNametag(visitorName: String): EntityArmorStand? {
+    fun findNametag(visitorName: String): ArmorStandEntity? {
         val nametags = findNametags(visitorName)
         if (nametags.isEmpty()) return null
 
@@ -96,10 +96,10 @@ object NpcVisitorFix {
         return nametags.firstOrNull()
     }
 
-    private fun findNametags(visitorName: String): MutableList<EntityArmorStand> {
-        val foundVisitorNameTags = mutableListOf<EntityArmorStand>()
-        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
-            if (entity.name.removeColor() == visitorName) {
+    private fun findNametags(visitorName: String): MutableList<ArmorStandEntity> {
+        val foundVisitorNameTags = mutableListOf<ArmorStandEntity>()
+        for (entity in EntityUtils.getEntities<ArmorStandEntity>()) {
+            if (entity.name.formattedTextCompatLessResets().removeColor() == visitorName) {
                 foundVisitorNameTags.add(entity)
             }
         }

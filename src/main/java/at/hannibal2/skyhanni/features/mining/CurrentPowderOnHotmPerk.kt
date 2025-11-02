@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.skyhanni.features.mining import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -18,7 +18,7 @@ object CurrentPowderOnHotmPerk {
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
 
-        val itemName = event.itemStack.displayName
+        val itemName = event.itemStack.name.formattedTextCompatLeadingWhiteLessResets()
         val perk = HotmData.getPerkByNameOrNull(itemName.removeColor()) ?: return
 
         if (perk.isMaxLevel || !perk.isUnlocked) return

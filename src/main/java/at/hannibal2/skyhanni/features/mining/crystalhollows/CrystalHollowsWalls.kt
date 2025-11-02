@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.render.QuadDrawer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.inflateBlock
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.math.Box
 import java.awt.Color
 
 @SkyHanniModule
@@ -45,10 +45,10 @@ object CrystalHollowsWalls {
     private const val MIDDLE_Z = 513.0
     private const val MAX_Z = 1024.0
 
-    private val yViewOffset get() = -MinecraftCompat.localPlayer.getEyeHeight().toDouble()
+    private val yViewOffset get() = -MinecraftCompat.localPlayer.standingEyeHeight.toDouble()
 
     // Yes Hypixel has misaligned the nucleus
-    private val nucleusBB = AxisAlignedBB(
+    private val nucleusBB = Box(
         463.0, HEAT_HEIGHT, 460.0,
         560.0, MAX_HEIGHT, 563.0,
     )
@@ -73,7 +73,7 @@ object CrystalHollowsWalls {
         val position = WorldRenderUtils.getViewerPos(event.partialTicks)
         when {
             position.y < HEAT_HEIGHT + yViewOffset -> drawHeat(event)
-            nucleusBBOffsetY.isVecInside(position.toVec3()) -> {
+            nucleusBBOffsetY.contains(position.toVec3()) -> {
                 if (!config.nucleus) return
                 drawNucleus(event)
             }

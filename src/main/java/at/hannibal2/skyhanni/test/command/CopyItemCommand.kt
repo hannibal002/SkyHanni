@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.test.command
+package at.hannibal2.skyhanni.test.command import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -29,7 +29,7 @@ object CopyItemCommand {
     fun copyItemToClipboard(itemStack: ItemStack) {
         val resultList = mutableListOf<String>()
         resultList.add("internal name: " + itemStack.getInternalName().asString())
-        resultList.add("display name: '" + itemStack.displayName.toString() + "'")
+        resultList.add("display name: '" + itemStack.name.formattedTextCompatLeadingWhiteLessResets().toString() + "'")
         resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
         resultList.add("lore:")
         for (line in itemStack.getLore()) {

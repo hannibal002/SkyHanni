@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import net.minecraft.client.renderer.GlStateManager
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 
 /**
  * Object to handle chroma font states from handler methods from MixinFontRenderer
@@ -91,9 +91,9 @@ object FontRendererHook {
         if (config.allChroma) {
             // Handles setting the base color of text when they don't use color codes i.e. MoulConfig
             if (shadow) {
-                GlStateManager.color(0.33f, 0.33f, 0.33f, RenderUtils.getAlpha())
+                ModernGlStateManager.color(0.33f, 0.33f, 0.33f, RenderUtils.getAlpha())
             } else {
-                GlStateManager.color(1f, 1f, 1f, RenderUtils.getAlpha())
+                ModernGlStateManager.color(1f, 1f, 1f, RenderUtils.getAlpha())
             }
             setupChromaFont()
         }

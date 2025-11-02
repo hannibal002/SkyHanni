@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
@@ -41,7 +41,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -496,15 +496,15 @@ object HypixelData {
 
     private fun checkHypixel() {
         if (!hasScoreboardUpdated) return
-        val mc = Minecraft.getMinecraft()
+        val mc = MinecraftClient.getInstance()
         val player = MinecraftCompat.localPlayerOrNull ?: return
 
         var hypixel = false
 
         //#if MC < 1.21
-        val clientBrand = player.clientBrand
+        //$$ val clientBrand = player.clientBrand
         //#else
-        //$$ val clientBrand = mc.networkHandler?.brand
+        val clientBrand = mc.networkHandler?.brand
         //#endif
         clientBrand?.let {
             if (it.contains("hypixel", ignoreCase = true)) {
@@ -512,7 +512,7 @@ object HypixelData {
             }
         }
 
-        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP.orEmpty()) {
+        serverNameConnectionPattern.matchMatcher(mc.currentServerEntry?.address.orEmpty()) {
             hypixel = true
             if (group("prefix") == "alpha.") {
                 hypixelAlpha = true
@@ -612,7 +612,7 @@ object HypixelData {
         val world = MinecraftCompat.localWorldOrNull ?: return null
 
         val objective = world.scoreboard.getSidebarObjective() ?: return null
-        val displayName = objective.displayName
+        val displayName = objective.displayName.formattedTextCompat()
         return displayName
     }
 

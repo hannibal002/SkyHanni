@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.CommandArgument.Companion.findSpecifierAndGet
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
-import net.minecraft.util.BlockPos
+import net.minecraft.util.math.BlockPos
 
 data class ComplexCommand<O : CommandContextAwareObject>(
     val name: String,

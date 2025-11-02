@@ -1,52 +1,52 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 //#if MC < 1.16
-import net.minecraft.client.gui.ScaledResolution
+//$$ import net.minecraft.client.gui.ScaledResolution
 //#endif
 
 object GuiScreenUtils {
 
-    private val mc get() = Minecraft.getMinecraft()
+    private val mc get() = MinecraftClient.getInstance()
 
     val scaledWindowHeight: Int
         get() =
 //#if MC < 1.16
-            ScaledResolution(mc).scaledHeight
+//$$             ScaledResolution(mc).scaledHeight
 //#else
-//$$            mc.window.guiScaledHeight.toInt()
+           mc.window.scaledHeight.toInt()
 //#endif
 
     val scaledWindowWidth: Int
         get() =
 //#if MC < 1.16
-            ScaledResolution(mc).scaledWidth
+//$$             ScaledResolution(mc).scaledWidth
 //#else
-//$$            mc.window.guiScaledWidth.toInt()
+           mc.window.scaledWidth.toInt()
 //#endif
 
     val displayWidth: Int
         get() =
 //#if MC < 1.16
-            mc.displayWidth
+//$$             mc.displayWidth
 //#else
-//$$            mc.window.width.toInt()
+           mc.window.framebufferWidth.toInt()
 //#endif
 
     val displayHeight: Int
         get() =
 //#if MC < 1.16
-            mc.displayHeight
+//$$             mc.displayHeight
 //#else
-//$$            mc.window.height.toInt()
+           mc.window.framebufferHeight.toInt()
 //#endif
 
     val scaleFactor: Int
         get() =
 //#if MC < 1.16
-            ScaledResolution(mc).scaleFactor
+//$$             ScaledResolution(mc).scaleFactor
 //#else
-//$$            mc.window.scaleFactor.toInt()
+           mc.window.scaleFactor.toInt()
 //#endif
 
     private val globalMouseX get() = MouseCompat.getX()
@@ -55,7 +55,7 @@ object GuiScreenUtils {
     val mouseX: Int get() {
         var x = globalMouseX * scaledWindowWidth / displayWidth
         //#if MC > 1.21
-        //$$ if (mc.window.framebufferWidth > mc.window.width) x *= 2
+        if (mc.window.framebufferWidth > mc.window.width) x *= 2
         //#endif
         return x
     }
@@ -66,10 +66,10 @@ object GuiScreenUtils {
             // TODO: in later versions the height - factor is removed, i think
             var y = globalMouseY * height / displayHeight
 //#if MC < 1.21
-            return height - y - 1
+//$$             return height - y - 1
 //#else
-//$$            if (mc.window.framebufferHeight > mc.window.height) y *= 2
-//$$            return y
+           if (mc.window.framebufferHeight > mc.window.height) y *= 2
+           return y
 //#endif
         }
 

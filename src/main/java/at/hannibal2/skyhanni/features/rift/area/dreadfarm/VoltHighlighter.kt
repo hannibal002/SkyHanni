@@ -22,8 +22,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -46,7 +46,7 @@ object VoltHighlighter {
         if (!config.voltWarning) return
         val player = MinecraftCompat.localPlayerOrNull ?: return
         if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING &&
-            event.entity.positionVector.squareDistanceTo(player.positionVector) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
+            event.entity.pos.squaredDistanceTo(player.pos) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
         ) {
             chargingSince = chargingSince.editCopy {
                 this[event.entity] = SimpleTimeMark.now()
@@ -57,7 +57,7 @@ object VoltHighlighter {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!(config.voltRange || config.voltMoodMeter)) return
-        for (entity in getEntities<EntityLivingBase>()) {
+        for (entity in getEntities<LivingEntity>()) {
             val state = getVoltState(entity).takeIf { it != VoltState.NO_VOLT } ?: continue
 
             if (config.voltMoodMeter) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
@@ -68,9 +68,9 @@ object VoltHighlighter {
             if (state == VoltState.DOING_LIGHTNING && config.voltRange) {
                 event.drawCylinderInWorld(
                     config.voltColor.toColor(),
-                    entity.posX,
-                    entity.posY - 4f,
-                    entity.posZ,
+                    entity.pos.x,
+                    entity.pos.y - 4f,
+                    entity.pos.z,
                     radius = LIGHTNING_DISTANCE,
                     height = 20F,
                 )
@@ -104,7 +104,7 @@ object VoltHighlighter {
     }
 
     private fun getVoltState(entity: Entity): VoltState {
-        if (entity !is EntityArmorStand) return VoltState.NO_VOLT
+        if (entity !is ArmorStandEntity) return VoltState.NO_VOLT
         val helmet = entity.getStandHelmet() ?: return VoltState.NO_VOLT
         return getVoltState(helmet)
     }

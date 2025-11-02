@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 
 @SkyHanniModule
 object AshfangHighlights {
@@ -29,12 +29,12 @@ object AshfangHighlights {
 
     private val BLAZING_SOUL by lazy { SkullTextureHolder.getTexture("ASHFANG_BLAZING_SOUL") }
     private val GRAVITY_ORB by lazy { SkullTextureHolder.getTexture("ASHFANG_GRAVITY_ORB") }
-    private val blazingSouls = mutableSetOf<EntityArmorStand>()
-    private val gravityOrbs = mutableSetOf<EntityArmorStand>()
+    private val blazingSouls = mutableSetOf<ArmorStandEntity>()
+    private val gravityOrbs = mutableSetOf<ArmorStandEntity>()
     private const val MAX_DISTANCE = 15.0
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onEntityJoin(event: EntityEnterWorldEvent<EntityArmorStand>) {
+    fun onEntityJoin(event: EntityEnterWorldEvent<ArmorStandEntity>) {
         if (!AshfangManager.active) return
         val entity = event.entity
         DelayedRun.runNextTick {
@@ -46,7 +46,7 @@ object AshfangHighlights {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onEntityLeave(event: EntityLeaveWorldEvent<EntityArmorStand>) {
+    fun onEntityLeave(event: EntityLeaveWorldEvent<ArmorStandEntity>) {
         blazingSouls -= event.entity
         gravityOrbs -= event.entity
     }

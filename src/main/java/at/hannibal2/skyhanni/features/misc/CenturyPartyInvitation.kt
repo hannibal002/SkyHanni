@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -148,7 +148,7 @@ object CenturyPartyInvitation {
     }
 
     private fun addPlayer(mob: Mob) {
-        val displayName = mob.baseEntity.name
+        val displayName = mob.baseEntity.name.formattedTextCompatLessResets()
         val colorCode = playerRankColorPattern.matchMatcher(displayName) {
             group("color")
         } ?: run {

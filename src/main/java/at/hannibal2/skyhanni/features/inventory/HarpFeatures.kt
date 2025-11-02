@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.container import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -23,13 +23,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedClay
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.player.inventory.ContainerLocalMenu
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.inventory.SimpleInventory
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.21
-//$$ import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.systems.RenderSystem
 //#endif
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
@@ -69,7 +69,7 @@ object HarpFeatures {
     fun onGui(event: GuiKeyPressEvent) {
         if (!config.keybinds) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
-        val chest = event.guiContainer as? GuiChest ?: return
+        val chest = event.guiContainer as? GenericContainerScreen ?: return
 
         for (index in 0..6) {
             val key = getKey(index) ?: error("no key for index $index")
@@ -78,7 +78,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, 2, 3)
+            InventoryUtils.clickSlot(37 + index, chest.container.syncId, 2, 3)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -109,21 +109,21 @@ object HarpFeatures {
     }
 
     private fun updateScale() {
-        if (Minecraft.getMinecraft().currentScreen == null) {
+        if (MinecraftClient.getInstance().currentScreen == null) {
             DelayedRun.runNextTick {
                 updateScale()
             }
             return
         }
         // Copied from Minecraft Code to update the scale
-        val minecraft = Minecraft.getMinecraft()
+        val minecraft = MinecraftClient.getInstance()
         //#if MC < 1.21
-        val width = GuiScreenUtils.scaledWindowWidth
-        val height = GuiScreenUtils.scaledWindowHeight
-        minecraft.currentScreen?.setWorldAndResolution(minecraft, width, height)
+        //$$ val width = GuiScreenUtils.scaledWindowWidth
+        //$$ val height = GuiScreenUtils.scaledWindowHeight
+        //$$ minecraft.currentScreen?.setWorldAndResolution(minecraft, width, height)
         //#else
-        //$$ RenderSystem.assertOnRenderThread()
-        //$$ minecraft.window.calculateScaleFactor(minecraft.options.guiScale.value, minecraft.forcesUnicodeFont())
+        RenderSystem.assertOnRenderThread()
+        minecraft.window.calculateScaleFactor(minecraft.options.guiScale.value, minecraft.forcesUnicodeFont())
         //#endif
     }
 
@@ -150,46 +150,46 @@ object HarpFeatures {
 
     private fun setGuiScale() {
         //#if MC > 1.21
-        //$$ MinecraftClient.getInstance().execute {
+        MinecraftClient.getInstance().execute {
         //#endif
         guiSetting = getMinecraftGuiScale()
         setMinecraftGuiScale(0)
         isGuiScaled = true
         updateScale()
         //#if MC > 1.21
-        //$$ }
+        }
         //#endif
     }
 
     private fun unSetGuiScale() {
         if (!isGuiScaled) return
         //#if MC > 1.21
-        //$$ MinecraftClient.getInstance().execute {
+        MinecraftClient.getInstance().execute {
         //#endif
         setMinecraftGuiScale(guiSetting)
         isGuiScaled = false
         //#if MC > 1.21
-        //$$ }
+        }
         //#endif
     }
 
     private fun getMinecraftGuiScale(): Int {
-        val gameSettings = Minecraft.getMinecraft().gameSettings
+        val gameSettings = MinecraftClient.getInstance().options
         //#if MC < 1.21
-        return gameSettings.guiScale
+        //$$ return gameSettings.guiScale
         //#else
-        //$$ RenderSystem.assertOnRenderThread()
-        //$$ return gameSettings.guiScale.value
+        RenderSystem.assertOnRenderThread()
+        return gameSettings.guiScale.value
         //#endif
     }
 
     private fun setMinecraftGuiScale(scale: Int) {
-        val gameSettings = Minecraft.getMinecraft().gameSettings
+        val gameSettings = MinecraftClient.getInstance().options
         //#if MC < 1.21
-        gameSettings.guiScale = scale
+        //$$ gameSettings.guiScale = scale
         //#else
-        //$$ RenderSystem.assertOnRenderThread()
-        //$$ gameSettings.guiScale.value = scale
+        RenderSystem.assertOnRenderThread()
+        gameSettings.guiScale.value = scale
         //#endif
     }
 
@@ -208,21 +208,21 @@ object HarpFeatures {
 
         if (!config.quickRestart) return
         if (!isMenuGui(InventoryUtils.openInventoryName())) return
-        if (event.slot?.slotNumber != CLOSE_BUTTON_SLOT) return
+        if (event.slot?.id != CLOSE_BUTTON_SLOT) return
         if (openTime.passedSince() > 2.seconds) return
         //#if MC < 1.21
-        val indexOfFirst = event.container.inventory.filterNotNull().indexOfFirst {
-            songSelectedPattern.anyMatches(it.getLore())
-        }
+        //$$ val indexOfFirst = event.container.stacks.filterNotNull().indexOfFirst {
+        //$$     songSelectedPattern.anyMatches(it.getLore())
+        //$$ }
         //#else
-        //$$ val indexOfFirst = event.container.slots.filterNotNull().indexOfFirst {
-        //$$          songSelectedPattern.anyMatches(it.stack.getLore())
-        //$$      }
+        val indexOfFirst = event.container.slots.filterNotNull().indexOfFirst {
+                 songSelectedPattern.anyMatches(it.stack.getLore())
+             }
         //#endif
         indexOfFirst.takeIf { it != -1 }?.let {
             val clickType = event.clickType?.id ?: return
             event.cancel()
-            InventoryUtils.clickSlot(it, event.container.windowId, event.clickedButton, clickType)
+            InventoryUtils.clickSlot(it, event.container.syncId, event.clickedButton, clickType)
         }
     }
 
@@ -233,7 +233,7 @@ object HarpFeatures {
         if (!event.stack.isStainedClay()) return
 
         // Example: §9| §7Click! will select the 9
-        val index = buttonColors.indexOfFirst { it == event.stack.displayName[1] }
+        val index = buttonColors.indexOfFirst { it == event.stack.name.formattedTextCompatLeadingWhiteLessResets()[1] }
         if (index == -1) return // this should never happen unless there's an update
 
         val keyCode = getKey(index) ?: return
@@ -250,7 +250,7 @@ object HarpFeatures {
     fun onToolTip(event: ToolTipEvent) {
         if (!config.hideMelodyTooltip) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
-        if (event.slot.inventory !is ContainerLocalMenu) return
+        if (event.slot.inventory !is SimpleInventory) return
         event.cancel()
     }
 }

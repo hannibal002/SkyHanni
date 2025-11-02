@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import org.intellij.lang.annotations.Language
 import java.util.EnumMap
 import java.util.regex.Pattern
@@ -196,7 +196,7 @@ enum class SkyblockStat(
     companion object {
 
         val fontSizeOfLargestIcon by lazy {
-            entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.icon) } + 1
+            entries.maxOf { MinecraftClient.getInstance().textRenderer.getWidth(it.icon) } + 1
         }
 
         fun getValueOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.name == string || it.hypxelId == string }

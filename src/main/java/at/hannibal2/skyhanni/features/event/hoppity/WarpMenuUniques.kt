@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.skyhanni.features.event.hoppity import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -35,7 +35,7 @@ object WarpMenuUniques {
         if (!HoppityApi.isHoppityEvent()) return
         if (InventoryUtils.openInventoryName() != "Fast Travel") return
 
-        val name = islandNamePattern.matchMatcher(event.slot.stack.displayName) {
+        val name = islandNamePattern.matchMatcher(event.slot.stack.name.formattedTextCompatLeadingWhiteLessResets()) {
             group("name")
         } ?: return
 

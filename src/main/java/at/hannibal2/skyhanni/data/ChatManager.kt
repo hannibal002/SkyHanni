@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -20,16 +20,16 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ChatLine
-import net.minecraft.network.Packet
-import net.minecraft.network.play.client.C01PacketChatMessage
-import net.minecraft.util.EnumChatFormatting
-import net.minecraft.util.IChatComponent
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.hud.ChatHudLine
+import net.minecraft.network.packet.Packet
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket
+import net.minecraft.util.Formatting
+import net.minecraft.text.Text
 import kotlin.time.Duration.Companion.seconds
 
 //#if MC > 1.21
-//$$ import net.minecraft.client.gui.hud.MessageIndicator
+import net.minecraft.client.gui.hud.MessageIndicator
 //#endif
 
 @SkyHanniModule
@@ -44,9 +44,9 @@ object ChatManager {
     private val loggerFilteredTypes = mutableMapOf<String, LorenzLogger>()
 
     private val backingMessageHistory =
-        object : LinkedHashMap<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>() {
+        object : LinkedHashMap<IdentityCharacteristics<Text>, MessageFilteringResult>() {
             override fun removeEldestEntry(
-                eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?,
+                eldest: MutableMap.MutableEntry<IdentityCharacteristics<Text>, MessageFilteringResult>?,
             ): Boolean {
                 return size > config.chatHistoryLength.coerceAtLeast(0)
             }
@@ -59,10 +59,10 @@ object ChatManager {
         }
     )
 
-    private val replacementReasonMap: MutableMap<IdentityCharacteristics<IChatComponent>, String> = mutableMapOf()
+    private val replacementReasonMap: MutableMap<IdentityCharacteristics<Text>, String> = mutableMapOf()
 
     fun addReplacementContext(
-        chatComponent: IChatComponent,
+        chatComponent: Text,
         reason: String,
     ) = replacementReasonMap.put(
         IdentityCharacteristics(chatComponent),
@@ -73,16 +73,16 @@ object ChatManager {
 
     private fun getRecentMessageHistoryWithSearch(searchTerm: String): List<MessageFilteringResult> =
         messageHistory.toList().map { it.second }
-            .filter { it.message.formattedText.removeColor().contains(searchTerm, ignoreCase = true) }
+            .filter { it.message.formattedTextCompat().removeColor().contains(searchTerm, ignoreCase = true) }
 
     enum class ActionKind(format: Any) {
-        BLOCKED(EnumChatFormatting.RED.toString() + EnumChatFormatting.BOLD),
-        RETRACTED(EnumChatFormatting.DARK_PURPLE.toString() + EnumChatFormatting.BOLD),
-        MODIFIED(EnumChatFormatting.YELLOW.toString() + EnumChatFormatting.BOLD),
-        EDITED(EnumChatFormatting.GOLD.toString() + EnumChatFormatting.BOLD),
-        ALLOWED(EnumChatFormatting.GREEN),
-        OUTGOING(EnumChatFormatting.BLUE),
-        OUTGOING_BLOCKED(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.BOLD),
+        BLOCKED(Formatting.RED.toString() + Formatting.BOLD),
+        RETRACTED(Formatting.DARK_PURPLE.toString() + Formatting.BOLD),
+        MODIFIED(Formatting.YELLOW.toString() + Formatting.BOLD),
+        EDITED(Formatting.GOLD.toString() + Formatting.BOLD),
+        ALLOWED(Formatting.GREEN),
+        OUTGOING(Formatting.BLUE),
+        OUTGOING_BLOCKED(Formatting.BLUE.toString() + Formatting.BOLD),
         ;
 
         val renderedString = "$format$name"
@@ -90,16 +90,16 @@ object ChatManager {
         companion object {
 
             val maxLength by lazy {
-                entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.renderedString) }
+                entries.maxOf { MinecraftClient.getInstance().textRenderer.getWidth(it.renderedString) }
             }
         }
     }
 
     data class MessageFilteringResult(
-        val message: IChatComponent,
+        val message: Text,
         var actionKind: ActionKind,
         var actionReason: String?,
-        var modified: IChatComponent?,
+        var modified: Text?,
         var modifiedReason: String?,
         val hoverInfo: List<String> = listOf(),
         val hoverExtraInfo: List<String> = listOf(),
@@ -142,9 +142,9 @@ object ChatManager {
 
     private fun getMessageFromPacket(packet: Packet<*>): String? {
         return when (packet) {
-            is C01PacketChatMessage -> packet.message
+            is ChatMessageC2SPacket -> packet.chatMessage
             //#if MC > 1.21
-            //$$ is net.minecraft.network.packet.c2s.play.CommandExecutionC2SPacket -> "/${packet.command}"
+            is net.minecraft.network.packet.c2s.play.CommandExecutionC2SPacket -> "/${packet.command}"
             //#endif
             else -> null
         }
@@ -154,9 +154,9 @@ object ChatManager {
      * If the message is modified return the modified message otherwise return null.
      * If the message is cancelled return true.
      */
-    fun onChatReceive(original: IChatComponent): Pair<IChatComponent?, Boolean> {
+    fun onChatReceive(original: Text): Pair<Text?, Boolean> {
         var component = original
-        val message = component.formattedText.stripHypixelMessage()
+        val message = component.formattedTextCompat().stripHypixelMessage()
         var cancelled = false
 
         if (message.startsWith("§f{\"server\":\"") || message.startsWith("{\"server\":\"")) {
@@ -184,12 +184,12 @@ object ChatManager {
         var modified = false
         loggerAllowed.log("[allowed] $message")
         loggerAll.log("[allowed] $message")
-        if (modifiedComponent.formattedText != component.formattedText) {
+        if (modifiedComponent.formattedTextCompat() != component.formattedTextCompat()) {
             val reason = replacementReasonMap[key].orEmpty().uppercase()
             modified = true
             loggerModified.log(" ")
-            loggerModified.log("[original] " + component.formattedText)
-            loggerModified.log("[modified] " + modifiedComponent.formattedText)
+            loggerModified.log("[original] " + component.formattedTextCompat())
+            loggerModified.log("[modified] " + modifiedComponent.formattedTextCompat())
             messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, modifiedComponent, reason)
             component = modifiedComponent
         } else {
@@ -223,9 +223,9 @@ object ChatManager {
 
     // TODO: Add another predicate to stop searching after a certain amount of lines have been searched
     //  or if the lines were sent too long ago. Same thing for the deleteChatLine function.
-    fun MutableList<ChatLine>.editChatLine(
-        component: (IChatComponent) -> IChatComponent,
-        predicate: (ChatLine) -> Boolean,
+    fun MutableList<ChatHudLine>.editChatLine(
+        component: (Text) -> Text,
+        predicate: (ChatHudLine) -> Boolean,
         reason: String? = null,
     ) {
         DelayedRun.onThread.execute {
@@ -234,15 +234,15 @@ object ChatManager {
             }.takeIf { it != -1 }?.let {
                 val chatLine = this[it]
                 //#if MC < 1.21
-                val counter = chatLine.updatedCounter
-                val id = chatLine.chatLineID
-                val oldComponent = chatLine.chatComponent
-                val newComponent = component(chatLine.chatComponent)
+                //$$ val counter = chatLine.addedTime
+                //$$ val id = chatLine.id
+                //$$ val oldComponent = chatLine.chatComponent
+                //$$ val newComponent = component(chatLine.chatComponent)
                 //#else
-                //$$ val counter = chatLine.creationTick
-                //$$ val id = chatLine.signature
-                //$$ val oldComponent = chatLine.content
-                //$$ val newComponent = component(chatLine.content)
+                val counter = chatLine.creationTick
+                val id = chatLine.signature
+                val oldComponent = chatLine.content
+                val newComponent = component(chatLine.content)
                 //#endif
 
                 val key = IdentityCharacteristics(oldComponent)
@@ -256,18 +256,18 @@ object ChatManager {
                 }
 
                 //#if MC < 1.21
-                this[it] = ChatLine(counter, newComponent, id)
+                //$$ this[it] = ChatHudLine(counter, newComponent, id)
                 //#else
-                //$$ this[it] = ChatHudLine(counter, newComponent, id, MessageIndicator.system())
+                this[it] = ChatHudLine(counter, newComponent, id, MessageIndicator.system())
                 //#endif
             }
         }
     }
 
-    fun MutableList<ChatLine>.deleteChatLine(
+    fun MutableList<ChatHudLine>.deleteChatLine(
         amount: Int,
         reason: String? = null,
-        predicate: (ChatLine) -> Boolean,
+        predicate: (ChatHudLine) -> Boolean,
     ) {
         DelayedRun.onThread.execute {
             val iterator = iterator()
@@ -283,9 +283,9 @@ object ChatManager {
                     iterator.remove()
                     removed++
                     //#if MC < 1.21
-                    val key = IdentityCharacteristics(chatLine.chatComponent)
+                    //$$ val key = IdentityCharacteristics(chatLine.chatComponent)
                     //#else
-                    //$$ val key = IdentityCharacteristics(chatLine.content)
+                    val key = IdentityCharacteristics(chatLine.content)
                     //#endif
                     reason?.let {
                         messageHistory[key]?.let { history ->

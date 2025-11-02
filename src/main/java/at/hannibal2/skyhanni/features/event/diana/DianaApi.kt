@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.skyhanni.features.event.diana import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.network.OtherClientPlayerEntity
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -32,8 +32,8 @@ object DianaApi {
     private fun hasSpadeInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isDianaSpade }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onJoinWorld(event: EntityEnterWorldEvent<EntityOtherPlayerMP>) {
-        if (event.entity.name == "Minos Inquisitor") {
+    fun onJoinWorld(event: EntityEnterWorldEvent<OtherClientPlayerEntity>) {
+        if (event.entity.name.formattedTextCompatLessResets() == "Minos Inquisitor") {
             InquisitorFoundEvent(event.entity).post()
         }
     }

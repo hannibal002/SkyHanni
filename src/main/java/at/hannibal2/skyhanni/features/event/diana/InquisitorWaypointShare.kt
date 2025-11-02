@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.diana
+package at.hannibal2.skyhanni.features.event.diana import at.hannibal2.skyhanni.utils.compat.deceased
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -27,8 +27,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.network.OtherClientPlayerEntity
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -73,7 +73,7 @@ object InquisitorWaypointShare {
     private var lastInquisitor = -1
     private var lastShareTime = SimpleTimeMark.farPast()
 
-    private val inquisitorsNearby = ConcurrentHashMap<Int, EntityOtherPlayerMP>()
+    private val inquisitorsNearby = ConcurrentHashMap<Int, OtherClientPlayerEntity>()
 
     private val _waypoints = ConcurrentHashMap<String, SharedInquisitor>()
     val waypoints: Map<String, SharedInquisitor>
@@ -91,7 +91,7 @@ object InquisitorWaypointShare {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
-            inquisitorsNearby.removeIf { it.value.isDead }
+            inquisitorsNearby.removeIf { it.value.deceased }
         }
 
         _waypoints.removeIf { it.value.spawnTime.passedSince() > 75.seconds }
@@ -108,10 +108,10 @@ object InquisitorWaypointShare {
     @HandleEvent
     fun onInquisitorFound(event: InquisitorFoundEvent) {
         val inquisitor = event.inquisitorEntity
-        inquisitorsNearby[inquisitor.entityId] = inquisitor
+        inquisitorsNearby[inquisitor.id] = inquisitor
         GriffinBurrowHelper.update()
 
-        lastInquisitor = inquisitor.entityId
+        lastInquisitor = inquisitor.id
         checkInquisFound()
     }
 
@@ -178,7 +178,7 @@ object InquisitorWaypointShare {
         if (!isEnabled()) return
         if (event.health > 0) return
 
-        val entityId = event.entity.entityId
+        val entityId = event.entity.id
         if (entityId == inquisitor) {
             sendDeath()
         }
@@ -188,7 +188,7 @@ object InquisitorWaypointShare {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (MinecraftClient.getInstance().currentScreen != null) return
         if (event.keyCode == config.keyBindShare) sendInquisitor()
     }
 
@@ -218,7 +218,7 @@ object InquisitorWaypointShare {
             return
         }
 
-        if (inquisitor.isDead) {
+        if (inquisitor.deceased) {
             ChatUtils.chat("§cInquisitor is dead")
             return
         }

@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO rename to something else to reduce confusion
@@ -44,7 +44,7 @@ object MineshaftWaypoints {
         }
 
         if (config.mineshaftWaypoints.ladderLocation) {
-            val vec = MinecraftCompat.localPlayer.horizontalFacing.directionVec
+            val vec = MinecraftCompat.localPlayer.horizontalFacing.vector
             val location = playerLocation
                 // Move 7 blocks in front of the player to be in the ladder shaft
                 .add(x = vec.x * BLOCKS_FORWARD, z = vec.z * BLOCKS_FORWARD)
@@ -58,7 +58,7 @@ object MineshaftWaypoints {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (MinecraftClient.getInstance().currentScreen != null) return
         if (event.keyCode != config.shareWaypointLocation) return
         if (timeLastShared.passedSince() < 500.milliseconds) return
 

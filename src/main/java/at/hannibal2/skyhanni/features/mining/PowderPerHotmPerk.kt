@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.skyhanni.features.mining import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object PowderPerHotmPerk {
@@ -24,7 +24,7 @@ object PowderPerHotmPerk {
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
 
-        val itemName = event.itemStack.displayName
+        val itemName = event.itemStack.name.formattedTextCompatLeadingWhiteLessResets()
         val perk = HotmData.getPerkByNameOrNull(itemName.removeColor()) ?: return
 
         if (perk.getLevelUpCost() == null) return
@@ -34,7 +34,7 @@ object PowderPerHotmPerk {
     }
 
     private fun handlePowderFor10Levels(event: ToolTipEvent, perk: HotmData) {
-        if (!Keyboard.KEY_LSHIFT.isKeyHeld()) return
+        if (!GLFW.GLFW_KEY_LEFT_SHIFT.isKeyHeld()) return
 
         val indexOfCost = event.toolTip.indexOfFirst { HotmData.perkCostPattern.matches(it) }
 

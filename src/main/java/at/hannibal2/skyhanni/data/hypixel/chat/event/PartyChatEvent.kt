@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.data.hypixel.chat.event
 
 import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import net.minecraft.util.IChatComponent
+import net.minecraft.text.Text
 
 class PartyChatEvent(
     authorComponent: ComponentSpan,
     messageComponent: ComponentSpan,
-    chatComponent: IChatComponent,
+    chatComponent: Text,
     blockedReason: String? = null,
 ) : AbstractSourcedChatEvent(authorComponent, messageComponent, chatComponent, blockedReason) {
     val cleanedAuthor = author.cleanPlayerName()

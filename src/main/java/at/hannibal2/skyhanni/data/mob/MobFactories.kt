@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.mob
+package at.hannibal2.skyhanni.data.mob import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EnumUtils
@@ -6,14 +6,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.decoration.ArmorStandEntity
 
 object MobFactories {
     fun slayer(
-        baseEntity: EntityLivingBase,
-        armorStand: EntityArmorStand,
-        extraEntityList: List<EntityLivingBase>,
+        baseEntity: LivingEntity,
+        armorStand: ArmorStandEntity,
+        extraEntityList: List<LivingEntity>,
     ): Mob? =
         MobFilter.slayerNameFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
@@ -28,9 +28,9 @@ object MobFactories {
         }
 
     fun boss(
-        baseEntity: EntityLivingBase,
-        armorStand: EntityArmorStand,
-        extraEntityList: List<EntityLivingBase> = emptyList(),
+        baseEntity: LivingEntity,
+        armorStand: ArmorStandEntity,
+        extraEntityList: List<LivingEntity> = emptyList(),
         overriddenName: String? = null,
     ): Mob? =
         MobFilter.bossMobNameFilter.matchMatcher(armorStand.cleanName()) {
@@ -46,9 +46,9 @@ object MobFactories {
         }
 
     fun dungeon(
-        baseEntity: EntityLivingBase,
-        armorStand: EntityArmorStand,
-        extraEntityList: List<EntityLivingBase> = emptyList(),
+        baseEntity: LivingEntity,
+        armorStand: ArmorStandEntity,
+        extraEntityList: List<LivingEntity> = emptyList(),
     ): Mob? =
         MobFilter.dungeonNameFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
@@ -67,9 +67,9 @@ object MobFactories {
         }
 
     fun basic(
-        baseEntity: EntityLivingBase,
-        armorStand: EntityArmorStand,
-        extraEntityList: List<EntityLivingBase>? = null,
+        baseEntity: LivingEntity,
+        armorStand: ArmorStandEntity,
+        extraEntityList: List<LivingEntity>? = null,
     ): Mob? =
         MobFilter.mobNameFilter.findMatcher(armorStand.cleanName()) {
             Mob(
@@ -86,13 +86,13 @@ object MobFactories {
             )
         }
 
-    fun basic(baseEntity: EntityLivingBase, name: String) =
+    fun basic(baseEntity: LivingEntity, name: String) =
         Mob(baseEntity = baseEntity, mobType = Mob.Type.BASIC, name = name)
 
     fun summon(
-        baseEntity: EntityLivingBase,
-        armorStand: EntityArmorStand,
-        extraEntityList: List<EntityLivingBase>,
+        baseEntity: LivingEntity,
+        armorStand: ArmorStandEntity,
+        extraEntityList: List<LivingEntity>,
     ): Mob? =
         MobFilter.summonFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
@@ -105,7 +105,7 @@ object MobFactories {
             )
         }
 
-    fun displayNpc(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, clickArmorStand: EntityArmorStand): Mob =
+    fun displayNpc(baseEntity: LivingEntity, armorStand: ArmorStandEntity, clickArmorStand: ArmorStandEntity): Mob =
         Mob(
             baseEntity = baseEntity,
             mobType = Mob.Type.DISPLAY_NPC,
@@ -114,15 +114,15 @@ object MobFactories {
             additionalEntities = listOf(clickArmorStand),
         )
 
-    fun player(baseEntity: EntityLivingBase): Mob = Mob(baseEntity, Mob.Type.PLAYER, name = baseEntity.name)
-    fun projectile(baseEntity: EntityLivingBase, name: String): Mob =
+    fun player(baseEntity: LivingEntity): Mob = Mob(baseEntity, Mob.Type.PLAYER, name = baseEntity.name.formattedTextCompatLessResets())
+    fun projectile(baseEntity: LivingEntity, name: String): Mob =
         Mob(baseEntity = baseEntity, mobType = Mob.Type.PROJECTILE, name = name)
 
-    fun special(baseEntity: EntityLivingBase, name: String, armorStand: EntityArmorStand? = null) =
+    fun special(baseEntity: LivingEntity, name: String, armorStand: ArmorStandEntity? = null) =
         Mob(baseEntity = baseEntity, mobType = Mob.Type.SPECIAL, armorStand = armorStand, name = name)
 
     private fun String.removeCorruptedSuffix(case: Boolean) = if (case) this.dropLast(1) else this
-    fun dojo(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): Mob? =
+    fun dojo(baseEntity: LivingEntity, armorStand: ArmorStandEntity): Mob? =
         MobFilter.dojoFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
@@ -134,7 +134,7 @@ object MobFactories {
             )
         }
 
-    fun minionMob(baseEntity: EntityLivingBase) =
+    fun minionMob(baseEntity: LivingEntity) =
         Mob(baseEntity, Mob.Type.SPECIAL, name = MobFilter.MINION_MOB_PREFIX + baseEntity.cleanName())
 
 }
