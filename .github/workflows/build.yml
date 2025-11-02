@@ -6,7 +6,7 @@ on:
             - "*"
         paths-ignore:
             - ".gitignore"
-    pull_request_target:
+    pull_request:
         branches:
             - "*"
         paths-ignore:
@@ -18,70 +18,56 @@ jobs:
         runs-on: ubuntu-latest
         name: "Build and test"
         steps:
-            -   name: Checkout code
-                uses: actions/checkout@v4
-                with:
-                    ref: ${{ github.event.pull_request.head.ref }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-            -   uses: ./.github/actions/setup-normal-workspace
-            -   name: Build with Gradle w/retry
-                uses: ./.github/actions/gradle-retry
-                with:
-                    gradle-command: assemble -x test --stacktrace -PskipDetekt=true
-            -   uses: actions/upload-artifact@v4
-                name: Upload development build
-                with:
-                    name: "Development Build"
-                    path: build/libs/*.jar
-            -   name: Test with Gradle w/retry
-                uses: ./.github/actions/gradle-retry
-                with:
-                    gradle-command: test
-            -   uses: actions/upload-artifact@v4
-                name: "Upload test report"
-                if: ${{ !cancelled() }}
-                with:
-                    name: "Test Results"
-                    path: versions/1.8.9/build/reports/tests/test/
+            - uses: ./.github/actions/setup-normal-workspace
+
+            - name: Build with Gradle w/retry
+              uses: ./.github/actions/gradle-retry
+              with:
+                  gradle-command: assemble -x test --stacktrace -PskipDetekt=true
+
+            - uses: actions/upload-artifact@v4
+              name: Upload development build
+              with:
+                  name: "Development Build"
+                  path: build/libs/*.jar
+
+            - name: Test with Gradle w/retry
+              uses: ./.github/actions/gradle-retry
+              with:
+                  gradle-command: test
+
+            - uses: actions/upload-artifact@v4
+              name: "Upload test report"
+              if: ${{ !cancelled() }}
+              with:
+                  name: "Test Results"
+                  path: versions/1.8.9/build/reports/tests/test/
 
     preprocess:
         runs-on: ubuntu-latest
         name: "Build multi version"
         steps:
-            -   name: Checkout code
-                uses: actions/checkout@v4
-                with:
-                    ref: ${{ github.event.pull_request.head.ref }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-            -   uses: ./.github/actions/setup-normal-workspace
-            -   name: Enable preprocessor
-                run: |
-                    mkdir -p .gradle
-                    echo skyhanni.multi-version=compile > .gradle/private.properties
-            -   name: Build with Gradle w/retry
-                uses: ./.github/actions/gradle-retry
-                with:
-                    gradle-command: build --stacktrace -PskipDetekt=true
+            - uses: ./.github/actions/setup-normal-workspace
 
-            -   name: Add label if build fails
-                if: ${{ failure() && github.event_name == 'pull_request_target' && github.event.pull_request.state == 'open' }}
-                uses: actions-ecosystem/action-add-labels@v1
-                with:
-                    github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Fails Multi-Version'
+            - name: Enable preprocessor
+              run: |
+                  mkdir -p .gradle
+                  echo skyhanni.multi-version=compile > .gradle/private.properties
 
-            -   name: Remove label if build passes
-                if: ${{ success() && github.event_name == 'pull_request_target' && github.event.pull_request.state == 'open' }}
-                uses: actions-ecosystem/action-remove-labels@v1
-                with:
-                    github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Fails Multi-Version'
+            - name: Build with Gradle w/retry
+              uses: ./.github/actions/gradle-retry
+              with:
+                  gradle-command: build --stacktrace -PskipDetekt=true
 
-            -   name: Upload multi-version build
-                uses: actions/upload-artifact@v4
-                if: ${{ !cancelled() }}
-                with:
-                    name: "Multi-version Development Build"
-                    path: build/libs/*.jar
+            - name: Upload multi-version build
+              uses: actions/upload-artifact@v4
+              if: ${{ !cancelled() }}
+              with:
+                  name: "Multi-version Development Build"
+                  path: build/libs/*.jar
