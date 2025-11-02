@@ -35,7 +35,7 @@ SkyHanni is especially useful when doing farming, slayers, Bingo, Diana, fishing
 Give feedback or just chat with others on our community Discord!
 
 * **Bug Reports:** Use the `#bug-reports` channel when you find broken features (please check out `#faq` and `#known-bugs`).
-* **Quick Help** Ask in `#support` for questions and problems with the mod or Minecraft in general.
+* **Quick Help:** Ask in `#support` for questions and problems with the mod or Minecraft in general.
 * **Feature Suggestions:** Feel free to tell your ideas in `#suggestions` channel for new features and improvements to the mod. (Don't copy from existing mods or break Hypixel rules).
 * **General Chat:** Chat with other SkyHanni users in `#skyblock-general` channel about the game.
 
