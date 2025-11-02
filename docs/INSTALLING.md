@@ -30,7 +30,7 @@ If you already have the latest alpha version from NEU, you can skip to step 5.
 > - [SkyHanni Discord](<https://discord.com/invite/skyhanni-997079228510117908>) in the channel #neu-updates.
 
 > **5: Download SkyHanni**
-> SkyHanni has two different update circles: [Full Release](<https://github.com/hannibal002/SkyHanni/releases/latest>) and [Beta](<https://github.com/hannibal002/SkyHanni/releases>).
+> SkyHanni has two different update channels: [Full Release](<https://github.com/hannibal002/SkyHanni/releases/latest>) and [Beta](<https://github.com/hannibal002/SkyHanni/releases>).
 > It is recommended to use the **Full Release**.
 > It updates every 3–4 weeks and should run very stable.
 > If you find bugs or miss features in the full version, they might be fixed/implemented already in a beta version.
