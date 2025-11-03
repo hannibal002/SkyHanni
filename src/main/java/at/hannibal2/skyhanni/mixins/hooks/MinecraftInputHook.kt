@@ -7,9 +7,7 @@ import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
-
 //#if MC > 1.21
 //$$ import net.minecraft.util.hit.EntityHitResult
 //#endif
@@ -57,7 +55,7 @@ object MinecraftInputHook {
     }
 
     @JvmStatic
-    fun shouldCancelMouseLeftClick(blockHitResult: MovingObjectPosition?): Boolean {
+    fun shouldCancelMouseLeftCLick(blockHitResult: MovingObjectPosition?): Boolean {
         if (blockHitResult == null) return false
 
         val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
@@ -93,31 +91,6 @@ object MinecraftInputHook {
                 }.post()
             }
         }
-
-        return cancelled
-    }
-
-    @JvmStatic
-    fun shouldCancelContinuedBlockBreak(
-        blockHitResult: MovingObjectPosition?,
-        currentBlockPos: BlockPos
-    ): Boolean {
-        if (blockHitResult == null || blockHitResult.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return false
-
-        val position = blockHitResult.blockPos
-
-        if (currentBlockPos == position) return false
-
-        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
-
-        val cancelled = BlockClickEvent(
-            ClickType.LEFT_CLICK,
-            position.toLorenzVec(),
-            InventoryUtils.getItemInHand(),
-        ).also {
-            if (clickCancelled) it.cancel()
-        }.post()
-
 
         return cancelled
     }
