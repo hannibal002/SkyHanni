@@ -70,7 +70,7 @@ object MinecraftInputHook {
 
             MovingObjectPosition.MovingObjectType.BLOCK -> {
                 val position =
-                //#if MC < 1.21
+                    //#if MC < 1.21
                     blockHitResult.blockPos
                 //#else
                 //$$     (blockHitResult as BlockHitResult).blockPos
@@ -112,7 +112,7 @@ object MinecraftInputHook {
         if (blockHitResult == null || blockHitResult.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return false
 
         val position =
-        //#if MC < 1.21
+            //#if MC < 1.21
             blockHitResult.blockPos
         //#else
         //$$     (blockHitResult as BlockHitResult).blockPos
