@@ -116,6 +116,7 @@ enum class SkyblockStat(
     ),
     MINING_FORTUNE("§6☘", " *Mining Fortune: §r§6☘$VALUE_PATTERN", " *§6☘ Mining Fortune §f$VALUE_PATTERN"),
     FEAR("§5☠", " *Fear: §r§5☠$VALUE_PATTERN", " *§5☠ Fear §f$VALUE_PATTERN"),
+    TRACKING("§d❃", " *Tracking: §r§d❃$VALUE_PATTERN", " *§d❃ Tracking §f$VALUE_PATTERN"),
     COLD_RESISTANCE("§b❄", " *Cold Resistance: §r§b❄$VALUE_PATTERN", ""),
     WHEAT_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Wheat Fortune $VALUE_PATTERN"),
     CARROT_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Carrot Fortune $VALUE_PATTERN"),
