@@ -15,6 +15,6 @@ data class MythologicalCreatureType(
     @Expose val name: String,
     @Expose val rare: Boolean?
 ) {
-    val cleanName = name.removeColor()
-    val trackerId = cleanName.replace(" ", "_").uppercase()
+    val cleanName by lazy { name.removeColor() }
+    val trackerId by lazy { cleanName.replace(" ", "_").uppercase() }
 }
