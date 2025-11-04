@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -76,8 +75,8 @@ object LegionBobbinOverlay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
-        if (!event.isMod(2) || !isEnabled()) return
+    fun onTick() {
+        if (!isEnabled()) return
         var bobbers = 0
         var players = 0
         val playerPos = LocationUtils.playerLocation()
