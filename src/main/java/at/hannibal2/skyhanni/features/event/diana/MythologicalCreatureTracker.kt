@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -60,33 +61,36 @@ object MythologicalCreatureTracker {
 
     data class Data(
         @Expose var since: MutableMap<String, Int> = mutableMapOf(),
-        @Expose var count: MutableMap<String, Int> = mutableMapOf()
+        @Expose var count: MutableMap<String, Int> = mutableMapOf(),
     ) : Resettable
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
 
-        val type = DianaApi.mythologicalCreatures[creatureMatch]
-
         BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
 
-        if (type != null) {
-            tracker.modify {
-                it.count.addOrPut(type.trackerId, 1)
-                for (creatureEntry in DianaApi.mythologicalCreatures.values) {
-                    if (creatureEntry == type) {
-                        event.chatComponent = (event.message + " §e(${it.since[creatureEntry.trackerId]})").asComponent()
-                        it.since[creatureEntry.trackerId] = 0
-                    } else {
-                        it.since.addOrPut(creatureEntry.trackerId, 1)
-                    }
+        val type = DianaApi.mythologicalCreatures[creatureMatch] ?: run {
+            ErrorManager.skyHanniError(
+                "Unknown mythological creature $creatureMatch",
+                "message" to event.message,
+            )
+        }
+
+        tracker.modify {
+            it.count.addOrPut(type.trackerId, 1)
+            val since = it.since
+            for (creatureEntry in DianaApi.mythologicalCreatures.values) {
+                val trackerId = creatureEntry.trackerId
+                if (creatureEntry == type) {
+                    event.chatComponent = (event.message + " §e(${since[trackerId]})").asComponent()
+                    since[trackerId] = 0
+                } else {
+                    since.addOrPut(trackerId, 1)
                 }
             }
-            if (config.hideChat) event.blockedReason = "mythological_creature_dug"
-        } else {
-            ErrorManager.skyHanniError("Unknown mythological creature $creatureMatch", "message" to event.message)
         }
+        if (config.hideChat) event.blockedReason = "mythological_creature_dug"
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -98,10 +102,10 @@ object MythologicalCreatureTracker {
                 " §7$percentage"
             } else ""
 
-            val type = DianaApi.getCreatureByTrackerName(creatureType)
+            val typeName = DianaApi.getCreatureByTrackerName(creatureType)?.name ?: "§cUnknown type"
 
             addSearchString(
-                " §7- §e${amount.addSeparators()} ${type?.name}$percentageSuffix",
+                " §7- §e${amount.addSeparators()} $typeName$percentageSuffix",
                 searchText = creatureType,
             )
         }
@@ -111,7 +115,7 @@ object MythologicalCreatureTracker {
 
         for ((creatureTrackerId, since) in data.since.entries.sortedBy { it.value }) {
             val creature = DianaApi.getCreatureByTrackerName(creatureTrackerId)
-            if (creature == null || creature.rare != true) continue
+            if (creature?.rare != true) continue
 
             addSearchString("§7- §e${creature.name}§7: §e${since.addSeparators()} ")
         }
@@ -163,15 +167,11 @@ object MythologicalCreatureTracker {
         event.transform(110, "#profile.diana.mythologicalMobTrackerPerElection", ::fixPastData)
     }
 
-    private fun fixPastData(jsonElement: JsonElement): JsonElement {
-        val jsonObject = jsonElement.asJsonObject
-
-        for ((key, value) in jsonObject.entrySet()) {
-            jsonObject.add(key, fixData(value))
+    private fun fixPastData(jsonElement: JsonElement) =
+        jsonElement.asJsonObject.also {
+            it.entrySet().forEach { (k, v) -> it.add(k, fixData(v)) }
         }
 
-        return jsonObject
-    }
 
     private fun fixData(jsonElement: JsonElement): JsonElement {
         val jsonObject = jsonElement.asJsonObject
@@ -179,9 +179,9 @@ object MythologicalCreatureTracker {
             "since",
             ConfigManager.gson.toJsonTree(
                 mapOf(
-                    "MINOS_INQUISITOR" to jsonObject.get("creaturesSinceLastInquisitor").asInt
-                )
-            )
+                    "MINOS_INQUISITOR" to jsonObject.get("creaturesSinceLastInquisitor").asInt,
+                ),
+            ),
         )
         jsonObject.remove("creaturesSinceLastInquisitor")
         return jsonElement

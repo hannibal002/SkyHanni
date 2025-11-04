@@ -55,7 +55,7 @@ object DianaApi {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val dianaJson = event.getConstant<DianaJson>("Diana")
+        val dianaJson = event.getConstant<DianaJson>("events/Diana")
 
         mythologicalCreatures = dianaJson.mythologicalCreatures
         sphinxQuestions = dianaJson.sphinxQuestions
