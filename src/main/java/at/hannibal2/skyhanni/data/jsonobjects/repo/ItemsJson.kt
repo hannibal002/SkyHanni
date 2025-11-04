@@ -39,6 +39,6 @@ data class EndCapData(
 
 data class DistanceEnchantData(
     @Expose val distance: Double,
-    @Expose val maxAmount: Int,
-    @Expose val perStackMultiplier: Double,
+    @Expose @SerializedName("max_amount") val maxAmount: Int,
+    @Expose @SerializedName("per_stack_multiplier") val perStackMultiplier: Double,
 )
