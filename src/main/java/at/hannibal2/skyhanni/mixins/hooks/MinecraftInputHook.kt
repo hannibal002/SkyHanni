@@ -11,7 +11,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
 
 //#if MC > 1.21
-//$$ import new.minecraft.util.hit.BlockHitResult
+//$$ import net.minecraft.util.hit.BlockHitResult
 //$$ import net.minecraft.util.hit.EntityHitResult
 //#endif
 
