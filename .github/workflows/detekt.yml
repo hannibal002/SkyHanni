@@ -29,10 +29,12 @@ jobs:
                 with:
                   ref: ${{ github.event.pull_request.head.ref }}
                   repository: ${{ github.event.pull_request.head.repo.full_name }}
-            -   uses: ./.github/actions/setup-normal-workspace
+
+            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
+
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt
-                uses: ./.github/actions/gradle-retry
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
                 continue-on-error: true
                 with:
                     gradle-command: detektMain --stacktrace

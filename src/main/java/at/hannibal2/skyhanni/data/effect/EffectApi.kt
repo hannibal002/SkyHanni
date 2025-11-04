@@ -256,12 +256,12 @@ object EffectApi {
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun readSalts(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SALTS)) return
-        saltTabPattern.firstMatcher(event.lines) {
+        saltTabPattern.matchAll(event.lines) {
             val effect = group("effect")
             val duration = TimeUtils.getDuration(group("time"))
             val salt = NonGodPotEffect.entries.firstOrNull {
                 it.tabListName == effect
-            } ?: return@firstMatcher
+            } ?: return@matchAll
             EffectDurationChangeEvent(salt, EffectDurationChangeType.SET, duration).post()
         }
     }

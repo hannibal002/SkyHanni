@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -25,6 +26,7 @@ object InvisibugHighlighter {
     private val config get() = SkyHanniMod.feature.hunting.mobHighlight.invisibug
 
     private val invisibugEntities = mutableListOf<LivingEntity>()
+    private var locationsToRender = setOf<LorenzVec>()
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onParticle(event: ReceiveParticleEvent) {
@@ -41,15 +43,19 @@ object InvisibugHighlighter {
         invisibugEntities.add(nearestArmorStand)
     }
 
+    @HandleEvent(SkyHanniTickEvent::class, onlyOnIsland = IslandType.GALATEA)
+    fun onTick() {
+        if (!config.enabled) return
+        locationsToRender = invisibugEntities.filter { it.canBeSeen(32) }.map { it.getLorenzVec() }.toSet()
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled) return
 
-        for (entity in invisibugEntities.toList()) {
-            if (!entity.canBeSeen(32)) continue
-
+        for (location in locationsToRender) {
             event.drawWaypointFilled(
-                entity.getLorenzVec() - LorenzVec(0.4, -0.2, 0.4),
+                location - LorenzVec(0.4, -0.2, 0.4),
                 config.color.toColor(),
                 extraSize = -0.2,
             )

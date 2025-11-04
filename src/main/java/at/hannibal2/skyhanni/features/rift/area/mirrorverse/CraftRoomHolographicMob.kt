@@ -5,14 +5,14 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -22,7 +22,6 @@ import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
-import kotlin.math.abs
 
 // TODO fix looking at direction, slime size, helmet/skull of zombie
 @SkyHanniModule
@@ -33,75 +32,71 @@ object CraftRoomHolographicMob {
         -108.0, 58.0, -106.0,
         -117.0, 51.0, -128.0,
     )
-    private var entitiesList = listOf<HolographicEntities.HolographicEntity<out EntityLivingBase>>()
     private val entityToHolographicEntity = mapOf(
         EntityZombie::class.java to HolographicEntities.zombie,
         EntitySlime::class.java to HolographicEntities.slime,
         EntityCaveSpider::class.java to HolographicEntities.caveSpider,
     )
 
-    @HandleEvent
+    private var holograms = mapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
+    private var enabled = false
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onTick() {
-        if (!isEnabled()) return
-        for (entity in entitiesList) {
-            entity.moveTo(entity.position.up(.1), (entity.yaw + 5) % 360)
+        enabled = config.enabled && craftRoomArea.isPlayerInside()
+        if (!enabled) return
+
+        val map = mutableMapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
+        for (entity in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(25.0)) {
+            if (entity is EntityPlayer) continue
+            val holographicEntity = entityToHolographicEntity[entity::class.java] ?: continue
+
+            val currentLocation = entity.getLorenzVec()
+            if (!craftRoomArea.isInside(currentLocation)) continue
+            val previousLocation = LorenzVec(entity.lastTickPosX, entity.lastTickPosY, entity.lastTickPosZ) // used to interpolate movement
+
+            // we currently don't rotate the body so head rotations looked very weird
+            val instance = holographicEntity.instance(previousLocation.mirror(), 0f)
+            instance.isChild = entity.isChild
+            instance.moveTo(currentLocation.mirror(), 0f)
+            map[instance] = entity.display()
         }
+        holograms = map
     }
 
-    @HandleEvent
-    fun onWorldChange() {
-        entitiesList = emptyList()
-    }
+    private fun EntityLivingBase.display() = buildString {
+        if (config.showName) {
+            val mobName = displayName.formattedText
+            append("§a$mobName ")
+        }
+        if (config.showHealth) {
+            append("§c${health.roundTo(1)}♥")
+        }
+    }.trim().takeIf { it.isNotEmpty() }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled()) return
+        if (!enabled) return
+        for ((mob, string) in holograms) {
+            event.renderHolographicEntity(mob)
 
-        for (theMob in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(25.0)) {
-            if (theMob is EntityPlayer) continue
-
-            val mobPos = theMob.getLorenzVec()
-            if (!craftRoomArea.isInside(mobPos)) continue
-
-            val wallZ = -116.5
-            val dist = abs(mobPos.z - wallZ)
-            val holographicMobPos = mobPos.add(z = dist * 2)
-            val displayString = buildString {
-                val mobName = theMob.displayName.formattedText
-                if (config.showName) {
-                    append("§a$mobName ")
-                }
-                if (config.showHealth) {
-                    append("§c${theMob.health.roundTo(1)}♥")
-                }
-            }.trim()
-
-            val mob = entityToHolographicEntity[theMob::class.java] ?: continue
-
-            val instance = mob.instance(holographicMobPos, -theMob.rotationYaw)
-
-            instance.isChild = theMob.isChild
-
-            event.renderHolographicEntity(instance)
-
-            if (displayString.isNotEmpty()) {
-                event.drawString(holographicMobPos.add(y = theMob.eyeHeight + .5), displayString)
+            string?.let {
+                event.drawString(mob.position.add(y = mob.entity.eyeHeight + .5), it)
             }
-
-            entitiesList = entitiesList.editCopy { add(instance) }
         }
     }
 
     @HandleEvent(receiveCancelled = true, onlyOnIsland = IslandType.THE_RIFT)
     fun onPlayerRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
-        if (!isEnabled()) return
-        if (!config.hidePlayers) return
-
-        val entity = event.entity
-        if (craftRoomArea.isInside(entity.getLorenzVec())) {
+        if (enabled && config.hidePlayers) {
             event.cancel()
         }
     }
 
-    private fun isEnabled() = RiftApi.inRift() && config.enabled
+    private const val WALL_Z = -116.5
+    private fun LorenzVec.mirror(): LorenzVec {
+        require(z <= WALL_Z) { "mirror() assumes z <= WALL_Z, z was ${z.roundTo(1)} instead" }
+        val dist = WALL_Z - z
+        return add(z = dist * 2)
+    }
 }
