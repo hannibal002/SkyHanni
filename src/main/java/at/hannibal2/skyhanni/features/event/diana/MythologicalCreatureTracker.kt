@@ -131,7 +131,7 @@ object MythologicalCreatureTracker {
 
     @HandleEvent
     fun onRepoLoaded(event: RepositoryReloadEvent) {
-        val dianaJson = event.getConstant<DianaJson>("Diana")
+        val dianaJson = event.getConstant<DianaJson>("events/Diana")
 
         tracker.modify {
             dianaJson.mythologicalCreatures.forEach { (_, creature) ->
