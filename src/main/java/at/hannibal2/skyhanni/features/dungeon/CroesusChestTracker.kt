@@ -50,6 +50,10 @@ object CroesusChestTracker {
      * REGEX-TEST: §aNo more chests to open!
      */
     private val keyUsedPattern by patternGroup.pattern("chest.state.keyused", "§aNo more chests to open!")
+
+    /**
+     * REGEX-TEST: §7Opened Chest: §fWood
+     */
     private val openedPattern by patternGroup.pattern("chest.state.opened", "§8Opened [cC]hest:.*")
 
     /**
