@@ -56,6 +56,11 @@ object CroesusChestTracker {
     private val masterPattern by patternGroup.pattern("chest.master", ".*Master.*")
 
     /**
+     * REGEX-TEST: §eInfernal Tier
+     */
+    private val kuudraPattern by patternGroup.pattern("chest.kuudra", "§e(?<tier>Basic|Hot|Burning|Fiery|Infernal) Tier")
+
+    /**
      * REGEX-TEST: §aNo more chests to open!
      */
     private val keyUsedPattern by patternGroup.pattern("chest.state.keyused", "§aNo more chests to open!")
@@ -162,6 +167,8 @@ object CroesusChestTracker {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"
                     )
+            if (run.floor == "F0" && kuudraPattern.matches(item.displayName)) run.floor =
+                ("T" + KuudraApi.getKuudraRunTierNumber(lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }))
             run.openState = when {
                 keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
                 openedPattern.anyMatches(lore) -> OpenedState.OPENED

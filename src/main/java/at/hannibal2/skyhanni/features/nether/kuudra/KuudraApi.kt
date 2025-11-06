@@ -44,14 +44,16 @@ object KuudraApi {
         "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
-    val kuudraTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
+    val kuudraTiers = listOf("basic", "hot", "burning", "fiery", "infernal")
+
+    val kuudraArmorTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
     val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
     fun NeuInternalName.isKuudraArmor(): Boolean = kuudraArmorPattern.matches(asString())
 
-    fun NeuInternalName.getKuudraTier(): Int? {
+    fun NeuInternalName.getArmorKuudraTier(): Int? {
         val tier = kuudraArmorPattern.matchGroup(asString(), "tier") ?: return null
-        return (kuudraTiers.indexOf(tier) + 1).takeIf { it != 0 }
+        return (kuudraArmorTiers.indexOf(tier) + 1).takeIf { it != 0 }
     }
 
     fun NeuInternalName.removeKuudraTier(): NeuInternalName {
@@ -74,6 +76,7 @@ object KuudraApi {
         }
     }
 
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (kuudraTier != null) return
@@ -95,6 +98,14 @@ object KuudraApi {
             val tier = kuudraTier ?: return
             KuudraCompleteEvent(tier).post()
         }
+    }
+
+    fun getKuudraRunTierName(tier: Int): String {
+        return kuudraTiers[tier - 1]
+    }
+
+    fun getKuudraRunTierNumber(tier: String?): Int {
+        return kuudraTiers.indexOf(tier)
     }
 
 }
