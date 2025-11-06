@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
+import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.DungeonChest
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -220,11 +221,19 @@ object CroesusChestTracker {
         event.offsetX = -9
         event.stackTip = "§a✔"
     }
+    @HandleEvent
+    fun onKuudraComplete(event: KuudraCompleteEvent) {
+        addCroesusChest("T${event.kuudraTier}")
+    }
 
     @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         if (event.floor == "E") return
-        croesusChests?.add(0, DungeonRunInfo(event.floor))
+        addCroesusChest(event.floor)
+    }
+
+    private fun addCroesusChest(floororTier: String) {
+        croesusChests?.add(0, DungeonRunInfo(floororTier))
         currentRunIndex = 0
         if ((croesusChests?.size ?: 0) > MAX_CHESTS) {
             croesusChests?.dropLast(1)
