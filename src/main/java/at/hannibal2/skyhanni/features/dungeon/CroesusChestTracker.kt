@@ -124,6 +124,7 @@ object CroesusChestTracker {
             croesusPattern.matches(event.inventoryName)
         ) {
             pageSetup(event)
+            checkValidChests()
 
             if (croesusEmpty) {
                 croesusChests?.forEach { it.setValuesNull() }
@@ -271,28 +272,45 @@ object CroesusChestTracker {
     private fun createRenderable(): List<Renderable> {
         return buildList {
             add(
-                Renderable.text("Chests: ${croesusChests?.size ?: 0}/${MAX_CHESTS}"),
+                Renderable.text("Chests: ${chestCountColour(croesusChests?.size ?: 0)}/${MAX_CHESTS}"),
             )
         }
     }
 
-    private fun checkValidTimestampChests() {
+    private fun chestCountColour(size: Int): String {
+        return when{
+            size>=45 -> "§4"
+            size>=30 -> "§c"
+            size>=15 -> "§e"
+            size>= 0 -> "§6"
+            else -> "§0"
+        } + size.toString()
+    }
+
+    private fun checkValidChests() {
+        var removalNum = 0
         val iterator = croesusChests?.iterator()
         if (iterator != null) {
             while (iterator.hasNext()) {
-                val sinceRun = iterator.next().runTime?.passedSince() ?: 0.days // purely exists for pre-addition runs
+                val next = iterator.next()
+                if (next.floor == null) {
+                    iterator.remove()
+                    removalNum++
+                }
+                val sinceRun = next.runTime?.passedSince() ?: 0.days // purely exists for pre-addition runs
                 if (sinceRun > 3.days) {
                     iterator.remove()
                     ChatUtils.debug("Chest Removed due to Time Expiring.")
                 }
             }
         }
+        ChatUtils.debug("$removalNum null Croesus chests removed")
     }
 
 
     private fun addCroesusChest(floorOrTier: String) {
         croesusChests?.add(0, DungeonRunInfo(floorOrTier, SimpleTimeMark.now()))
-        checkValidTimestampChests()
+        checkValidChests()
         currentRunIndex = 0
         if ((croesusChests?.size ?: 0) > MAX_CHESTS) {
             croesusChests?.dropLast(1)
