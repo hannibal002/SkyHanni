@@ -60,6 +60,7 @@ object SkyHanniMod {
     fun preInit() {
         PlatformUtils.checkIfNeuIsLoaded()
 
+
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
