@@ -171,7 +171,8 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     private fun statusUpdate(nextStep: String, phase: Phase) {
         if (phase == Phase.START) {
             if (currentlyRunning) {
-                ErrorManager.skyHanniError(
+                ErrorManager.logErrorStateWithData(
+                    "error properly logging something in SkyHanni",
                     "trying to start an already running chat",
                     "next step" to nextStep,
                     "last step" to currentStep?.lastOrNull(),
@@ -183,7 +184,8 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
         }
         if (phase == Phase.UPDATE) {
             if (!currentlyRunning) {
-                ErrorManager.skyHanniError(
+                ErrorManager.logErrorStateWithData(
+                    "error properly logging something in SkyHanni",
                     "trying to update an not running chat",
                     "next step" to nextStep,
                 )
@@ -203,7 +205,8 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
 
         if (phase == Phase.END) {
             if (!currentlyRunning) {
-                ErrorManager.skyHanniError(
+                ErrorManager.logErrorStateWithData(
+                    "error properly logging something in SkyHanni",
                     "trying to end an not running chat",
                     "next step" to nextStep,
                     "last step" to currentStep?.lastOrNull(),

@@ -137,7 +137,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             simpleCallback {
                 val progress = progressCategory.start("reloading local epo via /$reloadCommand")
                 reloadLocalRepo(progress)
-                progress.end("done with /$reloadCommand")
             }
         }
     }

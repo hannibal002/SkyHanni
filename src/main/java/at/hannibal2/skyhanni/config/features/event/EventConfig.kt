@@ -30,6 +30,10 @@ class EventConfig {
     @Expose
     val gifting: GiftingConfig = GiftingConfig()
 
+    @Category(name = "Spooky", desc = "Spooky Festival")
+    @Expose
+    val spooky: SpookyConfig = SpookyConfig()
+
     @Expose
     @Category(name = "Hoppity Eggs", desc = "Features for the Hoppity event that happens every SkyBlock spring.")
     val hoppityEggs: HoppityEggsConfig = HoppityEggsConfig()
