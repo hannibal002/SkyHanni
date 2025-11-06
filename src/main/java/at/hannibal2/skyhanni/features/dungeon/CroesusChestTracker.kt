@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorag
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
@@ -15,6 +16,8 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.DungeonChest
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi.inDungeon
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -28,9 +31,14 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
 object CroesusChestTracker {
@@ -80,6 +88,8 @@ object CroesusChestTracker {
     private var currentRunIndex = 0
 
     private var kismetAmountCache = 0
+
+    private var display: List<Renderable>? = null
 
     private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
@@ -232,6 +242,7 @@ object CroesusChestTracker {
         event.offsetX = -9
         event.stackTip = "§a✔"
     }
+
     @HandleEvent
     fun onKuudraComplete(event: KuudraCompleteEvent) {
         addCroesusChest("T${event.kuudraTier}")
@@ -243,8 +254,38 @@ object CroesusChestTracker {
         addCroesusChest(event.floor)
     }
 
-    private fun addCroesusChest(floororTier: String) {
-        croesusChests?.add(0, DungeonRunInfo(floororTier))
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!((config.croesusOverlayKuudra && KuudraApi.inKuudra) || config.croesusOverlayDungeons && inDungeon())) return
+        val renderables = display ?: createRenderable().also { display = it }
+        config.croesusOverlayPosition.renderRenderables(renderables, posLabel = "Croesus Overlay")
+    }
+
+    private fun createRenderable(): List<Renderable> {
+        return buildList {
+            add(
+                Renderable.text("Chests: ${croesusChests?.size ?: 0}/${MAX_CHESTS}"),
+            )
+        }
+    }
+
+    private fun checkValidTimestampChests() {
+        val iterator = croesusChests?.iterator()
+        if (iterator != null) {
+            while (iterator.hasNext()) {
+                val sinceRun = iterator.next().runTime?.passedSince() ?: 0.days // purely exists for pre-addition runs
+                if (sinceRun > 3.days) {
+                    iterator.remove()
+                    ChatUtils.debug("Chest Removed due to Time Expiring.")
+                }
+            }
+        }
+    }
+
+
+    private fun addCroesusChest(floorOrTier: String) {
+        croesusChests?.add(0, DungeonRunInfo(floorOrTier, SimpleTimeMark.now()))
+        checkValidTimestampChests()
         currentRunIndex = 0
         if ((croesusChests?.size ?: 0) > MAX_CHESTS) {
             croesusChests?.dropLast(1)

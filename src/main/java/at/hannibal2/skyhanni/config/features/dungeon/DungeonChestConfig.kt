@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.NoConfigLink
+import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -29,4 +31,20 @@ class DungeonChestConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var croesusLimit: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Croesus Overlay in Kuudra", desc = "display number of Croesus Chests out of Max as a UI Element")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var croesusOverlayKuudra: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Croesus Overlay in Dungeons", desc = "display number of Croesus Chests out of Max as a UI Element")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var croesusOverlayDungeons: Boolean = false
+
+    @Expose
+    @NoConfigLink
+    val croesusOverlayPosition: Position = Position(200, 100)
 }

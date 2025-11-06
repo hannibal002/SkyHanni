@@ -125,10 +125,13 @@ class ProfileSpecificStorage(
         class DungeonRunInfo {
             constructor()
 
-            constructor(floor: String?) {
+            constructor(floor: String?, runTime: SimpleTimeMark?) {
                 this.floor = floor
+                this.runTime = runTime
                 this.openState = OpenedState.UNOPENED
             }
+            @Expose
+            var runTime: SimpleTimeMark? = null
 
             @Expose
             var floor: String? = null
