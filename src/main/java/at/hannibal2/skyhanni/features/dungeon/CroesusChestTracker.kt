@@ -47,9 +47,20 @@ object CroesusChestTracker {
     private val floorPattern by patternGroup.pattern("chest.floor", "§7Tier: §eFloor (?<floor>[IV]+)")
     private val masterPattern by patternGroup.pattern("chest.master", ".*Master.*")
 
-    private val keyUsedPattern by patternGroup.pattern("chest.state.keyused", "§aNo more Chests to open!")
-    private val openedPattern by patternGroup.pattern("chest.state.opened", "§8Opened Chest:.*")
-    private val unopenedPattern by patternGroup.pattern("chest.state.unopened", "§8No Chests Opened!")
+    /**
+     * REGEX-TEST: §aNo more chests to open!
+     */
+    private val keyUsedPattern by patternGroup.pattern("chest.state.keyused", "§aNo more chests to open!")
+
+    /**
+     * REGEX-TEST: §7Opened Chest: §fWood
+     */
+    private val openedPattern by patternGroup.pattern("chest.state.opened", "§.Opened [cC]hest:.*")
+
+    /**
+     * REGEX-TEST: §cNo chests opened yet!
+     */
+    private val unopenedPattern by patternGroup.pattern("chest.state.unopened", "§cNo chests opened yet!")
 
     private const val KISMET_SLOT = 50
     private const val EMPTY_SLOT = 22

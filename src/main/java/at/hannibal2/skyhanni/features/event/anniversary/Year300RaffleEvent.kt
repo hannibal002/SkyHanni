@@ -23,7 +23,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 // @SkyHanniModule
-@Suppress("SKyHanniModuleInspection", "unused")
+@Suppress("SkyHanniModuleInspection", "unused")
 object Year300RaffleEvent {
 
     val ORANGE_CAKE = "EPOCH_CAKE_ORANGE".toInternalName()

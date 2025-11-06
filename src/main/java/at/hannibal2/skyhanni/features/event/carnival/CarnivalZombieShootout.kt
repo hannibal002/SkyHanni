@@ -227,7 +227,7 @@ object CarnivalZombieShootout {
 
     private fun updateZombies() {
         val nearbyZombies = getZombies()
-        maxType = nearbyZombies.maxBy { it.type.points }.type
+        maxType = nearbyZombies.maxByOrNull { it.type.points }?.type ?: ZombieType.LEATHER
         val maxZombies = nearbyZombies.filter { it.type == maxType }
 
         drawZombies = when {
