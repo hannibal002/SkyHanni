@@ -43,6 +43,9 @@ object CroesusChestTracker {
     private val kismetPattern by patternGroup.pattern("kismet.reroll", "§aReroll Chest")
     private val kismetUsedPattern by patternGroup.pattern("kismet.used", "§aYou already rerolled a chest!")
 
+    /**
+     * REGEX-TEST: §eFloor V
+     */
     private val floorPattern by patternGroup.pattern("chest.floor", "§eFloor (?<floor>[IV]+)")
     private val masterPattern by patternGroup.pattern("chest.master", ".*Master.*")
 
