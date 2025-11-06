@@ -1,17 +1,17 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class DungeonChestConfig {
     @Expose
     @ConfigOption(
         name = "Show Used Kismet",
-        desc = "Add a visual highlight for used Kismet Feathers to the Croesus inventory."
+        desc = "Add a visual highlight for used Kismet Feathers to the Croesus inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -26,11 +26,20 @@ class DungeonChestConfig {
     @Expose
     @ConfigOption(
         name = "Croesus Limit Warning",
-        desc = "Give a warning when you are close to being past Croesus limit."
+        desc = "Give a warning when you are close to being past Croesus limit.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var croesusLimit: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Croesus Overlay",
+        desc = "display number of Croesus Chests out of Max as a UI Element in Dungeon Hub/Forgotten Skull",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var croesusOverlay: Boolean = false
 
     @Expose
     @ConfigOption(name = "Croesus Overlay in Kuudra", desc = "display number of Croesus Chests out of Max as a UI Element")
@@ -39,12 +48,15 @@ class DungeonChestConfig {
     var croesusOverlayKuudra: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Croesus Overlay in Dungeons", desc = "display number of Croesus Chests out of Max as a UI Element")
+    @ConfigOption(
+        name = "Croesus Overlay in Dungeons",
+        desc = "display number of Croesus Chests out of Max as a UI Element",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var croesusOverlayDungeons: Boolean = false
 
     @Expose
-    @NoConfigLink
+    @ConfigLink(owner = DungeonChestConfig::class, field = "croesusOverlay")
     val croesusOverlayPosition: Position = Position(200, 100)
 }

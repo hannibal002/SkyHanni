@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -262,9 +263,10 @@ object CroesusChestTracker {
         addCroesusChest(event.floor)
     }
 
+    @Suppress("MaxLineLength", "ComplexCondition")
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!((config.croesusOverlayKuudra && KuudraApi.inKuudra) || config.croesusOverlayDungeons && inDungeon())) return
+        if (!((config.croesusOverlayKuudra && KuudraApi.inKuudra) || config.croesusOverlayDungeons && inDungeon() || (config.croesusOverlay && (SkyBlockUtils.graphArea == "Dungeon Hub" || SkyBlockUtils.graphArea == "Forgotten Skull")))) return
         val renderables = display ?: createRenderable().also { display = it }
         config.croesusOverlayPosition.renderRenderables(renderables, posLabel = "Croesus Overlay")
     }
@@ -272,17 +274,17 @@ object CroesusChestTracker {
     private fun createRenderable(): List<Renderable> {
         return buildList {
             add(
-                Renderable.text("Chests: ${chestCountColour(croesusChests?.size ?: 0)}/${MAX_CHESTS}"),
+                Renderable.text("Chests: ${chestCountColor(croesusChests?.size ?: 0)}/${MAX_CHESTS}"),
             )
         }
     }
 
-    private fun chestCountColour(size: Int): String {
-        return when{
-            size>=45 -> "§4"
-            size>=30 -> "§c"
-            size>=15 -> "§e"
-            size>= 0 -> "§6"
+    private fun chestCountColor(size: Int): String {
+        return when {
+            size >= 45 -> "§4"
+            size >= 30 -> "§c"
+            size >= 15 -> "§e"
+            size >= 0 -> "§6"
             else -> "§0"
         } + size.toString()
     }
