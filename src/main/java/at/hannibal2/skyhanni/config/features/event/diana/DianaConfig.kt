@@ -22,7 +22,7 @@ class DianaConfig {
     var highlightInquisitors: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Rare Diana Mob Highlight", desc = "Color in which Inquisitors will be highlighted.")
+    @ConfigOption(name = "Rare Diana Mob Highlight", desc = "Color in which Rare Diana Mobs will be highlighted.")
     @ConfigEditorColour
     var color: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 255, 127)
 

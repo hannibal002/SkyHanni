@@ -46,9 +46,11 @@ object DianaApi {
     var sphinxQuestions = emptyMap<String, String>()
         private set
 
+    @Suppress("MaxLineLength")
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<EntityOtherPlayerMP>) {
-        //TODO: MAKE THIS USE REPO
+        // TODO: MAKE THIS USE REPO
+
         if (event.entity.name == "Minos Inquisitor" || event.entity.name == "Sphinx" || event.entity.name == "King Minos" || event.entity.name == "Manticore") {
             RareDianaMobFoundEvent(event.entity).post()
         }

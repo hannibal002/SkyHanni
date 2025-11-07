@@ -66,7 +66,7 @@ object InquisitorWaypointShare {
      */
     private val inquisitorFoundChatPattern by patternGroup.pattern(
         "dug",
-        ".* §r§eYou dug out a §.§.(Minos Inquisitor|Sphinx|King Minos|Manticore)§.§.!",
+        ".* §r§eYou dug out a §.§.(?:Minos Inquisitor|Sphinx|King Minos|Manticore)§.§.!",
     )
 
 

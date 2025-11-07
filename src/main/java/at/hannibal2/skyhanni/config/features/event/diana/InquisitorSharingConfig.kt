@@ -16,14 +16,14 @@ class InquisitorSharingConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Focus", desc = "Hide other waypoints when your Party finds an Inquisitor.")
+    @ConfigOption(name = "Focus", desc = "Hide other waypoints when your Party finds a Rare Diana Mob.")
     @ConfigEditorBoolean
     var focusInquisitor: Boolean = false
 
     @Expose
     @ConfigOption(
         name = "Instant Share",
-        desc = "Share the waypoint as soon as you find an Inquisitor. As an alternative, you can share it only via key press."
+        desc = "Share the waypoint as soon as you find a Rare Diana Mob. As an alternative, you can share it only via key press."
     )
     @ConfigEditorBoolean
     var instantShare: Boolean = true
@@ -34,7 +34,7 @@ class InquisitorSharingConfig {
     var keyBindShare: Int = Keyboard.KEY_Y
 
     @Expose
-    @ConfigOption(name = "Inquisitor Sound", desc = "")
+    @ConfigOption(name = "Rare Diana Mob Sound", desc = "")
     @Accordion
     val sound: InquisitorSoundConfig = InquisitorSoundConfig()
 
