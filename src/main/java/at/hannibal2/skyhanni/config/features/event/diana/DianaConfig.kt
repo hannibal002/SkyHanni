@@ -14,15 +14,15 @@ import org.lwjgl.input.Keyboard
 class DianaConfig {
     @Expose
     @ConfigOption(
-        name = "Highlight Inquisitors",
-        desc = "Highlight Inquisitors found from the Mythological Event perk.",
+        name = "Highlight Rare Diana Mobs",
+        desc = "Highlight Rare Diana Mobs (Sphinx+) found from the Mythological Event perk.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightInquisitors: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Inquisitor Highlight", desc = "Color in which Inquisitors will be highlighted.")
+    @ConfigOption(name = "Rare Diana Mob Highlight", desc = "Color in which Inquisitors will be highlighted.")
     @ConfigEditorColour
     var color: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 255, 127)
 
@@ -93,7 +93,7 @@ class DianaConfig {
     val ignoredWarps: IgnoredWarpsConfig = IgnoredWarpsConfig()
 
     @Expose
-    @ConfigOption(name = "Inquisitor Waypoint Sharing", desc = "")
+    @ConfigOption(name = "Rare Diana Mob Waypoint Sharing", desc = "")
     @Accordion
     val inquisitorSharing: InquisitorSharingConfig = InquisitorSharingConfig()
 

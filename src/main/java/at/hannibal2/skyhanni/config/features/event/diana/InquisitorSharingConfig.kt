@@ -10,7 +10,7 @@ import org.lwjgl.input.Keyboard
 
 class InquisitorSharingConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Share your Inquisitor and receiving other Inquisitors via Party Chat.")
+    @ConfigOption(name = "Enabled", desc = "Share your Rare Diana Mobs and receiving other Rare Diana Mobs via Party Chat.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
@@ -29,7 +29,7 @@ class InquisitorSharingConfig {
     var instantShare: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Share Key", desc = "Press this key to share your Inquisitor Waypoint.")
+    @ConfigOption(name = "Share Key", desc = "Press this key to share your Rare Diana Mob Waypoint.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Y)
     var keyBindShare: Int = Keyboard.KEY_Y
 
@@ -46,7 +46,7 @@ class InquisitorSharingConfig {
     @Expose
     @ConfigOption(
         name = "Read Global Chat",
-        desc = "Also read the global chat for detecting inquistiors, not only party chat."
+        desc = "Also read the global chat for detecting Rare Diana Mobs, not only party chat."
     )
     @ConfigEditorBoolean
     var globalChat: Boolean = false

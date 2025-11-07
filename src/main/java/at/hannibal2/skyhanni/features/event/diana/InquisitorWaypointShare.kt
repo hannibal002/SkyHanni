@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
+import at.hannibal2.skyhanni.events.diana.RareDianaMobFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -106,7 +106,7 @@ object InquisitorWaypointShare {
     private val inquisitorTime = mutableListOf<SimpleTimeMark>()
 
     @HandleEvent
-    fun onInquisitorFound(event: InquisitorFoundEvent) {
+    fun onInquisitorFound(event: RareDianaMobFoundEvent) {
         val inquisitor = event.inquisitorEntity
         inquisitorsNearby[inquisitor.entityId] = inquisitor
         GriffinBurrowHelper.update()

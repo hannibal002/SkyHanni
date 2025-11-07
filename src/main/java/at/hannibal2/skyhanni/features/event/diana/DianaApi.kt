@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MythologicalCreatureType
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
+import at.hannibal2.skyhanni.events.diana.RareDianaMobFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -48,8 +48,9 @@ object DianaApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<EntityOtherPlayerMP>) {
-        if (event.entity.name == "Minos Inquisitor") {
-            InquisitorFoundEvent(event.entity).post()
+        //TODO: MAKE THIS USE REPO
+        if (event.entity.name == "Minos Inquisitor" || event.entity.name == "Sphinx" || event.entity.name == "King Minos" || event.entity.name == "Manticore") {
+            RareDianaMobFoundEvent(event.entity).post()
         }
     }
 
