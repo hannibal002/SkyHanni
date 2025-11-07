@@ -1,5 +1,37 @@
 # SkyHanni - Change Log
 
+## Version 6.0.0
+
+### New Features
+
+#### Events
+
++ Added Trick-or-Treat/Party Chest Alert. - Mayaqq (https://github.com/hannibal002/SkyHanni/pull/4805)
+
+### Improvements
+
+#### Events
+
++ Added new Mythological Creatures to Mythological Tracker. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4780)
+
+### Fixes
+
+#### Misc
+
++ Fixed an issue with clicks. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4843)
+
+#### Events
+
++ Fixed Burrow Guessing not working with newer spades. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4780)
+
+#### Dungeon
+
++ Fixed Croesus Chest Tracker after Hypixel update. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4845)
+
+#### Bingo
+
++ Fixed missing Bingo reward line. - nopo (https://github.com/hannibal002/SkyHanni/pull/4835)
+
 ## Version 5.0.0
 
 ### New Features

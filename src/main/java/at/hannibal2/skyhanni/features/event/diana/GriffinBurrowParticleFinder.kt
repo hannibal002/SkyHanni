@@ -17,9 +17,11 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.minutes
@@ -36,6 +38,16 @@ object GriffinBurrowParticleFinder {
 
     // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
     private var fakeBurrow: LorenzVec? = null
+
+    private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
+
+    /**
+     * REGEX-TEST: §eYou finished the Griffin burrow chain! §r§7(4/4)
+     */
+    private val finishedChainPattern by patternGroup.pattern(
+        "chain-finished",
+        "§eYou finished the Griffin burrow chain! §r§7\\(\\d+/\\d+\\)"
+    )
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -154,7 +166,7 @@ object GriffinBurrowParticleFinder {
         if (!config.guess) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
-            message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
+            finishedChainPattern.matches(message)
         ) {
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             val burrow = lastDugParticleBurrow
