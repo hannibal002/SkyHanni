@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.bingo.BingoApi.getData
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -24,6 +25,7 @@ object BingoCardTips {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
 
     private val patternGroup = RepoPattern.group("bingo.card.tips")
+
     private val inventoryPattern by patternGroup.pattern(
         "card",
         "Bingo Card",
@@ -50,10 +52,12 @@ object BingoCardTips {
         "(?:§.)+Row #.*",
     )
 
+    private val bingoCardInventory = InventoryDetector(inventoryPattern)
+
     @HandleEvent
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
-        if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
+        if (!bingoCardInventory.isInside()) return
 
         val slot = event.slot
         val goal = BingoApi.bingoGoals[slot.slotNumber] ?: return
@@ -72,9 +76,9 @@ object BingoCardTips {
             toolTip.indexOfFirst { rewardPattern.matches(it) }
         } else {
             toolTip.indexOfFirst { contributionRewardsPattern.matches(it) }
-        } - 1
+        } - 2
 
-        if (index == -2) {
+        if (index < 0) {
             ErrorManager.logErrorWithData(
                 IndexOutOfBoundsException(),
                 "BingoCardTips reward line not found",
@@ -85,13 +89,13 @@ object BingoCardTips {
             return
         }
 
-        toolTip.add(index++, "")
-        toolTip.add(index++, "§eGuide:")
+        toolTip.add(++index, "")
+        toolTip.add(++index, "§eGuide:")
         for (line in bingoTip.guide) {
-            toolTip.add(index++, " $line")
+            toolTip.add(++index, " $line")
         }
         bingoTip.found?.let {
-            toolTip.add(index++, "§7Found by: §e$it")
+            toolTip.add(++index, "§7Found by: §e$it")
         }
     }
 
