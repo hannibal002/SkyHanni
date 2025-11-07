@@ -15,6 +15,7 @@ data class MythologicalCreatureType(
     @Expose val name: String,
     @Expose val rare: Boolean?
 ) {
-    val cleanName by lazy { name.removeColor() }
-    val trackerId by lazy { cleanName.replace(" ", "_").uppercase() }
+    // i KNOW lazy / initializing it in constructor is better, but GSON doesnt call those so they are always null.
+    val cleanName get() = name.removeColor()
+    val trackerId get() = cleanName.replace(" ", "_").uppercase()
 }
