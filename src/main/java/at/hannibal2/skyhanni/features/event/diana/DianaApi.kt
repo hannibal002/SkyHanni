@@ -51,7 +51,10 @@ object DianaApi {
     private val group = RepoPattern.group("event-diana")
 
     /**
-     * REGEX-TEST: Schedules an extra §bFishing Festival §7event during the year.
+     * REGEX-TEST: Minos Inquisitor
+     * REGEX-TEST: Sphinx
+     * REGEX-TEST: King Minos
+     * REGEX-TEST: Manticore
      */
     private val rareDianaMobNamePattern by group.pattern(
         "rare-mob-name",
