@@ -8,17 +8,17 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 
 @SkyHanniModule
-object HighlightInquisitors {
+object HighlightRareDianaMob {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
     @HandleEvent
-    fun onInquisitorFound(event: RareDianaMobFoundEvent) {
+    fun onRareDianaMobFound(event: RareDianaMobFoundEvent) {
         if (!config.highlightInquisitors) return
 
-        val inquisitor = event.inquisitorEntity
+        val rareMob = event.entity
 
         val color = config.color.toColor()
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(inquisitor, color) { config.highlightInquisitors }
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(rareMob, color) { config.highlightInquisitors }
     }
 }

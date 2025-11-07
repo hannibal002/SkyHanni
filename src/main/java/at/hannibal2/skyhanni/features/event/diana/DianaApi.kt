@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.item.ItemStack
 
@@ -46,13 +48,21 @@ object DianaApi {
     var sphinxQuestions = emptyMap<String, String>()
         private set
 
-    @Suppress("MaxLineLength")
+    private val group = RepoPattern.group("event-diana")
+
+    /**
+     * REGEX-TEST: Schedules an extra §bFishing Festival §7event during the year.
+     */
+    private val rareDianaMobNamePattern by group.pattern(
+        "rare-mob-name",
+        "Minos Inquisitor|Sphinx|King Minos|Manticore",
+    )
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<EntityOtherPlayerMP>) {
-        // TODO: MAKE THIS USE REPO
-
-        if (event.entity.name == "Minos Inquisitor" || event.entity.name == "Sphinx" || event.entity.name == "King Minos" || event.entity.name == "Manticore") {
-            RareDianaMobFoundEvent(event.entity).post()
+        val entity = event.entity
+        if (rareDianaMobNamePattern.matches(entity.name)) {
+            RareDianaMobFoundEvent(entity).post()
         }
     }
 

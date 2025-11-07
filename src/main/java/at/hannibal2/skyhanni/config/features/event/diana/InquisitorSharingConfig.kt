@@ -15,6 +15,7 @@ class InquisitorSharingConfig {
     @FeatureToggle
     var enabled: Boolean = true
 
+    // TODO rename to focus
     @Expose
     @ConfigOption(name = "Focus", desc = "Hide other waypoints when your Party finds a Rare Diana Mob.")
     @ConfigEditorBoolean
@@ -36,7 +37,7 @@ class InquisitorSharingConfig {
     @Expose
     @ConfigOption(name = "Rare Diana Mob Sound", desc = "")
     @Accordion
-    val sound: InquisitorSoundConfig = InquisitorSoundConfig()
+    val sound: RareDianaMobSoundConfig = RareDianaMobSoundConfig()
 
     @Expose
     @ConfigOption(name = "Show Despawn Time", desc = "Show the time until the shared Inquisitor will despawn.")

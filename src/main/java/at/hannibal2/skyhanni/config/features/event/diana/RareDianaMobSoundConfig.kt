@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.event.diana
 
-import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.event.diana.RareMobWaypointShare
 import at.hannibal2.skyhanni.utils.OSUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
@@ -8,9 +8,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class InquisitorSoundConfig {
+class RareDianaMobSoundConfig {
     @Expose
-    @ConfigOption(name = "Notification Sound", desc = "The sound played when an Inquisitor is found.")
+    @ConfigOption(name = "Notification Sound", desc = "The sound played when an Rare Diana Mob is found.")
     @ConfigEditorText
     var name: String = "random.orb"
 
@@ -21,7 +21,7 @@ class InquisitorSoundConfig {
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    val testSound: Runnable = Runnable { InquisitorWaypointShare.playUserSound() }
+    val testSound: Runnable = Runnable { RareMobWaypointShare.playUserSound() }
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
