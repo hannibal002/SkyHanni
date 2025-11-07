@@ -59,7 +59,7 @@ object RareMobWaypointShare {
      */
     private val diedPattern by patternGroup.pattern(
         "died",
-        "(?<party>§9Party §8> )?(?<playerName>.*)§f: (Inquisitor|Rare Diana Mob) dead!",
+        "(?<party>§9Party §8> )?(?<playerName>.*)§f: §r(?:Inquisitor|Rare Diana Mob) dead!",
     )
 
     /**
