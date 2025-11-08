@@ -502,8 +502,8 @@ object ChatFilter {
 
     /**
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§aChocolate Dinner Egg §r§dhas appeared!
-     * REGEX-TEST: HOPPITY'S HUNT A Chocolate Déjeuner Egg has appeared!
-     * REGEX-TEST: HOPPITY'S HUNT A Chocolate Brunch Egg has appeared!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§9Chocolate Déjeuner Egg §r§dhas appeared!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§6Chocolate Brunch Egg §r§dhas appeared!
      */
     private val hoppityAppearPattern by eventPatternGroup.pattern(
         "hoppity-egg-appear",
