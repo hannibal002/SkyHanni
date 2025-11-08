@@ -141,9 +141,7 @@ class FilterTypesConfig {
 
     @Expose
     @ConfigOption(
-        name = "Hoppity's Hunt"
-        desc = "Hide 'Hoppity's Hunt has begun' and egg appearance messages."
-    )
+        name = "Hoppity's Hunt", desc = "Hide 'Hoppity's Hunt has begun' and egg appearance messages.")
     @ConfigEditorBoolean
     @FeatureToggle
     var hoppity: Boolean = false
