@@ -16,7 +16,7 @@ class HalloweenBasketConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Only Closest", desc = "Only show the closest waypoint.")
@@ -24,7 +24,7 @@ class HalloweenBasketConfig {
     var onlyClosest: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Pathfind", desc = "Show a path to the closest basket.")
+    @ConfigOption(name = "Pathfinder", desc = "Show a path to the closest basket.")
     @ConfigEditorBoolean
     @FeatureToggle
     val pathfind: Property<Boolean> = Property.of(true)

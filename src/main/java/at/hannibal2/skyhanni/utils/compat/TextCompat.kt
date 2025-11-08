@@ -100,20 +100,24 @@ fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false, leadingW
 //$$
 //$$ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
 //$$     this ?: return ""
-//$$     val sb = StringBuilder()
+//$$     val sb = StringBuilder(50)
+//$$     var wasFormatted  = false
 //$$     for (component in iterator()) {
 //$$         val chatStyle = component.style.chatStyle()
-//$$         if (leadingWhite || (sb.contains("§") && sb.toString() != "§r") || chatStyle != "§f") {
+//$$         if (chatStyle.isNotEmpty() && (leadingWhite || (wasFormatted && (sb.length != 2 || sb.get(0) != '§' || sb.get(1) != 'r')) || chatStyle != "§f")) {
 //$$             sb.append(chatStyle)
+//$$             wasFormatted  = true
 //$$         }
 //$$         sb.append(component.unformattedTextForChatCompat())
 //$$         if (!noExtraResets) {
 //$$             sb.append("§r")
-//$$         } else {
-//$$             if (component == Component.empty()) sb.append("§r")
+//$$             wasFormatted  = true
+//$$         } else if (component == Component.empty()){
+//$$             sb.append("§r")
+//$$             wasFormatted  = true
 //$$         }
 //$$     }
-//$$     return sb.toString().removeSuffix("§r").removePrefix("§r")
+//$$     return sb.removeSuffix("§r").removePrefix("§r").toString()
 //$$ }
 //$$
 //$$ private val textColorLUT = ChatFormatting.entries

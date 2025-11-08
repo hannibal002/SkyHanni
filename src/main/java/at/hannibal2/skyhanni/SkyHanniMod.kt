@@ -85,24 +85,22 @@ object SkyHanniMod {
 
     @HandleEvent
     fun onTick() {
-        screenToOpen?.let {
-            screenTicks++
-            if (screenTicks == 5) {
-                val title = InventoryUtils.openInventoryName()
-                if (shouldCloseScreen) {
-                    //#if MC < 1.21
-                    MinecraftCompat.localPlayer.closeScreen()
-                    //#else
-                    //$$ MinecraftCompat.localPlayer.closeHandledScreen()
-                    //#endif
-                    OtherInventoryData.close(title)
-                }
-                shouldCloseScreen = true
-                Minecraft.getMinecraft().displayGuiScreen(it)
-                screenTicks = 0
-                screenToOpen = null
-            }
+        val screenToOpen = screenToOpen ?: return
+        screenTicks++
+        if (screenTicks != 5) return
+        val title = InventoryUtils.openInventoryName()
+        if (shouldCloseScreen) {
+            //#if MC < 1.21
+            MinecraftCompat.localPlayer.closeScreen()
+            //#else
+            //$$ MinecraftCompat.localPlayer.closeHandledScreen()
+            //#endif
+            OtherInventoryData.close(title)
         }
+        shouldCloseScreen = true
+        Minecraft.getMinecraft().displayGuiScreen(screenToOpen)
+        screenTicks = 0
+        this.screenToOpen = null
     }
 
     const val MODID: String = "skyhanni"
