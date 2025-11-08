@@ -41,7 +41,7 @@ object CroesusChestTracker {
     private val croesusPattern by patternGroup.pattern("inventory", "Croesus")
     private val croesusEmptyPattern by patternGroup.pattern("empty", "§cNo treasures!")
     private val kismetPattern by patternGroup.pattern("kismet.reroll", "§aReroll Chest")
-    private val kismetUsedPattern by patternGroup.pattern("kismet.used", "§aYou already rerolled a chest!")
+    private val kismetUsedInChestPattern by patternGroup.pattern("kismet.used", "§aYou already rerolled a chest!")
 
     /**
      * REGEX-TEST: §eFloor V
@@ -63,6 +63,8 @@ object CroesusChestTracker {
      * REGEX-TEST: §cNo chests opened yet!
      */
     private val unopenedPattern by patternGroup.pattern("chest.state.unopened", "§cNo chests opened yet!")
+
+    private val kismetUsedInCroesusPattern by patternGroup.pattern("chest.state.kismet.used", " §8§mKismet Feather")
 
     private const val KISMET_SLOT = 50
     private const val EMPTY_SLOT = 22
@@ -122,21 +124,13 @@ object CroesusChestTracker {
 
             return
         }
-        if (config.showUsedKismets || config.kismetStackSize) {
-            kismetDungeonChestSetup(event)
-        }
+        kismetDungeonChestSetup(event)
     }
 
     private fun kismetDungeonChestSetup(event: InventoryFullyOpenedEvent) {
+        if (!config.kismetStackSize) return
         chestInventory = DungeonChest.getByInventoryName(event.inventoryName) ?: return
-        if (config.kismetStackSize) {
-            kismetAmountCache = getKismetAmount()
-        }
-        if (config.showUsedKismets) {
-            val kismetItem = event.inventoryItems[KISMET_SLOT] ?: return
-            if (config.showUsedKismets && kismetUsedPattern.matches(kismetItem.getLore().lastOrNull()))
-                setKismetUsed()
-        }
+        kismetAmountCache = getKismetAmount()
     }
 
     private fun checkChests(inventory: Map<Int, ItemStack?>) {
@@ -165,6 +159,7 @@ object CroesusChestTracker {
                     "lore" to lore,
                 ).run { null }
             }
+            run.kismetUsed = kismetUsedInCroesusPattern.anyMatches(lore)
         }
     }
 
@@ -192,10 +187,6 @@ object CroesusChestTracker {
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.showUsedKismets) return
-        if (chestInventory != null && event.slotId == KISMET_SLOT) {
-            setKismetUsed()
-            return
-        }
         if (inCroesusInventory && !croesusEmpty) {
             if (event.slot == null) return
             when (event.slotId) {
@@ -219,7 +210,7 @@ object CroesusChestTracker {
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
         if (!kismetPattern.matches(event.stack.displayName)) return
-        if (kismetUsedPattern.matches(event.stack.getLore().lastOrNull())) return
+        if (kismetUsedInChestPattern.matches(event.stack.getLore().lastOrNull())) return
         event.stackTip = "§a$kismetAmountCache"
     }
 
@@ -253,10 +244,6 @@ object CroesusChestTracker {
 
     private fun getRun0(run: Int = currentRunIndex) = croesusChests?.takeIf { run < it.size }?.get(run)
 
-    private fun setKismetUsed() {
-        getRun0()?.kismetUsed = true
-    }
-
     private fun getKismetUsed(runIndex: Int) = getRun0(runIndex)?.kismetUsed ?: false
 
     private fun getKismetAmount() = kismetInternalName.getAmountInSacks() + kismetInternalName.getAmountInInventory()
@@ -273,21 +260,6 @@ object CroesusChestTracker {
 
     private inline fun <reified T> runSlots(slotId: Int, any: T) =
         croesusSlotMapToRun(slotId)?.getRun()?.let { it to any }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shresetkismet") {
-            description = "Resets the saved values of the applied kismet feathers in Croesus"
-            category = CommandCategory.USERS_RESET
-            simpleCallback {
-                croesusChests?.let {
-                    it.clear()
-                    it.addAll(generateMaxChest())
-                    ChatUtils.chat("Kismet State was Reset!")
-                }
-            }
-        }
-    }
 
     @JvmStatic
     fun generateMaxChestAsList(): MutableList<DungeonRunInfo> = generateMaxChest().toMutableList()
