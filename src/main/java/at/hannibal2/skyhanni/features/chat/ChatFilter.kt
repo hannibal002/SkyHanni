@@ -547,8 +547,8 @@ object ChatFilter {
         "redundant_hunting" to redundantShardsPatterns,
         "unmineable_tree" to unmineableTreePatterns,
         "swoop_axe" to listOf(swoopAxePattern),
-        "hoppity" to listOf(hoppityAppearPattern),
-        "hoppity" to listOf(hoppityBeginPattern),
+        "hoppity_appear" to listOf(hoppityAppearPattern),
+        "hoppity_begin" to listOf(hoppityBeginPattern),
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -621,7 +621,8 @@ object ChatFilter {
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.rewardBundles && message.isPresent("reward_bundles") -> "reward_bundles"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
-        config.hoppity && message.isPresent("hoppity") -> "hoppity"
+        config.hoppity_appear && message.isPresent("hoppity_appear") -> "hoppity_appear"
+        config.hoppity_begin && message.isPresent("hoppity_begin") -> "hoppity_begin"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && message.isPresent("skymall") -> "skymall"
