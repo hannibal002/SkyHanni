@@ -44,6 +44,11 @@ object KuudraApi {
         "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
+    private val kuudraChestPattern by patternGroup.pattern(
+        "kuudrachest",
+        "(?<chesttype>(?:Paid|Free) Chest)(?: Chest)?"
+    )
+
     val kuudraTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
     val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
@@ -70,9 +75,16 @@ object KuudraApi {
         ;
 
         companion object {
-            fun getByInventoryName(inventory: String) = entries.firstOrNull { it.inventory == inventory }
+            fun getByInventoryName(inventory: String) {
+                var realInventory = inventory
+                kuudraChestPattern.matchMatcher(inventory) {
+                    realInventory = group("chesttype")
+                }
+                entries.firstOrNull { it.inventory == realInventory }
+            }
+            }
         }
-    }
+
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
