@@ -46,7 +46,7 @@ object KuudraApi {
 
     private val kuudraChestPattern by patternGroup.pattern(
         "kuudrachest",
-        "(?<chesttype>(?:Paid|Free) Chest)(?: Chest)?"
+        "(?<chesttype>(?:Paid|Free) Chest)(?: Chest)?",
     )
 
     val kuudraTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
@@ -82,8 +82,8 @@ object KuudraApi {
                 }
                 entries.firstOrNull { it.inventory == realInventory }
             }
-            }
         }
+    }
 
 
     @HandleEvent(onlyOnSkyblock = true)
