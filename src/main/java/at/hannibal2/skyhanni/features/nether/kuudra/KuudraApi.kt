@@ -44,6 +44,12 @@ object KuudraApi {
         "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
+    /**
+     * REGEX-TEST: Paid Chest
+     * REGEX-TEST: Paid Chest Chest
+     * REGEX-TEST: Free Chest
+     * REGEX-TEST: Free Chest Chest
+     */
     private val kuudraChestPattern by patternGroup.pattern(
         "kuudrachest",
         "(?<chesttype>(?:Paid|Free) Chest)(?: Chest)?",
