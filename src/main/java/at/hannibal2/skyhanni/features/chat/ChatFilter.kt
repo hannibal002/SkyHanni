@@ -502,10 +502,12 @@ object ChatFilter {
 
     /**
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§aChocolate Dinner Egg §r§dhas appeared!
+     * REGEX-TEST: HOPPITY'S HUNT A Chocolate Déjeuner Egg has appeared!
+     * REGEX-TEST: HOPPITY'S HUNT A Chocolate Brunch Egg has appeared!
      */
     private val hoppityAppearPattern by eventPatternGroup.pattern(
         "hoppity-egg-appear",
-        "§d§lHOPPITY'S HUNT §r§dA [\\w\\s§]* §r§dhas appeared!"
+        "§d§lHOPPITY'S HUNT §r§dA .* §r§dhas appeared!"
     )
     @Suppress("MaxLineLength")
     private val hoppityBeginPattern by eventPatternGroup.pattern(
