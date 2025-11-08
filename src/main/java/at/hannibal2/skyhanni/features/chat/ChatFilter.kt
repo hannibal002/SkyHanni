@@ -499,7 +499,10 @@ object ChatFilter {
         "swoop-axe-message",
         "§e\\[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!"
     )
-
+    
+    /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§aChocolate Dinner Egg §r§dhas appeared!
+     */
     private val hoppityAppearPattern by eventPatternGroup.pattern(
         "hoppity-egg-appear",
         "§d§lHOPPITY'S HUNT §r§dA [\\w\\s§]* §r§dhas appeared!"
