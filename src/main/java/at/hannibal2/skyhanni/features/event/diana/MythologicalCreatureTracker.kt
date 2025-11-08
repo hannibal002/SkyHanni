@@ -44,7 +44,7 @@ object MythologicalCreatureTracker {
      */
     private val genericMythologicalSpawnPattern by patternGroup.pattern(
         "generic-spawn",
-        "§c§l(?:Oh|Uh oh|Yikes|Oi|Good Grief|Danger)! §r§eYou dug out (?:a )?(?:§[a-f0-9r])*(?<creatureType>[\\w\\s]+)§r§e!",
+        "§c§l(?:Oh|Uh oh|Yikes|Oi|Good Grief|Danger|Woah)! §r§eYou dug out (?:a )?(?:§[a-f0-9r])*(?<creatureType>[\\w\\s]+)§r§e!",
     )
 
     private val tracker = SkyHanniTracker(
