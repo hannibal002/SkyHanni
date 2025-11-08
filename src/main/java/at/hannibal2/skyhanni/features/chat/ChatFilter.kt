@@ -366,6 +366,13 @@ object ChatFilter {
         "§7You will now produce §r§6.* Chocolate §r§7per click!".toPattern(),
         "§7You upgraded to §r§d.*?§r§7!".toPattern(),
     )
+    private val hoppityPatterns = listOf(
+        "§d§lHOPPITY'S HUNT §r§dA [\w\s§]* §r§dhas appeared!".toPattern(),
+    )
+    @Suppress("MaxLineLength")
+    private val hoppityMessages = listOf(
+        "§dHoppity's Hunt §r§ehas begun! Help §r§aHoppity §r§efind his §r§6Chocolate Rabbit Eggs §r§eacross SkyBlock each day during the §r§aSpring§r§e!"
+    )
 
     /**
      * REGEX-TEST: §c§lSACRIFICE! §r§6[MVP§r§d++§r§6] Mikecraft1224§r§f §r§eturned §r§6Young Dragon Boots §r§einto §r§d40 Dragon Essence§r§e!
@@ -516,6 +523,7 @@ object ChatFilter {
         "fire_sale" to fireSalePatterns,
         "event" to eventPatterns,
         "factory_upgrade" to factoryUpgradePatterns,
+        "hoppity" to hoppityPatterns,
         "sacrifice" to sacrificePatterns,
         "rare_drops" to rareDropsMessages,
         "solo_class" to soloClassPatterns,
@@ -549,6 +557,7 @@ object ChatFilter {
         "powder_mining" to powderMiningMessages,
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
+        "hoppity" to hoppityPatterns,
         "skymall" to skymallMessages,
         "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
@@ -603,6 +612,7 @@ object ChatFilter {
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.rewardBundles && message.isPresent("reward_bundles") -> "reward_bundles"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
+        config.hoppity && message.isPresent("hoppity") -> "hoppity"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && message.isPresent("skymall") -> "skymall"
