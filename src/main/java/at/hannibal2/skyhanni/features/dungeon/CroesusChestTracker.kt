@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
@@ -66,7 +64,6 @@ object CroesusChestTracker {
 
     private val kismetUsedInCroesusPattern by patternGroup.pattern("chest.state.kismet.used", " §8§mKismet Feather")
 
-    private const val KISMET_SLOT = 50
     private const val EMPTY_SLOT = 22
     private const val FRONT_ARROW_SLOT = 53
     private const val BACK_ARROW_SLOT = 45
