@@ -35,6 +35,7 @@ object ChatFilter {
     private val huntingPatternGroup = chatFilterGroup.group("hunting")
     private val foragingPatternGroup = chatFilterGroup.group("foraging")
     private val miscPatternGroup = chatFilterGroup.group("hypixel-misc")
+    private val eventPatternGroup = chatFilterGroup.group("event")
 
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
@@ -366,13 +367,6 @@ object ChatFilter {
         "§7You will now produce §r§6.* Chocolate §r§7per click!".toPattern(),
         "§7You upgraded to §r§d.*?§r§7!".toPattern(),
     )
-    private val hoppityPatterns = listOf(
-        "§d§lHOPPITY'S HUNT §r§dA [\\w\\s§]* §r§dhas appeared!".toPattern(),
-    )
-    @Suppress("MaxLineLength")
-    private val hoppityMessages = listOf(
-        "§dHoppity's Hunt §r§ehas begun! Help §r§aHoppity §r§efind his §r§6Chocolate Rabbit Eggs §r§eacross SkyBlock each day during the §r§aSpring§r§e!"
-    )
 
     /**
      * REGEX-TEST: §c§lSACRIFICE! §r§6[MVP§r§d++§r§6] Mikecraft1224§r§f §r§eturned §r§6Young Dragon Boots §r§einto §r§d40 Dragon Essence§r§e!
@@ -506,6 +500,16 @@ object ChatFilter {
         "§e\\[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!"
     )
 
+    private val hoppityAppearPattern by eventPatternGroup.pattern(
+        "hoppity-egg-appear",
+        "§d§lHOPPITY'S HUNT §r§dA [\\w\\s§]* §r§dhas appeared!"
+    )
+    @Suppress("MaxLineLength")
+    private val hoppityBeginPattern by eventPatternGroup.pattern(
+        "hoppity-begin",
+        "§dHoppity's Hunt §r§ehas begun! Help §r§aHoppity §r§efind his §r§6Chocolate Rabbit Eggs §r§eacross SkyBlock each day during the §r§aSpring§r§e!"
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -523,7 +527,6 @@ object ChatFilter {
         "fire_sale" to fireSalePatterns,
         "event" to eventPatterns,
         "factory_upgrade" to factoryUpgradePatterns,
-        "hoppity" to hoppityPatterns,
         "sacrifice" to sacrificePatterns,
         "rare_drops" to rareDropsMessages,
         "solo_class" to soloClassPatterns,
@@ -539,6 +542,8 @@ object ChatFilter {
         "redundant_hunting" to redundantShardsPatterns,
         "unmineable_tree" to unmineableTreePatterns,
         "swoop_axe" to listOf(swoopAxePattern),
+        "hoppity" to listOf(hoppityAppearPattern),
+        "hoppity" to listOf(hoppityBeginPattern),
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -557,7 +562,6 @@ object ChatFilter {
         "powder_mining" to powderMiningMessages,
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
-        "hoppity" to hoppityMessages,
         "skymall" to skymallMessages,
         "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
