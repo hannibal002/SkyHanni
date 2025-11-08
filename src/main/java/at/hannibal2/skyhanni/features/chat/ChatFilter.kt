@@ -367,7 +367,7 @@ object ChatFilter {
         "§7You upgraded to §r§d.*?§r§7!".toPattern(),
     )
     private val hoppityPatterns = listOf(
-        "§d§lHOPPITY'S HUNT §r§dA [\w\s§]* §r§dhas appeared!".toPattern(),
+        "§d§lHOPPITY'S HUNT §r§dA [\\w\\s§]* §r§dhas appeared!".toPattern(),
     )
     @Suppress("MaxLineLength")
     private val hoppityMessages = listOf(
@@ -557,7 +557,7 @@ object ChatFilter {
         "powder_mining" to powderMiningMessages,
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
-        "hoppity" to hoppityPatterns,
+        "hoppity" to hoppityMessages,
         "skymall" to skymallMessages,
         "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
