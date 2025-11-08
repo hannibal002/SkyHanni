@@ -75,12 +75,15 @@ object KuudraApi {
         ;
 
         companion object {
-            fun getByInventoryName(inventory: String) {
+            fun getByInventoryName(inventory: String): KuudraChest? {
                 var realInventory = inventory
-                kuudraChestPattern.matchMatcher(inventory) {
-                    realInventory = group("chesttype")
+                if (kuudraChestPattern.matches(inventory)) {
+                    kuudraChestPattern.matchMatcher(inventory) {
+                        realInventory = group("chesttype")
+                    }
                 }
-                entries.firstOrNull { it.inventory == realInventory }
+                return entries.firstOrNull { it.inventory == realInventory }
+
             }
         }
     }
