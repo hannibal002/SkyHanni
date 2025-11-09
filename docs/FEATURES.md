@@ -301,6 +301,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Tracks the amount of coins you have put towards the daily 15 billion trade limit.
     + Coins in excess of the integer limit on an individual order do not count towards the daily limit.
     + Resets at midnight UTC.
++ Added a keybind to fill your inventory with the hovered item from Sacks. - nopo (https://github.com/hannibal002/SkyHanni/pull/4697)
 
 </details>
 <details open><summary>
@@ -566,6 +567,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Slayer Time messages. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4518)
     + Sends time to complete (Spawn & Kill) a slayer quest in chat.
 + Added Title/Sound when a Slayer is cocooned. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4569)
++ Added Active Boss Transparency. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4744)
+    + Reduces transparency of other mobs while fighting a Slayer boss.
++ Added option to hide Damage Splashes near Slayer Bosses. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4721)
++ Added option to hide Slayer Spawn particles. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4721)
 
 </details>
 <details open><summary>
@@ -1065,7 +1070,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added gemstone money per hour display when mining. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3586)
 + Added HotM Sky Mall display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4332)
 + Added metal detector solver, mute metal detector option, and all tools alert. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3589)
-+ Added Mineshaft Detection. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4343)
++ Added Mineshaft Detection. - Siv (https://github.com/hannibal002/SkyHanni/pull/4343)
     + Ability to send entered Mineshaft to party chat.
     + Tracks how many shafts you entered since each Mineshaft Type.
 + Added Coleweight's Ordered Waypoints (/shordered or /sho). - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3622)
@@ -1101,14 +1106,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Opens the Bazaar when clicking an attribute name.
 + Added Attribute Tier as Stack Size. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4203)
     + Displays Attribute Shard tier as stack size in Attribute Menu.
-+ Added Invisibug Highlight. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4195)
++ Added Invisibug Highlight. - Siv (https://github.com/hannibal002/SkyHanni/pull/4195)
 + Added Hunting Box Value. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4251)
     + Shows the value of the shards.
 + Added profit per Agatha Coupon in Agatha's Shop. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4250)
 + Added Compact messages for sweep details. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4259)
 + Added HotF Lottery display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4332)
 + Added compact messages for Agatha/Starlyn Sister contests. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4258)
-+ Added option to mute final Tree Breaking Sound. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/4459)
++ Added option to mute final Tree Breaking Sound. - Siv (https://github.com/hannibal002/SkyHanni/pull/4459)
 
 </details>
 <details open><summary>
@@ -1270,8 +1275,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ### The Great Spook
 
-+ Added chat solvers for Primal Fears. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/2771)
++ Added chat solvers for Primal Fears. - Siv (https://github.com/hannibal002/SkyHanni/pull/2771)
     +  Added solvers for Math and Public Speaking Primal Fears.
++ Added Trick-or-Treat/Party Chest Alert. - Mayaqq (https://github.com/hannibal002/SkyHanni/pull/4805)
 
 #### Anniversary Celebration
 
@@ -1329,7 +1335,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + `/gold` warps to Gold Mines, `/crimson` to Crimson Isles, etc.
 + Added party commands !ping and !tps. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4001)
     + Customizable trigger permissions for party commands.
-+ Added Prevent command early execution. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3377)
++ Added Prevent command early execution. - Siv (https://github.com/hannibal002/SkyHanni/pull/3377)
 + Added /shping to show your ping in chat. - nopo (https://github.com/hannibal002/SkyHanni/pull/4478)
 + Added tab complete for /call. - nopo (https://github.com/hannibal002/SkyHanni/pull/4632)
 + Added tab complete to the /show command. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4605)
@@ -1358,7 +1364,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows your current Dragon/Protector weight on the HUD during fights in the End.
 + Added Superior Notification. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/844)
     + Notifies via title when a Superior Dragon spawns in the End.
-+ Added Dragon Profit Tracker. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3507)
++ Added Dragon Profit Tracker. - Siv (https://github.com/hannibal002/SkyHanni/pull/3507)
     + Tracks all loot collected during a dragon fight, records the eyes spent, and calculates overall profit.
 + Added option to prevent player interactions during the Kuudra boss fight. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3683)
     + Added option to disable Profile Viewer on right-click.
@@ -1760,6 +1766,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Frozen Treasure highlighter for the Glacial Caves. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4393)
 + Added Glowing Mushroom highlighter for the Glowing Mushroom Cave. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4392)
 + Fixed Hypixel 1.21 double-click bug when right-clicking a block with Blaze Daggers or Fishing Rods. - yhtez (https://github.com/hannibal002/SkyHanni/pull/4466)
++ Added Block-Breaking Particle Hider. - ThatOneDevil (https://github.com/hannibal002/SkyHanni/pull/4673)
+    + An option in Particle Hider to disable block-breaking particles.
+    + Extra option for Garden only.
++ Added 1.21.10 support. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4596)
 
 </details>
 <details open><summary>

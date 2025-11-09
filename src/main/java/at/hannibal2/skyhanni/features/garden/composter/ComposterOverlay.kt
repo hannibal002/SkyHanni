@@ -67,6 +67,9 @@ import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+/**
+ * Display while in the composter inventory
+ */
 @SkyHanniModule
 object ComposterOverlay {
 

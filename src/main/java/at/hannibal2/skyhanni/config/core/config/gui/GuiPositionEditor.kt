@@ -32,7 +32,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -43,7 +43,7 @@ class GuiPositionEditor(
     private val positions: List<Position>,
     private val border: Int,
     private val oldScreen: GuiContainer? = null,
-) : SkyhanniBaseScreen() {
+) : SkyHanniBaseScreen() {
 
     private var grabbedX = 0
     private var grabbedY = 0
@@ -61,8 +61,11 @@ class GuiPositionEditor(
         // Items aren't drawn due to a bug in neu rendering
         drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
-            val accessor = oldScreen as AccessorGuiContainer
+            //#if MC > 1.21.5
+            //$$ oldScreen.drawBackground(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
+            //#endif
             //#if MC < 1.21
+            val accessor = oldScreen as AccessorGuiContainer
             accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
             //#else
             //$$ oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)

@@ -24,9 +24,9 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: ./.github/actions/setup-normal-workspace
+            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
             -   name: Build with Gradle w/retry
-                uses: ./.github/actions/gradle-retry
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
                 with:
                     gradle-command: assemble -x test --stacktrace -PskipDetekt=true
             -   uses: actions/upload-artifact@v4
@@ -35,7 +35,7 @@ jobs:
                     name: "Development Build"
                     path: build/libs/*.jar
             -   name: Test with Gradle w/retry
-                uses: ./.github/actions/gradle-retry
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
                 with:
                     gradle-command: test
             -   uses: actions/upload-artifact@v4
@@ -55,13 +55,13 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: ./.github/actions/setup-normal-workspace
+            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
             -   name: Enable preprocessor
                 run: |
                     mkdir -p .gradle
                     echo skyhanni.multi-version=compile > .gradle/private.properties
             -   name: Build with Gradle w/retry
-                uses: ./.github/actions/gradle-retry
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
                 with:
                     gradle-command: build --stacktrace -PskipDetekt=true
 

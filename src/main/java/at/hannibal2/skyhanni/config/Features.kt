@@ -20,12 +20,14 @@ import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
 import at.hannibal2.skyhanni.config.storage.Storage
+import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.TimeUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
+import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory
 
@@ -46,9 +48,9 @@ class Features : Config() {
 
     override fun getSocials(): List<Social> {
         return listOf(
-            Social.forLink("Discord", discord, "https://discord.com/invite/skyhanni-997079228510117908"),
-            Social.forLink("GitHub", github, "https://github.com/hannibal002/SkyHanni"),
-            Social.forLink("Patreon", patreon, "https://www.patreon.com/hannibal2"),
+            Social.forLink("Discord".asStructuredText(), discord, "https://discord.com/invite/skyhanni-997079228510117908"),
+            Social.forLink("GitHub".asStructuredText(), github, "https://github.com/hannibal002/SkyHanni"),
+            Social.forLink("Patreon".asStructuredText(), patreon, "https://www.patreon.com/hannibal2"),
         )
     }
 
@@ -56,9 +58,9 @@ class Features : Config() {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "close-gui")
     }
 
-    override fun getTitle(): String {
+    override fun getTitle(): StructuredText {
         val modName = if (TimeUtils.isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
-        return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89"
+        return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89".asStructuredText()
     }
 
     /*

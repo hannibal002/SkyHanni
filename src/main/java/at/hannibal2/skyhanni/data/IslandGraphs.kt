@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandGraphSettingsJson
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
@@ -48,8 +49,6 @@ import kotlin.time.Duration.Companion.milliseconds
  * TODO
  * benefits of every island graphs:
  * global:
- * 	NEU's fairy souls
- * 	slayer area (not all there yet)
  * 	NEU's NPC's (auto acitvate when searching via neu)
  * 	races (end, park, winter, dungeon hub)
  * 	jump pads between servers
@@ -64,7 +63,6 @@ import kotlin.time.Duration.Companion.milliseconds
  * rift:
  * 	eyes
  * 	big quests
- * 	montezuma souls
  * 	blood effigies
  * 	avoid area around enderman
  * spider:
@@ -74,7 +72,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * 	commssion areas
  * 	events: raffle, goblin slayer, donpieresso
  * deep
- * 	path to the bottom (Rhys NPC)
+ * 	path to the bottom (Rhys NPC) (replace in DeepCavernsGuide.kt)
  * end
  * 	golem spawn
  * 	dragon death spot
@@ -147,6 +145,7 @@ object IslandGraphs {
     private var fastestPath: Graph? = null
     private var condition: () -> Boolean = { true }
     private var inGlaciteTunnels: Boolean? = null
+    private var ignoredIslandTypes = setOf<IslandType>()
 
     private val patternGroup = RepoPattern.group("data.island.navigation")
 
@@ -160,9 +159,14 @@ object IslandGraphs {
         "Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center",
     )
 
-    @HandleEvent(RepositoryReloadEvent::class, onlyOnSkyblock = true)
-    fun onRepoReload() {
-        loadIsland(SkyBlockUtils.currentIsland)
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<IslandGraphSettingsJson>("misc/IslandGraphSettings")
+        ignoredIslandTypes = data.ignoredIslandTypes
+
+        if (SkyBlockUtils.inSkyBlock) {
+            loadIsland(SkyBlockUtils.currentIsland)
+        }
     }
 
     @HandleEvent
@@ -213,9 +217,14 @@ object IslandGraphs {
     private fun loadIsland(newIsland: IslandType) {
         if (newIsland == IslandType.DWARVEN_MINES) {
             loadDwarvenMines()
-        } else {
-            reloadFromJson(newIsland.name)
+            return
         }
+
+        // TODO custom behaviour for mineshaft or catacombs, private island, or garden
+
+        if (newIsland in ignoredIslandTypes) return
+
+        reloadFromJson(newIsland.name)
     }
 
     @HandleEvent
@@ -255,7 +264,7 @@ object IslandGraphs {
     private fun reloadFromJson(islandName: String) {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("load island graph data for $islandName") {
             try {
                 val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
                 IslandAreas.display = null
@@ -264,6 +273,13 @@ object IslandGraphs {
                 }
             } catch (e: Error) {
                 currentIslandGraph = null
+                if (SkyBlockUtils.debug) {
+                    ErrorManager.logErrorWithData(
+                        e,
+                        "failed to load graph data for island $islandName",
+                        "island name" to islandName,
+                    )
+                }
             }
         }
     }
@@ -650,70 +666,64 @@ object IslandGraphs {
             return
         }
 
+        val userReportedReason = args.joinToString(" ")
         sendReportLocation(
             playerPosition,
-            reasonForReport = "Manual reported graph location error",
-            userReason = args.joinToString(" "),
-            ignoreCache = true,
-            betaOnly = false,
+            reasonForReport = userReportedReason,
+            technicalInfo = "Manual reported graph location error via /shreportlocation",
+            "reason provided by user" to userReportedReason,
         )
     }
 
     fun reportLocation(
         location: LorenzVec,
         userFacingReason: String,
-        additionalInternalInfo: String? = null,
-        ignoreCache: Boolean = false,
-        betaOnly: Boolean = false,
+        technicalInfo: String? = null,
+        vararg extraData: Pair<String, Any?>,
     ) {
         sendReportLocation(
             location,
-            reasonForReport = "Automatic graph location error: $userFacingReason",
-            additionalInternalInfo = additionalInternalInfo,
-            ignoreCache = ignoreCache,
-            betaOnly = betaOnly,
+            reasonForReport = userFacingReason,
+            technicalInfo = "Automatic graph location error: $technicalInfo",
+            extraData = extraData,
         )
     }
 
     private fun sendReportLocation(
         location: LorenzVec,
         reasonForReport: String,
-        userReason: String? = null,
-        additionalInternalInfo: String? = null,
-        ignoreCache: Boolean,
-        betaOnly: Boolean,
+        technicalInfo: String? = null,
+        vararg extraData: Pair<String, Any?>,
     ) {
         val graphArea = SkyBlockUtils.graphArea
         val scoreboardArea = SkyBlockUtils.scoreboardArea ?: "unknown"
 
-        val extraData = mutableMapOf<String, Any>()
-        userReason?.let {
-            extraData["reason provided by user"] = it
+        val data = mutableMapOf<String, Any?>()
+        technicalInfo?.let {
+            data["technical info"] = it
         }
-        additionalInternalInfo?.let {
-            extraData["internal info"] = it
-        }
+        data.putAll(extraData.toMap())
         val island = SkyBlockUtils.currentIsland.name
-        extraData["island"] = island
-        extraData["location"] = with(location.roundTo(1)) { "/shtestwaypoint $x $y $z pathfind" }
+
+        data["generic data"] = "below"
+        data["island"] = island
+        data["reported location"] = with(location.roundTo(1)) { "/shtestwaypoint $x $y $z pathfind" }
         if (graphArea != scoreboardArea) {
-            extraData["area graph"] = graphArea.orEmpty()
-            extraData["area scoreboard"] = scoreboardArea
+            data["area graph"] = graphArea.orEmpty()
+            data["area scoreboard"] = scoreboardArea
         }
 
         SkyHanniRepoManager.localRepoCommit.let { (hash, time) ->
-            extraData["repo update time"] = time?.toString() ?: "none"
-            extraData["repo update age"] = time?.passedSince() ?: "unknown"
-            extraData["repo update hash"] = hash ?: "none"
+            data["repo update time"] = time?.toString() ?: "none"
+            data["repo update age"] = time?.passedSince() ?: "unknown"
+            data["repo update hash"] = hash ?: "none"
         }
 
         ErrorManager.logErrorStateWithData(
             reasonForReport,
             "",
             noStackTrace = true,
-            extraData = extraData.map { it.key to it.value }.normalizeAsArray(),
-            ignoreErrorCache = ignoreCache,
-            betaOnly = betaOnly,
+            extraData = data.map { it.key to it.value }.normalizeAsArray(),
         )
     }
 

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetNumsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -83,7 +84,9 @@ object EnoughUpdatesManager {
     /**
      * Called by the Neu Repo Manager when the NEU repo is reloaded.
      */
-    suspend fun reloadItemsFromRepo(): Unit = loadingMutex.withLock {
+    suspend fun reloadItemsFromRepo(progress: ChatProgressUpdates): Unit = loadingMutex.withLock {
+        progress.update("reloadItemsFromRepo")
+        progress.update("clearing caches and maps")
         itemStackCache.clear()
         displayNameCache.clear()
         itemMap.clear()
@@ -92,10 +95,12 @@ object EnoughUpdatesManager {
         recipesMap.clear()
 
         val tempItemMap = TreeMap<NeuInternalName, NeuItemJson>()
-        loadItemMap(tempItemMap)
+        loadItemMap(progress, tempItemMap)
 
+        progress.update("synchronized itemMap")
         synchronized(itemMap) {
             itemMap.putAll(tempItemMap)
+            progress.update("putAll tempItemMap")
         }
 
         synchronized(internalNameSet) {
@@ -105,22 +110,29 @@ object EnoughUpdatesManager {
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
-    private suspend fun loadItemMap(tempItemMap: TreeMap<NeuInternalName, NeuItemJson>) = coroutineScope {
+    private suspend fun loadItemMap(progress: ChatProgressUpdates, tempItemMap: TreeMap<NeuInternalName, NeuItemJson>) = coroutineScope {
+        progress.update("loadItemMap")
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
-        fileSystem.list("items").mapNotNullAsync { name ->
+        val list = fileSystem.list("items")
+        progress.innerProgressStart(list.size)
+        val async = list.mapNotNullAsync { name ->
             try {
                 val internalName = name.removeSuffix(".json")
                 val itemJson = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject
-                val parsed = parseItem(
+                val item = parseItem(
                     internalName = internalName,
                     json = itemJson,
-                ) ?: return@mapNotNullAsync null
+                )
+                progress.innerProgressStep()
+                val parsed = item ?: return@mapNotNullAsync null
                 internalName.toInternalName() to parsed
             } catch (e: Exception) {
+                progress.update("Failed to parse item: $name")
                 ErrorManager.logErrorWithData(e, "Failed to parse item: $name")
                 null
             }
-        }.forEach { (internalName, item) ->
+        }
+        async.forEach { (internalName, item) ->
             tempItemMap[internalName] = item
         }
     }

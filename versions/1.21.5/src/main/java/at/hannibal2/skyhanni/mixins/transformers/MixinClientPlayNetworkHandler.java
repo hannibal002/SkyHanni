@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent;
+import at.hannibal2.skyhanni.features.misc.CurrentPing;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -19,5 +21,11 @@ public class MixinClientPlayNetworkHandler {
         packet.getEquipmentList().forEach((equipment) -> {
             new EntityEquipmentChangeEvent(entity, equipment.getFirst().getIndex(), equipment.getSecond()).post();
         });
+    }
+
+    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowPacketSizeAndPingCharts()Z"))
+    public boolean shouldShowPacketSizeAndPingCharts(boolean original) {
+        if (!CurrentPing.INSTANCE.isEnabled()) return original;
+        return true;
     }
 }

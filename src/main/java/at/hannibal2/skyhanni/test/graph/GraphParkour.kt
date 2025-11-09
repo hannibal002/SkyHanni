@@ -24,7 +24,7 @@ object GraphParkour {
             description = "Loads the current clipboard as parkour into the graph editor."
             category = CommandCategory.DEVELOPER_TEST
             callback {
-                SkyHanniMod.launchCoroutine {
+                SkyHanniMod.launchCoroutine("shgraphloadparkour command") {
                     loadParkour()
                 }
             }
