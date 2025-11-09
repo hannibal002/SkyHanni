@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
@@ -91,15 +93,76 @@ object InstanceChestProfit {
         "§aReroll Shard",
     )
 
+    private val runNameCroesus by patternGroup.pattern(
+        "runname",
+        ".+ Catacombs - Flo.*",
+    )
+
+    private val kuudraChestFutureProofing by patternGroup.pattern(
+        "kuudrachest",
+        "§.(?<chestname>Free|Paid)(?: Chest)?",
+    )
+
+    private val chestCostCroesus by patternGroup.pattern(
+        "croesuscost",
+        "§6(?<amount>.*) Coins|§aFREE",
+    )
+
+    private val bookPattern by patternGroup.pattern(
+        "bookpattern",
+        "§fEnchanted Book \\((?:§.)*(?<bookname>.*)(?:§.)+\\)",
+    )
+
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
 
     private var inDungeonChest = false
     private var inKuudraChest = false
-    private var display: Renderable? = null
+    private var inCroesusRunMenu = false
+    private var chestDisplay: Renderable? = null
+    private var croesusDisplay: Renderable? = null
+    private var chests = mutableListOf<CroesusChest>()
+
+    data class CroesusChest(
+        val chestType: CroesusChestType,
+        var contents: MutableList<NeuInternalName> = mutableListOf(),
+        val price: Double,
+    ) {
+        fun getValue(): Double {
+            var value = 0.0
+            contents.forEach {
+                value += it.getPriceOrNull(config.priceSource) ?: 0.0
+            }
+            return value
+        }
+    }
+
+    enum class CroesusChestType(val stackChestName: String) {
+        WOOD("§fWood"),
+        GOLD("§6Gold"),
+        DIAMOND("§bDiamond"),
+        EMERALD("§2Emerald"),
+        OBSIDIAN("§5Obsidian"),
+        BEDROCK("§8Bedrock"),
+        FREE("§fFree"),
+        PAID("§6Paid"),
+        ;
+
+        companion object {
+            fun getByStackName(stackName: String): CroesusChestType? {
+                var newstackname = stackName
+                kuudraChestFutureProofing.matchMatcher(stackName) {
+                    newstackname = group("chestname")
+                }
+                return entries.firstOrNull { it.stackChestName == newstackname }
+            }
+        }
+    }
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        ChatUtils.debug(event.inventoryName)
         if (!config.enabled) return
+        chests.clear()
 
         val name = event.inventoryName
         when {
@@ -111,7 +174,18 @@ object InstanceChestProfit {
                 inKuudraChest = true
             }
 
+            runNameCroesus.matches(name) -> inCroesusRunMenu = true
+
             else -> return
+        }
+        inCroesusRunMenu = true
+
+        event.inventoryItems.values.forEach {
+            val chestType = CroesusChestType.getByStackName(it.displayName)
+            if (chestType != null) parseCroesusChest(it, chestType)
+        }
+        if (chests.isNotEmpty()) {
+            createCroesusDisplay()
         }
 
         createDisplay(event.inventoryItems)
@@ -121,6 +195,50 @@ object InstanceChestProfit {
     fun onInventoryClose() {
         inDungeonChest = false
         inKuudraChest = false
+        inCroesusRunMenu = false
+    }
+
+    private fun parseCroesusChest(itemStack: ItemStack?, chestType: CroesusChestType) {
+        ChatUtils.debug("Reached ParseCroesusChest")
+        var chestList = mutableListOf<NeuInternalName>()
+        itemStack?.getLore()?.forEach {
+            var itemInternalName = NeuInternalName.fromItemNameOrNull(it)
+            bookPattern.matchMatcher(it) {
+                itemInternalName = NeuInternalName.fromItemNameOrNull(group("bookname"))
+            }
+            if (itemInternalName != null) chestList.add(itemInternalName!!)
+            chestCostCroesus.matchMatcher(it) {
+                val cost = group("amount").formatInt().toDouble()
+                chests.add(CroesusChest(chestType, chestList, cost))
+            }
+            kuudraChestKey.matchMatcher(it) {
+                ItemPriceUtils
+                val cost = NeuInternalName.fromItemName(it).getPriceOrNull(config.priceSource) ?: 0.0
+                chests.add(CroesusChest(chestType, chestList, cost))
+            }
+        }
+        chestList.clear()
+    }
+
+    private fun createCroesusDisplay() {
+        var chestItems = mutableListOf<Renderable>()
+        val newDisplay = buildList {
+            add(listOf(Renderable.text("Croesus Chest Profit")))
+            chests.forEach { currentChest ->
+                currentChest.contents.forEach {
+                    chestItems.add(Renderable.text("${it.repoItemName}: ${it.getPriceOrNull() ?: 0.0} \n"))
+                }
+                add(
+                    listOf(
+                        Renderable.hoverTips(
+                            Renderable.text("${currentChest.chestType.stackChestName}: ${currentChest.getValue()}"),
+                            chestItems,
+                        ),
+                    ),
+                )
+            }
+        }
+        croesusDisplay = Renderable.table(newDisplay, ySpacing = 1)
     }
 
     private fun createDisplay(items: Map<Int, ItemStack>) {
@@ -200,7 +318,7 @@ object InstanceChestProfit {
             add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color ${total.formatCoin()}")))
         }
 
-        display = Renderable.table(newDisplay, ySpacing = 1)
+        chestDisplay = Renderable.table(newDisplay, ySpacing = 1)
     }
 
     private fun getKuudraEssenceBonus(): Double {
@@ -217,8 +335,17 @@ object InstanceChestProfit {
 
     @HandleEvent(GuiRenderEvent::class)
     fun onRenderOverlay() {
-        if (!config.enabled || (!inDungeonChest && !inKuudraChest)) return
-
-        config.position.renderRenderable(display, posLabel = "Instance Chest Profit")
+        if (config.enabled && (inDungeonChest || inKuudraChest)) {
+            config.position.renderRenderable(
+                chestDisplay,
+                posLabel = "Instance Chest Profit",
+            )
+        }
+        if (config.croesusEnabled && inCroesusRunMenu) {
+            config.croesusPosition.renderRenderable(
+                croesusDisplay,
+                posLabel = "Croesus Chest Profit",
+            )
+        }
     }
 }
