@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
@@ -21,11 +20,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
@@ -120,21 +122,7 @@ object InstanceChestProfit {
     private var inCroesusRunMenu = false
     private var chestDisplay: Renderable? = null
     private var croesusDisplay: Renderable? = null
-    private var chests = mutableListOf<CroesusChest>()
-
-    data class CroesusChest(
-        val chestType: CroesusChestType,
-        var contents: MutableList<NeuInternalName> = mutableListOf(),
-        val price: Double,
-    ) {
-        fun getValue(): Double {
-            var value = 0.0
-            contents.forEach {
-                value += it.getPriceOrNull(config.priceSource) ?: 0.0
-            }
-            return value
-        }
-    }
+    private val croesusDisplayList = mutableListOf<List<Renderable>>()
 
     enum class CroesusChestType(val stackChestName: String) {
         WOOD("§fWood"),
@@ -162,7 +150,6 @@ object InstanceChestProfit {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         ChatUtils.debug(event.inventoryName)
         if (!config.enabled) return
-        chests.clear()
 
         val name = event.inventoryName
         when {
@@ -184,10 +171,8 @@ object InstanceChestProfit {
             val chestType = CroesusChestType.getByStackName(it.displayName)
             if (chestType != null) parseCroesusChest(it, chestType)
         }
-        if (chests.isNotEmpty()) {
-            createCroesusDisplay()
-        }
 
+        createCroesusDisplay()
         createDisplay(event.inventoryItems)
     }
 
@@ -196,49 +181,80 @@ object InstanceChestProfit {
         inDungeonChest = false
         inKuudraChest = false
         inCroesusRunMenu = false
+        croesusDisplayList.clear()
+        croesusDisplay = null
     }
 
     private fun parseCroesusChest(itemStack: ItemStack?, chestType: CroesusChestType) {
         ChatUtils.debug("Reached ParseCroesusChest")
         var chestList = mutableListOf<NeuInternalName>()
+        var chestItems = mutableListOf<Renderable>()
+        var cost = 0.0
+        var itemPrice = 0.0
+        var finprice = ""
+        var totalPrice = 0.0
         itemStack?.getLore()?.forEach {
             var itemInternalName = NeuInternalName.fromItemNameOrNull(it)
             bookPattern.matchMatcher(it) {
                 itemInternalName = NeuInternalName.fromItemNameOrNull(group("bookname"))
             }
-            if (itemInternalName != null) chestList.add(itemInternalName!!)
+            if (itemInternalName != null) {
+                itemPrice = NeuInternalName.fromItemName(it).getPriceOrNull() ?: 0.0
+                essencePattern.matchMatcher(it) {
+                    itemPrice = getEssence(it)
+                }
+                if (dungeonChestKey.matches(it)) {
+                    cost += NeuInternalName.fromItemName(it).getPriceOrNull(config.priceSource)?.times(-1) ?: 0.0
+                    itemPrice = 0.0
+                }
+                totalPrice += totalPrice + itemPrice
+                finprice = itemPrice.formatCoin()
+                chestItems.add(Renderable.text("${it}: $finprice \n"))
+                if (itemPrice != 0.0 ) chestList.add(itemInternalName!!)
+            }
+            if (dungeonChestKey.matches(it)) cost += it.removeColor().toInternalName().getPriceOrNull() ?: 0.0
             chestCostCroesus.matchMatcher(it) {
-                val cost = group("amount").formatInt().toDouble()
-                chests.add(CroesusChest(chestType, chestList, cost))
+                cost += groupOrNull("amount")?.formatInt()?.toDouble() ?: 0.0
             }
             kuudraChestKey.matchMatcher(it) {
-                ItemPriceUtils
-                val cost = NeuInternalName.fromItemName(it).getPriceOrNull(config.priceSource) ?: 0.0
-                chests.add(CroesusChest(chestType, chestList, cost))
+                cost += NeuInternalName.fromItemName(it).getPriceOrNull(config.priceSource) ?: 0.0
             }
         }
+
+        croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, chestItems))
         chestList.clear()
     }
 
-    private fun createCroesusDisplay() {
-        var chestItems = mutableListOf<Renderable>()
-        val newDisplay = buildList {
-            add(listOf(Renderable.text("Croesus Chest Profit")))
-            chests.forEach { currentChest ->
-                currentChest.contents.forEach {
-                    chestItems.add(Renderable.text("${it.repoItemName}: ${it.getPriceOrNull() ?: 0.0} \n"))
-                }
-                add(
-                    listOf(
+    private fun createCroesusSingleChestDisplay(chestType: CroesusChestType, totalValue: Double, contents: MutableList<Renderable>): List<Renderable> {
+       return buildList {
+                add((
                         Renderable.hoverTips(
-                            Renderable.text("${currentChest.chestType.stackChestName}: ${currentChest.getValue()}"),
-                            chestItems,
-                        ),
+                            Renderable.text("${chestType.stackChestName}: ${totalValue.formatCoin()}"),
+                            contents,
+                        )
                     ),
                 )
             }
+    }
+
+    private fun createCroesusDisplay() {
+        val newDisplay = buildList {
+            croesusDisplayList.forEach{
+                add(it)
+            }
         }
         croesusDisplay = Renderable.table(newDisplay, ySpacing = 1)
+    }
+
+    private fun getEssence(essenceName: String): Double {
+        essencePattern.matchMatcher(essenceName) {
+            val name = group("name")
+            val rawCount = group("count").toInt()
+            val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
+            else rawCount.toDouble()
+            return count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
+        }
+        return 0.0
     }
 
     private fun createDisplay(items: Map<Int, ItemStack>) {
@@ -256,12 +272,8 @@ object InstanceChestProfit {
                 itemsWithCost.addOrPut(it.value.displayName, price)
             }
             essencePattern.matchMatcher(it.value.displayName) {
-                val name = group("name")
-                val rawCount = group("count").toInt()
-                val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
-                else rawCount.toDouble()
-                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.displayName, price)
+                val price = getEssence(it.value.displayName)
+                if (price != 0.0) itemsWithCost.addOrPut(it.value.displayName, price)
             }
         }
 
