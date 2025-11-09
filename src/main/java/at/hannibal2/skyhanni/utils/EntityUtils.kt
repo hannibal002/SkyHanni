@@ -34,8 +34,11 @@ import net.minecraft.tileentity.TileEntity
 //$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 //$$ import net.minecraft.entity.attribute.EntityAttributes
 //$$ import net.minecraft.entity.EquipmentSlot
+//$$ import net.minecraft.util.math.Box
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
+import net.minecraft.util.AxisAlignedBB
+
 //#endif
 
 @SkyHanniModule
@@ -105,13 +108,7 @@ object EntityUtils {
         val a = center.add(-radius, -radius - 3, -radius)
         val b = center.add(radius, radius + 3, radius)
         val alignedBB = a.axisAlignedTo(b)
-        val clazz = EntityArmorStand::class.java
-        val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
-        //#if MC < 1.21
-        return world.getEntitiesWithinAABB(clazz, alignedBB)
-        //#else
-        //$$ return world.getEntitiesByClass(clazz, alignedBB, net.minecraft.predicate.entity.EntityPredicates.EXCEPT_SPECTATOR)
-        //#endif
+        return getEntitiesInBoundingBox<EntityArmorStand>(alignedBB)
     }
 
     @Deprecated("Old. Instead use entity detection feature instead.")
@@ -184,6 +181,17 @@ object EntityUtils {
 
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
+    // More efficient than filtering by type, and then for distance, as Minecraft already first filters the chunks that contain the aabb,
+    // and then filters both for entity type and with the predicate for entities inside those chunks.
+    inline fun <reified E : Entity> getEntitiesInBoundingBox(aabb: AxisAlignedBB, noinline predicate: (E) -> Boolean = { true }): List<E> {
+        val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
+        //#if MC < 1.21
+        return world.getEntitiesWithinAABB(E::class.java, aabb) { it != null && predicate(it) }
+        //#else
+        //$$ return world.getEntitiesByClass<E>(E::class.java, aabb, predicate)
+        //#endif
+    }
+
     private fun WorldClient.getAllEntities(): Iterable<Entity> =
         //#if MC < 1.14
         loadedEntityList
@@ -213,6 +221,7 @@ object EntityUtils {
     //$$ }
     //#endif
 
+    @Deprecated("Remove with EntityRemovedEvent")
     inline fun <reified T : Entity> removeInvalidEntities(list: MutableList<T>) {
         list.keepOnlyIn(getEntities<T>())
     }
