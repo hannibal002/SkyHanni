@@ -20,3 +20,4 @@ gradle.properties
 .devauth/*
 !.devauth/config.toml
 .kotlin
+build.bat
