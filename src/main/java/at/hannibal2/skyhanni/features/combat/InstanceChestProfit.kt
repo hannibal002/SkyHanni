@@ -209,6 +209,7 @@ object InstanceChestProfit {
                 }
                 totalPrice += totalPrice + itemPrice
                 finprice = itemPrice.formatCoin()
+                ChatUtils.debug("${it}/${itemInternalName!!.repoItemName}: $finprice")
                 chestItems.add(Renderable.text("${it}: $finprice \n"))
                 if (itemPrice != 0.0 ) chestList.add(itemInternalName!!)
             }
