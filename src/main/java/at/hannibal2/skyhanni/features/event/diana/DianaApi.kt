@@ -58,13 +58,14 @@ object DianaApi {
      */
     private val rareDianaMobNamePattern by group.pattern(
         "rare-mob-name",
-        "Minos Inquisitor|Sphinx|King Minos|Manticore",
+        "(?:Minos Inquisitor|Sphinx|King Minos|Manticore)\\s*",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<EntityOtherPlayerMP>) {
         val entity = event.entity
-        if (rareDianaMobNamePattern.matches(entity.name)) {
+        // TODO: fetch rare mobs from repo instead
+        if (rareDianaMobNamePattern.matches(entity.name.trim())) {
             RareDianaMobFoundEvent(entity).post()
         }
     }
