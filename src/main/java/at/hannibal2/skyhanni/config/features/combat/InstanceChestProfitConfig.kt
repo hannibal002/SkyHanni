@@ -27,4 +27,14 @@ class InstanceChestProfitConfig {
     @Expose
     @ConfigLink(owner = InstanceChestProfitConfig::class, field = "enabled")
     val position: Position = Position(107, 141)
+
+    @Expose
+    @ConfigOption(name = "Croesus Chest Price Overlay", desc = "Display Each Chests' Profit for Dungeons and Kuudra")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var croesusEnabled: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = InstanceChestProfitConfig::class, field = "croesusEnabled")
+    val croesusPosition: Position = Position(107, 141)
 }
