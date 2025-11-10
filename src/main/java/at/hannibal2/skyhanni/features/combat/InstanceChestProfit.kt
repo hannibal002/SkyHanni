@@ -156,7 +156,7 @@ object InstanceChestProfit {
     private var chestDisplay: Renderable? = null
     private var croesusDisplay: Renderable? = null
     private val croesusDisplayList = mutableListOf<List<Renderable>>()
-    var slotToHighlight = Pair(-1, 0.0)
+    private var slotToHighlight = Pair(-1, 0.0)
 
     enum class CroesusChestType(val stackChestName: String) {
         WOOD("§fWood"),
@@ -228,15 +228,14 @@ object InstanceChestProfit {
     }
 
     private fun parseCroesusChest(itemStack: ItemStack?, chestType: CroesusChestType, slot: Int) {
-        var chestList = mutableListOf<NeuInternalName>()
-        var chestTipsRenderables = mutableListOf<Renderable>()
+        val chestList = mutableListOf<NeuInternalName>()
+        val chestTipsRenderables = mutableListOf<Renderable>()
         chestTipsRenderables.add(Renderable.text("${chestType.stackChestName}:"))
         var totalPrice = 0.0
         var cost = 0.0
         itemStack?.getLore()?.forEach {
             if (alreadyOpened.matches(it)) return
-            var itemPrice = 0.0
-            var finprice = ""
+            var itemPrice: Double
             var itemInternalName = NeuInternalName.fromItemNameOrNull(it)
             bookPattern.matchMatcher(it) {
                 var prefix = ""
@@ -254,10 +253,8 @@ object InstanceChestProfit {
                     cost += NeuInternalName.fromItemName(it).getPrice(config.priceSource).times(-1)
                     itemPrice = -1.0
                 }
-
-                finprice = itemPrice.formatCoin()
                 if (itemPrice != -1.0) {
-                    chestTipsRenderables.add(Renderable.text("  ${itemInternalName?.repoItemName}: $finprice "))
+                    chestTipsRenderables.add(Renderable.text("  ${itemInternalName?.repoItemName}: ${itemPrice.formatCoin()} "))
                     totalPrice += itemPrice
                     chestList.add(itemInternalName!!)
                 }
