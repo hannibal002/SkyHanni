@@ -227,16 +227,15 @@ object InstanceChestProfit {
         itemStack?.getLore()?.forEach {
             if (alreadyOpened.matches(it)) return
             var itemPrice: Double
-            var itemInternalName = NeuInternalName.fromItemNameOrNull(it)
+            var itemInternalName = NeuInternalName.fromItemName(it)
             bookPattern.matchMatcher(it) {
                 var prefix = ""
                 if ((group("ultimate") != null)) prefix = "ULTIMATE_"
                 if (group("bookname").startsWith("Ultimate")) prefix = ""
                 val bookID = prefix + group("bookname")
-                itemInternalName = NeuInternalName.fromItemNameOrNull(bookID)
+                itemInternalName = NeuInternalName.fromItemName(bookID)
             }
-            if (itemInternalName != null) {
-                itemPrice = itemInternalName?.getPrice(config.priceSource) ?: 0.0
+                itemPrice = itemInternalName.getPrice(config.priceSource)
                 essencePattern.matchMatcher(it) {
                     itemPrice = getEssence(it)
                 }
@@ -245,11 +244,10 @@ object InstanceChestProfit {
                     itemPrice = -1.0
                 }
                 if (itemPrice != -1.0) {
-                    chestTipsRenderables.add(Renderable.text("  ${itemInternalName?.repoItemName}: ${itemPrice.formatCoin()} "))
+                    chestTipsRenderables.add(Renderable.text("  ${itemInternalName.repoItemName}: ${itemPrice.formatCoin()} "))
                     totalPrice += itemPrice
-                    chestList.add(itemInternalName!!)
+                    chestList.add(itemInternalName)
                 }
-            }
             chestCostCroesus.matchMatcher(it) {
                 cost += groupOrNull("amount")?.formatInt()?.toDouble()?.times(-1) ?: 0.0
             }
