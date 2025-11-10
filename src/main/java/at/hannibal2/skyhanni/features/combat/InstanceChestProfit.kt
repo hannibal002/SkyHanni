@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -20,14 +21,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
@@ -88,7 +87,7 @@ object InstanceChestProfit {
 
     private val runNameCroesus by patternGroup.pattern(
         "runname",
-        ".+ Catacombs - Flo.*",
+        ".*Catacombs - Flo.*|Kuudra - .*",
     )
 
     private val kuudraChestFutureProofing by patternGroup.pattern(
@@ -103,7 +102,7 @@ object InstanceChestProfit {
 
     private val bookPattern by patternGroup.pattern(
         "bookpattern",
-        "§fEnchanted Book \\((?:§.)*(?<bookname>.*)(?:§.)+\\)",
+        "§fEnchanted Book \\((?<ultimate>§.§.)?(?<bookname>.*)(?:§.)+\\)",
     )
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
@@ -158,12 +157,13 @@ object InstanceChestProfit {
         }
         inCroesusRunMenu = true
 
-        event.inventoryItems.values.forEach {
-            val chestType = CroesusChestType.getByStackName(it.displayName)
-            if (chestType != null) parseCroesusChest(it, chestType)
+        event.inventoryItems.forEach {
+            val chestType = CroesusChestType.getByStackName(it.value.displayName)
+            if (chestType != null) parseCroesusChest(it.value, chestType)
         }
 
         createCroesusDisplay()
+
         createDisplay(event.inventoryItems)
     }
 
@@ -180,58 +180,71 @@ object InstanceChestProfit {
         ChatUtils.debug("Reached ParseCroesusChest")
         var chestList = mutableListOf<NeuInternalName>()
         var chestItems = mutableListOf<Renderable>()
-        var cost = 0.0
-        var itemPrice = 0.0
-        var finprice = ""
+        chestItems.add(Renderable.text(chestType.stackChestName))
         var totalPrice = 0.0
+        var cost = 0.0
         itemStack?.getLore()?.forEach {
+            var itemPrice = 0.0
+            var finprice = ""
             var itemInternalName = NeuInternalName.fromItemNameOrNull(it)
             bookPattern.matchMatcher(it) {
-                itemInternalName = NeuInternalName.fromItemNameOrNull(group("bookname"))
+                var prefix = ""
+                if ((group("ultimate") != null)) prefix = "ULTIMATE_"
+                val bookID = prefix + group("bookname")
+                itemInternalName = NeuInternalName.fromItemNameOrNull(bookID)
             }
             if (itemInternalName != null) {
-                itemPrice = NeuInternalName.fromItemName(it).getPriceOrNull() ?: 0.0
+                itemPrice = itemInternalName!!.getPrice(config.priceSource)
                 essencePattern.matchMatcher(it) {
                     itemPrice = getEssence(it)
                 }
                 if (dungeonChestKey.matches(it)) {
-                    cost += NeuInternalName.fromItemName(it).getPriceOrNull(config.priceSource)?.times(-1) ?: 0.0
-                    itemPrice = 0.0
+                    cost += NeuInternalName.fromItemName(it).getPrice(config.priceSource).times(-1)
+                    itemPrice = -1.0
                 }
-                totalPrice += totalPrice + itemPrice
+
                 finprice = itemPrice.formatCoin()
-                ChatUtils.debug("${it}/${itemInternalName!!.repoItemName}: $finprice")
-                chestItems.add(Renderable.text("${it}: $finprice \n"))
-                if (itemPrice != 0.0 ) chestList.add(itemInternalName!!)
+                if (itemPrice != -1.0) {
+                    ChatUtils.debug("${itemInternalName?.repoItemName ?: ""}/${itemInternalName}: $finprice")
+                    chestItems.add(Renderable.text(" ${it}: $finprice "))
+                    totalPrice += itemPrice
+                    chestList.add(itemInternalName!!)
+                }
             }
-            if (dungeonChestKey.matches(it)) cost += it.removeColor().toInternalName().getPriceOrNull() ?: 0.0
             chestCostCroesus.matchMatcher(it) {
-                cost += groupOrNull("amount")?.formatInt()?.toDouble() ?: 0.0
+                cost += groupOrNull("amount")?.formatInt()?.toDouble()?.times(-1) ?: 0.0
             }
             kuudraChestKey.matchMatcher(it) {
-                cost += NeuInternalName.fromItemName(it).getPriceOrNull(config.priceSource) ?: 0.0
+                cost += NeuInternalName.fromItemName(it).getPriceOrNull(config.priceSource)?.times(-1) ?: 0.0
             }
+            ChatUtils.debug(totalPrice.formatCoin())
         }
-
+        totalPrice += cost
         croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, chestItems))
         chestList.clear()
     }
 
-    private fun createCroesusSingleChestDisplay(chestType: CroesusChestType, totalValue: Double, contents: MutableList<Renderable>): List<Renderable> {
-       return buildList {
-                add((
-                        Renderable.hoverTips(
-                            Renderable.text("${chestType.stackChestName}: ${totalValue.formatCoin()}"),
-                            contents,
-                        )
+    private fun createCroesusSingleChestDisplay(
+        chestType: CroesusChestType,
+        totalValue: Double,
+        contents: MutableList<Renderable>,
+    ): List<Renderable> {
+        return buildList {
+            add(
+                (
+                    Renderable.hoverTips(
+                        Renderable.text("${chestType.stackChestName}: ${totalValue.formatCoin()}"),
+                        contents,
+                    )
                     ),
-                )
-            }
+            )
+        }
     }
 
     private fun createCroesusDisplay() {
         val newDisplay = buildList {
-            croesusDisplayList.forEach{
+            add(listOf(Renderable.text("§6§lCroesus Profit Overlay§r")))
+            croesusDisplayList.forEach {
                 add(it)
             }
         }
