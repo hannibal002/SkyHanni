@@ -94,7 +94,8 @@ object UpgradeReminder {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        inInventory = event.inventoryName == "Community Shop" && event.inventoryItems[11]?.isStainedGlassPane(ColoredBlockCompat.LIME) == true
+        inInventory = event.inventoryName == "Community Shop" &&
+            event.inventoryItems[11]?.isStainedGlassPane(ColoredBlockCompat.LIME) == true
         if (!inInventory) return
 
         handleItems(event.inventoryItems)
