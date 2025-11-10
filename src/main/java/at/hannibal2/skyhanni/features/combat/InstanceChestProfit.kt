@@ -271,6 +271,15 @@ object InstanceChestProfit {
         return 0.0
     }
 
+    private fun getAttribute(attributeName: String): Double {
+        attributeShardPattern.matchMatcher(attributeName) {
+            val name = group("name")
+            val count = group("count").toInt()
+            return count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
+        }
+        return 0.0
+    }
+
     private fun createDisplay(items: Map<Int, ItemStack>) {
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
@@ -279,13 +288,11 @@ object InstanceChestProfit {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
             }
-            attributeShardPattern.matchMatcher(it.value.displayName) {
-                val name = group("name")
-                val count = group("count").toInt()
-                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
+            if (attributeShardPattern.matches(it.value.displayName)) {
+                val price = getAttribute(it.value.displayName)
                 itemsWithCost.addOrPut(it.value.displayName, price)
             }
-            essencePattern.matchMatcher(it.value.displayName) {
+            if (essencePattern.matches(it.value.displayName)) {
                 val price = getEssence(it.value.displayName)
                 if (price != 0.0) itemsWithCost.addOrPut(it.value.displayName, price)
             }
