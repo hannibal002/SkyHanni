@@ -221,7 +221,7 @@ object InstanceChestProfit {
     private fun parseCroesusChest(itemStack: ItemStack?, chestType: CroesusChestType, slot: Int) {
         var chestList = mutableListOf<NeuInternalName>()
         var chestTipsRenderables = mutableListOf<Renderable>()
-        chestTipsRenderables.add(Renderable.text(chestType.stackChestName))
+        chestTipsRenderables.add(Renderable.text("${chestType.stackChestName}:"))
         var totalPrice = 0.0
         var cost = 0.0
         itemStack?.getLore()?.forEach {
@@ -237,7 +237,7 @@ object InstanceChestProfit {
                 itemInternalName = NeuInternalName.fromItemNameOrNull(bookID)
             }
             if (itemInternalName != null) {
-                itemPrice = itemInternalName!!.getPrice(config.priceSource)
+                itemPrice = itemInternalName?.getPrice(config.priceSource) ?: 0.0
                 essencePattern.matchMatcher(it) {
                     itemPrice = getEssence(it)
                 }
@@ -248,7 +248,7 @@ object InstanceChestProfit {
 
                 finprice = itemPrice.formatCoin()
                 if (itemPrice != -1.0) {
-                    chestTipsRenderables.add(Renderable.text(" $it: $finprice "))
+                    chestTipsRenderables.add(Renderable.text("  ${itemInternalName?.repoItemName}: $finprice "))
                     totalPrice += itemPrice
                     chestList.add(itemInternalName!!)
                 }
@@ -264,7 +264,7 @@ object InstanceChestProfit {
         totalPrice += cost
         if (slotToHighlight.second < totalPrice) slotToHighlight = Pair(slot, totalPrice)
         chestTipsRenderables.add(Renderable.text("Cost: ${cost.formatCoin()}"))
-        chestTipsRenderables.add(Renderable.text("Profit: ${totalPrice.formatCoin()} §6(Pre Cost Profit ${preCostPrice.formatCoin()}\"))"))
+        chestTipsRenderables.add(Renderable.text("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f)"))
         croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, chestTipsRenderables))
         chestList.clear()
     }
