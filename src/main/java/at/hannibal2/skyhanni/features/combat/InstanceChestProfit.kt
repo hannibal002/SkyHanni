@@ -235,19 +235,19 @@ object InstanceChestProfit {
                 val bookID = prefix + group("bookname")
                 itemInternalName = NeuInternalName.fromItemName(bookID)
             }
-                itemPrice = itemInternalName.getPrice(config.priceSource)
-                essencePattern.matchMatcher(it) {
-                    itemPrice = getEssence(it)
-                }
-                if (dungeonChestKey.matches(it)) {
-                    cost += NeuInternalName.fromItemName(it).getPrice(config.priceSource).times(-1)
-                    itemPrice = -1.0
-                }
-                if (itemPrice != -1.0) {
-                    chestTipsRenderables.add(Renderable.text("  ${itemInternalName.repoItemName}: ${itemPrice.formatCoin()} "))
-                    totalPrice += itemPrice
-                    chestList.add(itemInternalName)
-                }
+            itemPrice = itemInternalName.getPrice(config.priceSource)
+            essencePattern.matchMatcher(it) {
+                itemPrice = getEssence(it)
+            }
+            if (dungeonChestKey.matches(it)) {
+                cost += NeuInternalName.fromItemName(it).getPrice(config.priceSource).times(-1)
+                itemPrice = -1.0
+            }
+            if (itemPrice != -1.0) {
+                chestTipsRenderables.add(Renderable.text(" ${itemInternalName.repoItemName}: ${itemPrice.formatCoin()} "))
+                totalPrice += itemPrice
+                chestList.add(itemInternalName)
+            }
             chestCostCroesus.matchMatcher(it) {
                 cost += groupOrNull("amount")?.formatInt()?.toDouble()?.times(-1) ?: 0.0
             }
