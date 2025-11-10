@@ -97,6 +97,7 @@ object MythologicalCreatureTracker {
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§7Mythological Creature Tracker:")
         val total = data.count.sumAllValues()
+        val foundCreatures = data.count.filterValues { it > 0 }.keys
         for ((creatureType, amount) in data.count.entries.sortedByDescending { it.value }) {
             val percentageSuffix = if (config.showPercentage.get()) {
                 val percentage = (amount.toDouble() / total).formatPercentage()
@@ -112,11 +113,12 @@ object MythologicalCreatureTracker {
         }
         addSearchString("§7Total Mythological Creatures: §e${total.addSeparators()}")
 
+        if (foundCreatures.isEmpty()) return@buildList
         addSearchString("§7Creatures since:")
 
         for ((creatureTrackerId, since) in data.since.entries.sortedBy { it.value }) {
-            val creature = DianaApi.getCreatureByTrackerName(creatureTrackerId)
-            if (creature?.rare != true) continue
+            val creature = DianaApi.getCreatureByTrackerName(creatureTrackerId) ?: continue
+            if (!creature.rare || creatureTrackerId !in foundCreatures) continue
 
             addSearchString("§7- §e${creature.name}§7: §e${since.addSeparators()} ")
         }
