@@ -45,6 +45,7 @@ object KuudraApi {
     )
 
     /**
+     * Hypixel currently duplicate the word Chest in the inventory name of Kuudra chests in Croesus/Vesuvius
      * REGEX-TEST: Paid Chest
      * REGEX-TEST: Paid Chest Chest
      * REGEX-TEST: Free Chest
