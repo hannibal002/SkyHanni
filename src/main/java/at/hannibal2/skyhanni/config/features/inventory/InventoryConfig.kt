@@ -369,5 +369,5 @@ class InventoryConfig {
     @FeatureToggle
     @SearchTag("pick block")
     @OnlyModern
-    var middleClickFix: Boolean = false
+    var middleClickFix: Boolean = true
 }
