@@ -263,6 +263,7 @@ object CroesusChestTracker {
         addCroesusChest(event.floor)
     }
 
+    @Suppress("MaxLineLength")
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (config.croesusOverlayKuudra && KuudraApi.inKuudra) renderChestOverlay()
