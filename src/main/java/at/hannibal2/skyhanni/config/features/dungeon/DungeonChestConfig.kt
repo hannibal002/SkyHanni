@@ -35,14 +35,14 @@ class DungeonChestConfig {
     @Expose
     @ConfigOption(
         name = "Croesus Overlay",
-        desc = "display number of Croesus Chests out of Max as a UI Element in Dungeon Hub/Forgotten Skull",
+        desc = "Displays current number of Croesus chests out of 60.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var croesusOverlay: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Croesus Overlay in Kuudra", desc = "display number of Croesus Chests out of Max as a UI Element")
+    @ConfigOption(name = "Croesus Overlay in Kuudra", desc = "Displays current number of Croesus chests out of 60.")
     @ConfigEditorBoolean
     @FeatureToggle
     var croesusOverlayKuudra: Boolean = false
@@ -50,7 +50,7 @@ class DungeonChestConfig {
     @Expose
     @ConfigOption(
         name = "Croesus Overlay in Dungeons",
-        desc = "display number of Croesus Chests out of Max as a UI Element",
+        desc = "Displays current number of Croesus chests out of 60.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

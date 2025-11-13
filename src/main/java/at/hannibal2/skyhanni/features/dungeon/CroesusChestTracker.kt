@@ -263,10 +263,14 @@ object CroesusChestTracker {
         addCroesusChest(event.floor)
     }
 
-    @Suppress("MaxLineLength", "ComplexCondition")
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!((config.croesusOverlayKuudra && KuudraApi.inKuudra) || config.croesusOverlayDungeons && inDungeon() || (config.croesusOverlay && (SkyBlockUtils.graphArea == "Dungeon Hub" || SkyBlockUtils.graphArea == "Forgotten Skull")))) return
+        if (config.croesusOverlayKuudra && KuudraApi.inKuudra) renderChestOverlay()
+        if (config.croesusOverlay && (SkyBlockUtils.graphArea == "Forgotten Skull" || SkyBlockUtils.scoreboardArea == "Dungeon Hub")) renderChestOverlay()
+        if (config.croesusOverlayDungeons && inDungeon()) renderChestOverlay()
+    }
+
+    private fun renderChestOverlay() {
         val renderables = display ?: createRenderable().also { display = it }
         config.croesusOverlayPosition.renderRenderables(renderables, posLabel = "Croesus Overlay")
     }
@@ -298,6 +302,9 @@ object CroesusChestTracker {
                 if (next.floor == null) {
                     iterator.remove()
                     removalNum++
+                }
+                if (next.runTime == null) {
+                    next.runTime = SimpleTimeMark.now()
                 }
                 val sinceRun = next.runTime?.passedSince() ?: 0.days // purely exists for pre-addition runs
                 if (sinceRun > 3.days) {
