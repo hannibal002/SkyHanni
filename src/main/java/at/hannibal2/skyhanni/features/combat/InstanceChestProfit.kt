@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
@@ -22,6 +24,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.MISSING_ITEM
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -129,6 +133,11 @@ object InstanceChestProfit {
         "§aAlready opened!",
     )
 
+    private val bookColorFixer by patternGroup.pattern(
+        "bookcolorfix",
+        "(?<item>.+)(?:§.)+"
+    )
+
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
 
     private var inDungeonChest = false
@@ -217,8 +226,13 @@ object InstanceChestProfit {
         itemStack?.getLore()?.forEach { loreLine ->
             if (alreadyOpened.matches(loreLine)) return
             var itemPrice: Double
-            val itemInternalName = NeuInternalName.fromItemNameOrNull(ItemUtils.readBookType(loreLine) ?: loreLine)
-            if (itemInternalName != null) {
+            var itemName = ItemUtils.readBookType(loreLine) ?: loreLine
+            var itemInternalName = NeuInternalName.fromItemName(itemName)
+            bookColorFixer.matchMatcher(itemName) {
+                itemName = ItemResolutionQuery.resolveEnchantmentByName(group("item")) ?: itemName
+                itemInternalName = itemName.toInternalName()
+            }
+            if (itemInternalName != MISSING_ITEM) {
                 itemPrice = itemInternalName.getPrice(config.priceSource)
                 essencePattern.matchMatcher(loreLine) {
                     itemPrice = getEssence(group("name"), group("count").toInt())

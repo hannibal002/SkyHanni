@@ -621,9 +621,15 @@ object ItemUtils {
         "item.enchantedbook",
         "§fEnchanted Book \\((?<item>.+)\\)"
     )
-    fun readBookType(input: String): String? {
+    fun readBookTypeStrippedColor(input: String): String? {
         return enchantedBookPattern.matchMatcher(input) {
             group("item").removeColor()
+        }
+    }
+
+    fun readBookType(input: String): String? {
+        return enchantedBookPattern.matchMatcher(input) {
+            group("item")
         }
     }
 
