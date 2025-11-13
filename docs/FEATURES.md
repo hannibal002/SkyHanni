@@ -1277,6 +1277,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Added chat solvers for Primal Fears. - Siv (https://github.com/hannibal002/SkyHanni/pull/2771)
     +  Added solvers for Math and Public Speaking Primal Fears.
++ Added Trick-or-Treat/Party Chest Alert. - Mayaqq (https://github.com/hannibal002/SkyHanni/pull/4805)
 
 #### Anniversary Celebration
 

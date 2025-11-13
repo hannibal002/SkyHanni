@@ -1,5 +1,44 @@
 # SkyHanni - Change Log
 
+## Version 6.0.0
+
+### New Features
+
+#### Events
+
++ Added Trick-or-Treat/Party Chest Alert. - Mayaqq (https://github.com/hannibal002/SkyHanni/pull/4805)
+
+### Improvements
+
+#### Events
+
++ Added new Mythological Creatures to Mythological Tracker. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4780)
++ Added support for new Diana Mobs to Waypoint Sharing. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4852)
+
+### Fixes
+
+#### Misc
+
++ Fixed an issue with clicks. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4843)
+
+#### Events
+
++ Fixed Burrow Guessing not working with newer spades. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4780)
++ Fixed an error when reading Diana repo data. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4850)
+
+#### Dungeon
+
++ Fixed Croesus Chest Tracker after Hypixel update. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4845)
+
+#### Bingo
+
++ Fixed missing Bingo reward line. - nopo (https://github.com/hannibal002/SkyHanni/pull/4835)
++ Fixed occasional Bingo Card Tips reward line not found errors in chat. - Luna (https://github.com/hannibal002/SkyHanni/pull/4851)
+
+#### Combat
+
++ Fixed Ghost Tracker coin count not working when using a Scavenger setup. - nopo (https://github.com/hannibal002/SkyHanni/pull/4849)
+
 ## Version 5.0.0
 
 ### New Features
