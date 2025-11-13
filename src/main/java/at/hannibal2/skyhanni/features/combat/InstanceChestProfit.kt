@@ -132,6 +132,10 @@ object InstanceChestProfit {
         "§aAlready opened!",
     )
 
+    /**
+     * REGEX-TEST: §d§lUltimate Wise I§f
+     * REGEX-TEST: §d§lCombo I§f
+     */
     private val bookColorFixer by patternGroup.pattern(
         "bookcolorfix",
         "(?<item>.+)(?:§.)+",
