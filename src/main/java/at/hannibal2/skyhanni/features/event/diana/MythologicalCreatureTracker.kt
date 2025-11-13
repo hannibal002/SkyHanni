@@ -113,13 +113,16 @@ object MythologicalCreatureTracker {
         }
         addSearchString("§7Total Mythological Creatures: §e${total.addSeparators()}")
 
-        if (foundCreatures.isEmpty()) return@buildList
-        addSearchString("§7Creatures since:")
+        var addedCreaturesSince = false
 
         for ((creatureTrackerId, since) in data.since.entries.sortedBy { it.value }) {
             val creature = DianaApi.getCreatureByTrackerName(creatureTrackerId) ?: continue
             if (!creature.rare || creatureTrackerId !in foundCreatures) continue
 
+            if (!addedCreaturesSince) {
+                addSearchString("§7Creatures since:")
+                addedCreaturesSince = true
+            }
             addSearchString("§7- §e${creature.name}§7: §e${since.addSeparators()} ")
         }
 
