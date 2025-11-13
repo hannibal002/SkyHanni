@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
@@ -144,7 +143,7 @@ object InstanceChestProfit {
 
     private val bookColorFixer by patternGroup.pattern(
         "bookcolorfix",
-        "(?<item>.+)(?:§.)+"
+        "(?<item>.+)(?:§.)+",
     )
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
