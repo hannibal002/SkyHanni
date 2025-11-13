@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -131,16 +131,6 @@ object InstanceChestProfit {
     )
 
     /**
-     * REGEX-TEST: §fEnchanted Book (§d§lBank I§f)
-     * REGEX-TEST: §fEnchanted Book (Rejuvenate I§f)
-     * REGEX-TEST: §fEnchanted Book (§d§lUltimate Wise I§f)
-     */
-    private val bookPattern by patternGroup.pattern(
-        "bookpattern",
-        "§fEnchanted Book \\((?<ultimate>§.§.)?(?<bookname>.*)(?:§.)+\\)",
-    )
-
-    /**
      * REGEX-TEST: §aAlready opened!'
      */
     private val alreadyOpened by patternGroup.pattern(
@@ -233,35 +223,30 @@ object InstanceChestProfit {
         chestTipsRenderables.add(Renderable.text("${chestType.stackChestName}:"))
         var totalPrice = 0.0
         var cost = 0.0
-        itemStack?.getLore()?.forEach {
-            if (alreadyOpened.matches(it)) return
+        itemStack?.getLore()?.forEach { loreLine ->
+            if (alreadyOpened.matches(loreLine)) return
             var itemPrice: Double
-            var itemInternalName = NeuInternalName.fromItemName(it)
-            bookPattern.matchMatcher(it) {
-                var prefix = ""
-                if ((group("ultimate") != null)) prefix = "ULTIMATE_"
-                if (group("bookname").startsWith("Ultimate")) prefix = ""
-                val bookID = prefix + group("bookname")
-                itemInternalName = NeuInternalName.fromItemName(bookID)
+            val itemInternalName = NeuInternalName.fromItemNameOrNull(ItemUtils.readBookType(loreLine) ?: loreLine)
+            if (itemInternalName != null) {
+                itemPrice = itemInternalName.getPrice(config.priceSource)
+                essencePattern.matchMatcher(loreLine) {
+                    itemPrice = getEssence(group("name"), group("count").toInt())
+                }
+                if (dungeonChestKey.matches(loreLine)) {
+                    cost += itemInternalName.getPrice(config.priceSource).times(-1)
+                    itemPrice = -1.0
+                }
+                if (itemPrice != -1.0) {
+                    chestTipsRenderables.add(Renderable.text(" ${itemInternalName.repoItemName}: ${itemPrice.formatCoin()} "))
+                    totalPrice += itemPrice
+                    chestList.add(itemInternalName)
+                }
+                kuudraChestKey.matchMatcher(loreLine) {
+                    cost += itemInternalName.getRawCraftCostOrNull(config.priceSource)?.times(-1) ?: 0.0
+                }
             }
-            itemPrice = itemInternalName.getPrice(config.priceSource)
-            essencePattern.matchMatcher(it) {
-                itemPrice = getEssence(it)
-            }
-            if (dungeonChestKey.matches(it)) {
-                cost += NeuInternalName.fromItemName(it).getPrice(config.priceSource).times(-1)
-                itemPrice = -1.0
-            }
-            if (itemPrice != -1.0) {
-                chestTipsRenderables.add(Renderable.text(" ${itemInternalName.repoItemName}: ${itemPrice.formatCoin()} "))
-                totalPrice += itemPrice
-                chestList.add(itemInternalName)
-            }
-            chestCostCroesus.matchMatcher(it) {
+            chestCostCroesus.matchMatcher(loreLine) {
                 cost += groupOrNull("amount")?.formatInt()?.toDouble()?.times(-1) ?: 0.0
-            }
-            kuudraChestKey.matchMatcher(it) {
-                cost += NeuInternalName.fromItemName(it).getPriceOrNull(config.priceSource)?.times(-1) ?: 0.0
             }
         }
         val preCostPrice = totalPrice
@@ -300,22 +285,17 @@ object InstanceChestProfit {
         croesusDisplay = Renderable.table(newDisplay, ySpacing = 1)
     }
 
-    private fun getEssence(essenceName: String): Double {
-        essencePattern.matchMatcher(essenceName) {
-            val name = group("name")
-            val rawCount = group("count").toInt()
-            val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
-            else rawCount.toDouble()
-            return count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-        }
-        return 0.0
+    private fun getEssence(name: String, rawCount: Int): Double {
+        val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
+        else rawCount.toDouble()
+        return count * (NeuInternalName.fromItemName(name).getPrice(config.priceSource))
     }
 
     private fun getAttribute(attributeName: String): Double {
         attributeShardPattern.matchMatcher(attributeName) {
             val name = group("name")
             val count = group("count").toInt()
-            return count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
+            return count * (NeuInternalName.fromItemName(name).getPrice(config.priceSource))
         }
         return 0.0
     }
@@ -332,8 +312,8 @@ object InstanceChestProfit {
                 val price = getAttribute(it.value.displayName)
                 itemsWithCost.addOrPut(it.value.displayName, price)
             }
-            if (essencePattern.matches(it.value.displayName)) {
-                val price = getEssence(it.value.displayName)
+            essencePattern.matchMatcher(it.value.displayName) {
+                val price = getEssence(group("name"), group("count").toInt())
                 if (price != 0.0) itemsWithCost.addOrPut(it.value.displayName, price)
             }
         }
@@ -346,7 +326,7 @@ object InstanceChestProfit {
             }
             dungeonChestKey.matchMatcher(it) {
                 val name = NeuInternalName.fromItemName(it)
-                itemsWithCost.put(it, name.getPriceOrNull(config.priceSource)?.times(-1) ?: 0.0)
+                itemsWithCost.put(it, name.getPrice(config.priceSource).times(-1))
             }
             kuudraChestKey.matchMatcher(it) {
                 val name = NeuInternalName.fromItemName(it)
