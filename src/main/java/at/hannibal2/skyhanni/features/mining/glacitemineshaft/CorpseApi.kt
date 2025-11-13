@@ -77,7 +77,7 @@ object CorpseApi {
         } ?: return
 
         if (pair.first.startsWith("§fEnchanted Book (")) {
-            val book = ItemUtils.readBookType(pair.first) ?: return
+            val book = ItemUtils.readBookTypeStrippedColor(pair.first) ?: return
             pair = book to pair.second
         }
         loot.add(pair)
