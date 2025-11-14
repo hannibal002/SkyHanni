@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo
 
+import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.annotations.Expose
@@ -11,11 +12,13 @@ data class DianaJson(
     @Expose @SerializedName("mythological_mobs") val mythologicalCreatures: Map<String, MythologicalCreatureType>
 )
 
+@KSerializable
 data class MythologicalCreatureType(
     @Expose val name: String,
-    @Expose val rare: Boolean?
+    @Expose val rare: Boolean = false,
 ) {
-    // i KNOW lazy / initializing it in constructor is better, but GSON doesnt call those so they are always null.
-    val cleanName get() = name.removeColor()
-    val trackerId get() = cleanName.replace(" ", "_").uppercase()
+    // If the class is annotated by @KSerializable, Gson directly uses the main data class constructor, meaning that
+    // lazy fields get property initialized.
+    val cleanName by lazy { name.removeColor() }
+    val trackerId by lazy { cleanName.replace(" ", "_").uppercase() }
 }
