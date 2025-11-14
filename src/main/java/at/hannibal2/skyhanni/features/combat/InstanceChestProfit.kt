@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -297,13 +297,17 @@ object InstanceChestProfit {
     ).toSingletonListOrEmpty()
 
     private fun createCroesusDisplay() {
-        val newDisplay = buildList {
-            add(listOf(Renderable.text("§6§lCroesus Profit Overlay")))
-            croesusDisplayList.forEach {
-                add(it)
-            }
-        }
-        croesusDisplay = Renderable.table(newDisplay, ySpacing = 1)
+        croesusDisplay = Renderable.vertical(
+            buildList {
+                add(Renderable.text("§6§lCroesus Profit Overlay"))
+                croesusDisplayList.forEach { listRenderables ->
+                    listRenderables.forEach { renderable ->
+                        add(renderable)
+                    }
+                }
+            },
+            spacing = 1,
+        )
     }
 
     private fun getEssence(name: String, rawCount: Int): Double {
@@ -354,44 +358,45 @@ object InstanceChestProfit {
             }
         }
 
-        val newDisplay = buildList {
-            val chestName = if (inDungeonChest) "Dungeon"
-            else if (inKuudraChest) "Kuudra"
-            else ""
-            add(listOf(Renderable.text("§d§l$chestName Chest Profit")))
-            add(listOf(Renderable.emptyText()))
+        chestDisplay = Renderable.vertical(
+            buildList {
+                val chestName = if (inDungeonChest) "Dungeon"
+                else if (inKuudraChest) "Kuudra"
+                else ""
+                add((Renderable.text("§d§l$chestName Chest Profit")))
+                add((Renderable.emptyText()))
 
-            var total = 0.0
-            var displayedCost = false
+                var total = 0.0
+                var displayedCost = false
 
-            val revenue = itemsWithCost.values.filter { it > 0 }.sum()
-            add(listOf(Renderable.text("§a§lTotal Revenue"), Renderable.text("§a${revenue.formatCoin()}")))
+                val revenue = itemsWithCost.values.filter { it > 0 }.sum()
+                add(Renderable.text("§a§lTotal Revenue §a${revenue.formatCoin()}"))
 
-            itemsWithCost.forEach {
-                val coinsColor = if (it.value < 0) "§c"
-                else "§a"
+                itemsWithCost.forEach {
+                    val coinsColor = if (it.value < 0) "§c"
+                    else "§a"
 
-                if (!displayedCost && it.value < 0) {
-                    val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
-                    add(listOf(Renderable.emptyText()))
-                    add(listOf(Renderable.text("§c§lTotal Cost"), Renderable.text("§c${cost.formatCoin()}")))
-                    displayedCost = true
+                    if (!displayedCost && it.value < 0) {
+                        val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
+                        add((Renderable.emptyText()))
+                        add((Renderable.text("§c§lTotal Cost §c${cost.formatCoin()}")))
+                        displayedCost = true
+                    }
+
+                    val coins = "$coinsColor${it.value.formatCoin()}"
+
+                    total += it.value
+                    add(Renderable.text("${it.key} $coins"))
                 }
 
-                val coins = "$coinsColor${it.value.formatCoin()}"
+                val color = if (total < 0) "§c"
+                else "§a"
 
-                total += it.value
-                add(listOf(Renderable.text(it.key), Renderable.text(coins)))
-            }
-
-            val color = if (total < 0) "§c"
-            else "§a"
-
-            add(listOf(Renderable.emptyText()))
-            add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color ${total.formatCoin()}")))
-        }
-
-        chestDisplay = Renderable.table(newDisplay, ySpacing = 1)
+                add((Renderable.emptyText()))
+                add(Renderable.text("$color§lProfit $color ${total.formatCoin()}"))
+            },
+            spacing = 1,
+        )
     }
 
     private fun getKuudraEssenceBonus(): Double =
