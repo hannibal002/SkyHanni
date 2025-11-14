@@ -48,6 +48,7 @@ object CrystalNucleusApi {
     private val FORTUNE_IV_BOOK_ITEM = "FORTUNE;4".toInternalName()
     val EPIC_BAL_ITEM = "BAL;3".toInternalName()
     val LEGENDARY_BAL_ITEM = "BAL;4".toInternalName()
+    val BAL_SHARD_ITEM = "ATTRIBUTE_SHARD_DEEP_TECHNIQUE;1".toInternalName()
     private val PRECURSOR_APPARATUS_ITEM = "PRECURSOR_APPARATUS".toInternalName()
     val JUNGLE_KEY_ITEM = "JUNGLE_KEY".toInternalName()
     private val ROBOT_PARTS_ITEMS = listOf(

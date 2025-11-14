@@ -48,7 +48,7 @@ object GeorgeHelper {
 
     init {
         InventoryDetector(
-            openInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
+            onOpenInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
         ) { name ->
             name == "Offer Pets"
         }

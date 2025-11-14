@@ -78,15 +78,7 @@ object GardenApi {
     private val cropIconCache = TimeLimitedCache<String, ItemStack>(10.minutes)
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
-    // TODO USE SH-REPO
-    private val otherToolsList = listOf(
-        "BASIC_GARDENING_HOE",
-        "ADVANCED_GARDENING_AXE",
-        "BASIC_GARDENING_AXE",
-        "ADVANCED_GARDENING_HOE",
-        "ROOKIE_HOE",
-        "BINGHOE",
-    )
+    private var extraFarmingTools: Set<NeuInternalName> = setOf()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSendPacket(event: ItemInHandChangeEvent) {
@@ -165,9 +157,8 @@ object GardenApi {
         return if (isOtherTool(internalName)) internalName.asString() else null
     }
 
-    private fun isOtherTool(internalName: NeuInternalName): Boolean {
-        return internalName.asString() in otherToolsList
-    }
+    private fun isOtherTool(internalName: NeuInternalName): Boolean =
+        internalName in extraFarmingTools
 
     fun inGarden() = IslandType.GARDEN.isCurrent()
 
@@ -274,6 +265,7 @@ object GardenApi {
         val data = event.getConstant<GardenJson>("Garden")
         gardenExperience = data.gardenExp
         totalAmountVisitorsExisting = data.visitors.size
+        extraFarmingTools = data.extraFarmingTools
     }
 
     private var gardenExperience = listOf<Int>()

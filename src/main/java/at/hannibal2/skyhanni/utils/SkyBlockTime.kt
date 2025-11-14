@@ -57,6 +57,11 @@ data class SkyBlockTime(
         fun fromSBYear(year: Int): SkyBlockTime =
             fromTimeMark(SimpleTimeMark(SKYBLOCK_EPOCH_START_MILLIS + (SKYBLOCK_YEAR_MILLIS * year)))
 
+        fun fromAbsoluteDay(absDay: Int): SkyBlockTime {
+            val millis = SKYBLOCK_EPOCH_START_MILLIS + absDay * SKYBLOCK_DAY_MILLIS
+            return fromTimeMark(SimpleTimeMark(millis))
+        }
+
         fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeasonModifier? = null): SkyBlockTime {
             return fromTimeMark(
                 SimpleTimeMark(

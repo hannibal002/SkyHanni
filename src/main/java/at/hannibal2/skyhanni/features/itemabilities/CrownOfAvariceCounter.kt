@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.config.features.itemability.CrownOfAvariceConfig.CrownOfAvariceLines
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -15,18 +15,21 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.billion
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCoinsOfAvarice
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -38,29 +41,43 @@ object CrownOfAvariceCounter {
 
     private var display: List<Renderable> = emptyList()
     private val MAX_AVARICE_COINS = 1.billion
-    private val MAX_AFK_TIME = 2.minutes
+    private var inventoryOpen = false
     private val isWearingCrown by RecalculatingValue(1.seconds) {
         InventoryUtils.getHelmet()?.getInternalNameOrNull() == internalName
     }
 
-    private var count: Long? = null
+    private var totalCoins: Long? = null
     private var coinsEarned: Long = 0L
-    private var sessionStart: SimpleTimeMark? = null
-    private var lastCoinUpdate: SimpleTimeMark? = null
-    private val isSessionActive get(): Boolean = sessionStart?.passedSince()?.let { it < config.sessionActiveTime.seconds } ?: false
+    private var sessionUptime: Stopwatch = Stopwatch()
+    private val isSessionActive get(): Boolean = sessionUptime.getDuration() < config.sessionActiveTime.seconds
     private var coinsDifference: Long? = null
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!isWearingCrown) return
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { isEnabled() && isWearingCrown },
+            onRender = { renderDisplay() },
+        )
+    }
+
+    fun renderDisplay() {
+        val invCurrentlyOpen = InventoryUtils.inAnyInventory()
+        if (inventoryOpen != invCurrentlyOpen) {
+            inventoryOpen = invCurrentlyOpen
+            update()
+        }
+
         config.position.renderRenderables(display, posLabel = "Crown of Avarice Counter")
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         if (!isWearingCrown) return
+        // No need to update if paused, we'll unpause with onInventoryUpdated
+        if (sessionUptime.isPaused()) return
         update()
     }
 
@@ -70,82 +87,142 @@ object CrownOfAvariceCounter {
         val item = event.itemStack
         if (item.getInternalNameOrNull() != internalName) return
         val coins = item.getCoinsOfAvarice() ?: return
-        if (count == null) count = coins
-        coinsDifference = coins - (count ?: 0)
+        if (totalCoins == null) totalCoins = coins
+        coinsDifference = coins - (totalCoins ?: 0)
 
         if (coinsDifference == 0L) return
 
         if ((coinsDifference ?: 0) < 0) {
             reset()
-            count = coins
+            totalCoins = coins
             return
         }
 
-        if (isSessionAFK()) reset()
-        lastCoinUpdate = SimpleTimeMark.now()
+        sessionUptime.start() // does nothing if already un-paused
+        sessionUptime.lap() // mark last added coins time for afk timeout
         coinsEarned += coinsDifference ?: 0
-        count = coins
+        totalCoins = coins
 
         update()
     }
 
-    @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        reset()
-        count = InventoryUtils.getHelmet()?.getCoinsOfAvarice()
+    @HandleEvent(IslandChangeEvent::class)
+    fun onIslandChange() {
+        if (config.resetOnWorldChange) reset()
+        totalCoins = InventoryUtils.getHelmet()?.getCoinsOfAvarice()
     }
 
     private fun update() {
-        display = buildList()
+        if (sessionUptime.getLapTime()?.let { it > config.afkTimeout.seconds } != false) {
+            sessionUptime.pause(true)
+        }
+        display = buildDisplay()
     }
 
-    private fun buildList(): List<Renderable> = buildList {
-        addLine {
+    private fun formatDisplay(lines: Map<CrownOfAvariceLines, Renderable>): List<Renderable> {
+        val newList = mutableListOf<Renderable>()
+        newList.addLine {
             addItemStack(internalName.getItemStack())
-            addString("§6" + if (config.shortFormat) count?.shortFormat() else count?.addSeparators())
+            val format = totalCoins?.let {
+                if (config.shortFormat) it.shortFormat() else it.addSeparators()
+            } ?: "0"
+            addString("§6$format")
         }
+        newList.addAll(config.text.mapNotNull { lines[it] })
 
-        if (config.perHour) {
+        if (inventoryOpen) {
+            newList.addLine {
+                add(
+                    if (coinsEarned == 0L) {
+                        Renderable.text("§8[Reset session]")
+                    } else {
+                        Renderable.clickable(
+                            text = "§c[Reset session]",
+                            onLeftClick = ::reset,
+                            tips = listOf("§eClick to reset the current session!"),
+                        )
+                    },
+                )
+                addHorizontalSpacer(3)
+                add(
+                    if (sessionUptime.isPaused()) {
+                        Renderable.text("§8[Pause session]")
+                    } else {
+                        Renderable.clickable(
+                            text = "§6[Pause session]",
+                            onLeftClick = {
+                                pauseSession()
+                                update()
+                            },
+                            tips = listOf("§eClick to pause the current session!"),
+                        )
+                    },
+                )
+            }
+        }
+        return newList
+    }
+
+    private fun buildDisplay(): List<Renderable> {
+
+        val lines = mutableMapOf<CrownOfAvariceLines, Renderable>()
+        lines[CrownOfAvariceLines.COINSPERHOUR] = Renderable.horizontal {
             val coinsPerHour = calculateCoinsPerHour().toLong()
             addString(
                 "§aCoins Per Hour: §6${
                     if (isSessionActive) "Calculating..."
                     else if (config.shortFormatCPH) coinsPerHour.shortFormat() else coinsPerHour.addSeparators()
-                } " + if (isSessionAFK()) "§c(RESET)" else "",
+                } " + if (sessionUptime.isPaused()) "§c(PAUSED)" else "",
             )
-
         }
-        if (config.time) {
+        lines[CrownOfAvariceLines.TIMEUNTILMAX] = Renderable.horizontal {
             val timeUntilMax = calculateTimeUntilMax()
             addString(
-                "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " + if (isSessionAFK()) "§c(RESET)" else "",
+                "§aTime until Max: §b${if (isSessionActive) "Calculating..." else timeUntilMax} " +
+                    if (sessionUptime.isPaused()) "§c(PAUSED)" else "",
             )
         }
-        if (config.coinDiff) {
-            addString("§aLast coins gained: §6$coinsDifference")
+
+        lines[CrownOfAvariceLines.COINDIFFERENCE] = Renderable.horizontal {
+            val format = coinsDifference ?: "§cnever"
+            addString("§aLast coins gained: §6$format")
         }
+
+        lines[CrownOfAvariceLines.SESSIONCOINS] = Renderable.horizontal {
+            addString("§aCoins this session: §6${coinsEarned.addSeparators()}")
+        }
+
+        lines[CrownOfAvariceLines.SESSIONTIME] = Renderable.horizontal {
+            addString("§aSession Time: §b${sessionUptime.getDuration().format()}")
+        }
+
+        return formatDisplay(lines)
     }
+
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable
 
     private fun reset() {
         coinsEarned = 0L
-        sessionStart = SimpleTimeMark.now()
-        lastCoinUpdate = SimpleTimeMark.now()
+        sessionUptime = Stopwatch()
         coinsDifference = 0L
+        update()
+    }
+
+    private fun pauseSession() {
+        sessionUptime.pause()
     }
 
     private fun calculateCoinsPerHour(): Double {
-        val timeInHours = sessionStart?.passedSince()?.inPartialHours ?: 0.0
+        val timeInHours = sessionUptime.getDuration().inPartialHours
         return if (timeInHours > 0) coinsEarned / timeInHours else 0.0
     }
-
-    private fun isSessionAFK() = lastCoinUpdate?.passedSince()?.let { it > MAX_AFK_TIME } ?: false
 
     private fun calculateTimeUntilMax(): String {
         val coinsPerHour = calculateCoinsPerHour()
         if (coinsPerHour == 0.0) return "Forever..."
-        val timeUntilMax = ((MAX_AVARICE_COINS - (count ?: 0)) / coinsPerHour).hours
+        val timeUntilMax = ((MAX_AVARICE_COINS - (totalCoins ?: 0)) / coinsPerHour).hours
         return timeUntilMax.format()
     }
+
 }

@@ -42,7 +42,7 @@ object CoralFishHelper {
     init {
         InventoryDetector(
             pattern = "\\(\\d+/\\d+\\) Fish Family".toPattern(),
-            openInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
+            onOpenInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
         )
     }
 

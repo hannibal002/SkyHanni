@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
@@ -54,7 +55,7 @@ object ItemTipHelper {
         DrawContextUtils.pushMatrix()
         DrawContextUtils.translate(0f, 0f, 300f)
         for (slot in gui.inventorySlots.inventorySlots) {
-            val stack = slot.stack ?: continue
+            val stack = slot.stack.orNull() ?: continue
 
             val itemTipEvent = RenderInventoryItemTipEvent(inventoryName, slot, stack)
             itemTipEvent.post()

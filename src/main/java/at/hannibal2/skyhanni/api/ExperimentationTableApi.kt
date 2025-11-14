@@ -299,7 +299,7 @@ object ExperimentationTableApi {
         var tier: ExperimentationTier? = null,
         var enchantingXpGained: Long = 0L,
         var rareFoundFired: Boolean = false,
-    ) : Resettable() {
+    ) : Resettable {
         private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
 
         fun addReward(internalName: NeuInternalName, amount: Int = 1) {

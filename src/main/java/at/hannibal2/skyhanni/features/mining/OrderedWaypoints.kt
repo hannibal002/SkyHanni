@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
+import at.hannibal2.skyhanni.data.model.waypoints.SkyHanniWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
 import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -29,17 +29,20 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import kotlinx.coroutines.Job
 import java.util.Locale
 import java.util.ServiceLoader
 
 @SkyHanniModule
 object OrderedWaypoints {
     private val config get() = SkyHanniMod.feature.mining.orderedWaypoints
+    private val storage get() = ProfileStorageData.orderedWaypointsRoutes
 
-    private var orderedWaypointsList = Waypoints<SkyhanniWaypoint>()
+    private var orderedWaypointsList = Waypoints<SkyHanniWaypoint>()
     private val renderWaypoints: MutableList<Int> = mutableListOf()
     private var currentOrderedWaypointIndex = 0
     private var lastCloser = 0
+    private var loadJob: Job? = null
 
     @HandleEvent(HypixelJoinEvent::class)
     fun onHypixelJoin() {
@@ -87,7 +90,7 @@ object OrderedWaypoints {
                 )
             }
 
-            if (config.setupMode || config.showAll || i in 0..(1 + config.nextCount.toInt())) {
+            if (shouldRenderName(i)) {
                 // Waypoint name (number)
                 event.drawString(
                     orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.5, 0.5),
@@ -153,9 +156,9 @@ object OrderedWaypoints {
                 arg(
                     "name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { getRouteNames() },
                 ) { name ->
-                    callback { load(getArg(name)) }
+                    coroutineSimpleCallback { load(getArg(name)) }
                 }
-                simpleCallback { load("") }
+                coroutineSimpleCallback { load("") }
             }
             literal("unload", "clear") {
                 description = "Unloads the current ordered waypoints."
@@ -223,39 +226,37 @@ object OrderedWaypoints {
         }
     }
 
+    private fun shouldRenderName(waypointIndice: Int) =
+        config.showName && (config.setupMode || config.showAll || waypointIndice in 0..(1 + config.nextCount.toInt()))
+
     private fun getRouteNames() = ProfileStorageData.orderedWaypointsRoutes?.routes?.keys.orEmpty()
 
-    private fun load(name: String) {
-        SkyHanniMod.launchIOCoroutine {
-            val res = if (name == "") {
-                loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
-            } else {
-                val routes = ProfileStorageData.orderedWaypointsRoutes?.routes
-                routes?.get(name) ?: run {
-                    ChatUtils.userError(
-                        "Route $name doesn't exist.\n" +
-                            "§cSaved Routes: ${routes?.keys?.toList()?.joinToString(", ")}\n" +
-                            "§cIf you would like to import a route from your clipboard, leave the route name blank.",
-                    )
-                    return@launchIOCoroutine
-                }
-            }
-
-            res?.let {
-                orderedWaypointsList = it.deepCopy()
-                orderedWaypointsList.sortedBy { waypoint -> waypoint.number }
-                currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
-                renderWaypoints.clear()
-                ChatUtils.chat("Loaded ordered waypoints!")
-            } ?: run {
-                ChatUtils.userError(
-                    "There was an error parsing waypoints. " +
-                        "Please make sure they are properly formatted and in a supported format.\n" +
-                        "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
-                )
-                return@launchIOCoroutine
-            }
+    private suspend fun load(name: String) {
+        if (loadJob?.isActive == true) {
+            return ChatUtils.userError("A route is already being loaded. Please wait until it finishes.")
         }
+        loadJob = setupLoadJob(name)
+        loadJob?.join()
+    }
+
+    private fun setupLoadJob(name: String): Job = SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
+        val loadedRoute = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
+        else storage?.routes?.get(name) ?: return@launchIOCoroutine ChatUtils.userError(
+            "Route $name doesn't exist.\n" +
+                "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
+                "§cIf you would like to import a route from your clipboard, leave the route name blank.",
+        )
+
+        if (loadedRoute == null) return@launchIOCoroutine ChatUtils.userError(
+            "There was an error parsing waypoints. " +
+                "Please make sure they are properly formatted and in a supported format.\n" +
+                "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
+        )
+
+        orderedWaypointsList = loadedRoute.deepCopy()
+        currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
+        renderWaypoints.clear()
+        ChatUtils.chat("Loaded ordered waypoints!")
     }
 
     private fun unload() {
@@ -325,7 +326,7 @@ object OrderedWaypoints {
             return ChatUtils.userError("$number is not between 1 and ${orderedWaypointsList.size + 1}.")
         }
 
-        val newWaypoint = SkyhanniWaypoint(pos, number = number, options = mutableMapOf("name" to number.toString()))
+        val newWaypoint = SkyHanniWaypoint(pos, number = number, options = mutableMapOf("name" to number.toString()))
         if (number == orderedWaypointsList.size + 1) {
             orderedWaypointsList.add(newWaypoint)
         } else {
@@ -339,7 +340,7 @@ object OrderedWaypoints {
     }
 
     private fun export(format: String) {
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("ordered waypoints export format:$format") {
             val route = if (format.isEmpty()) exportWaypoints(orderedWaypointsList, "coleweight")
             else exportWaypoints(orderedWaypointsList, format.lowercase(Locale.getDefault()))
 
@@ -431,7 +432,7 @@ object OrderedWaypoints {
         currentOrderedWaypointIndex = Math.floorMod(currentOrderedWaypointIndex + increment, orderedWaypointsList.size)
     }
 
-    private fun loadWaypoints(data: String): Waypoints<SkyhanniWaypoint>? {
+    private fun loadWaypoints(data: String): Waypoints<SkyHanniWaypoint>? {
         return ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull {
             it.load(data)
         }?.let {
@@ -439,7 +440,7 @@ object OrderedWaypoints {
         }
     }
 
-    private fun exportWaypoints(waypoints: Waypoints<SkyhanniWaypoint>, name: String): String? {
+    private fun exportWaypoints(waypoints: Waypoints<SkyHanniWaypoint>, name: String): String? {
         return ServiceLoader.load(WaypointFormat::class.java).firstOrNull { it.name == name }?.export(waypoints)
     }
 

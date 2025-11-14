@@ -20,18 +20,21 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
+import at.hannibal2.skyhanni.utils.GraphUtils.getNearestToPlayer
+import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RaycastUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
@@ -39,6 +42,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
@@ -73,7 +78,6 @@ object GraphEditor {
         }
 
     private var selectedEdge: GraphingEdge? = null
-    private var ghostPosition: LorenzVec? = null
 
     private var seeThroughBlocks = true
 
@@ -117,29 +121,15 @@ object GraphEditor {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
         edges.forEach { event.drawEdge(it) }
-        drawGhostPosition(event)
     }
 
-    private fun drawGhostPosition(event: SkyHanniRenderWorldEvent) {
-        val ghostPosition = ghostPosition ?: return
-        if (ghostPosition.distanceToPlayer() >= config.maxNodeDistance) return
-
-        event.drawWaypointFilled(
-            ghostPosition,
-            if (activeNode == null) Color.RED else Color.GRAY,
-            seeThroughBlocks = seeThroughBlocks,
-            minimumAlpha = 0.2f,
-            inverseAlphaScale = true,
-        )
-    }
-
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled()) return
-        config.infoDisplay.renderStrings(buildDisplay(), posLabel = "Graph Info")
+        config.infoDisplay.renderRenderables(buildDisplay(), posLabel = "Graph Info")
     }
 
-    private fun buildDisplay(): List<String> = buildList {
+    private fun buildDisplay(): List<Renderable> = buildList {
         add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
         if (!inEditMode && !inTextMode) {
             add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
@@ -152,7 +142,6 @@ object GraphEditor {
             add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
             add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
             add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
-            add("§eToggle Ghost Position: §6${KeyboardManager.getKeyName(config.toggleGhostPosition)}")
             add(" ")
             if (activeNode != null) {
                 add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
@@ -167,8 +156,6 @@ object GraphEditor {
         if (!inTextMode) {
             if (activeNode != null) {
                 add("§eEdit active node: §6${KeyboardManager.getKeyName(config.editKey)}")
-            } else if (ghostPosition != null) {
-                add("Edit Ghost Position: §6${KeyboardManager.getKeyName(config.editKey)}")
             }
         }
 
@@ -184,7 +171,7 @@ object GraphEditor {
             add("§eFormat: ${textBox.finalText()}")
             add("§eRaw:     ${textBox.editText(textColor = LorenzColor.YELLOW)}")
         }
-    }
+    }.map { StringRenderable.from(it) }
 
     private var dissolvePossible = false
 
@@ -212,15 +199,14 @@ object GraphEditor {
             updateRender()
         }
         if (nodes.isEmpty()) return
-        closestNode = nodes.minBy { distanceToPlayer(it.position) }
+        closestNode = nodes.getNearestNode()
         handleAllNodeFind()
     }
 
     private fun updateRender() {
         val maxNodeDistance = config.maxNodeDistance * config.maxNodeDistance
-        val player = LocationUtils.playerLocation()
         for (node in nodes) {
-            node.rendering = node.position.distanceSq(player) < maxNodeDistance
+            node.rendering = node.distanceSqToPlayer() < maxNodeDistance
         }
     }
 
@@ -228,8 +214,8 @@ object GraphEditor {
         if (!active) return
 
         if (nodesToFind.isEmpty()) return
-        val closest = nodesToFind.minBy { distanceToPlayer(it) }
-        if (closest.distanceToPlayer() >= 3) return
+        val closest = nodesToFind.getNearestToPlayer()
+        if (distanceSqToPlayer(closest) >= 9) return
         nodesAlreadyFound.add(closest)
 
         if (nodesToFind.isEmpty()) {
@@ -281,11 +267,12 @@ object GraphEditor {
         )
 
         val nodeName = node.name ?: return
+        val showTextAlways = seeThroughBlocks || node.distanceSqToPlayer() < 100
         this.drawDynamicText(
             node.position,
             nodeName,
             0.8,
-            seeThroughBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
+            seeThroughBlocks = showTextAlways,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = -15f,
@@ -299,7 +286,7 @@ object GraphEditor {
             node.position,
             tagText,
             0.8,
-            seeThroughBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
+            seeThroughBlocks = showTextAlways,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = 0f,
@@ -456,7 +443,7 @@ object GraphEditor {
             editModeClicks()
             inEditMode = false
         }
-        if ((activeNode != null || ghostPosition != null) && config.editKey.isKeyHeld()) {
+        if ((activeNode != null) && config.editKey.isKeyHeld()) {
             inEditMode = true
             return
         }
@@ -494,9 +481,6 @@ object GraphEditor {
         if (config.placeKey.isKeyClicked()) {
             addNode()
         }
-        if (config.toggleGhostPosition.isKeyClicked()) {
-            toggleGhostPosition()
-        }
         if (config.selectKey.isKeyClicked()) {
             activeNode = if (activeNode == closestNode) {
                 feedBackInTutorial("De-selected active node.")
@@ -521,7 +505,7 @@ object GraphEditor {
                     minimumDistance = distance
                     continue
                 }
-                if (minimumNode == null || distanceToPlayer(minimumNode.position) > distanceToPlayer(node.position)) {
+                if (minimumNode == null || minimumNode.distanceSqToPlayer() > node.distanceSqToPlayer()) {
                     minimumNode = node
                     minimumDistance = distance
                 }
@@ -655,11 +639,7 @@ object GraphEditor {
     private fun KeyBinding.handleEditClicks(vector: LorenzVec) {
         if (this.keyCode.isKeyClicked()) {
             activeNode?.let {
-                it.position = it.position + vector
-            } ?: run {
-                ghostPosition?.let {
-                    ghostPosition = it + vector
-                }
+                it.position += vector
             }
         }
     }
@@ -673,7 +653,7 @@ object GraphEditor {
 
     private fun addNode() {
         val closestNode = closestNode
-        if (closestNode != null && distanceToPlayer(closestNode.position) < 9.0) {
+        if (closestNode != null && closestNode.distanceSqToPlayer() < 9.0) {
             if (closestNode == activeNode) {
                 feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
                 nodes.remove(closestNode)
@@ -684,26 +664,15 @@ object GraphEditor {
             }
         }
 
-        val position = ghostPosition ?: LocationUtils.playerEyeLocation().roundToBlock()
-        if (nodes.any { it.position == position }) {
+        if (nodes.any { it.position == playerPosition }) {
             feedBackInTutorial("Can't create node, here is already another one.")
             return
         }
-        val node = GraphingNode(id++, position)
+        val node = GraphingNode(id++, playerPosition)
         nodes.add(node)
         feedBackInTutorial("Added graph node.")
         if (activeNode == null) return
         addEdge(activeNode, node)
-    }
-
-    fun toggleGhostPosition() {
-        if (ghostPosition != null) {
-            ghostPosition = null
-            feedBackInTutorial("Disabled Ghost Position.")
-        } else {
-            ghostPosition = LocationUtils.playerEyeLocation().roundToBlock()
-            feedBackInTutorial("Enabled Ghost Position.")
-        }
     }
 
     private fun getEdgeIndex(node1: GraphingNode?, node2: GraphingNode?) =
@@ -827,12 +796,6 @@ object GraphEditor {
         activeNode = null
         closestNode = null
         dissolvePossible = false
-        ghostPosition = null
-    }
-
-    fun distanceToPlayer(location: LorenzVec): Double {
-        val playerPosition = ghostPosition ?: LocationUtils.playerEyeLocation().roundToBlock()
-        return location.distanceSq(playerPosition)
     }
 
     fun enable() {
@@ -846,10 +809,10 @@ object GraphEditor {
 // The node object the graph editor is working with
 class GraphingNode(
     val id: Int,
-    var position: LorenzVec,
+    override var position: LorenzVec,
     var name: String? = null,
     var tags: MutableList<GraphNodeTag> = mutableListOf(),
-) {
+) : GraphUtils.GenericNode {
 
     var rendering = true
 

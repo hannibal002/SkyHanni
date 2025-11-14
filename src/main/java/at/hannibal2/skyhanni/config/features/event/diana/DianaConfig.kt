@@ -9,20 +9,24 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.input.Keyboard
 
 class DianaConfig {
+    // TODO rename to highlightRareMobs
     @Expose
     @ConfigOption(
-        name = "Highlight Inquisitors",
-        desc = "Highlight Inquisitors found from the Mythological Event perk.",
+        name = "Highlight Rare Diana Mobs",
+        desc = "Highlight Rare Diana Mobs (Sphinx+) found from the Mythological Event perk.",
     )
+    @SearchTag("inquisitor")
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightInquisitors: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Inquisitor Highlight", desc = "Color in which Inquisitors will be highlighted.")
+    @ConfigOption(name = "Rare Diana Mob Highlight", desc = "Color in which Rare Diana Mobs will be highlighted.")
+    @SearchTag("inquisitor")
     @ConfigEditorColour
     var color: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 255, 127)
 
@@ -92,8 +96,10 @@ class DianaConfig {
     @Accordion
     val ignoredWarps: IgnoredWarpsConfig = IgnoredWarpsConfig()
 
+    // TODO rename to rareMobsSharing
     @Expose
-    @ConfigOption(name = "Inquisitor Waypoint Sharing", desc = "")
+    @ConfigOption(name = "Rare Diana Mob Waypoint Sharing", desc = "")
+    @SearchTag("inquisitor")
     @Accordion
     val inquisitorSharing: InquisitorSharingConfig = InquisitorSharingConfig()
 

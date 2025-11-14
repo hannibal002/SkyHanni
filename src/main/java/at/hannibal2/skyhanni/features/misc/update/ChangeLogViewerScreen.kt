@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
@@ -22,7 +22,7 @@ import java.util.NavigableMap
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class ChangeLogViewerScreen : SkyhanniBaseScreen() {
+class ChangeLogViewerScreen : SkyHanniBaseScreen() {
     private val changelogScroll = ScrollValue()
 
     private lateinit var scrollList: Renderable
@@ -136,7 +136,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
                         Renderable.text("§aNo changes found", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
                     } else if (!ChangelogViewer.shouldShowBeta) {
                         Renderable.text(
-                            "§aOnly Betas where added, turn on \"Include Betas\"",
+                            "§aNo Full Releases in specified interval, modify the search or turn on \"Include Betas\"",
                             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                         )
                     } else {

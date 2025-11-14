@@ -45,14 +45,11 @@ object ShinyOrbTracker {
         ) { config.enabled && IslandType.HUB.isCurrent() && passesHoldingItem() && PigFeaturesApi.isYearOfThePig() }
     }
 
-    class ShinyOrbData : ItemTrackerData() {
-
-        override fun resetItems() {
-            orbsUsed = 0L
-            orbsCompleted = 0L
-            skillXpGained = enumMapOf()
-        }
-
+    data class ShinyOrbData(
+        @Expose var orbsUsed: Long = 0L,
+        @Expose var orbsCompleted: Long = 0L,
+        @Expose var skillXpGained: MutableMap<SkillType, Long> = enumMapOf(),
+    ) : ItemTrackerData() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / orbsCompleted
             val perOrb = percentage.coerceAtMost(1.0).formatPercentage()
@@ -72,15 +69,6 @@ object ShinyOrbTracker {
                 "§7You got §6$coinsFormat coins §7that way.",
             )
         }
-
-        @Expose
-        var orbsUsed = 0L
-
-        @Expose
-        var orbsCompleted = 0L
-
-        @Expose
-        var skillXpGained: MutableMap<SkillType, Long> = enumMapOf()
     }
 
     @HandleEvent

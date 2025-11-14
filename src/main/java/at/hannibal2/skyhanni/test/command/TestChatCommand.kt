@@ -29,7 +29,7 @@ object TestChatCommand {
             return
         }
 
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("test chat command") {
             val mutArgs = args.toMutableList()
             val multiLines = mutArgs.remove("-lines")
             val isComplex = mutArgs.remove("-complex")
