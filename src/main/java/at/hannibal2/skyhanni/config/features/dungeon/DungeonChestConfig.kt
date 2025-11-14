@@ -34,23 +34,26 @@ class DungeonChestConfig {
 
     @Expose
     @ConfigOption(
-        name = "Croesus Overlay",
-        desc = "Displays current number of Croesus chests out of 60.",
+        name = "Croesus Unopened Overlay",
+        desc = "Displays current number of Unopened Croesus chests out of 60.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var croesusOverlay: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Croesus Overlay in Kuudra", desc = "Displays current number of Croesus chests out of 60.")
+    @ConfigOption(
+        name = "Show In Kuudra",
+        desc = "Displays current number of Unopened Croesus chests out of 60 in Kuudra.",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var croesusOverlayKuudra: Boolean = false
 
     @Expose
     @ConfigOption(
-        name = "Croesus Overlay in Dungeons",
-        desc = "Displays current number of Croesus chests out of 60.",
+        name = "Show In Dungeons",
+        desc = "Displays current number of Unopened Croesus chests out of 60 in Dungeons.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
