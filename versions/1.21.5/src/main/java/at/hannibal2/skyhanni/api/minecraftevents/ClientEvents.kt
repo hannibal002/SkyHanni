@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.data.ActionBarData
+import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -9,12 +11,17 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.hud.ChatHudLine
+import net.minecraft.client.gui.hud.MessageIndicator
 import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceReloader
 import net.minecraft.resource.ResourceType
+import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
@@ -86,6 +93,49 @@ object ClientEvents {
             },
         )
 
+        ClientReceiveMessageEvents.ALLOW_GAME.register(::onAllow);
+        ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify);
+
+    }
+
+    private var lastMessage: Text? = null
+    private var lastResult: Text? = null
+    private var wasActionBar = false
+
+    private fun onAllow(message: Text, actionBar: Boolean): Boolean {
+        wasActionBar = false
+        lastMessage = message
+        if (actionBar) {
+            wasActionBar = true
+            lastResult = ActionBarData.onChatReceive(message)
+
+            // we never cancel the action bar
+            return true
+        }
+
+        val (result, cancel) = ChatManager.onChatReceive(message)
+        lastResult = result
+
+        if (cancel) {
+            // the message doesn't get logged if we cancel it, so we do that ourselves
+            val inGameHud = MinecraftClient.getInstance().inGameHud
+            val chatHudLine = ChatHudLine(inGameHud.ticks, message, null, MessageIndicator.system())
+            inGameHud.chatHud.logChatMessage(chatHudLine)
+        }
+
+        // if we cancel then we don't allow the message
+        return !cancel
+    }
+
+    private fun onModify(message: Text, actionBar: Boolean): Text {
+        // we check if the message is the same as the one from allow
+        // if someone else modifies the message it won't be the same but what can you do about that
+        if (lastMessage == message && wasActionBar == actionBar) {
+            // if last result is null then we didn't want to change the message
+            lastResult?.let { return it }
+        }
+
+        return message
     }
 
 }
