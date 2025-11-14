@@ -56,7 +56,7 @@ object KuudraApi {
         "(?<chesttype>(?:Paid|Free) Chest)(?: Chest)?",
     )
 
-    val kuudraTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
+    val kuudraTiers = listOf("basic", "hot", "burning", "fiery", "infernal")
 
     val kuudraArmorTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
     val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
