@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -321,7 +322,8 @@ object InstanceChestProfit {
         val itemsWithCost = mutableMapOf<String, Double>()
         for (item in items.values) {
             if (item.getInternalNameOrNull() != null) {
-                val cost = EstimatedItemValueCalculator.getTotalPrice(item)
+                var cost = EstimatedItemValueCalculator.getTotalPrice(item)
+                if (cost == 0.0) cost = getPrice(item.getInternalName())
                 if (cost != null) itemsWithCost.addOrPut(item.repoItemName, cost)
             }
             val name = item.displayName
