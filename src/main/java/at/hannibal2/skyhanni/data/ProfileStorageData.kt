@@ -28,6 +28,7 @@ object ProfileStorageData {
     var playerSpecific: PlayerSpecificStorage? = null
     var profileSpecific: ProfileSpecificStorage? = null
     var loaded = false
+    private var firstLoad = true
     private var noTabListTime = SimpleTimeMark.farPast()
 
     private var sackPlayers: SackData.PlayerSpecific? = null
@@ -70,7 +71,7 @@ object ProfileStorageData {
             ErrorManager.skyHanniError("orderedWaypointRoutes is null in ProfileJoinEvent!")
         }
         loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, petPlayers, profileName)
-        ConfigLoadEvent.post()
+        postConfigLoadEvent()
     }
 
     private fun workaroundIn10SecondsProfileStorage(profileName: String) {
@@ -104,7 +105,7 @@ object ProfileStorageData {
         }
 
         loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, petPlayers, profileName)
-        ConfigLoadEvent.post()
+        postConfigLoadEvent()
     }
 
     @HandleEvent
@@ -145,6 +146,11 @@ object ProfileStorageData {
         }
     }
 
+    private fun postConfigLoadEvent() {
+        ConfigLoadEvent(firstLoad).post()
+        firstLoad = false
+    }
+
     private fun loadProfileSpecific(
         playerSpecific: PlayerSpecificStorage,
         sackProfile: SackData.PlayerSpecific,
@@ -158,7 +164,7 @@ object ProfileStorageData {
         storageProfiles = storagePlayer.profiles.getOrPut(profileName) { StorageData.ProfileSpecific() }
         petProfiles = petPlayer.profiles.getOrPut(profileName) { PetDataStorage.ProfileSpecific() }
         loaded = true
-        ConfigLoadEvent.post()
+        postConfigLoadEvent()
     }
 
     @HandleEvent
@@ -169,7 +175,7 @@ object ProfileStorageData {
         storagePlayer = SkyHanniMod.storageData.players.getOrPut(playerUuid) { StorageData.PlayerSpecific() }
         petPlayers = SkyHanniMod.petData.players.getOrPut(playerUuid) { PetDataStorage.PlayerSpecific() }
         orderedWaypointsRoutes = SkyHanniMod.orderedWaypointsRoutesData
-        ConfigLoadEvent.post()
+        postConfigLoadEvent()
     }
 
     @HandleEvent

@@ -85,7 +85,7 @@ object GriffinBurrowHelper {
 
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
     var lastTitleSentTime = SimpleTimeMark.farPast()
-    private var shouldFocusOnInquis = false
+    private var shouldFocusOnRareMob = false
 
     private var testList = listOf<LorenzVec>()
     private var testGriffinSpots = false
@@ -161,16 +161,16 @@ object GriffinBurrowHelper {
         val locations = mutableListOf<LorenzVec>()
 
         if (config.inquisitorSharing.enabled) {
-            for (waypoint in InquisitorWaypointShare.waypoints) {
+            for (waypoint in RareMobWaypointShare.waypoints) {
                 locations.add(waypoint.value.location)
             }
         }
-        shouldFocusOnInquis = config.inquisitorSharing.focusInquisitor && locations.isNotEmpty()
-        if (!shouldFocusOnInquis) {
+        shouldFocusOnRareMob = config.inquisitorSharing.focusInquisitor && locations.isNotEmpty()
+        if (!shouldFocusOnRareMob) {
             locations.addAll(particleBurrows.keys.toMutableList())
 
             locations.addAll(allGuessLocations)
-            locations.addAll(InquisitorWaypointShare.waypoints.values.map { it.location })
+            locations.addAll(RareMobWaypointShare.waypoints.values.map { it.location })
         }
         val newLocation = locations.minByOrNull { it.distanceToPlayer() }
         return newLocation
@@ -337,25 +337,25 @@ object GriffinBurrowHelper {
 
         val playerLocation = LocationUtils.playerLocation()
         if (config.inquisitorSharing.enabled) {
-            for (inquis in InquisitorWaypointShare.waypoints.values) {
-                val location = inquis.location
+            for (rareMob in RareMobWaypointShare.waypoints.values) {
+                val location = rareMob.location
                 // TODO add chroma color support via config
                 event.drawColor(location, LorenzColor.LIGHT_PURPLE.toChromaColor())
                 val distance = location.distance(playerLocation)
                 if (distance > 10) {
                     // TODO use round(1)
                     val formattedDistance = distance.toInt().addSeparators()
-                    event.drawDynamicText(location.up(), "§d§lInquisitor §e${formattedDistance}m", 1.7)
+                    event.drawDynamicText(location.up(), "§d§lRare Diana Mob §e${formattedDistance}m", 1.7)
                 } else {
-                    event.drawDynamicText(location.up(), "§d§lInquisitor", 1.7)
+                    event.drawDynamicText(location.up(), "§d§lRare Diana Mob", 1.7)
                 }
                 if (distance < 5) {
-                    InquisitorWaypointShare.maybeRemove(inquis)
+                    RareMobWaypointShare.maybeRemove(rareMob)
                 }
-                event.drawDynamicText(location.up(), "§eFrom §b${inquis.displayName}", 1.6, yOff = 9f)
+                event.drawDynamicText(location.up(), "§eFrom §b${rareMob.displayName}", 1.6, yOff = 9f)
 
                 if (config.inquisitorSharing.showDespawnTime) {
-                    val spawnTime = inquis.spawnTime
+                    val spawnTime = rareMob.spawnTime
                     val format = (75.seconds - spawnTime.passedSince()).format()
                     event.drawDynamicText(location.up(), "§eDespawns in §b$format", 1.6, yOff = 18f)
                 }
@@ -369,7 +369,7 @@ object GriffinBurrowHelper {
                 color = LorenzColor.AQUA.toChromaColor()
                 currentWarp.location
             } else {
-                color = if (shouldFocusOnInquis) LorenzColor.LIGHT_PURPLE.toChromaColor() else LorenzColor.WHITE.toChromaColor()
+                color = if (shouldFocusOnRareMob) LorenzColor.LIGHT_PURPLE.toChromaColor() else LorenzColor.WHITE.toChromaColor()
                 targetLocation?.blockCenter() ?: return
             }
 
@@ -382,7 +382,7 @@ object GriffinBurrowHelper {
             }
         }
 
-        if (InquisitorWaypointShare.waypoints.isNotEmpty() && config.inquisitorSharing.focusInquisitor) {
+        if (RareMobWaypointShare.waypoints.isNotEmpty() && config.inquisitorSharing.focusInquisitor) {
             return
         }
 

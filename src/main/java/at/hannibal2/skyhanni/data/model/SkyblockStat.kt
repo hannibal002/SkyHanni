@@ -161,6 +161,8 @@ enum class SkyblockStat(
     MANA_REGEN("§b⚡", " *Mana Regen: §r§b⚡$VALUE_PATTERN", " *§b⚡ Mana Regen §f$VALUE_PATTERN"),
     HEARTS("§c♥", " *Hearts: §r§c♥$VALUE_PATTERN", " *§c♥ Hearts §f$VALUE_PATTERN"),
 
+    TRACKING("§d❃", " *Tracking: §r§d❃$VALUE_PATTERN", " *§d❃ Tracking §f$VALUE_PATTERN"),
+
     UNKNOWN("§c?", "", "")
     ;
 
