@@ -116,7 +116,7 @@ object HuntingBoxValue {
         val data = SkyShardsAttributeData(huntingBoxShards.toShardIds(), attributeMenuShards.toShardIds())
         val json = ConfigManager.gson.toJson(data)
         ClipboardUtils.copyToClipboard(json)
-        OSUtils.openBrowser("https://skyshards.com/")
+        OSUtils.openBrowser("https://skyshards.com/smart")
         ChatUtils.chat("§aCopied your attribute shard data to your clipboard and opened §dSkyShards§a.")
     }
 
