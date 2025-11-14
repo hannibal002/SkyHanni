@@ -35,7 +35,6 @@ jobs:
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt
                 uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
-                continue-on-error: true
                 with:
                     gradle-command: detektMain --stacktrace
             -   name: Check if SARIF file exists

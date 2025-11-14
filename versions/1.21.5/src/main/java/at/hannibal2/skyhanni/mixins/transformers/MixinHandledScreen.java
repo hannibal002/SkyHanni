@@ -10,10 +10,12 @@ import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent;
 import at.hannibal2.skyhanni.features.inventory.BetterContainers;
+import at.hannibal2.skyhanni.features.inventory.MiddleClickFix;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe;
 import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -124,4 +126,9 @@ public abstract class MixinHandledScreen {
         return BetterContainers.slotCanBeHighlighted(slot);
     }
 
+    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isInCreativeMode()Z"))
+    private boolean fixMiddleClick(boolean original) {
+        if (!MiddleClickFix.INSTANCE.isEnabled()) return original;
+        return true;
+    }
 }
