@@ -74,4 +74,15 @@ class HuntingConfig {
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var nextHideonleafKeybind: Int = Keyboard.KEY_NONE
 
+    @Expose
+    @ConfigOption(name = "Fusion Display", desc = "Displays the shard you are fusing and how many you have.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var fusionDisplay = true
+
+    @Expose
+    @ConfigLink(owner = HuntingConfig::class, field = "fusionDisplay")
+    val fusionDisplayPosition: Position = Position(30, 210)
+
 }

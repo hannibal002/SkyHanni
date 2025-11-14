@@ -345,14 +345,14 @@ object GriffinBurrowHelper {
                 if (distance > 10) {
                     // TODO use round(1)
                     val formattedDistance = distance.toInt().addSeparators()
-                    event.drawDynamicText(location.up(), "§d§lRare Diana Mob §e${formattedDistance}m", 1.7)
+                    event.drawDynamicText(location.up(), "§d§l${rareMob.mobName} §e${formattedDistance}m", 1.7)
                 } else {
-                    event.drawDynamicText(location.up(), "§d§lRare Diana Mob", 1.7)
+                    event.drawDynamicText(location.up(), "§d§l${rareMob.mobName}", 1.7)
                 }
                 if (distance < 5) {
                     RareMobWaypointShare.maybeRemove(rareMob)
                 }
-                event.drawDynamicText(location.up(), "§eFrom §b${rareMob.displayName}", 1.6, yOff = 9f)
+                event.drawDynamicText(location.up(), "§eFrom §b${rareMob.playerDisplayName}", 1.6, yOff = 9f)
 
                 if (config.inquisitorSharing.showDespawnTime) {
                     val spawnTime = rareMob.spawnTime

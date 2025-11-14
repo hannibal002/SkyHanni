@@ -27,8 +27,8 @@ jobs:
             -   name: Checkout PR code
                 uses: actions/checkout@v4
                 with:
-                  ref: ${{ github.event.pull_request.head.ref }}
-                  repository: ${{ github.event.pull_request.head.repo.full_name }}
+                    ref: ${{ github.event.pull_request.head.ref }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
 
@@ -38,6 +38,7 @@ jobs:
                 continue-on-error: true
                 with:
                     gradle-command: detektMain --stacktrace
+
             -   name: Check if SARIF file exists
                 if: always()
                 id: check_sarif

@@ -5,11 +5,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -25,8 +26,10 @@ import net.minecraft.particle.ParticleTypes
 object InvisibugHighlighter {
     private val config get() = SkyHanniMod.feature.hunting.mobHighlight.invisibug
 
-    private val invisibugEntities = mutableListOf<LivingEntity>()
-    private var locationsToRender = setOf<LorenzVec>()
+    private const val DISTANCE = 5.0
+
+    private val invisibugEntities = mutableSetOf<LivingEntity>()
+    private var locationsToRender = listOf<LorenzVec>()
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onParticle(event: ReceiveParticleEvent) {
@@ -34,39 +37,51 @@ object InvisibugHighlighter {
 
         val particle = event.type
         if (particle != ParticleTypes.CRIT) return
+        if (invisibugEntities.any { it.distanceTo(event.location) < DISTANCE }) return
 
-        val nearestArmorStand = EntityUtils.getEntitiesNearby<ArmorStandEntity>(event.location, 5.0)
-            .minByOrNull { it.distanceTo(event.location) }
+        val aabb = event.location.boundingCenter(DISTANCE)
+        val nearestArmorStand = EntityUtils.getEntitiesInBoundingBox<ArmorStandEntity>(aabb).minByOrNull { it.distanceTo(event.location) } ?: return
 
-        if (nearestArmorStand == null || !nearestArmorStand.isCompletelyDefault()) return
+        if (!nearestArmorStand.isCompletelyDefault()) return
 
-        invisibugEntities.add(nearestArmorStand)
+        DelayedRun.onThread.execute { invisibugEntities.add(nearestArmorStand) }
+
     }
 
-    @HandleEvent(SkyHanniTickEvent::class, onlyOnIsland = IslandType.GALATEA)
-    fun onTick() {
+    private val renderOffset = LorenzVec(0.4, -0.2, 0.4)
+
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!event.isMod(5)) return
         if (!config.enabled) return
-        locationsToRender = invisibugEntities.filter { it.canBeSeen(32) }.map { it.getLorenzVec() }.toSet()
+        locationsToRender = invisibugEntities.mapNotNull {
+            if (it.canBeSeen(32)) it.getLorenzVec() else null
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled) return
+        if (locationsToRender.isEmpty()) return
+        val color = config.color.toColor()
 
         for (location in locationsToRender) {
             event.drawWaypointFilled(
-                location - LorenzVec(0.4, -0.2, 0.4),
-                config.color.toColor(),
+                location - renderOffset,
+                color,
                 extraSize = -0.2,
             )
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!config.enabled) return
+    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStandEntity>) {
+        invisibugEntities.remove(event.entity)
+    }
 
-        EntityUtils.removeInvalidEntities(invisibugEntities)
+    @HandleEvent
+    fun onWorldChange() {
+        invisibugEntities.clear()
     }
 
     @HandleEvent
