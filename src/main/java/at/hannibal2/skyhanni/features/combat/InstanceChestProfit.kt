@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.MISSING_ITEM
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
@@ -238,33 +237,37 @@ object InstanceChestProfit {
         var cost = 0.0
         itemStack?.getLore()?.forEach { loreLine ->
             if (alreadyOpened.matches(loreLine)) return
-            var itemPrice: Double
-            var itemName = ItemUtils.readBookType(loreLine) ?: loreLine
-            var itemInternalName = NeuInternalName.fromItemName(itemName)
-            bookColorFixer.matchMatcher(itemName) {
-                itemName = ItemResolutionQuery.resolveEnchantmentByName(group("item")) ?: itemName
-                itemInternalName = itemName.toInternalName()
-            }
-            if (itemInternalName != MISSING_ITEM) {
-                itemPrice = getPrice(itemInternalName)
-                essencePattern.matchMatcher(loreLine) {
-                    itemPrice = getEssence(group("name"), group("count").toInt())
+            if (loreLine.contains("Coins")) {
+                chestCostCroesus.matchMatcher(loreLine) {
+                    cost += groupOrNull("amount")?.formatInt()?.toDouble()?.times(-1) ?: 0.0
                 }
-                if (dungeonChestKey.matches(loreLine)) {
-                    cost += getPrice(itemInternalName).times(-1)
-                    itemPrice = -1.0
+            } else {
+                var itemPrice: Double
+                var itemName = ItemUtils.readBookType(loreLine) ?: loreLine
+                var itemInternalName = NeuInternalName.fromItemNameOrNull(itemName)
+                bookColorFixer.matchMatcher(itemName) {
+                    itemName = ItemResolutionQuery.resolveEnchantmentByName(group("item")) ?: itemName
+                    itemInternalName = itemName.toInternalName()
                 }
-                if (itemPrice != -1.0) {
-                    chestTips.add(" ${itemInternalName.repoItemName}: ${itemPrice.formatCoin()} ")
-                    totalPrice += itemPrice
-                    chestList.add(itemInternalName)
+                val internalName = itemInternalName
+                if (internalName != null) {
+                    itemPrice = getPrice(internalName)
+                    essencePattern.matchMatcher(loreLine) {
+                        itemPrice = getEssence(group("name"), group("count").toInt())
+                    }
+                    if (dungeonChestKey.matches(loreLine)) {
+                        cost += getPrice(internalName).times(-1)
+                        itemPrice = -1.0
+                    }
+                    if (itemPrice != -1.0) {
+                        chestTips.add(" ${internalName.repoItemName}: ${itemPrice.formatCoin()} ")
+                        totalPrice += itemPrice
+                        chestList.add(internalName)
+                    }
+                    kuudraChestKey.matchMatcher(loreLine) {
+                        cost += internalName.getRawCraftCostOrNull(config.priceSource)?.times(-1) ?: 0.0
+                    }
                 }
-                kuudraChestKey.matchMatcher(loreLine) {
-                    cost += itemInternalName.getRawCraftCostOrNull(config.priceSource)?.times(-1) ?: 0.0
-                }
-            }
-            chestCostCroesus.matchMatcher(loreLine) {
-                cost += groupOrNull("amount")?.formatInt()?.toDouble()?.times(-1) ?: 0.0
             }
         }
         val preCostPrice = totalPrice
