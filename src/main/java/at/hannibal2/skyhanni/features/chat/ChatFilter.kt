@@ -497,7 +497,7 @@ object ChatFilter {
      */
     private val swoopAxePattern by huntingPatternGroup.pattern(
         "swoop-axe-message",
-        "§e\\[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!"
+        "§e\\[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!",
     )
 
     /**
@@ -507,12 +507,13 @@ object ChatFilter {
      */
     private val hoppityAppearPattern by eventPatternGroup.pattern(
         "hoppity-egg-appear",
-        "§d§lHOPPITY'S HUNT §r§dA .* §r§dhas appeared!"
+        "§d§lHOPPITY'S HUNT §r§dA .* §r§dhas appeared!",
     )
+
     @Suppress("MaxLineLength")
     private val hoppityBeginPattern by eventPatternGroup.pattern(
         "hoppity-begin",
-        "§dHoppity's Hunt §r§ehas begun! Help §r§aHoppity §r§efind his §r§6Chocolate Rabbit Eggs §r§eacross SkyBlock each day during the §r§aSpring§r§e!"
+        "§dHoppity's Hunt §r§ehas begun! Help §r§aHoppity §r§efind his §r§6Chocolate Rabbit Eggs §r§eacross SkyBlock each day during the §r§aSpring§r§e!",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
