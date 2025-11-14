@@ -230,7 +230,7 @@ object RareMobWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-        val mobName = rareMob.mob?.name ?: ""
+        val mobName = rareMob.mob?.name.orEmpty()
         val name = if (mobName.isEmpty()) "" else " | $mobName"
         HypixelCommands.partyChat("x: $x, y: $y, z: $z $name")
     }

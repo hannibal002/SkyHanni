@@ -22,5 +22,5 @@ data class MythologicalCreatureType(
     // lazy fields get property initialized.
     val cleanName by lazy { name.removeColor() }
     val trackerId by lazy { cleanName.replace(" ", "_").uppercase() }
-    val mobAliases by lazy { listOf(cleanName.lowercase()) + (shortNames ?: listOf()) }
+    val mobAliases by lazy { listOf(cleanName.lowercase()) + (shortNames.orEmpty()) }
 }
