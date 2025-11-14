@@ -30,15 +30,13 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.AxisAlignedBB
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 //$$ import net.minecraft.entity.attribute.EntityAttributes
 //$$ import net.minecraft.entity.EquipmentSlot
-//$$ import net.minecraft.util.math.Box
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
-import net.minecraft.util.AxisAlignedBB
-
 //#endif
 
 @SkyHanniModule

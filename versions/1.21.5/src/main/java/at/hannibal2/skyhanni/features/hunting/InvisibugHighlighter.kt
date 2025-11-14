@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -80,8 +79,10 @@ object InvisibugHighlighter {
         invisibugEntities.remove(event.entity)
     }
 
-    @HandleEvent(WorldChangeEvent::class)
-    fun onWorldChange() = invisibugEntities.clear()
+    @HandleEvent
+    fun onWorldChange() {
+        invisibugEntities.clear()
+    }
 
     @HandleEvent
     fun onConfigFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
