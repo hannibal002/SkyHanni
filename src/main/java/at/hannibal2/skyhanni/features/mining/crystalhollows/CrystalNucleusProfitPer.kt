@@ -8,8 +8,7 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JU
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
@@ -28,8 +27,7 @@ object CrystalNucleusProfitPer {
         for ((internalName, amount) in loot) {
             internalName.getPrice().takeIf { price: Double -> price != -1.0 }?.let { pricePer: Double ->
                 val profit: Double = amount * pricePer
-                val nameFormat = internalName.repoItemName
-                val text = "§eFound $nameFormat §8${amount.addSeparators()}x §7(§6${profit.shortFormat()}§7)"
+                val text = "§eFound ${internalName.getPriceName(amount, pricePer)}"
                 map.addOrPut(text, profit)
                 totalProfit += profit
             }

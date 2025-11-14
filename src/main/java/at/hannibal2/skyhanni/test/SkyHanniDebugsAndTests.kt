@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -69,8 +70,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 //#endif
 import java.io.File
-import java.time.LocalDate
-import java.time.Month
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -82,8 +81,6 @@ object SkyHanniDebugsAndTests {
 
     @Suppress("MemberVisibilityCanBePrivate")
     var displayList = emptyList<Renderable>()
-
-    var globalRender = true
 
     var a = 1.0
     var b = 60.0
@@ -103,25 +100,13 @@ object SkyHanniDebugsAndTests {
         LorenzDebug.log(text)
     }
 
-    private var previousApril = false
-
-    val isAprilFoolsDay: Boolean
-        get() {
-            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
-            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
-            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
-            val result = (!never && (always || itsTime))
-            previousApril = result
-            return result
-        }
-
     private var testLocation: LorenzVec? = null
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
-            event.drawDynamicText(it, "Test", 1.5)
+            event.drawDynamicText(it, "Debug Test", 1.5)
         }
     }
 
@@ -147,7 +132,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("shtest command") {
             asyncTest(args)
         }
     }
@@ -155,6 +140,11 @@ object SkyHanniDebugsAndTests {
     @Suppress("UNUSED_PARAMETER")
     private fun asyncTest(args: Array<String>) {
         ChatUtils.chat("§fTest successful!")
+
+        val progress = ChatProgressUpdates()
+        progress.start("a")
+        progress.update("b")
+        progress.end("c")
     }
 
     private fun findNull(obj: Any, path: String) {
@@ -460,7 +450,7 @@ object SkyHanniDebugsAndTests {
                 config.debugLocationPos.renderRenderables(renderables, posLabel = "SkyBlock Area (Debug)")
             }
 
-            if (debugConfig.raytracedOreblock) {
+            if (debugConfig.rayTracedOreBlock) {
                 BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
@@ -522,6 +512,7 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+        event.move(103, "dev.debug.raytracedOreblock", "dev.debug.rayTracedOreBlock")
     }
 
     @Suppress("LongMethod")
@@ -617,18 +608,6 @@ object SkyHanniDebugsAndTests {
                     ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
                 } else {
                     ChatUtils.chat("§eYou are not in Skyblock.")
-                }
-            }
-        }
-        event.registerBrigadier("shrendertoggle") {
-            description = "Disables/enables the rendering of all skyhanni guis."
-            category = CommandCategory.USERS_BUG_FIX
-            callback {
-                globalRender = !globalRender
-                if (globalRender) {
-                    ChatUtils.chat("§aEnabled global renderer!")
-                } else {
-                    ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
                 }
             }
         }

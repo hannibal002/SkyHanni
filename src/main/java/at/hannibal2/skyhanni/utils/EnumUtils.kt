@@ -18,6 +18,16 @@ object EnumUtils {
     fun <T : Enum<T>> Enum<T>.toFormattedName(): String =
         name.split("_").joinToString(" ") { it.lowercase().replaceFirstChar(Char::uppercase) }
 
+    inline fun <reified T : Enum<T>> T.previous(wrap: Boolean = false): T? {
+        val values = enumValues<T>()
+        val previousIndex = ordinal - 1
+        return when {
+            previousIndex >= 0 -> values[previousIndex]
+            wrap -> values.lastOrNull()
+            else -> null
+        }
+    }
+
     inline fun <reified T : Enum<T>> T.next(wrap: Boolean = false): T? {
         val values = enumValues<T>()
         val nextIndex = ordinal + 1

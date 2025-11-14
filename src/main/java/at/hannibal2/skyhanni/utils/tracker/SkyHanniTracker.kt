@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
@@ -32,7 +33,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
-open class SkyHanniTracker<Data : TrackerData>(
+open class SkyHanniTracker<Data : Resettable>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
@@ -215,7 +216,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         )
     }
 
-    inner class SharedTracker<Data : TrackerData>(
+    inner class SharedTracker<Data : Resettable>(
         private val entries: Map<DisplayMode, Data>,
     ) {
 
@@ -251,7 +252,7 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     fun addPriceFromButton(lists: MutableList<Searchable>) {
         if (isInventoryOpen()) {
-            lists.addButton<ItemPriceSource>(
+            lists.addButton(
                 label = "Price Source",
                 current = config.priceSource,
                 getName = { it.sellName },

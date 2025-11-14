@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -29,7 +30,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
@@ -78,6 +79,10 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.component.type.ItemEnchantmentsComponent
 //$$ import net.minecraft.component.type.ProfileComponent
 //$$ import net.minecraft.registry.Registries
+//#endif
+//#if MC > 1.21.8
+//$$ import com.google.common.collect.ImmutableMultimap
+//$$ import com.mojang.authlib.properties.PropertyMap
 //#endif
 
 @SkyHanniModule
@@ -307,16 +312,25 @@ object ItemUtils {
 
     fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
 
-    // Checks for the enchantment glint as part of the minecraft enchantments
+    // Checks for the enchantment glint as part of the Minecraft enchantments
     fun ItemStack.isEnchanted(): Boolean =
         //#if MC < 1.21
         isItemEnchanted
     //#else
-    //$$ hasEnchantments() || this.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE) == true
+    //$$ hasGlint()
     //#endif
 
-    // Checks for hypixel enchantments in the attributes
-    fun ItemStack.hasHypixelEnchantments() = getHypixelEnchantments()?.isNotEmpty() ?: false
+    // Checks for Hypixel enchantments in the attributes
+    fun ItemStack.hasHypixelEnchantments(): Boolean =
+        getHypixelEnchantments()?.isNotEmpty() ?: false
+
+    fun ItemStack.addEnchantGlint(): ItemStack = apply {
+        //#if MC < 1.21
+        addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
+        //#else
+        //$$ set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true)
+        //#endif
+    }
 
     fun ItemStack.removeEnchants(): ItemStack = apply {
         //#if MC < 1.21
@@ -335,8 +349,10 @@ object ItemUtils {
         val compound = tagCompound ?: return null
         if (!compound.hasKey("SkullOwner")) return null
         return compound.getCompoundTag("SkullOwner").getSkullTexture()
-        //#else
+        //#elseif MC < 1.21.9
         //$$ return this.get(DataComponentTypes.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
+        //#else
+        //$$ return this.get(DataComponentTypes.PROFILE)?.gameProfile?.properties?.get("textures")?.firstOrNull()?.value
         //#endif
 
     }
@@ -353,8 +369,10 @@ object ItemUtils {
 
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
-        //#else
+        //#elseif MC < 1.21.9
         //$$ return this.get(DataComponentTypes.PROFILE)?.id?.get().toString()
+        //#else
+        //$$ return this.get(DataComponentTypes.PROFILE)?.gameProfile?.id.toString()
         //#endif
     }
 
@@ -387,9 +405,16 @@ object ItemUtils {
         return stack
         //#else
         //$$ val stack = ItemStack(Items.PLAYER_HEAD)
+        //#if MC < 1.21.9
         //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo")
         //$$ profile.properties.put("textures", Property("textures", value))
         //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent(profile))
+        //#else
+        //$$ val builder = ImmutableMultimap.builder<String, Property>()
+        //$$ builder.put("textures", Property("textures", value))
+        //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo", PropertyMap(builder.build()))
+        //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent.ofStatic(profile))
+        //#endif
         //$$ stack.setCustomItemName(displayName)
         //$$ stack.setLore(lore.toList())
         //$$ return stack
@@ -516,6 +541,7 @@ object ItemUtils {
 
     private fun ItemStack.updateCategoryAndRarity() {
         val data = cachedData
+        if (data.itemRarityLastCheck.passedSince() < 10.seconds) return
         data.itemRarityLastCheck = SimpleTimeMark.now()
         val internalName = getInternalName()
         if (internalName == NeuInternalName.NONE) {
@@ -529,22 +555,14 @@ object ItemUtils {
     }
 
     fun ItemStack.getItemCategoryOrNull(): ItemCategory? {
-        val data = cachedData
-        if (itemRarityLastCheck(data)) {
-            this.updateCategoryAndRarity()
-        }
-        return data.itemCategory
+        this.updateCategoryAndRarity()
+        return cachedData.itemCategory
     }
 
     fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
-        val data = cachedData
-        if (itemRarityLastCheck(data)) {
-            this.updateCategoryAndRarity()
-        }
-        return data.itemRarity
+        this.updateCategoryAndRarity()
+        return cachedData.itemRarity
     }
-
-    private fun itemRarityLastCheck(data: CachedItemData) = data.itemRarityLastCheck.passedSince() > 10.seconds
 
     // Taken from NEU
     fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
@@ -593,6 +611,20 @@ object ItemUtils {
 
         val itemName = color + matcher.group("name").trim()
         return makePair(input, itemName, matcher)
+    }
+
+    /**
+     * REGEX-TEST: §fEnchanted Book (Lapidary I)
+     * REGEX-TEST: §fEnchanted Book (Ice Cold I§r§f)
+     */
+    private val enchantedBookPattern by RepoPattern.pattern(
+        "item.enchantedbook",
+        "§fEnchanted Book \\((?<item>.+)\\)"
+    )
+    fun readBookType(input: String): String? {
+        return enchantedBookPattern.matchMatcher(input) {
+            group("item").removeColor()
+        }
     }
 
     private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {
@@ -798,7 +830,7 @@ object ItemUtils {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("shtestitem") {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }
@@ -898,7 +930,7 @@ object ItemUtils {
         if (EnoughUpdatesManager.inLoadingState()) {
             return ChatUtils.debug(
                 "Ignoring missing repo item warning, repo is currently loading or fetching",
-                replaceSameMessage = true
+                replaceSameMessage = true,
             )
         }
 
@@ -911,8 +943,9 @@ object ItemUtils {
     }
 
     // These two are matching right now, but we keep them separate for future-proofing
-    val resetCommand get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
-    else EnoughUpdatesRepoManager.updateCommand
+    val resetCommand
+        get() = if (PlatformUtils.isNeuLoaded()) "neuresetrepo"
+        else EnoughUpdatesRepoManager.updateCommand
 
     private fun showRepoWarning(item: String) {
         val text = listOf(
@@ -942,7 +975,7 @@ object ItemUtils {
     }
 
     fun NeuInternalName.getNumberedName(amount: Number): String {
-        val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
+        val prefix = if (amount.toDouble() == 1.0) "" else "§8${amount.addSeparators()}x "
         return "$prefix§r$repoItemName"
     }
 

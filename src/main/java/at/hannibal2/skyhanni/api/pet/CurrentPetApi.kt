@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.pets.PetChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -69,6 +70,8 @@ object CurrentPetApi {
         if (petData.uuid == null) {
             ErrorManager.skyHanniError("Tried to assert a non-UUID having pet!")
         }
+
+        PetChangeEvent(petData).post()
         ProfileStorageData.profileSpecific?.currentPetUuid = petData.uuid
     }
 
@@ -82,6 +85,8 @@ object CurrentPetApi {
             )?.takeIf {
                 it.uuid != null
             } ?: return
+
+            PetChangeEvent(resolvedPet).post()
 
             ProfileStorageData.profileSpecific?.currentPetUuid = resolvedPet.uuid
         }

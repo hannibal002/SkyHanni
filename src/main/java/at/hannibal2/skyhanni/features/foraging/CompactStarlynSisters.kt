@@ -123,7 +123,7 @@ object CompactStarlynSisters {
         var hadPreviousPB: Boolean = false,
         var lastScoreDisplay: String = "",
         var lastSister: String = "",
-    ) : Resettable()
+    ) : Resettable
 
     data class StarlynCollectionPersonalBests(
         var lastPBWoodType: String = "",
@@ -131,7 +131,7 @@ object CompactStarlynSisters {
         var lastPBCollectionIncreaseDuringContestDisplay: String = "",
         var lastPBPreviousBestDifferenceDisplay: String = "",
         var lastPBSweepIncreaseDisplay: String = "",
-    ) : Resettable()
+    ) : Resettable
 
     private var isInResults = false
     private var contestVariablesAreDirty = false

@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas.getAreaTag
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.graph.GraphEditor.distanceToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import java.awt.Color
 
@@ -20,7 +20,7 @@ object GraphEditorBugFinder {
     private var errorsInWorld = emptyMap<GraphNode, String>()
 
     fun runTests() {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("graph editor bug finder") {
             asyncTest()
         }
     }
@@ -28,9 +28,8 @@ object GraphEditorBugFinder {
     private fun asyncTest() {
         val graph = IslandGraphs.currentIslandGraph ?: return
         val errorsInWorld: MutableMap<GraphNode, String> = mutableMapOf()
-        val nodes = graph.nodes
 
-        for (node in nodes) {
+        for (node in graph) {
             if (node.tags.any { it in NavigationHelper.allowedTags }) {
                 val remainingTags = node.tags.filter { it in NavigationHelper.allowedTags }
                 if (remainingTags.size != 1) {
@@ -39,9 +38,8 @@ object GraphEditorBugFinder {
             }
         }
 
-
         val nearestArea = mutableMapOf<GraphNode, GraphNode>()
-        for (node in nodes) {
+        for (node in graph) {
             val pathToNearestArea = GraphUtils.findFastestPath(node) { it.getAreaTag() != null }?.first
             if (pathToNearestArea == null) {
                 continue
@@ -49,7 +47,7 @@ object GraphEditorBugFinder {
             val areaNode = pathToNearestArea.lastOrNull() ?: error("Empty path to nearest area")
             nearestArea[node] = areaNode
         }
-        for (node in nodes) {
+        for (node in graph) {
             val areaNode = nearestArea[node]?.name ?: continue
             for (neighbour in node.neighbours.keys) {
                 val neighbouringAreaNode = nearestArea[neighbour]?.name ?: continue
@@ -59,7 +57,7 @@ object GraphEditorBugFinder {
                 }
             }
         }
-        for (node in nodes) {
+        for (node in graph) {
             val nameNull = node.name.isNullOrBlank()
             val tagsEmpty = node.tags.isEmpty()
             if (nameNull > tagsEmpty) {
@@ -72,13 +70,13 @@ object GraphEditorBugFinder {
 
         val clusters = GraphUtils.findDisjointClusters(graph)
         if (clusters.size > 1) {
-            val closestCluster = clusters.minBy { cluster -> cluster.minOf { distanceToPlayer(it.position) } }
+            val closestCluster = clusters.minBy { cluster -> cluster.minOf { it.distanceSqToPlayer() } }
             val foreignClusters = clusters.filter { it !== closestCluster }
-            val closestForeignNodes = foreignClusters.map { network -> network.minBy { distanceToPlayer(it.position) } }
+            val closestForeignNodes = foreignClusters.map { network -> network.minBy { it.distanceSqToPlayer() } }
             closestForeignNodes.forEach {
                 errorsInWorld[it] = "§cDisjoint node network"
             }
-            val closestForeignNode = closestForeignNodes.minBy { distanceToPlayer(it.position) }
+            val closestForeignNode = closestForeignNodes.minBy { it.distanceSqToPlayer() }
             val closestNodeToForeignNode = closestCluster.minBy { it.position.distanceSq(closestForeignNode.position) }
             closestNodeToForeignNode.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
         }
@@ -86,7 +84,7 @@ object GraphEditorBugFinder {
         this.errorsInWorld = errorsInWorld
         if (clusters.size <= 1) {
             errorsInWorld.keys.minByOrNull {
-                distanceToPlayer(it.position)
+                it.distanceSqToPlayer()
             }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
         }
     }

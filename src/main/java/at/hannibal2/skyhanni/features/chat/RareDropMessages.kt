@@ -35,11 +35,13 @@ object RareDropMessages {
 
     /**
      * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168% §r§b✯ Magic Find§r§b)
+     * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168 §r§b✯ Magic Find§r§b)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
+     * REGEX-TEST: §6§lPET DROP! §r§6Rat
      */
     private val petDroppedPattern by petGroup.pattern(
         "droppedmessage",
-        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> .*)",
+        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>(?: .*)?)",
     )
 
     /**
@@ -64,6 +66,16 @@ object RareDropMessages {
     private val petObtainedPattern by petGroup.pattern(
         "obtainedmessage",
         "(?<start>.*has obtained (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
+    )
+
+    /**
+     * REGEX-TEST: SMITE;6
+     * REGEX-TEST: ENDER_SLAYER;7
+     * REGEX-TEST: ULTIMATE_REITERATE;1
+     */
+    private val slayerBookIDPattern by repoGroup.pattern(
+        "slayerbook",
+        "SMITE;(?:6|7)|ENDER_SLAYER;(?:6|7)|MANA_STEAL;1|SMARTY_PANTS;1|BANE_OF_ARTHROPODS;6|CRITIAL;6|FIRE_ASPECT;3|ULTIMATE_REITERATE;1",
     )
 
     /**
@@ -146,7 +158,8 @@ object RareDropMessages {
             )
         }
 
-        if (!anyRecentMessage && config.enchantedBookMissingMessage) {
+        // Hypixel send Slayer Book messages late, so we do a manual internalName Regex Match
+        if (!anyRecentMessage && config.enchantedBookMissingMessage && !slayerBookIDPattern.matches(internalName.asString())) {
             var message = "§r§6§lRARE DROP! ${internalName.repoItemName}"
             if (SkyHanniMod.feature.misc.userLuck) {
                 userLuck.takeIf { it != 0f }?.let { luck ->

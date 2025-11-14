@@ -12,21 +12,22 @@ import java.util.regex.Pattern
  * The InventoryDetector tracks whether an inventory is open and provides
  * an inventory open consumer and a isInside function to handle inventory check logic.
  *
- * @property openInventory A callback triggered when the given inventory is detected to be open. Optional.
- * @property closeInventory A callback triggered when the inventory is closed. Optional.
+ * @property onOpenInventory A callback triggered when the given inventory is detected to be open. Optional.
+ * @property onCloseInventory A callback triggered when the inventory is closed. Optional.
  * @property checkInventoryName Define what inventory name or names we are looking for.
  */
 class InventoryDetector(
-    val openInventory: (InventoryFullyOpenedEvent) -> Unit = {},
-    val closeInventory: (InventoryCloseEvent) -> Unit = {},
+    val onOpenInventory: (InventoryFullyOpenedEvent) -> Unit = {},
+    val onCloseInventory: (InventoryCloseEvent) -> Unit = {},
     val checkInventoryName: (String) -> Boolean,
 ) {
     constructor(
         pattern: Pattern,
-        openInventory: (InventoryFullyOpenedEvent) -> Unit = {},
-        closeInventory: (InventoryCloseEvent) -> Unit = {},
+        onOpenInventory: (InventoryFullyOpenedEvent) -> Unit = {},
+        onCloseInventory: (InventoryCloseEvent) -> Unit = {},
     ) : this(
-        openInventory,
+        onOpenInventory,
+        onCloseInventory,
         checkInventoryName = { name -> pattern.matches(name) }
     )
 
@@ -49,7 +50,7 @@ class InventoryDetector(
         fun onInventoryClose(event: InventoryCloseEvent) {
             detectors.forEach {
                 it.inInventory = false
-                it.closeInventory(event)
+                it.onCloseInventory(event)
             }
         }
 
@@ -69,7 +70,7 @@ class InventoryDetector(
 
         if (inInventory) {
             try {
-                openInventory(event)
+                onOpenInventory(event)
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(e, "Failed to run inventory open in InventoryDetector")
             }

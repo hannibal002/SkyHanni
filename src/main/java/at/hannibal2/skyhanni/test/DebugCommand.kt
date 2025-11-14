@@ -52,7 +52,6 @@ object DebugCommand {
         // calling default debug stuff
         player(event)
         repoData(event)
-        globalRender(event)
         skyblockStatus(event)
         networkInfo(event)
         profileName(event)
@@ -146,24 +145,12 @@ object DebugCommand {
             add("on Hypixel SkyBlock")
             add("skyBlockIsland: ${SkyBlockUtils.currentIsland}")
             add("skyBlockArea:")
-            add("  scoreboard: '${SkyBlockUtils.graphArea}'")
+            add("  scoreboard: '${SkyBlockUtils.scoreboardArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
             with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
                 add(" /shtestwaypoint $x $y $z pathfind")
             }
             add("isOnAlphaServer: '${SkyBlockUtils.isOnAlphaServer}'")
-        }
-    }
-
-    private fun globalRender(event: DebugDataCollectEvent) {
-        event.title("Global Render")
-        if (SkyHanniDebugsAndTests.globalRender) {
-            event.addIrrelevant("normal enabled")
-        } else {
-            event.addData {
-                add("Global renderer is disabled!")
-                add("No renderable elements from SkyHanni will show up anywhere!")
-            }
         }
     }
 

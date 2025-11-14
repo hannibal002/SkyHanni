@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -112,7 +110,7 @@ enum class HotmData(
         140,
         { level -> (level + 1.0).pow(2.3) },
         { level -> mapOf(HotmReward.MINING_SPEED to 50.0 + (level * 5.0)) },
-        HotmApi.PowderType.GEMSTONE
+        HotmApi.PowderType.GEMSTONE,
     ),
     MOLE(
         "Mole",
@@ -613,12 +611,6 @@ enum class HotmData(
                 type.setAmount(amount, postEvent = true)
             }
         }
-
-        @HandleEvent
-        override fun onInventoryClose(event: InventoryCloseEvent) = super.onInventoryClose(event)
-
-        @HandleEvent(onlyOnSkyblock = true)
-        override fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) = super.onInventoryFullyOpened(event)
 
         override fun extraInventoryHandling() {
             abilities.filter { it.isUnlocked }.forEach {

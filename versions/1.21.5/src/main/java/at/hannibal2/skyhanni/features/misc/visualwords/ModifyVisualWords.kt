@@ -39,15 +39,15 @@ object ModifyVisualWords {
     fun transformText(orderedText: OrderedText?): OrderedText? {
         if (orderedText == null) return null
 
-        if (!config.enabled) return orderedText
-        if (!changeWords) return orderedText
+        if (!config.enabled) return null
+        if (!changeWords) return null
 
         if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
             userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
             update()
         }
 
-        if (userModifiedWords.isEmpty()) return orderedText
+        if (userModifiedWords.isEmpty()) return null
 
         return textCache.getOrPut(orderedText) {
 
@@ -92,15 +92,15 @@ object ModifyVisualWords {
     fun transformStringVisitable(stringVisitable: StringVisitable?) : StringVisitable? {
         if (stringVisitable == null) return null
 
-        if (!config.enabled) return stringVisitable
-        if (!changeWords) return stringVisitable
+        if (!config.enabled) return null
+        if (!changeWords) return null
 
         if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
             userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
             update()
         }
 
-        if (userModifiedWords.isEmpty()) return stringVisitable
+        if (userModifiedWords.isEmpty()) return null
 
         return stringVisitableCache.getOrPut(stringVisitable) {
             var characters = mutableListOf<StyledCharacter>()
@@ -155,7 +155,7 @@ object ModifyVisualWords {
                 if (
                     index <= workingCharacters.size - word.from.size &&
                     workingCharacters[index].codePoint == first.codePoint &&
-                    first.style.withParent(workingCharacters[index].style) == workingCharacters[index].style
+                    stylesAreOverlapping(first.style, workingCharacters[index].style)
                 ) {
                     var subIndex = 1
                     while (subIndex < word.from.size) {
@@ -165,7 +165,7 @@ object ModifyVisualWords {
 
                         if (
                             char.codePoint != styledCharacter.codePoint ||
-                            char.style.withParent(styledCharacter.style) != styledCharacter.style
+                            !stylesAreOverlapping(char.style, styledCharacter.style)
                         ) break
 
                         subIndex++
@@ -189,6 +189,13 @@ object ModifyVisualWords {
 
         return workingCharacters
     }
+
+    private fun stylesAreOverlapping(testStyle: Style, testedStyle: Style) = (testStyle.color == testedStyle.color || testStyle.color == null) &&
+            !(testStyle.isBold && !testedStyle.isBold) &&
+            !(testStyle.isItalic && !testedStyle.isItalic) &&
+            !(testStyle.isObfuscated && !testedStyle.isObfuscated) &&
+            !(testStyle.isUnderlined && !testedStyle.isUnderlined) &&
+            !(testStyle.isStrikethrough && !testedStyle.isStrikethrough)
 }
 
 data class StyledCharacter(
@@ -225,7 +232,7 @@ data class VisualWordText(
     }
 }
 
-fun List<StyledCharacter>.toLegacyString(): String {
+private fun List<StyledCharacter>.toLegacyString(): String {
     val builder = StringBuilder()
     var lastStyle = Style.EMPTY
     for (character in this) {
@@ -238,7 +245,7 @@ fun List<StyledCharacter>.toLegacyString(): String {
     return builder.toString()
 }
 
-fun String.toStyledCharacterList(style: Style = Style.EMPTY, hasFirst: Boolean = true): List<StyledCharacter> {
+private fun String.toStyledCharacterList(style: Style = Style.EMPTY, hasFirst: Boolean = true): List<StyledCharacter> {
     val newList = mutableListOf<StyledCharacter>()
 
     TextVisitFactory.visitFormatted(this, style) {  index: Int, style: Style, codePoint: Int ->

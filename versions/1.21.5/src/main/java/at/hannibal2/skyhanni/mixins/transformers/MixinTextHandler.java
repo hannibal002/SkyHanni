@@ -49,9 +49,12 @@ public class MixinTextHandler {
     )
     private StringVisitable modifyStringVisitable(StringVisitable visitable) {
 
-        return ModifyVisualWords.INSTANCE.transformStringVisitable(
+        StringVisitable replaced = ModifyVisualWords.INSTANCE.transformStringVisitable(
             visitable
         );
+
+        if (replaced == null) return visitable;
+        return replaced;
     }
 
 }

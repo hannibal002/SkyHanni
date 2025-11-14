@@ -171,7 +171,8 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
 //     }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${target.minecraftVersion.versionName}")
+    val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
+    minecraft("com.mojang:minecraft:$versionName")
     if (target.mappingDependency == "official") {
         mappings(loom.officialMojangMappings())
     } else {
@@ -182,7 +183,10 @@ dependencies {
     }
 
     // Discord RPC client
-    shadowImpl("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
+    shadowImpl("com.github.caoimhebyrne:KDiscordIPC:0.2.3") {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+    }
     compileOnly(libs.jbAnnotations)
 
     headlessLwjgl(libs.headlessLwjgl)
@@ -237,8 +241,9 @@ dependencies {
     if (target == ProjectTarget.MAIN) {
         shadowModImpl(libs.moulconfig)
     } else if (target.isModern) {
-        shadowModImpl("org.notenoughupdates.moulconfig:modern-${target.minecraftVersion.versionName}:${libs.versions.moulconfig.get()}")
-        include("org.notenoughupdates.moulconfig:modern-${target.minecraftVersion.versionName}:${libs.versions.moulconfig.get()}")
+        val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
+        shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
+        include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
     }
     @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {

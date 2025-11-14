@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
@@ -34,6 +35,7 @@ object HideFarEntities {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
+        if (GlobalRender.renderDisabled) return
         if (!isEnabled()) return
         if (event.isMod(20)) {
             updateNeverHide()

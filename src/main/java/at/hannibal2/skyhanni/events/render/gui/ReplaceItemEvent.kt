@@ -5,7 +5,7 @@ import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack, val slot: Int) : SkyHanniEvent() {
+class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack?, val slot: Int) : SkyHanniEvent() {
     var replacement: ItemStack? = null
         private set
     var shouldRemove = false
@@ -27,7 +27,7 @@ class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack, v
             slot: Int,
             cir: CallbackInfoReturnable<ItemStack>,
         ) {
-            val originalItem = inventoryContents.getOrNull(slot) ?: return
+            val originalItem = inventoryContents.getOrNull(slot)
             val event = ReplaceItemEvent(inventory, originalItem, slot)
             event.post()
             if (event.shouldRemove) {

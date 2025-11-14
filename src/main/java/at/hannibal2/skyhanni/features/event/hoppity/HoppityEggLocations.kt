@@ -48,7 +48,6 @@ object HoppityEggLocations {
         // TODO: split Chocolate Factory and Hoppity repo data
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
         apiEggLocations = data.apiEggLocations
-        legacyEggLocations = data.eggLocations.mapValues { it.value.toSet() }
     }
 
     fun saveNearestEgg() {
@@ -122,9 +121,6 @@ object HoppityEggLocations {
     /* Debug logic, enabled using /shtoggleegglocationdebug */
     private var showEggLocationsDebug = false
 
-    // to be removed - in case there are any issues with missing locations
-    private var legacyEggLocations: Map<IslandType, Set<LorenzVec>> = mapOf()
-
     private fun toggleDebug() {
         showEggLocationsDebug = !showEggLocationsDebug
         val enabledDisabled = if (showEggLocationsDebug) "§aEnabled" else "§cDisabled"
@@ -134,17 +130,14 @@ object HoppityEggLocations {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!showEggLocationsDebug) return
-        val legacyLocations = legacyEggLocations[SkyBlockUtils.currentIsland] ?: return
         val apiLocations = apiEggLocations[SkyBlockUtils.currentIsland] ?: return
         val collectedLocations = islandCollectedLocations
-        for (location in legacyLocations) {
-            val name = apiLocations.entries.find { it.value == location }?.key
+        for ((name, location) in apiLocations) {
             val isCollected = collectedLocations.contains(location)
             val color = if (isCollected) LorenzColor.GREEN.toChromaColor() else LorenzColor.RED.toChromaColor()
-            val nameColorCode = (if (name != null) LorenzColor.GREEN else LorenzColor.RED).getChatColor()
 
             event.drawColor(location, color, false, 0.5f)
-            event.drawDynamicText(location.up(0.5), "$nameColorCode$name", 1.2)
+            event.drawDynamicText(location.up(0.5), "§a$name", 1.2)
             if (location.distanceSqToPlayer() < 100) {
                 event.drawDynamicText(location.up(0.5), location.toCleanString(), 1.0, yOff = 12f)
             }
