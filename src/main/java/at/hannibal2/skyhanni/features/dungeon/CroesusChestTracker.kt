@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -259,7 +260,8 @@ object CroesusChestTracker {
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (config.croesusOverlayKuudra && KuudraApi.inKuudra) renderChestOverlay()
-        if (config.croesusOverlay && (SkyBlockUtils.graphArea == "Forgotten Skull" || IslandType.DUNGEON_HUB.isCurrent())) renderChestOverlay()
+        // TODO This y>103check should be replaced with a better "is actively playing Cata/Kuudra" of some kind tbh
+        if (config.croesusOverlay && (SkyBlockUtils.graphArea == "Forgotten Skull" || (IslandType.DUNGEON_HUB.isCurrent() && LocationUtils.playerLocation().y > 103.0))) renderChestOverlay()
         if (config.croesusOverlayDungeons && inDungeon()) renderChestOverlay()
     }
 
