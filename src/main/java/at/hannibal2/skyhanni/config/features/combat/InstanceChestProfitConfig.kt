@@ -33,7 +33,7 @@ class InstanceChestProfitConfig {
     @ConfigOption(name = "Croesus Chest Price Overlay", desc = "Display each chests' profit for Dungeons and Kuudra.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var croesusEnabled: Boolean = false
+    var croesusProfitOverlayEnabled: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -41,7 +41,8 @@ class InstanceChestProfitConfig {
         desc = "Highlights most profitable chest for Dungeons and Kuudra."
     )
     @ConfigEditorBoolean
-    var croesusHighlight: Boolean = true
+    @FeatureToggle
+    var croesusHighlight: Boolean = false
 
     @Expose
     @ConfigLink(owner = InstanceChestProfitConfig::class, field = "croesusEnabled")

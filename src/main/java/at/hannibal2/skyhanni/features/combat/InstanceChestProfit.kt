@@ -186,7 +186,7 @@ object InstanceChestProfit {
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!config.enabled && !config.croesusEnabled && !config.croesusHighlight) return
+        if (!config.enabled && !config.croesusProfitOverlayEnabled && !config.croesusHighlight) return
 
         val name = event.inventoryName
         when {
@@ -198,7 +198,7 @@ object InstanceChestProfit {
                 inKuudraChest = true
             }
 
-            runNameCroesus.matches(name) && (config.croesusHighlight || config.croesusEnabled) -> inCroesusRunMenu = true
+            runNameCroesus.matches(name) && (config.croesusHighlight || config.croesusProfitOverlayEnabled) -> inCroesusRunMenu = true
 
             else -> return
         }
@@ -427,7 +427,7 @@ object InstanceChestProfit {
                 posLabel = "Instance Chest Profit",
             )
         }
-        if (config.croesusEnabled && inCroesusRunMenu) {
+        if (config.croesusProfitOverlayEnabled && inCroesusRunMenu) {
             config.croesusPosition.renderRenderable(
                 croesusDisplay,
                 posLabel = "Croesus Chest Profit",
