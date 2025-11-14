@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
@@ -152,6 +153,7 @@ object InstanceChestProfit {
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
 
+    // TODO replace those three "in chest" booleans with inventory detectors
     private var inDungeonChest = false
     private var inKuudraChest = false
     private var inCroesusRunMenu = false
@@ -279,18 +281,10 @@ object InstanceChestProfit {
         chestType: CroesusChestType,
         totalValue: Double,
         contents: MutableList<Renderable>,
-    ): List<Renderable> {
-        return buildList {
-            add(
-                (
-                    Renderable.hoverTips(
-                        Renderable.text("${chestType.stackChestName}: ${totalValue.formatCoin()}"),
-                        contents,
-                    )
-                    ),
-            )
-        }
-    }
+    ): List<Renderable> = Renderable.hoverTips(
+        Renderable.text("${chestType.stackChestName}: ${totalValue.formatCoin()}"),
+        contents,
+    ).toSingletonListOrEmpty()
 
     private fun createCroesusDisplay() {
         val newDisplay = buildList {
@@ -308,14 +302,11 @@ object InstanceChestProfit {
         return count * (NeuInternalName.fromItemName(name).getPrice(config.priceSource))
     }
 
-    private fun getAttribute(attributeName: String): Double {
-        attributeShardPattern.matchMatcher(attributeName) {
-            val name = group("name")
-            val count = group("count").toInt()
-            return count * (NeuInternalName.fromItemName(name).getPrice(config.priceSource))
-        }
-        return 0.0
-    }
+    private fun getAttribute(attributeName: String): Double = attributeShardPattern.matchMatcher(attributeName) {
+        val name = group("name")
+        val count = group("count").toInt()
+        count * (NeuInternalName.fromItemName(name).getPrice(config.priceSource))
+    } ?: 0.0
 
     private fun createDisplay(items: Map<Int, ItemStack>) {
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
@@ -325,13 +316,15 @@ object InstanceChestProfit {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
             }
-            if (attributeShardPattern.matches(it.value.displayName)) {
-                val price = getAttribute(it.value.displayName)
-                itemsWithCost.addOrPut(it.value.displayName, price)
+            val name = it.value.displayName
+            if (attributeShardPattern.matches(name)) {
+                val price = getAttribute(name)
+                itemsWithCost.addOrPut(name, price)
             }
-            essencePattern.matchMatcher(it.value.displayName) {
+            essencePattern.matchMatcher(name) {
                 val price = getEssence(group("name"), group("count").toInt())
-                if (price != 0.0) itemsWithCost.addOrPut(it.value.displayName, price)
+                // TODO remove if check, getEssence should return null if no price is found
+                if (price != 0.0) itemsWithCost.addOrPut(name, price)
             }
         }
 
@@ -391,8 +384,8 @@ object InstanceChestProfit {
         chestDisplay = Renderable.table(newDisplay, ySpacing = 1)
     }
 
-    private fun getKuudraEssenceBonus(): Double {
-        return ProfileStorageData.petProfiles?.pets?.filter { PetUtils.getPetProperName(it.fauxInternalName) == "KUUDRA" }
+    private fun getKuudraEssenceBonus(): Double =
+        ProfileStorageData.petProfiles?.pets?.filter { PetUtils.getPetProperName(it.fauxInternalName) == "KUUDRA" }
             ?.maxByOrNull { it.rarity.id }
             ?.let {
                 when (it.rarity) {
@@ -401,7 +394,6 @@ object InstanceChestProfit {
                     else -> 0.0
                 }
             } ?: 0.0
-    }
 
     @HandleEvent(GuiRenderEvent::class)
     fun onRenderOverlay() {

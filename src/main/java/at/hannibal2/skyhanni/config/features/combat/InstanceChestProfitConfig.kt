@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class InstanceChestProfitConfig {
+    // TODO since this feature toggle no longer enables the whole category, it should be renamed
     @Expose
     @ConfigOption(name = "Instance Chest Profit", desc = "Display chest profit for dungeons and kuudra.")
     @ConfigEditorBoolean
