@@ -40,7 +40,7 @@ object DebugEntitySkinCommand {
             foundEntities = emptySet()
             return
         }
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("debug entity skin read clipboard") {
             val skin = OSUtils.readFromClipboard() ?: error("no string in clipboard")
             skinToFind = skin
             ChatUtils.chat("Enabled Debug Entity Skin Highlighter and set clipboard as skin texture.")

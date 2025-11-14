@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.rift.area.westvillage
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import java.util.regex.Pattern
 
@@ -76,15 +75,9 @@ object VerminTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData() {
-
-        override fun reset() {
-            count.clear()
-        }
-
-        @Expose
-        var count: MutableMap<VerminType, Int> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var count: MutableMap<VerminType, Int> = mutableMapOf()
+    ) : Resettable
 
     enum class VerminType(val order: Int, val vermin: String, val pattern: Pattern) {
         FLY(1, "§aFlies", flyPattern),
@@ -93,7 +86,7 @@ object VerminTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         checkVacuum()
     }
 

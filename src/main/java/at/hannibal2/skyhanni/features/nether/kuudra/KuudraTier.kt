@@ -1,8 +1,13 @@
 package at.hannibal2.skyhanni.features.nether.kuudra
 
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 enum class KuudraTier(val displayName: String) {
     BASIC("Basic"),
@@ -28,7 +33,31 @@ enum class KuudraTier(val displayName: String) {
 
     fun getTieredDisplayName() = "Tier $intTierNumber ($displayName)"
 
+    @SkyHanniModule
     companion object {
+        private val patternGroup = RepoPattern.group("crimson.kuudra")
+
+        /**
+         * REGEX-TEST: Kill Kuudra Basic Tier
+         * REGEX-TEST: Kill Kuudra Fiery Tier
+         */
+        private val kuudraQuestPattern by patternGroup.pattern(
+            "quest.identifier",
+            "Kill Kuudra (?<tier>\\w+) Tier"
+        )
+
+        fun getQuestOrNull(
+            questName: String,
+            state: QuestState,
+        ): KuudraQuest? = kuudraQuestPattern.matchMatcher(questName) {
+            val tierName = getTierByNameOrNull(group("tier")) ?: return@matchMatcher null
+            KuudraQuest(tierName, state)
+        }
+
+        private fun getTierByNameOrNull(name: String) = entries.firstOrNull {
+            it.displayName.lowercase() == name.lowercase() || it.name.lowercase() == name.lowercase()
+        }
+
         fun addRepoData(
             displayName: String,
             displayItem: NeuInternalName,

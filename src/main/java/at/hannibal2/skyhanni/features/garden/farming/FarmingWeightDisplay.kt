@@ -92,7 +92,7 @@ object FarmingWeightDisplay {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("farming weight update tick") {
             update()
             getCropWeights()
         }
@@ -124,7 +124,9 @@ object FarmingWeightDisplay {
 
     private val config get() = GardenApi.config.eliteFarmingWeights
     private val storage get() = GardenApi.storage?.farmingWeight
-    private val lbName get() = "${config.eliteLBType.get().leaderboardName} Farming Weight"
+    private val lbName get() = config.eliteLBType.get().leaderboardName.let {
+        if (it.isEmpty()) "" else "$it "
+    } + "Farming Weight"
     private val localCounter = mutableMapOf<CropType, Long>()
 
     private var display = emptyList<Renderable>()
@@ -293,7 +295,7 @@ object FarmingWeightDisplay {
             storage?.lastLeaderboard = leaderboardPosition
 
             // Remove passed player to present the next one
-            nextPlayers.removeFirst()
+            nextPlayers.removeFirstOrNull()
 
             // Display waiting message if nextPlayers list is empty
             // Update values to next player
@@ -403,7 +405,7 @@ object FarmingWeightDisplay {
 
     private fun loadLeaderboardIfAble() {
         if (loadingLeaderboardMutex.isLocked) return
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("farming weight display loadLeaderboardPosition") {
             loadingLeaderboardMutex.withLock {
                 val wasNotLoaded = leaderboardPosition == -1
                 leaderboardPosition = loadLeaderboardPosition()
@@ -484,7 +486,7 @@ object FarmingWeightDisplay {
         return if (newData) apiData.rank else leaderboardPosition
     }
 
-    private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine {
+    private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine("farming weight display load weight") {
         val apiData = EliteDevApi.fetchWeightProfile(localProfile) ?: run {
             apiError = true
             return@launchIOCoroutine

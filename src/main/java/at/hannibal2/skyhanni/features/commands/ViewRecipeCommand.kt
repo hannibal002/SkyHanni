@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -66,6 +67,7 @@ object ViewRecipeCommand {
     }
 
     fun customTabComplete(command: String): List<String>? {
+        if (!SkyBlockUtils.inSkyBlock) return null
         if (command == "viewrecipe" && config.tabComplete.viewrecipeItems) {
             return list
         }

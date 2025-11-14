@@ -142,11 +142,12 @@ object PetStorageApi {
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §6Golden Dragon§e! §a§lVIEW RULE
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §dRabbit§9 ✦§e! §a§lVIEW RULE
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §r§8[§r§6122§4✦] §r§6Golden Dragon§e! §a§lVIEW RULE
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §8[§634§8§4✦§8] §6Golden Dragon§e! §a§lVIEW RULE
      */
     @Suppress("MaxLineLength")
     private val autoPetMessagePattern by patternGroup.pattern(
         "autopet.message",
-        "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?:(?:§.)+\\[(?:§.)+\\d+(?<altskin>§.✦)\\] )?(?:§.)*§(?<rarity>.)(?<pet>[^§]+)(?<skin>§. ✦)?§e! §a§lVIEW RULE",
+        "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?:(?:§.)+\\[(?:§.)*\\d+(?:§.)*(?<altskin>§.✦)(?:§.)*\\] )?(?:§.)*§(?<rarity>.)(?<pet>[^§]+)(?<skin>§. ✦)?§e! §a§lVIEW RULE",
     )
 
     /**
@@ -184,7 +185,8 @@ object PetStorageApi {
             val level = group("level").toInt()
             val rarity = getRarityOrNull() ?: return@firstMatcher false
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
-                PetUtils.resolvePetItemOrNull(line.trim().removeResets())
+                val trimmedLine = line.trim().removeResets().takeIf { it.isNotBlank() } ?: return@firstNotNullOfOrNull null
+                PetUtils.resolvePetItemOrNull(trimmedLine)
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) expFirstMatcher@{

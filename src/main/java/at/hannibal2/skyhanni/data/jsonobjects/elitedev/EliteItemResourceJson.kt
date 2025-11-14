@@ -114,7 +114,7 @@ data class EliteItemRequirement(
         ageUnit.asDuration(rawInt)
     }
     val slayerBossType: SlayerType? = slayerBossTypeStr?.let {
-        SlayerType.getByClazzName(it)
+        SlayerType.getByClassName(it)
     }
     val targetPracticeMode: Int? = eliteMode?.romanToDecimalIfNecessary()
     val ciFaction: FactionType? = ciFactionStr?.let {

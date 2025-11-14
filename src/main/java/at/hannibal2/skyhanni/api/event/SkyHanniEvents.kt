@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.optionalEmpty
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import java.lang.reflect.Method
 
@@ -93,8 +94,8 @@ object SkyHanniEvents {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
-        disabledHandlers = data.disabledHandlers
-        disabledHandlerInvokers = data.disabledInvokers
+        disabledHandlers = data.disabledHandlers.optionalEmpty()
+        disabledHandlerInvokers = data.disabledInvokers.optionalEmpty()
     }
 
     val seconds = listOf(10, 60, 60 * 5)

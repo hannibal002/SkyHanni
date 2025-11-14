@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
@@ -22,6 +22,7 @@ object HideMobNames {
         addMobToHide("Zombie")
         addMobToHide("Zombie Villager")
         addMobToHide("Crypt Ghoul")
+        addMobToHide("Graveyard Zombie")
 
         addMobToHide("Dasher Spider")
         addMobToHide("Weaver Spider")
@@ -40,14 +41,15 @@ object HideMobNames {
         addMobToHide("Mutated Blaze") // 1.5m
         addMobToHide("Bezal") // 2m
         addMobToHide("Smoldering Blaze") // 5.5m
+        addMobToHide("Flaming Spider") // 5.5m
     }
 
     private fun addMobToHide(bossName: String) {
-        patterns.add("§8\\[§7Lv\\d+§8] §c$bossName§r §[ae](?<min>.+)§f/§a(?<max>.+)§c❤".toPattern())
+        patterns.add("§8\\[§7Lv\\d+§8] (?<mobType>(§.[✈☮⚓♃Ж⚙⚂♣⊙☃❄✰♨♆✿ൠ⛨\uD83E\uDDB4☽⛏༕☠⸙])+)? §c$bossName§r §[ae](?<min>.+)§f\\/§a(?<max>.+)§c❤(§r)?".toPattern())
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!SlayerApi.config.hideMobNames) return
 
         val entity = event.entity

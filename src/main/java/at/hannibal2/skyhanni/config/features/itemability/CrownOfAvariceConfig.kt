@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -29,19 +30,12 @@ class CrownOfAvariceConfig {
     var shortFormatCPH: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Crown Coins Per Hour", desc = "Show coins per hour in the Avarice Counter.")
-    @ConfigEditorBoolean
-    var perHour: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Time until Max Crown", desc = "Shows the time until you reach max coins (1B coins).")
-    @ConfigEditorBoolean
-    var time: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Last coins gained", desc = "Shows the amount of scavenger coins gained by last killed mob.")
-    @ConfigEditorBoolean
-    var coinDiff: Boolean = false
+    @ConfigOption(
+        name = "Afk Pause Time",
+        desc = "Pauses the timer if no coins are added after this amount of time in seconds."
+    )
+    @ConfigEditorSlider(minValue = 5F, maxValue = 180F, minStep = 5F)
+    var afkTimeout: Int = 120
 
     @Expose
     @ConfigOption(
@@ -50,6 +44,34 @@ class CrownOfAvariceConfig {
     )
     @ConfigEditorSlider(minValue = 0F, maxValue = 10F, minStep = 1F)
     var sessionActiveTime: Int = 10
+
+    @Expose
+    @ConfigOption(name = "Reset on World Change", desc = "Resets your session on world change if enabled.")
+    @ConfigEditorBoolean
+    var resetOnWorldChange = false
+
+    @Expose
+    @ConfigOption(name = "Tracker Text", desc = "Drag the text to change the appearance of the overlay.")
+    @ConfigEditorDraggableList
+    val text: MutableList<CrownOfAvariceLines> = mutableListOf(
+        CrownOfAvariceLines.COINSPERHOUR,
+        CrownOfAvariceLines.TIMEUNTILMAX,
+        CrownOfAvariceLines.COINDIFFERENCE,
+        CrownOfAvariceLines.SESSIONCOINS,
+        CrownOfAvariceLines.SESSIONTIME,
+    )
+
+
+    enum class CrownOfAvariceLines(private val displayName: String) {
+        COINSPERHOUR("§aCoins Per Hour: §61,234,567 / 1.23M"),
+        TIMEUNTILMAX("§aTime until Max: §61234y 56d 7h 8m 9s"),
+        COINDIFFERENCE("§aLast coins gained: §61234"),
+        SESSIONCOINS("§aCoins this session: §6123,456,789"),
+        SESSIONTIME("§aSession Time: §612m 34s"),
+        ;override fun toString() = displayName
+    }
+
+
 
     @Expose
     @ConfigLink(owner = CrownOfAvariceConfig::class, field = "enable")

@@ -24,7 +24,7 @@ object SoundCompat {
         "mob.endermen.portal" to "entity.enderman.teleport",
         "mob.ghast.affectionate_scream" to "entity.ghast.ambient",
         "mob.ghast.fireball" to "entity.ghast.shoot",
-        "mob.ghast.scream" to "entity.ghast.scream",
+        "mob.ghast.scream" to "entity.ghast.hurt",
         "mob.guardian.curse" to "entity.elder_guardian.curse",
         "mob.guardian.elder.idle" to "entity.elder_guardian.ambient",
         "mob.horse.donkey.death" to "entity.donkey.death",

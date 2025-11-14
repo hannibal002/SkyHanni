@@ -14,6 +14,7 @@ enum class FarmingReforge(
     BLESSED("Blessed", "BLESSED_FRUIT", 5, 7, 9, 13, 16, 20),
     BOUNTIFUL("Bountiful", "GOLDEN_BALL", 1, 2, 3, 5, 7, 10),
     BLOOMING("Blooming", "FLOWERING_BOUQUET", 1, 2, 3, 4, 5, 6),
+    SQUEAKY("Squeaky", "SQUEAKY_TOY", 2, 4, 6, 8, 10, 12),
     ROOTED("Rooted", "BURROWING_SPORES", 6, 9, 12, 15, 18, 21),
     BUSTLING("Bustling", "SKYMART_BROCHURE", 1, 2, 4, 6, 8, 10),
     MOSSY("Mossy", "OVERGROWN_GRASS", 5, 10, 15, 20, 25, 30),

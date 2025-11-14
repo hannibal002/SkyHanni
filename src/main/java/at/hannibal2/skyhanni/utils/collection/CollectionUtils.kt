@@ -559,4 +559,6 @@ object CollectionUtils {
         retainAll(sequence.toSet())
     }
 
+    fun <T> Set<T>.optionalEmpty(): Set<T> = if (isEmpty()) emptySet() else this
+
 }

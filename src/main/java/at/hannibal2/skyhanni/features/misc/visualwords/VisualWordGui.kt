@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.util.MathHelper
@@ -32,7 +32,7 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-open class VisualWordGui : SkyhanniBaseScreen() {
+open class VisualWordGui : SkyHanniBaseScreen() {
 
     private var guiLeft = 0
     private var guiTop = 0
@@ -504,7 +504,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         }
 
         if (KeyboardManager.isPastingKeysDown()) {
-            SkyHanniMod.launchCoroutine {
+            SkyHanniMod.launchCoroutine("visual word pasting") {
                 val clipboard = OSUtils.readFromClipboard().orEmpty()
                 for (char in clipboard) {
                     if (currentText.length < maxTextLength && !Character.isISOControl(char)) {
@@ -598,7 +598,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
     }
 
     private fun drawUnmodifiedString(str: String, x: Float, y: Float) {
-        GuiRenderUtils.drawString("§§$str", x, y)
+        ModifyVisualWords.changeWords = false
+        GuiRenderUtils.drawString(str, x, y)
+        ModifyVisualWords.changeWords = true
     }
 
     private fun drawUnmodifiedString(str: String, x: Int, y: Int) {
@@ -606,7 +608,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
     }
 
     private fun drawUnmodifiedStringCentered(str: String?, x: Int, y: Int) {
-        GuiRenderUtils.drawStringCentered("§§$str", x, y)
+        ModifyVisualWords.changeWords = false
+        GuiRenderUtils.drawStringCentered(str ?: "null", x, y)
+        ModifyVisualWords.changeWords = true
     }
 
     private fun drawUnmodifiedStringCentered(str: String?, x: Float, y: Float) {

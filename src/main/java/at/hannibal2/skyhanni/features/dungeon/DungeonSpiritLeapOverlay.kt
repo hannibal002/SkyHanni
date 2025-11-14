@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -18,10 +19,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
@@ -45,6 +46,7 @@ object DungeonSpiritLeapOverlay {
     private var containerHeight = 0
     private var playerList = emptyList<PlayerStackInfo>()
     private val validInventoryNames = setOf("Spirit Leap", "Teleport to Player")
+    private val inventory = InventoryDetector { it in validInventoryNames }
 
     data class PlayerStackInfo(val playerInfo: DungeonApi.TeamMember?, val stack: ItemStack, val slotNumber: Int)
 
@@ -54,7 +56,7 @@ object DungeonSpiritLeapOverlay {
 
         val gui = event.gui
         // TODO find a way to make InventoryDetector usable here.
-        if (gui !is GuiChest || InventoryUtils.openInventoryName().removeColor() !in validInventoryNames) return
+        if (gui !is GuiChest || !inventory.isInside()) return
         containerWidth = gui.width
         containerHeight = gui.height
         scaleFactor = min(containerWidth, containerHeight).toDouble() / max(containerWidth, containerHeight).toDouble()
@@ -88,6 +90,7 @@ object DungeonSpiritLeapOverlay {
     @HandleEvent
     fun onKeyPress(event: KeyDownEvent) {
         if (!isEnabled() || !config.spiritLeapKeybindConfig.enableKeybind) return
+        if (!inventory.isInside()) return
         val index = getKeybindIndex(event.keyCode)
         if (index !in 0..<playerList.count()) return
         leapToPlayer(playerList[index])
@@ -109,8 +112,8 @@ object DungeonSpiritLeapOverlay {
         val layout = leapRenderItems.take(4).chunked(2)
         return if (layout.isNotEmpty()) Renderable.table(
             layout,
-            xPadding = 18,
-            yPadding = 18,
+            xSpacing = 18,
+            ySpacing = 18,
             horizontalAlign = HorizontalAlignment.CENTER,
             verticalAlign = VerticalAlignment.CENTER,
         ) else Renderable.wrappedText(

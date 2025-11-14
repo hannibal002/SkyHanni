@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 
 class RepoPatternConfig {
     @Expose
-    @ConfigOption(name = "Force Local Loading", desc = "Force loading local patterns.")
+    @ConfigOption(name = "Force Local Loading", desc = "When enabled, we use the pattern in the code and do not touch the repo file.")
     @ConfigEditorBoolean
     val forceLocal: Property<Boolean> = Property.of(false)
 

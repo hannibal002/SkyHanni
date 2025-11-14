@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
@@ -13,9 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
@@ -26,12 +25,12 @@ object ToolTooltipTweaks {
     private val config get() = GardenApi.config.tooltipTweak
 
     /**
-     * REGEX-TEST: §7Farming Fortune: §a+88.5 §9(+8)
-     * REGEX-TEST: §7Farming Fortune: §a+73 §9(+30) §d(+8)
+     * REGEX-TEST: §7Farming Fortune: §6+88.5 §9(+8)
+     * REGEX-TEST: §7Farming Fortune: §6+73 §9(+30) §d(+8)
      */
     private val farmingFortunePattern by RepoPattern.pattern(
         "garden.tooltip.farmingfortune",
-        "§7Farming Fortune: §a",
+        "§7Farming Fortune: §6",
     )
 
     private val counterStartLine = setOf("§6Logarithmic Counter", "§6Collection Analysis")
@@ -53,7 +52,9 @@ object ToolTooltipTweaks {
         val turboCropFortune = FarmingFortuneDisplay.getTurboCropFortune(itemStack, crop)
         val dedicationFortune = FarmingFortuneDisplay.getDedicationFortune(itemStack, crop)
 
-        val reforgeName = itemStack.getReforgeName()?.firstLetterUppercase()
+        val reforgeName = itemStack.getReforgeModifier()?.let { modifier ->
+            ReforgeApi.reforges.firstOrNull { it.nbtModifier == modifier }?.name
+        }
 
         val sunderFortune = FarmingFortuneDisplay.getSunderFortune(itemStack)
         val harvestingFortune = FarmingFortuneDisplay.getHarvestingFortune(itemStack)
@@ -92,20 +93,20 @@ object ToolTooltipTweaks {
 
                 val fortuneLine = when (config.cropTooltipFortune) {
                     CropTooltipFortuneEntry.DEFAULT ->
-                        "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
+                        "§7Farming Fortune: §6+${displayedFortune.formatStat()}$ffdString$reforgeString"
 
                     CropTooltipFortuneEntry.SHOW ->
-                        "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
+                        "§7Farming Fortune: §6+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
 
                     else ->
-                        "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
+                        "§7Farming Fortune: §6+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
                 }
                 iterator.set(fortuneLine)
 
                 if (config.fortuneTooltipKeybind.isKeyHeld()) {
                     iterator.addStat("  §7Base: §6+", baseFortune)
                     iterator.addStat("  §7Tool: §6+", toolFortune)
-                    iterator.addStat("  §7${reforgeName?.removeColor()}: §9+", reforgeFortune)
+                    iterator.addStat("  §7${reforgeName ?: "Reforge"}: §9+", reforgeFortune)
                     iterator.addStat("  §7Gemstone: §d+", gemstoneFortune)
                     iterator.addStat("  §7Ability: §2+", abilityFortune)
                     iterator.addStat("  §7Green Thumb: §a+", greenThumbFortune)

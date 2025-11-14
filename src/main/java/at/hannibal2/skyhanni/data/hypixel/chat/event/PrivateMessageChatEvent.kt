@@ -9,4 +9,4 @@ class PrivateMessageChatEvent(
     message: ComponentSpan,
     chatComponent: IChatComponent,
     blockedReason: String? = null,
-) : AbstractChatEvent(author, message, chatComponent, blockedReason)
+) : AbstractSourcedChatEvent(author, message, chatComponent, blockedReason)

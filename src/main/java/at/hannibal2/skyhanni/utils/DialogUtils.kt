@@ -10,47 +10,37 @@ import javax.swing.UIManager
 
 object DialogUtils {
 
-    /**
-     * Taken and modified from Skytils
-     */
-    fun openPopupWindow(title: String, message: String) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-        } catch (e: java.lang.Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Failed to open a popup window",
-                "message" to message,
-            )
+    private val closeListener = object : MouseAdapter() {
+        override fun mouseClicked(event: MouseEvent) {
+            (event.source as? JFrame)?.isVisible = false
         }
+    }
 
-        val frame = JFrame().apply {
+    private val baseFrame by lazy {
+        JFrame().apply {
             isUndecorated = true
             isAlwaysOnTop = true
             setLocationRelativeTo(null)
             isVisible = true
         }
+    }
 
-        val buttons = mutableListOf<JButton>()
-        val close = JButton("Ok")
-        close.addMouseListener(
-            object : MouseAdapter() {
-                override fun mouseClicked(event: MouseEvent) {
-                    frame.isVisible = false
-                }
-            },
-        )
-        buttons.add(close)
+    private val okButton = JButton("Ok").apply { addMouseListener(closeListener) }
 
-        val allOptions = buttons.toTypedArray()
+    /**
+     * Taken and modified from Skytils
+     */
+    fun openPopupWindow(title: String, message: String) = runCatching {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
         JOptionPane.showOptionDialog(
-            frame,
-            message,
-            title,
-            JOptionPane.DEFAULT_OPTION,
-            JOptionPane.INFORMATION_MESSAGE,
-            null,
-            allOptions,
-            allOptions[0],
+            baseFrame, message, title,
+            JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+            listOf(okButton).toTypedArray(), okButton,
+        )
+    }.onFailure { e ->
+        ErrorManager.logErrorWithData(
+            e, "Failed to open a popup window",
+            "message" to message,
         )
     }
 }

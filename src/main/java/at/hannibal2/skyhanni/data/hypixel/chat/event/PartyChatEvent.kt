@@ -9,6 +9,6 @@ class PartyChatEvent(
     messageComponent: ComponentSpan,
     chatComponent: IChatComponent,
     blockedReason: String? = null,
-) : AbstractChatEvent(authorComponent, messageComponent, chatComponent, blockedReason) {
+) : AbstractSourcedChatEvent(authorComponent, messageComponent, chatComponent, blockedReason) {
     val cleanedAuthor = author.cleanPlayerName()
 }

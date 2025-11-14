@@ -42,10 +42,24 @@ object TrophyFishManager {
         "§.(?<rarity>.*) §c✖",
     )
 
+    fun loadMissingTrophyFish(): Int {
+        val savedFishes = fish ?: return 0
+        var updatedFishes = 0
+        for (internalName in trophyFishInfo.keys) {
+            savedFishes.getOrPut(internalName) {
+                updatedFishes += 1
+                mutableMapOf()
+            }
+        }
+        return updatedFishes
+    }
+
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<TrophyFishJson>("TrophyFish")
         trophyFishInfo = data.trophyFish
+        loadMissingTrophyFish()
+        TrophyFishDisplay.update()
     }
 
     val fish: MutableMap<String, MutableMap<TrophyRarity, Int>>?
@@ -97,8 +111,8 @@ object TrophyFishManager {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Trophy Fishing") return
 
+        var updatedFishes = loadMissingTrophyFish()
         val savedFishes = fish ?: return
-        var updatedFishes = 0
         for (stack in event.inventoryItems.values) {
             val internalName = TrophyFishApi.getInternalName(stack.displayName.replace("§k", ""))
 

@@ -208,6 +208,7 @@ object BlazeSlayerDaggerHelper {
         clientSideClicked = true
     }
 
+    // TODO use internal names. see FixDoubleClicks.blazeDaggers
     enum class Dagger(val daggerNames: List<String>, vararg val shields: HellionShield, var updated: Boolean = false) {
         TWILIGHT(
             listOf("Twilight Dagger", "Mawdredge Dagger", "Deathripper Dagger"),

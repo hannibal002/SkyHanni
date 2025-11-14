@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractSourcedChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.NpcChatEvent
@@ -219,7 +219,7 @@ object PlayerChatManager {
         }
     }
 
-    private fun AbstractChatEvent.postChat(event: SkyHanniChatEvent) {
+    private fun AbstractSourcedChatEvent.postChat(event: SkyHanniChatEvent) {
         post()
         event.handleChat(blockedReason, chatComponent)
     }

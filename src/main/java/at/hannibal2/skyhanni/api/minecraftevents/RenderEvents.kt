@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.events.render.gui.InitializeGuiEvent
 import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent
 import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.WorldRenderContext
@@ -35,8 +35,8 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
+        if (GlobalRender.renderDisabled) return
         if (!canRender()) return
-        if (!SkyHanniDebugsAndTests.globalRender) return
         SkyHanniRenderWorldEvent(WorldRenderContext(), event.partialTicks).post()
     }
 

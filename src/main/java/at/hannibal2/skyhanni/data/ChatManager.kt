@@ -200,6 +200,9 @@ object ChatManager {
         if (chatEvent.chatLineId != 0) {
             cancelled = true
             component.send(chatEvent.chatLineId)
+            // Because we're separately sending the chat line, we don't want to modify the component again,
+            // even if we "meant" to replace the component.
+            modified = false
         }
         return Pair(component.takeIf { modified }, cancelled)
     }

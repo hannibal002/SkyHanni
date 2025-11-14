@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.item.ShardGainEvent
+import at.hannibal2.skyhanni.events.item.ShardEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -107,8 +107,8 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    @HandleEvent(GuiRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled()) return
         display?.let { config.position.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
@@ -134,7 +134,7 @@ object ItemPickupLog {
     }
 
     @HandleEvent
-    fun onShardGain(event: ShardGainEvent) {
+    fun onShardGain(event: ShardEvent) {
         if (!isEnabled() || !config.shards) return
 
         val itemStack = event.shardInternalName.getItemStack()
@@ -150,8 +150,8 @@ object ItemPickupLog {
         updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), event.coins < 0)
     }
 
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent(SkyHanniTickEvent::class)
+    fun onTick() {
         if (!isEnabled()) return
         val oldItemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
 

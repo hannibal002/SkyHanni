@@ -24,14 +24,15 @@ object CruxTalismanDisplay {
     private val config get() = RiftApi.config.cruxTalisman
 
     /**
-     * REGEX-TEST:   §23 §2Shy§7: §e88§7/§a100 §7kills
-     * REGEX-TEST:   §82 §8Shadow§7: §e42§7/§a50 §7kills
-     * REGEX-TEST:   §e- §eVolt§7: §e6§7/§a10 §7kills
+     * WRAPPED-REGEX-TEST: "  §23 §2Shy§7: §e88§7/§a100 §7kills"
+     * WRAPPED-REGEX-TEST: "  §82 §8Shadow§7: §e42§7/§a50 §7kills"
+     * WRAPPED-REGEX-TEST: "  §e- §eVolt§7: §e6§7/§a10 §7kills"
+     * WRAPPED-REGEX-TEST: "  4 Puff§7: §a§lMAXED"
      */
     @Suppress("MaxLineLength")
     private val progressPattern by RepoPattern.pattern(
         "rift.everywhere.crux.progress",
-        ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*",
+        ".*(?<tier>(?:§.)?[IV1-4-]+)\\s+(?<name>(?:§.)?\\w+)§.:\\s*(?<progress>(?:§.)*MAXED|§.\\d+§./§.\\d+).*",
     )
 
     private const val PARTIAL_NAME = "CRUX_TALISMAN"

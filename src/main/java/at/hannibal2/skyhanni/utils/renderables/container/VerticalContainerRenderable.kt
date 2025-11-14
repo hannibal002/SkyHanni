@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 
 open class VerticalContainerRenderable protected constructor(
-    renderables: Collection<Renderable>,
-    spacing: Int = 0,
-    horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
-    verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
-) : ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
+    final override var renderables: Collection<Renderable>,
+    final override val spacing: Int = 0,
+    override val horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+    override val verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
+) : ContainerRenderable() {
 
     override val width = renderables.maxOfOrNull { it.width } ?: 0
 

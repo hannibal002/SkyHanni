@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingl
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
@@ -55,6 +56,7 @@ object TrophyFishDisplay {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.CRIMSON_ISLE) {
             DelayedRun.runDelayed(200.milliseconds) {
+                TrophyFishManager.loadMissingTrophyFish()
                 update()
             }
         }
@@ -62,6 +64,7 @@ object TrophyFishDisplay {
 
     @HandleEvent
     fun onTrophyFishCaught(event: TrophyFishCaughtEvent) {
+        TrophyFishManager.loadMissingTrophyFish()
         recentlyDroppedTrophies[getInternalName(event.trophyFishName)] = event.rarity
         update()
         DelayedRun.runDelayed(5.1.seconds) {
@@ -72,6 +75,7 @@ object TrophyFishDisplay {
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
+        TrophyFishManager.loadMissingTrophyFish()
         update()
     }
 
@@ -91,6 +95,7 @@ object TrophyFishDisplay {
                 showCaughtHigher,
                 requireArmor,
             ) {
+                TrophyFishManager.loadMissingTrophyFish()
                 update()
             }
         }
@@ -100,7 +105,7 @@ object TrophyFishDisplay {
         if (!isEnabled()) return
         val list = mutableListOf<Renderable>()
         list.addString("§e§lTrophy Fish Display")
-        list.add(Renderable.table(createTable(), yPadding = config.extraSpace.get()))
+        list.add(Renderable.table(createTable(), ySpacing = config.extraSpace.get()))
         display = list
     }
 

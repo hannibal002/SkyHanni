@@ -502,4 +502,14 @@ class MiscConfig {
     @ConfigOption(name = "Abiphone Hotkey", desc = "Answer incoming abiphone calls with a hotkey.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var abiphoneAcceptKey: Int = Keyboard.KEY_NONE
+
+    @Expose
+    @ConfigOption(
+        name = "Fix item double clicks",
+        desc = "Fixes a Hypixel bug causing double clicks on blocks with blaze daggers or a fishing rod with autopet.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var fixDoubleClicks: Boolean = true
 }

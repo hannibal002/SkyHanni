@@ -10,33 +10,34 @@ import org.lwjgl.input.Keyboard
 
 class InquisitorSharingConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Share your Inquisitor and receiving other Inquisitors via Party Chat.")
+    @ConfigOption(name = "Enabled", desc = "Share your Rare Diana Mobs and receiving other Rare Diana Mobs via Party Chat.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
 
+    // TODO rename to focus
     @Expose
-    @ConfigOption(name = "Focus", desc = "Hide other waypoints when your Party finds an Inquisitor.")
+    @ConfigOption(name = "Focus", desc = "Hide other waypoints when your Party finds a Rare Diana Mob.")
     @ConfigEditorBoolean
     var focusInquisitor: Boolean = false
 
     @Expose
     @ConfigOption(
         name = "Instant Share",
-        desc = "Share the waypoint as soon as you find an Inquisitor. As an alternative, you can share it only via key press."
+        desc = "Share the waypoint as soon as you find a Rare Diana Mob. As an alternative, you can share it only via key press."
     )
     @ConfigEditorBoolean
     var instantShare: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Share Key", desc = "Press this key to share your Inquisitor Waypoint.")
+    @ConfigOption(name = "Share Key", desc = "Press this key to share your Rare Diana Mob Waypoint.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Y)
     var keyBindShare: Int = Keyboard.KEY_Y
 
     @Expose
-    @ConfigOption(name = "Inquisitor Sound", desc = "")
+    @ConfigOption(name = "Rare Diana Mob Sound", desc = "")
     @Accordion
-    val sound: InquisitorSoundConfig = InquisitorSoundConfig()
+    val sound: RareDianaMobSoundConfig = RareDianaMobSoundConfig()
 
     @Expose
     @ConfigOption(name = "Show Despawn Time", desc = "Show the time until the shared Inquisitor will despawn.")
@@ -46,7 +47,7 @@ class InquisitorSharingConfig {
     @Expose
     @ConfigOption(
         name = "Read Global Chat",
-        desc = "Also read the global chat for detecting inquistiors, not only party chat."
+        desc = "Also read the global chat for detecting Rare Diana Mobs, not only party chat."
     )
     @ConfigEditorBoolean
     var globalChat: Boolean = false

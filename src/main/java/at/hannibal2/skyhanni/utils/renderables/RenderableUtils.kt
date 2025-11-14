@@ -17,6 +17,8 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.table.ScrollTable.Companion.scrollTable
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.awt.Color
@@ -404,7 +406,7 @@ internal object RenderableUtils {
         itemScale: Double = NeuItems.ITEM_FONT_SIZE,
     ): Renderable {
         val outerList = constructOuterList(data, itemScale)
-        return Renderable.table(outerList, xPadding = 5, yPadding = padding)
+        return Renderable.table(outerList, xSpacing = 5, ySpacing = padding)
     }
 
     fun fillScrollTable(
@@ -415,15 +417,15 @@ internal object RenderableUtils {
         velocity: Double = 2.0,
     ): Renderable {
         val outerList = constructOuterList(data, itemScale)
-        if (outerList.isEmpty()) return Renderable.table(emptyList(), xPadding = 5, yPadding = padding)
-        return Renderable.scrollTable(outerList, height, xPadding = 5, yPadding = padding, velocity = velocity)
+        if (outerList.isEmpty()) return Renderable.table(emptyList(), xSpacing = 5, ySpacing = padding)
+        return Renderable.scrollTable(outerList, height, xSpacing = 5, ySpacing = padding, velocity = velocity)
     }
 
     private fun constructOuterList(
         data: List<DisplayTableEntry>,
         itemScale: Double = NeuItems.ITEM_FONT_SIZE,
     ): MutableList<List<Renderable>> {
-        val sorted = data.sortedByDescending { it.sort }
+        val sorted = data.sortedByDescending { it.sort.toDouble() }
         val outerList = mutableListOf<List<Renderable>>()
         for (entry in sorted) {
             val item = entry.item.getItemStackOrNull()?.let {

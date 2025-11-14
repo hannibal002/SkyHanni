@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -31,7 +33,9 @@ object CFShortcut {
             "§8(From SkyHanni)",
             "",
             "§7Click here to run",
-            "§e/chocolatefactory"
+            "§e/chocolatefactory",
+            "",
+            "§7Ctrl + Click to open config"
         )
     }
 
@@ -58,8 +62,12 @@ object CFShortcut {
         if (!showItem || event.slotId != slotId) return
         event.cancel()
         if (lastClick.passedSince() > 2.seconds) {
-            HypixelCommands.chocolateFactory()
             lastClick = SimpleTimeMark.now()
+            if (KeyboardManager.isControlKeyDown()) {
+                config::hoppityMenuShortcut.jumpToEditor()
+                return
+            }
+            HypixelCommands.chocolateFactory()
         }
     }
 }

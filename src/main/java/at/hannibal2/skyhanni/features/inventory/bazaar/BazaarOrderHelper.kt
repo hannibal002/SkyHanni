@@ -51,7 +51,7 @@ object BazaarOrderHelper {
     )
 
     private val inventory = InventoryDetector(
-        openInventory = { highlightedSlots = load(it.inventoryItems) },
+        onOpenInventory = { highlightedSlots = load(it.inventoryItems) },
         checkInventoryName = { name -> BazaarApi.isBazaarOrderInventory(name) && config.orderHelper },
     )
 

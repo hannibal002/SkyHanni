@@ -6,23 +6,26 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GitHubUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.getJson
 import at.hannibal2.skyhanni.utils.system.LazyVar
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.minecraft.util.IChatComponent
 import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.minutes
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
@@ -99,7 +102,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private var shouldManuallyReload: Boolean = false
     private var loadingError: Boolean = false
-    private var downloadFailed: Boolean = false
+    private var latestError = SimpleTimeMark.farPast()
 
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
@@ -110,21 +113,30 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (shouldRegisterUpdateCommand) event.registerBrigadier(updateCommand) {
             description = "Remove and re-download the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            simpleCallback { updateRepo(forceReset = true) }
+            simpleCallback { updateRepo("/$updateCommand", forceReset = true) }
             argCallback("force", BoolArgumentType.bool()) {
                 description = "optionally only re-download if the repo is out of date"
-                updateRepo(forceReset = it)
+                updateRepo("/$updateCommand force", forceReset = it)
             }
         }
         if (shouldRegisterStatusCommand) event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            simpleCallback { displayRepoStatus(false) }
+            coroutineSimpleCallback {
+                val progress = ChatProgressUpdates()
+                progress.start("Showing status of $commonName repo via /$statusCommand")
+                displayRepoStatus(progress, joinEvent = true, command = true)
+                progress.end("done showing status")
+            }
         }
         if (shouldRegisterReloadCommand) event.registerBrigadier(reloadCommand) {
             description = "Reloads the local $commonName repo"
             category = CommandCategory.DEVELOPER_TEST
-            simpleCallback { reloadLocalRepo() }
+            simpleCallback {
+                val progress = ChatProgressUpdates()
+                progress.start("Reloading the local $commonName repo via /$reloadCommand")
+                reloadLocalRepo(progress)
+            }
         }
     }
 
@@ -140,8 +152,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             return repoFileSystem.readAllBytesAsJsonElement(path)
         }
         val onDisk = repoDirectory.resolve(path)
-        if (!onDisk.isFile) logger.throwError("Repo file not found: $path")
-        return onDisk.getJson()
+        return if (!onDisk.isFile) {
+            logger.logNonDestructiveError("Repo file not found: $path")
+            null
+        } else onDisk.getJson()
     }
 
     @PublishedApi
@@ -161,222 +175,341 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     // <editor-fold desc="Repo Management">
-    fun updateRepo(forceReset: Boolean = false) {
+    fun updateRepo(reason: String, forceReset: Boolean = false) {
+        val progress = ChatProgressUpdates()
+        progress.start("updateRepo $commonName Repo")
+        progress.update("reason: $reason")
+        progress.update("Remove and re-download, forceReset=$forceReset")
         shouldManuallyReload = true
         if (!config.location.valid) {
-            ChatUtils.userError("Invalid $commonName Repo settings detected, resetting default settings.")
+            logger.errorToChat("Invalid $commonName repo settings detected, resetting default settings.")
             resetRepositoryLocation()
         }
 
-        SkyHanniMod.launchIOCoroutine {
-            fetchAndUnpackRepo(command = true, forceReset = forceReset)
-            reloadRepository("$commonName Repo updated successfully.")
+        SkyHanniMod.launchIOCoroutine("$commonName updateRepo", timeout = 2.minutes) {
+            if (!fetchAndUnpackRepo(progress, command = true, forceReset = forceReset).canContinue) {
+                logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
+                return@launchIOCoroutine
+            }
+            reloadRepository(progress, "$commonName repo updated successfully.")
             if (unsuccessfulConstants.isEmpty() && !isUsingBackup) return@launchIOCoroutine
             val informed = logger.logErrorStateWithData(
-                "Error updating reading $commonName Repo",
+                "Error updating reading $commonName repo",
                 "no success",
                 "usingBackupRepo" to isUsingBackup,
                 "unsuccessfulConstants" to unsuccessfulConstants,
             )
             if (informed) return@launchIOCoroutine
-            ChatUtils.chat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
+            logger.logToChat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
         }
     }
 
     private fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
         if (hasDefaultSettings()) {
-            if (manual) ChatUtils.chat("$commonShortNameCased Repo settings are already on default!")
+            if (manual) logger.logToChat("$commonShortNameCased repo settings are already on default!")
             return
         }
 
         reset()
         if (!manual) return@with
         ChatUtils.clickableChat(
-            "Reset $commonName Repo settings to default. " +
-                "Click §aUpdate Repo Now §ein config or run /$updateCommand to update!",
-            onClick = ::updateRepo,
-            "§eClick to update the $commonShortNameCased Repo!",
+            "Reset $commonName repo settings to default. " +
+                "Click §aUpdate repo Now §ein config or run /$updateCommand to update!",
+            onClick = { updateRepo("click in chat after reset") },
+            "§eClick to update the $commonShortNameCased repo!",
         )
     }
 
     fun initRepo() {
+        val progress = ChatProgressUpdates()
+        progress.start("auto loading $commonName repo on init")
         shouldManuallyReload = true
-        SkyHanniMod.launchIOCoroutine {
-            if (config.repoAutoUpdate) {
-                fetchAndUnpackRepo(command = false)
-                if (downloadFailed) switchToBackupRepo()
+        val loaded = AtomicBoolean(false)
+        val job = SkyHanniMod.launchIOCoroutine("$commonName repo init", timeout = 2.minutes) {
+            if (config.repoAutoUpdate && !fetchAndUnpackRepo(progress, command = false).canContinue) {
+                progress.end("Failed to fetch & unpack repo - aborting repository reload.")
+                logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
+                return@launchIOCoroutine
             }
-            reloadRepository()
+            loaded.set(true)
+            reloadRepository(progress)
+        }
+        job.invokeOnCompletion {
+            if (!loaded.get()) {
+                progress.end("reached timeout")
+            }
         }
     }
 
     // Code taken + adapted from NotEnoughUpdates
-    private fun switchToBackupRepo() {
+    private fun switchToBackupRepo(progress: ChatProgressUpdates): FetchUnpackResult = runCatching {
+        progress.update("switchToBackupRepo")
+        if (PlatformUtils.isDevEnvironment) {
+            progress.end("Can not use backup repo in dev env.")
+            return@runCatching FetchUnpackResult.FAILED
+        }
+
         if (backupRepoResourcePath == null) {
+            progress.update("No backup repo resource path provided, cannot switch to backup repo.")
             logger.warn("No backup repo resource path provided, cannot switch to backup repo.")
-            return
+            return FetchUnpackResult.FAILED
+        }
+
+        progress.update("Attempting to switch to backup repo")
+        logger.debug("Attempting to switch to backup repo")
+        val inputStream = javaClass.classLoader.getResourceAsStream(backupRepoResourcePath)
+            ?: run {
+                progress.update("Failed to find backup resource '$backupRepoResourcePath'")
+                logger.throwError("Failed to find backup resource '$backupRepoResourcePath'")
+            }
+
+        progress.update("prepCleanRepoFileSystem")
+        prepCleanRepoFileSystem(progress)
+
+        Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        if (!repoFileSystem.loadFromZip(progress, repoZipFile, logger)) {
+            progress.update("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
+            logger.throwError("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
         }
 
         isUsingBackup = true
-        logger.debug("Attempting to switch to backup repo")
-
-        try {
-            val inputStream = javaClass.classLoader.getResourceAsStream(backupRepoResourcePath)
-                ?: logger.throwError("Failed to find backup resource '$backupRepoResourcePath'")
-
-            prepCleanRepoFileSystem()
-
-            Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
-                logger.throwError("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
-            }
-
-            commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
-            logger.debug("Successfully switched to backup repo")
-        } catch (e: Error) {
-            logger.logErrorWithData(e, "Failed to switch to backup repo")
-        }
-    }
+        progress.update("writeToFile: switchToBackupRepo")
+        commitStorage.writeToFile(RepoCommit("backup-repo", time = null))
+        progress.update("Successfully switched to backup repo")
+        logger.debug("Successfully switched to backup repo")
+        return FetchUnpackResult.SWITCHED_TO_BACKUP
+    }.onFailure { e ->
+        logger.logNonDestructiveError("Failed to switch to backup repo: ${e.message}")
+        progress.update("reason: ${e.message ?: "no reason"}")
+        progress.end("Failed to switch to backup repo")
+    }.getOrDefault(FetchUnpackResult.FAILED)
 
     open fun reportExtraStatusInfo(): Unit = Unit
 
-    fun displayRepoStatus(joinEvent: Boolean) {
-        if (joinEvent) return onJoinStatusError()
+    private suspend fun isRepeatErrorOrFixed(progress: ChatProgressUpdates): Boolean {
+        progress.update("isRepeatErrorOrFixed")
+        if (latestError.passedSince() < 5.minutes || !config.repoAutoUpdate) {
+            progress.end("is repeat error or auto update disabled")
+            return true
+        }
+        latestError = SimpleTimeMark.now()
+
+        val comparison = getCommitComparison(silentError = false)
+        val isOutdated = comparison?.let { !it.hashesMatch } ?: run {
+            logger.logNonDestructiveError("Failed to fetch latest commit for repo status check.")
+            false
+        }
+        if (isOutdated) {
+            logger.logToChat("Repo Issue caught, however the repo is outdated.\n§aTrying to update it now...")
+            val result = fetchAndUnpackRepo(progress, command = false)
+            if (result == FetchUnpackResult.SUCCESS) {
+                logger.logToChat("§a$commonName repo updated successfully!")
+                progress.update("repo update successfully!")
+                return true
+            } else {
+                logger.logToChat("§cFailed to update the $commonName repo.")
+                progress.update("Failed to update the $commonName repo.")
+            }
+        }
+        return false
+    }
+
+    suspend fun displayRepoStatus(progress: ChatProgressUpdates, joinEvent: Boolean, command: Boolean = false) {
+        progress.update("displayRepoStatus for $commonName")
+        if (joinEvent) return onJoinStatusError(progress)
 
         val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("$commonName Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
+            logger.logToChat("$commonName repo working fine! Commit hash: §b$currentDownloadedCommit§r")
             reportExtraStatusInfo()
             return
         }
-        ChatUtils.chat("$commonName Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
-        if (successfulConstants.isNotEmpty()) ChatUtils.chat(
-            "Successful Constants §7(${successfulConstants.size}):",
-            prefixColor = "§a",
-        )
-        for (constant in successfulConstants) {
-            ChatUtils.chat("   §a- §7$constant", false)
-        }
-        ChatUtils.chat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):")
-        for (constant in unsuccessfulConstants) {
-            ChatUtils.chat("   §e- §7$constant", false)
-        }
+
+        if (!command && isRepeatErrorOrFixed(progress)) return
+        logger.errorToChat("$commonName repo has errors! Commit hash: §b$currentDownloadedCommit§r")
+
+        if (successfulConstants.isNotEmpty()) logger.logToChat("Successful Constants §7(${successfulConstants.size}):")
+        for (constant in successfulConstants) logger.logToChat("   - §7$constant")
+
+        logger.logToChat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):", color = "§e")
+        for (constant in unsuccessfulConstants) logger.logToChat("   - §7$constant", color = "§e")
+
+        progress.update("reportExtraStatusInfo")
         reportExtraStatusInfo()
+        progress.update("done with displayRepoStatus")
     }
 
-    private fun onJoinStatusError() {
-        if (unsuccessfulConstants.isEmpty()) return
-        val text = mutableListOf<IChatComponent>()
-        text.add(
-            (
-                "§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName Repo Issue! Some features may not work. " +
-                    "Please report this error on the Discord!"
-                ).asComponent(),
-        )
-        text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
-        text.add("§7Backup Repo Value: §c$isUsingBackup".asComponent())
-        text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
-        text.add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):".asComponent())
-
-        for (constant in unsuccessfulConstants) {
-            text.add("   §e- §7$constant".asComponent())
-        }
+    private suspend fun onJoinStatusError(progress: ChatProgressUpdates) {
+        progress.update("onJoinStatusError")
+        if (unsuccessfulConstants.isEmpty() || isRepeatErrorOrFixed(progress)) return
+        // Last sanity check, we want to make sure repo is up to date before displaying
+        val text = buildList {
+            add("§c[SkyHanni-${SkyHanniMod.VERSION}] §7$commonName repo Issue!")
+            add("§cSome features may not work. Please report this error on the Discord if it persists!")
+            add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}")
+            add("§7Backup repo Value: §c$isUsingBackup")
+            if (!config.repoAutoUpdate) add("§4You have repo Auto Update turned off, please try turning that on.")
+            add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):")
+            for (constant in unsuccessfulConstants) {
+                add("   §e- §7$constant")
+            }
+        }.map { it.asComponent() }
         TextHelper.multiline(text).send()
+    }
+
+    private enum class FetchUnpackResult(val canContinue: Boolean = true) {
+        SUCCESS,
+        SWITCHED_TO_BACKUP,
+        FAILED(false),
+    }
+
+    /**
+     * Returns a [RepoComparison] object that represents the 'diff' between the local commit,
+     * and the latest commit from GitHub.
+     * May return null if the latest commit could not be fetched.
+     *
+     * @param silentError If true, will not show errors to the user.
+     */
+    private suspend fun getCommitComparison(silentError: Boolean): RepoComparison? {
+        localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
+        val latestRepoCommit = githubRepoLocation.getLatestCommit(silentError) ?: return null
+        return RepoComparison(commonName, localRepoCommit, latestRepoCommit)
     }
 
     /**
      * Determines the latest commit on the GitHub repo and compares it to the current commit.
      * If out of date, will download the latest commit zip file and unpack it into the repo directory.
+     * Will automatically switch to the backup repo if the download fails or the unpacking fails,
+     * unless `switchToBackupOnFail` is false.
      *
      * @param command If true, will report the status of the repo to the user.
      * @param silentError If true, will not log errors to the console.
+     * @param forceReset If true, will always download the latest commit zip file, even if the repo is up to date.
+     * @param switchToBackupOnFail If true, will switch to the backup repo if the download or unpacking fails.
+     * @return FetchUnpackResult.SUCCESS if the repo was successfully fetched and unpacked,
+     *         FetchUnpackResult.SWITCHED_TO_BACKUP if the backup repo was used,
+     *         FetchUnpackResult.FAILED if the repo could not be fetched or unpacked and no backup repo is available.
      */
     private suspend fun fetchAndUnpackRepo(
+        progress: ChatProgressUpdates,
         command: Boolean,
         silentError: Boolean = true,
         forceReset: Boolean = false,
-    ) = repoMutex.withLock {
-        localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
-        val (currentSha, currentCommitTime) = localRepoCommit
-
-        val (latestSha, latestCommitTime) = githubRepoLocation.getLatestCommit(silentError)?.let { response ->
-            response.sha to response.commit.committer.date
-        } ?: ((null to null).also { downloadFailed = true })
-
-        val diffCheck = RepoComparison(currentSha, currentCommitTime, latestSha, latestCommitTime)
-        val outdated = !diffCheck.hashesMatch
-
-        if (!outdated && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
+        switchToBackupOnFail: Boolean = true,
+    ): FetchUnpackResult = repoMutex.withLock {
+        progress.update("fetchAndUnpackRepo")
+        val comparison = getCommitComparison(silentError) ?: run {
+            return if (switchToBackupOnFail) switchToBackupRepo(progress)
+            else FetchUnpackResult.FAILED
+        }
+        if (comparison.hashesMatch && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
             if (command) {
-                diffCheck.reportRepoUpToDate()
+                comparison.reportRepoUpToDate()
                 shouldManuallyReload = false
             }
-            return
-        } else if ((command && outdated) || forceReset) diffCheck.reportRepoOutdated()
+            return FetchUnpackResult.SUCCESS
+        } else if (command) {
+            if (!comparison.hashesMatch) {
+                progress.update("hashes don't match, outdated!")
+                comparison.reportRepoOutdated()
+            } else if (forceReset) comparison.reportForceRebuild()
+        }
 
-        prepCleanRepoFileSystem()
+        progress.update("prepCleanRepoFileSystem")
+        prepCleanRepoFileSystem(progress)
 
+        progress.update("downloadCommitZipToFile")
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
-            downloadFailed = true
-            logger.logError("Failed to download the repo zip file from GitHub.")
+            progress.update("Failed to download the repo zip file from GitHub.")
+            logger.logNonDestructiveError("Failed to download the repo zip file from GitHub.")
+            return if (switchToBackupOnFail) switchToBackupRepo(progress)
+            else {
+                progress.update("FetchUnpackResult.FAILED")
+                FetchUnpackResult.FAILED
+            }
         }
 
+        progress.update("loadFromZip")
         // Actually unpack the repo zip file into our local 'file system'
-        if (!repoFileSystem.loadFromZip(repoZipFile, logger)) {
-            downloadFailed = true
-            logger.logError("Failed to unpack the downloaded zip file.")
-        } else {
-            localRepoCommit = RepoCommit(latestSha, latestCommitTime)
-            commitStorage.writeToFile(localRepoCommit)
-            downloadFailed = false
-            isUsingBackup = false
+        if (!repoFileSystem.loadFromZip(progress, repoZipFile, logger)) {
+            progress.update("Failed to unpack the downloaded zip file.")
+            logger.logNonDestructiveError("Failed to unpack the downloaded zip file.")
+            return if (switchToBackupOnFail) switchToBackupRepo(progress)
+            else FetchUnpackResult.FAILED
         }
+
+        progress.update("writeToFile: fetchAndUnpackRepo")
+        commitStorage.writeToFile(comparison.latest)
+        isUsingBackup = false
+        return FetchUnpackResult.SUCCESS
     }
 
-    private fun prepCleanRepoFileSystem() {
+    private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates) {
+        progress.update("deleteRecursively")
         repoDirectory.deleteRecursively()
+        progress.update("createAndClean")
         repoFileSystem = RepoFileSystem.createAndClean(repoDirectory, config.unzipToMemory)
+        progress.update("mkdirs")
         repoDirectory.mkdirs()
+        progress.update("createNewFile")
         repoZipFile.createNewFile()
+        progress.update("done with prepCleanRepoFileSystem")
     }
 
-    fun reloadLocalRepo(answerMessage: String = "$commonName Repo loaded from local files successfully.") {
+    fun reloadLocalRepo(progress: ChatProgressUpdates, answerMessage: String = "$commonName repo loaded from local files successfully.") {
+        progress.update("reloadLocalRepo")
         shouldManuallyReload = true
-        SkyHanniMod.launchIOCoroutine {
-            reloadRepository(answerMessage)
+        SkyHanniMod.launchIOCoroutine("$commonName reloadLocalRepo", timeout = 2.minutes) {
+            reloadRepository(progress, answerMessage)
         }
     }
 
     /**
      * Called before the repo reload event is fired, but inside the IO coroutine.
      */
-    open suspend fun extraReloadCoroutineWork() = Unit
+    open suspend fun extraReloadCoroutineWork(progress: ChatProgressUpdates) = Unit
 
-    private suspend fun reloadRepository(answerMessage: String = "") = repoMutex.withLock {
-        if (!shouldManuallyReload) return
+    private suspend fun reloadRepository(progress: ChatProgressUpdates, answerMessage: String = "") = repoMutex.withLock {
+        progress.update("reloadRepository")
+        if (!shouldManuallyReload) {
+            progress.end("should not manually reload")
+            return
+        }
         loadingError = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
-        extraReloadCoroutineWork()
+        progress.update("extraReloadCoroutineWork")
+        extraReloadCoroutineWork(progress)
 
-        eventCtor.newInstance(this).post { error ->
+        val event = eventCtor.newInstance(this)
+        progress.update("posting events: ${event.javaClass.simpleName}")
+        event.post { error ->
+            if (loadingError) return@post
+            progress.update("Error while posting repo reload event: ${error.message}")
             logger.logErrorWithData(error, "Error while posting repo reload event")
             loadingError = true
         }
+        progress.update("post done")
         // Only check if we can dispose after the event has been posted, as we may see speed increases using
         // the MemoryRepoFileSystem for the event, and writing to disk after the event.
-        repoFileSystem = repoFileSystem.transitionAfterReload()
+        progress.update("transitionAfterReload")
+        repoFileSystem = repoFileSystem.transitionAfterReload(progress)
 
+        progress.update("transitionAfterReload done")
         if (answerMessage.isNotEmpty() && !loadingError) {
-            ChatUtils.chat("§a$answerMessage")
+            progress.end("answerMessage: $answerMessage")
+            logger.logToChat("§a$answerMessage")
         } else if (loadingError) {
+            progress.end("Error with the $commonShortName repo detected")
             ChatUtils.clickableChat(
-                "Error with the $commonShortName Repo detected, try /$updateCommand to fix it!",
-                onClick = ::updateRepo,
-                "§eClick to update the Repo!",
+                "Error with the $commonShortName repo detected, try /$updateCommand to fix it!",
+                onClick = { updateRepo("click on chat after error") },
+                "§eClick to update the repo!",
                 prefixColor = "§c",
             )
             if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")
+        } else {
+            progress.end("done reloading $commonShortName repo")
         }
     }
 }

@@ -10,4 +10,4 @@ class GuildChatEvent(
     val guildRank: ComponentSpan?,
     chatComponent: IChatComponent,
     blockedReason: String? = null,
-) : AbstractChatEvent(author, message, chatComponent, blockedReason)
+) : AbstractSourcedChatEvent(author, message, chatComponent, blockedReason)

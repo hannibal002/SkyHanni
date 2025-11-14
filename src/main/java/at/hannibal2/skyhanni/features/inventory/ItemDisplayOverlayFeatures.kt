@@ -31,6 +31,8 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CachedItemData
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -66,6 +68,7 @@ object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
+    private var lastSize = 0
 
     /**
      * REGEX-TEST: MASTER_SKULL_TIER_1
@@ -118,7 +121,15 @@ object ItemDisplayOverlayFeatures {
 
     @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        event.stackTip = getStackTip(event.stack) ?: return
+        val currentSize = config.itemNumberAsStackSize.size
+        if (lastSize != currentSize) {
+            lastSize = currentSize
+            CachedItemData.forEachValue { it.stackTip = null }
+        }
+        val stack = event.stack
+        val cachedData = stack.cachedData
+        val tip = cachedData.stackTip ?: getStackTip(stack).also { cachedData.stackTip = it.orEmpty() }
+        tip?.takeIf { it.isNotEmpty() }?.let { event.stackTip = it }
     }
 
     private fun getStackTip(item: ItemStack): String? {
@@ -165,7 +176,7 @@ object ItemDisplayOverlayFeatures {
                 // 0.0 Would probably work, but rounding errors can occur
                 // due to hypixel's imprecision in storage.
                 it.exp > 10.0 || PetStorageApi.mainPetMenuNamePattern.matches(
-                    InventoryUtils.openInventoryName()
+                    InventoryUtils.openInventoryName(),
                 )
             } ?: return null
             val level = item.getPetLevel()
@@ -325,13 +336,13 @@ object ItemDisplayOverlayFeatures {
         return null
     }
 
-    fun isOwnItem(lore: List<String>) =
-        lore.none {
-            it.contains("Click to trade!") ||
-                it.contains("Starting bid:") ||
-                it.contains("Buy it now:") ||
-                it.contains("Click to inspect")
-        }
+    // todo repo
+    private fun isOwnItem(lore: List<String>) = lore.none {
+        it.contains("Click to trade!") ||
+            it.contains("Starting bid:") ||
+            it.contains("Buy it now:") ||
+            it.contains("Click to inspect")
+    }
 
     var done = false
 

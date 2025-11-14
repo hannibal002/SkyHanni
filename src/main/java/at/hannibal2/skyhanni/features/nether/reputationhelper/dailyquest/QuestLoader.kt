@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ReputationQuest
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.ProgressQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.Quest
@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.Q
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.RescueMissionQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
-import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -90,12 +89,8 @@ object QuestLoader {
                 return MiniBossQuest(miniBoss, state, needAmount)
             }
         }
-        for (kuudraTier in DailyKuudraBossHelper.kuudraTiers) {
-            val kuudraName = kuudraTier.name
-            if (name == "Kill Kuudra $kuudraName Tier") {
-                return KuudraQuest(kuudraTier, state)
-            }
-        }
+        KuudraTier.getQuestOrNull(name, state)?.let { return it }
+
         var questName = name
         var dojoGoal = ""
 

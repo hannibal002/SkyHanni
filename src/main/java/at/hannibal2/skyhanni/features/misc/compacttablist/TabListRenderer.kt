@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
@@ -32,6 +33,7 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
+        if (GlobalRender.renderDisabled) return
         if (event.type != RenderLayer.PLAYER_LIST) return
         if (!config.enabled.get()) return
         event.cancel()
@@ -46,6 +48,7 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (GlobalRender.renderDisabled) return
         if (!config.enabled.get()) return
         if (!config.toggleTab) return
         if (Minecraft.getMinecraft().currentScreen != null) return
@@ -176,6 +179,9 @@ object TabListRenderer {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
                         val texture = playerInfo.locationSkin
+                        //#if MC > 1.21.8
+                        //$$ .id()
+                        //#endif
                         //#if MC < 1.21
                         GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 8 / 64f, 16 / 64f, 8 / 64f, 16 / 64f, texture)
 

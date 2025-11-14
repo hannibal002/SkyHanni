@@ -21,4 +21,9 @@ class SpiderConfig {
     @ConfigEditorColour
     val highlightInvincibleColor: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(255, 255, 0, 60))
 
+    @Expose
+    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Tara 5 Slayer boss.")
+    @ConfigEditorBoolean
+    var phaseDisplay: Boolean = false
+
 }
