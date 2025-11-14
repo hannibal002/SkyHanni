@@ -38,7 +38,7 @@ class InstanceChestProfitConfig {
     @Expose
     @ConfigOption(
         name = "Croesus Chest Highlight",
-        desc = "Highlights most profitable chest for Dungeons and Kuudra.\n §4THIS RELIES ON CROESUS OVERLAY.",
+        desc = "Highlights most profitable chest for Dungeons and Kuudra."
     )
     @ConfigEditorBoolean
     var croesusHighlight: Boolean = true
