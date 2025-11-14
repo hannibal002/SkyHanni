@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.gui
 
-
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
@@ -26,7 +25,6 @@ import net.minecraft.entity.projectile.EntityFishHook
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("VarCouldBeVal")
 @SkyHanniModule
 object LegionBobbinOverlay {
 
@@ -42,8 +40,14 @@ object LegionBobbinOverlay {
 
     @Suppress("VarCouldBeVal")
     private var nearbyBobbers: Int = 0
+
+    @Suppress("VarCouldBeVal")
     private var nearbyPlayers: Int = 0
+
+    @Suppress("VarCouldBeVal")
     private var armorLegionBuff: Double = 0.0
+
+    @Suppress("VarCouldBeVal")
     private var armorBobbinBuff: Double = 0.0
 
     private val wearingLegion: Boolean get() = armorLegionBuff != 0.0
@@ -156,5 +160,4 @@ object LegionBobbinOverlay {
     }
 
     private fun isEnabled() = config.enabled
-
 }
