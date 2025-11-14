@@ -294,7 +294,7 @@ object InstanceChestProfit {
 
     private fun createCroesusDisplay() {
         val newDisplay = buildList {
-            add(listOf(Renderable.text("§6§lCroesus Profit Overlay§r")))
+            add(listOf(Renderable.text("§6§lCroesus Profit Overlay")))
             croesusDisplayList.forEach {
                 add(it)
             }
