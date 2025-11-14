@@ -128,7 +128,7 @@ object CroesusChestTracker {
             croesusPattern.matches(event.inventoryName)
         ) {
             pageSetup(event)
-            countUnopenedChestsandRemoveOld()
+            countUnopenedChestsAndRemoveOld()
 
             if (croesusEmpty) {
                 croesusChests?.forEach { it.setValuesNull() }
@@ -269,7 +269,7 @@ object CroesusChestTracker {
     }
 
     private fun createRenderable(): List<Renderable> =
-        Renderable.text("Chests: ${chestCountColor(countUnopenedChestsandRemoveOld())}/${MAX_CHESTS}").toSingletonListOrEmpty()
+        Renderable.text("Chests: ${chestCountColor(countUnopenedChestsAndRemoveOld())}/${MAX_CHESTS}").toSingletonListOrEmpty()
 
     private fun chestCountColor(size: Int): String = when {
         size >= 45 -> "§4"
@@ -279,7 +279,7 @@ object CroesusChestTracker {
         else -> "§0"
     } + size.toString()
 
-    private fun countUnopenedChestsandRemoveOld(): Int {
+    private fun countUnopenedChestsAndRemoveOld(): Int {
         val iterator = croesusChests?.iterator() ?: return 0
         var removalNum = 0
         var unopenedChests = 0
@@ -304,7 +304,7 @@ object CroesusChestTracker {
 
     private fun addCroesusChest(floorOrTier: String) {
         croesusChests?.add(0, DungeonRunInfo(floorOrTier, SimpleTimeMark.now()))
-        countUnopenedChestsandRemoveOld()
+        countUnopenedChestsAndRemoveOld()
         currentRunIndex = 0
         if ((croesusChests?.size ?: 0) > MAX_CHESTS) {
             croesusChests?.dropLast(1)
