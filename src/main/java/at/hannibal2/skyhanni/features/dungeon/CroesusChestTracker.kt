@@ -256,12 +256,14 @@ object CroesusChestTracker {
         addCroesusChest(event.floor)
     }
 
+    // TODO Replace y > 103 check with a better "is actively playing Cata/Kuudra" heuristic
+    private fun isInDH(): Boolean = IslandType.DUNGEON_HUB.isCurrent() && LocationUtils.playerLocation().y > 103.0
+
     @Suppress("MaxLineLength")
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (config.croesusOverlayKuudra && KuudraApi.inKuudra) renderChestOverlay()
-        // TODO This y>103check should be replaced with a better "is actively playing Cata/Kuudra" of some kind tbh
-        if (config.croesusOverlay && (SkyBlockUtils.graphArea == "Forgotten Skull" || (IslandType.DUNGEON_HUB.isCurrent() && LocationUtils.playerLocation().y > 103.0))) renderChestOverlay()
+        if (config.croesusOverlay && (SkyBlockUtils.graphArea == "Forgotten Skull" || isInDH())) renderChestOverlay()
         if (config.croesusOverlayDungeons && inDungeon()) renderChestOverlay()
     }
 
