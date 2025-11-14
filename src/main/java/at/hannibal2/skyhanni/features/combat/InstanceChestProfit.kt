@@ -33,10 +33,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -150,7 +148,7 @@ object InstanceChestProfit {
     private var inCroesusRunMenu = false
     private var chestDisplay: Renderable? = null
     private var croesusDisplay: Renderable? = null
-    private val croesusDisplayList = mutableListOf<List<Renderable>>()
+    private val croesusDisplayList = mutableListOf<Renderable>()
     private var slotToHighlight: Pair<Int, Double>? = null
 
     enum class CroesusChestType(val stackChestName: String) {
@@ -225,8 +223,8 @@ object InstanceChestProfit {
 
     private fun parseCroesusChest(itemStack: ItemStack?, chestType: CroesusChestType, slot: Int) {
         val chestList = mutableListOf<NeuInternalName>()
-        val chestTipsRenderables = mutableListOf<String>()
-        chestTipsRenderables.add("${chestType.stackChestName}:")
+        val chestTips = mutableListOf<String>()
+        chestTips.add("${chestType.stackChestName}:")
         var totalPrice = 0.0
         var cost = 0.0
         itemStack?.getLore()?.forEach { loreLine ->
@@ -248,7 +246,7 @@ object InstanceChestProfit {
                     itemPrice = -1.0
                 }
                 if (itemPrice != -1.0) {
-                    chestTipsRenderables.add(" ${itemInternalName.repoItemName}: ${itemPrice.formatCoin()} ")
+                    chestTips.add(" ${itemInternalName.repoItemName}: ${itemPrice.formatCoin()} ")
                     totalPrice += itemPrice
                     chestList.add(itemInternalName)
                 }
@@ -270,44 +268,28 @@ object InstanceChestProfit {
                     slotToHighlight = Pair(slot, totalPrice)
             }
         }
-        chestTipsRenderables.add("Cost: ${cost.formatCoin()}")
-        chestTipsRenderables.add("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f)")
-        croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, createRenderableList(chestTipsRenderables)))
+        chestTips.add("Cost: ${cost.formatCoin()}")
+        chestTips.add("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f)")
+        croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, chestTips))
     }
 
-    private fun getPrice(internalName: NeuInternalName): Double {
-        return internalName.getPrice(config.priceSource)
-    }
-
-    private fun createRenderableList(mutableList: MutableList<String>): MutableList<Renderable> {
-        val renderList = mutableListOf<Renderable>()
-        mutableList.forEach {
-            renderList.add(Renderable.text(it))
-        }
-        return renderList
-    }
+    private fun getPrice(internalName: NeuInternalName): Double = internalName.getPrice(config.priceSource)
 
     private fun createCroesusSingleChestDisplay(
         chestType: CroesusChestType,
         totalValue: Double,
-        contents: MutableList<Renderable>,
-    ): List<Renderable> = Renderable.hoverTips(
-        Renderable.text("${chestType.stackChestName}: ${totalValue.formatCoin()}"),
+        contents: MutableList<String>,
+    ): Renderable = Renderable.hoverTips(
+        "${chestType.stackChestName}: ${totalValue.formatCoin()}",
         contents,
-    ).toSingletonListOrEmpty()
+    )
 
     private fun createCroesusDisplay() {
-        croesusDisplay = Renderable.vertical(
-            buildList {
-                add(Renderable.text("§6§lCroesus Profit Overlay"))
-                croesusDisplayList.forEach { listRenderables ->
-                    listRenderables.forEach { renderable ->
-                        add(renderable)
-                    }
-                }
-            },
-            spacing = 1,
-        )
+        val list = buildList {
+            add(Renderable.text("§6§lCroesus Profit Overlay"))
+            addAll(croesusDisplayList)
+        }
+        croesusDisplay = Renderable.vertical(list, spacing = 1)
     }
 
     private fun getEssence(name: String, rawCount: Int): Double {
@@ -358,45 +340,44 @@ object InstanceChestProfit {
             }
         }
 
-        chestDisplay = Renderable.vertical(
-            buildList {
-                val chestName = if (inDungeonChest) "Dungeon"
-                else if (inKuudraChest) "Kuudra"
-                else ""
-                add((Renderable.text("§d§l$chestName Chest Profit")))
-                add((Renderable.emptyText()))
 
-                var total = 0.0
-                var displayedCost = false
+        val list = buildList {
+            val chestName = if (inDungeonChest) "Dungeon"
+            else if (inKuudraChest) "Kuudra"
+            else ""
+            add(("§d§l$chestName Chest Profit"))
+            add((" "))
 
-                val revenue = itemsWithCost.values.filter { it > 0 }.sum()
-                add(Renderable.text("§a§lTotal Revenue §a${revenue.formatCoin()}"))
+            var total = 0.0
+            var displayedCost = false
 
-                itemsWithCost.forEach {
-                    val coinsColor = if (it.value < 0) "§c"
-                    else "§a"
+            val revenue = itemsWithCost.values.filter { it > 0 }.sum()
+            add("§a§lTotal Revenue §a${revenue.formatCoin()}")
 
-                    if (!displayedCost && it.value < 0) {
-                        val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
-                        add((Renderable.emptyText()))
-                        add((Renderable.text("§c§lTotal Cost §c${cost.formatCoin()}")))
-                        displayedCost = true
-                    }
-
-                    val coins = "$coinsColor${it.value.formatCoin()}"
-
-                    total += it.value
-                    add(Renderable.text("${it.key} $coins"))
-                }
-
-                val color = if (total < 0) "§c"
+            itemsWithCost.forEach {
+                val coinsColor = if (it.value < 0) "§c"
                 else "§a"
 
-                add((Renderable.emptyText()))
-                add(Renderable.text("$color§lProfit $color ${total.formatCoin()}"))
-            },
-            spacing = 1,
-        )
+                if (!displayedCost && it.value < 0) {
+                    val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
+                    add((" "))
+                    add(("§c§lTotal Cost §c${cost.formatCoin()}"))
+                    displayedCost = true
+                }
+
+                val coins = "$coinsColor${it.value.formatCoin()}"
+
+                total += it.value
+                add("${it.key} $coins")
+            }
+
+            val color = if (total < 0) "§c"
+            else "§a"
+
+            add("")
+            add("$color§lProfit $color ${total.formatCoin()}")
+        }
+        chestDisplay = Renderable.vertical(list.map { Renderable.text(it) }, spacing = 1)
     }
 
     private fun getKuudraEssenceBonus(): Double =
