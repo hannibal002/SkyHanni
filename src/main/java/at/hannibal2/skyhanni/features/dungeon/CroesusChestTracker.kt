@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -127,7 +128,7 @@ object CroesusChestTracker {
             croesusPattern.matches(event.inventoryName)
         ) {
             pageSetup(event)
-            checkValidChests()
+            countUnopenedChestsandRemoveOld()
 
             if (croesusEmpty) {
                 croesusChests?.forEach { it.setValuesNull() }
@@ -258,7 +259,7 @@ object CroesusChestTracker {
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (config.croesusOverlayKuudra && KuudraApi.inKuudra) renderChestOverlay()
-        if (config.croesusOverlay && (SkyBlockUtils.graphArea == "Forgotten Skull" || SkyBlockUtils.scoreboardArea == "Dungeon Hub")) renderChestOverlay()
+        if (config.croesusOverlay && (SkyBlockUtils.graphArea == "Forgotten Skull" || IslandType.DUNGEON_HUB.isCurrent())) renderChestOverlay()
         if (config.croesusOverlayDungeons && inDungeon()) renderChestOverlay()
     }
 
@@ -268,7 +269,7 @@ object CroesusChestTracker {
     }
 
     private fun createRenderable(): List<Renderable> =
-        Renderable.text("Chests: ${chestCountColor(checkValidChests())}/${MAX_CHESTS}").toSingletonListOrEmpty()
+        Renderable.text("Chests: ${chestCountColor(countUnopenedChestsandRemoveOld())}/${MAX_CHESTS}").toSingletonListOrEmpty()
 
     private fun chestCountColor(size: Int): String = when {
         size >= 45 -> "§4"
@@ -277,8 +278,8 @@ object CroesusChestTracker {
         size >= 0 -> "§6"
         else -> "§0"
     } + size.toString()
-
-    private fun checkValidChests(): Int {
+            
+    private fun countUnopenedChestsandRemoveOld(): Int {
         val iterator = croesusChests?.iterator() ?: return 0
         var removalNum = 0
         var unopenedChests = 0
@@ -303,7 +304,7 @@ object CroesusChestTracker {
 
     private fun addCroesusChest(floorOrTier: String) {
         croesusChests?.add(0, DungeonRunInfo(floorOrTier, SimpleTimeMark.now()))
-        checkValidChests()
+        countUnopenedChestsandRemoveOld()
         currentRunIndex = 0
         if ((croesusChests?.size ?: 0) > MAX_CHESTS) {
             croesusChests?.dropLast(1)
