@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.util.MathHelper
@@ -32,7 +32,7 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-open class VisualWordGui : SkyhanniBaseScreen() {
+open class VisualWordGui : SkyHanniBaseScreen() {
 
     private var guiLeft = 0
     private var guiTop = 0
