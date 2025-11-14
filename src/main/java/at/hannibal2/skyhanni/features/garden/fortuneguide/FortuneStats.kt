@@ -31,6 +31,7 @@ enum class FortuneStats(
     TURBO("§2Turbo-Crop Enchantment", "§7§2Fortune for each enchantment level\n§2You get 5☘ per level"),
     DEDICATION("§2Dedication Enchantment", "§7§2Fortune for each enchantment level\n§2and crop milestone"),
     CARROLYN(::carrolynLabel, ::carrolynToolTip, ::carrolynOnClick),
+    PERSONAL_BEST("§2Personal Best", "§7§2Fortune from Personal Best bonus achieved from Jacob's contests"),
     ;
 
     constructor(label: String, tooltip: String) : this({ label }, { tooltip })

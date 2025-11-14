@@ -508,6 +508,14 @@ object AttributeShardsData {
         return internalName
     }
 
+    fun shardNameToAttributeInformation(shardName: String): NeuAttributeShardData? {
+        val info = attributeInfo[shardName]
+        if (info == null) {
+            ItemUtils.addMissingRepoItem(shardName, "Could not find information for attribute shard: $shardName")
+        }
+        return info
+    }
+
     fun isAttributeShard(internalName: NeuInternalName): Boolean =
         internalName.asString().let {
             it.startsWith("ATTRIBUTE_SHARD_") && it.endsWith(";1")

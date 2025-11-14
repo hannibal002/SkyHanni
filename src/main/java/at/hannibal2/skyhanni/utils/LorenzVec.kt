@@ -167,6 +167,10 @@ data class LorenzVec(
         return LorenzVec(x, y, z)
     }
 
+    fun boundingCenter(expand: Double): AxisAlignedBB {
+        return AxisAlignedBB(x - expand, y - expand, z - expand, x + expand, y + expand, z + expand)
+    }
+
     fun boundingToOffset(offX: Double, offY: Double, offZ: Double) =
         AxisAlignedBB(x, y, z, x + offX, y + offY, z + offZ)
 

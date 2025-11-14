@@ -999,6 +999,9 @@ object DamageIndicatorManager {
             if (showNameAndHealth && config.hideDamageSplash) {
                 event.cancel()
             }
+            if (SkyHanniMod.feature.slayer.damageSplashHider && entityData.bossType.isSlayer) {
+                event.cancel()
+            }
             if (entityData.bossType == BossType.DUMMY) {
                 val uuid = entity.uniqueID
                 if (dummyDamageCache.contains(uuid)) return
