@@ -41,7 +41,6 @@ class InstanceChestProfitConfig {
         desc = "Highlights most profitable chest for Dungeons and Kuudra.\n §4THIS RELIES ON CROESUS OVERLAY.",
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     var croesusHighlight: Boolean = true
 
     @Expose

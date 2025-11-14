@@ -159,7 +159,7 @@ object InstanceChestProfit {
     private var chestDisplay: Renderable? = null
     private var croesusDisplay: Renderable? = null
     private val croesusDisplayList = mutableListOf<List<Renderable>>()
-    private var slotToHighlight = Pair(-1, 0.0)
+    private var slotToHighlight: Pair<Int, Double>? = null
 
     enum class CroesusChestType(val stackChestName: String) {
         WOOD("§fWood"),
@@ -185,37 +185,39 @@ object InstanceChestProfit {
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!config.enabled) return
+        if (!config.enabled && !config.croesusEnabled && !config.croesusHighlight) return
 
         val name = event.inventoryName
         when {
-            DungeonApi.DungeonChest.getByInventoryName(name) != null -> {
+            DungeonApi.DungeonChest.getByInventoryName(name) != null && config.enabled -> {
                 inDungeonChest = true
             }
 
-            KuudraApi.KuudraChest.getByInventoryName(name) != null -> {
+            KuudraApi.KuudraChest.getByInventoryName(name) != null && config.enabled -> {
                 inKuudraChest = true
             }
 
-            runNameCroesus.matches(name) -> inCroesusRunMenu = true
+            runNameCroesus.matches(name) && (config.croesusHighlight || config.croesusEnabled) -> inCroesusRunMenu = true
 
             else -> return
         }
 
-        event.inventoryItems.forEach {
-            val chestType = CroesusChestType.getByStackName(it.value.displayName)
-            if (chestType != null) parseCroesusChest(it.value, chestType, it.key)
-        }
-
+        if (inCroesusRunMenu) {
+            event.inventoryItems.forEach { (slot, item) ->
+                val chestType = CroesusChestType.getByStackName(item.displayName)
+                if (chestType != null) parseCroesusChest(item, chestType, slot)
+            }
         createCroesusDisplay()
+        }
 
         createDisplay(event.inventoryItems)
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (inCroesusRunMenu && slotToHighlight.first != -1 && config.croesusHighlight) {
-            event.container.inventorySlots[slotToHighlight.first].highlight(LorenzColor.GREEN)
+        val slot = slotToHighlight?.first
+        if (inCroesusRunMenu && slot != null && config.croesusHighlight) {
+            event.container.inventorySlots[slot].highlight(LorenzColor.GREEN)
         }
     }
 
@@ -225,7 +227,7 @@ object InstanceChestProfit {
         inKuudraChest = false
         inCroesusRunMenu = false
         croesusDisplayList.clear()
-        slotToHighlight = Pair(-1, 0.0)
+        slotToHighlight = null
         croesusDisplay = null
     }
 
@@ -245,12 +247,12 @@ object InstanceChestProfit {
                 itemInternalName = itemName.toInternalName()
             }
             if (itemInternalName != MISSING_ITEM) {
-                itemPrice = itemInternalName.getPrice(config.priceSource)
+                itemPrice = getPrice(itemInternalName)
                 essencePattern.matchMatcher(loreLine) {
                     itemPrice = getEssence(group("name"), group("count").toInt())
                 }
                 if (dungeonChestKey.matches(loreLine)) {
-                    cost += itemInternalName.getPrice(config.priceSource).times(-1)
+                    cost += getPrice(itemInternalName).times(-1)
                     itemPrice = -1.0
                 }
                 if (itemPrice != -1.0) {
@@ -268,18 +270,25 @@ object InstanceChestProfit {
         }
         val preCostPrice = totalPrice
         totalPrice += cost
-        if (slotToHighlight.second < totalPrice) slotToHighlight = Pair(slot, totalPrice)
+        if (slotToHighlight == null) slotToHighlight = Pair(slot, totalPrice)
+        else {
+            if (slotToHighlight!!.second < totalPrice) slotToHighlight = Pair(slot, totalPrice)
+        }
         chestTipsRenderables.add("Cost: ${cost.formatCoin()}")
         chestTipsRenderables.add("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f)")
         croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, createRenderableList(chestTipsRenderables)))
     }
 
+    private fun getPrice(internalName: NeuInternalName): Double {
+        return internalName.getPrice(config.priceSource)
+    }
+
     private fun createRenderableList(mutableList: MutableList<String>): MutableList<Renderable> {
-        val rendlist = mutableListOf<Renderable>()
+        val renderList = mutableListOf<Renderable>()
         mutableList.forEach {
-            rendlist.add(Renderable.text(it))
+            renderList.add(Renderable.text(it))
         }
-        return rendlist
+        return renderList
     }
 
     private fun createCroesusSingleChestDisplay(
@@ -304,13 +313,13 @@ object InstanceChestProfit {
     private fun getEssence(name: String, rawCount: Int): Double {
         val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
         else rawCount.toDouble()
-        return count * (NeuInternalName.fromItemName(name).getPrice(config.priceSource))
+        return count * getPrice(NeuInternalName.fromItemName(name))
     }
 
     private fun getAttribute(attributeName: String): Double = attributeShardPattern.matchMatcher(attributeName) {
         val name = group("name")
         val count = group("count").toInt()
-        count * (NeuInternalName.fromItemName(name).getPrice(config.priceSource))
+        count * getPrice(NeuInternalName.fromItemName(name))
     } ?: 0.0
 
     private fun createDisplay(items: Map<Int, ItemStack>) {
@@ -341,7 +350,7 @@ object InstanceChestProfit {
             }
             dungeonChestKey.matchMatcher(it) {
                 val name = NeuInternalName.fromItemName(it)
-                itemsWithCost.put(it, name.getPrice(config.priceSource).times(-1))
+                itemsWithCost.put(it, getPrice(name).times(-1))
             }
             kuudraChestKey.matchMatcher(it) {
                 val name = NeuInternalName.fromItemName(it)
