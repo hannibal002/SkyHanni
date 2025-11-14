@@ -123,8 +123,8 @@ object ShardTrackerDisplay {
 
     private fun isInsideShardsMenu(): Boolean {
         return AttributeShardsData.attributeMenuInventory.isInside() ||
-                AttributeShardsData.huntingBoxInventory.isInside() ||
-                AttributeShardsData.isInFusionMachine()
+            AttributeShardsData.huntingBoxInventory.isInside() ||
+            AttributeShardsData.isInFusionMachine()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
