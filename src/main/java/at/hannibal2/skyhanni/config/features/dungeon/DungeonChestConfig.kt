@@ -34,8 +34,8 @@ class DungeonChestConfig {
 
     @Expose
     @ConfigOption(
-        name = "Croesus Unopened Overlay",
-        desc = "Displays current number of Unopened Croesus chests out of 60.",
+        name = "Croesus Unopened Display",
+        desc = "Display of Unopened Croesus chests out of Max (60) in Dungeon Hub/Kuudra Zone (Forgotten Skull)",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -44,7 +44,7 @@ class DungeonChestConfig {
     @Expose
     @ConfigOption(
         name = "Show In Kuudra",
-        desc = "Displays current number of Unopened Croesus chests out of 60 in Kuudra.",
+        desc = "Displays the Unopened Croesus Chest Display in Kuudra (This does not require the Dungeon Hub/Skull toggle).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -53,7 +53,7 @@ class DungeonChestConfig {
     @Expose
     @ConfigOption(
         name = "Show In Dungeons",
-        desc = "Displays current number of Unopened Croesus chests out of 60 in Dungeons.",
+        desc = "Displays the Unopened Croesus Chest Display in Dungeons (This does not require the Dungeon Hub/Skull toggle).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
