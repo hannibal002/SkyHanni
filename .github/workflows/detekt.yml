@@ -21,8 +21,8 @@ jobs:
             contents: read
             pull-requests: write
         outputs:
-            sarif_exists: ${{ steps.check_sarif.outputs.exists }}
-            detekt_failed: ${{ steps.run_detekt.outcome == 'failure' }}
+            sarif_exists: ${{ steps.set_outputs.outputs.sarif_exists }}
+            detekt_failed: ${{ steps.set_outputs.outputs.detekt_failed }}
         steps:
             -   name: Checkout PR code
                 uses: actions/checkout@v4
@@ -73,6 +73,12 @@ jobs:
                 with:
                     name: detekt-output
                     path: detekt_output.txt
+
+            -   name: Set detekt outputs
+                id: set_outputs
+                run: |
+                    echo "sarif_exists=${{ steps.check_sarif.outputs.exists }}" >> $GITHUB_OUTPUT
+                    echo "detekt_failed=${{ steps.run_detekt.outcome == 'failure' }}" >> $GITHUB_OUTPUT
 
             -   name: Fail job if detekt failed
                 if: ${{ steps.run_detekt.outcome == 'failure' }}
