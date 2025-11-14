@@ -27,16 +27,18 @@ jobs:
             -   name: Checkout PR code
                 uses: actions/checkout@v4
                 with:
-                  ref: ${{ github.event.pull_request.head.ref }}
-                  repository: ${{ github.event.pull_request.head.repo.full_name }}
+                    ref: ${{ github.event.pull_request.head.ref }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
 
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt
                 uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
+                continue-on-error: true
                 with:
                     gradle-command: detektMain --stacktrace
+
             -   name: Check if SARIF file exists
                 if: always()
                 id: check_sarif
@@ -71,6 +73,10 @@ jobs:
                 with:
                     name: detekt-output
                     path: detekt_output.txt
+
+            -   name: Fail job if detekt failed
+                if: ${{ steps.run_detekt.outcome == 'failure' }}
+                run: exit 1
 
     detekt_comment:
         name: Comment detekt failures on PR
