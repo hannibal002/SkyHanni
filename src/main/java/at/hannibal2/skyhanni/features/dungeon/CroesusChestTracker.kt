@@ -138,6 +138,7 @@ object CroesusChestTracker {
 
             // With null, since if an item is missing the chest will be set null
             checkChests(event.inventoryItemsWithNull)
+            display = null
 
             return
         }
@@ -320,6 +321,7 @@ object CroesusChestTracker {
         if ((croesusChests?.size ?: 0) > MAX_CHESTS) {
             croesusChests?.dropLast(1)
         }
+        display = null
 
         if (config.croesusLimit && getLastActiveChest() >= 55) {
             ChatUtils.chat("You are close to the Croesus Limit. Please open your chests!")
