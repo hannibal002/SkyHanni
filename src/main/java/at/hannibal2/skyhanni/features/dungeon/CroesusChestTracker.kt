@@ -278,7 +278,7 @@ object CroesusChestTracker {
         size >= 0 -> "§6"
         else -> "§0"
     } + size.toString()
-            
+
     private fun countUnopenedChestsandRemoveOld(): Int {
         val iterator = croesusChests?.iterator() ?: return 0
         var removalNum = 0
