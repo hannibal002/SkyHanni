@@ -45,6 +45,6 @@ class InstanceChestProfitConfig {
     var croesusHighlight: Boolean = false
 
     @Expose
-    @ConfigLink(owner = InstanceChestProfitConfig::class, field = "croesusEnabled")
+    @ConfigLink(owner = InstanceChestProfitConfig::class, field = "croesusProfitOverlayEnabled")
     val croesusPosition: Position = Position(107, 141)
 }
