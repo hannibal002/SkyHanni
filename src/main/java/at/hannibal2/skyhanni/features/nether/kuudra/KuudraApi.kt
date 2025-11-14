@@ -90,11 +90,9 @@ object KuudraApi {
                     }
                 }
                 return entries.firstOrNull { it.inventory == realInventory }
-
             }
         }
     }
-
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
