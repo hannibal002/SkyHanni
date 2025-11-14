@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -101,22 +102,21 @@ object CroesusChestTracker {
 
     private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
-    @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, priority = HandleEvent.LOW, onlyOnSkyblock = true)
+    fun onBackgroundDrawn() {
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
 
-        if (inCroesusInventory && !croesusEmpty) {
-            for ((run, slot) in InventoryUtils.getItemsInOpenChest()
-                .mapNotNull { slot -> runSlots(slot.slotIndex, slot) }) {
+        if (!inCroesusInventory || croesusEmpty) return
+        for ((run, slot) in InventoryUtils.getItemsInOpenChest()
+            .mapNotNull { slot -> runSlots(slot.slotIndex, slot) }) {
 
-                // If one chest is null every followup chest is null. Therefore, an early return is possible
-                if (run.floor == null) return
+            // If one chest is null every followup chest is null. Therefore, an early return is possible
+            if (run.floor == null) return
 
-                val state = run.openState ?: OpenedState.UNOPENED
+            val state = run.openState ?: OpenedState.UNOPENED
 
-                if (state != OpenedState.KEY_USED) {
-                    slot.highlight(if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE)
-                }
+            if (state != OpenedState.KEY_USED) {
+                slot.highlight(if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE)
             }
         }
     }
@@ -195,8 +195,8 @@ object CroesusChestTracker {
         kismetUsed = null
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         inCroesusInventory = false
         chestInventory = null
     }
@@ -232,7 +232,7 @@ object CroesusChestTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderItemTipIsKismetable(event: RenderInventoryItemTipEvent) {
+    fun onRenderInventoryItemTip(event: RenderInventoryItemTipEvent) {
         if (!config.showUsedKismets) return
         if (!inCroesusInventory) return
         if (event.slot.slotIndex != event.slot.slotNumber) return
@@ -267,44 +267,35 @@ object CroesusChestTracker {
         config.croesusOverlayPosition.renderRenderables(renderables, posLabel = "Croesus Overlay")
     }
 
-    private fun createRenderable(): List<Renderable> {
-        return buildList {
-            add(
-                Renderable.text("Chests: ${chestCountColor(checkValidChests())}/${MAX_CHESTS}"),
-            )
-        }
-    }
+    private fun createRenderable(): List<Renderable> =
+        Renderable.text("Chests: ${chestCountColor(checkValidChests())}/${MAX_CHESTS}").toSingletonListOrEmpty()
 
-    private fun chestCountColor(size: Int): String {
-        return when {
-            size >= 45 -> "§4"
-            size >= 30 -> "§c"
-            size >= 15 -> "§e"
-            size >= 0 -> "§6"
-            else -> "§0"
-        } + size.toString()
-    }
+    private fun chestCountColor(size: Int): String = when {
+        size >= 45 -> "§4"
+        size >= 30 -> "§c"
+        size >= 15 -> "§e"
+        size >= 0 -> "§6"
+        else -> "§0"
+    } + size.toString()
 
     private fun checkValidChests(): Int {
+        val iterator = croesusChests?.iterator() ?: return 0
         var removalNum = 0
         var unopenedChests = 0
-        val iterator = croesusChests?.iterator()
-        if (iterator != null) {
-            while (iterator.hasNext()) {
-                val next = iterator.next()
-                if (next.floor == null) {
-                    iterator.remove()
-                    removalNum++
-                }
-                if (next.runTime == null) {
-                    next.runTime = SimpleTimeMark.now()
-                }
-                val sinceRun = next.runTime?.passedSince() ?: 0.days // purely exists for pre-addition runs
-                if (sinceRun > 3.days) {
-                    iterator.remove()
-                }
-                if (next.openState == OpenedState.UNOPENED) unopenedChests++
+        while (iterator.hasNext()) {
+            val next = iterator.next()
+            if (next.floor == null) {
+                iterator.remove()
+                removalNum++
             }
+            if (next.runTime == null) {
+                next.runTime = SimpleTimeMark.now()
+            }
+            val sinceRun = next.runTime?.passedSince() ?: 0.days // purely exists for pre-addition runs
+            if (sinceRun > 3.days) {
+                iterator.remove()
+            }
+            if (next.openState == OpenedState.UNOPENED) unopenedChests++
         }
         return unopenedChests
     }
