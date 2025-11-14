@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.21
 //$$ import net.minecraft.server.world.ServerWorld
 //#endif

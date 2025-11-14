@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiChest
@@ -106,7 +107,7 @@ object InventoryCompat {
 //#endif
 
     fun getWindowId(): Int =
-        getWindowIdOrNull() ?: error("windowId is null")
+        getWindowIdOrNull() ?: ErrorManager.skyHanniError("windowId is null")
 
     fun Array<ItemStack?>?.filterNotNullOrEmpty(): List<ItemStack>? {
         return this?.filterNotNull()?.filter { it.isNotEmpty() }
