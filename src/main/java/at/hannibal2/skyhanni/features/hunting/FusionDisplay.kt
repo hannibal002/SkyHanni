@@ -34,7 +34,7 @@ object FusionDisplay {
     /**
      * REGEX-TEST: §b§lPURE REPTILE
      */
-    val pureReptilePattern by RepoPattern.group("attributeshards").pattern(
+    private val pureReptilePattern by RepoPattern.group("attributeshards").pattern(
         "pure-reptile-chat",
         "^§b§lPURE REPTILE",
     )
@@ -70,7 +70,6 @@ object FusionDisplay {
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onChat(event: SkyHanniChatEvent) {
         if (pureReptilePattern.find(event.message)) pureReptiles++
-
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
