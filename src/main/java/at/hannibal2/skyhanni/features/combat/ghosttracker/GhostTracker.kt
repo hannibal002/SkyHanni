@@ -78,7 +78,7 @@ object GhostTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Ghost Tracker",
-        { Data() },
+        ::Data,
         { it.ghostStorage.ghostTracker },
     ) { drawDisplay(it) }
 

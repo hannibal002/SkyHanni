@@ -51,7 +51,7 @@ enum class ChunkedStatsLine(
         configLine = "§6Bank",
     ),
     BITS(
-        displayPair = { getBitsLine() },
+        displayPair = ::getBitsLine,
         showWhen = { !(hideEmptyLines && getBits() == "0" && getBitsAvailable() == "0") && ScoreboardElementBits.showWhen() },
         showIsland = { ScoreboardElementBits.showIsland() },
         configLine = "§bBits",

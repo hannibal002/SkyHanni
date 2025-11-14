@@ -76,7 +76,7 @@ object TimiteTracker {
         addSearchString("§dTotal Profit§7: §5${profit.toInt().shortFormat()} Motes")
     }
 
-    private val tracker = SkyHanniItemTracker("Timite Tracker", { Data() }, { it.rift.timiteTracker }) {
+    private val tracker = SkyHanniItemTracker("Timite Tracker", ::Data, { it.rift.timiteTracker }) {
         drawDisplay(it)
     }
 

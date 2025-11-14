@@ -620,7 +620,7 @@ object CustomWardrobe {
                 horizontalAlign = horizontalAlignment,
                 verticalAlign = verticalAlignment,
             ),
-            onHover = { onHover() },
+            onHover = ::onHover,
         )
 
     private fun WardrobeSlot.getOutlineColor(): Pair<Color, Color> {

@@ -33,7 +33,7 @@ object DicerRngDropTracker {
 
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = GardenApi.config.dicerRngDropTracker
-    private val tracker = SkyHanniTracker("Dicer RNG Drop Tracker", { Data() }, { it.garden.dicerDropTracker }) {
+    private val tracker = SkyHanniTracker("Dicer RNG Drop Tracker", ::Data, { it.garden.dicerDropTracker }) {
         drawDisplay(it)
     }
 

@@ -49,7 +49,7 @@ object SackDisplay {
     init {
         RenderDisplayHelper(
             inventory = SackApi.inventory,
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         ) {
             config.position.renderRenderables(
                 display, extraSpace = config.extraSpace, posLabel = "Sacks Items",

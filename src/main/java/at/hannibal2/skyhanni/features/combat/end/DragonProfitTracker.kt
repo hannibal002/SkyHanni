@@ -31,7 +31,7 @@ import java.util.EnumMap
 @SkyHanniModule
 object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfitTracker.BucketData>(
     "Dragon Profit Tracker",
-    { BucketData() },
+    ::BucketData,
     { it.dragonProfitTracker },
     { drawDisplay(it) },
 ) {

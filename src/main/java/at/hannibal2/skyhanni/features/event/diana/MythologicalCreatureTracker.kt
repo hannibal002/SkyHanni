@@ -50,7 +50,7 @@ object MythologicalCreatureTracker {
     )
 
     private val tracker = SkyHanniTracker(
-        "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
+        "Mythological Creature Tracker", ::Data, { it.diana.mythologicalMobTracker },
         extraDisplayModes = mapOf(
             SkyHanniTracker.DisplayMode.MAYOR to {
                 it.diana.mythologicalMobTrackerPerElection.getOrPut(

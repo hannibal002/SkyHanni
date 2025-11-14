@@ -34,7 +34,7 @@ import com.google.gson.annotations.Expose
 @SkyHanniModule
 object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.BucketData>(
     "Corpse Tracker",
-    { BucketData() },
+    ::BucketData,
     { it.mining.mineshaft.corpseProfitTracker },
     { drawDisplay(it) },
 ) {

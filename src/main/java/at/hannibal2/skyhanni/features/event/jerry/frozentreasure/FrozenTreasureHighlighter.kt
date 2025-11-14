@@ -24,7 +24,7 @@ object FrozenTreasureHighlighter {
     private val config get() = SkyHanniMod.feature.event.winter.frozenTreasureHighlighter
 
     private val blockHighlighter = SkyHanniBlockHighlighter<TimedHighlightBlock>(
-        highlightCondition = { isEnabled() },
+        highlightCondition = ::isEnabled,
         blockCondition = { it.block == Blocks.ice || it.block == Blocks.packed_ice },
         colorProvider = { config.treasureColor },
     )

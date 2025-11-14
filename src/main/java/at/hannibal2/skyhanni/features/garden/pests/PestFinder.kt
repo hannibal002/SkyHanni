@@ -134,7 +134,7 @@ object PestFinder {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { shouldShowDisplay() },
+            condition = ::shouldShowDisplay,
             onRender = {
                 config.position.renderRenderables(display, posLabel = "Pest Finder")
             },

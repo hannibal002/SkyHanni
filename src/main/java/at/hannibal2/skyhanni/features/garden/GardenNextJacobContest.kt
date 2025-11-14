@@ -300,7 +300,7 @@ object GardenNextJacobContest {
         if (config.shareAutomatically == ShareContestsEntry.ASK) {
             ChatUtils.clickableChat(
                 "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
-                onClick = { shareContests() },
+                onClick = ::shareContests,
                 "§eClick to submit!",
                 oneTimeClick = true,
             )

@@ -57,7 +57,7 @@ object CrownOfAvariceCounter {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { isEnabled() && isWearingCrown },
-            onRender = { renderDisplay() },
+            onRender = ::renderDisplay,
         )
     }
 

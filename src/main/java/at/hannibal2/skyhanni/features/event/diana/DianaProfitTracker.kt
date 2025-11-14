@@ -51,7 +51,7 @@ object DianaProfitTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Diana Profit Tracker",
-        { Data() },
+        ::Data,
         { it.diana.profitTracker },
         extraDisplayModes = mapOf(
             SkyHanniTracker.DisplayMode.MAYOR to {
