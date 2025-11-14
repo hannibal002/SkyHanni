@@ -78,7 +78,7 @@ object GardenApi {
     private val cropIconCache = TimeLimitedCache<String, ItemStack>(10.minutes)
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
-    private var extraFarmingTools: List<NeuInternalName> = listOf()
+    private var extraFarmingTools: Set<NeuInternalName> = setOf()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSendPacket(event: ItemInHandChangeEvent) {
