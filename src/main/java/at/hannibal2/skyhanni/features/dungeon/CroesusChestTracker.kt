@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -259,12 +260,19 @@ object CroesusChestTracker {
     // TODO Replace y > 103 check with a better "is actively playing Cata/Kuudra" heuristic
     private fun isInDH(): Boolean = IslandType.DUNGEON_HUB.isCurrent() && LocationUtils.playerLocation().y > 103.0
 
-    @Suppress("MaxLineLength")
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (config.croesusOverlayKuudra && KuudraApi.inKuudra) renderChestOverlay()
-        if (config.croesusOverlay && (SkyBlockUtils.graphArea == "Forgotten Skull" || isInDH())) renderChestOverlay()
-        if (config.croesusOverlayDungeons && inDungeon()) renderChestOverlay()
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            condition = ::shouldRenderCroesus,
+            onRender = ::renderChestOverlay,
+        )
+    }
+
+    private fun shouldRenderCroesus(): Boolean = when {
+        config.croesusOverlayKuudra && KuudraApi.inKuudra -> true
+        config.croesusOverlay && (SkyBlockUtils.graphArea == "Forgotten Skull" || isInDH()) -> true
+        config.croesusOverlayDungeons && inDungeon() -> true
+        else -> false
     }
 
     private fun renderChestOverlay() {
