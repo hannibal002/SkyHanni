@@ -41,8 +41,7 @@ object ShardTrackerDisplay {
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     private var renderables: List<Renderable>? = null
-    private val trackedShards
-        get() = ProfileStorageData.profileSpecific?.hunting?.trackedAttributeShards ?: mutableMapOf()
+    private val trackedShards get() = ProfileStorageData.profileSpecific?.hunting?.trackedAttributeShards ?: mutableMapOf()
 
     private fun toggleShard(neuId: NeuInternalName) {
         if (!AttributeShardsData.isAttributeShard(neuId)) {
@@ -74,8 +73,7 @@ object ShardTrackerDisplay {
 
             val shardName = AttributeShardsData.shardInternalNameToShardName(shardId)
             val amountInHuntingBox = AttributeShardsData.getAmountInHuntingBox(shardName)
-            val amountUntilMax =
-                if (shard.value == -1) AttributeShardsData.getAmountUntilMax(shardName) else shard.value
+            val amountUntilMax = if (shard.value == -1) AttributeShardsData.getAmountUntilMax(shardName) else shard.value
 
             if (amountUntilMax == 0) {
                 renderable += Renderable.clickable(
@@ -84,8 +82,7 @@ object ShardTrackerDisplay {
                     tips = listOf("§cClick to remove from tracker")
                 )
             } else {
-                val color =
-                    if (amountInHuntingBox >= amountUntilMax) "§a" else if (amountInHuntingBox == 0) "§c" else "§e"
+                val color = if (amountInHuntingBox >= amountUntilMax) "§a" else if (amountInHuntingBox == 0) "§c" else "§e"
                 renderable += Renderable.clickable(
                     " $shardDisplayName§7: $color$amountInHuntingBox§7/§a$amountUntilMax",
                     onLeftClick = { toggleShard(shardId) },
