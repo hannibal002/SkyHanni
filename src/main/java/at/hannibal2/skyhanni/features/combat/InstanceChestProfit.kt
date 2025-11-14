@@ -198,7 +198,7 @@ object InstanceChestProfit {
                 val chestType = CroesusChestType.getByStackName(item.displayName)
                 if (chestType != null) parseCroesusChest(item, chestType, slot)
             }
-        createCroesusDisplay()
+            createCroesusDisplay()
         }
 
         createDisplay(event.inventoryItems)
@@ -263,7 +263,11 @@ object InstanceChestProfit {
         totalPrice += cost
         if (slotToHighlight == null) slotToHighlight = Pair(slot, totalPrice)
         else {
-            if (slotToHighlight!!.second < totalPrice) slotToHighlight = Pair(slot, totalPrice)
+            val nonNullSlot = slotToHighlight
+            if (nonNullSlot != null) {
+                if (nonNullSlot.second < totalPrice)
+                    slotToHighlight = Pair(slot, totalPrice)
+            }
         }
         chestTipsRenderables.add("Cost: ${cost.formatCoin()}")
         chestTipsRenderables.add("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f)")
