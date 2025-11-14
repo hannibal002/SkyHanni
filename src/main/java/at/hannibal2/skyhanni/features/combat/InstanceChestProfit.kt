@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -202,7 +201,6 @@ object InstanceChestProfit {
 
             else -> return
         }
-        inCroesusRunMenu = true
 
         event.inventoryItems.forEach {
             val chestType = CroesusChestType.getByStackName(it.value.displayName)
@@ -233,8 +231,8 @@ object InstanceChestProfit {
 
     private fun parseCroesusChest(itemStack: ItemStack?, chestType: CroesusChestType, slot: Int) {
         val chestList = mutableListOf<NeuInternalName>()
-        val chestTipsRenderables = mutableListOf<Renderable>()
-        chestTipsRenderables.add(Renderable.text("${chestType.stackChestName}:"))
+        val chestTipsRenderables = mutableListOf<String>()
+        chestTipsRenderables.add("${chestType.stackChestName}:")
         var totalPrice = 0.0
         var cost = 0.0
         itemStack?.getLore()?.forEach { loreLine ->
@@ -256,7 +254,7 @@ object InstanceChestProfit {
                     itemPrice = -1.0
                 }
                 if (itemPrice != -1.0) {
-                    chestTipsRenderables.add(Renderable.text(" ${itemInternalName.repoItemName}: ${itemPrice.formatCoin()} "))
+                    chestTipsRenderables.add(" ${itemInternalName.repoItemName}: ${itemPrice.formatCoin()} ")
                     totalPrice += itemPrice
                     chestList.add(itemInternalName)
                 }
@@ -271,10 +269,17 @@ object InstanceChestProfit {
         val preCostPrice = totalPrice
         totalPrice += cost
         if (slotToHighlight.second < totalPrice) slotToHighlight = Pair(slot, totalPrice)
-        chestTipsRenderables.add(Renderable.text("Cost: ${cost.formatCoin()}"))
-        chestTipsRenderables.add(Renderable.text("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f)"))
-        croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, chestTipsRenderables))
-        chestList.clear()
+        chestTipsRenderables.add("Cost: ${cost.formatCoin()}")
+        chestTipsRenderables.add("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f)")
+        croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, createRenderableList(chestTipsRenderables)))
+    }
+
+    private fun createRenderableList(mutableList: MutableList<String>): MutableList<Renderable> {
+        val rendlist = mutableListOf<Renderable>()
+        mutableList.forEach {
+            rendlist.add(Renderable.text(it))
+        }
+        return rendlist
     }
 
     private fun createCroesusSingleChestDisplay(
