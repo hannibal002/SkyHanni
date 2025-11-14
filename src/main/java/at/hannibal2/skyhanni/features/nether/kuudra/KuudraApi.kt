@@ -44,7 +44,7 @@ object KuudraApi {
         "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
-    val kuudraTiers = listOf("basic", "hot", "burning", "fiery", "infernal")
+    private val kuudraTiers = listOf("basic", "hot", "burning", "fiery", "infernal")
 
     val kuudraArmorTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
     val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")

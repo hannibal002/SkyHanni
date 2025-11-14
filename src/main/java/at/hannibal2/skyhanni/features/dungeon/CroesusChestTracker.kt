@@ -282,7 +282,7 @@ object CroesusChestTracker {
     private fun createRenderable(): List<Renderable> {
         return buildList {
             add(
-                Renderable.text("Chests: ${chestCountColor(croesusChests?.size ?: 0)}/${MAX_CHESTS}"),
+                Renderable.text("Chests: ${chestCountColor(checkValidChests())}/${MAX_CHESTS}"),
             )
         }
     }
@@ -297,8 +297,9 @@ object CroesusChestTracker {
         } + size.toString()
     }
 
-    private fun checkValidChests() {
+    private fun checkValidChests(): Int {
         var removalNum = 0
+        var unopenedChests = 0
         val iterator = croesusChests?.iterator()
         if (iterator != null) {
             while (iterator.hasNext()) {
@@ -313,11 +314,11 @@ object CroesusChestTracker {
                 val sinceRun = next.runTime?.passedSince() ?: 0.days // purely exists for pre-addition runs
                 if (sinceRun > 3.days) {
                     iterator.remove()
-                    ChatUtils.debug("Chest Removed due to Time Expiring.")
                 }
+                if (next.openState == OpenedState.UNOPENED) unopenedChests++
             }
         }
-        ChatUtils.debug("$removalNum null Croesus chests removed")
+        return unopenedChests
     }
 
 
