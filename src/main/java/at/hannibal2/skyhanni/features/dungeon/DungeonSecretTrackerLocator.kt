@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
@@ -28,13 +29,20 @@ import kotlin.time.Duration.Companion.seconds
 object DungeonSecretTrackerLocator {
     private val config get() = SkyHanniMod.feature.dungeon.dungeonSecretCompass
 
+    private val patternGroup = RepoPattern.group("dungeon.secrettracker")
+
     /**
      * REGEX-TEST: §aThere's a secret §r§e11 blocks in front of you!
      * REGEX-TEST: §aThere's a secret §r§e38 blocks in front of you and 15 blocks above you§r§a!
      */
-    private val SECRET_TRACKER_MESSAGE_REGEX by RepoPattern.pattern(
-        "dungeon.secrettracker.message",
-        "There's a secret (?:§.)*(?<distance>\\d+) blocks(?:.+and (?<distance2>\\d+) blocks)?"
+    private val secretTrackerMessagePattern by patternGroup.pattern(
+        "message",
+        "There's a secret (?:§.)*(?<distance>\\d+) blocks(?:.+and (?<distance2>\\d+) blocks)?",
+    )
+
+    private val noMissingSecretsPattern by patternGroup.pattern(
+        "no.missing",
+        "§cThere are no missing secrets near you!",
     )
 
     private var lastParticle = SimpleTimeMark.farPast()
@@ -71,11 +79,11 @@ object DungeonSecretTrackerLocator {
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-
+        if (!isEnabled()) return
         val location = secretLocation ?: return
         val distance = location.distance(event.exactPlayerEyeLocation())
 
-        if (distance > 2) {
+        if (distance > 3) {
             val formattedDistance = distance.toInt().addSeparators()
             event.drawDynamicText(location, "§d§lSECRET", 1.7)
             event.drawDynamicText(location.add(0.0, -0.1 - distance / (12 * 1.7), 0.0), " §r§e${formattedDistance}m", 1.0)
@@ -87,12 +95,13 @@ object DungeonSecretTrackerLocator {
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onChatMessage(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        SECRET_TRACKER_MESSAGE_REGEX.findMatcher(event.message) {
+        secretTrackerMessagePattern.findMatcher(event.message) {
             val distance1 = group("distance").toInt()
             val distance2 = groupOrNull("distance2")?.toInt() ?: 0
             secretDistance = sqrt((distance1 * distance1 + distance2 * distance2).toDouble()).toInt()
             repredictPoint()
         }
+        if (noMissingSecretsPattern.matches(event.message)) reset()
     }
 
     private fun repredictPoint() {

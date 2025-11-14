@@ -207,5 +207,5 @@ class DungeonConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var dungeonSecretCompass: Boolean = false
+    var dungeonSecretCompass: Boolean = true
 }
