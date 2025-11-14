@@ -434,7 +434,6 @@ class ProfileSpecificStorage(
         @Expose
         var latestTrueFarmingFortune: MutableMap<CropType, Double> = enumMapOf()
 
-        // TODO use in /ff guide
         @Expose
         var personalBestFF: MutableMap<CropType, Double> = enumMapOf()
 
@@ -550,6 +549,12 @@ class ProfileSpecificStorage(
 
             @Expose
             var bestiary: Double = -1.0
+
+            @Expose
+            var cacao: Int = -1
+
+            @Expose
+            var relicOfPower: Double = -1.0
 
             @Expose
             var plotsUnlocked: Int = -1

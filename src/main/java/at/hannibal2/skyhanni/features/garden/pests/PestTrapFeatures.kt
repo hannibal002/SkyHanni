@@ -16,12 +16,12 @@ import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.audio.ISound
 import kotlin.math.max
@@ -62,7 +62,7 @@ object PestTrapFeatures {
         if (!PestTrapApi.inInventory) return
         if (!config.releaseHotkey.isKeyHeld()) return
         if (event.guiContainer !is AccessorGuiContainer) return
-        InventoryCompat.clickInventorySlot(16, mouseButton = 0, mode = 0)
+        InventoryUtils.clickSlot(16)
     }
 
     @HandleEvent(ConfigLoadEvent::class)
