@@ -16,9 +16,11 @@ data class DianaJson(
 data class MythologicalCreatureType(
     @Expose val name: String,
     @Expose val rare: Boolean = false,
+    @Expose @SerializedName("short_names") val shortNames: List<String>? = null,
 ) {
     // If the class is annotated by @KSerializable, Gson directly uses the main data class constructor, meaning that
     // lazy fields get property initialized.
     val cleanName by lazy { name.removeColor() }
     val trackerId by lazy { cleanName.replace(" ", "_").uppercase() }
+    val mobAliases by lazy { listOf(cleanName.lowercase()) + (shortNames.orEmpty()) }
 }

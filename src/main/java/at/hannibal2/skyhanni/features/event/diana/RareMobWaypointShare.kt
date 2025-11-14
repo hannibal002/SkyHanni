@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -45,11 +47,12 @@ object RareMobWaypointShare {
      * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 -3
      * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
      * REGEX-TEST: §9Party §8> §6[MVP§0++§6] scaryron§f: §rx: -67, y: 75, z: 116 | Minos Inquisitor spawned at [ ⏣ Mountain ]!
+     * REGEX-TEST: §9Party §8> §b[MVP§5+§b] Throwpo§f: §rx: -144, y: 59, z: -119 | Sphinx
      */
     @Suppress("MaxLineLength")
     private val rareMobCoordsPattern by patternGroup.list(
         "coords",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+).*",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)(?<mobName> \\| .*)?.*",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)",
     )
 
@@ -83,9 +86,10 @@ object RareMobWaypointShare {
 
     class SharedRareMob(
         val fromPlayer: String,
-        val displayName: String,
+        val playerDisplayName: String,
         val location: LorenzVec,
         val spawnTime: SimpleTimeMark,
+        val mobName: String
     )
 
     @HandleEvent
@@ -226,29 +230,41 @@ object RareMobWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-        HypixelCommands.partyChat("x: $x, y: $y, z: $z ")
+        val mobName = rareMob.mob?.name.orEmpty()
+        val name = if (mobName.isEmpty()) "" else " | $mobName"
+        HypixelCommands.partyChat("x: $x, y: $y, z: $z $name")
     }
 
     private fun Matcher.block(): Boolean = !hasGroup("party") && !config.globalChat
 
     private fun Matcher.detectFromChat(): Boolean {
         if (block()) return false
-        val rawName = group("playerName")
+        val rawPlayerName = group("playerName")
         val x = group("x").trim().toDoubleOrNull() ?: return false
         val y = group("y").trim().toDoubleOrNull() ?: return false
         val z = group("z").trim().toDoubleOrNull() ?: return false
         val location = LorenzVec(x, y, z)
 
-        val name = rawName.cleanPlayerName()
-        val displayName = rawName.cleanPlayerName(displayName = true)
+        val rawMobName = if (hasGroup("mobName")) group("mobName").replace(" | ", "").trim().lowercase() else "Rare Mob"
+        var mobName = "Rare Mob"
+        for (mob in DianaApi.mythologicalCreatures.values) {
+            if (!mob.rare) continue
+            if (rawMobName !in mob.mobAliases) continue
+            mobName = mob.cleanName
+        }
+
+        val optionalAn = StringUtils.optionalAn(mobName)
+
+        val name = rawPlayerName.cleanPlayerName()
+        val playerDisplayName = rawPlayerName.cleanPlayerName(displayName = true)
         if (!waypoints.containsKey(name)) {
-            ChatUtils.chat("$displayName §l§efound an Rare Mob at §l§c${x.toInt()} ${y.toInt()} ${z.toInt()}!")
+            ChatUtils.chat("$playerDisplayName §l§efound $optionalAn $mobName at §l§c${x.toInt()} ${y.toInt()} ${z.toInt()}!")
             if (name != PlayerUtils.getName()) {
-                TitleManager.sendTitle("§dRare Diana Mob §efrom §b$displayName")
+                TitleManager.sendTitle("§d$mobName §efrom §b$playerDisplayName")
                 playUserSound()
             }
         }
-        _waypoints[name] = SharedRareMob(name, displayName, location, SimpleTimeMark.now())
+        _waypoints[name] = SharedRareMob(name, playerDisplayName, location, SimpleTimeMark.now(), mobName)
         GriffinBurrowHelper.update()
         return true
     }
@@ -259,7 +275,7 @@ object RareMobWaypointShare {
         if (rareMobsNearby.isEmpty()) {
             _waypoints.remove(sharedMob.fromPlayer)
             GriffinBurrowHelper.update()
-            ChatUtils.chat("Rare Diana Mob from ${sharedMob.displayName} §enot found, deleting.")
+            ChatUtils.chat("${sharedMob.mobName} from ${sharedMob.playerDisplayName} §enot found, deleting.")
         }
     }
 

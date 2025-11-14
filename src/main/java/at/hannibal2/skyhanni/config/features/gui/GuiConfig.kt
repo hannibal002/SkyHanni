@@ -182,4 +182,9 @@ class GuiConfig {
     @Expose
     @NoConfigLink
     val titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
+
+    @Expose
+    @ConfigOption(name = "Legion/Bobbin Overlay", desc = "")
+    @Accordion
+    val legionBobbinOverlay: LegionBobbinOverlayConfig = LegionBobbinOverlayConfig()
 }

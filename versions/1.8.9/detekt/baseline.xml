@@ -54,7 +54,6 @@
     <ID>MemberNameEqualsClassName:CaptureFarmingGear.kt$CaptureFarmingGear$fun captureFarmingGear()</ID>
     <ID>MemberNameEqualsClassName:FirstMinionTier.kt$FirstMinionTier$fun firstMinionTier( otherItems: Map&lt;NeuInternalName, Int&gt;, minions: MutableMap&lt;String, NeuInternalName&gt;, tierOneMinions: MutableList&lt;NeuInternalName&gt;, tierOneMinionsDone: MutableSet&lt;NeuInternalName&gt;, )</ID>
     <ID>MemberNameEqualsClassName:LastServers.kt$LastServers$private val lastServers = mutableMapOf&lt;String, SimpleTimeMark&gt;()</ID>
-    <ID>MemberNameEqualsClassName:PestSpawn.kt$PestSpawn$private fun pestSpawn(amount: Int, plotNames: List&lt;String&gt;, unknownAmount: Boolean)</ID>
     <ID>MemberNameEqualsClassName:Shimmy.kt$Shimmy.Companion$private fun shimmy(source: Any?, fieldName: String): Any?</ID>
     <ID>MemberNameEqualsClassName:TestBingo.kt$TestBingo$var testBingo = false</ID>
     <ID>NoNameShadowing:ContributorManager.kt$ContributorManager${ it.isAllowed() }</ID>
@@ -88,9 +87,7 @@
     <ID>RepoPatternRegexTestMissing:CompactBingoChat.kt$CompactBingoChat$by patternGroup.pattern( "border", "§[e3]§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬" )</ID>
     <ID>RepoPatternRegexTestMissing:CompactBingoChat.kt$CompactBingoChat$by patternGroup.pattern( "health", " {3}§r§7§8\\+§a.* §c❤ Health" )</ID>
     <ID>RepoPatternRegexTestMissing:CompactBingoChat.kt$CompactBingoChat$by patternGroup.pattern( "strength", " {3}§r§7§8\\+§a. §c❁ Strength" )</ID>
-    <ID>RepoPatternRegexTestMissing:CroesusChestTracker.kt$CroesusChestTracker$by patternGroup.pattern("chest.floor", "§7Tier: §eFloor (?&lt;floor&gt;[IV]+)")</ID>
     <ID>RepoPatternRegexTestMissing:CroesusChestTracker.kt$CroesusChestTracker$by patternGroup.pattern("chest.master", ".*Master.*")</ID>
-    <ID>RepoPatternRegexTestMissing:CroesusChestTracker.kt$CroesusChestTracker$by patternGroup.pattern("chest.state.opened", "§8Opened Chest:.*")</ID>
     <ID>RepoPatternRegexTestMissing:DianaProfitTracker.kt$DianaProfitTracker$by patternGroup.pattern( "burrow.dug", "(?:§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*", )</ID>
     <ID>RepoPatternRegexTestMissing:DianaProfitTracker.kt$DianaProfitTracker$by patternGroup.pattern( "coins", "§6§lWow! §r§eYou dug out §r§6(?&lt;coins&gt;.*) coins§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by melonPatternGroup.pattern( "crazyrare", "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9]\\d+x §r§[a|9]Enchanted Melon(?: Block| Slice)?§r§e!", )</ID>
@@ -127,7 +124,6 @@
     <ID>RepoPatternRegexTestMissing:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "mayhem", "§b§lMAYHEM! §r§7(?&lt;perk&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:HypixelData.kt$HypixelData$by patternGroup.pattern( "lobbytype", "(?&lt;lobbyType&gt;.*lobby)\\d+", )</ID>
     <ID>RepoPatternRegexTestMissing:HypixelData.kt$HypixelData$by patternGroup.pattern( "servername.connection", "(?&lt;prefix&gt;.+\\.)?hypixel\\.net", )</ID>
-    <ID>RepoPatternRegexTestMissing:InquisitorWaypointShare.kt$InquisitorWaypointShare$by patternGroup.pattern( "died", "(?&lt;party&gt;§9Party §8&gt; )?(?&lt;playerName&gt;.*)§f: §rInquisitor dead!", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemAbilityCooldown.kt$ItemAbilityCooldown$by patternGroup.pattern( "alignedother", "§eYou aligned §r§a.* §r§eother players?!", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemAbilityCooldown.kt$ItemAbilityCooldown$by patternGroup.pattern( "buffedyourself", "§aYou buffed yourself for §r§c\\+\\d+❁ Strength", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemAddManager.kt$ItemAddManager$by RepoPattern.pattern( "data.itemmanager.diceroll", "§eYour §r§(?:5|6High Class )Archfiend Dice §r§erolled a §r§.(?&lt;number&gt;.)§r§e! Bonus: §r§.(?&lt;hearts&gt;.*)❤", )</ID>
@@ -147,12 +143,6 @@
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.petcare", "^\\[\\w+ (?&lt;level&gt;\\d+)\\] (?&lt;name&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.summon.owner", ".*Spawned by: (?&lt;name&gt;.*).*", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern("displaynpc.name", "[a-z0-9]{10}")</ID>
-    <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "gaiaconstruct", ".* §r§eYou dug out a §r§2Gaia Construct§r§e!", )</ID>
-    <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minoschampion", ".* §r§eYou dug out a §r§2Minos Champion§r§e!", )</ID>
-    <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minoshunter", ".* §r§eYou dug out a §r§2Minos Hunter§r§e!", )</ID>
-    <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minosinquisitor", ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!", )</ID>
-    <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minotaur", ".* §r§eYou dug out a §r§2Minotaur§r§e!", )</ID>
-    <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "siameselynxes", ".* §r§eYou dug out §r§2Siamese Lynxes§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:NewYearCakeReminder.kt$NewYearCakeReminder$by RepoPattern.pattern( "event.winter.newyearcake.reminder.sidebar", "§dNew Year Event!§f (?&lt;time&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:PartyApi.kt$PartyApi$by patternGroup.pattern( "kuudrafinder.join", "§dParty Finder §f&gt; (?&lt;name&gt;.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level \\d+§e\\)", )</ID>
     <ID>RepoPatternRegexTestMissing:PestApi.kt$PestApi$by patternGroup.pattern( "inventory", "§4§lൠ §cThis plot has §6(?&lt;amount&gt;\\d) Pests?§c!", )</ID>
@@ -167,8 +157,6 @@
     <ID>RepoPatternRegexTestMissing:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSB.pattern( "cleared", "(?:§.)*Cleared: (?:§.)*(?&lt;percent&gt;[\\w,.]+)% (?:§.)*\\((?:§.)*(?&lt;score&gt;[\\w,.]+)(?:§.)*\\)", )</ID>
     <ID>RepoPatternRegexTestMissing:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSB.pattern( "keys", "Keys: §.■ §.[✗✓] §.■ §a.x", )</ID>
     <ID>RepoPatternRegexTestMissing:ShowMotesNpcSellPrice.kt$ShowMotesNpcSellPrice$by RepoPattern.pattern( "rift.everywhere.burger", ".*(?:§\\w)+You have (?:§\\w)+(?&lt;amount&gt;\\d) Grubber Stacks.*", )</ID>
-    <ID>RepoPatternRegexTestMissing:SkillApi.kt$SkillApi$by patternGroup.pattern( "skill.tab.max", " (?&lt;type&gt;\\w+) (?&lt;level&gt;\\d+): §r§c§lMAX", )</ID>
-    <ID>RepoPatternRegexTestMissing:SkillApi.kt$SkillApi$by patternGroup.pattern( "skill.tab.nopercent", " §r§a(?&lt;type&gt;\\w+)(?: (?&lt;level&gt;\\d+))?: §r§e(?&lt;current&gt;[0-9,.]+)§r§6/§r§e(?&lt;needed&gt;[0-9kmb]+)", )</ID>
     <ID>RepoPatternRegexTestMissing:SkillExperience.kt$SkillExperience$by patternGroup.pattern( "actionbar", ".*§3\\+.* (?&lt;skill&gt;.*) \\((?&lt;overflow&gt;.*)/(?&lt;needed&gt;.*)\\).*" )</ID>
     <ID>RepoPatternRegexTestMissing:SkillExperience.kt$SkillExperience$by patternGroup.pattern( "inventory", ".* §e(?&lt;number&gt;.*)§6/.*" )</ID>
     <ID>RepoPatternRegexTestMissing:SlayerBossSpawnSoon.kt$SlayerBossSpawnSoon$by RepoPattern.pattern( "slayer.bosswarning.progress", " \\(?(?&lt;progress&gt;[0-9.,k]+)/(?&lt;total&gt;[0-9.,k]+)\\)?.*" )</ID>
