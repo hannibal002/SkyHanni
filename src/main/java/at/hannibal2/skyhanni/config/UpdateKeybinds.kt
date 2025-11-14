@@ -205,6 +205,7 @@ object UpdateKeybinds {
         val currentMcVersion = PlatformUtils.MC_VERSION
         config.lastMinecraftVersion = currentMcVersion
         if (!config.storage.hasPlayedBefore) {
+            logger.log("User has never used skyhanni before!")
             return
         }
         if (lastMcVersion == currentMcVersion || (lastMcVersion != "1.8.9" && currentMcVersion != "1.8.9")) {
@@ -212,11 +213,13 @@ object UpdateKeybinds {
             return
         }
 
+        logger.log("Fixing keybinds because lastMcVersion: $lastMcVersion and currentMcVersion: $currentMcVersion")
         fixKeybinds(lastMcVersion != "1.8.9")
     }
 
     private fun tryFixLegacyKeybinds() {
         if (!PlatformUtils.IS_LEGACY) return
+        logger.log("Attempting to fix any out of bounds keybinds")
         for (keybind in keybinds) {
             val (_, currentValue) = readKeybindConfig(keybind) ?: continue
 

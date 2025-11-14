@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.utils.collection
 
+import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -55,8 +55,7 @@ object RenderableCollectionUtils {
         scale: Double = NeuItems.ITEM_FONT_SIZE,
     ) {
         if (highlight) {
-            // Hack to add enchant glint, like Hypixel does it
-            itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
+            itemStack.addEnchantGlint()
         }
         add(Renderable.item(itemStack, scale = scale))
     }

@@ -18,7 +18,7 @@ jobs:
                     ref: ${{ github.event.pull_request.head.sha }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: ./.github/actions/setup-normal-workspace
+            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
 
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
@@ -27,7 +27,7 @@ jobs:
                 env:
                     PR_TITLE: ${{ github.event.pull_request.title }}
                     PR_BODY: ${{ github.event.pull_request.body }}
-                uses: ./.github/actions/gradle-retry
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
                 with:
                     gradle-command: checkPrDescription -PprTitle="${PR_TITLE}" -PprBody="${PR_BODY}"
 

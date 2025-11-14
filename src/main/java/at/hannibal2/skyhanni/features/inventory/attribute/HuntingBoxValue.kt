@@ -111,8 +111,8 @@ object HuntingBoxValue {
     }
 
     private fun exportToSkyShards() {
-        val huntingBoxShards = storage?.map { it.key to it.value.amountInBox }?.toMap()?.filter { it.value > 0 } ?: emptyMap()
-        val attributeMenuShards = storage?.map { it.key to it.value.amountSyphoned }?.toMap()?.filter { it.value > 0 } ?: emptyMap()
+        val huntingBoxShards = storage?.map { it.key to it.value.amountInBox }?.toMap()?.filter { it.value > 0 }.orEmpty()
+        val attributeMenuShards = storage?.map { it.key to it.value.amountSyphoned }?.toMap()?.filter { it.value > 0 }.orEmpty()
         val data = SkyShardsAttributeData(huntingBoxShards.toShardIds(), attributeMenuShards.toShardIds())
         val json = ConfigManager.gson.toJson(data)
         ClipboardUtils.copyToClipboard(json)

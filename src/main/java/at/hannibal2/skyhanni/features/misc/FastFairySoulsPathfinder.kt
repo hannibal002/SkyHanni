@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -101,16 +100,16 @@ object FastFairySoulsPathfinder {
 
             val inAir = PlayerUtils.inAir()
             if (inAir) {
-                val abovePlayer = LocationUtils.playerLocation().up(10)
+                val abovePlayer = playerLocation.up(10)
                 val aboveNearest = allSouls.minBy { it.distanceSq(abovePlayer) }
-                if (aboveNearest.distanceToPlayer() < 10) return aboveNearest
+                if (aboveNearest.distance(abovePlayer) < 10) return aboveNearest
             }
 
-            ErrorManager.logErrorStateWithData(
-                "unknown fairy soul",
-                "user clicked a fairy soul while far away from known fairy souls",
-                "nearest loc" to nearest,
-                "player loc" to LocationUtils.playerLocation(),
+            IslandGraphs.reportLocation(
+                playerLocation,
+                userFacingReason = "unknown fairy soul",
+                technicalInfo = "user clicked a fairy soul while far away from known fairy souls",
+                "nearest soul" to nearest,
                 "distance" to nearest.distanceToPlayer().roundTo(1),
                 "inAir" to inAir,
             )
