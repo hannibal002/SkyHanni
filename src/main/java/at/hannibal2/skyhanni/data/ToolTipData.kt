@@ -24,8 +24,8 @@ object ToolTipData {
     //$$     stack: ItemStack,
     //$$     originalToolTip: MutableList<Text>,
     //$$ ): MutableList<Text> {
-    //$$     val tooltip = originalToolTip.map { it.formattedTextCompatLessResets().removePrefix("§5") }.toMutableList()
-    //$$     val tooltipCopy = tooltip.toMutableList()
+    //$$     val tooltip = originalToolTip.mapTo(mutableListOf()) { it.formattedTextCompatLessResets().removePrefix("§5§o") }
+    //$$     val tooltipCopy = tooltip.toList()
     //$$     getTooltip(stack, tooltip)
     //$$     onHover(context, stack, tooltip)
     //$$     renderToolTip(context, stack)
