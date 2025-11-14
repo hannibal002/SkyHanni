@@ -33,7 +33,7 @@ class InstanceChestProfitConfig {
     @ConfigOption(name = "Croesus Chest Price Overlay", desc = "Display each chests' profit for Dungeons and Kuudra.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var croesusProfitOverlayEnabled: Boolean = false
+    var croesusAllChestsOverlay: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -45,6 +45,6 @@ class InstanceChestProfitConfig {
     var croesusHighlight: Boolean = false
 
     @Expose
-    @ConfigLink(owner = InstanceChestProfitConfig::class, field = "croesusProfitOverlayEnabled")
+    @ConfigLink(owner = InstanceChestProfitConfig::class, field = "croesusAllChestsOverlay")
     val croesusPosition: Position = Position(107, 141)
 }
