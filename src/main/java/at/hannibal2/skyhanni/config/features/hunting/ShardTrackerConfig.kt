@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
-class ShardTracker {
+class ShardTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Track your current shards.")
     @ConfigEditorBoolean
@@ -20,7 +20,7 @@ class ShardTracker {
     var enabled: Boolean = false
 
     @Expose
-    @ConfigLink(owner = ShardTracker::class, field = "enabled")
+    @ConfigLink(owner = ShardTrackerConfig::class, field = "enabled")
     val position: Position = Position(80, 180)
 
     @Expose
@@ -30,8 +30,7 @@ class ShardTracker {
 
     @ConfigOption(
         name = "SkyShards",
-        desc = "Click this button to import a recipe from SkyShards.\n" +
-            "You can also use §e/shimportskyshards§f."
+        desc = "Click this button to import a recipe from SkyShards.\nYou can also use §e/shimportskyshards§f."
     )
     @ConfigEditorButton(buttonText = "Import")
     val skyShardsImport: Runnable = Runnable { ShardTrackerDisplay.importFromSkyShards() }

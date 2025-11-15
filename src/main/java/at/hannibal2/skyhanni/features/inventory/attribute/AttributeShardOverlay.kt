@@ -233,8 +233,7 @@ object AttributeShardOverlay {
                 "§cif there is an error with the data",
             ),
             onLeftClick = {
-                storage?.forEach { it.value.amountInBox = 0 }
-                ChatUtils.chat("Reset hunting box shards data")
+                AttributeShardsData.resetHuntingBoxShards()
                 reconstructDisplay()
             }
         )

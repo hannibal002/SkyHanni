@@ -89,6 +89,6 @@ class HuntingConfig {
     @Expose
     @ConfigOption(name = "Shard Tracker", desc = "")
     @Accordion
-    val shardTracker: ShardTracker = ShardTracker()
+    val shardTracker: ShardTrackerConfig = ShardTrackerConfig()
 
 }
