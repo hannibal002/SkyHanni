@@ -147,6 +147,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Dungeon Instance Creation Cooldown display. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3373)
     + Optionally blocks sending /joininstance command during cooldown.
 + Added Floor 7 Spring Boots Helper. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2581)
++ Added a guess for the Secret Tracker 3000 while in dungeons. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4611)
 
 </details>
 <details open><summary>
@@ -1127,6 +1128,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Empty traps in the Hunting Toolkit are now unclickable.
 + Added Hideonleaf Finder in Galatea. - Motte + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4615)
     + Shows a route to the nearest Hideonleaf spawn; toggle via keybind.
++ Added Attribute Shard Tracker. - nopo (https://github.com/hannibal002/SkyHanni/pull/4813)
++ Shard Fusion Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4819)
 
 </details>
 <details open><summary>
@@ -1263,6 +1266,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Sub-option available to revert to "1.8 sounds" (eating sound).
     + Will only apply to the "new" sounds that happen in 1.20 and above.
 + Added option to prevent closing CF when stray timer or strays are active. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4067)
++ Added Hoppity's Hunt messages to chat filter. - AfkUserMC (https://github.com/hannibal002/SkyHanni/pull/4853)
 
 ### The Carnival
 
@@ -1770,6 +1774,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + An option in Particle Hider to disable block-breaking particles.
     + Extra option for Garden only.
 + Added 1.21.10 support. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4596)
++ Added Legion/Bobbin' Time Display. - Empa & Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4815)
++ Added Middle Click Fix for 1.21.x. - Luna (https://github.com/hannibal002/SkyHanni/pull/4863)
+    + This fixes not being able to middle click items in inventories (e.g. to disable a full set bonus or a rune).
 
 </details>
 <details open><summary>
