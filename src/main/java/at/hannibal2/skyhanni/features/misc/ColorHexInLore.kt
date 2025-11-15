@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 
 @SkyHanniModule
 object ColorHexInLore {
@@ -37,6 +38,8 @@ object ColorHexInLore {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipEvent) {
+        // this feature wont work on 1.21 probably until we drop 1.8
+        if (!PlatformUtils.IS_LEGACY) return
         if (!isEnabled()) return
         val itemCategory = event.itemStack.getItemCategoryOrNull()
         if (itemCategory != ItemCategory.DYE &&
