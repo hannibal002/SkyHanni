@@ -83,6 +83,7 @@
 + Fixed an issue with clicks. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4843)
 
 ### Technical Details
+
 + `InventoryUtils.clickSlot()` now takes a `GuiContainerEvent.ClickType` instead of an `Int` for the `mode` parameter. - Luna (https://github.com/hannibal002/SkyHanni/pull/4536)
 + Added getEntitiesInBoundingBox function. - Empa (https://github.com/hannibal002/SkyHanni/pull/4860)
 + Added source to the shard events. - nopo (https://github.com/hannibal002/SkyHanni/pull/4819)
