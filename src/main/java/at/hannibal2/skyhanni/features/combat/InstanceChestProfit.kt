@@ -313,6 +313,7 @@ object InstanceChestProfit {
             if (item.getInternalNameOrNull() != null) {
                 var cost = EstimatedItemValueCalculator.getTotalPrice(item)
                 // This is here for pre-upgraded items in chests, this does currently ignore the config option for price source though.
+                // If you think they don't exist, make sure you check in-run chests since Croesus wipes & never rolls the upgrades.
                 if (cost == 0.0) cost = getPrice(item.getInternalName())
                 // Books just, stopped resolving via above at a point during #4857.
                 // but because Books can't have upgrades, this is technically more accurate since it can use the config for price.
