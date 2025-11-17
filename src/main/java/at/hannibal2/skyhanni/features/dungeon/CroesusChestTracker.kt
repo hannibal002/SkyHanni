@@ -181,6 +181,7 @@ object CroesusChestTracker {
         chestInventory = null
     }
 
+    @Suppress("MaxLineLength")
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.showUsedKismets) return
