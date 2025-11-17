@@ -192,7 +192,7 @@ object CroesusChestTracker {
                     currentPage++
                 }
 
-                BACK_ARROW_SLOT -> if (pageSwitchable && event.slot.stack.isArrow()) {
+                BACK_ARROW_SLOT -> if (pageSwitchable && event.slot.stack.isArrow() && currentPage != 0) { // People are getting Index out of range errors and I hope this fixes it?
                     pageSwitchable = false
                     currentPage--
                 }
