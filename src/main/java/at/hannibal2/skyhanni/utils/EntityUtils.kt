@@ -145,8 +145,12 @@ object EntityUtils {
         getEntitiesNearby<T>(LocationUtils.playerLocation(), radius, predicate)
 
     // First filters for a bounding box because it's faster, and then filters based on distance
-    inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> {
-        return getEntitiesInBox<T>(location, radius) { it.distanceTo(location) < radius && predicate(it)}
+    inline fun <reified T : Entity> getEntitiesNearby(
+        location: LorenzVec,
+        radius: Double,
+        noinline predicate: (T) -> Boolean = ALWAYS
+    ): List<T> {
+        return getEntitiesInBox<T>(location, radius) { it.distanceTo(location) < radius && predicate(it) }
     }
 
     inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: LorenzVec, radius: Double): Sequence<T> =
