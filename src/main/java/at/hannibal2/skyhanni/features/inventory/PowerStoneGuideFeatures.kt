@@ -5,7 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -65,7 +66,7 @@ object PowerStoneGuideFeatures {
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
 

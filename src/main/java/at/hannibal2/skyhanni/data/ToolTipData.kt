@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.Text
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 //#if MC > 1.21
@@ -18,6 +20,16 @@ import net.minecraft.item.ItemStack
 object ToolTipData {
 
     //#if MC > 1.21
+    //$$ init {
+    //$$     ItemTooltipCallback.EVENT.register { stack, context, type, originalToolTip ->
+    //$$         val slot = lastSlot ?: return@register
+    //$$         if (ToolTipTextEvent(slot, stack, originalToolTip).post()) {
+    //$$             originalToolTip.clear()
+    //$$             return@register
+    //$$         }
+    //$$     }
+    //$$ }
+    //$$
     //$$ @JvmStatic
     //$$ fun processModernTooltip(
     //$$     context: DrawContext,
@@ -54,6 +66,10 @@ object ToolTipData {
         val itemStack = slot.stack ?: return
         try {
             if (ToolTipEvent(slot, itemStack, toolTip).post()) {
+                toolTip.clear()
+            }
+            val textTooltip = toolTip.map { Text.of(it) }.toMutableList()
+            if (ToolTipTextEvent(slot, itemStack, textTooltip).post()) {
                 toolTip.clear()
             }
         } catch (e: Throwable) {

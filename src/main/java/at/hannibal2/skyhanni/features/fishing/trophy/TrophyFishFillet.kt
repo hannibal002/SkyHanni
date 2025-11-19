@@ -3,7 +3,8 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -22,7 +23,7 @@ object TrophyFishFillet {
     private val MAGMA_FISH = "MAGMA_FISH".toInternalName()
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName().contains("Sack")) return
 
