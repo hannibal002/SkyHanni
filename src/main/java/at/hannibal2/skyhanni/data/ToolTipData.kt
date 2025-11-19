@@ -13,7 +13,6 @@ import net.minecraft.item.ItemStack
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.mixins.hooks.renderToolTip
 //$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-//$$ import net.minecraft.text.Text
 //#endif
 
 // Please use ToolTipEvent over ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
