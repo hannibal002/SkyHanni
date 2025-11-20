@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.Text
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 //#if MC > 1.21
@@ -68,9 +69,13 @@ object ToolTipData {
             if (ToolTipEvent(slot, itemStack, toolTip).post()) {
                 toolTip.clear()
             }
-            val textTooltip = toolTip.map { Text.of(it) }.toMutableList()
-            if (ToolTipTextEvent(slot, itemStack, textTooltip).post()) {
+            if (PlatformUtils.IS_LEGACY) {
+                val textTooltip = toolTip.map { Text.of(it) }.toMutableList()
+                if (ToolTipTextEvent(slot, itemStack, textTooltip).post()) {
+                    toolTip.clear()
+                }
                 toolTip.clear()
+                toolTip.addAll(textTooltip.map { it.string }.toMutableList())
             }
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(

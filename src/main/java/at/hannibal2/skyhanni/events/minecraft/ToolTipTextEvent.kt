@@ -14,3 +14,14 @@ fun MutableList<Text>.add(index: Int, string: String) {
 fun MutableList<Text>.add(string: String) {
     this.add(Text.of(string))
 }
+
+fun MutableList<Text>.addAll(strings: Collection<String>) {
+    for (string in strings) {
+        this.add(Text.of(string))
+    }
+}
+
+fun MutableList<Text>.addAll(index: Int, strings: Collection<String>) {
+    val texts = strings.map { Text.of(it) }
+    this.addAll(index, texts)
+}
