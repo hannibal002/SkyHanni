@@ -20,6 +20,9 @@ object GardenBurrowingSporesNotifier {
 
     private val config get() = GardenApi.config
     private val patternGroup = RepoPattern.group("garden.burrowingspores")
+    /**
+     * REGEX-TEST: §6§lVERY RARE CROP! §r§f§r§9Burrowing Spores
+     */
     private val sporeDropMessage by patternGroup.pattern(
         "drop",
         "§6§lVERY RARE CROP! (?:§.)*§9Burrowing Spores",
