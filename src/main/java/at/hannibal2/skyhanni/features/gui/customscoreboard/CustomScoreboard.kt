@@ -223,7 +223,7 @@ object CustomScoreboard {
         activePatterns = ScoreboardConfigElement.getElements()
             .flatMap { it.elementPatterns }
             .distinct()
-        activePatterns += listOf(ScoreboardPattern.brokenPatterns, ScoreboardPattern.gemsPattern)
+        activePatterns += listOf(*ScoreboardPattern.brokenPatterns.toTypedArray(), ScoreboardPattern.gemsPattern)
     }
 
     @HandleEvent
