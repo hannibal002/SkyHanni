@@ -223,6 +223,7 @@ object CustomScoreboard {
         activePatterns = ScoreboardConfigElement.getElements()
             .flatMap { it.elementPatterns }
             .distinct()
+        @Suppress("SpreadOperator")
         activePatterns += listOf(*ScoreboardPattern.brokenPatterns.toTypedArray(), ScoreboardPattern.gemsPattern)
     }
 
