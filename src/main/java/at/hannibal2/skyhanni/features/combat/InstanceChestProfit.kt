@@ -78,7 +78,7 @@ object InstanceChestProfit {
      */
     private val kuudraChestKey by patternGroup.pattern(
         "kuudrachestkey",
-        "§.\\w+ Kuudra Key",
+        "§.(?:\\w+ )?Kuudra Key",
     )
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
