@@ -15,11 +15,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -73,10 +76,24 @@ object MetalDetectorSolver {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
+    @Suppress("CyclomaticComplexMethod") // todo: fix instead of ignoring the problem
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         if (predictedChestLocations.size == 1) return
-
+        if (config.metalDetectorStopWhenAllTools) {
+            var hasLapis = false
+            var hasDiamond = false
+            var hasEmerald = false
+            var hasGold = false
+            InventoryUtils.getItemsInOwnInventory().forEach {
+                val internalName = it.getInternalName()
+                if (internalName == DWARVEN_LAPIS_SWORD) hasLapis = true
+                if (internalName == DWARVEN_DIAMOND_AXE) hasDiamond = true
+                if (internalName == DWARVEN_EMERALD_HAMMER) hasEmerald = true
+                if (internalName == DWARVEN_GOLD_HAMMER) hasGold = true
+            }
+            if (hasLapis && hasDiamond && hasEmerald && hasGold) return
+        }
         val player = LocationUtils.playerLocation()
         if (lastLoc != player) {
             lastLoc = player
