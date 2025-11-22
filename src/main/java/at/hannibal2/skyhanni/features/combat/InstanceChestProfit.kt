@@ -75,6 +75,7 @@ object InstanceChestProfit {
     /**
      * REGEX-TEST: §6Infernal Kuudra Key
      * REGEX-TEST: §5Burning Kuudra Key
+     * REGEX-TEST: §9Kuudra Key
      */
     private val kuudraChestKey by patternGroup.pattern(
         "kuudrachestkey",
