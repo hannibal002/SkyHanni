@@ -116,23 +116,25 @@ object InstanceChestProfit {
     private fun createDisplay(items: Map<Int, ItemStack>) {
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
-            if (it.value.getInternalNameOrNull() != null) {
-                val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
-                if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
-            }
-            attributeShardPattern.matchMatcher(it.value.displayName) {
-                val name = group("name")
-                val count = group("count").toInt()
-                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.displayName, price)
-            }
-            essencePattern.matchMatcher(it.value.displayName) {
-                val name = group("name")
-                val rawCount = group("count").toInt()
-                val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
-                else rawCount.toDouble()
-                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.displayName, price)
+            if (items[51]?.equals(it) == false) { // This checks against Wheel of Fate in Kuudra chests since it both passes the item name check & is in the chest Type
+                if (it.value.getInternalNameOrNull() != null) {
+                    val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
+                    if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
+                }
+                attributeShardPattern.matchMatcher(it.value.displayName) {
+                    val name = group("name")
+                    val count = group("count").toInt()
+                    val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
+                    itemsWithCost.addOrPut(it.value.displayName, price)
+                }
+                essencePattern.matchMatcher(it.value.displayName) {
+                    val name = group("name")
+                    val rawCount = group("count").toInt()
+                    val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
+                    else rawCount.toDouble()
+                    val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
+                    itemsWithCost.addOrPut(it.value.displayName, price)
+                }
             }
         }
 
