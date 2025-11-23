@@ -69,6 +69,10 @@ object MetalDetectorSolver {
     private var lastLoc: LorenzVec? = null
     private var playedPling = false
     private var lastTreasureFound = SimpleTimeMark.farPast()
+    private val DWARVEN_LAPIS_SWORD = "DWARVEN_LAPIS_SWORD".toInternalName()
+    private val DWARVEN_EMERALD_HAMMER = "DWARVEN_EMERALD_HAMMER".toInternalName()
+    private val DWARVEN_GOLD_HAMMER = "DWARVEN_GOLD_HAMMER".toInternalName()
+    private val DWARVEN_DIAMOND_AXE = "DWARVEN_DIAMOND_AXE".toInternalName()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
