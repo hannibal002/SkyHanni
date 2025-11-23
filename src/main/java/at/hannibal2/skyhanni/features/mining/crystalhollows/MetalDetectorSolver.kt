@@ -78,7 +78,9 @@ object MetalDetectorSolver {
     fun onRepoReload(event: RepositoryReloadEvent) {
         chestLocations = event.getConstant<MetalDetectorChestsJson>("MetalDetectorChests").locations
     }
+    // TODO make this less complex instead of ignoring the problem
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
+    @Suppress("CyclomaticComplexMethod")
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         if (predictedChestLocations.size == 1) return
