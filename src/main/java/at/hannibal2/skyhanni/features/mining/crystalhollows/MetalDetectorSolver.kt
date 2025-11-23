@@ -91,10 +91,12 @@ object MetalDetectorSolver {
             var hasGold = false
             InventoryUtils.getItemsInOwnInventory().forEach {
                 val internalName = it.getInternalName()
-                if (internalName == DWARVEN_LAPIS_SWORD) hasLapis = true
-                if (internalName == DWARVEN_DIAMOND_AXE) hasDiamond = true
-                if (internalName == DWARVEN_EMERALD_HAMMER) hasEmerald = true
-                if (internalName == DWARVEN_GOLD_HAMMER) hasGold = true
+                when (internalName) {
+                    DWARVEN_LAPIS_SWORD -> hasLapis = true
+                    DWARVEN_DIAMOND_AXE -> hasDiamond = true
+                    DWARVEN_EMERALD_HAMMER -> hasEmerald = true
+                    DWARVEN_GOLD_HAMMER -> hasGold = true
+                }
             }
             if (hasLapis && hasDiamond && hasEmerald && hasGold) return
         }
