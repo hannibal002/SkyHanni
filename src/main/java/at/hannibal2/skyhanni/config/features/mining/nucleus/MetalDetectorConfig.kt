@@ -34,7 +34,6 @@ class MetalDetectorConfig {
     @Expose
     @ConfigOption(name = "Stop After All Tools", desc = "Stop looking for treasure when you have all the metal detector tools.")
     @ConfigEditorBoolean
-    @FeatureToggle
     var metalDetectorStopWhenAllTools: Boolean = false
 
     @Expose
