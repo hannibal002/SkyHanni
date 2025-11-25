@@ -149,7 +149,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
             val amount = group("amount").toInt().fixAmount(internalName, pest)
 
-            if (config.hideChat) blockedReason = "pest_drop"
+            if (config.hideChat && config.enabled) blockedReason = "pest_drop"
 
             addItem(pest, internalName, amount, command = false)
 

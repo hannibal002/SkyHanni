@@ -38,8 +38,10 @@ object BlockUtils {
     fun TileEntitySkull.getSkullTexture(): String? {
         //#if MC < 1.21
         return this.serializeNBT().getCompoundTag("Owner").getSkullTexture()
-        //#else
+        //#elseif MC < 1.21.9
         //$$ return this.owner?.id?.get()?.toString()
+        //#else
+        //$$ return this.owner?.gameProfile?.id.toString()
         //#endif
     }
 

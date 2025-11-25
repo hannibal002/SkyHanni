@@ -10,10 +10,12 @@ import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent;
 import at.hannibal2.skyhanni.features.inventory.BetterContainers;
+import at.hannibal2.skyhanni.features.inventory.MiddleClickFix;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe;
 import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -27,6 +29,10 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+//#if MC > 1.21.8
+//$$ import net.minecraft.client.gui.Click;
+//$$ import net.minecraft.client.input.KeyInput;
+//#endif
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +80,12 @@ public abstract class MixinHandledScreen {
     }
 
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
+    //#if MC < 1.21.9
     private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+        //#else
+        //$$ private void keyPressed(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
+        //$$     int keyCode = input.getKeycode();
+        //#endif
         TextInput.Companion.onGuiInput(cir);
         boolean shouldCancelInventoryClose = KeyboardManager.checkIsInventoryClosure(keyCode);
         if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post() || shouldCancelInventoryClose) {
@@ -83,7 +94,11 @@ public abstract class MixinHandledScreen {
     }
 
     @Inject(method = "mouseClicked", at = @At(value = "HEAD"), cancellable = true)
+    //#if MC < 1.21.9
     private void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+        //#else
+        //$$ private void mouseClicked(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+        //#endif
         if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post()) {
             cir.setReturnValue(false);
         }
@@ -111,4 +126,9 @@ public abstract class MixinHandledScreen {
         return BetterContainers.slotCanBeHighlighted(slot);
     }
 
+    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isInCreativeMode()Z"))
+    private boolean fixMiddleClick(boolean original) {
+        if (!MiddleClickFix.INSTANCE.isEnabled()) return original;
+        return true;
+    }
 }

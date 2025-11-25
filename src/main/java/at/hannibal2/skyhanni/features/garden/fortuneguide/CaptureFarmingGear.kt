@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
@@ -69,6 +70,15 @@ object CaptureFarmingGear {
     )
 
     /**
+     * REGEX-TEST: §6+4☘
+     * REGEX-TEST: §6+2.5☘
+     */
+    private val fortuneFlatPattern by patternGroup.pattern(
+        "fortune.farming.flat",
+        ".*§6+(?<fortune>.*)☘.*"
+    )
+
+    /**
      * REGEX-TEST: §7You have: §6+52☘ Farming Fortune
      */
     private val anitaMenuPattern by patternGroup.pattern(
@@ -119,6 +129,48 @@ object CaptureFarmingGear {
     private val tierProgressPattern by patternGroup.pattern(
         "uniquevisitors.tierprogress",
         ".* §e(?<having>.*)§6/(?<total>.*)",
+    )
+
+    /**
+     * REGEX-TEST: Accessory Bag (1/2)
+     */
+    private val accessoryBagNamePattern by RepoPattern.pattern(
+        "accessorybag.name",
+        "Accessory Bag.*",
+    )
+
+    /**
+     * REGEX-TEST: Farming Fortune: +2.5 (+2.5)
+     */
+    private val relicOfPowerFarmingFortune by RepoPattern.pattern(
+        "relicofpower.farmingfortune",
+        ".*Farming Fortune: +(?<fortune>.*) [(+].*[)]",
+    )
+
+    /**
+     * REGEX-TEST: Stats ➜ Wheat Fortune
+     * REGEX-TEST: Stats ➜ Nether Wart Fortune
+     */
+    private val statsCropInventoryPattern by RepoPattern.pattern(
+        "fortune.stats.inventory",
+        "Stats ➜ (?<crop>.*) Fortune"
+    )
+
+    /**
+     * REGEX-TEST: Wheat Fortune ➜ Flat Bonuses
+     * REGEX-TEST: Farming Fortune ➜ Flat Bonuses
+     */
+    private val flatFortuneInventoryPattern by RepoPattern.pattern(
+        "fortune.stats.inventory.flat",
+        "(?<crop>.*) Fortune ➜ Flat Bonuses"
+    )
+
+    /**
+     * REGEX-TEST:  §6+88.24☘ §fAnita's Personal Bests
+     */
+    private val personalBestPattern by RepoPattern.pattern(
+        "fortune.farming.crop.personalbest",
+        ".*§6+(?<fortune>.*)☘ §fAnita's Personal Bests"
     )
     // </editor-fold>
 
@@ -203,6 +255,26 @@ object CaptureFarmingGear {
             "Visitor Milestones" -> visitorMilestones(items)
             "Bestiary", "Bestiary ➜ Garden" -> bestiary(items, storage)
         }
+
+        flatFortuneInventoryPattern.matchMatcher(event.inventoryName) {
+            val crop = CropType.entries.firstOrNull { group("crop").equals(it.cropName, true) }
+            crop?.let {
+                cropFortune(items, it)
+            } ?: run {
+                flatFortune(items, storage)
+            }
+        }
+
+        statsCropInventoryPattern.matchMatcher(event.inventoryName) {
+            val crop = CropType.entries.firstOrNull { group("crop").equals(it.cropName, true) }
+            crop?.let {
+                cropFortune(items, it)
+            }
+        }
+
+        if (accessoryBagNamePattern.matches(event.inventoryName)) {
+            accessory(items, storage)
+        }
     }
 
     private fun InventoryFullyOpenedEvent.tryReadPets(): Boolean {
@@ -225,6 +297,88 @@ object CaptureFarmingGear {
                 }
                 if (fortune > -1.0) {
                     storage.bestiary = fortune
+                }
+            }
+        }
+    }
+
+    private fun flatFortune(
+        items: Map<Int, ItemStack>,
+        storage: ProfileSpecificStorage.GardenStorage.Fortune,
+    ) {
+        for ((_, item) in items) {
+            if (item.displayName.contains("Dark Chocolate")) {
+                var fortune = -1
+                for (line in item.getLore()) {
+                    fortuneFlatPattern.matchMatcher(line) {
+                        fortune = group("fortune").toInt()
+                    }
+                }
+                if (fortune > -1) {
+                    storage.cacao = fortune
+                }
+            }
+            if (item.displayName.contains("Relic of Power")) {
+                var fortune = -1.0
+                for (line in item.getLore()) {
+                    fortuneFlatPattern.matchMatcher(line) {
+                        fortune = group("fortune").toDouble()
+                    }
+                }
+                if (fortune > -1.0) {
+                    storage.relicOfPower = fortune
+                }
+            }
+        }
+    }
+
+    private fun cropFortune(
+        items: Map<Int, ItemStack>,
+        crop: CropType,
+    ) {
+        for ((_, item) in items) {
+            // Stats ➜ <Crop> Fortune
+            if (item.displayName.contains("Flat Bonuses")) {
+                var fortune = -1.0
+                for (line in item.getLore()) {
+                    personalBestPattern.matchMatcher(line) {
+                        fortune = group("fortune").toDouble()
+                    }
+                }
+                if (fortune > -1.0) {
+                    GardenApi.storage?.personalBestFF[crop] = fortune
+                }
+            }
+
+            // <Crop> Fortune ➜ Flat Bonuses
+            if (item.displayName.contains("Anita's Personal Bests")) {
+                var fortune = -1.0
+                for (line in item.getLore()) {
+                    fortuneFlatPattern.matchMatcher(line) {
+                        fortune = group("fortune").toDouble()
+                    }
+                }
+                if (fortune > -1.0) {
+                    GardenApi.storage?.personalBestFF[crop] = fortune
+                }
+            }
+        }
+    }
+
+    private fun accessory(
+        items: Map<Int, ItemStack>,
+        storage: ProfileSpecificStorage.GardenStorage.Fortune,
+    ) {
+        for ((_, item) in items) {
+            if (item.displayName.contains("Relic of Power")) {
+                var fortune = -1.0
+                for (line in item.getLore()) {
+                    relicOfPowerFarmingFortune.matchMatcher(line) {
+                        fortune = group("fortune").toDouble()
+                    }
+                }
+                if (fortune > -1.0) {
+                    storage.relicOfPower = fortune
                 }
             }
         }

@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class TimerConfig {
     @Expose
@@ -40,8 +41,9 @@ class TimerConfig {
     @ConfigOption(
         name = "New Visitor Ping",
         desc = "Ping you when you are less than 10 seconds away from getting a new visitor.\n" +
-            "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event."
+            "§eUseful for getting Ephemeral Gratitudes during the Great Spook event."
     )
+    @SearchTag("halloween")
     @ConfigEditorBoolean
     var newVisitorPing: Boolean = false
 

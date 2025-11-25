@@ -37,6 +37,14 @@ object ScoreboardPattern {
     )
 
     /**
+     * REGEX-TEST: Gems: §a350
+     */
+    val gemsPattern by mainSB.pattern(
+        "gems",
+        "(?:§.)*Gems: (?:§.)*(?<gems>[\\d,]+).*",
+    )
+
+    /**
      * REGEX-TEST:  §5ф §dWizard Tower
      */
     val locationPattern by mainSB.pattern(
