@@ -201,7 +201,7 @@ object UserLuckBreakdown {
     private fun skyblockMenuTooltip(event: ToolTipTextEvent) {
         if (event.slot.slotIndex != 13) return
         val luckEvent = getOrPostLuckEvent()
-            val lastIndex = event.toolTip.indexOfLast { it.string.removeColor() == " and more..." }
+        val lastIndex = event.toolTip.indexOfLast { it.string.removeColor() == " and more..." }
         if (lastIndex == -1) return
 
         val luckString = tryTruncateFloat(luckEvent.getTotalLuck())
