@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
@@ -84,5 +85,10 @@ class HuntingConfig {
     @Expose
     @ConfigLink(owner = HuntingConfig::class, field = "fusionDisplay")
     val fusionDisplayPosition: Position = Position(30, 210)
+
+    @Expose
+    @ConfigOption(name = "Shard Tracker", desc = "")
+    @Accordion
+    val shardTracker: ShardTrackerConfig = ShardTrackerConfig()
 
 }

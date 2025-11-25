@@ -933,6 +933,15 @@ class ProfileSpecificStorage(
         @Expose var enabled: Boolean = true,
     )
 
+    // - hunting
+    @Expose
+    var hunting: HuntingStorage = HuntingStorage()
+
+    class HuntingStorage {
+        @Expose
+        var trackedAttributeShards: MutableMap<String, Int> = mutableMapOf()
+    }
+
     @Expose
     var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
 }
