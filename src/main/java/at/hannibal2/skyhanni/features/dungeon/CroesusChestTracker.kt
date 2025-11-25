@@ -181,7 +181,6 @@ object CroesusChestTracker {
         chestInventory = null
     }
 
-    @Suppress("MaxLineLength")
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.showUsedKismets) return
@@ -193,7 +192,8 @@ object CroesusChestTracker {
                     currentPage++
                 }
 
-                BACK_ARROW_SLOT -> if (pageSwitchable && event.slot.stack.isArrow() && currentPage != 0) { // People are getting Index out of range errors presumably due to negative pages.
+                // People are getting Index out of range errors presumably due to negative pages.
+                BACK_ARROW_SLOT -> if (pageSwitchable && currentPage != 0 && event.slot.stack.isArrow()) {
                     pageSwitchable = false
                     currentPage--
                 }
