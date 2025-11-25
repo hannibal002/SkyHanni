@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -81,6 +82,14 @@ object InstanceChestProfit {
         "§.\\w+ Kuudra Key",
     )
 
+    /**
+     * REGEX-TEST: §aReroll Shard
+     */
+    private val fakeWheelofFate by patternGroup.pattern(
+        "fakewheeloffate",
+        "§aReroll Shard",
+    )
+
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
 
     private var inDungeonChest = false
@@ -116,7 +125,7 @@ object InstanceChestProfit {
     private fun createDisplay(items: Map<Int, ItemStack>) {
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
-            if (items[51]?.equals(it) == false) {
+            if (fakeWheelofFate.matches(it.value.displayName)) return
                 // This is intended to check against Wheel of Fate in Kuudra chests since it both passes the item name check & is in the chest Type
                 if (it.value.getInternalNameOrNull() != null) {
                     val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
@@ -137,7 +146,6 @@ object InstanceChestProfit {
                     itemsWithCost.addOrPut(it.value.displayName, price)
                 }
             }
-        }
 
         // Slot 31 has the cost information for the chest
         items[31]?.getLore()?.forEach {
