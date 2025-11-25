@@ -126,7 +126,6 @@ object InstanceChestProfit {
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
             if (fakeWheelofFate.matches(it.value.displayName)) return
-                // This is intended to check against Wheel of Fate in Kuudra chests since it both passes the item name check & is in the chest Type
                 if (it.value.getInternalNameOrNull() != null) {
                     val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                     if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
