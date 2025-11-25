@@ -119,6 +119,7 @@ object ErrorManager {
     private var cachedExtraData: String? = null
 
     // throw an error, best to not use it if not absolutely necessary
+    // when extraData is not used, rather call kotlin's `error()`
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         buildExtraDataString(extraData)?.let {
             cachedExtraData = it
@@ -174,7 +175,7 @@ object ErrorManager {
     // log with stack trace from other try catch block
     fun logErrorWithData(
         throwable: Throwable,
-        message: String,
+        message: String = throwable.message ?: "message is null",
         vararg extraData: Pair<String, Any?>,
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
@@ -183,6 +184,7 @@ object ErrorManager {
 
     data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
 
+    @Suppress("ReturnCount")
     private fun logError(
         originalThrowable: Throwable,
         message: String,
@@ -192,6 +194,9 @@ object ErrorManager {
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
     ): Boolean {
+        if (MinecraftCompat.localPlayerOrNull == null) {
+            println("extra data:\n${getExtraDataOrCached(extraData)}")
+        }
         if (betaOnly && !SkyHanniMod.isBetaVersion) return false
         val throwable = originalThrowable.maybeSkipError()
         if (!ignoreErrorCache) {

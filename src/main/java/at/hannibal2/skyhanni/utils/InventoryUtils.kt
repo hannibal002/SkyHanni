@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -61,7 +63,7 @@ object InventoryUtils {
             .filter { it.inventory is InventoryPlayer && it.stack.isNotEmpty() }
     }
 
-    fun openInventoryName(): String = InventoryCompat.getOpenChestName()
+    fun openInventoryName(): String = OtherInventoryData.currentInventoryName
 
     fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
 
@@ -104,7 +106,7 @@ object InventoryUtils {
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
-            clickSlot(slotNumber, container.windowId, mouseButton = 0, mode = 1)
+            clickSlot(slotNumber, container.windowId, mouseButton = 0, mode = ClickType.SHIFT)
             this.cancel()
         }
     }
@@ -185,13 +187,21 @@ object InventoryUtils {
 
     fun isInNormalChest(name: String = openInventoryName()): Boolean = name in normalChestInternalNames.map { I18n.format(it) }
 
-    // TODO replace mode with GuiContainerEvent.ClickType
-    fun clickSlot(slotNumber: Int, windowId: Int? = null, mouseButton: Int = 0, mode: Int = 0) {
-        if (windowId != null) {
-            InventoryCompat.clickInventorySlot(slotNumber, windowId, mouseButton = mouseButton, mode = mode)
-        } else {
-            InventoryCompat.clickInventorySlot(slotNumber, mouseButton = mouseButton, mode = mode)
-        }
+    fun clickSlot(
+        slotId: Int,
+        windowId: Int = InventoryCompat.getWindowId(),
+        mouseButton: Int = 0,
+        mode: ClickType = ClickType.NORMAL,
+    ) {
+        InventoryCompat.clickInventorySlot(windowId, slotId, mouseButton, mode.id)
+    }
+
+    fun mouseClickSlot(
+        slotId: Int,
+        mouseButton: Int = 0,
+        mode: ClickType = ClickType.NORMAL,
+    ) {
+        InventoryCompat.mouseClickInventorySlot(slotId, mouseButton, mode.id)
     }
 
     fun GuiContainer.slots(): List<Slot> {

@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.data.hotx
 
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -173,24 +171,20 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     private val treeInventoryDetector by lazy {
         InventoryDetector(
             pattern = inventoryPattern,
-            openInventory = ::onInventoryFullyOpened,
-            closeInventory = ::onInventoryClose,
+            onOpenInventory = {
+                DelayedRun.runNextTick {
+                    InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
+                    extraInventoryHandling()
+                }
+            },
+            onCloseInventory = { _ ->
+                data.forEach {
+                    it.slot = null
+                    it.item = null
+                }
+                heartItem = null
+            },
         )
-    }
-
-    open fun onInventoryClose(event: InventoryCloseEvent) {
-        data.forEach {
-            it.slot = null
-            it.item = null
-        }
-        heartItem = null
-    }
-
-    open fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        DelayedRun.runNextTick {
-            InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
-            extraInventoryHandling()
-        }
     }
 
     protected open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }

@@ -11,7 +11,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MineshaftPityDisplayConfig {
     @Expose
-    @ConfigOption(name = "Enable Display", desc = "Enable the Mineshaft Pity Display.")
+    @ConfigOption(
+        name = "Enable Display",
+        desc = "Enable the Mineshaft Pity Display."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
@@ -24,7 +27,7 @@ class MineshaftPityDisplayConfig {
         MineshaftPityLine.COUNTER,
         MineshaftPityLine.CHANCE,
         MineshaftPityLine.NEEDED_TO_PITY,
-        MineshaftPityLine.TIME_SINCE_MINESHAFT
+        MineshaftPityLine.TIME_SINCE_MINESHAFT,
     )
 
     @Expose

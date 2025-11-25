@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 
@@ -63,7 +64,7 @@ object SprayDisplay {
         expiredPlots.forEach { it.markExpiredSprayAsNotified() }
         val wasAwayString = if (wasAway) "§7While you were away, your" else "§7Your"
         val plotString = expiredPlots.map { "§b${it.name}" }.createCommaSeparatedList("§7")
-        val sprayString = if (expiredPlots.size > 1) "sprays" else "spray"
+        val sprayString = "spray".pluralize(expiredPlots.size)
         val out = "$wasAwayString $sprayString on §aPlot §7- $plotString §7expired."
         ChatUtils.chat(out)
     }

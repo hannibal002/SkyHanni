@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -29,8 +30,8 @@ object CFInventory {
     @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!CFApi.inChocolateFactory) return
+        if (!CFApi.isEnabled()) return
         if (!config.highlightUpgrades) return
-
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.stack == null) continue
@@ -45,6 +46,7 @@ object CFInventory {
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!CFApi.inChocolateFactory) return
+        if (!CFApi.isEnabled()) return
         if (!config.highlightUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
@@ -83,6 +85,7 @@ object CFInventory {
     @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!CFApi.inChocolateFactory) return
+        if (!CFApi.isEnabled()) return
         if (!config.showStackSizes) return
 
         val upgradeInfo = CFApi.factoryUpgrades.find { it.slotIndex == event.slot.slotNumber } ?: return
@@ -92,6 +95,7 @@ object CFInventory {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!CFApi.inChocolateFactory) return
+        if (!CFApi.isEnabled()) return
         val slot = event.slot ?: return
         val slotNumber = slot.slotNumber
         if (!config.useMiddleClick) return
@@ -100,7 +104,7 @@ object CFInventory {
         ) return
 
         // this would break CFKeybinds otherwise
-        if (event.clickType == GuiContainerEvent.ClickType.HOTBAR) return
+        if (event.clickType == ClickType.HOTBAR) return
 
         // if the user is holding shift, we don't want to pickblock, handled by hypixel as +10 levels for rabbits
         if (KeyboardManager.isShiftKeyDown() && slotNumber in CFApi.rabbitSlots.keys) return

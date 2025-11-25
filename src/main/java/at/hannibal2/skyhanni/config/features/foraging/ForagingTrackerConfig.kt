@@ -26,6 +26,7 @@ class ForagingTrackerConfig {
     @ConfigOption(name = "Compact Gifts", desc = "Compact the chat messages when you receive a tree gift.")
     @ConfigEditorBoolean
     @OnlyModern
+    @FeatureToggle
     var compactGiftChats: Boolean = true
 
     @Expose

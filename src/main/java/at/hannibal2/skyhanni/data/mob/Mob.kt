@@ -66,6 +66,8 @@ import java.util.UUID
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
  * @property uniqueId Unique identifier for each Mob instance
+ *
+ * @property hypixelTypes The types hypixel has assigned for that mob as the icons
  */
 @Suppress("TooManyFunctions")
 class Mob(
@@ -78,12 +80,15 @@ class Mob(
     val hasStar: Boolean = false,
     val attribute: MobFilter.DungeonAttribute? = null,
     val levelOrTier: Int = -1,
+    val hypixelTypes: String = "",
 ) {
 
     private val uniqueId: UUID = UUID.randomUUID()
     val id = baseEntity.entityId
 
     val owner: MobUtils.OwnerShip?
+
+    val ownerNameOrEmpty: String get() = owner?.ownerName.orEmpty()
 
     companion object {
 
@@ -119,10 +124,12 @@ class Mob(
             else -> false
         }
     }
+
     /**
      * @property isCorrupted can change.
      */
     val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted()
+
     /**
      * @property isRunic does not change.
      */

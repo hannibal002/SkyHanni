@@ -7,7 +7,6 @@ import com.google.gson.annotations.SerializedName
 import java.util.TreeSet
 
 data class HoppityEggLocationsJson(
-    @Expose val eggLocations: Map<IslandType, List<LorenzVec>>,
     @Expose val rabbitSlots: Map<Int, Int>,
     @Expose val otherUpgradeSlots: Set<Int>,
     @Expose val noPickblockSlots: Set<Int>,

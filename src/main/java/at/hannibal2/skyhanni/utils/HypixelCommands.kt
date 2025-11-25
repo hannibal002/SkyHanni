@@ -26,6 +26,10 @@ object HypixelCommands {
         send("sbmenu")
     }
 
+    fun stats() {
+        send("stats")
+    }
+
     fun skills() {
         send("skills")
     }
@@ -237,6 +241,10 @@ object HypixelCommands {
 
     fun fishingBag() {
         send("fishingbag")
+    }
+
+    fun huntingBox() {
+        send("hb")
     }
 
     private fun send(command: String) {

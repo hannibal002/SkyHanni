@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -19,7 +20,7 @@ object ChumBucketHider {
 
     private val config get() = SkyHanniMod.feature.fishing.chumBucketHider
     private val titleEntity = TimeLimitedSet<Entity>(5.seconds)
-    private val hiddenEntities = TimeLimitedSet<Entity>(5.seconds)
+    private val hiddenEntities = TimeLimitedCache<Entity, Boolean>(5.seconds)
 
     @HandleEvent
     fun onWorldChange() {
@@ -32,8 +33,10 @@ object ChumBucketHider {
 
         val entity = event.entity
 
-        if (entity in hiddenEntities) {
-            event.cancel()
+        hiddenEntities[entity]?.let { cancelled ->
+            if (cancelled) {
+                event.cancel()
+            }
             return
         }
 
@@ -43,7 +46,7 @@ object ChumBucketHider {
         if (name.endsWith("'s Chum Bucket") || name.endsWith("'s Chumcap Bucket")) {
             if (name.contains(PlayerUtils.getName()) && !config.hideOwn.get()) return
             titleEntity.add(entity)
-            hiddenEntities.add(entity)
+            hiddenEntities[entity] = true
             event.cancel()
             return
         }
@@ -53,7 +56,7 @@ object ChumBucketHider {
             val entityLocation = entity.getLorenzVec()
             for (title in titleEntity) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
-                    hiddenEntities.add(entity)
+                    hiddenEntities[entity] = true
                     event.cancel()
                     return
                 }
@@ -69,12 +72,13 @@ object ChumBucketHider {
             val entityLocation = entity.getLorenzVec()
             for (title in titleEntity) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
-                    hiddenEntities.add(entity)
+                    hiddenEntities[entity] = true
                     event.cancel()
                     return
                 }
             }
         }
+        hiddenEntities[entity] = false
     }
 
     @HandleEvent

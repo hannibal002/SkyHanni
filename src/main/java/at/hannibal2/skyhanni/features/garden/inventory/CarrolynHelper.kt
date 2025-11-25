@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -34,7 +34,7 @@ object CarrolynHelper {
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ItemHoverEvent) {
+    fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
 
         if (!event.itemStack.isCarrolynItem()) return

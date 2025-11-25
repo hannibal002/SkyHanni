@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -23,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -30,7 +33,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -52,9 +59,11 @@ object FarmingFortuneDisplay {
         "tablist.universal",
         " Farming Fortune: §r§6☘(?<fortune>\\d+)",
     )
+
+    @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific",
-        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)",
+        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon Slice|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)",
     )
     private val collectionPattern by patternGroup.pattern(
         "collection",
@@ -64,12 +73,16 @@ object FarmingFortuneDisplay {
     @Suppress("MaxLineLength")
     private val tooltipFortunePattern by patternGroup.pattern(
         "tooltip.new",
-        "^§7Farming Fortune: §a\\+(?<display>[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?<reforge>\\d+)\\))?(?: §d\\(\\+(?<gemstone>\\d+)\\))?\$",
+        "^§7Farming Fortune: §6\\+(?<display>[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?<reforge>\\d+)\\))?(?: §d\\(\\+(?<gemstone>\\d+)\\))?\$",
     )
     private val armorAbilityPattern by patternGroup.pattern(
         "armorability",
         "Tiered Bonus: .* [(](?<pieces>.*)/4[)]",
     )
+
+    /**
+     * REGEX-TEXT: §7Piece Bonus: §6+10☘
+     */
     private val lotusAbilityPattern by patternGroup.pattern(
         "lotusability",
         "§7Piece Bonus: §6+(?<bonus>.*)☘",
@@ -81,11 +94,23 @@ object FarmingFortuneDisplay {
         "§7.*§7Grants §6(?<bonus>.*)☘.*",
     )
 
+    /**
+     * REGEX-TEST:  Bonus: §r§c§lINACTIVE
+     * REGEX-TEST:  Bonus: §r§6+200☘ §r§b29m
+     * REGEX-TEST:  Bonus: §r§6+200☘ §r§b5m 2s
+     * REGEX-TEST:  Bonus: §r§6+200☘ §r§b8s
+     */
+    private val pestFortuneBuffPattern by patternGroup.pattern(
+        "pestfortunebuff",
+        " Bonus: §r§.(?<inactive>§lINACTIVE)?(?:\\+(?<fortune>\\d+)☘ §r§b(?<time>.*))?.*",
+    )
+
     private var display = emptyList<Renderable>()
 
     private var lastToolSwitch = SimpleTimeMark.farPast()
 
     private val latestFF: MutableMap<CropType, Double>? get() = GardenApi.storage?.latestTrueFarmingFortune
+    private val personalBest: MutableMap<CropType, Double>? get() = GardenApi.storage?.personalBestFF
 
     private var currentCrop: CropType? = null
 
@@ -105,33 +130,65 @@ object FarmingFortuneDisplay {
     private var firstBrokenCropTime = SimpleTimeMark.farPast()
     private var lastUniversalFortuneMissingError = SimpleTimeMark.farPast()
     private var lastCropFortuneMissingError = SimpleTimeMark.farPast()
+    private var pestBonusExpireTime = SimpleTimeMark.farPast()
+    private var hasWarnedPestBonus = true
+    private var pestBonusFortune = 0
 
     private val ZORROS_CAPE = "ZORROS_CAPE".toInternalName()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        event.tabList.firstNotNullOfOrNull {
-            universalTabFortunePattern.matchMatcher(it) {
-                val fortune = group("fortune").toDouble()
-                foundTabUniversalFortune = true
-                if (fortune != tabFortuneUniversal) {
-                    tabFortuneUniversal = fortune
-                    update()
-                }
-            }
-            cropSpecificTabFortunePattern.matchMatcher(it) {
-                val crop = CropType.getByName(group("crop"))
-                val cropFortune = group("fortune").toDouble()
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        val widget = event.widget
+        if (event.isWidget(TabWidget.STATS)) {
+            checkStats(widget)
+        } else if (event.isWidget(TabWidget.PESTS)) {
+            checkPests(widget)
+        }
+    }
 
-                currentCrop = crop
-                foundTabCropFortune = true
-                if (cropFortune != tabFortuneCrop) {
-                    tabFortuneCrop = cropFortune
-                    update()
+    private fun checkPests(widget: TabWidget) {
+        pestFortuneBuffPattern.firstMatcher(widget.lines) {
+            val inactive = groupOrNull("inactive")
+            val time = groupOrNull("time")?.let { getTablistEndTime(it, pestBonusExpireTime) }
+            val fortune = groupOrNull("fortune")?.toIntOrNull()
+
+            if (inactive != null) {
+                pestBonusExpireTime = SimpleTimeMark.farPast()
+                pestBonusFortune = 0
+                if (!hasWarnedPestBonus) {
+                    pestBuffExpireWarning()
                 }
-                if (GardenApi.cropInHand == crop) {
-                    latestFF?.put(crop, getCurrentFarmingFortune())
-                }
+            } else if (time != null && fortune != null) {
+                hasWarnedPestBonus = false
+                pestBonusFortune = fortune
+                pestBonusExpireTime = time
+
+            }
+            update()
+        }
+    }
+
+    private fun checkStats(widget: TabWidget) {
+        universalTabFortunePattern.firstMatcher(widget.lines) {
+            val fortune = group("fortune").toDouble()
+            foundTabUniversalFortune = true
+            if (fortune != tabFortuneUniversal) {
+                tabFortuneUniversal = fortune
+                update()
+            }
+        }
+        cropSpecificTabFortunePattern.firstMatcher(widget.lines) {
+            val crop = CropType.getByName(group("crop"))
+            val cropFortune = group("fortune").toDouble()
+
+            currentCrop = crop
+            foundTabCropFortune = true
+            if (cropFortune != tabFortuneCrop) {
+                tabFortuneCrop = cropFortune
+                update()
+            }
+            if (GardenApi.cropInHand == crop) {
+                latestFF?.put(crop, getCurrentFarmingFortune())
             }
         }
     }
@@ -147,6 +204,21 @@ object FarmingFortuneDisplay {
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null) return
         config.position.renderRenderables(display, posLabel = "True Farming Fortune")
+    }
+
+    private fun pestBuffExpireWarning() {
+        if (config.bonusFortuneChat)
+            ChatUtils.clickToActionOrDisable(
+                "§cPest fortune buff has expired!",
+                config::bonusFortuneChat,
+                "teleport to barn",
+                action = { HypixelCommands.teleportToPlot("barn") },
+            )
+        if (config.bonusFortuneTitle) {
+            TitleManager.sendTitle("§cPest Fortune Buff Has Expired!", duration = 3.seconds)
+            playUserSound()
+        }
+        hasWarnedPestBonus = true
     }
 
     private fun update() {
@@ -190,6 +262,8 @@ object FarmingFortuneDisplay {
             ),
         )
 
+        if (config.showPestBonusFortune) addString(pestBuffString())
+
         if (ffReduction > 0) {
             if (config.compactFormat) {
                 addString("§cPests: §7-§e$ffReduction%")
@@ -201,6 +275,15 @@ object FarmingFortuneDisplay {
         if (wrongTabCrop && !config.hideMissingFortuneWarnings && !config.compactFormat) {
             addString(wrongTabCropText)
         }
+    }
+
+    private fun pestBuffString(): String {
+        val bonusInfo = if (pestBonusExpireTime.isInPast()) {
+            "§cInactive!"
+        } else {
+            "§6+$pestBonusFortune☘ §b${pestBonusExpireTime.timeUntil().format()}"
+        }
+        return if (config.compactFormat) bonusInfo else "§eBonus: $bonusInfo"
     }
 
     private fun drawMissingFortuneDisplay(cropFortune: Boolean) = buildList {
@@ -352,7 +435,7 @@ object FarmingFortuneDisplay {
         var pieces = 0
 
         for (line in lore) {
-            if (internalName.contains("LOTUS")) {
+            if (internalName.startsWith("LOTUS_")) {
                 lotusAbilityPattern.matchMatcher(line) {
                     return group("bonus").toDouble()
                 }
@@ -402,6 +485,13 @@ object FarmingFortuneDisplay {
         }
     }
 
+    @JvmStatic
+    fun playUserSound() {
+        with(config.sound) {
+            SoundUtils.createSound(name, pitch).playSound()
+        }
+    }
+
     fun getCurrentFarmingFortune() = tabFortuneUniversal + tabFortuneCrop
 
     fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
@@ -413,5 +503,9 @@ object FarmingFortuneDisplay {
         event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")
 
         event.move(87, "garden.farmingFortunes.pos", "garden.farmingFortunes.position")
+    }
+
+    fun getPersonalBest(crop: CropType): Double {
+        return personalBest?.get(crop) ?: 0.0
     }
 }

@@ -120,7 +120,7 @@ class DungeonConfig {
     val lividFinder: LividFinderConfig = LividFinderConfig()
 
     @Expose
-    @ConfigOption(name = "Trinity", desc = "")
+    @ConfigOption(name = "Trinity Helper", desc = "")
     @Accordion
     val trinityHelper: TrinityConfig = TrinityConfig()
 
@@ -199,4 +199,13 @@ class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var springBootsNotification: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Secret Tracker Locator",
+        desc = "Shows the secret that the secret tracker is pointing to.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var dungeonSecretCompass: Boolean = true
 }

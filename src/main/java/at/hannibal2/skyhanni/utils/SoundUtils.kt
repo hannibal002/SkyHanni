@@ -60,8 +60,13 @@ object SoundUtils {
         }
     }
 
+    // TODO this needs fixing on 1.21.9
     private fun SoundCategory.setLevel(level: Float) =
+        //#if MC < 1.21.9
         Minecraft.getMinecraft().soundHandler.setSoundLevel(this, level)
+    //#else
+    //$$ Unit
+    //#endif
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): ISound {
         //#if MC < 1.21
@@ -77,7 +82,8 @@ object SoundUtils {
         return sound
         //#else
         //$$ val newSound = at.hannibal2.skyhanni.utils.compat.SoundCompat.getModernSoundName(name)
-        //$$ return PositionedSoundInstance.master(SoundEvent.of(Identifier.of(newSound)), pitch, volume)
+        //$$ val identifier = Identifier.of(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
+        //$$ return PositionedSoundInstance.master(SoundEvent.of(identifier), pitch, volume)
         //#endif
     }
 
@@ -113,7 +119,7 @@ object SoundUtils {
 
     // TODO use duration for delay
     fun repeatSound(delay: Long, repeat: Int, sound: ISound) {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("repeatSound") {
             repeat(repeat) {
                 sound.playSound()
                 delay(delay)

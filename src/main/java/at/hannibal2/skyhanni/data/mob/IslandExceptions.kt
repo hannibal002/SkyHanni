@@ -66,7 +66,7 @@ object IslandExceptions {
     ) = when {
         baseEntity is EntityZombie &&
             armorStand != null &&
-            (armorStand.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || armorStand.name == "§3§lWatchful Eye§r") ->
+            (armorStand.name == "§e﴾ §5♃ §c§lThe Watcher§r§r §e﴿" || armorStand.name == "§3§lWatchful Eye§r") ->
             MobData.MobResult.found(
                 MobFactories.special(baseEntity, armorStand.cleanName(), armorStand),
             )
@@ -194,6 +194,7 @@ object IslandExceptions {
     ) = when {
         baseEntity is EntityOcelot &&
             armorStand?.isDefaultValue() == false &&
+            // TODO fix pattern
             armorStand.name.startsWith("§8[§7Lv155§8] §cAzrael§r") ->
             MobUtils.getArmorStand(baseEntity, 1)
                 .makeMobResult { MobFactories.basic(baseEntity, it) }

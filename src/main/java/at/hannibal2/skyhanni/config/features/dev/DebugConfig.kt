@@ -176,11 +176,10 @@ class DebugConfig {
     @ConfigEditorBoolean
     var currentAreaDebug: Boolean = true
 
-    // TODO rename to rayTracedOreBlock
     @Expose
-    @ConfigOption(name = "OreBlock Name", desc = "Show the OreBlock you are currently looking at.")
+    @ConfigOption(name = "OreBlock Name", desc = "Show the OreBlock you are currently looking at while F3 is open.")
     @ConfigEditorBoolean
-    var raytracedOreblock: Boolean = true
+    var rayTracedOreBlock: Boolean = true
 
     @Expose
     @ConfigOption(name = "Ore Event Messages", desc = "Shows debug messages every time the Ore Event happens.")
@@ -196,6 +195,11 @@ class DebugConfig {
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
     val assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
+
+    @Expose
+    @ConfigOption(name = "Set Mayor on Start", desc = "Set assumed mayor to disabled on game start.")
+    @ConfigEditorBoolean
+    var disableAssumeMayor: Boolean = true
 
     @Expose
     @ConfigOption(name = "Always Year of Pig", desc = "Assumes the Year of the Pig is always active, even if it is not.")

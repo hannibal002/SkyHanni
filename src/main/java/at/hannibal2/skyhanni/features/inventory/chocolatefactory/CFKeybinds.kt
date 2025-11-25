@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -30,7 +31,7 @@ object CFKeybinds {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(28 + index, chest.inventorySlots.windowId, mouseButton = 2, mode = 3)
+            InventoryUtils.clickSlot(28 + index, chest.inventorySlots.windowId, mouseButton = 2, mode = ClickType.MIDDLE)
             break
         }
     }
@@ -41,7 +42,7 @@ object CFKeybinds {
         if (!CFApi.inChocolateFactory) return
 
         // needed to not send duplicate clicks via keybind feature
-        if (event.clickType == GuiContainerEvent.ClickType.HOTBAR) {
+        if (event.clickType == ClickType.HOTBAR) {
             event.cancel()
         }
     }

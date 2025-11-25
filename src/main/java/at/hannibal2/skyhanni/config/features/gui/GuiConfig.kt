@@ -113,6 +113,7 @@ class GuiConfig {
     @FeatureToggle
     var beaconPower: Boolean = false
 
+    // TODO move beacon power options into an accordion and into their own config file
     @Expose
     @ConfigOption(name = "Show Beacon Stat", desc = "Show what stat is being boosted by your beacon.")
     @ConfigEditorBoolean
@@ -181,4 +182,9 @@ class GuiConfig {
     @Expose
     @NoConfigLink
     val titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
+
+    @Expose
+    @ConfigOption(name = "Legion/Bobbin Overlay", desc = "")
+    @Accordion
+    val legionBobbinOverlay: LegionBobbinOverlayConfig = LegionBobbinOverlayConfig()
 }
