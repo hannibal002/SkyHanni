@@ -85,8 +85,8 @@ object InstanceChestProfit {
     /**
      * REGEX-TEST: §aReroll Shard
      */
-    private val fakeWheelofFate by patternGroup.pattern(
-        "fakewheeloffate",
+    private val fakeItemNamePattern by patternGroup.pattern(
+        "fakeitemname",
         "§aReroll Shard",
     )
 
@@ -125,7 +125,7 @@ object InstanceChestProfit {
     private fun createDisplay(items: Map<Int, ItemStack>) {
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
-            if (fakeWheelofFate.matches(it.value.displayName)) return@forEach
+            if (fakeItemNamePattern.matches(it.value.displayName)) return@forEach
             if (it.value.getInternalNameOrNull() != null) {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
