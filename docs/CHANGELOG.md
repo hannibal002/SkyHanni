@@ -12,6 +12,7 @@
 
 + Added Attribute Shard Tracker. - nopo (https://github.com/hannibal002/SkyHanni/pull/4813)
 + Shard Fusion Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4819)
++ Added tracker for hunting to count shards collected. - Pugzy (https://github.com/hannibal002/SkyHanni/pull/4764)
 
 #### Dungeon
 
@@ -20,6 +21,11 @@
 #### Chat
 
 + Added Hoppity's Hunt messages to chat filter. - AfkUserMC (https://github.com/hannibal002/SkyHanni/pull/4853)
+
+#### The Rift
+
++ Added Bacte Kill Zone Warning. - Luna (https://github.com/hannibal002/SkyHanni/pull/4541)
+  + Sound and title alert if you are outside the arena during the Bacte fight and about to die.
 
 #### Misc
 
@@ -43,6 +49,18 @@
 #### Farming
 
 + Added additional fortune sources to /ff. - brettt89 (https://github.com/hannibal002/SkyHanni/pull/4814)
+
+#### Mining
+
++ Added a toggle to stop Metal Detector Solver when having all tools. - AfkUserMC (https://github.com/hannibal002/SkyHanni/pull/4888)
+
+#### Misc
+
++ Added option to reset a gui's position and scale in the editor. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/4809)
+
+#### Dungeons
+
++ Improved Trinity Helper to be less confusing. - Luna (https://github.com/hannibal002/SkyHanni/pull/4875)
 
 ### Fixes
 
@@ -78,9 +96,31 @@
 
 + Fixed Ghost Tracker coin count not working when using a Scavenger setup. - nopo (https://github.com/hannibal002/SkyHanni/pull/4849)
 
+#### Farming
+
++ Fixed Burrowing Spores notification not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/4883)
+
+#### Chocolate Factory
+
++ Fixed Chocolate Factory Custom Reminder not working if you use middle or right click to buy the upgrade or item. - Luna (https://github.com/hannibal002/SkyHanni/pull/4890)
++ Fixed Chocolate Factory Upgrade chat filter sometimes not hiding messages. - Luna (https://github.com/hannibal002/SkyHanni/pull/4886)
+
+#### Combat
+
++ Fixed Instance Chest Profit ignoring Basic Kuudra Key Cost. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4885)
++ Fixed Wheel of Fate being erroneously added as chest profit. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4887)
+
+
 #### Misc
 
 + Fixed an issue with clicks. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4843)
++ Fixed Custom Scoreboard Error when in the Community Center. - juna (https://github.com/hannibal002/SkyHanni/pull/4884)
++ Fixed F3 not showing day count on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/4891)
++ Fixed hide skill info in action bar not working with other mods. - nopo (https://github.com/hannibal002/SkyHanni/pull/4880)
++ Fixed some overlays (e.g. Garden Optimal Angle & Speed) appearing dimmed on Minecraft 1.21.8 and above. - Luna (https://github.com/hannibal002/SkyHanni/pull/4889)
++ Fixed while F3 is open features sometimes showing up while F3 is not open on Minecraft 1.21.10. - Luna (https://github.com/hannibal002/SkyHanni/pull/4879)
++ The Fix item double clicks feature now works again. - Luna (https://github.com/hannibal002/SkyHanni/pull/4878)
+
 
 ### Technical Details
 
@@ -90,6 +130,10 @@
 + Cleanup in HoppityEggLocations. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4859)
 + Moved `GardenApi.otherToolsList` to the repo and renamed it to `extraFarmingTools`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4534)
 + Use fabric chat events instead of a mixin. - nopo (https://github.com/hannibal002/SkyHanni/pull/4867)
++ Changed `SkyHanniItemTracker` to be passed whole `TrackedItem` object. - Pugzy (https://github.com/hannibal002/SkyHanni/pull/4764)
+  + Allows amount gained and times collected to be displayed in lore.
+  + Default implementation added to match current behavior.
++ Changed some tooltip event uses to use the right event. - nopo (https://github.com/hannibal002/SkyHanni/pull/4874)
 
 ## Version 5.0.0
 
