@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig.Comm
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -131,8 +131,9 @@ object EnchantParser {
         }
     }
 
+    // We have to use ItemHoverEvent instead of ToolTipEvent otherwise it causes issues on 1.8
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltipEvent(event: ToolTipEvent) {
+    fun onTooltipEvent(event: ItemHoverEvent) {
         // If enchants doesn't have any enchant data then we have no data to parse enchants correctly
         if (!this.enchants.hasEnchantData()) return
 
