@@ -317,18 +317,14 @@ object InstanceChestProfit {
     } ?: 0.0
 
     private fun createDisplay(items: Map<Int, ItemStack>) {
-        val itemsWithCost = mutableMapOf<String, Double>()
-        for (item in items.values) {
-            if (item.getInternalNameOrNull() != null) {
-                var cost = EstimatedItemValueCalculator.getTotalPrice(item)
-                // This is here for pre-upgraded items in chests, this does currently ignore the config option for price source though.
-                // If you think they don't exist, make sure you check in-run chests since Croesus wipes & never rolls the upgrades.
-                if (cost == 0.0) cost = getPrice(item.getInternalName())
-                // Books just, stopped resolving via above at a point during #4857.
-                // but because Books can't have upgrades, this is technically more accurate since it can use the config for price.
-                if (cost != null) itemsWithCost.addOrPut(item.repoItemName, cost)
+        val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
+        items.forEach {
+            if (fakeItemNamePattern.matches(it.value.displayName)) return@forEach
+            if (it.value.getInternalNameOrNull() != null) {
+                val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
+                if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
             }
-            val name = item.displayName
+            val name = it.value.displayName
             if (attributeShardPattern.matches(name)) {
                 val price = getAttribute(name)
                 itemsWithCost.addOrPut(name, price)
@@ -337,27 +333,6 @@ object InstanceChestProfit {
                 val price = getEssence(group("name"), group("count").toInt())
                 // TODO remove if check, getEssence should return null if no price is found
                 if (price != 0.0) itemsWithCost.addOrPut(name, price)
-    private fun createDisplay(items: Map<Int, ItemStack>) {
-        val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
-        items.forEach {
-            if (fakeItemNamePattern.matches(it.value.displayName)) return@forEach
-            if (it.value.getInternalNameOrNull() != null) {
-                val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
-                if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
-            }
-            attributeShardPattern.matchMatcher(it.value.displayName) {
-                val name = group("name")
-                val count = group("count").toInt()
-                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.displayName, price)
-            }
-            essencePattern.matchMatcher(it.value.displayName) {
-                val name = group("name")
-                val rawCount = group("count").toInt()
-                val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
-                else rawCount.toDouble()
-                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.displayName, price)
             }
         }
 
