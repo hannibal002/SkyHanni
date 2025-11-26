@@ -117,7 +117,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
         },
         getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String> = { internalName, item ->
             if (internalName == SKYBLOCK_COIN) data.getCoinDescription(item)
-            else data.getDescription(item.timesGained)
+            else data.getDescription(item)
         },
     ): Double {
         var profit = 0.0

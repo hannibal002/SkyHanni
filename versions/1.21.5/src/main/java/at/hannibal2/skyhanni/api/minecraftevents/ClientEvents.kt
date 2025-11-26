@@ -100,15 +100,10 @@ object ClientEvents {
 
     private var lastMessage: Text? = null
     private var lastResult: Text? = null
-    private var wasActionBar = false
 
     private fun onAllow(message: Text, actionBar: Boolean): Boolean {
-        wasActionBar = false
         lastMessage = message
         if (actionBar) {
-            wasActionBar = true
-            lastResult = ActionBarData.onChatReceive(message)
-
             // we never cancel the action bar
             return true
         }
@@ -130,9 +125,15 @@ object ClientEvents {
     private fun onModify(message: Text, actionBar: Boolean): Text {
         // we check if the message is the same as the one from allow
         // if someone else modifies the message it won't be the same but what can you do about that
-        if (lastMessage == message && wasActionBar == actionBar) {
+        if (lastMessage == message && !actionBar) {
             // if last result is null then we didn't want to change the message
             lastResult?.let { return it }
+        } else if (actionBar) {
+            // we don't have to worry about cancelling the action bar
+            // this is more compatible with other mods changing the action bar as well
+            // ie to remove hp/mana
+            val result = ActionBarData.onChatReceive(message) ?: return message
+            return result
         }
 
         return message
