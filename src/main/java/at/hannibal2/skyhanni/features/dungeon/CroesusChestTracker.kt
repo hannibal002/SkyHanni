@@ -294,13 +294,11 @@ object CroesusChestTracker {
 
     private fun countUnopenedChestsAndRemoveOld(): Int {
         val iterator = croesusChests?.iterator() ?: return 0
-        var removalNum = 0
         var unopenedChests = 0
         while (iterator.hasNext()) {
             val next = iterator.next()
             if (next.floor == null) {
                 iterator.remove()
-                removalNum++
             }
             if (next.runTime == null) {
                 next.runTime = SimpleTimeMark.now()

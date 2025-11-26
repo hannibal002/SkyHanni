@@ -131,6 +131,7 @@ class ProfileSpecificStorage(
                 this.runTime = runTime
                 this.openState = OpenedState.UNOPENED
             }
+
             @Expose
             var runTime: SimpleTimeMark? = null
 

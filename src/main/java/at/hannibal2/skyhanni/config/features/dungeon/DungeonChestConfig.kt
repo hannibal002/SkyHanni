@@ -44,7 +44,7 @@ class DungeonChestConfig {
     @Expose
     @ConfigOption(
         name = "Show In Kuudra",
-        desc = "Displays the Unopened Croesus Chest Display in Kuudra (This does not require the Dungeon Hub/Skull toggle).",
+        desc = "Displays the Unopened Croesus Chest Display in Kuudra.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -53,7 +53,7 @@ class DungeonChestConfig {
     @Expose
     @ConfigOption(
         name = "Show In Dungeons",
-        desc = "Displays the Unopened Croesus Chest Display in Dungeons (This does not require the Dungeon Hub/Skull toggle).",
+        desc = "Displays the Unopened Croesus Chest Display in Dungeons.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
