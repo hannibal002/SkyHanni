@@ -120,7 +120,7 @@ class DungeonConfig {
     val lividFinder: LividFinderConfig = LividFinderConfig()
 
     @Expose
-    @ConfigOption(name = "Trinity", desc = "")
+    @ConfigOption(name = "Trinity Helper", desc = "")
     @Accordion
     val trinityHelper: TrinityConfig = TrinityConfig()
 

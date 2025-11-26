@@ -82,10 +82,19 @@ object InstanceChestProfit {
     /**
      * REGEX-TEST: §6Infernal Kuudra Key
      * REGEX-TEST: §5Burning Kuudra Key
+     * REGEX-TEST: §9Kuudra Key
      */
     private val kuudraChestKey by patternGroup.pattern(
         "kuudrachestkey",
-        "§.\\w+ Kuudra Key",
+        "§.(?:\\w+ )?Kuudra Key",
+    )
+
+    /**
+     * REGEX-TEST: §aReroll Shard
+     */
+    private val fakeItemNamePattern by patternGroup.pattern(
+        "fakeitemname",
+        "§aReroll Shard",
     )
 
     /**
@@ -328,6 +337,27 @@ object InstanceChestProfit {
                 val price = getEssence(group("name"), group("count").toInt())
                 // TODO remove if check, getEssence should return null if no price is found
                 if (price != 0.0) itemsWithCost.addOrPut(name, price)
+    private fun createDisplay(items: Map<Int, ItemStack>) {
+        val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
+        items.forEach {
+            if (fakeItemNamePattern.matches(it.value.displayName)) return@forEach
+            if (it.value.getInternalNameOrNull() != null) {
+                val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
+                if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
+            }
+            attributeShardPattern.matchMatcher(it.value.displayName) {
+                val name = group("name")
+                val count = group("count").toInt()
+                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
+                itemsWithCost.addOrPut(it.value.displayName, price)
+            }
+            essencePattern.matchMatcher(it.value.displayName) {
+                val name = group("name")
+                val rawCount = group("count").toInt()
+                val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
+                else rawCount.toDouble()
+                val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
+                itemsWithCost.addOrPut(it.value.displayName, price)
             }
         }
 

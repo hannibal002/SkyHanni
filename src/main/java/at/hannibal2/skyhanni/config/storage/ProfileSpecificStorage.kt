@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
+import at.hannibal2.skyhanni.features.hunting.HuntingProfitTracker
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
@@ -940,6 +941,9 @@ class ProfileSpecificStorage(
     class HuntingStorage {
         @Expose
         var trackedAttributeShards: MutableMap<String, Int> = mutableMapOf()
+
+        @Expose
+        var huntingProfitTracker: HuntingProfitTracker.Data = HuntingProfitTracker.Data()
     }
 
     @Expose

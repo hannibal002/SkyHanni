@@ -362,7 +362,7 @@ object ChatFilter {
         "(?:§f)? +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
     )
     private val factoryUpgradePatterns = listOf(
-        "§.* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
+        ".* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
         "§7Your §r§aRabbit Barn §r§7capacity has been increased to §r§a.* Rabbits§r§7!".toPattern(),
         "§7You will now produce §r§6.* Chocolate §r§7per click!".toPattern(),
         "§7You upgraded to §r§d.*?§r§7!".toPattern(),

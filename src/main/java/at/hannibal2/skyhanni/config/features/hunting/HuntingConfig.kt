@@ -31,6 +31,16 @@ class HuntingConfig {
     var notice: String = ""
 
     @Expose
+    @ConfigOption(name = "Shard Tracker", desc = "")
+    @Accordion
+    val shardTracker: ShardTrackerConfig = ShardTrackerConfig()
+
+    @Expose
+    @ConfigOption(name = "Hunting Profit Tracker", desc = "")
+    @Accordion
+    val huntingProfitTracker: HuntingProfitTrackerConfig = HuntingProfitTrackerConfig()
+
+    @Expose
     @OnlyModern
     @Category(name = "Galatea Mob Highlights", desc = "Settings for Galatea mob highlights")
     var mobHighlight = GalateaMobHighlightConfig()
@@ -85,10 +95,5 @@ class HuntingConfig {
     @Expose
     @ConfigLink(owner = HuntingConfig::class, field = "fusionDisplay")
     val fusionDisplayPosition: Position = Position(30, 210)
-
-    @Expose
-    @ConfigOption(name = "Shard Tracker", desc = "")
-    @Accordion
-    val shardTracker: ShardTrackerConfig = ShardTrackerConfig()
 
 }
