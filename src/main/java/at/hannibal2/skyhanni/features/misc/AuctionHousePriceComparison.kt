@@ -6,7 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -34,7 +35,7 @@ object AuctionHousePriceComparison {
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        inInventory = event.inventoryName.startsWith("Auctions")
+        inInventory = event.inventoryName.startsWith("Auctions") || event.inventoryName.startsWith("Cosmetics Browser")
         if (!inInventory) return
 
         bestPrice = 0L
@@ -109,8 +110,9 @@ object AuctionHousePriceComparison {
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
+        event.slot ?: return
 
         val diff = slotPriceMap[event.slot.slotIndex] ?: return
         if (event.slot.inventory !is ContainerLocalMenu) return
