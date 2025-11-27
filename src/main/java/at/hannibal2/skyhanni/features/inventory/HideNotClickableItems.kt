@@ -470,6 +470,7 @@ object HideNotClickableItems {
         return result
     }
 
+    @Suppress("ReturnCount")
     private fun hideNpcSell(stack: ItemStack): Boolean {
         if (RiftApi.inRift()) return false
         if (!ShiftClickNpcSell.inInventory) return false
