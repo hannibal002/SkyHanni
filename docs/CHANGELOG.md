@@ -73,7 +73,6 @@
 + Improved Trinity Helper to be less confusing. - Luna (https://github.com/hannibal002/SkyHanni/pull/4875)
 + Added Support for Kuudra runs in Croesus nearly full warning. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4846)
 
-
 #### Misc
 
 + Added support for Aura mayor. - Luna (https://github.com/hannibal002/SkyHanni/pull/4897)
