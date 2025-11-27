@@ -474,6 +474,7 @@ object HideNotClickableItems {
         if (RiftApi.inRift()) return false
         if (!ShiftClickNpcSell.inInventory) return false
         if (VisitorApi.inInventory) return false
+
         showGreenLine = true
 
         var name = stack.cleanName()
@@ -483,29 +484,21 @@ object HideNotClickableItems {
             name = name.substring(0, name.length - amountText.length)
         }
 
-        if (ItemUtils.isSkyBlockMenuItem(stack)) {
-            hideReason = "The SkyBlock Menu cannot be sold at the NPC!"
-            return true
-        }
-
-        if (!ItemUtils.isRecombobulated(stack)) {
-            if (SkyBlockUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) {
-                return false
-            }
-
-            if (hideNpcSellFilter.match(name)) return false
-
-            if (stack.isVanilla() && !stack.isEnchanted()) {
-                return false
-            }
-        }
-
         if (stack.getInternalNameOrNull()?.getNpcPriceOrNull() == null) {
             hideReason = "This item cannot be sold at the NPC!"
             return true
         }
 
+        if (ItemUtils.isRecombobulated(stack)) {
+            hideReason = "This item should not be sold at the NPC! (Recombobulated)"
+            return true
+        }
+
         if (config.protectRarelySoldItems) {
+            if (stack.isVanilla() && !stack.isEnchanted()) return false
+            if (SkyBlockUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) return false
+            if (hideNpcSellFilter.match(name)) return false
+
             hideReason = "This item should not be sold at the NPC!"
             return true
         }
