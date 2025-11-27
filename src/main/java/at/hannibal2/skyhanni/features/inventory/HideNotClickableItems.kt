@@ -489,6 +489,11 @@ object HideNotClickableItems {
             return true
         }
 
+        if (stack.isMuseumDonated()) {
+            hideReason = "This item cannot be sold at the NPC! (Donated to Museum)"
+            return true
+        }
+
         if (ItemUtils.isRecombobulated(stack)) {
             hideReason = "This item should not be sold at the NPC! (Recombobulated)"
             return true
