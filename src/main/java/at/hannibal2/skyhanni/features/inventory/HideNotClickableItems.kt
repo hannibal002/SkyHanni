@@ -500,16 +500,13 @@ object HideNotClickableItems {
             return true
         }
 
-        if (config.protectRarelySoldItems) {
-            if (stack.isVanilla() && !stack.isEnchanted()) return false
-            if (SkyBlockUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) return false
-            if (hideNpcSellFilter.match(name)) return false
+        if (!config.protectRarelySoldItems) return false
+        if (stack.isVanilla() && !stack.isEnchanted()) return false
+        if (SkyBlockUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) return false
+        if (hideNpcSellFilter.match(name)) return false
 
-            hideReason = "This item should not be sold at the NPC!"
-            return true
-        }
-
-        return false
+        hideReason = "This item should not be sold at the NPC!"
+        return true
     }
 
     private fun hideInStorage(chestName: String, stack: ItemStack): Boolean {
