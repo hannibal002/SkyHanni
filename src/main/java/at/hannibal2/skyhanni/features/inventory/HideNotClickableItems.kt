@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -499,8 +500,17 @@ object HideNotClickableItems {
             }
         }
 
-        hideReason = "This item should not be sold at the NPC!"
-        return true
+        if (stack.getInternalNameOrNull()?.getNpcPriceOrNull() == null) {
+            hideReason = "This item cannot be sold at the NPC!"
+            return true
+        }
+
+        if (config.protectRarelySoldItems) {
+            hideReason = "This item should not be sold at the NPC!"
+            return true
+        }
+
+        return false
     }
 
     private fun hideInStorage(chestName: String, stack: ItemStack): Boolean {
