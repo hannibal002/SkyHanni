@@ -27,7 +27,7 @@ public class MixinPlayerEntityRenderer {
     //#endif
     private Text modifyRenderLabelIfPresentArgs(Text text) {
         if (SkyBlockUtils.INSTANCE.getInSkyBlock()) {
-            return Text.of(EntityData.getHealthDisplay(TextCompatKt.formattedTextCompatLessResets(text)));
+            return EntityData.getHealthDisplay(text);
         }
         return text;
     }
