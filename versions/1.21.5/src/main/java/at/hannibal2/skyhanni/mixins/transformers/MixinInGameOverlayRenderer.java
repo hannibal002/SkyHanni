@@ -16,7 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 abstract class MixinInGameOverlayRenderer {
 
     @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)
+    //#if MC < 1.21.9
     private static void renderFire(MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
+        //#else
+        //$$ private static void renderFire(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Sprite sprite, CallbackInfo ci) {
+        //#endif
         if (new BlockOverlayRenderEvent(OverlayType.FIRE).post()) ci.cancel();
     }
 

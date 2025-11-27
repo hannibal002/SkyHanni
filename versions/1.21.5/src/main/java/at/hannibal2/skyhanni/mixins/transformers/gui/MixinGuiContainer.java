@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
-
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
 import net.minecraft.client.gui.DrawContext;
@@ -18,6 +17,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+//#if MC > 1.21.8
+//$$ import net.minecraft.client.input.KeyInput;
+//#endif
 
 @Mixin(HandledScreen.class)
 public abstract class MixinGuiContainer<T extends ScreenHandler> extends Screen {
@@ -34,7 +36,11 @@ public abstract class MixinGuiContainer<T extends ScreenHandler> extends Screen 
     private final GuiContainerHook skyHanni$hook = new GuiContainerHook(this);
 
     @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;close()V", shift = At.Shift.BEFORE), cancellable = true)
+    //#if MC < 1.21.9
     private void closeWindowPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+        //#else
+        //$$ private void closeWindowPressed(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
+        //#endif
         skyHanni$hook.closeWindowPressed(cir);
     }
 

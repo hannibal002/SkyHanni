@@ -6,6 +6,10 @@ import com.google.gson.annotations.SerializedName
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import java.util.UUID
+//#if MC > 1.21.8
+//$$ import com.google.common.collect.ImmutableMultimap
+//$$ import com.mojang.authlib.properties.PropertyMap
+//#endif
 
 data class NeuNbtInfoJson(
     @Expose @SerializedName("HideFlags") val hideFlags: Int?,
@@ -44,12 +48,23 @@ data class DisplayInfo(
     @Expose val color: Int?,
 )
 
+//#if MC < 1.21.9
 fun SkullOwnerInfo.toGameProfile(): GameProfile {
     val profile = GameProfile(UUID.fromString(this.uuid), "hannibal2")
     val textures = this.properties?.textures?.get(0)
     profile.properties.put("textures", Property("textures", textures?.value.orEmpty(), textures?.signature.orEmpty()))
     return profile
 }
+//#else
+//$$ fun SkullOwnerInfo.toGameProfile(): GameProfile {
+//$$     val builder = ImmutableMultimap.builder<String, Property>()
+//$$     val textures = this.properties?.textures?.get(0)
+//$$     if (textures != null) {
+//$$         builder.put("textures", Property("textures", textures.value.orEmpty(), textures.signature.orEmpty()))
+//$$     }
+//$$     return GameProfile(UUID.fromString(this.uuid), "hannibal2", PropertyMap(builder.build()))
+//$$ }
+//#endif
 
 data class NbtBoolean(val boolean: Boolean) {
     fun asString(): String {

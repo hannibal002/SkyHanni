@@ -9,7 +9,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.Text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -155,8 +157,9 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltip(event: ToolTipEvent) {
+    fun onTooltip(event: ToolTipTextEvent) {
         if (!config.userLuck) return
+        event.slot ?: return
         if (!event.slot.isTopInventory()) return
         if (skillCalcCoolDown.passedSince() > 3.seconds) {
             skillCalcCoolDown = SimpleTimeMark.now()
@@ -169,23 +172,25 @@ object UserLuckBreakdown {
         }
     }
 
-    private fun equipmentMenuTooltip(event: ToolTipEvent) {
+    private fun equipmentMenuTooltip(event: ToolTipTextEvent) {
+        event.slot ?: return
         if (event.slot.slotIndex != 25) return
         val luckEvent = getOrPostLuckEvent()
         val totalLuck = luckEvent.getTotalLuck()
         if (totalLuck == 0f && !showAllStats) return
 
-        val lastIndex = event.toolTip.indexOfLast { it.removeColor().isEmpty() }
+        val lastIndex = event.toolTip.indexOfLast { it.string.removeColor().isEmpty() }
         if (lastIndex == -1) return
 
         val luckString = tryTruncateFloat(totalLuck)
         event.toolTip.add(lastIndex, "$LUCK_TOOLTIP$luckString")
     }
 
-    private fun statsBreakdownLoreTooltip(event: ToolTipEvent) {
+    private fun statsBreakdownLoreTooltip(event: ToolTipTextEvent) {
+        event.slot ?: return
         if (!inMiscStats) return
         if (inCustomBreakdown && event.slot.slotIndex == 48) {
-            event.toolTip[1] = "§7To Your Stats Breakdown"
+            event.toolTip[1] = Text.of("§7To Your Stats Breakdown")
         }
         if (event.slot.slotIndex != 4 || inCustomBreakdown) return
         val luckEvent = getOrPostLuckEvent()
@@ -196,10 +201,11 @@ object UserLuckBreakdown {
         event.toolTip.add("$LUCK_TOOLTIP$luckString")
     }
 
-    private fun skyblockMenuTooltip(event: ToolTipEvent) {
+    private fun skyblockMenuTooltip(event: ToolTipTextEvent) {
+        event.slot ?: return
         if (event.slot.slotIndex != 13) return
         val luckEvent = getOrPostLuckEvent()
-        val lastIndex = event.toolTip.indexOfLast { it.removeColor() == " and more..." }
+        val lastIndex = event.toolTip.indexOfLast { it.string.removeColor() == " and more..." }
         if (lastIndex == -1) return
 
         val luckString = tryTruncateFloat(luckEvent.getTotalLuck())

@@ -12,17 +12,26 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+//#if MC > 1.21.8
+//$$ import net.minecraft.client.input.CharInput;
+//$$ import net.minecraft.client.input.KeyInput;
+//#endif
 
 @Mixin(Keyboard.class)
 public class MixinKeyboard {
 
     @Inject(method = "onKey", at = @At("HEAD"))
+    //#if MC < 1.21.9
     private void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
+        //#else
+        //$$ private void onKey(long window, int action, KeyInput input, CallbackInfo ci) {
+        //$$     int key = input.key();
+        //#endif
         if (MinecraftClient.getInstance().player == null) return;
         if (key == GLFW.GLFW_KEY_UNKNOWN) return;
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
 
-        // dont send key events if Rei search bar is selected
+        // don't send key events if Rei search bar is selected
         if (ReiCompat.searchHasFocus()) return;
 
         /*
@@ -51,8 +60,15 @@ public class MixinKeyboard {
     }
 
     @Inject(method = "onChar", at = @At("HEAD"))
+    //#if MC < 1.21.9
     private void onChar(long window, int codePoint, int modifiers, CallbackInfo ci) {
         if (MinecraftClient.getInstance().player == null) return;
         new CharEvent(codePoint).post();
     }
+    //#else
+    //$$ private void onChar(long window, CharInput input, CallbackInfo ci) {
+    //$$     if (MinecraftClient.getInstance().player == null) return;
+    //$$     new CharEvent(input.codepoint()).post();
+    //$$ }
+    //#endif
 }

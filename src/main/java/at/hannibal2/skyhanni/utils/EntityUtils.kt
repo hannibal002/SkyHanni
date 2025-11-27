@@ -30,16 +30,20 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.AxisAlignedBB
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 //$$ import net.minecraft.entity.attribute.EntityAttributes
 //$$ import net.minecraft.entity.EquipmentSlot
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
+
 //#endif
 
 @SkyHanniModule
 object EntityUtils {
+
+    inline val ALWAYS get(): (Entity) -> Boolean = { true }
 
     // TODO remove this relatively heavy call everywhere
     @Deprecated("Use Mob Detection Instead")
@@ -105,13 +109,7 @@ object EntityUtils {
         val a = center.add(-radius, -radius - 3, -radius)
         val b = center.add(radius, radius + 3, radius)
         val alignedBB = a.axisAlignedTo(b)
-        val clazz = EntityArmorStand::class.java
-        val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
-        //#if MC < 1.21
-        return world.getEntitiesWithinAABB(clazz, alignedBB)
-        //#else
-        //$$ return world.getEntitiesByClass(clazz, alignedBB, net.minecraft.predicate.entity.EntityPredicates.EXCEPT_SPECTATOR)
-        //#endif
+        return getEntitiesInBoundingBox<EntityArmorStand>(alignedBB)
     }
 
     @Deprecated("Old. Instead use entity detection feature instead.")
@@ -143,11 +141,17 @@ object EntityUtils {
             .firstOrNull { it.name == "textures" }?.value
     }
 
-    inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double): Sequence<T> =
-        getEntitiesNearby<T>(LocationUtils.playerLocation(), radius)
+    inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
+        getEntitiesNearby<T>(LocationUtils.playerLocation(), radius, predicate)
 
-    inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): Sequence<T> =
-        getEntities<T>().filter { it.distanceTo(location) < radius }
+    // First filters for a bounding box because it's faster, and then filters based on distance
+    inline fun <reified T : Entity> getEntitiesNearby(
+        location: LorenzVec,
+        radius: Double,
+        noinline predicate: (T) -> Boolean = ALWAYS
+    ): List<T> {
+        return getEntitiesInBox<T>(location, radius) { it.distanceTo(location) < radius && predicate(it) }
+    }
 
     inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: LorenzVec, radius: Double): Sequence<T> =
         getEntities<T>().filter { it.distanceToIgnoreY(location) < radius }
@@ -184,6 +188,21 @@ object EntityUtils {
 
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
+    inline fun <reified E : Entity> getEntitiesInBox(pos: LorenzVec, radius: Double, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
+        return getEntitiesInBoundingBox(pos.boundingCenter(radius), predicate)
+    }
+
+    // More efficient than filtering by type, and then for distance, as Minecraft already first filters the chunks that contain the aabb,
+    // and then filters both for entity type and with the predicate for entities inside those chunks.
+    inline fun <reified E : Entity> getEntitiesInBoundingBox(aabb: AxisAlignedBB, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
+        val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
+        //#if MC < 1.21
+        return world.getEntitiesWithinAABB(E::class.java, aabb) { it != null && predicate(it) }
+        //#else
+        //$$ return world.getEntitiesByClass<E>(E::class.java, aabb, predicate)
+        //#endif
+    }
+
     private fun WorldClient.getAllEntities(): Iterable<Entity> =
         //#if MC < 1.14
         loadedEntityList
@@ -213,6 +232,7 @@ object EntityUtils {
     //$$ }
     //#endif
 
+    @Deprecated("Remove with EntityRemovedEvent")
     inline fun <reified T : Entity> removeInvalidEntities(list: MutableList<T>) {
         list.keepOnlyIn(getEntities<T>())
     }
