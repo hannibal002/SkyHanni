@@ -148,6 +148,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Optionally blocks sending /joininstance command during cooldown.
 + Added Floor 7 Spring Boots Helper. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2581)
 + Added a guess for the Secret Tracker 3000 while in dungeons. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4611)
++ Added Croesus Unopened Chest Count Overlay for Kuudra and Dungeons. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4846)
 
 </details>
 <details open><summary>
@@ -884,6 +885,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Pest Trap tab widgets to Tab Widget Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
 + Added warnings for Pest Traps being full or out of bait. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4069)
 + Added keybind to release all pests in a Pest Trap. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4675)
++ Added option to change the pest spawn sound. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4580)
+  + Modes are Default, Muted, Custom, and Plumber.
 
 </details>
 <details open><summary>
@@ -1117,6 +1120,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added HotF Lottery display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4332)
 + Added compact messages for Agatha/Starlyn Sister contests. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4258)
 + Added option to mute final Tree Breaking Sound. - Siv (https://github.com/hannibal002/SkyHanni/pull/4459)
++ Added some whisper cost and spent info to HOTF perk tooltips. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4754)
 
 </details>
 <details open><summary>
