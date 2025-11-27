@@ -15,11 +15,8 @@ data class MCVersion(val epoch: Int, val major: Int, val minor: Int) : Comparabl
     }
 
     /** Inclusive for both borders */
-    fun isInBetween(current: MCVersion, target: MCVersion): Boolean {
-        if (this > target) return false
-        if (this < current) return false
-        if (this == current) return true
-        return true
+    fun isInBetween(lower: MCVersion, higher: MCVersion): Boolean {
+        return this in lower..higher
     }
 
     companion object {
