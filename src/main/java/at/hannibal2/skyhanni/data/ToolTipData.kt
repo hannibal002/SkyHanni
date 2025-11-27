@@ -17,13 +17,13 @@ import net.minecraft.item.ItemStack
 //$$ import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 //#endif
 
-// Please use ToolTipEvent over ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
+// Please use ToolTipTextEvent over ToolTipEvent, ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
 object ToolTipData {
 
     //#if MC > 1.21
     //$$ init {
     //$$     ItemTooltipCallback.EVENT.register { stack, context, type, originalToolTip ->
-    //$$         val slot = lastSlot ?: return@register
+    //$$         val slot = lastSlot
     //$$         if (ToolTipTextEvent(slot, stack, originalToolTip).post()) {
     //$$             originalToolTip.clear()
     //$$             return@register

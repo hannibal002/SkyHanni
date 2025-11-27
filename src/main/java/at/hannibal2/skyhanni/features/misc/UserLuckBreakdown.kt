@@ -159,6 +159,7 @@ object UserLuckBreakdown {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipTextEvent) {
         if (!config.userLuck) return
+        event.slot ?: return
         if (!event.slot.isTopInventory()) return
         if (skillCalcCoolDown.passedSince() > 3.seconds) {
             skillCalcCoolDown = SimpleTimeMark.now()
@@ -172,6 +173,7 @@ object UserLuckBreakdown {
     }
 
     private fun equipmentMenuTooltip(event: ToolTipTextEvent) {
+        event.slot ?: return
         if (event.slot.slotIndex != 25) return
         val luckEvent = getOrPostLuckEvent()
         val totalLuck = luckEvent.getTotalLuck()
@@ -185,6 +187,7 @@ object UserLuckBreakdown {
     }
 
     private fun statsBreakdownLoreTooltip(event: ToolTipTextEvent) {
+        event.slot ?: return
         if (!inMiscStats) return
         if (inCustomBreakdown && event.slot.slotIndex == 48) {
             event.toolTip[1] = Text.of("§7To Your Stats Breakdown")
@@ -199,6 +202,7 @@ object UserLuckBreakdown {
     }
 
     private fun skyblockMenuTooltip(event: ToolTipTextEvent) {
+        event.slot ?: return
         if (event.slot.slotIndex != 13) return
         val luckEvent = getOrPostLuckEvent()
         val lastIndex = event.toolTip.indexOfLast { it.string.removeColor() == " and more..." }

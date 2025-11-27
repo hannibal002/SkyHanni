@@ -18,6 +18,7 @@ object EstimatedWardrobePrice {
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
+        event.slot ?: return
 
         val slot = WardrobeApi.slots.firstOrNull {
             event.slot.slotNumber == it.inventorySlot && it.isInCurrentPage()

@@ -220,6 +220,7 @@ object TunnelsMaps {
     @HandleEvent
     fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
+        event.slot ?: return
         clickTranslate[event.slot.slotIndex]?.let {
             event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
         }

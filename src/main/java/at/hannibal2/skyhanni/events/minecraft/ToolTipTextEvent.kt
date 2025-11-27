@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.utils.compat.Text
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
-class ToolTipTextEvent(val slot: Slot, val itemStack: ItemStack, val toolTip: MutableList<Text>) : CancellableSkyHanniEvent()
+class ToolTipTextEvent(val slot: Slot?, val itemStack: ItemStack, val toolTip: MutableList<Text>) : CancellableSkyHanniEvent()
 
 fun MutableList<Text>.add(index: Int, string: String) {
     this.add(index, Text.of(string))

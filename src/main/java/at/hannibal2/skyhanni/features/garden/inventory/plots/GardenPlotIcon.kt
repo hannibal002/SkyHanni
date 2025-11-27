@@ -134,7 +134,7 @@ object GardenPlotIcon {
         if (!isEnabled()) return
         val plotList = plotList ?: return
         val list = event.toolTip
-        val index = event.slot.slotNumber
+        val index = event.slot?.slotNumber ?: return
         if (index == 53) {
             list.clear()
             list.add("§6Edit Mode")

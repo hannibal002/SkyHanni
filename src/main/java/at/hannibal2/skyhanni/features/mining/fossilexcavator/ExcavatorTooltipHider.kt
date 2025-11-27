@@ -24,6 +24,7 @@ object ExcavatorTooltipHider {
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
+        event.slot ?: return
 
         if (event.slot.inventory !is ContainerLocalMenu) return
         if (config.hideEverything) {

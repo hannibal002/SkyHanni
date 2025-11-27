@@ -145,6 +145,7 @@ object KloonHacking {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onToolTip(event: ToolTipTextEvent) {
+        event.slot ?: return
         if (!inTerminalInventory) return
         if (!config.solver) return
 

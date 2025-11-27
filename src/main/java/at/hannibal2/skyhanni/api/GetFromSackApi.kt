@@ -114,6 +114,7 @@ object GetFromSackApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipTextEvent) {
+        event.slot ?: return
         val list = inventoryMap[event.slot.slotIndex] ?: return
         event.toolTip.let { tip ->
             tip.add("")

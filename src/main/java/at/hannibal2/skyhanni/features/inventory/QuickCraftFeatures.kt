@@ -42,6 +42,7 @@ object QuickCraftFeatures {
 
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {
+        event.slot ?: return
         val inventoryType = getInventoryType() ?: return
         if (inventoryType.ignoreSlot(event.slot.slotNumber)) return
 

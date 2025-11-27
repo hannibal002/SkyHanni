@@ -112,6 +112,7 @@ object AuctionHousePriceComparison {
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
+        event.slot ?: return
 
         val diff = slotPriceMap[event.slot.slotIndex] ?: return
         if (event.slot.inventory !is ContainerLocalMenu) return

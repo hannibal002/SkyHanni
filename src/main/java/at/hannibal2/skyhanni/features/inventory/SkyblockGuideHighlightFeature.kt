@@ -111,6 +111,7 @@ class SkyblockGuideHighlightFeature private constructor(
         @HandleEvent
         fun onTooltip(event: ToolTipTextEvent) {
             if (!isEnabled()) return
+            event.slot ?: return
             val current = activeObject ?: return
             if (!missing.contains(event.slot.slotNumber)) return
             current.onTooltip.invoke(event)

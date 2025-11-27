@@ -68,6 +68,7 @@ object PowerStoneGuideFeatures {
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
+        event.slot ?: return
         if (!inInventory) return
 
         val internalName = missing[event.slot.slotNumber] ?: return

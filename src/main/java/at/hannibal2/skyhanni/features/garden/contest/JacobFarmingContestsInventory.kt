@@ -182,6 +182,7 @@ object JacobFarmingContestsInventory {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipTextEvent) {
+        event.slot ?: return
         if (!FarmingContestApi.inInventory) return
 
         val slot = event.slot.slotNumber

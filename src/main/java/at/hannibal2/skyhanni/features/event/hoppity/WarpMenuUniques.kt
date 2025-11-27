@@ -34,6 +34,7 @@ object WarpMenuUniques {
     fun onToolTip(event: ToolTipTextEvent) {
         if (!config.enabled) return
         if (!HoppityApi.isHoppityEvent()) return
+        event.slot ?: return
         if (InventoryUtils.openInventoryName() != "Fast Travel") return
 
         val name = islandNamePattern.matchMatcher(event.slot.stack.displayName) {
