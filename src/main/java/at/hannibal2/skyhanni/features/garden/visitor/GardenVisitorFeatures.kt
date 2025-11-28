@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.Highli
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -44,6 +45,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -635,9 +637,9 @@ object GardenVisitorFeatures {
         val nameTagVec = nameTag.getLorenzVec()
         EntityUtils.getEntitiesNearby<EntityLivingBase>(
             nameTagVec,
-            10.0
+            5.0
         ) { entity ->
-            entity !is EntityArmorStand && entity !is EntityPlayerSP && entity.distanceToIgnoreY(nameTagVec) != 0.0
+            entity.mob?.armorStand == nameTag
         }.forEach {
             visitor.entityId = it.entityId
             visitor.nameTagEntityId = nameTag.entityId
