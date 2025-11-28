@@ -17,7 +17,7 @@ class OdonataConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var highlight: Property<Boolean> = Property.of(true)
+    val highlight: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Color", desc = "Color of the Odonatas.")
