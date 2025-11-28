@@ -118,7 +118,7 @@ object InstanceChestProfit {
     if the Croesus UI starts showing like "Emerald Chest" as the Chest Name the Regex should include all the cata chest names too then. */
     private val chestFutureProofing by patternGroup.pattern(
         "kuudrachest",
-        "§.(?<chestname>Free|Paid)(?: Chest)?",
+        "(?<chestname>§.(?:Free|Paid))(?: Chest)?",
     )
 
     /**
@@ -174,6 +174,7 @@ object InstanceChestProfit {
             fun getByStackName(stackName: String): CroesusChestType? {
                 var newStackName = stackName
                 chestFutureProofing.matchMatcher(stackName) {
+
                     newStackName = group("chestname")
                 }
                 return entries.firstOrNull { it.stackChestName == newStackName }
