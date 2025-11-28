@@ -70,6 +70,13 @@ object HideNotClickableItems {
     private val hidePlayerTradeFilter = MultiFilter()
     private val notAuctionableFilter = MultiFilter()
 
+    private val patternGroup = RepoPattern.group("inventory.hidenotclickable")
+
+    private val clickToSellPattern = patternGroup.pattern(
+        "clicktosell",
+        "§eClick to sell!",
+    )
+
     /**
      * REGEX-TEST: SEEDS
      * REGEX-TEST: CARROT_ITEM
@@ -80,7 +87,7 @@ object HideNotClickableItems {
      * REGEX-TEST: CACTUS
      * REGEX-TEST: INK_SACK-3
      */
-    private val seedsPattern by RepoPattern.pattern(
+    private val seedsPattern by patternGroup.pattern(
         "inventory.hidenotclickable.seeds",
         "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3",
     )
@@ -485,7 +492,7 @@ object HideNotClickableItems {
             name = name.substring(0, name.length - amountText.length)
         }
 
-        if (stack.getInternalNameOrNull()?.getNpcPriceOrNull() == null) {
+        if (!clickToSellPattern.anyMatches(stack.getLore())) {
             hideReason = "This item cannot be sold at the NPC!"
             return true
         }
