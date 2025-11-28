@@ -72,7 +72,7 @@ object HideNotClickableItems {
 
     private val patternGroup = RepoPattern.group("inventory.hidenotclickable")
 
-    private val clickToSellPattern = patternGroup.pattern(
+    private val clickToSellPattern by patternGroup.pattern(
         "clicktosell",
         "§eClick to sell!",
     )
