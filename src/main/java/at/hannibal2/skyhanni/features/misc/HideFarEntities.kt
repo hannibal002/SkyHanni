@@ -44,6 +44,7 @@ object HideFarEntities {
         val maxAmount = config.maxAmount.coerceAtLeast(1)
         val minDistance = config.minDistance.coerceAtLeast(3)
 
+        // TODO: optimize to not use getAllEntities each tick, since its bad for performance
         ignored = EntityUtils.getAllEntities()
             .map { it.entityId to it.distanceToPlayer() }
             .filter { it.second > minDistance && it.first !in neverHide }

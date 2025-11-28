@@ -164,7 +164,8 @@ object EntityUtils {
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
-    fun EntityArmorStand.wearingSkullTexture(skin: String) = getStandHelmet()?.getSkullTexture() == skin
+    fun EntityArmorStand.getWornSkullTexture(): String? =  getStandHelmet()?.getSkullTexture()
+    fun EntityArmorStand.wearingSkullTexture(skin: String) = getWornSkullTexture() == skin
     fun EntityArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
 
     fun EntityPlayer.isNpc() = !isRealPlayer()

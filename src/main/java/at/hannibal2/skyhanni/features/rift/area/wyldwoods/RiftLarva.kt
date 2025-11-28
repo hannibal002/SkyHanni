@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.features.rift.area.wyldwoods
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -30,25 +33,32 @@ object RiftLarva {
         if (!isEnabled()) return
 
         checkHand()
-        if (!hasHookInHand) return
-
-        findLarvas()
     }
 
     private fun checkHand() {
         hasHookInHand = InventoryUtils.getItemInHand()?.getInternalName() == LARVA_HOOK
     }
 
-    private fun findLarvas() {
-        for (stand in getEntities<EntityArmorStand>()) {
-            if (stand.wearingSkullTexture(LARVA_SKULL_TEXTURE)) {
-                RenderLivingEntityHelper.setEntityColor(
-                    stand,
-                    config.highlightColor.toColor().addAlpha(1),
-                ) { isEnabled() && hasHookInHand }
-            }
+    @HandleEvent
+    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<EntityArmorStand>) {
+        if (isEnabled()) tryAdd(event.entity)
+    }
+
+    private fun tryAdd(stand: EntityArmorStand) {
+        if (stand.wearingSkullTexture(LARVA_SKULL_TEXTURE)) {
+            RenderLivingEntityHelper.setEntityColor(
+                stand,
+                config.highlightColor.toColor().addAlpha(1),
+            ) { isEnabled() && hasHookInHand }
         }
     }
 
-    fun isEnabled() = RiftApi.inRift() && config.highlight
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.highlight.onToggle {
+            getEntities<EntityArmorStand>().forEach(::tryAdd)
+        }
+    }
+
+    fun isEnabled() = RiftApi.inRift() && config.highlight.get()
 }

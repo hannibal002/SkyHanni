@@ -55,6 +55,7 @@ object HighlightMiningCommissionMobs {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
 
+        // TODO: optimize to just update when the commissions change
         val entities = EntityUtils.getEntities<EntityLivingBase>()
         for ((type, entity) in active.flatMap { type -> entities.map { type to it } }) {
             if (type.isMob(entity)) {

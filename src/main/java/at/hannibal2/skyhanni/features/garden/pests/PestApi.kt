@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -325,8 +324,8 @@ object PestApi {
 
     fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
 
-    fun isNearPestTrap() = EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>().any {
-        it.distanceToPlayer() < 10 && pestTrapPattern.matches(it.displayName.formattedText)
+    fun isNearPestTrap() = EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(10.0).any {
+        pestTrapPattern.matches(it.displayName.formattedText)
     }
 
     private fun removePests(removedPests: Int) {

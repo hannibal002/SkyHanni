@@ -12,7 +12,7 @@ class MarkedPlayerConfig {
     @Expose
     @ConfigOption(name = "Highlight in World", desc = "Highlight marked players in the world.")
     @ConfigEditorBoolean
-    var highlightInWorld: Boolean = true
+    var highlightInWorld: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Highlight in Chat", desc = "Highlight marked player names in chat.")

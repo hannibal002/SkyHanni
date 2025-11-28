@@ -41,6 +41,7 @@ object LassoDisplay {
             display = null
             return
         }
+        // TODO: Don't use EntityUtils.getAllEntities(), as its bad for performance
         for (entity in EntityUtils.getAllEntities()) {
             //#if MC < 1.21
             if (entity !is EntityLiving) continue

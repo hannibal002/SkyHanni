@@ -458,9 +458,9 @@ object ExperimentationTableApi {
 
     private fun updateTablePosition() {
         val storage = storage ?: return
-        val tableEntity = EntityUtils.getEntities<EntityArmorStand>().find {
+        val tableEntity = EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(20.0) {
             it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
-        } ?: return
+        }.firstOrNull() ?: return
         storage.tablePos = tableEntity.getLorenzVec()
     }
 

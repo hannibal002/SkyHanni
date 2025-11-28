@@ -49,6 +49,7 @@ object TrevorSolver {
         averageHeight = (minHeight + maxHeight) / 2
     }
 
+    // TODO: don't use EntityUtils.getAllEntities()
     fun findMob() {
         val hasBlindness = MinecraftCompat.localPlayer.hasPotionEffect(EffectsCompat.BLINDNESS)
         for (entity in EntityUtils.getAllEntities()) {

@@ -19,6 +19,7 @@ import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand
 import kotlin.time.Duration.Companion.minutes
 
+// TODO: optimize this to not use EntityUtils.getEntities()
 @SkyHanniModule
 object SummoningSoulsName {
 

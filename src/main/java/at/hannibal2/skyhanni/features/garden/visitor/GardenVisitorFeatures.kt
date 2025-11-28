@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -73,6 +74,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.EntityLivingBase
@@ -571,7 +573,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    private fun doesVisitorEntityExist(name: String) = EntityUtils.getEntities<EntityOtherPlayerMP>().any {
+    private fun doesVisitorEntityExist(name: String) = EntityUtils.getEntitiesInBoundingBox<EntityOtherPlayerMP>(GardenApi.barnArea).any {
         it.name.trim().equals(name, true)
     }
 
@@ -630,11 +632,14 @@ object GardenVisitorFeatures {
     }
 
     private fun findEntity(nameTag: EntityArmorStand, visitor: VisitorApi.Visitor) {
-        for (entity in EntityUtils.getAllEntities()) {
-            if (entity is EntityArmorStand) continue
-            if (entity.getLorenzVec().distanceIgnoreY(nameTag.getLorenzVec()) != 0.0) continue
-
-            visitor.entityId = entity.entityId
+        val nameTagVec = nameTag.getLorenzVec()
+        EntityUtils.getEntitiesNearby<EntityLivingBase>(
+            nameTagVec,
+            10.0
+        ) { entity ->
+            entity !is EntityArmorStand && entity !is EntityPlayerSP && entity.distanceToIgnoreY(nameTagVec) != 0.0
+        }.forEach {
+            visitor.entityId = it.entityId
             visitor.nameTagEntityId = nameTag.entityId
         }
     }

@@ -62,6 +62,7 @@ object HighlightVisitorsOutsideOfGarden {
         }
     }
 
+    // TODO: optimize to not get entities every second
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.highlightVisitors) return
