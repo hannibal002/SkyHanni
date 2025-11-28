@@ -639,7 +639,7 @@ object GardenVisitorFeatures {
             nameTagVec,
             5.0
         ) { entity ->
-            entity.mob?.armorStand == nameTag
+            entity !is EntityArmorStand && entity !is EntityPlayerSP && entity.distanceToIgnoreY(nameTagVec) < 0.5
         }.forEach {
             visitor.entityId = it.entityId
             visitor.nameTagEntityId = nameTag.entityId
