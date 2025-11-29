@@ -91,7 +91,8 @@ object HuntingProfitTracker {
             ).toSearchable(),
         )
 
-        add(tracker.addTotalProfit(profit, data.totalMobsCaught, "shard"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.totalMobsCaught, "shard", duration, "Shards"))
 
         tracker.addPriceFromButton(this)
     }
