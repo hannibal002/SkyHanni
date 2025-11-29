@@ -116,7 +116,7 @@ object GardenCustomKeybinds {
 
     private fun checkDuplicateKeybinds() {
         hasDisallowedDuplicateKeybinds = !alwaysAllowDuplicateKeybinds &&
-            MCVersion.fromString(PlatformUtils.MC_VERSION) < MCVersion.fromString("1.21.9") &&
+            MCVersion.currentMcVersion < MCVersion.fromString("1.21.9") &&
             map.values
                 .filter { it != Keyboard.KEY_NONE }
                 .let { values -> values.size != values.toSet().size }
