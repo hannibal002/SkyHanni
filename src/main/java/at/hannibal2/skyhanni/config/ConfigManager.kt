@@ -311,12 +311,20 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
             return GuiOptionEditorBlocked(default, extraMessage)
         }
 
+        if (field.isAnnotationPresent(Hidden::class.java)) {
+            return GuiOptionEditorHidden(default)
+        }
+
+        val onlyLegacy = field.isAnnotationPresent(OnlyLegacy::class.java)
+        val onlyModern = field.isAnnotationPresent(OnlyModern::class.java)
         if (PlatformUtils.IS_LEGACY) {
-            if (field.isAnnotationPresent(OnlyModern::class.java)) {
+            if (onlyModern) {
+                if (onlyLegacy) throw IllegalStateException("@OnlyLegacy and @OnlyModern cannot be used together on the same option")
                 return GuiOptionEditorHidden(default)
             }
         } else {
-            if (field.isAnnotationPresent(OnlyLegacy::class.java)) {
+            if (onlyLegacy) {
+                if (onlyModern) throw IllegalStateException("@OnlyLegacy and @OnlyModern cannot be used together on the same option")
                 return GuiOptionEditorHidden(default)
             }
         }
