@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -16,7 +16,7 @@ object FixIronman {
     private val sbLevelingInventory = InventoryDetector { name -> name == "SkyBlock Leveling" }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltipEvent(event: ItemHoverEvent) {
+    fun onTooltipEvent(event: ToolTipEvent) {
         // We don't need to always fix this
         if (!TimeUtils.isAprilFoolsDay) return
 

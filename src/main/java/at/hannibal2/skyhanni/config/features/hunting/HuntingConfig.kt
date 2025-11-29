@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
@@ -28,6 +29,16 @@ class HuntingConfig {
     @OnlyLegacy
     @ConfigEditorInfoText
     var notice: String = ""
+
+    @Expose
+    @ConfigOption(name = "Shard Tracker", desc = "")
+    @Accordion
+    val shardTracker: ShardTrackerConfig = ShardTrackerConfig()
+
+    @Expose
+    @ConfigOption(name = "Hunting Profit Tracker", desc = "")
+    @Accordion
+    val huntingProfitTracker: HuntingProfitTrackerConfig = HuntingProfitTrackerConfig()
 
     @Expose
     @OnlyModern
@@ -73,5 +84,16 @@ class HuntingConfig {
     @ConfigOption(name = "Show next Hideonleaf", desc = "Press this key to show the next Hideonleaf.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var nextHideonleafKeybind: Int = Keyboard.KEY_NONE
+
+    @Expose
+    @ConfigOption(name = "Fusion Display", desc = "Displays the shard you are fusing and how many you have.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var fusionDisplay = true
+
+    @Expose
+    @ConfigLink(owner = HuntingConfig::class, field = "fusionDisplay")
+    val fusionDisplayPosition: Position = Position(30, 210)
 
 }

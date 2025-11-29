@@ -6,6 +6,9 @@ import com.google.gson.annotations.Expose
 
 abstract class ItemTrackerData : TrackerData() {
 
+    // default implementation, delegates to below
+    open fun getDescription(item: TrackedItem) = getDescription(item.timesGained)
+
     abstract fun getDescription(timesGained: Long): List<String>
 
     abstract fun getCoinName(item: TrackedItem): String

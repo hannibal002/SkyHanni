@@ -11,6 +11,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
 
 //#if MC > 1.21
+//$$ import net.minecraft.util.hit.BlockHitResult
 //$$ import net.minecraft.util.hit.EntityHitResult
 //#endif
 
@@ -68,10 +69,16 @@ object MinecraftInputHook {
             }
 
             MovingObjectPosition.MovingObjectType.BLOCK -> {
-                val position = blockHitResult.blockPos.toLorenzVec()
+                val position =
+                    //#if MC < 1.21
+                    blockHitResult.blockPos
+                //#else
+                //$$     (blockHitResult as BlockHitResult).blockPos
+                //#endif
+
                 BlockClickEvent(
                     ClickType.LEFT_CLICK,
-                    position,
+                    position.toLorenzVec(),
                     InventoryUtils.getItemInHand(),
                 ).also {
                     if (clickCancelled) it.cancel()
@@ -104,7 +111,12 @@ object MinecraftInputHook {
     ): Boolean {
         if (blockHitResult == null || blockHitResult.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return false
 
-        val position = blockHitResult.blockPos
+        val position =
+            //#if MC < 1.21
+            blockHitResult.blockPos
+        //#else
+        //$$     (blockHitResult as BlockHitResult).blockPos
+        //#endif
 
         if (currentBlockPos == position) return false
 

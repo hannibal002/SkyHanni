@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.misc.CurrentPing;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.MinecraftClient;
@@ -9,9 +8,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
@@ -31,12 +28,4 @@ public class MixinDebugHud {
         return false;
     }
     //#endif
-
-    @Inject(method = "shouldShowPacketSizeAndPingCharts", at = @At("HEAD"), cancellable = true)
-    public void shouldShowPacketSizeAndPingCharts(CallbackInfoReturnable<Boolean> cir) {
-        // This does not actually make any charts permanently visible,
-        // it simply makes the client always send ping packets.
-        if (!CurrentPing.INSTANCE.isEnabled()) return;
-        cir.setReturnValue(true);
-    }
 }

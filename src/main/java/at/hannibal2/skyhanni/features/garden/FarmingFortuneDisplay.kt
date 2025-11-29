@@ -79,6 +79,10 @@ object FarmingFortuneDisplay {
         "armorability",
         "Tiered Bonus: .* [(](?<pieces>.*)/4[)]",
     )
+
+    /**
+     * REGEX-TEXT: §7Piece Bonus: §6+10☘
+     */
     private val lotusAbilityPattern by patternGroup.pattern(
         "lotusability",
         "§7Piece Bonus: §6+(?<bonus>.*)☘",
@@ -106,6 +110,7 @@ object FarmingFortuneDisplay {
     private var lastToolSwitch = SimpleTimeMark.farPast()
 
     private val latestFF: MutableMap<CropType, Double>? get() = GardenApi.storage?.latestTrueFarmingFortune
+    private val personalBest: MutableMap<CropType, Double>? get() = GardenApi.storage?.personalBestFF
 
     private var currentCrop: CropType? = null
 
@@ -430,7 +435,7 @@ object FarmingFortuneDisplay {
         var pieces = 0
 
         for (line in lore) {
-            if (internalName.contains("LOTUS")) {
+            if (internalName.startsWith("LOTUS_")) {
                 lotusAbilityPattern.matchMatcher(line) {
                     return group("bonus").toDouble()
                 }
@@ -498,5 +503,9 @@ object FarmingFortuneDisplay {
         event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")
 
         event.move(87, "garden.farmingFortunes.pos", "garden.farmingFortunes.position")
+    }
+
+    fun getPersonalBest(crop: CropType): Double {
+        return personalBest?.get(crop) ?: 0.0
     }
 }

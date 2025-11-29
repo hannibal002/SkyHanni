@@ -16,9 +16,10 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.EventWaypoint
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -30,12 +31,13 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object HalloweenBasketWaypoints {
 
     private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.halloweenBasket
-    private var isActive: Boolean = false
+    private var isActive = false
+    private var isNavigating = false
 
-    private val basketList = mutableListOf<EventWaypoint>()
+    private var basketList = setOf<EventWaypoint>()
     private var closestBasket: EventWaypoint? = null
 
-    private val patternGroup = RepoPattern.group("event.lobbywaypoints")
+    private val patternGroup = RepoPattern.group("event.lobby-waypoints")
 
     // TODO add regex tests
     private val scoreboardTitlePattern by patternGroup.pattern(
@@ -57,7 +59,7 @@ object HalloweenBasketWaypoints {
         "^(?:(?:§.)+You found a Candy Basket! (?:(?:§.)+\\((?:§.)+(?<current>\\d+)(?:§.)+/(?:§.)+(?<max>\\d+)(?:§.)+\\))?|(?:§.)+You already found this Candy Basket!)\$",
     )
     private val basketAllFoundPattern by patternGroup.pattern(
-        "basket.allfound",
+        "basket.all-found",
         "^§a§lCongratulations! You found all Candy Baskets!$",
     )
 
@@ -67,15 +69,22 @@ object HalloweenBasketWaypoints {
         if (!isActive || !isEnabled()) return
 
         val newClosest = getClosest()
-        if (newClosest == closestBasket) return
+        if (newClosest == closestBasket) {
+            newClosest?.let {
+                if (!isNavigating && it.position.distanceToPlayer() > 5) {
+                    startPathfinding()
+                }
+            }
+            return
+        }
 
         closestBasket = newClosest
-        if (config.pathfind.get() && config.enabled) startPathfind()
+        if (config.pathfind.get() && config.enabled.get()) startPathfinding()
     }
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!isActive) return
         if (!isEnabled()) return
 
@@ -91,14 +100,14 @@ object HalloweenBasketWaypoints {
             return
         }
         closestBasket = getClosest()
-        startPathfind()
+        startPathfinding()
     }
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!isActive) return
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
 
         if (config.onlyClosest) {
             closestBasket.render(event)
@@ -137,35 +146,38 @@ object HalloweenBasketWaypoints {
 
         val newIsActive = inHub && halloweenMatches && basketMatches
         if (isActive != newIsActive && newIsActive) {
-            IslandGraphs.loadLobby("MAIN_LOBBY")
-
-            val nodeList = IslandGraphs.currentIslandGraph?.getNodesWithTags(GraphNodeTag.HALLOWEEN_BASKET).orEmpty()
-            basketList.clear()
-            nodeList.forEach { node ->
-                basketList.add(EventWaypoint(position = node.position, isFound = false))
+            if (IslandGraphs.currentIslandGraph == null) {
+                IslandGraphs.loadLobby("MAIN_LOBBY")
             }
-            closestBasket = getClosest(nodeList)
-            if (config.pathfind.get() && config.enabled) startPathfind()
+            IslandGraphs.currentIslandGraph?.let {
+                val halloweenNodes = it.getNodesWithTags(GraphNodeTag.HALLOWEEN_BASKET)
+                basketList = halloweenNodes.map { node ->
+                    EventWaypoint(position = node.position, isFound = false)
+                }.toSet()
+                closestBasket = getClosest(halloweenNodes)
+                if (config.pathfind.get() && config.enabled.get()) startPathfinding()
+            }
         }
-        isActive = newIsActive
+        isActive = newIsActive && basketList.isNotEmpty()
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        config.pathfind.onToggle {
-            if (config.pathfind.get() && isActive && isEnabled()) startPathfind()
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
+        ConditionalUtils.onToggle(config.enabled, config.pathfind) {
+            if (config.pathfind.get() && isActive && isEnabled()) startPathfinding()
         }
     }
 
-    private fun startPathfind() {
+    private fun startPathfinding() {
         val basket = closestBasket ?: return
-
         IslandGraphs.pathFind(
             basket.position,
             "§dNext Basket",
             LorenzColor.LIGHT_PURPLE.toColor(),
-            condition = { config.pathfind.get() && closestBasket != null && config.enabled },
+            onFound = { isNavigating = false },
+            condition = { config.pathfind.get() && closestBasket != null && config.enabled.get() },
         )
+        isNavigating = true
     }
 
     private fun getClosest(nodeList: List<GraphNode>? = null): EventWaypoint? {
@@ -181,7 +193,7 @@ object HalloweenBasketWaypoints {
 
     private fun disableFeature() {
         ChatUtils.chat("Disabling Halloween Basket waypoints since you found all of them!")
-        config.enabled = false
+        config.enabled.set(false)
     }
 
     private fun isEnabled() = HypixelData.hypixelLive && !SkyBlockUtils.inSkyBlock
