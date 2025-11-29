@@ -4,10 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -15,7 +13,6 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderChestReward
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -28,6 +25,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import java.util.Locale
 
 @SkyHanniModule
 object ActualGemstonePowderDisplay {
@@ -53,16 +51,26 @@ object ActualGemstonePowderDisplay {
     private var is2xPowderActive = false
 
     private val patternGroup = RepoPattern.group("mining.powder.multiplier")
+
+    /**
+     * REGEX-TEST: §e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l0:30§r
+     */
     private val powderBossBarPattern by patternGroup.pattern(
         "powder.bossbar",
         "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r",
     )
 
+    /**
+     * REGEX-TEST: §7§7Grants §d+50% §dGemstone Powder§7, and
+     */
     private val drillBasePowderPattern by patternGroup.pattern(
         "drill.powder.base",
         "§7§7Grants §d\\+(?<bonus>\\d+)% §dGemstone Powder§7, and"
     )
 
+    /**
+     * REGEX-TEST: §7Earn §9+25% Powder §7from all sources.
+     */
     private val drillUpgradePowderPattern by patternGroup.pattern(
         "drill.powder.upgrade",
         "§7Earn §9\\+(?<bonus>\\d+)% Powder §7from all sources."
@@ -172,7 +180,7 @@ object ActualGemstonePowderDisplay {
             return if (this % 1.0 == 0.0) {
                 this.toInt().toString()
             } else {
-                String.format("%.2f", this).trimEnd('0').trimEnd('.')
+                String.format(Locale.US, "%.2f", this).trimEnd('0').trimEnd('.')
             }
         }
 
