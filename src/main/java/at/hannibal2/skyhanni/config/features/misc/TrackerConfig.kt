@@ -105,7 +105,7 @@ class TrackerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Only Show Session Uptime",
+        name = "Don't show uptime on total",
         desc = "Only show uptime and profit per hour when the tracker is on session mode."
     )
     @ConfigEditorBoolean
