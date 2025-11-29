@@ -191,8 +191,8 @@ class ChatConfig {
 
     @Expose
     @ConfigOption(
-        name = "Show Effective Powder",
-        desc = "Shows both original and effective Gemstone Powder amounts in chat messages, " +
+        name = "Show Actual Powder Gained",
+        desc = "Shows both base and actual Gemstone Powder amounts in chat messages, " +
             "accounting for 2x Powder events, Sky Mall perks, and other multipliers.\n" +
             "§eFormat: §dGemstone Powder §r§8x1,944 §7(x3,888)"
     )
