@@ -153,7 +153,7 @@ object ActualGemstonePowderDisplay {
         )
     }
 
-    private fun MultiplierBreakdown.toTooltipLines(baseAmount: Int, effectiveAmount: Int): List<String> {
+    private fun MultiplierBreakdown.toTooltipLines(baseAmount: Int, effectiveAmount: Int): List<String> = buildList {
         val lines = mutableListOf<String>()
 
         fun Double.formatPretty(): String {
