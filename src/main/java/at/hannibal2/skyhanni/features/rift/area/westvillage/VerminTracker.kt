@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.rift.area.westvillage
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import java.util.regex.Pattern
 
@@ -77,7 +77,7 @@ object VerminTracker {
 
     data class Data(
         @Expose var count: MutableMap<VerminType, Int> = mutableMapOf()
-    ) : Resettable
+    ) : TrackerData()
 
     enum class VerminType(val order: Int, val vermin: String, val pattern: Pattern) {
         FLY(1, "§aFlies", flyPattern),

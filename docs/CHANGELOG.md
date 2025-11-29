@@ -42,6 +42,7 @@
 + Added Legion/Bobbin' Time Display. - Empa & Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4815)
 + Added Middle Click Fix for 1.21.x. - Luna (https://github.com/hannibal002/SkyHanni/pull/4863)
     + This fixes not being able to middle click items in inventories (e.g. to disable a full set bonus or a rune).
++ \* Few extra features not worth mentioning. - nopo (https://github.com/hannibal002/SkyHanni/pull/4902)
 
 ### Improvements
 
@@ -73,11 +74,24 @@
 + Improved Trinity Helper to be less confusing. - Luna (https://github.com/hannibal002/SkyHanni/pull/4875)
 + Added Support for Kuudra runs in Croesus nearly full warning. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4846)
 
+#### Inventory
+
++ Improved the Not Clickable Items feature in NPC trade menus. - Luna (https://github.com/hannibal002/SkyHanni/pull/4899)
+  + By default, it only grays out items that cannot be sold to NPCs, or are recombobulataed.
+  + You can re-enable graying out items that are not commonly sold to NPCs in the config.
+
 #### Misc
 
 + Added support for Aura mayor. - Luna (https://github.com/hannibal002/SkyHanni/pull/4897)
 + Improved performance of Mob Detection and other features that detect entities by 10x. - Empa (https://github.com/hannibal002/SkyHanni/pull/4877)
 + Made some tooltip based features work in pv on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4882)
++ Added profit per hour and actions per hour to tracker profit line hover tooltip. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4629)
++ Added profit per hour line to profit trackers. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4629)
++ Added the ability to copy a tracker's profit and profit per hour. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4629)
+  + Click on the profit line while in an inventory.
++ Added tracker uptime. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4629)
+  + Tracks how long a tracker has been active, and pauses if it has not been modified for some time (default 5m).
+  + Only enabled on sessions by default; uptime was not tracked before this and will be wrong on total mode.
 
 ### Fixes
 
@@ -115,6 +129,8 @@
 #### Combat
 
 + Fixed Ghost Tracker coin count not working when using a Scavenger setup. - nopo (https://github.com/hannibal002/SkyHanni/pull/4849)
++ Fixed mob detection features not working while Aura's work harder perk is active. - nopo (https://github.com/hannibal002/SkyHanni/pull/4901)
++ Fixed Slayer spawn costs not being tracked during aura. - nopo (https://github.com/hannibal002/SkyHanni/pull/4905)
 
 #### Farming
 
@@ -142,6 +158,7 @@
 + Fixed while F3 is open features sometimes showing up while F3 is not open on Minecraft 1.21.10. - Luna (https://github.com/hannibal002/SkyHanni/pull/4879)
 + The Fix item double clicks feature now works again. - Luna (https://github.com/hannibal002/SkyHanni/pull/4878)
 + Fixed custom colours sometimes being stripped from player names. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4894)
++ Fixed gems error in the community centre. - nopo (https://github.com/hannibal002/SkyHanni/pull/4903)
 
 
 ### Technical Details

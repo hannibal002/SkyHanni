@@ -94,6 +94,32 @@ class TrackerConfig {
     var hideOutsideInventory: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Show Uptime", desc = "Show how long the tracker has been active.")
+    @ConfigEditorBoolean
+    val showUptime: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(name = "Show Profit Per Hour", desc = "Show profit per hour on trackers that show profit.")
+    @ConfigEditorBoolean
+    val profitPerHour: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(
+        name = "Don't show uptime on total",
+        desc = "Only show uptime and profit per hour when the tracker is on session mode."
+    )
+    @ConfigEditorBoolean
+    val onlyShowSession: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(
+        name = "AFK timeout",
+        desc = "Pause the tracker if it is not modified for this amount of seconds."
+    )
+    @ConfigEditorSlider(minValue = 15f, maxValue = 900f, minStep = 15f)
+    var afkTimeout: Int = 30
+
+    @Expose
     @ConfigOption(name = "Tracker Search", desc = "Add a search bar to tracker GUIs.")
     @ConfigEditorBoolean
     val trackerSearchEnabled: Property<Boolean> = Property.of(true)

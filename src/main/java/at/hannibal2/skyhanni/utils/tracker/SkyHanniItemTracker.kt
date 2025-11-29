@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -17,19 +18,24 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.math.absoluteValue
 import kotlin.math.min
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 open class
@@ -234,18 +240,95 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
         }
     }
 
-    fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Searchable {
+    fun addTotalProfit(
+        profit: Double,
+        totalAmount: Long,
+        action: String,
+        duration: Duration,
+        actionPluralized: String = ""
+    ): List<Searchable> {
         val profitFormat = profit.toLong().addSeparators()
         val profitPrefix = if (profit < 0) "§c" else "§6"
 
-        val tips = if (totalAmount > 0) {
-            val profitPerCatch = profit / totalAmount
-            val profitPerCatchFormat = profitPerCatch.shortFormat()
-            listOf("§7Profit per $action: $profitPrefix$profitPerCatchFormat")
-        } else emptyList()
+        val profitTips = buildList {
+            if (totalAmount > 0) {
+                val profitPerCatch = profit / totalAmount
+                add("§7Profit per $action: $profitPrefix${profitPerCatch.shortFormat()}")
+            }
+
+            if (duration > 0.seconds) {
+                val profitPerHour = profit / duration.inPartialHours
+                add("§7Profit per hour: $profitPrefix${profitPerHour.shortFormat()}")
+            }
+
+            if (totalAmount > 0 && duration > 0.seconds && actionPluralized != "") {
+                val amountPerHour = totalAmount / duration.inPartialHours
+                add("§7$actionPluralized per hour: §e${amountPerHour.shortFormat()}")
+            }
+        }
+
+
+        val tips: List<String> = buildList {
+            addAll(profitTips)
+            addAll(
+                listOf(
+                    "",
+                    "§eClick to copy line!",
+                    "§eShift Click to include stats in this tooltip!"
+                )
+            )
+        }
 
         val coinFormat = "coin".pluralize(profit.toInt())
-        val text = "§eTotal Profit: $profitPrefix$profitFormat $coinFormat"
-        return Renderable.hoverTips(text, tips).toSearchable()
+        val text = "§e${getDisplayMode().shortenedName} Profit: $profitPrefix$profitFormat $coinFormat"
+
+        val profitRenderable = Renderable.clickable(
+            text,
+            tips = tips,
+            onLeftClick = {
+                val line = "$name: ${text.removeColor()}"
+                val tipStats = profitTips.take(2)
+                val fullTipsLine = line + "\n " + tipStats.joinToString(" \n") { it.removeColor() }
+                copyOnClick(line, fullTipsLine, "profit")
+            }
+        )
+        val profitPerHourRenderable =
+            if (shouldShowProfitPerHour()) profitPerHourRenderable(profit, duration) else Renderable.empty()
+        return listOf(profitRenderable.toSearchable(), profitPerHourRenderable.toSearchable())
+    }
+
+    private fun shouldShowProfitPerHour() =
+        config.profitPerHour.get() && !(getDisplayMode() == DisplayMode.TOTAL && config.onlyShowSession.get())
+
+    private fun profitPerHourRenderable(profit: Double, duration: Duration): Renderable {
+        if (duration == 0.seconds) return Renderable.empty()
+        val profitPerHour = profit / duration.inPartialHours
+        val profitPerHourFormat = profitPerHour.roundTo(0).addSeparators()
+        val coinFormat = "coin".pluralize(profitPerHour.toInt())
+        val profitPrefix = if (profitPerHour < 0) "§c" else "§6"
+        val text = "§eProfit Per Hour: $profitPrefix$profitPerHourFormat $coinFormat"
+
+        val tips = listOf(
+            "§7Uptime: §b${duration.format()}",
+            "",
+            "§eClick to copy line!",
+            "§eShift Click to include stats in this tooltip!"
+        )
+        return Renderable.clickable(
+            text,
+            tips = tips,
+            onLeftClick = {
+                val line = "$name: ${text.removeColor()}"
+                val tipStats = tips[0]
+                val fullTipsLine = "$line\n${tipStats.removeColor()}"
+                copyOnClick(line, fullTipsLine, "profit per hour")
+            }
+        )
+    }
+
+    private fun copyOnClick(line: String, fullTipsLine: String, type: String) {
+        if (KeyboardManager.isShiftKeyDown()) ClipboardUtils.copyToClipboard(fullTipsLine)
+        else ClipboardUtils.copyToClipboard(line)
+        ChatUtils.chat("§eCopied $name $type to clipboard!")
     }
 }

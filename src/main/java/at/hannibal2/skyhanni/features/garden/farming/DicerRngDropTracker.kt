@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import java.util.regex.Pattern
 
@@ -39,7 +39,7 @@ object DicerRngDropTracker {
 
     data class Data(
         @Expose var drops: MutableMap<CropType, MutableMap<DropRarity, Int>> = mutableMapOf()
-    ) : Resettable
+    ) : TrackerData()
 
     // TODO eventually regex tests
     private val melonPatternGroup = RepoPattern.group("garden.dicer.melon")
