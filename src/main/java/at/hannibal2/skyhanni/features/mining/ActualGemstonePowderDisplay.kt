@@ -117,9 +117,7 @@ object ActualGemstonePowderDisplay {
 
 
 
-        val hotmBuffPercent = if (HotmData.POWDER_BUFF.enabled) {
-            HotmData.POWDER_BUFF.activeLevel
-        } else 0
+        val hotmBuffPercent = HotmData.POWDER_BUFF.activeLevel
 
         val drillFractional = getDrillMultiplierFraction()
         val drillAdditiveBonusPercent = ((drillFractional - 1) * 100.0)
