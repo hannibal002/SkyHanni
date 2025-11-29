@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.system.MCVersion
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -30,6 +29,7 @@ object GardenCustomKeybinds {
 
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
+    private val versionAllowsDuplicateKeybinds by lazy { MCVersion.currentMcVersion < MCVersion.fromString("1.21.9") }
 
     private var map: Map<KeyBinding, Int> = emptyMap()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
@@ -116,7 +116,7 @@ object GardenCustomKeybinds {
 
     private fun checkDuplicateKeybinds() {
         hasDisallowedDuplicateKeybinds = !alwaysAllowDuplicateKeybinds &&
-            MCVersion.currentMcVersion < MCVersion.fromString("1.21.9") &&
+            !versionAllowsDuplicateKeybinds &&
             map.values
                 .filter { it != Keyboard.KEY_NONE }
                 .let { values -> values.size != values.toSet().size }
