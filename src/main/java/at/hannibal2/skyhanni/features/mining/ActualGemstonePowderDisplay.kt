@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -23,9 +25,15 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 
 @SkyHanniModule
 object ActualGemstonePowderDisplay {
+
+    private const val ATOMIZED_CRYSTALS_SHARD = "SHARD_THYST"
+    private const val ECHO_OF_ATOMIZED_SHARD = "SHARD_IGUANA"
 
     private data class MultiplierBreakdown(
         val atomizedCrystals: Double,
@@ -62,11 +70,14 @@ object ActualGemstonePowderDisplay {
 
 
     private fun getAtomizedCrystalsBonus(): Double {
-        return 0.10 // 10%
+        val level = AttributeShardsData.getActiveLevel(ATOMIZED_CRYSTALS_SHARD)
+        return level / 100.0
     }
 
     private fun getEchoOfAtomizedBonusRate(): Double {
-        return 0.02 // 2%
+        val level = AttributeShardsData.getActiveLevel(ECHO_OF_ATOMIZED_SHARD)
+        val bonusPercent = level * 2.0
+        return bonusPercent / 100.0
     }
 
 
@@ -101,6 +112,7 @@ object ActualGemstonePowderDisplay {
         additiveBonus += atomizedCrystalsMulti
 
         val echoContribution = atomizedCrystalsMulti * echoOfAtomizedRate
+        ChatUtils.debug("[PowderDebug] Echo Contribution: ${echoContribution * 100}%")
         additiveBonus += echoContribution
 
         var totalMultiplier = 1.0 + additiveBonus
@@ -183,6 +195,10 @@ object ActualGemstonePowderDisplay {
                 sb.append(" §7($baseStr% + $echoStr% of $baseStr%)")
             }
 
+            val atomizedLevel = AttributeShardsData.getActiveLevel(ATOMIZED_CRYSTALS_SHARD)
+            val echoLevel = AttributeShardsData.getActiveLevel(ECHO_OF_ATOMIZED_SHARD)
+            sb.append(" §8[AC:$atomizedLevel EC:$echoLevel]")
+
             lines.add(sb.toString())
         }
 
@@ -195,7 +211,7 @@ object ActualGemstonePowderDisplay {
         }
 
         if (hotmBuffPercent > 0) {
-            lines.add("§7 HOTM Powder Buff: §a+${hotmBuffPercent}%")
+            lines.add("§7 HOTM Powder Buff: §a+$hotmBuffPercent%")
         }
 
         val drillBonusPercent = (drillMultiplier - 1.0) * 100.0
@@ -246,8 +262,7 @@ object ActualGemstonePowderDisplay {
     private fun getDrillMultiplierFraction(): Double {
         var bonusPercent = 0
         val heldItem = InventoryUtils.getItemInHand() ?: return 1.0
-
-        if(heldItem.getItemCategoryOrNull() != ItemCategory.DRILL)
+        if(heldItem.getItemCategoryOrNull() != ItemCategory.DRILL) return 1.0
 
         val lore = heldItem.getLore()
 
