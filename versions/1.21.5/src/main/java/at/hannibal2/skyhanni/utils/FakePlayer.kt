@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier
 
 class FakePlayer(val hannibal: Boolean = false) : OtherClientPlayerEntity(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
 
-    //#if MC < 1.21.8
+    //#if MC < 1.21.9
     private val hannibalSkin = SkinTextures(Identifier.of("skyhanni:hannibal2.png"), null, null, null, null ,false)
     //#else
     //$$ private val hannibalSkin = SkinTextures(AssetInfo.SkinAssetInfo(Identifier.of("skyhanni:hannibal2.png"), ""), null, null ,PlayerSkinType.WIDE, false)
