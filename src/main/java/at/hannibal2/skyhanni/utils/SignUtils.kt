@@ -107,6 +107,11 @@ object SignUtils {
         return isRancherSign() || isMousematSign()
     }
 
+    fun GuiEditSign.isPlayerElectionSign(): Boolean {
+        val signText = getSignLines() ?: return false
+        return signText[2] == "Cast your" && signText[3] == "vote"
+    }
+
     private val AccessorGuiEditSign.signText: Array<IChatComponent>
         //#if MC < 1.21
         get() = this.tileSign.signText

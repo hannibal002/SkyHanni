@@ -5,11 +5,17 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraft.scoreboard.ScorePlayerTeam
+import net.minecraft.util.ResourceLocation
 
-class FakePlayer : EntityOtherPlayerMP(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
+class FakePlayer(val hannibal: Boolean = false) : EntityOtherPlayerMP(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
 
-    override fun getLocationSkin() =
-        MinecraftCompat.localPlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(MinecraftCompat.localPlayer.uniqueID)
+    private val hannibalSkin = ResourceLocation("skyhanni:hannibal2.png")
+
+    override fun getLocationSkin(): ResourceLocation? {
+        if (hannibal) return hannibalSkin
+        return MinecraftCompat.localPlayer.locationSkin
+            ?: DefaultPlayerSkin.getDefaultSkin(MinecraftCompat.localPlayer.uniqueID)
+    }
 
     override fun getTeam() = object : ScorePlayerTeam(null, null) {
         override fun getNameTagVisibility() = EnumVisible.NEVER

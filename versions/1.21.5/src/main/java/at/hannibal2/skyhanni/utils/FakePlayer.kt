@@ -6,11 +6,17 @@ import net.minecraft.client.util.DefaultSkinHelper
 import net.minecraft.client.util.SkinTextures
 import net.minecraft.entity.player.PlayerModelPart
 import net.minecraft.scoreboard.Team
+import net.minecraft.util.Identifier
 
-class FakePlayer : OtherClientPlayerEntity(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
+class FakePlayer(val hannibal: Boolean = false) : OtherClientPlayerEntity(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
 
-    override fun getSkinTextures(): SkinTextures =
-        MinecraftCompat.localPlayer.skinTextures ?: DefaultSkinHelper.getSkinTextures(MinecraftCompat.localPlayer.uuid)
+    private val hannibalSkin = SkinTextures(Identifier.of("skyhanni:hannibal2.png"), null, null, null, null ,false)
+
+    override fun getSkinTextures(): SkinTextures {
+        if (hannibal) return hannibalSkin
+        return MinecraftCompat.localPlayer.skinTextures
+            ?: DefaultSkinHelper.getSkinTextures(MinecraftCompat.localPlayer.uuid)
+    }
 
     override fun getScoreboardTeam() = object : Team(null, "") {
         override fun getNameTagVisibilityRule() = VisibilityRule.NEVER
