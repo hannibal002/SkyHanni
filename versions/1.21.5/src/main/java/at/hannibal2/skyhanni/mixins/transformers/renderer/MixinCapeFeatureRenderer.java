@@ -13,10 +13,14 @@ import net.minecraft.client.util.SkinTextures;
 import net.minecraft.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+//#if MC > 1.21.8
+//$$ import org.spongepowered.asm.mixin.injection.ModifyArg;
+//#endif
 
 @Mixin(CapeFeatureRenderer.class)
 public class MixinCapeFeatureRenderer {
 
+    //#if MC < 1.21.9
     @WrapOperation(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/state/PlayerEntityRenderState;FF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;"))
     private VertexConsumer replaceVertexConsumer(VertexConsumerProvider instance, RenderLayer renderLayer, Operation<VertexConsumer> original, @Local SkinTextures skinTextures) {
         if (skinTextures.capeTexture() != null && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
@@ -28,5 +32,16 @@ public class MixinCapeFeatureRenderer {
         }
         return original.call(instance, renderLayer);
     }
+    //#else
+    //$$ @ModifyArg(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;ILnet/minecraft/client/render/entity/state/PlayerEntityRenderState;FF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/RenderLayer;IIILnet/minecraft/client/render/command/ModelCommandRenderer$CrumblingOverlayCommand;)V"), index = 3)
+    //$$ private RenderLayer replaceRenderLayer(RenderLayer original, @Local SkinTextures skinTextures) {
+    //$$     if (skinTextures.cape() != null && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+    //$$         Integer entityAlpha = EntityOpacityManager.getEntityOpacity(livingEntity);
+    //$$         if (entityAlpha == null) return original;
+    //$$         return RenderLayer.getItemEntityTranslucentCull(skinTextures.cape().texturePath());
+    //$$     }
+    //$$     return original;
+    //$$ }
+    //#endif
 
 }

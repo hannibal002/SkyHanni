@@ -83,6 +83,7 @@ class TrevorTheTrapperConfig {
     @Expose
     @ConfigOption(name = "Mob Dead Warning", desc = "Show a message when Trevor's mob dies.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var mobDiedMessage: Boolean = true
 
     @Expose

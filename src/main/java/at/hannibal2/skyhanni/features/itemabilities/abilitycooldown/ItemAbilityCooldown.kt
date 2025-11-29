@@ -160,7 +160,7 @@ object ItemAbilityCooldown {
                 }
             }
             // Weird Tuba & Weirder Tuba
-            event.soundName == "mob.wolf.howl" && event.volume == 0.5f -> {
+            (event.soundName == "mob.wolf.howl" || event.soundName == "mob.wolf.death") && event.volume == 0.5f -> {
                 if (WEIRD_TUBA.recentlyHeld()) {
                     ItemAbility.WEIRD_TUBA.sound()
                 }

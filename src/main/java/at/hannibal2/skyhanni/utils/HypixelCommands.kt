@@ -243,6 +243,10 @@ object HypixelCommands {
         send("fishingbag")
     }
 
+    fun huntingBox() {
+        send("hb")
+    }
+
     private fun send(command: String) {
         if (command.startsWith("/")) {
             debug("Sending wrong command to server? ($command)")

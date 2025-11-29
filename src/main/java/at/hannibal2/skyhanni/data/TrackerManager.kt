@@ -27,6 +27,9 @@ object TrackerManager {
                 textOrder,
                 showTable,
                 itemsShown,
+                showUptime,
+                onlyShowSession,
+                profitPerHour
             ) {
                 hasChanged = true
             }

@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -75,10 +76,19 @@ object InstanceChestProfit {
     /**
      * REGEX-TEST: §6Infernal Kuudra Key
      * REGEX-TEST: §5Burning Kuudra Key
+     * REGEX-TEST: §9Kuudra Key
      */
     private val kuudraChestKey by patternGroup.pattern(
         "kuudrachestkey",
-        "§.\\w+ Kuudra Key",
+        "§.(?:\\w+ )?Kuudra Key",
+    )
+
+    /**
+     * REGEX-TEST: §aReroll Shard
+     */
+    private val fakeItemNamePattern by patternGroup.pattern(
+        "fakeitemname",
+        "§aReroll Shard",
     )
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
@@ -116,6 +126,7 @@ object InstanceChestProfit {
     private fun createDisplay(items: Map<Int, ItemStack>) {
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
+            if (fakeItemNamePattern.matches(it.value.displayName)) return@forEach
             if (it.value.getInternalNameOrNull() != null) {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)

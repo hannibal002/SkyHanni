@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.hunting
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -27,12 +28,12 @@ object FusionKeybinds {
         when (InventoryUtils.openInventoryName()) {
             "Fusion Box" -> {
                 if (!config.repeatFusionKeybind.isKeyHeld() || config.confirmFusionKeybind.isKeyHeld()) return
-                InventoryUtils.clickSlot(47, mouseButton = 2, mode = 3)
+                InventoryUtils.clickSlot(47, mouseButton = 2, mode = ClickType.MIDDLE)
             }
 
             "Confirm Fusion" -> {
                 if (!config.confirmFusionKeybind.isKeyHeld() || config.repeatFusionKeybind.isKeyHeld()) return
-                InventoryUtils.clickSlot(33, mouseButton = 2, mode = 3)
+                InventoryUtils.clickSlot(33, mouseButton = 2, mode = ClickType.MIDDLE)
             }
         }
     }

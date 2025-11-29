@@ -15,13 +15,16 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.ChatComponentText
 import kotlin.time.Duration.Companion.milliseconds
+//#if MC < 1.21
+import at.hannibal2.skyhanni.utils.compat.Text
+//#endif
 
 @SkyHanniModule
 object EntityData {
 
     private val maxHealthMap = mutableMapOf<Int, Int>()
     private val nametagCache = TimeLimitedCache<Entity, ChatComponentText>(50.milliseconds)
-    private val healthDisplayCache = TimeLimitedCache<String, String>(50.milliseconds)
+    private val healthDisplayCache = TimeLimitedCache<Text, Text>(50.milliseconds)
     private val lastVisibilityCheck = TimeLimitedCache<Int, Boolean>(200.milliseconds)
 
     // TODO replace with packet detection
@@ -65,7 +68,7 @@ object EntityData {
     }
 
     @JvmStatic
-    fun getHealthDisplay(text: String) = healthDisplayCache.getOrPut(text) {
+    fun getHealthDisplay(text: Text) = healthDisplayCache.getOrPut(text) {
         val event = EntityHealthDisplayEvent(text)
         event.post()
         event.text

@@ -60,8 +60,13 @@ object SoundUtils {
         }
     }
 
+    // TODO this needs fixing on 1.21.9
     private fun SoundCategory.setLevel(level: Float) =
+        //#if MC < 1.21.9
         Minecraft.getMinecraft().soundHandler.setSoundLevel(this, level)
+    //#else
+    //$$ Unit
+    //#endif
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): ISound {
         //#if MC < 1.21

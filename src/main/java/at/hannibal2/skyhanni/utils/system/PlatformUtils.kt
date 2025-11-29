@@ -171,6 +171,22 @@ object PlatformUtils {
         DelayedRun.runNextTick { NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true)) }
         //#endif
     }
+
+    fun isMcAbove(version: String): Boolean {
+        return MCVersion.fromString(version) > MCVersion.currentMcVersion
+    }
+
+    fun isMcAbove(version: MCVersion): Boolean {
+        return version > MCVersion.currentMcVersion
+    }
+
+    fun isMcBelow(version: String): Boolean {
+        return MCVersion.fromString(version) < MCVersion.currentMcVersion
+    }
+
+    fun isMcBelow(version: MCVersion): Boolean {
+        return version < MCVersion.currentMcVersion
+    }
 }
 
 data class ModInstance(val id: String, val name: String, val version: String, val sourceJar: String)
