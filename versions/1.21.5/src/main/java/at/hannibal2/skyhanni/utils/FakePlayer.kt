@@ -7,10 +7,18 @@ import net.minecraft.client.util.SkinTextures
 import net.minecraft.entity.player.PlayerModelPart
 import net.minecraft.scoreboard.Team
 import net.minecraft.util.Identifier
+//#if MC > 1.21.8
+//$$ import net.minecraft.entity.player.PlayerSkinType
+//$$ import net.minecraft.util.AssetInfo
+//#endif
 
 class FakePlayer(val hannibal: Boolean = false) : OtherClientPlayerEntity(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
 
+    //#if MC < 1.21.8
     private val hannibalSkin = SkinTextures(Identifier.of("skyhanni:hannibal2.png"), null, null, null, null ,false)
+    //#else
+    //$$ private val hannibalSkin = SkinTextures(AssetInfo.SkinAssetInfo(Identifier.of("skyhanni:hannibal2.png"), ""), null, null ,PlayerSkinType.WIDE, false)
+    //#endif
 
     override fun getSkinTextures(): SkinTextures {
         if (hannibal) return hannibalSkin
