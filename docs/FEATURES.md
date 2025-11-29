@@ -1784,6 +1784,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Legion/Bobbin' Time Display. - Empa & Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4815)
 + Added Middle Click Fix for 1.21.x. - Luna (https://github.com/hannibal002/SkyHanni/pull/4863)
     + This fixes not being able to middle click items in inventories (e.g. to disable a full set bonus or a rune).
++ \* Few extra features not worth mentioning. - nopo (https://github.com/hannibal002/SkyHanni/pull/4902)
 
 </details>
 <details open><summary>
