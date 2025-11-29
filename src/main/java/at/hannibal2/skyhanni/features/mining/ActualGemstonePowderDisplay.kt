@@ -249,8 +249,7 @@ object ActualGemstonePowderDisplay {
         var bonusPercent = 0
         val heldItem = InventoryUtils.getItemInHand() ?: return 1.0
 
-        val internalName = heldItem.getInternalName()
-        if (!internalName.contains("DRILL")) return 1.0
+        if(heldItem.getItemCategoryOrNull() != ItemCategory.DRILL)
 
         val lore = heldItem.getLore()
 
