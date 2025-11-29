@@ -117,16 +117,16 @@ object EntityUtils {
 
     @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
-        val derpyMultiplier = if (ElectionApi.isDerpy) 2 else 1
-        if (maxHealth == health * derpyMultiplier) return true
+        val derpyMultiplier = if (ElectionApi.isDerpy) 2.0 else if (ElectionApi.isAura) 1.1 else 1.0
+        if (maxHealth == (health * derpyMultiplier).toInt()) return true
 
         if (!boss && !DungeonApi.inDungeon()) {
             // Corrupted
-            if (maxHealth == health * 3 * derpyMultiplier) return true
+            if (maxHealth == (health * 3 * derpyMultiplier).toInt()) return true
             // Runic
-            if (maxHealth == health * 4 * derpyMultiplier) return true
+            if (maxHealth == (health * 4 * derpyMultiplier).toInt()) return true
             // Corrupted+Runic
-            if (maxHealth == health * 12 * derpyMultiplier) return true
+            if (maxHealth == (health * 12 * derpyMultiplier).toInt()) return true
         }
 
         return false
