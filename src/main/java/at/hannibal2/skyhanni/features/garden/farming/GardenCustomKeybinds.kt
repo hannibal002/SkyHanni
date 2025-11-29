@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledFeaturesJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -33,7 +31,6 @@ object GardenCustomKeybinds {
 
     private var map: Map<KeyBinding, Int> = emptyMap()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
-    private var alwaysAllowDuplicateKeybinds = true
     private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
     private var hasDisallowedDuplicateKeybinds = false
 
@@ -115,8 +112,7 @@ object GardenCustomKeybinds {
     }
 
     private fun checkDuplicateKeybinds() {
-        hasDisallowedDuplicateKeybinds = !alwaysAllowDuplicateKeybinds &&
-            !versionAllowsDuplicateKeybinds &&
+        hasDisallowedDuplicateKeybinds = !versionAllowsDuplicateKeybinds &&
             map.values
                 .filter { it != Keyboard.KEY_NONE }
                 .let { values -> values.size != values.toSet().size }
@@ -162,13 +158,6 @@ object GardenCustomKeybinds {
             jump.set(Keyboard.KEY_SPACE)
             sneak.set(Keyboard.KEY_LSHIFT)
         }
-    }
-
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val constant = event.getConstant<DisabledFeaturesJson>("DisabledFeatures")
-        // Whether to allow duplicate keybinds on Minecraft versions that do not natively support it
-        alwaysAllowDuplicateKeybinds = constant.features?.get("duplicate_keybinds") ?: true
     }
 
     @HandleEvent
