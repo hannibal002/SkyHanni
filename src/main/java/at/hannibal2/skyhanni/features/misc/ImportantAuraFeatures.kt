@@ -54,8 +54,8 @@ object ImportantAuraFeatures {
 
     private var lastFakePlayerUUID: String? = null
 
-    @HandleEvent
-    fun onRepoReload(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onRepoReload() {
         if (getTarget() == lastFakePlayerUUID) return
 
         CompletableFuture.runAsync {
@@ -104,8 +104,8 @@ object ImportantAuraFeatures {
         if (event.inventoryName == "Player Election") ChatUtils.chat("§eMake sure to vote!", prefix = false)
     }
 
-    @HandleEvent
-    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onRender() {
         if (!isEnabled()) return
         if (ElectionApi.currentMayor != ElectionCandidate.AURA) return
         if (InventoryUtils.openInventoryName() != "Player Election") return
