@@ -239,11 +239,11 @@ class DebugConfig {
     var addonsDebug: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Aura Propaganda", desc = "Make sure to vote for hannibal2 :)")
-    @ConfigEditorBoolean
     @OnlyModern
     @OnlyLegacy
-    var auraPropaganda: Boolean = true
+    @ConfigOption(name = "Aura Propaganda", desc = "Make sure to vote :)")
+    @Accordion
+    var auraPropagandas = AuraPropagandaConfig()
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
