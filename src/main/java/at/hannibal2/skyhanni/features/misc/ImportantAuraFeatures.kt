@@ -100,9 +100,9 @@ object ImportantAuraFeatures {
         if (InventoryUtils.openInventoryName() != "Player Election") return
 
         val renderables = buildList {
-            addString("§eVote For ${fakePlayer.name}")
+            addString("§eVote For ${fakePlayer.getOverrideName()}")
             add(Renderable.fakePlayer(fakePlayer, width = 100, height = 200, entityScale = 100, followMouse = true))
-            addString("§eA vote for ${fakePlayer.name} is a vote for freedom")
+            addString("§eA vote for ${fakePlayer.getOverrideName()} is a vote for freedom")
         }
 
         pos.renderRenderables(renderables, posLabel = "Important Propaganda", addToGuiManager = false)
@@ -117,12 +117,12 @@ object ImportantAuraFeatures {
 
         val renderable = Renderable.link(
             Renderable.vertical {
-                addString("§eVote For ${fakePlayer.name}")
+                addString("§eVote For ${fakePlayer.getOverrideName()}")
                 add(Renderable.fakePlayer(fakePlayer, width = 100, height = 200, entityScale = 100, followMouse = true))
-                addString("§eClick §lHERE§e to vote for ${fakePlayer.name}!")
+                addString("§eClick §lHERE§e to vote for ${fakePlayer.getOverrideName()}!")
             },
             onLeftClick = {
-                SignUtils.setTextIntoSign("${fakePlayer.name}")
+                SignUtils.setTextIntoSign("${fakePlayer.getOverrideName()}")
             }
         )
 

@@ -43,7 +43,7 @@ class FakePlayer : EntityOtherPlayerMP(MinecraftCompat.localWorld, MinecraftComp
         customSkinType = type ?: "default"
     }
 
-    override fun getName(): String? = customGameProfile?.name ?: super.name
+    fun getOverrideName(): String? = customGameProfile?.name ?: super.name
 
     override fun getSkinType(): String? {
         return customSkinType ?: super.skinType
