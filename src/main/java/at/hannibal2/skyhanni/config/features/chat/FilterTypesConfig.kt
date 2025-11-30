@@ -140,6 +140,18 @@ class FilterTypesConfig {
     var factoryUpgrade: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Hoppity's Hunt Begin", desc = "Hide \"Hoppity's Hunt has begun\" messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hoppityBegun: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Hoppity's Hunt Eggs", desc = "Hide \"An egg has appeared!\" messages during hoppity's hunt.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hoppityEggs: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Sacrifice", desc = "Hide other players' sacrifice messages.")
     @ConfigEditorBoolean
     @FeatureToggle

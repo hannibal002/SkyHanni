@@ -4,10 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
@@ -78,7 +77,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, 2, 3)
+            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, mouseButton = 2, mode = ClickType.MIDDLE)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -128,7 +127,7 @@ object HarpFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         if (!config.guiScale) return
         unSetGuiScale()
     }
@@ -140,7 +139,7 @@ object HarpFeatures {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    fun onIslandChange() {
         if (!config.guiScale) return
         unSetGuiScale()
     }
@@ -199,7 +198,7 @@ object HarpFeatures {
         if (isHarpGui(InventoryUtils.openInventoryName())) {
             if (config.keybinds) {
                 // needed to not send duplicate clicks via keybind feature
-                if (event.clickType == GuiContainerEvent.ClickType.HOTBAR) {
+                if (event.clickType == ClickType.HOTBAR) {
                     event.cancel()
                     return
                 }
@@ -220,9 +219,9 @@ object HarpFeatures {
         //$$      }
         //#endif
         indexOfFirst.takeIf { it != -1 }?.let {
-            val clickType = event.clickType?.id ?: return
+            val clickType = event.clickType ?: return
             event.cancel()
-            InventoryUtils.clickSlot(it, event.container.windowId, event.clickedButton, clickType)
+            InventoryUtils.clickSlot(it, event.container.windowId, mouseButton = event.clickedButton, mode = clickType)
         }
     }
 

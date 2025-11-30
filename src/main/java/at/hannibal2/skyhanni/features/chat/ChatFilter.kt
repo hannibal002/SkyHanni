@@ -35,6 +35,7 @@ object ChatFilter {
     private val huntingPatternGroup = chatFilterGroup.group("hunting")
     private val foragingPatternGroup = chatFilterGroup.group("foraging")
     private val miscPatternGroup = chatFilterGroup.group("hypixel-misc")
+    private val eventPatternGroup = chatFilterGroup.group("event")
 
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
@@ -361,7 +362,7 @@ object ChatFilter {
         "(?:§f)? +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
     )
     private val factoryUpgradePatterns = listOf(
-        "§.* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
+        ".* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
         "§7Your §r§aRabbit Barn §r§7capacity has been increased to §r§a.* Rabbits§r§7!".toPattern(),
         "§7You will now produce §r§6.* Chocolate §r§7per click!".toPattern(),
         "§7You upgraded to §r§d.*?§r§7!".toPattern(),
@@ -496,7 +497,23 @@ object ChatFilter {
      */
     private val swoopAxePattern by huntingPatternGroup.pattern(
         "swoop-axe-message",
-        "§e\\[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!"
+        "§e\\[NPC] §bSwoop§f: §rWow! I forgot to tell you, monsters around here can only take damage from Axes!",
+    )
+
+    /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§aChocolate Dinner Egg §r§dhas appeared!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§9Chocolate Déjeuner Egg §r§dhas appeared!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§6Chocolate Brunch Egg §r§dhas appeared!
+     */
+    private val hoppityAppearPattern by eventPatternGroup.pattern(
+        "hoppity-egg-appear",
+        "§d§lHOPPITY'S HUNT §r§dA .* §r§dhas appeared!",
+    )
+
+    @Suppress("MaxLineLength")
+    private val hoppityBeginPattern by eventPatternGroup.pattern(
+        "hoppity-begin",
+        "§dHoppity's Hunt §r§ehas begun! Help §r§aHoppity §r§efind his §r§6Chocolate Rabbit Eggs §r§eacross SkyBlock each day during the §r§aSpring§r§e!",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
@@ -531,6 +548,8 @@ object ChatFilter {
         "redundant_hunting" to redundantShardsPatterns,
         "unmineable_tree" to unmineableTreePatterns,
         "swoop_axe" to listOf(swoopAxePattern),
+        "hoppity_appear" to listOf(hoppityAppearPattern),
+        "hoppity_begin" to listOf(hoppityBeginPattern),
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -603,6 +622,8 @@ object ChatFilter {
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.rewardBundles && message.isPresent("reward_bundles") -> "reward_bundles"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
+        config.hoppityEggs && message.isPresent("hoppity_appear") -> "hoppity_appear"
+        config.hoppityBegun && message.isPresent("hoppity_begin") -> "hoppity_begin"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && message.isPresent("skymall") -> "skymall"

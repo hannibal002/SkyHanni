@@ -131,6 +131,7 @@ object EnchantParser {
         }
     }
 
+    // We have to use ItemHoverEvent instead of ToolTipEvent otherwise it causes issues on 1.8
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltipEvent(event: ItemHoverEvent) {
         // If enchants doesn't have any enchant data then we have no data to parse enchants correctly

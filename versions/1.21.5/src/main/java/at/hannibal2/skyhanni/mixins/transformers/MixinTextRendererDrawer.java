@@ -32,8 +32,9 @@ public class MixinTextRendererDrawer {
     //#else
     //$$ @Inject(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer$GlyphDrawer;drawGlyph(Lnet/minecraft/client/font/TextDrawable;)V"))
     //$$ private void checkIfGlyphIsChroma(CallbackInfo ci, @Local TextDrawable textDrawable) {
-    //$$     BakedGlyphImpl.DrawnGlyph drawnGlyph = (BakedGlyphImpl.DrawnGlyph) textDrawable;
-    //$$     ChromaFontManagerKt.checkIfGlyphIsChroma(drawnGlyph);
+    //$$     if (textDrawable instanceof BakedGlyphImpl.DrawnGlyph drawnGlyph) {
+    //$$         ChromaFontManagerKt.checkIfGlyphIsChroma(drawnGlyph);
+    //$$     }
     //$$ }
     //#endif
 

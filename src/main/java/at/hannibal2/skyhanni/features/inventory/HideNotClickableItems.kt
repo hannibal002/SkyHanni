@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -69,6 +70,13 @@ object HideNotClickableItems {
     private val hidePlayerTradeFilter = MultiFilter()
     private val notAuctionableFilter = MultiFilter()
 
+    private val patternGroup = RepoPattern.group("inventory.hidenotclickable")
+
+    private val clickToSellPattern by patternGroup.pattern(
+        "clicktosell",
+        "§eClick to sell!",
+    )
+
     /**
      * REGEX-TEST: SEEDS
      * REGEX-TEST: CARROT_ITEM
@@ -79,7 +87,7 @@ object HideNotClickableItems {
      * REGEX-TEST: CACTUS
      * REGEX-TEST: INK_SACK-3
      */
-    private val seedsPattern by RepoPattern.pattern(
+    private val seedsPattern by patternGroup.pattern(
         "inventory.hidenotclickable.seeds",
         "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3",
     )
@@ -469,10 +477,12 @@ object HideNotClickableItems {
         return result
     }
 
+    @Suppress("ReturnCount")
     private fun hideNpcSell(stack: ItemStack): Boolean {
         if (RiftApi.inRift()) return false
         if (!ShiftClickNpcSell.inInventory) return false
         if (VisitorApi.inInventory) return false
+
         showGreenLine = true
 
         var name = stack.cleanName()
@@ -482,22 +492,25 @@ object HideNotClickableItems {
             name = name.substring(0, name.length - amountText.length)
         }
 
-        if (ItemUtils.isSkyBlockMenuItem(stack)) {
-            hideReason = "The SkyBlock Menu cannot be sold at the NPC!"
+        if (!clickToSellPattern.anyMatches(stack.getLore())) {
+            hideReason = "This item cannot be sold at the NPC!"
             return true
         }
 
-        if (!ItemUtils.isRecombobulated(stack)) {
-            if (SkyBlockUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) {
-                return false
-            }
-
-            if (hideNpcSellFilter.match(name)) return false
-
-            if (stack.isVanilla() && !stack.isEnchanted()) {
-                return false
-            }
+        if (stack.isMuseumDonated()) {
+            hideReason = "This item cannot be sold at the NPC! (Donated to Museum)"
+            return true
         }
+
+        if (ItemUtils.isRecombobulated(stack)) {
+            hideReason = "This item should not be sold at the NPC! (Recombobulated)"
+            return true
+        }
+
+        if (!config.protectRarelySoldItems) return false
+        if (stack.isVanilla() && !stack.isEnchanted()) return false
+        if (SkyBlockUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) return false
+        if (hideNpcSellFilter.match(name)) return false
 
         hideReason = "This item should not be sold at the NPC!"
         return true

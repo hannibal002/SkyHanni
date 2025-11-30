@@ -19,6 +19,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
 @SkyHanniModule
@@ -27,17 +29,17 @@ object MineshaftDetection {
 
     private val profileStorage get() = ProfileStorageData.profileSpecific?.mining?.mineshaft
 
-    private fun getSinceMineshaftType(type: MineshaftType): Int = profileStorage?.mineshaftsEnteredSince?.get(type) ?: 0
+    private fun getSinceMineshaftType(type: MineshaftType): Int = profileStorage?.mineshaftsEnteredSinceNew?.get(type) ?: 0
 
     private fun setSinceMineshaftType(type: MineshaftType, value: Int) {
-        profileStorage?.mineshaftsEnteredSince?.set(type, value)
+        profileStorage?.mineshaftsEnteredSinceNew?.set(type, value)
     }
 
     private fun getTimeSinceMineshaftType(type: MineshaftType): SimpleTimeMark =
-        profileStorage?.lastMineshaftTime?.get(type) ?: SimpleTimeMark.farPast()
+        profileStorage?.lastMineshaftTimeNew?.get(type) ?: SimpleTimeMark.farPast()
 
     private fun setTimeSinceMineshaftType(type: MineshaftType, time: SimpleTimeMark) {
-        profileStorage?.lastMineshaftTime?.set(type, time)
+        profileStorage?.lastMineshaftTimeNew?.set(type, time)
     }
 
     private var found = false
@@ -156,19 +158,50 @@ object MineshaftDetection {
         event.transform(108, "mining.glaciteMineshaft.mineshaftDetectionConfig.mineshaftsToTrack") { element ->
             val newList = JsonArray()
             for (entry in element.asJsonArray) {
-                val str = entry.asString
-                val type = str.dropLast(1)
-                when (str.last()) {
-                    '1' -> {
-                        newList.add(JsonPrimitive("${type}_1"))
-                        enumValues<MineshaftType>().find { it.name == "${type}_2" }?.let {
-                            newList.add(JsonPrimitive(it.name))
-                        }
-                    }
-                    '2' -> newList.add(JsonPrimitive("${type}_C"))
+                val fixedEnumValue = transformMineshaftTypeEnum(entry.asString)
+                for (newEntry in fixedEnumValue) {
+                    newList.add(JsonPrimitive(newEntry))
                 }
             }
             newList
+        }
+        event.move(
+            109,
+            "#profile.mining.mineshaft.mineshaftsEnteredSince",
+            "#profile.mining.mineshaft.mineshaftsEnteredSinceNew",
+        ) { transformElementMap(it) }
+        event.move(
+            109,
+            "#profile.mining.mineshaft.lastMineshaftTime",
+            "#profile.mining.mineshaft.lastMineshaftTimeNew",
+        ) { transformElementMap(it) }
+    }
+
+    private fun transformElementMap(originalElement: JsonElement): JsonObject {
+        val newObj = JsonObject()
+        for ((key, value) in originalElement.asJsonObject.entrySet()) {
+            val fixedEnumValue = transformMineshaftTypeEnum(key)
+            for (newKey in fixedEnumValue) {
+                newObj.add(newKey, value)
+            }
+        }
+        return newObj
+    }
+
+    private fun transformMineshaftTypeEnum(original: String): List<String> {
+        val type = original.dropLast(1)
+        val newList = mutableListOf<String>()
+        return when (original.last()) {
+            '1' -> {
+                newList.add("${type}_1")
+                enumValues<MineshaftType>().find { it.name == "${type}_2" }?.let {
+                    newList.add(it.name)
+                }
+                newList
+            }
+
+            '2' -> listOf("${type}_C")
+            else -> listOf()
         }
     }
 }

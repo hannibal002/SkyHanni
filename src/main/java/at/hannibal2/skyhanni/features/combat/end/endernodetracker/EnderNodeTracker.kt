@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.combat.end.EnderNodeConfig.EnderNodeDisplayEntry
-import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -31,6 +30,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -70,7 +70,7 @@ object EnderNodeTracker {
         @Expose var totalNodesMined: Long = 0,
         @Expose var totalEndermiteNests: Long = 0,
         @Expose var lootCount: MutableMap<EnderNode, Int> = mutableMapOf(),
-    ) : Resettable
+    ) : TrackerData()
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
