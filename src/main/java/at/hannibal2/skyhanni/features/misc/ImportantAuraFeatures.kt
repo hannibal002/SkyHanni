@@ -29,6 +29,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+//#if MC > 1.21
+//$$ import kotlin.jvm.optionals.getOrNull
+//#endif
 
 @SkyHanniModule
 object ImportantAuraFeatures {
