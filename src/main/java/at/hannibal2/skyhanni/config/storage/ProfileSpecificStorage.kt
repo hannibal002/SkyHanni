@@ -62,6 +62,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
@@ -839,6 +840,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
+
+        @Expose
+        var ubikRemindTime: SimpleTimeMark = farFuture()
     }
 
     // - slayer
