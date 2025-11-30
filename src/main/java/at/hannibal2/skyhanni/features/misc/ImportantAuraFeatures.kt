@@ -15,13 +15,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isPlayerElectionSign
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.fakePlayer
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.minecraft.MinecraftProfileTexture
@@ -29,6 +27,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+
 //#if MC > 1.21
 //$$ import kotlin.jvm.optionals.getOrNull
 //#endif
@@ -117,7 +116,11 @@ object ImportantAuraFeatures {
             addString("§eA vote for ${fakePlayer.getNameForScoreboard()} is a vote for freedom")
         }
 
-        pos.renderRenderables(renderables, posLabel = "Important Propaganda", addToGuiManager = false)
+        pos.renderRenderables(
+            renderables,
+            posLabel = "Important Propaganda",
+            addToGuiManager = false
+        )
     }
 
     @HandleEvent
@@ -127,19 +130,24 @@ object ImportantAuraFeatures {
         val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isPlayerElectionSign()) return
 
-        val renderable = Renderable.link(
-            Renderable.vertical {
-                addString("§eVote For ${fakePlayer.getNameForScoreboard()}")
-                add(Renderable.fakePlayer(fakePlayer, width = 100, height = 200, entityScale = 100, followMouse = true))
-                addString("§eClick §lHERE§e to vote for ${fakePlayer.getNameForScoreboard()}!")
-            },
-            onLeftClick = {
-                SignUtils.setTextIntoSign("${fakePlayer.getNameForScoreboard()}")
-            }
-        )
+        val renderables = buildList {
+            addString("§eVote For ${fakePlayer.getNameForScoreboard()}")
+            add(Renderable.link(
+                Renderable.fakePlayer(fakePlayer, width = 100, height = 200, entityScale = 100, followMouse = true),
+                onLeftClick = {
+                    SignUtils.setTextIntoSign("${fakePlayer.getNameForScoreboard()}")
+                }
+            ))
+            add(Renderable.link(
+                "§eClick §lHERE§e to vote for ${fakePlayer.getNameForScoreboard()}!",
+                onLeftClick = {
+                    SignUtils.setTextIntoSign("${fakePlayer.getNameForScoreboard()}")
+                }
+            ))
+        }
 
-        pos.renderRenderable(
-            renderable,
+        pos.renderRenderables(
+            renderables,
             posLabel = "Important Propaganda",
             addToGuiManager = false
         )
