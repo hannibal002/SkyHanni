@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -110,7 +109,7 @@ object ActualGemstonePowderDisplay {
         val pet = CurrentPetApi.currentPet ?: return PetStats(null, 0, 1.0)
         var bonusPercent = 0.0
 
-        if (pet.cleanName == "Mole" && pet.rarity == LorenzRarity.LEGENDARY) {
+        if (pet.cleanName == "Scatha" && pet.rarity == LorenzRarity.LEGENDARY) {
             bonusPercent = 0.2 * pet.level
         }
 
