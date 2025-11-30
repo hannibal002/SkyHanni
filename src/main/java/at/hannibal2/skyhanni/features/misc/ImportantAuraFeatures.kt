@@ -51,13 +51,13 @@ object ImportantAuraFeatures {
     }
 
     private var lastFakePlayerUUID: String? = null
-    private var isFetching = false
 
     @HandleEvent
     fun onRepoReload(event: ConfigLoadEvent) {
-        CompletableFuture.runAsync {
-            isFetching = true
+        if (getTarget() == lastFakePlayerUUID) return
 
+        CompletableFuture.runAsync {
+            //#if MC < 1.21
             val gameProfile = Minecraft.getMinecraft().sessionService.fillProfileProperties(
                 GameProfile(
                     UUID.fromString(getTarget()),
@@ -77,12 +77,21 @@ object ImportantAuraFeatures {
                             fakePlayer.setSkin(resourceLocation)
                             fakePlayer.setSkinType(profileTexture.getMetadata("model"))
                             lastFakePlayerUUID = getTarget()
-                            isFetching = false
                         }
                     }
                 },
                 true
             )
+            //#else
+            //$$ val gameProfile = MinecraftClient.getInstance().apiServices.profileResolver().getProfileById(UUID.fromString(getTarget())).getOrNull()
+
+            //$$ fakePlayer.gameProfile = gameProfile
+
+            //$$ fakePlayer.setSkinTextures(MinecraftClient.getInstance().skinProvider.supplySkinTextures(
+            //$$     gameProfile,
+            //$$     true
+            //$$ ).get())
+            //#endif
         }
     }
 
@@ -100,9 +109,9 @@ object ImportantAuraFeatures {
         if (InventoryUtils.openInventoryName() != "Player Election") return
 
         val renderables = buildList {
-            addString("§eVote For ${fakePlayer.getOverrideName()}")
+            addString("§eVote For ${fakePlayer.getNameForScoreboard()}")
             add(Renderable.fakePlayer(fakePlayer, width = 100, height = 200, entityScale = 100, followMouse = true))
-            addString("§eA vote for ${fakePlayer.getOverrideName()} is a vote for freedom")
+            addString("§eA vote for ${fakePlayer.getNameForScoreboard()} is a vote for freedom")
         }
 
         pos.renderRenderables(renderables, posLabel = "Important Propaganda", addToGuiManager = false)
@@ -117,12 +126,12 @@ object ImportantAuraFeatures {
 
         val renderable = Renderable.link(
             Renderable.vertical {
-                addString("§eVote For ${fakePlayer.getOverrideName()}")
+                addString("§eVote For ${fakePlayer.getNameForScoreboard()}")
                 add(Renderable.fakePlayer(fakePlayer, width = 100, height = 200, entityScale = 100, followMouse = true))
-                addString("§eClick §lHERE§e to vote for ${fakePlayer.getOverrideName()}!")
+                addString("§eClick §lHERE§e to vote for ${fakePlayer.getNameForScoreboard()}!")
             },
             onLeftClick = {
-                SignUtils.setTextIntoSign("${fakePlayer.getOverrideName()}")
+                SignUtils.setTextIntoSign("${fakePlayer.getNameForScoreboard()}")
             }
         )
 
