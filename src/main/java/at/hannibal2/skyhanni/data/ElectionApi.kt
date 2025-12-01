@@ -302,8 +302,9 @@ object ElectionApi {
     }
 
     val isDerpy get() = Perk.DOUBLE_MOBS_HP.isActive
+    val isAura get() = Perk.WORK_HARDER.isActive
 
-    fun Int.derpy() = if (isDerpy) this / 2 else this
+    fun Int.derpy() = if (isDerpy) this / 2 else if (isAura) (this / 11 * 10) else this
 
-    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
+    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else if (isAura) (this * 1.1).toInt() else this
 }

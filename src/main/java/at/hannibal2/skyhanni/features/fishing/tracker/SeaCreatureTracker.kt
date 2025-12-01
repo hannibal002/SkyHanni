@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ExcludedSeaCreatureAreasJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -26,6 +25,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -40,7 +40,7 @@ object SeaCreatureTracker {
 
     data class Data(
         @Expose var amount: MutableMap<String, Int> = mutableMapOf(),
-    ) : Resettable
+    ) : TrackerData()
 
     @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
