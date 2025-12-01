@@ -153,12 +153,13 @@ object MiningEventsApi {
             widgetEventFallback = "§9§lMining Event: §r§a§r§cGoblin Raid",
             bossbarFallback = "§e§lEVENT §C§LGOBLIN RAID §e§lACTIVE IN §b§lGOBLIN BURROWS §e§lfor §a§l(?<time>.*)§r",
         ),
-        // chat works
+        // chat works, widget works
+        // lets hope this works I have not gotten any bossbar data yet to test it on.
         RAFFLE(
             duration = 3.minutes,
             chatFallback = ".*§r§6§lRAFFLE (?:STARTED|ENDED)!.*",
             widgetEventFallback = "§9§lMining Event: §r§a§r§6Raffle",
-            bossbarFallback = "§e§lACTIVE EVENT §6§lRAFFLE §e§lRUNNING FOR §a§l(?<time>.*)§r",
+            bossbarFallback = "§e§lEVENT §6§lRAFFLE §e§lACTIVE IN §b§lGOBLIN BURROWS §e§lfor §a§l(?<time>.*)§r",
         ),
         // all works
         // like bro hypixel can you just have the color codes and text be all normal ts pmo
