@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.sun.jndi.url.dns.dnsURLContext
 import org.intellij.lang.annotations.Language
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -53,7 +52,7 @@ object MiningEventsApi {
             ChatUtils.debug("[Mining Events API] Event started: ${eventType.name}")
             val newEvent = MiningEvent(type = eventType, timeLeft = timeLeft ?: eventType.duration)
             activeMiningEvent = newEvent
-            MiningEventEvent.Started(newEvent, newEvent.timeLeft).post()
+            MiningEventEvent.Started(newEvent).post()
             return
         }
 
@@ -64,7 +63,7 @@ object MiningEventsApi {
 
             val newEvent = MiningEvent(type = eventType, timeLeft = timeLeft ?: eventType.duration)
             activeMiningEvent = newEvent
-            MiningEventEvent.Started(newEvent, newEvent.timeLeft).post()
+            MiningEventEvent.Started(newEvent).post()
             return
         }
 
@@ -94,7 +93,7 @@ object MiningEventsApi {
     fun onSecondPassed() {
 
         if (TabWidget.EVENT.isActive) {
-            for ((index, line) in TabWidget.EVENT.lines.withIndex()) {
+            for ((line) in TabWidget.EVENT.lines.withIndex()) {
                 ChatUtils.consoleLog("[Mining Event Api] Tab Widget: $line")
             }
 

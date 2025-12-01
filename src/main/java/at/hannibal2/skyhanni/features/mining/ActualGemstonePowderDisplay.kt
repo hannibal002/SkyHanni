@@ -75,14 +75,6 @@ object ActualGemstonePowderDisplay {
     private val patternGroup = RepoPattern.group("mining.powder.multiplier")
 
     /**
-     * REGEX-TEST: §e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l0:30§r
-     */
-    private val powderBossBarPattern by patternGroup.pattern(
-        "powder.bossbar",
-        "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r",
-    )
-
-    /**
      * REGEX-TEST: §7§7Grants §d+50% §dGemstone Powder§7, and
      */
     private val drillBasePowderPattern by patternGroup.pattern(
