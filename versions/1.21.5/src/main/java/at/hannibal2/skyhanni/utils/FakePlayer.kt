@@ -22,7 +22,7 @@ class FakePlayer : OtherClientPlayerEntity(MinecraftCompat.localWorld, Minecraft
         override fun getNameTagVisibilityRule() = VisibilityRule.NEVER
     }
 
-    fun setSkinTextures(skinTextures: SkinTextures) {
+    fun setSkinTextures(skinTextures: SkinTextures?) {
         customSkinTextures = skinTextures
     }
 

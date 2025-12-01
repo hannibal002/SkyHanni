@@ -84,6 +84,23 @@ object ImportantAuraFeatures {
                 },
                 true
             )
+            //#elseif MC < 1.21.10
+            //$$ val profileResult = MinecraftClient.getInstance().sessionService.fetchProfile(
+            //$$     UUID.fromString(getTarget()),
+            //$$     true
+            //$$ )
+
+            //$$ val gameProfile = profileResult?.profile
+
+            //$$ fakePlayer.gameProfile = gameProfile
+
+            //$$ fakePlayer.setSkinTextures(
+            //$$     gameProfile?.let {
+            //$$         MinecraftClient.getInstance().skinProvider.getSkinTextures(
+            //$$             gameProfile
+            //$$         )
+            //$$     }
+            //$$ )
             //#else
             //$$ val gameProfile = MinecraftClient.getInstance().apiServices.profileResolver().getProfileById(UUID.fromString(getTarget())).getOrNull()
 
