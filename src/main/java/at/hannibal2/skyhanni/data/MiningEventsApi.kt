@@ -135,7 +135,10 @@ object MiningEventsApi {
             // if it gets through the matcher that means there is nothing there so set it to null
             // this might introduce a bug where you have the tablist widget for events disabled + get the hypixel bug for no boss bar would
             // result in this getting set to null. I will think of something better when im not brain-dead.
-            clearActiveMiningEvent()
+
+            // this does in fact introduce a bug if you have the boss bar not appearing glitch.
+
+            // clearActiveMiningEvent()
         }
     }
 
@@ -153,6 +156,7 @@ object MiningEventsApi {
             widgetEventFallback = "§9§lMining Event: §r§a§r§cGoblin Raid",
             bossbarFallback = "§e§lEVENT §C§LGOBLIN RAID §e§lACTIVE IN §b§lGOBLIN BURROWS §e§lfor §a§l(?<time>.*)§r",
         ),
+        // I cant test this because my boss bars suddenly stopped working, thanks hypixel
         // chat works, widget works
         // lets hope this works I have not gotten any bossbar data yet to test it on.
         RAFFLE(
