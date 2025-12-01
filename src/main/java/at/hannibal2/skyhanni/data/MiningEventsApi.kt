@@ -35,22 +35,12 @@ object MiningEventsApi {
         return activeMiningEvent!!.type == eventType
     }
 
-    private fun setActiveMiningEvent(eventType: MiningEventType?, timeLeft: Duration?) {
+    private fun setActiveMiningEvent(eventType: MiningEventType, timeLeft: Duration) {
         val current = activeMiningEvent
-
-
-        if (eventType == null) {
-            if (current != null) {
-                ChatUtils.debug("[Mining Events API] Event ended: ${current.type.name}")
-                MiningEventEvent.Ended(current).post()
-                activeMiningEvent = null
-            }
-            return
-        }
 
         if (current == null) {
             ChatUtils.debug("[Mining Events API] Event started: ${eventType.name}")
-            val newEvent = MiningEvent(type = eventType, timeLeft = timeLeft ?: eventType.duration)
+            val newEvent = MiningEvent(type = eventType, timeLeft = timeLeft)
             activeMiningEvent = newEvent
             MiningEventEvent.Started(newEvent).post()
             return
@@ -61,14 +51,21 @@ object MiningEventsApi {
             ChatUtils.debug("[Mining Events API] Event changed: ${current.type.name} -> ${eventType.name}")
             MiningEventEvent.Ended(current).post()
 
-            val newEvent = MiningEvent(type = eventType, timeLeft = timeLeft ?: eventType.duration)
+            val newEvent = MiningEvent(type = eventType, timeLeft = timeLeft)
             activeMiningEvent = newEvent
             MiningEventEvent.Started(newEvent).post()
             return
         }
 
-        if (timeLeft != null) {
-            current.timeLeft = timeLeft
+        current.timeLeft = timeLeft
+    }
+
+    private fun clearActiveMiningEvent() {
+        val current = activeMiningEvent
+        if (current != null) {
+            ChatUtils.debug("[Mining Events API] Event ended: ${current.type.name}")
+            MiningEventEvent.Ended(current).post()
+            activeMiningEvent = null
         }
     }
 
@@ -82,7 +79,7 @@ object MiningEventsApi {
                 if (msg.contains("STARTED")) {
                     setActiveMiningEvent(eventType, eventType.duration)
                 } else if (msg.contains("ENDED")) {
-                    setActiveMiningEvent(null, null)
+                    clearActiveMiningEvent()
                 }
                 return
             }
@@ -101,7 +98,7 @@ object MiningEventsApi {
             for (eventType in MiningEventType.entries) {
                 for ((index, line) in TabWidget.EVENT.lines.withIndex()) {
                     MiningEventType.widgetEventNotAnnouncedPattern.matchMatcher(line){
-                        setActiveMiningEvent(null, null)
+                        clearActiveMiningEvent()
                         return
                     }
                     eventType.widgetEventPattern.matchMatcher(line) {
@@ -134,7 +131,7 @@ object MiningEventsApi {
             // if it gets through the matcher that means there is nothing there so set it to null
             // this might introduce a bug where you have the tablist widget for events disabled + get the hypixel bug for no boss bar would
             // result in this getting set to null. I will think of something better when im not brain-dead.
-            setActiveMiningEvent(null, null)
+            clearActiveMiningEvent()
         }
     }
 
