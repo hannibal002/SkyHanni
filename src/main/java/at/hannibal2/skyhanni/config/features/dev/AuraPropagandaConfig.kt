@@ -17,5 +17,5 @@ class AuraPropagandaConfig {
     @ConfigEditorText
     @OnlyModern
     @OnlyLegacy
-    var targetUUID = "eaa5623c-8413-46b7-a74b-2d74a42b2841"
+    var targetUUID = "91548fba-61b4-449f-bc52-8227d463264d"
 }
