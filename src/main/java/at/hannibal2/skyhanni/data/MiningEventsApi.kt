@@ -144,12 +144,13 @@ object MiningEventsApi {
         @Language("RegExp") val widgetEventFallback: String,
         @Language("RegExp") val bossbarFallback: String,
     ) {
-        // chat works
+        // all work
+        // §e§lEVENT §C§LGOBLIN RAID §e§lACTIVE IN §b§lGOBLIN BURROWS §e§lfor §a§l02:00§r
         GOBLIN_RAID(
             duration = 5.minutes,
             chatFallback = ".*§r§c§lGOBLIN RAID (?:STARTED|ENDED)!.*",
             widgetEventFallback = "§9§lMining Event: §r§a§r§cGoblin Raid",
-            bossbarFallback = "§e§lACTIVE EVENT §c§lGOBLIN RAID §e§lRUNNING FOR §a§l(?<time>.*)§r",
+            bossbarFallback = "§e§lEVENT §C§LGOBLIN RAID §e§lACTIVE IN §b§lGOBLIN BURROWS §e§lfor §a§l(?<time>.*)§r",
         ),
         //chat works
         RAFFLE(
@@ -174,7 +175,7 @@ object MiningEventsApi {
             widgetEventFallback = "§9§lMining Event: §r§a§r§dBetter Together",
             bossbarFallback = "§e§lPASSIVE EVENT §b§l§D§LBETTER TOGETHER §e§lRUNNING FOR §a§l(?<time>.*)§r",
         ),
-        // widget works, chat works
+        // all work
         GONE_WITH_THE_WIND(
             duration = 20.minutes,
             chatFallback = ".*§r§9§lGONE WITH THE WIND (?:STARTED|ENDED)!.*",
