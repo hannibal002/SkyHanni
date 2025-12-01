@@ -85,7 +85,7 @@ object ImportantAuraFeatures {
         val renderables = buildList {
             addString("§eVote For ${fakePlayer.getNameForScoreboard()}")
             add(
-                Renderable.link(
+                Renderable.clickable(
                     Renderable.fakePlayer(fakePlayer, width = 100, height = 200, entityScale = 100, followMouse = true),
                     onLeftClick = {
                         SignUtils.setTextIntoSign("${fakePlayer.getNameForScoreboard()}")
