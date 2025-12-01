@@ -62,10 +62,12 @@ fun FakePlayer.setPlayerUUID(uuidString: String): FakePlayer {
 
         //$$ this.gameProfile = gameProfile
 
-        //$$ this.setSkinTextures(MinecraftClient.getInstance().skinProvider.supplySkinTextures(
+        //$$ this.setSkinTextures(
+        //$$     MinecraftClient.getInstance().skinProvider.supplySkinTextures(
         //$$     gameProfile,
         //$$     true
-        //$$ ).get())
+        //$$     ).get()
+        //$$ )
         //#endif
     }
     return this
