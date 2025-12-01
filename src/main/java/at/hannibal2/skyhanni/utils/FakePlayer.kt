@@ -8,7 +8,11 @@ import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.util.ResourceLocation
 
-class FakePlayer : EntityOtherPlayerMP(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
+class FakePlayer(uuid: String? = null) : EntityOtherPlayerMP(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
+
+    init {
+        if (uuid != null) setPlayerUUID(uuid)
+    }
 
     override fun getLocationSkin(): ResourceLocation? {
         return customSkin

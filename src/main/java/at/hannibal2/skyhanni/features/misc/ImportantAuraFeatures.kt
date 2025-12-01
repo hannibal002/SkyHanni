@@ -21,21 +21,13 @@ import at.hannibal2.skyhanni.utils.SignUtils.isPlayerElectionSign
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.fakePlayer
-import com.mojang.authlib.GameProfile
-import com.mojang.authlib.minecraft.MinecraftProfileTexture
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.setPlayerUUID
 import net.minecraft.client.gui.inventory.GuiEditSign
-import java.util.UUID
-import java.util.concurrent.CompletableFuture
-
-//#if MC > 1.21
-//$$ import kotlin.jvm.optionals.getOrNull
-//#endif
 
 @SkyHanniModule
 object ImportantAuraFeatures {
 
-    private val fakePlayer by lazy { FakePlayer() }
+    private val fakePlayer by lazy { FakePlayer(uuid = getTarget()) }
 
     val pos = Position(100, 100)
 
@@ -52,66 +44,9 @@ object ImportantAuraFeatures {
         }
     }
 
-    private var lastFakePlayerUUID: String? = null
-
     @HandleEvent(ConfigLoadEvent::class)
     fun onRepoReload() {
-        if (getTarget() == lastFakePlayerUUID) return
-
-        CompletableFuture.runAsync {
-            //#if MC < 1.21
-            val gameProfile = Minecraft.getMinecraft().sessionService.fillProfileProperties(
-                GameProfile(
-                    UUID.fromString(getTarget()),
-                    "UnknownPlayer"
-                ),
-                true
-            )
-
-            fakePlayer.gameProfile = gameProfile
-
-            Minecraft.getMinecraft().skinManager.loadProfileTextures(
-                gameProfile,
-                { type, resourceLocation, profileTexture ->
-                    when (type) {
-                        MinecraftProfileTexture.Type.CAPE -> fakePlayer.setCape(resourceLocation)
-                        MinecraftProfileTexture.Type.SKIN -> {
-                            fakePlayer.setSkin(resourceLocation)
-                            fakePlayer.setSkinType(profileTexture.getMetadata("model"))
-                            lastFakePlayerUUID = getTarget()
-                        }
-                    }
-                },
-                true
-            )
-            //#elseif MC < 1.21.10
-            //$$ val profileResult = MinecraftClient.getInstance().sessionService.fetchProfile(
-            //$$     UUID.fromString(getTarget()),
-            //$$     true
-            //$$ )
-
-            //$$ val gameProfile = profileResult?.profile
-
-            //$$ fakePlayer.gameProfile = gameProfile
-
-            //$$ fakePlayer.setSkinTextures(
-            //$$     gameProfile?.let {
-            //$$         MinecraftClient.getInstance().skinProvider.getSkinTextures(
-            //$$             gameProfile
-            //$$         )
-            //$$     }
-            //$$ )
-            //#else
-            //$$ val gameProfile = MinecraftClient.getInstance().apiServices.profileResolver().getProfileById(UUID.fromString(getTarget())).getOrNull()
-
-            //$$ fakePlayer.gameProfile = gameProfile
-
-            //$$ fakePlayer.setSkinTextures(MinecraftClient.getInstance().skinProvider.supplySkinTextures(
-            //$$     gameProfile,
-            //$$     true
-            //$$ ).get())
-            //#endif
-        }
+        fakePlayer.setPlayerUUID(getTarget())
     }
 
     @HandleEvent

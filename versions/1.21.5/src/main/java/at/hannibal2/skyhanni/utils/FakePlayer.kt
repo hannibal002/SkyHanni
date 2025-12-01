@@ -8,7 +8,11 @@ import net.minecraft.client.util.SkinTextures
 import net.minecraft.entity.player.PlayerModelPart
 import net.minecraft.scoreboard.Team
 
-class FakePlayer : OtherClientPlayerEntity(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
+class FakePlayer(uuid: String? = null) : OtherClientPlayerEntity(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
+
+    init {
+        if (uuid != null) setPlayerUUID(uuid)
+    }
 
     private var customSkinTextures: SkinTextures? = null
 
