@@ -244,7 +244,7 @@ object ActualGemstonePowderDisplay {
                 }
 
                 event.chatComponent = TextHelper.text(
-                    text ="    §r§dGemstone Powder §r§8x${originalAmount.addSeparators()} §7(x${actualAmount.addSeparators()})"
+                    text = "    §r§dGemstone Powder §r§8x${originalAmount.addSeparators()} §7(x${actualAmount.addSeparators()})"
                 ) {
                     this.hover = TextHelper.multiline(hoverText)
                 }
