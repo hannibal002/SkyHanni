@@ -154,17 +154,17 @@ object ActualGemstonePowderDisplay {
 
         val acLevel = AttributeShardsData.getActiveLevel(ATOMIZED_CRYSTALS_SHARD.shardName)
         val acRate = (acLevel * ATOMIZED_CRYSTALS_SHARD.divisor) / 100.0
-        if (acRate > 0) attributeFactors.add(SimpleFactor("Atomized Crystals [${acLevel}]", acRate))
+        if (acRate > 0) attributeFactors.add(SimpleFactor("Atomized Crystals [$acLevel]", acRate))
 
         val eaLevel = AttributeShardsData.getActiveLevel(ECHO_OF_ATOMIZED_SHARD.shardName)
         val eaRate = (eaLevel * ECHO_OF_ATOMIZED_SHARD.divisor) / 100.0
         val eaContrib = acRate * eaRate
-        if (eaContrib > 0) attributeFactors.add(SimpleFactor("Echo of Atomized [${eaLevel}]", eaContrib))
+        if (eaContrib > 0) attributeFactors.add(SimpleFactor("Echo of Atomized [$eaLevel]", eaContrib))
 
         val eeLevel = AttributeShardsData.getActiveLevel(ECHO_OF_ECHOES_SHARD.shardName)
         val eeRate = (eeLevel * ECHO_OF_ECHOES_SHARD.divisor) / 100.0
         val eeContrib = eaContrib * eeRate
-        if (eeContrib > 0) attributeFactors.add(SimpleFactor("Echo of Echoes [${eeLevel}]", eeContrib))
+        if (eeContrib > 0) attributeFactors.add(SimpleFactor("Echo of Echoes [$eeLevel]", eeContrib))
 
         if (attributeFactors.isNotEmpty()) {
             add(AdditiveFactor("Attribute Bonus", factors = attributeFactors))
@@ -243,7 +243,9 @@ object ActualGemstonePowderDisplay {
                     add("§7Actual Powder: §d${actualAmount.addSeparators()}")
                 }
 
-                event.chatComponent = TextHelper.text("    §r§dGemstone Powder §r§8x${originalAmount.addSeparators()} §7(x${actualAmount.addSeparators()})") {
+                event.chatComponent = TextHelper.text(
+                    text ="    §r§dGemstone Powder §r§8x${originalAmount.addSeparators()} §7(x${actualAmount.addSeparators()})"
+                ) {
                     this.hover = TextHelper.multiline(hoverText)
                 }
             }

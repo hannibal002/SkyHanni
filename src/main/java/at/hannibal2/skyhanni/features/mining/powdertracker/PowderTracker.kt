@@ -83,7 +83,9 @@ object PowderTracker {
         if (lastChestPicked.passedSince() > 1.minutes) {
             isGrinding = false
         }
-        if (MiningEventsApi.isMiningEventActive(MiningEventsApi.MiningEventType.DOUBLE_POWDER)){
+        val event = MiningEventsApi.getActiveEvent(MiningEventsApi.MiningEventType.DOUBLE_POWDER)
+
+        if (event != null) {
             tracker.update()
         }
     }
@@ -239,7 +241,15 @@ object PowderTracker {
 
         val chestPerHour = format(chestInfo.perHour)
         addSearchString("§d${data.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
-        addSearchString("§bDouble Powder: ${if (MiningEventsApi.isMiningEventActive(MiningEventsApi.MiningEventType.DOUBLE_POWDER)) "§aActive! §7(${MiningEventsApi.activeMiningEvent!!.timeLeft})" else "§cInactive!"}")
+
+        val event = MiningEventsApi.getActiveEvent(MiningEventsApi.MiningEventType.DOUBLE_POWDER)
+
+        addSearchString(
+            if (event != null)
+                "§bDouble Powder: §aActive! §7(${event.timeLeft})"
+            else
+                "§bDouble Powder: §cInactive!"
+        )
 
         val rewards = data.rewards
         addPerHour(rewards, PowderChestReward.GEMSTONE_POWDER, gemstoneInfo)
@@ -248,7 +258,10 @@ object PowderTracker {
         addPerHour(rewards, PowderChestReward.GOLD_ESSENCE, goldEssenceInfo)
         addSearchString("")
         val hardStonePerHour = format(hardStoneInfo.perHour)
-        addSearchString("§b${data.totalHardStoneCompacted.addSeparators()} §fHard Stone §bCompacted §7($hardStonePerHour/h)", "Hard Stone")
+        addSearchString(
+            "§b${data.totalHardStoneCompacted.addSeparators()} §fHard Stone §bCompacted §7($hardStonePerHour/h)", "Hard Stone"
+        )
+
         addSearchString("")
         for ((gem, color) in gemstones) {
             var totalGemstone = 0L

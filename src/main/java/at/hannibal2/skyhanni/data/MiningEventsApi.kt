@@ -30,10 +30,14 @@ object MiningEventsApi {
 
     var activeMiningEvent: MiningEvent? = null
 
-    fun isMiningEventActive(eventType: MiningEventType): Boolean {
-        if (activeMiningEvent == null) return false
-        return activeMiningEvent!!.type == eventType
+    fun getActiveEvent(type: MiningEventType? = null): MiningEvent? {
+        val event = activeMiningEvent ?: return null
+
+        return if (type == null || event.type == type) event else null
     }
+
+    fun isMiningEventActive(type: MiningEventType): Boolean =
+        getActiveEvent(type) != null
 
     private fun setActiveMiningEvent(eventType: MiningEventType, timeLeft: Duration) {
         val current = activeMiningEvent
@@ -97,7 +101,7 @@ object MiningEventsApi {
 
             for (eventType in MiningEventType.entries) {
                 for ((index, line) in TabWidget.EVENT.lines.withIndex()) {
-                    MiningEventType.widgetEventNotAnnouncedPattern.matchMatcher(line){
+                    MiningEventType.widgetEventNotAnnouncedPattern.matchMatcher(line) {
                         clearActiveMiningEvent()
                         return
                     }
@@ -149,7 +153,7 @@ object MiningEventsApi {
             widgetEventFallback = "§9§lMining Event: §r§a§r§cGoblin Raid",
             bossbarFallback = "§e§lEVENT §C§LGOBLIN RAID §e§lACTIVE IN §b§lGOBLIN BURROWS §e§lfor §a§l(?<time>.*)§r",
         ),
-        //chat works
+        // chat works
         RAFFLE(
             duration = 3.minutes,
             chatFallback = ".*§r§6§lRAFFLE (?:STARTED|ENDED)!.*",
@@ -158,7 +162,7 @@ object MiningEventsApi {
         ),
         // all works
         // like bro hypixel can you just have the color codes and text be all normal ts pmo
-//         §e§lEVENT §B§LMITHRIL GOURMAND §e§lACTIVE IN §b§lGOBLIN BURROWS §e§lfor §a§l09:46§r
+        // §e§lEVENT §B§LMITHRIL GOURMAND §e§lACTIVE IN §b§lGOBLIN BURROWS §e§lfor §a§l09:46§r
         MITHRIL_GOURMAND(
             duration = 10.minutes,
             chatFallback = ".*§r§b§lMITHRIL GOURMAND (?:STARTED|ENDED)!.*",
@@ -195,10 +199,16 @@ object MiningEventsApi {
         val bossBarPattern by RepoPattern.pattern("$basePath.bossbar.${asPatternId()}", bossbarFallback)
 
         companion object {
+            /**
+             * REGEX-TEST: Ends in: §r§c5m 30s
+             */
             val widgetDurationPattern by RepoPattern.pattern(
                 "mining.mining.event.widget.duration",
                 "Ends in: §r§.(?<duration>.*)"
             )
+            /**
+             * REGEX-TEST: §9§lMining Event: §r§7Not announced
+             */
             val widgetEventNotAnnouncedPattern by RepoPattern.pattern(
                 "mining.mining.event.widget.not.announced",
                 "§9§lMining Event: §r§7Not announced"
