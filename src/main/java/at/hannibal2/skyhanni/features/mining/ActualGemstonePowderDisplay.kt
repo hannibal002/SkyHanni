@@ -31,11 +31,17 @@ object ActualGemstonePowderDisplay {
     private val config get() = SkyHanniMod.feature.chat
     private val patternGroup = RepoPattern.group("mining.powder.multiplier")
 
+    /**
+     * REGEX-TEST: §7§7Grants §d+50% §dGemstone Powder§7, and
+     */
     private val drillBasePowderPattern by patternGroup.pattern(
         "drill.powder.base",
         "§7§7Grants §d\\+(?<bonus>\\d+)% §dGemstone Powder§7, and"
     )
 
+    /**
+     * REGEX-TEST: §7Earn §9+25% Powder §7from all sources.
+     */
     private val drillUpgradePowderPattern by patternGroup.pattern(
         "drill.powder.upgrade",
         "§7Earn §9\\+(?<bonus>\\d+)% Powder §7from all sources."
