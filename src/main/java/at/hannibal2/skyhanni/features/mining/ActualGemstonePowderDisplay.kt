@@ -3,15 +3,15 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hotx.HotmData
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderChestReward
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.MiningEventsApi
+import at.hannibal2.skyhanni.events.mining.MiningEventEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -30,9 +30,14 @@ import java.util.Locale
 @SkyHanniModule
 object ActualGemstonePowderDisplay {
 
-    private const val ATOMIZED_CRYSTALS_SHARD = "SHARD_THYST"
-    private const val ECHO_OF_ATOMIZED_SHARD = "SHARD_IGUANA"
-    private const val ECHO_OF_ECHOES_SHARD = "SHARD_TIAMAT"
+    private data class AttributeShardScaling(
+        val shardName: String,
+        val divisor: Int, // ie 5 for 5% per level
+    )
+
+    private val ATOMIZED_CRYSTALS_SHARD = AttributeShardScaling("SHARD_THYST", 1)
+    private val ECHO_OF_ATOMIZED_SHARD = AttributeShardScaling("SHARD_IGUANA", 2)
+    private val ECHO_OF_ECHOES_SHARD = AttributeShardScaling("SHARD_TIAMAT", 5)
 
     private data class AttributeStats(
         val level: Int,
@@ -57,20 +62,15 @@ object ActualGemstonePowderDisplay {
         val atomized: AttributeStats,
         val echoAtomized: AttributeStats,
         val echoEchoes: AttributeStats,
-        val totalAttributeBonusFraction: Double,
-        val hotmBuffPercent: Int,
         val drill: DrillStats,
-        val hotmDrillFactor: Double,
-        val is2xEventActive: Boolean,
-        val isSkymallActive: Boolean,
         val pet: PetStats,
+        val hotmBuffPercent: Int,
+        val totalAttributeBonusFraction: Double,
         val totalMultiplier: Double
     )
 
 
     private val config get() = SkyHanniMod.feature.chat
-
-    private var is2xPowderActive = false
 
     private val patternGroup = RepoPattern.group("mining.powder.multiplier")
 
@@ -99,9 +99,9 @@ object ActualGemstonePowderDisplay {
     )
 
 
-    private fun getAttributeStats(shardName: String, divisor: Double): Pair<Int, Double> {
-        val level = AttributeShardsData.getActiveLevel(shardName)
-        val rate = (level * divisor) / 100.0
+    private fun getAttributeStats(scaling: AttributeShardScaling): Pair<Int, Double> {
+        val level = AttributeShardsData.getActiveLevel(scaling.shardName)
+        val rate = (level * scaling.divisor) / 100.0
         return level to rate
     }
 
@@ -156,34 +156,13 @@ object ActualGemstonePowderDisplay {
         )
     }
 
-    @HandleEvent
-    fun onSecondPassed() {
-        if (!isEnabled()) return
-
-        is2xPowderActive = false
-
-        if (TabWidget.EVENT.isActive) {
-            for (line in TabWidget.EVENT.lines) {
-                if (line.contains("2x Powder")) {
-                    is2xPowderActive = true
-                    break
-                }
-            }
-        } else {
-            powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
-                is2xPowderActive = true
-            }
-        }
-    }
-
-
     private fun calculateMultiplierBreakdown(): MultiplierBreakdown {
-        val (acLevel, acRate) = getAttributeStats(ATOMIZED_CRYSTALS_SHARD, 1.0)
+        val (acLevel, acRate) = getAttributeStats(ATOMIZED_CRYSTALS_SHARD)
         val acStats = AttributeStats(acLevel, acRate, acRate)
-        val (eaLevel, eaRate) = getAttributeStats(ECHO_OF_ATOMIZED_SHARD, 2.0)
+        val (eaLevel, eaRate) = getAttributeStats(ECHO_OF_ATOMIZED_SHARD)
         val eaContribution = acStats.actualBonus * eaRate
         val eaStats = AttributeStats(eaLevel, eaRate, eaContribution)
-        val (eeLevel, eeRate) = getAttributeStats(ECHO_OF_ECHOES_SHARD, 5.0)
+        val (eeLevel, eeRate) = getAttributeStats(ECHO_OF_ECHOES_SHARD)
         val eeContribution = eaStats.actualBonus * eeRate
         val eeStats = AttributeStats(eeLevel, eeRate, eeContribution)
 
@@ -199,7 +178,7 @@ object ActualGemstonePowderDisplay {
 
         var currentMultiplier = totalAttributeBonusFraction * hotmDrillFactor
 
-        val is2xActive = is2xPowderActive
+        val is2xActive = MiningEventsApi.isMiningEventActive(MiningEventsApi.MiningEventType.DOUBLE_POWDER)
         if (is2xActive) currentMultiplier *= 2.0
 
         val isSkymallActive = HotmData.SKY_MALL.enabled && HotmApi.skymall == HotmApi.SkymallPerk.EXTRA_POWDER
@@ -215,15 +194,22 @@ object ActualGemstonePowderDisplay {
             totalAttributeBonusFraction = totalAttributeBonusFraction,
             hotmBuffPercent = hotmBuffPercent,
             drill = drillStats,
-            hotmDrillFactor = hotmDrillFactor,
-            is2xEventActive = is2xActive,
-            isSkymallActive = isSkymallActive,
             pet = petStats,
             totalMultiplier = currentMultiplier
         )
     }
 
-    private fun MultiplierBreakdown.toTooltipLines(baseAmount: Int, effectiveAmount: Int): List<String> = buildList {
+    @HandleEvent
+    fun onMiningEventStarted(event: MiningEventEvent.Started) {
+        ChatUtils.debug("[Powder Debug] Mining event Started Triggered ${event.event.type}")
+    }
+
+    @HandleEvent
+    fun onMiningEventEnded(event: MiningEventEvent.Ended) {
+        ChatUtils.debug("[Powder Debug] Mining event Ended Triggered ${event.event.type}")
+    }
+
+    private fun MultiplierBreakdown.toTooltipLines(baseAmount: Int, actualAmount: Int): List<String> = buildList {
         val lines = mutableListOf<String>()
 
         fun Double.formatPretty(): String {
@@ -249,17 +235,21 @@ object ActualGemstonePowderDisplay {
         lines.add("§6§lStacking Multipliers:")
 
 
-        if (hotmDrillFactor > 1.0) {
+        if (hotmBuffPercent > 0) {
             lines.add("§7 └ HOTM Powder Buff: §a+${hotmBuffPercent}%")
-            val drillBonusPercent = (drill.totalBonusFraction - 1.0) * 100.0
-            if (drillBonusPercent > 0.0) {
-                lines.add("§7 └ ${drill.name}: §a+${drillBonusPercent.formatPretty()}%")
-                if (drill.basePercent > 0) lines.add("§8   └ Drill Base: §2+${drill.basePercent}%")
-                if (drill.upgradePercent > 0) lines.add("§8   └ Goblin Egg: §2+${drill.upgradePercent}%")
-            }
         }
 
-        if (is2xEventActive) lines.add("§7 └ 2x Powder Event: §a+100%")
+        val drillBonusPercent = (drill.totalBonusFraction - 1.0) * 100.0
+        if (drillBonusPercent > 0.0) {
+            lines.add("§7 └ ${drill.name}: §a+${drillBonusPercent.formatPretty()}%")
+            if (drill.basePercent > 0) lines.add("§8   └ Drill Base: §2+${drill.basePercent}%")
+            if (drill.upgradePercent > 0) lines.add("§8   └ Goblin Egg: §2+${drill.upgradePercent}%")
+        }
+
+        val is2xActive = MiningEventsApi.isMiningEventActive(MiningEventsApi.MiningEventType.DOUBLE_POWDER)
+        if (is2xActive) lines.add("§7 └ 2x Powder Event: §a+100%")
+
+        val isSkymallActive = HotmData.SKY_MALL.enabled && HotmApi.skymall == HotmApi.SkymallPerk.EXTRA_POWDER
         if (isSkymallActive) lines.add("§7 └ Sky Mall: §a+15%")
 
         val petBonusPercent = (pet.petMultiplier - 1) * 100
@@ -269,7 +259,7 @@ object ActualGemstonePowderDisplay {
 
         lines.add("")
         lines.add("§7Total Multiplier: §6${totalMultiplier.formatPretty()}x")
-        lines.add("§7Effective Powder: §d${effectiveAmount.addSeparators()}")
+        lines.add("§7Actual Powder: §d${actualAmount.addSeparators()}")
 
         return lines
     }
@@ -284,17 +274,17 @@ object ActualGemstonePowderDisplay {
 
             val breakdown = calculateMultiplierBreakdown()
 
-            val effectiveAmount = (originalAmount * breakdown.totalMultiplier).toInt()
+            val actualAmount = (originalAmount * breakdown.totalMultiplier).toInt()
 
-            ChatUtils.debug("[PowderDebug] Base: $originalAmount, Effective: $effectiveAmount, Multiplier: ${breakdown.totalMultiplier}")
+            ChatUtils.debug("[PowderDebug] Base: $originalAmount, Effective: $actualAmount, Multiplier: ${breakdown.totalMultiplier}")
 
             if (breakdown.totalMultiplier > 1.0) {
                 val originalFormatted = originalAmount.addSeparators()
-                val effectiveFormatted = effectiveAmount.addSeparators()
+                val actualFormatted = actualAmount.addSeparators()
 
-                val hoverText = breakdown.toTooltipLines(originalAmount, effectiveAmount)
+                val hoverText = breakdown.toTooltipLines(originalAmount, actualAmount)
 
-                event.chatComponent = TextHelper.text("    §r§dGemstone Powder §r§8x$originalFormatted §7(x$effectiveFormatted)") {
+                event.chatComponent = TextHelper.text("    §r§dGemstone Powder §r§8x$originalFormatted §7(x$actualFormatted)") {
                     this.hover = TextHelper.multiline(hoverText)
                 }
             }
