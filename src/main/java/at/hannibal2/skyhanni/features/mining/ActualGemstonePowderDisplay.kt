@@ -1,18 +1,16 @@
 package at.hannibal2.skyhanni.features.mining
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MiningEventsApi
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderChestReward
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.MiningEventsApi
-import at.hannibal2.skyhanni.events.mining.MiningEventEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -30,230 +28,187 @@ import java.util.Locale
 @SkyHanniModule
 object ActualGemstonePowderDisplay {
 
+    private val config get() = SkyHanniMod.feature.chat
+    private val patternGroup = RepoPattern.group("mining.powder.multiplier")
+
+    private val drillBasePowderPattern by patternGroup.pattern(
+        "drill.powder.base",
+        "§7§7Grants §d\\+(?<bonus>\\d+)% §dGemstone Powder§7, and"
+    )
+
+    private val drillUpgradePowderPattern by patternGroup.pattern(
+        "drill.powder.upgrade",
+        "§7Earn §9\\+(?<bonus>\\d+)% Powder §7from all sources."
+    )
+
+    private enum class PowderStyle(
+        val indent: String,
+        val labelColor: String,
+        val valueColor: String
+    ) {
+        CATEGORY("§7└ ", "§7", "§a"),
+        DETAIL("§8  └ ", "§8", "§2"),
+        SUB_DETAIL("§5    └ ", "§5", "§b")
+    }
+
+    private fun Double.formatDec() = String.format(Locale.US, "%.2f", this).trimEnd('0').trimEnd('.')
+    private fun Double.toMultiplier(): String = "x${this.formatDec()}"
+    private fun Double.toPercent(): String {
+        val percent = this * 100.0
+        return if (percent % 1.0 == 0.0) "+${percent.toInt()}%"
+        else "+${String.format(Locale.US, "%.2f", percent).trimEnd('0').trimEnd('.')}%"
+    }
+
+
+    /**
+     * Represents a source that contributes to the final powder multiplier.
+     * @property bonusFraction The fractional bonus this specific factor contributes (e.g., 0.15 for +15%).
+     * @property multiplier The actual mathematical multiplier (1.0 + bonusFraction + sum_of_children_bonuses).
+     */
+    private sealed interface MultiplierFactor {
+        val name: String
+        val bonusFraction: Double
+        val factors: List<MultiplierFactor>
+        val multiplier: Double
+        fun getTooltipLines(level: Int = 1): List<String>
+    }
+
+    private fun formatLine(factor: MultiplierFactor, level: Int): String {
+        val style = when (level) {
+            1 -> PowderStyle.CATEGORY
+            2 -> PowderStyle.DETAIL
+            else -> PowderStyle.SUB_DETAIL
+        }
+
+        val displayValue = if (level == 1) {
+            factor.multiplier.toMultiplier()
+        } else {
+            factor.bonusFraction.toPercent()
+        }
+
+        return "${style.indent}${style.labelColor}${factor.name}: ${style.valueColor}$displayValue"
+    }
+
+    /**
+     * Represents an additive group where children's bonuses are summed.
+     * Formula: 1 + bonusFraction + Sum(children.bonusFraction)
+     * Note: Since drill components don't have their own children, we treat them as level-3 SimpleFactors.
+     */
+    private class AdditiveFactor(
+        override val name: String,
+        override val factors: List<MultiplierFactor> = emptyList()
+    ) : MultiplierFactor {
+
+        override val bonusFraction: Double
+            get() = factors.sumOf { it.bonusFraction }
+
+        override val multiplier: Double
+            get() = 1.0 + bonusFraction
+
+        override fun getTooltipLines(level: Int): List<String> = buildList {
+            if (multiplier <= 1.0) return@buildList
+
+            add(formatLine(this@AdditiveFactor, level))
+
+            factors.forEach { child ->
+                addAll(child.getTooltipLines(level + 1))
+            }
+        }
+    }
+
+    /**
+     * Represents a simple factor that has no children or represents a leaf component.
+     * Multipliers like events (x2) or leaf components (Drill Base +20%).
+     */
+    private class SimpleFactor(
+        override val name: String,
+        override val bonusFraction: Double,
+        override val factors: List<MultiplierFactor> = emptyList()
+    ) : MultiplierFactor {
+        override val multiplier: Double = 1.0 + bonusFraction
+
+        override fun getTooltipLines(level: Int): List<String> = buildList {
+            if (bonusFraction <= 0) return@buildList
+
+            add(formatLine(this@SimpleFactor, level))
+        }
+    }
+
     private data class AttributeShardScaling(
         val shardName: String,
-        val divisor: Int, // ie 5 for 5% per level
+        val divisor: Int,
     )
 
     private val ATOMIZED_CRYSTALS_SHARD = AttributeShardScaling("SHARD_THYST", 1)
     private val ECHO_OF_ATOMIZED_SHARD = AttributeShardScaling("SHARD_IGUANA", 2)
     private val ECHO_OF_ECHOES_SHARD = AttributeShardScaling("SHARD_TIAMAT", 5)
 
-    private data class AttributeStats(
-        val level: Int,
-        val baseRate: Double,
-        val actualBonus: Double
-    )
+    private fun getFactors(): List<MultiplierFactor> = buildList {
+        val attributeFactors = mutableListOf<MultiplierFactor>()
 
-    private data class PetStats(
-        val petName: String?,
-        val petLevel: Int,
-        val petMultiplier: Double
-    )
+        val acLevel = AttributeShardsData.getActiveLevel(ATOMIZED_CRYSTALS_SHARD.shardName)
+        val acRate = (acLevel * ATOMIZED_CRYSTALS_SHARD.divisor) / 100.0
+        if (acRate > 0) attributeFactors.add(SimpleFactor("Atomized Crystals [${acLevel}]", acRate))
 
-    private data class DrillStats(
-        val name: String,
-        val basePercent: Int,
-        val upgradePercent: Int,
-        val totalBonusFraction: Double
-    )
+        val eaLevel = AttributeShardsData.getActiveLevel(ECHO_OF_ATOMIZED_SHARD.shardName)
+        val eaRate = (eaLevel * ECHO_OF_ATOMIZED_SHARD.divisor) / 100.0
+        val eaContrib = acRate * eaRate
+        if (eaContrib > 0) attributeFactors.add(SimpleFactor("Echo of Atomized [${eaLevel}]", eaContrib))
 
-    private data class MultiplierBreakdown(
-        val atomized: AttributeStats,
-        val echoAtomized: AttributeStats,
-        val echoEchoes: AttributeStats,
-        val drill: DrillStats,
-        val pet: PetStats,
-        val hotmBuffPercent: Int,
-        val totalAttributeBonusFraction: Double,
-        val totalMultiplier: Double
-    )
+        val eeLevel = AttributeShardsData.getActiveLevel(ECHO_OF_ECHOES_SHARD.shardName)
+        val eeRate = (eeLevel * ECHO_OF_ECHOES_SHARD.divisor) / 100.0
+        val eeContrib = eaContrib * eeRate
+        if (eeContrib > 0) attributeFactors.add(SimpleFactor("Echo of Echoes [${eeLevel}]", eeContrib))
 
-
-    private val config get() = SkyHanniMod.feature.chat
-
-    private val patternGroup = RepoPattern.group("mining.powder.multiplier")
-
-    /**
-     * REGEX-TEST: §7§7Grants §d+50% §dGemstone Powder§7, and
-     */
-    private val drillBasePowderPattern by patternGroup.pattern(
-        "drill.powder.base",
-        "§7§7Grants §d\\+(?<bonus>\\d+)% §dGemstone Powder§7, and"
-    )
-
-    /**
-     * REGEX-TEST: §7Earn §9+25% Powder §7from all sources.
-     */
-    private val drillUpgradePowderPattern by patternGroup.pattern(
-        "drill.powder.upgrade",
-        "§7Earn §9\\+(?<bonus>\\d+)% Powder §7from all sources."
-    )
-
-
-    private fun getAttributeStats(scaling: AttributeShardScaling): Pair<Int, Double> {
-        val level = AttributeShardsData.getActiveLevel(scaling.shardName)
-        val rate = (level * scaling.divisor) / 100.0
-        return level to rate
-    }
-
-    private fun getPetStats(): PetStats {
-        val pet = CurrentPetApi.currentPet ?: return PetStats(null, 0, 1.0)
-        var bonusPercent = 0.0
-
-        if (pet.cleanName == "Scatha" && pet.rarity == LorenzRarity.LEGENDARY) {
-            bonusPercent = 0.2 * pet.level
+        if (attributeFactors.isNotEmpty()) {
+            add(AdditiveFactor("Attribute Bonus", factors = attributeFactors))
         }
 
-        val multiplier = 1.0 + (bonusPercent / 100.0)
+        val hotmFactors = mutableListOf<MultiplierFactor>()
 
-        return PetStats(
-            petName = pet.cleanName,
-            petLevel = pet.level,
-            petMultiplier = multiplier
-        )
-    }
-
-    private fun getDrillStats(): DrillStats {
-        var basePercent = 0
-        var upgradePercent = 0
-        var drillName = "None"
+        val hotmLevel = HotmData.POWDER_BUFF.activeLevel
+        if (hotmLevel > 0) {
+            hotmFactors.add(SimpleFactor("HOTM Powder Buff", (hotmLevel / 100.0)))
+        }
 
         val heldItem = InventoryUtils.getItemInHand()
-        if (heldItem == null || heldItem.getItemCategoryOrNull() != ItemCategory.DRILL) {
-            return DrillStats(drillName, basePercent, upgradePercent, 1.0)
-        }
+        if (heldItem != null && heldItem.getItemCategoryOrNull() == ItemCategory.DRILL) {
+            val drillFactors = mutableListOf<MultiplierFactor>()
+            val lore = heldItem.getLore()
+            var baseDrill = 0.0
+            var upgradeDrill = 0.0
 
-        drillName = heldItem.displayName
-
-        val lore = heldItem.getLore()
-
-        lore.forEach { line ->
-            drillBasePowderPattern.matchMatcher(line) {
-                basePercent += group("bonus").toInt()
+            lore.forEach { line ->
+                drillBasePowderPattern.matchMatcher(line) { baseDrill += group("bonus").toInt() }
+                drillUpgradePowderPattern.matchMatcher(line) { upgradeDrill += group("bonus").toInt() }
             }
-            drillUpgradePowderPattern.matchMatcher(line) {
-                upgradePercent += group("bonus").toInt()
+
+            if (baseDrill > 0) drillFactors.add(SimpleFactor("Drill Base", baseDrill / 100.0))
+            if (upgradeDrill > 0) drillFactors.add(SimpleFactor("Goblin Egg", upgradeDrill / 100.0))
+
+            if (drillFactors.isNotEmpty()) {
+                hotmFactors.add(AdditiveFactor(heldItem.displayName, factors = drillFactors))
             }
         }
 
-        val totalBonusPercent = basePercent + upgradePercent
-        val totalBonusFraction = 1.0 + (totalBonusPercent / 100.0)
-
-        return DrillStats(
-            name = drillName,
-            basePercent = basePercent,
-            upgradePercent = upgradePercent,
-            totalBonusFraction = totalBonusFraction
-        )
-    }
-
-    private fun calculateMultiplierBreakdown(): MultiplierBreakdown {
-        val (acLevel, acRate) = getAttributeStats(ATOMIZED_CRYSTALS_SHARD)
-        val acStats = AttributeStats(acLevel, acRate, acRate)
-        val (eaLevel, eaRate) = getAttributeStats(ECHO_OF_ATOMIZED_SHARD)
-        val eaContribution = acStats.actualBonus * eaRate
-        val eaStats = AttributeStats(eaLevel, eaRate, eaContribution)
-        val (eeLevel, eeRate) = getAttributeStats(ECHO_OF_ECHOES_SHARD)
-        val eeContribution = eaStats.actualBonus * eeRate
-        val eeStats = AttributeStats(eeLevel, eeRate, eeContribution)
-
-        val totalAttributeBonus = acStats.actualBonus + eaStats.actualBonus + eeStats.actualBonus
-        val totalAttributeBonusFraction = 1.0 + totalAttributeBonus
-
-        val drillStats = getDrillStats()
-        val hotmBuffPercent = HotmData.POWDER_BUFF.activeLevel
-
-        val additivePercentSum = hotmBuffPercent + (drillStats.totalBonusFraction - 1.0) * 100.0
-
-        val hotmDrillFactor = 1.0 + additivePercentSum / 100.0 // NEW FIELD
-
-        var currentMultiplier = totalAttributeBonusFraction * hotmDrillFactor
-
-        val is2xActive = MiningEventsApi.isMiningEventActive(MiningEventsApi.MiningEventType.DOUBLE_POWDER)
-        if (is2xActive) currentMultiplier *= 2.0
-
-        val isSkymallActive = HotmData.SKY_MALL.enabled && HotmApi.skymall == HotmApi.SkymallPerk.EXTRA_POWDER
-        if (isSkymallActive) currentMultiplier *= 1.15
-
-        val petStats = getPetStats()
-        currentMultiplier *= petStats.petMultiplier
-
-        return MultiplierBreakdown(
-            atomized = acStats,
-            echoAtomized = eaStats,
-            echoEchoes = eeStats,
-            totalAttributeBonusFraction = totalAttributeBonusFraction,
-            hotmBuffPercent = hotmBuffPercent,
-            drill = drillStats,
-            pet = petStats,
-            totalMultiplier = currentMultiplier
-        )
-    }
-
-    @HandleEvent
-    fun onMiningEventStarted(event: MiningEventEvent.Started) {
-        ChatUtils.debug("[Powder Debug] Mining event Started Triggered ${event.event.type}")
-    }
-
-    @HandleEvent
-    fun onMiningEventEnded(event: MiningEventEvent.Ended) {
-        ChatUtils.debug("[Powder Debug] Mining event Ended Triggered ${event.event.type}")
-    }
-
-    private fun MultiplierBreakdown.toTooltipLines(baseAmount: Int, actualAmount: Int): List<String> = buildList {
-        val lines = mutableListOf<String>()
-
-        fun Double.formatPretty(): String {
-            return if (this % 1.0 == 0.0) this.toInt().toString()
-            else String.format(Locale.US, "%.2f", this).trimEnd('0').trimEnd('.')
-        }
-        fun Double.toPercentStr() = (this * 100.0).formatPretty()
-
-        lines.add("§7Base Powder: §e${baseAmount.addSeparators()}")
-        lines.add("§7Multiplier Breakdown:")
-        lines.add("")
-
-        val attributeBonusPercent = (totalAttributeBonusFraction - 1.0) * 100.0
-        lines.add("§6§lAdditive Multipliers:")
-
-        lines.add("§7 └ Attributes Bonus: §a+${attributeBonusPercent.formatPretty()}%")
-        if (atomized.level > 0) lines.add("§8   └ Atomized [${atomized.level}]: §2+${atomized.actualBonus.toPercentStr()}%")
-        if (echoAtomized.level > 0) lines.add("§8   └ Echo of Atomized [${echoAtomized.level}]: §2+${echoAtomized.actualBonus.toPercentStr()}%")
-        if (echoEchoes.level > 0) lines.add("§8   └ Echo of Echoes [${echoEchoes.level}]: §2+${echoEchoes.actualBonus.toPercentStr()}%")
-
-        lines.add("")
-
-        lines.add("§6§lStacking Multipliers:")
-
-
-        if (hotmBuffPercent > 0) {
-            lines.add("§7 └ HOTM Powder Buff: §a+${hotmBuffPercent}%")
+        if (hotmFactors.isNotEmpty()) {
+            add(AdditiveFactor("HOTM Powder Buffs", factors = hotmFactors))
         }
 
-        val drillBonusPercent = (drill.totalBonusFraction - 1.0) * 100.0
-        if (drillBonusPercent > 0.0) {
-            lines.add("§7 └ ${drill.name}: §a+${drillBonusPercent.formatPretty()}%")
-            if (drill.basePercent > 0) lines.add("§8   └ Drill Base: §2+${drill.basePercent}%")
-            if (drill.upgradePercent > 0) lines.add("§8   └ Goblin Egg: §2+${drill.upgradePercent}%")
+
+        if (MiningEventsApi.isMiningEventActive(MiningEventsApi.MiningEventType.DOUBLE_POWDER)) {
+            add(SimpleFactor("2x Powder Event", 1.0))
         }
 
-        val is2xActive = MiningEventsApi.isMiningEventActive(MiningEventsApi.MiningEventType.DOUBLE_POWDER)
-        if (is2xActive) lines.add("§7 └ 2x Powder Event: §a+100%")
-
-        val isSkymallActive = HotmData.SKY_MALL.enabled && HotmApi.skymall == HotmApi.SkymallPerk.EXTRA_POWDER
-        if (isSkymallActive) lines.add("§7 └ Sky Mall: §a+15%")
-
-        val petBonusPercent = (pet.petMultiplier - 1) * 100
-        if (petBonusPercent > 0.0 && pet.petName != null) {
-            lines.add("§7 └ [Lvl ${pet.petLevel}] ${LorenzRarity.LEGENDARY.color.getChatColor()}${pet.petName}: §a+${petBonusPercent.formatPretty()}%")
+        if (HotmData.SKY_MALL.enabled && HotmApi.skymall == HotmApi.SkymallPerk.EXTRA_POWDER) {
+            add(SimpleFactor("Sky Mall", 0.15))
         }
 
-        lines.add("")
-        lines.add("§7Total Multiplier: §6${totalMultiplier.formatPretty()}x")
-        lines.add("§7Actual Powder: §d${actualAmount.addSeparators()}")
-
-        return lines
+        val pet = CurrentPetApi.currentPet
+        if (pet != null && pet.cleanName == "Scatha" && pet.rarity == LorenzRarity.LEGENDARY) {
+            val petBonus = (0.2 * pet.level) / 100.0
+            add(SimpleFactor("[Lvl ${pet.level}] ${pet.coloredName}", petBonus))
+        }
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
@@ -264,25 +219,30 @@ object ActualGemstonePowderDisplay {
             val amountStr = groupOrNull("amount") ?: return
             val originalAmount = amountStr.formatInt()
 
-            val breakdown = calculateMultiplierBreakdown()
+            val factors = getFactors()
+            val totalMultiplier = factors.fold(1.0) { acc, factor -> acc * factor.multiplier }
 
-            val actualAmount = (originalAmount * breakdown.totalMultiplier).toInt()
+            val actualAmount = (originalAmount * totalMultiplier).toInt()
 
-            ChatUtils.debug("[PowderDebug] Base: $originalAmount, Effective: $actualAmount, Multiplier: ${breakdown.totalMultiplier}")
+            if (totalMultiplier > 1.0) {
 
-            if (breakdown.totalMultiplier > 1.0) {
-                val originalFormatted = originalAmount.addSeparators()
-                val actualFormatted = actualAmount.addSeparators()
+                val hoverText = buildList {
+                    add("§7Base Powder: §e${originalAmount.addSeparators()}")
+                    add("")
+                    add("§7Total Multiplier: §6${totalMultiplier.toMultiplier()}")
+                    factors.forEach { factor ->
+                        addAll(factor.getTooltipLines(level = 1))
+                    }
+                    add("")
+                    add("§7Actual Powder: §d${actualAmount.addSeparators()}")
+                }
 
-                val hoverText = breakdown.toTooltipLines(originalAmount, actualAmount)
-
-                event.chatComponent = TextHelper.text("    §r§dGemstone Powder §r§8x$originalFormatted §7(x$actualFormatted)") {
+                event.chatComponent = TextHelper.text("    §r§dGemstone Powder §r§8x${originalAmount.addSeparators()} §7(x${actualAmount.addSeparators()})") {
                     this.hover = TextHelper.multiline(hoverText)
                 }
             }
         }
     }
-
 
     private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isCurrent() && config.showEffectivePowder
 }
