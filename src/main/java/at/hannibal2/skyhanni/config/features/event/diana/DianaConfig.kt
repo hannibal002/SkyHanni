@@ -13,6 +13,15 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.input.Keyboard
 
 class DianaConfig {
+    @Expose
+    @ConfigOption(
+        name = "Forcibly enable Diana",
+        desc = "Enables Diana features, even if no event has been detected."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var forceEnabled: Boolean = false
+
     // TODO rename to highlightRareMobs
     @Expose
     @ConfigOption(

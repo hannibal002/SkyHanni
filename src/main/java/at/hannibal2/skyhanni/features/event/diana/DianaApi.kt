@@ -32,7 +32,7 @@ object DianaApi {
 
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
-    fun isDoingDiana() = IslandType.HUB.isCurrent() && isRitualActive() && hasSpadeInInventory()
+    fun isDoingDiana() = SkyHanniMod.feature.event.diana.forceEnabled || (IslandType.HUB.isCurrent() && isRitualActive() && hasSpadeInInventory())
 
     val ItemStack.isDianaSpade get() = getInternalName() in spades
 
