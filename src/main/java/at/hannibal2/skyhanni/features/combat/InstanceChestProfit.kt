@@ -373,8 +373,8 @@ object InstanceChestProfit {
 
                 if (!displayedCost && it.value < 0) {
                     val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
-                    add((" "))
-                    add(("§c§lTotal Cost §c${cost.formatCoin()}"))
+                    add(" ")
+                    add("§c§lTotal Cost §c${cost.formatCoin()}")
                     displayedCost = true
                 }
 
