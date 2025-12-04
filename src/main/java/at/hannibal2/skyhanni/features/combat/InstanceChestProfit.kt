@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
@@ -238,7 +239,8 @@ object InstanceChestProfit {
         var cost = 0.0
         itemStack?.getLore()?.forEach { loreLine ->
             if (alreadyOpened.matches(loreLine)) return
-            if (loreLine.contains("Coins")) {
+            if (chestCostCroesus.matches(loreLine) || dungeonChestKey.matches(loreLine)) {
+                cost += getPrice(NeuInternalName.fromItemNameOrNull(loreLine) ?: NONE).times(-1)
                 chestCostCroesus.matchMatcher(loreLine) {
                     cost += groupOrNull("amount")?.formatInt()?.toDouble()?.times(-1) ?: 0.0
                 }
