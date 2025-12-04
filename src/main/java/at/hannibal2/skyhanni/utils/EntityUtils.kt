@@ -37,10 +37,13 @@ import net.minecraft.util.AxisAlignedBB
 //$$ import net.minecraft.entity.EquipmentSlot
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
+
 //#endif
 
 @SkyHanniModule
 object EntityUtils {
+
+    inline val ALWAYS get(): (Entity) -> Boolean = { true }
 
     // TODO remove this relatively heavy call everywhere
     @Deprecated("Use Mob Detection Instead")
@@ -114,16 +117,16 @@ object EntityUtils {
 
     @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
-        val derpyMultiplier = if (ElectionApi.isDerpy) 2 else 1
-        if (maxHealth == health * derpyMultiplier) return true
+        val derpyMultiplier = if (ElectionApi.isDerpy) 2.0 else if (ElectionApi.isAura) 1.1 else 1.0
+        if (maxHealth == (health * derpyMultiplier).toInt()) return true
 
         if (!boss && !DungeonApi.inDungeon()) {
             // Corrupted
-            if (maxHealth == health * 3 * derpyMultiplier) return true
+            if (maxHealth == (health * 3 * derpyMultiplier).toInt()) return true
             // Runic
-            if (maxHealth == health * 4 * derpyMultiplier) return true
+            if (maxHealth == (health * 4 * derpyMultiplier).toInt()) return true
             // Corrupted+Runic
-            if (maxHealth == health * 12 * derpyMultiplier) return true
+            if (maxHealth == (health * 12 * derpyMultiplier).toInt()) return true
         }
 
         return false
@@ -138,11 +141,17 @@ object EntityUtils {
             .firstOrNull { it.name == "textures" }?.value
     }
 
-    inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double): Sequence<T> =
-        getEntitiesNearby<T>(LocationUtils.playerLocation(), radius)
+    inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
+        getEntitiesNearby<T>(LocationUtils.playerLocation(), radius, predicate)
 
-    inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): Sequence<T> =
-        getEntities<T>().filter { it.distanceTo(location) < radius }
+    // First filters for a bounding box because it's faster, and then filters based on distance
+    inline fun <reified T : Entity> getEntitiesNearby(
+        location: LorenzVec,
+        radius: Double,
+        noinline predicate: (T) -> Boolean = ALWAYS
+    ): List<T> {
+        return getEntitiesInBox<T>(location, radius) { it.distanceTo(location) < radius && predicate(it) }
+    }
 
     inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: LorenzVec, radius: Double): Sequence<T> =
         getEntities<T>().filter { it.distanceToIgnoreY(location) < radius }
@@ -179,9 +188,13 @@ object EntityUtils {
 
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
+    inline fun <reified E : Entity> getEntitiesInBox(pos: LorenzVec, radius: Double, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
+        return getEntitiesInBoundingBox(pos.boundingCenter(radius), predicate)
+    }
+
     // More efficient than filtering by type, and then for distance, as Minecraft already first filters the chunks that contain the aabb,
     // and then filters both for entity type and with the predicate for entities inside those chunks.
-    inline fun <reified E : Entity> getEntitiesInBoundingBox(aabb: AxisAlignedBB, noinline predicate: (E) -> Boolean = { true }): List<E> {
+    inline fun <reified E : Entity> getEntitiesInBoundingBox(aabb: AxisAlignedBB, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
         val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
         //#if MC < 1.21
         return world.getEntitiesWithinAABB(E::class.java, aabb) { it != null && predicate(it) }

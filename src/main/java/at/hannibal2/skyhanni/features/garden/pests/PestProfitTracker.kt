@@ -258,7 +258,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             )
         }
 
-        add(addTotalProfit(profit, bucketData.getTotalPestCount(), "kill"))
+        val duration = bucketData.getTotalUptime()
+        addAll(addTotalProfit(profit, bucketData.getTotalPestCount(), "kill", duration, "Kills"))
 
         addPriceFromButton(this)
     }

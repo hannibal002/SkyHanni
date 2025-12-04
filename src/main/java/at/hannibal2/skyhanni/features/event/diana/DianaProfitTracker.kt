@@ -99,7 +99,8 @@ object DianaProfitTracker {
             ).toSearchable(),
         )
 
-        add(tracker.addTotalProfit(profit, data.burrowsDug, "burrow"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.burrowsDug, "burrow", duration, "Burrows"))
 
         tracker.addPriceFromButton(this)
     }

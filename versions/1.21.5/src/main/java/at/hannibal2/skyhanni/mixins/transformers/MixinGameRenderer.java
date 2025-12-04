@@ -36,8 +36,10 @@ public class MixinGameRenderer {
         GuiEditManager.renderLast(context);
     }
 
+    //#if MC < 1.21.6
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;renderWithTooltip(Lnet/minecraft/client/gui/DrawContext;IIF)V"))
     private void onRenderTooltip(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext context) {
          new ScreenDrawnEvent(context, MinecraftClient.getInstance().currentScreen).post();
     }
+    //#endif
 }

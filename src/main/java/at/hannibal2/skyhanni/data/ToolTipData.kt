@@ -2,22 +2,35 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.Text
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 //#if MC > 1.21
 //$$ import at.hannibal2.skyhanni.mixins.hooks.renderToolTip
 //$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-//$$ import net.minecraft.text.Text
+//$$ import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 //#endif
 
-// Please use ToolTipEvent over ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
+// Please use ToolTipTextEvent over ToolTipEvent, ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
 object ToolTipData {
 
     //#if MC > 1.21
+    //$$ init {
+    //$$     ItemTooltipCallback.EVENT.register { stack, context, type, originalToolTip ->
+    //$$         val slot = lastSlot
+    //$$         if (ToolTipTextEvent(slot, stack, originalToolTip).post()) {
+    //$$             originalToolTip.clear()
+    //$$             return@register
+    //$$         }
+    //$$     }
+    //$$ }
+    //$$
     //$$ @JvmStatic
     //$$ fun processModernTooltip(
     //$$     context: DrawContext,
@@ -55,6 +68,14 @@ object ToolTipData {
         try {
             if (ToolTipEvent(slot, itemStack, toolTip).post()) {
                 toolTip.clear()
+            }
+            if (PlatformUtils.IS_LEGACY) {
+                val textTooltip = toolTip.map { Text.of(it) }.toMutableList()
+                if (ToolTipTextEvent(slot, itemStack, textTooltip).post()) {
+                    toolTip.clear()
+                }
+                toolTip.clear()
+                toolTip.addAll(textTooltip.map { it.string }.toMutableList())
             }
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(

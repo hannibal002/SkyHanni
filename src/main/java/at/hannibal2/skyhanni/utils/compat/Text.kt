@@ -11,4 +11,6 @@ class Text private constructor(val text: String) {
     override fun toString(): String {
         return this.text
     }
+
+    val string get() = this.text
 }

@@ -8,18 +8,107 @@
 
 + Added Trick-or-Treat/Party Chest Alert. - Mayaqq (https://github.com/hannibal002/SkyHanni/pull/4805)
 
+#### Hunting
+
++ Added Attribute Shard Tracker. - nopo (https://github.com/hannibal002/SkyHanni/pull/4813)
++ Shard Fusion Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4819)
++ Added tracker for hunting to count shards collected. - Pugzy (https://github.com/hannibal002/SkyHanni/pull/4764)
+
+#### Dungeon
+
++ Added a guess for the Secret Tracker 3000 while in dungeons. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4611)
++ Added Croesus Unopened Chest Count Overlay for Kuudra and Dungeons. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4846)
+
+#### Chat
+
++ Added Hoppity's Hunt messages to chat filter. - AfkUserMC (https://github.com/hannibal002/SkyHanni/pull/4853)
+
+#### The Rift
+
++ Added Bacte Kill Zone Warning. - Luna (https://github.com/hannibal002/SkyHanni/pull/4541)
+  + Sound and title alert if you are outside the arena during the Bacte fight and about to die.
+
+#### Farming
+
++ Added option to change the pest spawn sound. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4580)
+  + Modes are Default, Muted, Custom, and Plumber.
+
+#### Foraging
+
++ Added some whisper cost and spent info to HOTF perk tooltips. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4754)
+
+#### Misc
+
++ Added Legion/Bobbin' Time Display. - Empa & Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4815)
++ Added Middle Click Fix for 1.21.x. - Luna (https://github.com/hannibal002/SkyHanni/pull/4863)
+    + This fixes not being able to middle click items in inventories (e.g. to disable a full set bonus or a rune).
++ \* Few extra features not worth mentioning. - nopo (https://github.com/hannibal002/SkyHanni/pull/4902)
+
 ### Improvements
 
 #### Events
 
 + Added new Mythological Creatures to Mythological Tracker. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4780)
 + Added support for new Diana Mobs to Waypoint Sharing. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4852)
++ Diana share rare mob now shares the mobs name. - nopo (https://github.com/hannibal002/SkyHanni/pull/4869)
++ Hide Mythological Creatures Since text for creatures you haven't gotten. - Empa (https://github.com/hannibal002/SkyHanni/pull/4861)
 
-### Fixes
+#### Hunting
+
++ Added a button to export attribute shard data and open SkyShards. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4692)
+
+#### Farming
+
++ Added additional fortune sources to /ff. - brettt89 (https://github.com/hannibal002/SkyHanni/pull/4814)
+
+#### Mining
+
++ Added a toggle to stop Metal Detector Solver when having all tools. - AfkUserMC (https://github.com/hannibal002/SkyHanni/pull/4888)
 
 #### Misc
 
-+ Fixed an issue with clicks. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4843)
++ Added option to reset a gui's position and scale in the editor. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/4809)
+
+#### Dungeons
+
++ Improved Trinity Helper to be less confusing. - Luna (https://github.com/hannibal002/SkyHanni/pull/4875)
++ Added Support for Kuudra runs in Croesus nearly full warning. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4846)
+
+#### Inventory
+
++ Improved the Not Clickable Items feature in NPC trade menus. - Luna (https://github.com/hannibal002/SkyHanni/pull/4899)
+  + By default, it only grays out items that cannot be sold to NPCs, or are recombobulataed.
+  + You can re-enable graying out items that are not commonly sold to NPCs in the config.
+
+#### Misc
+
++ Added support for Aura mayor. - Luna (https://github.com/hannibal002/SkyHanni/pull/4897)
++ Improved performance of Mob Detection and other features that detect entities by 10x. - Empa (https://github.com/hannibal002/SkyHanni/pull/4877)
++ Made some tooltip based features work in pv on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/4882)
++ Added profit per hour and actions per hour to tracker profit line hover tooltip. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4629)
++ Added profit per hour line to profit trackers. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4629)
++ Added the ability to copy a tracker's profit and profit per hour. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4629)
+  + Click on the profit line while in an inventory.
++ Added tracker uptime. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4629)
+  + Tracks how long a tracker has been active, and pauses if it has not been modified for some time (default 5m).
+  + Only enabled on sessions by default; uptime was not tracked before this and will be wrong on total mode.
+
+### Fixes
+
+#### Inventory
+
++ Fixed Community Upgrade Reminder not working properly. - Empa (https://github.com/hannibal002/SkyHanni/pull/4862)
++ Fixed Instance Chest Value For Kuudra in Croesus. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4856)
++ Fixed Show Used Kismet not having accurate data. - nopo (https://github.com/hannibal002/SkyHanni/pull/4854)
++ Fixed enchant parsing not applying with other mods installed on 1.8. - nopo (https://github.com/hannibal002/SkyHanni/pull/4893)
+
+#### Events
+
++ Fixed Manticore and Sphinx not being highlighted. - Luna (https://github.com/hannibal002/SkyHanni/pull/4858)
+
+#### Hunting
+
++ Fixed performance issues with Invisibug Highlighter. - Empa (https://github.com/hannibal002/SkyHanni/pull/4860)
 
 #### Events
 
@@ -29,6 +118,8 @@
 #### Dungeon
 
 + Fixed Croesus Chest Tracker after Hypixel update. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/4845)
++ Fixed Croesus Warning for already expired Chests. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4846)
+  + This checks for 3d old completions in chests and automatically removes them.
 
 #### Bingo
 
@@ -38,6 +129,58 @@
 #### Combat
 
 + Fixed Ghost Tracker coin count not working when using a Scavenger setup. - nopo (https://github.com/hannibal002/SkyHanni/pull/4849)
++ Fixed mob detection features not working while Aura's work harder perk is active. - nopo (https://github.com/hannibal002/SkyHanni/pull/4901)
++ Fixed Slayer spawn costs not being tracked during aura. - nopo (https://github.com/hannibal002/SkyHanni/pull/4905)
+
+#### Farming
+
++ Fixed Burrowing Spores notification not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/4883)
++ Fixed Fungi Cutter Warning not working on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4896)
+
+#### Chocolate Factory
+
++ Fixed Chocolate Factory Custom Reminder not working if you use middle or right click to buy the upgrade or item. - Luna (https://github.com/hannibal002/SkyHanni/pull/4890)
++ Fixed Chocolate Factory Upgrade chat filter sometimes not hiding messages. - Luna (https://github.com/hannibal002/SkyHanni/pull/4886)
+
+#### Combat
+
++ Fixed Instance Chest Profit ignoring Basic Kuudra Key Cost. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4885)
++ Fixed Wheel of Fate being erroneously added as chest profit. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4887)
+
+
+#### Misc
+
++ Fixed an issue with clicks. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4843)
++ Fixed Custom Scoreboard Error when in the Community Center. - juna (https://github.com/hannibal002/SkyHanni/pull/4884)
++ Fixed F3 not showing day count on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/4891)
++ Fixed hide skill info in action bar not working with other mods. - nopo (https://github.com/hannibal002/SkyHanni/pull/4880)
++ Fixed some overlays (e.g. Garden Optimal Angle & Speed) appearing dimmed on Minecraft 1.21.8 and above. - Luna (https://github.com/hannibal002/SkyHanni/pull/4889)
++ Fixed while F3 is open features sometimes showing up while F3 is not open on Minecraft 1.21.10. - Luna (https://github.com/hannibal002/SkyHanni/pull/4879)
++ The Fix item double clicks feature now works again. - Luna (https://github.com/hannibal002/SkyHanni/pull/4878)
++ Fixed custom colours sometimes being stripped from player names. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4894)
++ Fixed gems error in the community centre. - nopo (https://github.com/hannibal002/SkyHanni/pull/4903)
+
+
+### Technical Details
+
++ `InventoryUtils.clickSlot()` now takes a `GuiContainerEvent.ClickType` instead of an `Int` for the `mode` parameter. - Luna (https://github.com/hannibal002/SkyHanni/pull/4536)
++ Added getEntitiesInBoundingBox function. - Empa (https://github.com/hannibal002/SkyHanni/pull/4860)
++ Added source to the shard events. - nopo (https://github.com/hannibal002/SkyHanni/pull/4819)
++ Cleanup in HoppityEggLocations. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4859)
++ Moved `GardenApi.otherToolsList` to the repo and renamed it to `extraFarmingTools`. - Luna (https://github.com/hannibal002/SkyHanni/pull/4534)
++ Use fabric chat events instead of a mixin. - nopo (https://github.com/hannibal002/SkyHanni/pull/4867)
++ Changed `SkyHanniItemTracker` to be passed whole `TrackedItem` object. - Pugzy (https://github.com/hannibal002/SkyHanni/pull/4764)
+  + Allows amount gained and times collected to be displayed in lore.
+  + Default implementation added to match current behavior.
++ Changed some tooltip event uses to use the right event. - nopo (https://github.com/hannibal002/SkyHanni/pull/4874)
++ Added a ToolTipTextEvent which should be used instead of ToolTipEvent. - nopo (https://github.com/hannibal002/SkyHanni/pull/4882)
++ Added cost and reward formulas for Heart of the Forest. - Luna (https://github.com/hannibal002/SkyHanni/pull/4754)
++ Made EntityHealthDisplayEvent use Text instead of strings. - nopo (https://github.com/hannibal002/SkyHanni/pull/4895)
+
+### Removed Features
+
++ Removed Fix NEU Heavy Pearls. - nopo (https://github.com/hannibal002/SkyHanni/pull/4881)
+  + The bug in NEU was fixed long time ago.
 
 ## Version 5.0.0
 

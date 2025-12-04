@@ -127,7 +127,8 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
             )
         }
 
-        add(addTotalProfit(profit, bucketData.getCorpseCount(), "loot"))
+        val duration = bucketData.getTotalUptime()
+        addAll(addTotalProfit(profit, bucketData.getCorpseCount(), "corpse", duration, "Corpses"))
 
         addPriceFromButton(this)
     }

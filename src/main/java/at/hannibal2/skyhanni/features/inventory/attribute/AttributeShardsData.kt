@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.inventory.attribute
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.inventory.AttributeShardsConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -566,5 +568,25 @@ object AttributeShardsData {
 
     fun isInFusionMachine(): Boolean {
         return fusionBoxInventory.isInside() || shardFusionInventory.isInside() || confirmFusionInventory.isInside()
+    }
+
+    fun resetHuntingBoxShards() {
+        storage?.forEach { it.value.amountInBox = 0 }
+        ChatUtils.clickableChat(
+            "Reset hunting box shards data. Open the hunting box or click here to update the saved data.",
+            { HypixelCommands.huntingBox() },
+            "§eClick here to open the hunting box!"
+        )
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresethuntingbox") {
+            description = "Resets stored hunting box shards"
+            category = CommandCategory.USERS_RESET
+            simpleCallback {
+                resetHuntingBoxShards()
+            }
+        }
     }
 }

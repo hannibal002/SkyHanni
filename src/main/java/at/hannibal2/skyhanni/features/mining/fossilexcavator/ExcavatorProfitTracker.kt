@@ -79,7 +79,8 @@ object ExcavatorProfitTracker {
             addGlacitePowder(data)
         }
 
-        add(tracker.addTotalProfit(profit, data.timesExcavated, "excavation"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.timesExcavated, "excavation", duration, "Excavations"))
 
         tracker.addPriceFromButton(this)
     }
