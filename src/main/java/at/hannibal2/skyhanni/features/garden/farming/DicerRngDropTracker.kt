@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -38,33 +37,24 @@ object DicerRngDropTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData() {
+    data class Data(
+        @Expose var drops: MutableMap<CropType, MutableMap<DropRarity, Int>> = mutableMapOf()
+    ) : TrackerData()
 
-        override fun reset() {
-            drops.clear()
-        }
-
-        @Expose
-        var drops: MutableMap<CropType, MutableMap<DropRarity, Int>> = mutableMapOf()
-    }
-
+    // TODO eventually regex tests
     private val melonPatternGroup = RepoPattern.group("garden.dicer.melon")
-    @Suppress("RepoPatternRegexTestMissing")
     private val melonUncommonDropPattern by melonPatternGroup.pattern(
         "uncommon",
         "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon Slice§r§e!",
     )
-    @Suppress("RepoPatternRegexTestMissing")
     private val melonRareDropPattern by melonPatternGroup.pattern(
         "rare",
         "§9§lRARE DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon Slice§r§e!",
     )
-    @Suppress("RepoPatternRegexTestMissing")
     private val melonCrazyRareDropPattern by melonPatternGroup.pattern(
         "crazyrare",
         "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9]\\d+x §r§[a|9]Enchanted Melon(?: Block| Slice)?§r§e!",
     )
-    @Suppress("RepoPatternRegexTestMissing")
     private val melonRngesusDropPattern by melonPatternGroup.pattern(
         "rngesus",
         "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§9\\d+x §r§9Enchanted Melon§r§e!",
@@ -122,7 +112,7 @@ object DicerRngDropTracker {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.compact) {
             tracker.update()
         }

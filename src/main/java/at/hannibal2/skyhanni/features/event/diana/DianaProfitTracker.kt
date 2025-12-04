@@ -62,15 +62,9 @@ object DianaProfitTracker {
         ),
     ) { drawDisplay(it) }
 
-    class Data : ItemTrackerData() {
-
-        override fun resetItems() {
-            burrowsDug = 0
-        }
-
-        @Expose
-        var burrowsDug: Long = 0
-
+    data class Data(
+        @Expose var burrowsDug: Long = 0
+    ) : ItemTrackerData() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / burrowsDug
             val perBurrow = percentage.coerceAtMost(1.0).formatPercentage()
@@ -105,7 +99,8 @@ object DianaProfitTracker {
             ).toSearchable(),
         )
 
-        add(tracker.addTotalProfit(profit, data.burrowsDug, "burrow"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.burrowsDug, "burrow", duration, "Burrows"))
 
         tracker.addPriceFromButton(this)
     }

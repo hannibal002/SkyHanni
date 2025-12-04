@@ -17,7 +17,8 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -216,8 +218,9 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onTooltip(event: ToolTipEvent) {
+    fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
+        event.slot ?: return
         clickTranslate[event.slot.slotIndex]?.let {
             event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
         }

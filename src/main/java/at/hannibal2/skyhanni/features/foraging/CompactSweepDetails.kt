@@ -76,7 +76,7 @@ object CompactSweepDetails {
         var sweep: Double = -1.0,
         var toughness: Double = -1.0,
         var treeType: String = "",
-    ) : Resettable()
+    ) : Resettable
 
     private var sweepDetailsAreDirty = false
     private var isInsideSweepDetails = false

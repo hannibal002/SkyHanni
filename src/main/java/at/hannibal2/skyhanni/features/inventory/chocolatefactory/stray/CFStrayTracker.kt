@@ -142,22 +142,11 @@ object CFStrayTracker {
         drawDisplay(it)
     }
 
-    class Data : TrackerData() {
-        override fun reset() {
-            straysCaught.clear()
-            straysExtraChocMs.clear()
-            goldenTypesCaught.clear()
-        }
-
-        @Expose
-        var straysCaught: MutableMap<LorenzRarity, Int> = mutableMapOf()
-
-        @Expose
-        var straysExtraChocMs: MutableMap<LorenzRarity, Long> = mutableMapOf()
-
-        @Expose
-        var goldenTypesCaught: MutableMap<String, Int> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var straysCaught: MutableMap<LorenzRarity, Int> = mutableMapOf(),
+        @Expose var straysExtraChocMs: MutableMap<LorenzRarity, Long> = mutableMapOf(),
+        @Expose var goldenTypesCaught: MutableMap<String, Int> = mutableMapOf(),
+    ) : TrackerData()
 
     private fun incrementRarity(rarity: LorenzRarity, chocAmount: Long = 0) {
         tracker.modify { it.straysCaught.addOrPut(rarity, 1) }

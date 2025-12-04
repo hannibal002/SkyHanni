@@ -480,7 +480,7 @@ object GardenVisitorFeatures {
                 readingShoppingList = false
             }
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
-            val internalName = NeuInternalName.fromItemNameOrNull(itemName)?.replace("◆_", "") ?: continue
+            val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())?.replace("◆_", "") ?: continue
 
             // Ignoring custom NEU items like copper
             if (internalName.startsWith("SKYBLOCK_")) continue

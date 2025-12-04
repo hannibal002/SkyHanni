@@ -74,7 +74,7 @@ object VampireSlayerFeatures {
     private val KILLER_SPRING_TEXTURE by lazy { SkullTextureHolder.getTexture("KILLER_SPRING") }
 
     private var nextClawSend = 0L
-    private var lastWitherSpawnSound = ServerTimeMark.FAR_PAST
+    private var lastWitherSpawnSound = ServerTimeMark.farPast()
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -93,24 +93,20 @@ object VampireSlayerFeatures {
                 val vec = stand.position.toLorenzVec()
                 val distance = start.distance(vec)
                 val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
-                if (isIchor || stand.hasSkullTexture(KILLER_SPRING_TEXTURE)) {
-                    val color =
-                        (if (isIchor) configBloodIchor.color else configKillerSpring.color).toColor().addAlpha(config.withAlpha)
-                    if (distance <= 15) {
-                        RenderLivingEntityHelper.setEntityColor(
-                            stand,
-                            color,
-                        ) { isEnabled() }
-                        if (isIchor)
-                            entityList.add(stand)
-                    }
+                if (!isIchor && !stand.hasSkullTexture(KILLER_SPRING_TEXTURE)) continue
+                val chromaColour = if (isIchor) configBloodIchor.color else configKillerSpring.color
+                val color = chromaColour.toColor().addAlpha(config.withAlpha)
+                if (distance > 15) continue
+                RenderLivingEntityHelper.setEntityColor(stand, color) { isEnabled() }
+                if (isIchor) {
+                    entityList.add(stand)
                 }
             }
         }
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         entityList.editCopy { removeIf { it.isDead } }
     }

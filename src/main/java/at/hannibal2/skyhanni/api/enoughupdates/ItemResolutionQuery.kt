@@ -342,6 +342,12 @@ class ItemResolutionQuery {
         if (guiName == "Hunting Box" || guiName == "Fusion Box" || guiName == "Shard Fusion") {
             return resolveItemInHuntingBoxMenu(displayName)
         }
+        if (guiName == "Confirm Fusion") {
+            return resolveItemInHuntingBoxMenu(compound.getLore().firstOrNull() ?: return null)
+        }
+        if (guiName == "Dye Compendium") {
+            return findInternalNameByDisplayName(displayName, false)
+        }
         return null
     }
 

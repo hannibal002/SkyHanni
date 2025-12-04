@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DialogUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -41,7 +42,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
@@ -402,7 +402,7 @@ object GardenNextJacobContest {
         for (crop in contest.crops) {
             val isBoosted = crop == contest.boostedCrop
             val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest").apply {
-                if (isBoosted) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
+                if (isBoosted) addEnchantGlint()
             }
             val stack = Renderable.item(cropStack, 1.0)
             if (config.additionalBoostedHighlight && isBoosted) {
@@ -432,7 +432,7 @@ object GardenNextJacobContest {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
         if (config.warnPopup && !Minecraft.getMinecraft().inGameHasFocus) {
-            SkyHanniMod.launchIOCoroutine {
+            SkyHanniMod.launchCoroutine("garden jacob contest openPopupWindow") {
                 DialogUtils.openPopupWindow(
                     title = "SkyHanni Jacob Contest Notification",
                     message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",
@@ -467,7 +467,7 @@ object GardenNextJacobContest {
         // Allows retries every 10 minutes when it's after 1 day into the new year
         if (lastFetchAttempted.passedSince() < 10.minutes || nextContestsAvailableAt.isInFuture()) return
 
-        SkyHanniMod.launchIOCoroutineWithMutex(fetchingContestsMutex) {
+        SkyHanniMod.launchIOCoroutineWithMutex("garden jacob contest fetch", fetchingContestsMutex) {
             knownContests = EliteDevApi.fetchUpcomingContests().orEmpty()
             handleFetchedContests()
             lastFetchAttempted = SimpleTimeMark.now()
@@ -496,7 +496,7 @@ object GardenNextJacobContest {
 
     private fun sendContestsIfAble() {
         if (!haveAllContests || isCloseToNewYear()) return
-        SkyHanniMod.launchIOCoroutineWithMutex(sendingContestsMutex) {
+        SkyHanniMod.launchIOCoroutineWithMutex("garden jacob contest send", sendingContestsMutex) {
             if (EliteDevApi.submitContests(knownContests)) {
                 ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
             } else ErrorManager.logErrorStateWithData(

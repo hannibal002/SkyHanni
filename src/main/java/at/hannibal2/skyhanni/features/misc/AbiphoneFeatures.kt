@@ -64,12 +64,9 @@ object AbiphoneFeatures {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val constant = event.getConstant<Map<String, AbiphoneContactInfo>>("abiphone", NeuAbiphoneJson.TYPE)
-        val completions = mutableSetOf<String>()
-        for (contact in constant) {
-            val names = contact.value.callNames ?: listOf(contact.key.removeAllNonLettersAndNumbers().replace(" ", ""))
-            completions.addAll(names)
-        }
-        abiphoneContacts = completions
+        abiphoneContacts = constant.flatMap { (key, value) ->
+            value.callNames ?: listOf(key.removeAllNonLettersAndNumbers().replace(" ", ""))
+        }.toSet()
     }
 
     @HandleEvent(onlyOnSkyblock = true)

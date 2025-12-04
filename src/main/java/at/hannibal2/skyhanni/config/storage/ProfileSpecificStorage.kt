@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
+import at.hannibal2.skyhanni.features.hunting.HuntingProfitTracker
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
@@ -61,6 +62,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
@@ -125,10 +127,14 @@ class ProfileSpecificStorage(
         class DungeonRunInfo {
             constructor()
 
-            constructor(floor: String?) {
+            constructor(floor: String?, runTime: SimpleTimeMark?) {
                 this.floor = floor
+                this.runTime = runTime
                 this.openState = OpenedState.UNOPENED
             }
+
+            @Expose
+            var runTime: SimpleTimeMark? = null
 
             @Expose
             var floor: String? = null
@@ -315,7 +321,7 @@ class ProfileSpecificStorage(
             @Expose var singleSlotCooldownMark: SimpleTimeMark? = null,
             @Expose var allSlotsCooldownMark: SimpleTimeMark? = null,
             @Expose var purchasedHitmanSlots: Int = 0,
-        ) : Resettable()
+        ) : Resettable
 
         @Expose
         var hitmanStats: HitmanStatsStorage = HitmanStatsStorage()
@@ -434,7 +440,6 @@ class ProfileSpecificStorage(
         @Expose
         var latestTrueFarmingFortune: MutableMap<CropType, Double> = enumMapOf()
 
-        // TODO use in /ff guide
         @Expose
         var personalBestFF: MutableMap<CropType, Double> = enumMapOf()
 
@@ -478,7 +483,7 @@ class ProfileSpecificStorage(
         var visitorDrops: VisitorDrops = VisitorDrops()
 
         // Todo: Move to a SkyhanniTracker (preferably bucketed by rarity)
-        class VisitorDrops : Resettable() {
+        class VisitorDrops : Resettable {
             @Expose
             var acceptedVisitors: Int = 0
 
@@ -550,6 +555,12 @@ class ProfileSpecificStorage(
 
             @Expose
             var bestiary: Double = -1.0
+
+            @Expose
+            var cacao: Int = -1
+
+            @Expose
+            var relicOfPower: Double = -1.0
 
             @Expose
             var plotsUnlocked: Int = -1
@@ -732,10 +743,10 @@ class ProfileSpecificStorage(
             var corpseProfitTracker: CorpseTracker.BucketData = CorpseTracker.BucketData()
 
             @Expose
-            var mineshaftsEnteredSince: MutableMap<MineshaftDetection.MineshaftTypes, Int> = mutableMapOf()
+            var mineshaftsEnteredSinceNew: MutableMap<MineshaftDetection.MineshaftType, Int> = mutableMapOf()
 
             @Expose
-            var lastMineshaftTime: MutableMap<MineshaftDetection.MineshaftTypes, SimpleTimeMark> = mutableMapOf()
+            var lastMineshaftTimeNew: MutableMap<MineshaftDetection.MineshaftType, SimpleTimeMark> = mutableMapOf()
         }
 
         @Expose
@@ -829,6 +840,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
+
+        @Expose
+        var ubikRemindTime: SimpleTimeMark = farFuture()
     }
 
     // - slayer
@@ -925,7 +939,20 @@ class ProfileSpecificStorage(
     data class AttributeShardData(
         @Expose var amountSyphoned: Int = 0,
         @Expose var amountInBox: Int = 0,
+        @Expose var enabled: Boolean = true,
     )
+
+    // - hunting
+    @Expose
+    var hunting: HuntingStorage = HuntingStorage()
+
+    class HuntingStorage {
+        @Expose
+        var trackedAttributeShards: MutableMap<String, Int> = mutableMapOf()
+
+        @Expose
+        var huntingProfitTracker: HuntingProfitTracker.Data = HuntingProfitTracker.Data()
+    }
 
     @Expose
     var hiddenCoopMembers: MutableSet<String> = mutableSetOf()

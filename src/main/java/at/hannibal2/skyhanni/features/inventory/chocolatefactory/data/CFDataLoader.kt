@@ -176,9 +176,9 @@ object CFDataLoader {
     /**
      * REGEX-TEST: Time Tower I
      */
-    private val upgradeTierPattern by CFApi.patternGroup.pattern(
+    val upgradeTierPattern by CFApi.patternGroup.pattern(
         "upgradetier",
-        ".*\\s(?<tier>[IVXLC]+)",
+        "(?<upgrade>.*)\\s(?<tier>[IVXLC]+)",
     )
 
     /**

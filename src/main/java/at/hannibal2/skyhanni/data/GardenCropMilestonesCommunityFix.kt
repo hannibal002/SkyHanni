@@ -112,7 +112,7 @@ object GardenCropMilestonesCommunityFix {
      * The clipboard context can be used to update the repo content.
      */
     private fun readDataFromClipboard() {
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("garden crop milestones community fix clipboard") {
             OSUtils.readFromClipboard()?.let {
                 handleInput(it)
             }

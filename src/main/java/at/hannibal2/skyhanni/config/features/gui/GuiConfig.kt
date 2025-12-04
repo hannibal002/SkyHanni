@@ -41,7 +41,7 @@ class GuiConfig {
 
     @ConfigOption(
         name = "Edit GUI Locations",
-        desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays."
+        desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays.",
     )
     @ConfigEditorButton(buttonText = "Edit")
     val positions: Runnable = Runnable { openGuiPositionEditor(true) }
@@ -50,6 +50,11 @@ class GuiConfig {
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var keyBindOpen: Int = Keyboard.KEY_NONE
+
+    @Expose
+    @ConfigOption(name = "Reset Hotkey", desc = "Key to press hovering a gui element to reset it's position and scale in the GUI Editor.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_R)
+    var keyBindReset: Int = Keyboard.KEY_R
 
     @Expose
     @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all SkyHanni GUIs.")
@@ -113,6 +118,7 @@ class GuiConfig {
     @FeatureToggle
     var beaconPower: Boolean = false
 
+    // TODO move beacon power options into an accordion and into their own config file
     @Expose
     @ConfigOption(name = "Show Beacon Stat", desc = "Show what stat is being boosted by your beacon.")
     @ConfigEditorBoolean
@@ -125,7 +131,7 @@ class GuiConfig {
     @Expose
     @ConfigOption(
         name = "Real Time",
-        desc = "Display the current computer time, a handy feature when playing in full-screen mode."
+        desc = "Display the current computer time, a handy feature when playing in full-screen mode.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -134,7 +140,7 @@ class GuiConfig {
     @Expose
     @ConfigOption(
         name = "Real Time 12h Format",
-        desc = "Display the current computer time in 12hr Format rather than 24h Format."
+        desc = "Display the current computer time in 12hr Format rather than 24h Format.",
     )
     @ConfigEditorBoolean
     var realTimeFormatToggle: Boolean = false
@@ -181,4 +187,9 @@ class GuiConfig {
     @Expose
     @NoConfigLink
     val titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
+
+    @Expose
+    @ConfigOption(name = "Legion/Bobbin Overlay", desc = "")
+    @Accordion
+    val legionBobbinOverlay: LegionBobbinOverlayConfig = LegionBobbinOverlayConfig()
 }

@@ -24,6 +24,9 @@ module.exports = async ({github, context, core}) => {
     for (const link of links) {
         const [, depOwner, depRepo, depNum] =
             link.match(/github\.com\/([\w-]+)\/([\w-]+)\/pull\/(\d+)/);
+
+            // SkyHanni Repo PRs don't need to be waited on, they are "one unit"
+        if (depOwner === "hannibal002" && depRepo === "SkyHanni-REPO") continue;
         const {data: dep} = await github.rest.pulls.get({
             owner: depOwner,
             repo: depRepo,

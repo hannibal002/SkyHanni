@@ -22,7 +22,7 @@ import net.minecraft.item.ItemStack
 class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
 
     override val sizeX = 360
-    override val sizeY = 225
+    override val sizeY = 255
 
     @SkyHanniModule
     companion object {

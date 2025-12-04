@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.system.ModVersion
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -44,9 +46,13 @@ object BaseGsonBuilder {
         .registerTypeAdapter(Duration::class.java, SkyHanniTypeAdapters.DURATION.nullSafe())
         .registerTypeAdapter(Stopwatch::class.java, SkyHanniTypeAdapters.STOPWATCH.nullSafe())
         .registerTypeAdapter(LocalDate::class.java, SkyHanniTypeAdapters.LOCALE_DATE.nullSafe())
+        .registerTypeAdapter(SessionUptime::class.java, SkyHanniTypeAdapters.SESSION_UPTIME.nullSafe())
         .enableComplexMapKeySerialization()
 
-    fun lenientGson(): GsonBuilder = gson()
-        .registerTypeAdapterFactory(SkippingTypeAdapterFactory)
-        .registerTypeAdapterFactory(ListEnumSkippingTypeAdapterFactory)
+    fun lenientGson(): GsonBuilder {
+        if (PlatformUtils.isDevEnvironment) return gson()
+        return gson()
+            .registerTypeAdapterFactory(SkippingTypeAdapterFactory)
+            .registerTypeAdapterFactory(ListEnumSkippingTypeAdapterFactory)
+    }
 }

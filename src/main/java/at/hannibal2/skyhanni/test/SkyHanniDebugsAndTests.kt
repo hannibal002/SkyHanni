@@ -12,12 +12,14 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
@@ -69,8 +71,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 //#endif
 import java.io.File
-import java.time.LocalDate
-import java.time.Month
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -100,18 +100,6 @@ object SkyHanniDebugsAndTests {
     private fun print(text: String) {
         LorenzDebug.log(text)
     }
-
-    private var previousApril = false
-
-    val isAprilFoolsDay: Boolean
-        get() {
-            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
-            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
-            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
-            val result = (!never && (always || itsTime))
-            previousApril = result
-            return result
-        }
 
     private var testLocation: LorenzVec? = null
 
@@ -145,7 +133,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("shtest command") {
             asyncTest(args)
         }
     }
@@ -153,6 +141,11 @@ object SkyHanniDebugsAndTests {
     @Suppress("UNUSED_PARAMETER")
     private fun asyncTest(args: Array<String>) {
         ChatUtils.chat("§fTest successful!")
+
+        val progress = ChatProgressUpdates()
+        progress.start("a")
+        progress.update("b")
+        progress.end("c")
     }
 
     private fun findNull(obj: Any, path: String) {
@@ -346,7 +339,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowInternalName(event: ToolTipEvent) {
+    fun onShowInternalName(event: ToolTipTextEvent) {
         if (!debugConfig.showInternalName) return
         val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
@@ -355,7 +348,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun showItemRarity(event: ToolTipEvent) {
+    fun showItemRarity(event: ToolTipTextEvent) {
         if (!debugConfig.showItemRarity) return
         val itemStack = event.itemStack
 
@@ -364,7 +357,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun showItemCategory(event: ToolTipEvent) {
+    fun showItemCategory(event: ToolTipTextEvent) {
         if (!debugConfig.showItemCategory) return
         val itemStack = event.itemStack
 
@@ -373,7 +366,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowNpcPrice(event: ToolTipEvent) {
+    fun onShowNpcPrice(event: ToolTipTextEvent) {
         if (!debugConfig.showNpcPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
@@ -382,7 +375,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowBaseStats(event: ToolTipEvent) {
+    fun onShowBaseStats(event: ToolTipTextEvent) {
         if (!debugConfig.showBaseValues) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
@@ -397,7 +390,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowCraftPrice(event: ToolTipEvent) {
+    fun onShowCraftPrice(event: ToolTipTextEvent) {
         if (!debugConfig.showCraftPrice) return
         val price = event.itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return
 
@@ -405,7 +398,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowBzPrice(event: ToolTipEvent) {
+    fun onShowBzPrice(event: ToolTipTextEvent) {
         if (!debugConfig.showBZPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
@@ -418,7 +411,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowBinPrice(event: ToolTipEvent) {
+    fun onShowBinPrice(event: ToolTipTextEvent) {
         if (!debugConfig.showBinPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
         if (!internalName.isAuctionHouseItem()) return
@@ -429,7 +422,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowItemName(event: ToolTipEvent) {
+    fun onShowItemName(event: ToolTipTextEvent) {
         if (!debugConfig.showItemName) return
         val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
