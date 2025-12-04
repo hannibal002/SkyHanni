@@ -49,7 +49,7 @@ public class MixinWorldRenderer {
     //$$ @WrapOperation(method = "fillEntityRenderStates", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/state/EntityRenderState;hasOutline()Z"))
     //$$ public boolean shouldAlsoGlow(EntityRenderState instance, Operation<Boolean> original, @Local Entity entity) {
     //$$     Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
-    //$$     if (glowColor == null) {
+    //$$     if (glowColor == null || entity.isInvisible()) {
     //$$         return original.call(instance);
     //$$     }
     //$$     return true;
