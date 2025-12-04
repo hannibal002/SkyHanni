@@ -113,7 +113,7 @@ object MiningEventsApi {
         } else {
 
             val bossbar = BossbarData.getBossbar()
-            if (bossbar.isEmpty()){
+            if (bossbar.isEmpty()) {
                 // There is two approaches here:
                 // A: Clear the active mining event when the bossbar is empty, this could be problematic because if you have the no bossbar
                 // glitch appear then no events would be detected if you are relying on just the bossbar
