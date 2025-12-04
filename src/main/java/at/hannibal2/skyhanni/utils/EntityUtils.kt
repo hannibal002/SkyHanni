@@ -148,7 +148,7 @@ object EntityUtils {
     inline fun <reified T : Entity> getEntitiesNearby(
         location: LorenzVec,
         radius: Double,
-        noinline predicate: (T) -> Boolean = ALWAYS
+        noinline predicate: (T) -> Boolean = ALWAYS,
     ): List<T> {
         return getEntitiesInBox<T>(location, radius) { it.distanceTo(location) < radius && predicate(it) }
     }
@@ -187,6 +187,8 @@ object EntityUtils {
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
+    // TODO maybe replace this with a new and heavy "getAllEntities" function for the rare cases where we dont want to check distances at all
+    @Deprecated("Don't use EntityUtils.getEntities(), as its bad for performance. Instead use getEntitiesNextToPlayer or getEntitiesNearby or getEntitiesInBox or getEntitiesInBoundingBox")
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
     inline fun <reified E : Entity> getEntitiesInBox(pos: LorenzVec, radius: Double, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
@@ -211,6 +213,8 @@ object EntityUtils {
     //$$ entitiesForRendering()
     //#endif
 
+    // deprecate
+    @Deprecated("Don't use EntityUtils.getAllEntities(), as its bad for performance. Instead use getEntitiesNextToPlayer or getEntitiesNearby or getEntitiesInBox or getEntitiesInBoundingBox")
     fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.getAllEntities()?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it
         // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,

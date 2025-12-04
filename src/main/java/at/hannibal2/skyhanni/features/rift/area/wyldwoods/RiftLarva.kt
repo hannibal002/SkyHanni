@@ -45,12 +45,9 @@ object RiftLarva {
     }
 
     private fun tryAdd(stand: EntityArmorStand) {
-        if (stand.wearingSkullTexture(LARVA_SKULL_TEXTURE)) {
-            RenderLivingEntityHelper.setEntityColor(
-                stand,
-                config.highlightColor.toColor().addAlpha(1),
-            ) { isEnabled() && hasHookInHand }
-        }
+        if (!stand.wearingSkullTexture(LARVA_SKULL_TEXTURE)) return
+        val color = config.highlightColor.toColor().addAlpha(1)
+        RenderLivingEntityHelper.setEntityColor(stand, color) { isEnabled() && hasHookInHand }
     }
 
     @HandleEvent

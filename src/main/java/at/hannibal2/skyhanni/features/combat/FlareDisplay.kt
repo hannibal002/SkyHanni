@@ -85,7 +85,6 @@ object FlareDisplay {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!enabled) return
         flares.removeIf { !it.entity.isEntityAlive }
-        // TODO: don't use EntityUtils.getAllEntities(), as its bad for performance
         for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
             if (!entity.canBeSeen()) continue
             if (entity.ticksExisted.ticks > MAX_FLARE_TIME) continue

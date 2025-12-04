@@ -34,7 +34,7 @@ object FirePillarDisplay {
         if (!isEnabled()) return
         val seconds = entityNamePattern.matchGroup(event.newName ?: return, "seconds") ?: return
         entityId = event.entity.entityId
-        display = seconds.let { "§cFire Pillar: §b${it}s" }
+        display = "§cFire Pillar: §b${seconds}s"
     }
 
     @HandleEvent

@@ -41,7 +41,6 @@ object CorpseLocator {
     private val sharedWaypoints: MutableList<LorenzVec> = mutableListOf()
 
     private fun findCorpse() {
-        // TODO: don't use EntityUtils.getAllEntities(), as its bad for performance
         EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()
             .filterNot { corpse -> MineshaftWaypoints.waypoints.any { it.location.distance(corpse.getLorenzVec()) <= 3 } }
             .filter { entity ->

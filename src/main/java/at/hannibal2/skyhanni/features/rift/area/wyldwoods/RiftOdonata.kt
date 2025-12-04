@@ -29,9 +29,9 @@ object RiftOdonata {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-
-        checkHand()
+        if (isEnabled()) {
+            checkHand()
+        }
     }
 
     private fun checkHand() {
@@ -44,11 +44,9 @@ object RiftOdonata {
     }
 
     private fun tryAdd(stand: EntityArmorStand) {
-        if (stand.wearingSkullTexture(ODONATA_SKULL_TEXTURE)) {
-            RenderLivingEntityHelper.setEntityColor(
-                stand,
-                config.highlightColor.toColor().addAlpha(1),
-            ) { RiftLarva.isEnabled() && hasBottleInHand }
+        if (!stand.wearingSkullTexture(ODONATA_SKULL_TEXTURE)) return
+        RenderLivingEntityHelper.setEntityColor(stand, config.highlightColor.toColor().addAlpha(1)) {
+            RiftLarva.isEnabled() && hasBottleInHand
         }
     }
 

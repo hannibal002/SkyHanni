@@ -633,10 +633,7 @@ object GardenVisitorFeatures {
 
     private fun findEntity(nameTag: EntityArmorStand, visitor: VisitorApi.Visitor) {
         val nameTagVec = nameTag.getLorenzVec()
-        EntityUtils.getEntitiesNearby<EntityLivingBase>(
-            nameTagVec,
-            5.0
-        ) { entity ->
+        EntityUtils.getEntitiesNearby<EntityLivingBase>(nameTagVec, 5.0) { entity ->
             entity !is EntityArmorStand && entity !is EntityPlayerSP && entity.distanceToIgnoreY(nameTagVec) < 0.5
         }.forEach {
             visitor.entityId = it.entityId

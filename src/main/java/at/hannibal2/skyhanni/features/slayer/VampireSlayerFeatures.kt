@@ -255,7 +255,6 @@ object VampireSlayerFeatures {
         if (!isEnabled()) return
 
         if (config.drawLine) {
-            // TODO: don't use EntityUtils.getEntities(), as its bad for performance
             for (it in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
                 if (!it.isHighlighted()) continue
                 if (!it.canBeSeen(15)) continue
@@ -269,7 +268,6 @@ object VampireSlayerFeatures {
             }
         }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
-        // TODO: don't use EntityUtils.getAllEntities(), as its bad for performance
         for (stand in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
             val vec = stand.position.toLorenzVec()
             val distance = vec.distanceToPlayer()
