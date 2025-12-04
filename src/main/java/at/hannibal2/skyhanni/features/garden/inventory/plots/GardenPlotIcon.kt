@@ -4,7 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -129,11 +130,11 @@ object GardenPlotIcon {
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         val plotList = plotList ?: return
         val list = event.toolTip
-        val index = event.slot.slotNumber
+        val index = event.slot?.slotNumber ?: return
         if (index == 53) {
             list.clear()
             list.add("§6Edit Mode")
@@ -144,7 +145,6 @@ object GardenPlotIcon {
             list.add("${if (editMode == 2) "§6► " else ""}§9RESET§7: §bClick an item in the menu to reset it to default.")
             list.add("")
             list.add("§eClick to switch Edit Mode !")
-            list.add("")
         }
         if (plotList.contains(index)) {
             val stack = originalStack[index] ?: return

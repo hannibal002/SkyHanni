@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
 
-abstract class ItemTrackerData : Resettable {
+abstract class ItemTrackerData : TrackerData() {
 
     // default implementation, delegates to below
     open fun getDescription(item: TrackedItem) = getDescription(item.timesGained)

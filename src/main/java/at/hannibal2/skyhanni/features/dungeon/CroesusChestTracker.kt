@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -11,23 +12,35 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
+import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.DungeonChest
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi.inDungeon
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
 object CroesusChestTracker {
@@ -46,6 +59,11 @@ object CroesusChestTracker {
      */
     private val floorPattern by patternGroup.pattern("chest.floor", "§eFloor (?<floor>[IV]+)")
     private val masterPattern by patternGroup.pattern("chest.master", ".*Master.*")
+
+    /**
+     * REGEX-TEST: §eInfernal Tier
+     */
+    private val kuudraPattern by patternGroup.pattern("chest.kuudra", "§e(?<tier>Basic|Hot|Burning|Fiery|Infernal) Tier")
 
     /**
      * REGEX-TEST: §aNo more chests to open!
@@ -82,24 +100,25 @@ object CroesusChestTracker {
 
     private var kismetAmountCache = 0
 
+    private var display: List<Renderable>? = null
+
     private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
-    @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, priority = HandleEvent.LOW, onlyOnSkyblock = true)
+    fun onBackgroundDrawn() {
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
 
-        if (inCroesusInventory && !croesusEmpty) {
-            for ((run, slot) in InventoryUtils.getItemsInOpenChest()
-                .mapNotNull { slot -> runSlots(slot.slotIndex, slot) }) {
+        if (!inCroesusInventory || croesusEmpty) return
+        for ((run, slot) in InventoryUtils.getItemsInOpenChest()
+            .mapNotNull { slot -> runSlots(slot.slotIndex, slot) }) {
 
-                // If one chest is null every followup chest is null. Therefore, an early return is possible
-                if (run.floor == null) return
+            // If one chest is null every followup chest is null. Therefore, an early return is possible
+            if (run.floor == null) return
 
-                val state = run.openState ?: OpenedState.UNOPENED
+            val state = run.openState ?: OpenedState.UNOPENED
 
-                if (state != OpenedState.KEY_USED) {
-                    slot.highlight(if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE)
-                }
+            if (state != OpenedState.KEY_USED) {
+                slot.highlight(if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE)
             }
         }
     }
@@ -110,6 +129,7 @@ object CroesusChestTracker {
             croesusPattern.matches(event.inventoryName)
         ) {
             pageSetup(event)
+            countUnopenedChestsAndRemoveOld()
 
             if (croesusEmpty) {
                 croesusChests?.forEach { it.setValuesNull() }
@@ -118,6 +138,7 @@ object CroesusChestTracker {
 
             // With null, since if an item is missing the chest will be set null
             checkChests(event.inventoryItemsWithNull)
+            display = null
 
             return
         }
@@ -139,12 +160,14 @@ object CroesusChestTracker {
 
             val lore = item.getLore()
 
-            if (run.floor == null) run.floor =
+            if (run.floor == null || run.floor == "F0") run.floor =
                 (if (masterPattern.matches(item.displayName)) "M" else "F") + (
                     lore.firstNotNullOfOrNull {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"
                     )
+            if (run.floor == "F0" && kuudraPattern.matches(item.displayName)) run.floor =
+                ("T" + KuudraApi.getKuudraRunTierNumber(lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }))
             run.openState = when {
                 keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
                 openedPattern.anyMatches(lore) -> OpenedState.OPENED
@@ -175,8 +198,8 @@ object CroesusChestTracker {
         kismetUsed = null
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         inCroesusInventory = false
         chestInventory = null
     }
@@ -213,7 +236,7 @@ object CroesusChestTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderItemTipIsKismetable(event: RenderInventoryItemTipEvent) {
+    fun onRenderInventoryItemTip(event: RenderInventoryItemTipEvent) {
         if (!config.showUsedKismets) return
         if (!inCroesusInventory) return
         if (event.slot.slotIndex != event.slot.slotNumber) return
@@ -225,13 +248,79 @@ object CroesusChestTracker {
     }
 
     @HandleEvent
+    fun onKuudraComplete(event: KuudraCompleteEvent) {
+        addCroesusChest("T${event.kuudraTier}")
+    }
+
+    @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         if (event.floor == "E") return
-        croesusChests?.add(0, DungeonRunInfo(event.floor))
+        addCroesusChest(event.floor)
+    }
+
+    // TODO Replace y > 103 check with a better "is actively playing Cata/Kuudra" heuristic
+    private fun isInDH(): Boolean = IslandType.DUNGEON_HUB.isCurrent() && LocationUtils.playerLocation().y > 103.0
+
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            condition = ::shouldRenderCroesus,
+            onRender = ::renderChestOverlay,
+        )
+    }
+
+    private fun shouldRenderCroesus(): Boolean = when {
+        config.croesusOverlayKuudra && KuudraApi.inKuudra -> true
+        config.croesusOverlay && (SkyBlockUtils.graphArea == "Forgotten Skull" || isInDH()) -> true
+        config.croesusOverlayDungeons && inDungeon() -> true
+        else -> false
+    }
+
+    private fun renderChestOverlay() {
+        val renderables = display ?: createRenderable().also { display = it }
+        config.croesusOverlayPosition.renderRenderables(renderables, posLabel = "Croesus Overlay")
+    }
+
+    private fun createRenderable(): List<Renderable> =
+        Renderable.text("Chests: ${chestCountColor(countUnopenedChestsAndRemoveOld())}/${MAX_CHESTS}").toSingletonListOrEmpty()
+
+    private fun chestCountColor(size: Int): String = when {
+        size >= 45 -> "§4"
+        size >= 30 -> "§c"
+        size >= 15 -> "§e"
+        size >= 0 -> "§6"
+        else -> "§0"
+    } + size.toString()
+
+    private fun countUnopenedChestsAndRemoveOld(): Int {
+        val iterator = croesusChests?.iterator() ?: return 0
+        var unopenedChests = 0
+        while (iterator.hasNext()) {
+            val next = iterator.next()
+            if (next.floor == null) {
+                iterator.remove()
+            }
+            if (next.runTime == null) {
+                next.runTime = SimpleTimeMark.now()
+            }
+            val sinceRun = next.runTime?.passedSince() ?: 0.days // purely exists for pre-addition runs
+            if (sinceRun > 3.days) {
+                iterator.remove()
+            }
+            if (next.openState == OpenedState.UNOPENED) unopenedChests++
+        }
+        return unopenedChests
+    }
+
+
+    private fun addCroesusChest(floorOrTier: String) {
+        croesusChests?.add(0, DungeonRunInfo(floorOrTier, SimpleTimeMark.now()))
+        countUnopenedChestsAndRemoveOld()
         currentRunIndex = 0
         if ((croesusChests?.size ?: 0) > MAX_CHESTS) {
             croesusChests?.dropLast(1)
         }
+        display = null
 
         if (config.croesusLimit && getLastActiveChest() >= 55) {
             ChatUtils.chat("You are close to the Croesus Limit. Please open your chests!")

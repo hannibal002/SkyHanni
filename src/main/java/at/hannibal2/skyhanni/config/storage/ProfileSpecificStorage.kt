@@ -62,6 +62,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
@@ -126,10 +127,14 @@ class ProfileSpecificStorage(
         class DungeonRunInfo {
             constructor()
 
-            constructor(floor: String?) {
+            constructor(floor: String?, runTime: SimpleTimeMark?) {
                 this.floor = floor
+                this.runTime = runTime
                 this.openState = OpenedState.UNOPENED
             }
+
+            @Expose
+            var runTime: SimpleTimeMark? = null
 
             @Expose
             var floor: String? = null
@@ -835,6 +840,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
+
+        @Expose
+        var ubikRemindTime: SimpleTimeMark = farFuture()
     }
 
     // - slayer

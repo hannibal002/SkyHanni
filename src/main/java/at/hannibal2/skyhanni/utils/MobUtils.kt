@@ -33,11 +33,10 @@ object MobUtils {
         EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.getLorenzVec(), range)
 
     fun getClosestArmorStand(entity: Entity, range: Double) =
-        getArmorStandByRangeAll(entity, range).sortedBy { it.distanceTo(entity) }.firstOrNull()
+        getArmorStandByRangeAll(entity, range).minByOrNull { it.distanceTo(entity) }
 
     fun getClosestArmorStandWithName(entity: Entity, range: Double, name: String) =
-        getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }
-            .sortedBy { it.distanceTo(entity) }.firstOrNull()
+        getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }.minByOrNull { it.distanceTo(entity) }
 
     fun EntityArmorStand.isDefaultValue() = this.name == defaultArmorStandName
 

@@ -107,8 +107,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         ).toSearchable("trees felled")
         add(totalRenderable)
 
-
-        add(addTotalProfit(profit, treesContributedTo, "gift"))
+        val duration = bucketData.getTotalUptime()
+        addAll(addTotalProfit(profit, treesContributedTo, "gift", duration, "Gifts"))
         addPriceFromButton(this)
     }
 

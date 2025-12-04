@@ -4,6 +4,9 @@ import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
+/**
+ * Use [ToolTipTextEvent] Instead
+ */
 class ToolTipEvent(val slot: Slot, val itemStack: ItemStack, private val toolTip0: MutableList<String>) : CancellableSkyHanniEvent() {
 
     var toolTip: MutableList<String>
