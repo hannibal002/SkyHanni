@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.MiningEventEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -43,7 +42,6 @@ object MiningEventsApi {
         val current = activeMiningEvent
 
         if (current == null) {
-            ChatUtils.debug("[Mining Events API] Event started: ${eventType.name}")
             val newEvent = MiningEvent(type = eventType, timeLeft = timeLeft)
             activeMiningEvent = newEvent
             MiningEventEvent.Started(newEvent).post()
@@ -52,7 +50,6 @@ object MiningEventsApi {
 
         // edge case that I think can only happen if you swap servers to something with a different running event.
         if (current.type != eventType) {
-            ChatUtils.debug("[Mining Events API] Event changed: ${current.type.name} -> ${eventType.name}")
             MiningEventEvent.Ended(current).post()
 
             val newEvent = MiningEvent(type = eventType, timeLeft = timeLeft)
@@ -67,7 +64,6 @@ object MiningEventsApi {
     private fun clearActiveMiningEvent() {
         val current = activeMiningEvent
         if (current != null) {
-            ChatUtils.debug("[Mining Events API] Event ended: ${current.type.name}")
             MiningEventEvent.Ended(current).post()
             activeMiningEvent = null
         }
@@ -94,9 +90,6 @@ object MiningEventsApi {
     fun onSecondPassed() {
 
         if (TabWidget.EVENT.isActive) {
-            for ((line) in TabWidget.EVENT.lines.withIndex()) {
-                ChatUtils.consoleLog("[Mining Event Api] Tab Widget: $line")
-            }
 
 
             for (eventType in MiningEventType.entries) {
@@ -106,7 +99,6 @@ object MiningEventsApi {
                         return
                     }
                     eventType.widgetEventPattern.matchMatcher(line) {
-                        ChatUtils.debug("[Mining Event Api] Widget Event found event: ${eventType.name}")
                         val durationLine = TabWidget.EVENT.lines.getOrNull(index + 1) ?: return
 
                         MiningEventType.widgetDurationPattern.matchMatcher(durationLine) {
@@ -119,9 +111,25 @@ object MiningEventsApi {
                 }
             }
         } else {
-            ChatUtils.consoleLog("[Mining Event Api] Bossbar: ${BossbarData.getBossbar()}")
+
+            val bossbar = BossbarData.getBossbar()
+            if (bossbar.isEmpty()){
+                // There is two approaches here:
+                // A: Clear the active mining event when the bossbar is empty, this could be problematic because if you have the no bossbar
+                // glitch appear then no events would be detected if you are relying on just the bossbar
+                // B: Don't clear the bossbar. This would keep the event set as the active event until it gets swapped over for the next
+                // event. Pretty much it could be detected as double powder until a new event happens even when the double powder event is
+                // actually inactive.
+
+                // There might be a third approach that I am unaware of. But that is what I have for now.
+
+                // clearActiveMiningEvent()
+                return
+            }
+
             for (eventType in MiningEventType.entries) {
-                eventType.bossBarPattern.matchMatcher(BossbarData.getBossbar()) {
+                eventType.bossBarPattern.matchMatcher(bossbar) {
+
                     val durationString = group("time")
                     val newDuration = TimeUtils.getDuration(durationString)
 
@@ -132,13 +140,6 @@ object MiningEventsApi {
                     return
                 }
             }
-            // if it gets through the matcher that means there is nothing there so set it to null
-            // this might introduce a bug where you have the tablist widget for events disabled + get the hypixel bug for no boss bar would
-            // result in this getting set to null. I will think of something better when im not brain-dead.
-
-            // this does in fact introduce a bug if you have the boss bar not appearing glitch.
-
-            // clearActiveMiningEvent()
         }
     }
 
