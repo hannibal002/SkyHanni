@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
+import at.hannibal2.skyhanni.events.diana.RareDianaMobFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -34,7 +36,7 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object InquisitorWaypointShare {
+object RareMobWaypointShare {
 
     private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
 
@@ -45,45 +47,49 @@ object InquisitorWaypointShare {
      * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 -3
      * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
      * REGEX-TEST: §9Party §8> §6[MVP§0++§6] scaryron§f: §rx: -67, y: 75, z: 116 | Minos Inquisitor spawned at [ ⏣ Mountain ]!
+     * REGEX-TEST: §9Party §8> §b[MVP§5+§b] Throwpo§f: §rx: -144, y: 59, z: -119 | Sphinx
      */
     @Suppress("MaxLineLength")
-    private val inquisitorCoordsPattern by patternGroup.list(
+    private val rareMobCoordsPattern by patternGroup.list(
         "coords",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+).*",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)(?<mobName> \\| .*)?.*",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)",
     )
 
     /**
      * REGEX-TEST: §9Party §8> User Name§f: §rInquisitor dead!
+     * REGEX-TEST: §9Party §8> User Name§f: §rRare Diana Mob dead!
      */
     private val diedPattern by patternGroup.pattern(
         "died",
-        "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!",
+        "(?<party>§9Party §8> )?(?<playerName>.*)§f: §r(?:Inquisitor|Rare Diana Mob) dead!",
     )
 
     /**
      * REGEX-TEST: §c§lUh oh! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
      */
-    private val inquisitorFoundChatPattern by patternGroup.pattern(
+    private val rareMobFoundChatPattern by patternGroup.pattern(
         "dug",
-        ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!",
+        ".* §r§eYou dug out a §.§.(?:Minos Inquisitor|Sphinx|King Minos|Manticore)§.§.!",
     )
 
-    private var inquisitor = -1
-    private var lastInquisitor = -1
+
+    private var rareMob = -1
+    private var lastRareMob = -1
     private var lastShareTime = SimpleTimeMark.farPast()
 
-    private val inquisitorsNearby = ConcurrentHashMap<Int, EntityOtherPlayerMP>()
+    private val rareMobsNearby = ConcurrentHashMap<Int, EntityOtherPlayerMP>()
 
-    private val _waypoints = ConcurrentHashMap<String, SharedInquisitor>()
-    val waypoints: Map<String, SharedInquisitor>
+    private val _waypoints = ConcurrentHashMap<String, SharedRareMob>()
+    val waypoints: Map<String, SharedRareMob>
         get() = _waypoints
 
-    class SharedInquisitor(
+    class SharedRareMob(
         val fromPlayer: String,
-        val displayName: String,
+        val playerDisplayName: String,
         val location: LorenzVec,
         val spawnTime: SimpleTimeMark,
+        val mobName: String
     )
 
     @HandleEvent
@@ -91,7 +97,7 @@ object InquisitorWaypointShare {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
-            inquisitorsNearby.removeIf { it.value.isDead }
+            rareMobsNearby.removeIf { it.value.isDead }
         }
 
         _waypoints.removeIf { it.value.spawnTime.passedSince() > 75.seconds }
@@ -100,32 +106,32 @@ object InquisitorWaypointShare {
     @HandleEvent
     fun onWorldChange() {
         _waypoints.clear()
-        inquisitorsNearby.clear()
+        rareMobsNearby.clear()
     }
 
-    private val inquisitorTime = mutableListOf<SimpleTimeMark>()
+    private val rareMobTime = mutableListOf<SimpleTimeMark>()
 
     @HandleEvent
-    fun onInquisitorFound(event: InquisitorFoundEvent) {
-        val inquisitor = event.inquisitorEntity
-        inquisitorsNearby[inquisitor.entityId] = inquisitor
+    fun onRareDianaMobFound(event: RareDianaMobFoundEvent) {
+        val rareMob = event.entity
+        rareMobsNearby[rareMob.entityId] = rareMob
         GriffinBurrowHelper.update()
 
-        lastInquisitor = inquisitor.entityId
-        checkInquisFound()
+        lastRareMob = rareMob.entityId
+        checkRareMobFound()
     }
 
     // We do not know if the chat message or the entity spawn happens first.
-    // We only want to run foundInquisitor when both happens in under 1.5 seconds
-    private fun checkInquisFound() {
-        inquisitorTime.add(SimpleTimeMark.now())
+    // We only want to run foundRareMob when both happens in under 1.5 seconds
+    private fun checkRareMobFound() {
+        rareMobTime.add(SimpleTimeMark.now())
 
-        val lastTwo = inquisitorTime.takeLast(2)
+        val lastTwo = rareMobTime.takeLast(2)
         if (lastTwo.size != 2) return
 
         if (lastTwo.all { it.passedSince() < 1.5.seconds }) {
-            inquisitorTime.clear()
-            foundInquisitor(lastInquisitor)
+            rareMobTime.clear()
+            foundRareMob(lastRareMob)
         }
     }
 
@@ -134,13 +140,13 @@ object InquisitorWaypointShare {
         if (!isEnabled()) return
         val message = event.message
 
-        if (inquisitorFoundChatPattern.matches(message)) {
-            checkInquisFound()
+        if (rareMobFoundChatPattern.matches(message)) {
+            checkRareMobFound()
         }
 
-        inquisitorCoordsPattern.matchMatchers(message) {
+        rareMobCoordsPattern.matchMatchers(message) {
             if (!detectFromChat()) return@matchMatchers
-            event.blockedReason = "inquisitor_waypoint"
+            event.blockedReason = "rare_diana_mob_waypoint"
         }
 
         diedPattern.matchMatcher(message) {
@@ -152,21 +158,19 @@ object InquisitorWaypointShare {
         }
     }
 
-    private fun foundInquisitor(inquisId: Int) {
+    private fun foundRareMob(rareMobId: Int) {
         lastShareTime = SimpleTimeMark.farPast()
-        inquisitor = inquisId
+        rareMob = rareMobId
 
         if (config.instantShare) {
             // add repo kill switch
-            sendInquisitor()
+            sendRareMob()
         } else {
             val keyName = KeyboardManager.getKeyName(config.keyBindShare)
-            val message = "§l§bYou found an Inquisitor! Click §l§chere §l§bor press §c$keyName to share the location!"
+            val message = "§l§bYou found a Rare Diana Mob! Click §l§chere §l§bor press §c$keyName to share the location!"
             ChatUtils.clickableChat(
                 message,
-                onClick = {
-                    sendInquisitor()
-                },
+                onClick = { sendRareMob() },
                 "§eClick to share!",
                 oneTimeClick = true,
             )
@@ -179,17 +183,17 @@ object InquisitorWaypointShare {
         if (event.health > 0) return
 
         val entityId = event.entity.entityId
-        if (entityId == inquisitor) {
+        if (entityId == rareMob) {
             sendDeath()
         }
-        inquisitorsNearby.remove(entityId)
+        rareMobsNearby.remove(entityId)
     }
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
-        if (event.keyCode == config.keyBindShare) sendInquisitor()
+        if (event.keyCode == config.keyBindShare) sendRareMob()
     }
 
     private fun sendDeath() {
@@ -197,70 +201,81 @@ object InquisitorWaypointShare {
         if (lastShareTime.passedSince() < 5.seconds) return
 
         // already dead
-        if (inquisitor == -1) return
-        inquisitor = -1
-        HypixelCommands.partyChat("Inquisitor dead!")
+        if (rareMob == -1) return
+        rareMob = -1
+        HypixelCommands.partyChat("Rare Diana Mob dead!")
     }
 
-    private fun sendInquisitor() {
+    private fun sendRareMob() {
         if (!isEnabled()) return
         if (lastShareTime.passedSince() < 5.seconds) return
         lastShareTime = SimpleTimeMark.now()
 
-        if (inquisitor == -1) {
-            ChatUtils.debug("Trying to send inquisitor via chat, but no Inquisitor is nearby.")
+        if (rareMob == -1) {
+            ChatUtils.debug("Trying to send Rare Diana Mob via chat, but no mob found nearby.")
             return
         }
 
-        val inquisitor = EntityUtils.getEntityByID(inquisitor)
-        if (inquisitor == null) {
-            ChatUtils.chat("§cInquisitor out of range!")
+        val rareMob = EntityUtils.getEntityByID(rareMob)
+        if (rareMob == null) {
+            ChatUtils.chat("§cRare Mob out of range!")
             return
         }
 
-        if (inquisitor.isDead) {
-            ChatUtils.chat("§cInquisitor is dead")
+        if (rareMob.isDead) {
+            ChatUtils.chat("§cRare Mob is dead")
             return
         }
-        val location = inquisitor.getLorenzVec()
+        val location = rareMob.getLorenzVec()
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-        HypixelCommands.partyChat("x: $x, y: $y, z: $z ")
+        val mobName = rareMob.mob?.name.orEmpty()
+        val name = if (mobName.isEmpty()) "" else " | $mobName"
+        HypixelCommands.partyChat("x: $x, y: $y, z: $z $name")
     }
 
     private fun Matcher.block(): Boolean = !hasGroup("party") && !config.globalChat
 
     private fun Matcher.detectFromChat(): Boolean {
         if (block()) return false
-        val rawName = group("playerName")
+        val rawPlayerName = group("playerName")
         val x = group("x").trim().toDoubleOrNull() ?: return false
         val y = group("y").trim().toDoubleOrNull() ?: return false
         val z = group("z").trim().toDoubleOrNull() ?: return false
         val location = LorenzVec(x, y, z)
 
-        val name = rawName.cleanPlayerName()
-        val displayName = rawName.cleanPlayerName(displayName = true)
+        val rawMobName = if (hasGroup("mobName")) group("mobName").replace(" | ", "").trim().lowercase() else "Rare Mob"
+        var mobName = "Rare Mob"
+        for (mob in DianaApi.mythologicalCreatures.values) {
+            if (!mob.rare) continue
+            if (rawMobName !in mob.mobAliases) continue
+            mobName = mob.cleanName
+        }
+
+        val optionalAn = StringUtils.optionalAn(mobName)
+
+        val name = rawPlayerName.cleanPlayerName()
+        val playerDisplayName = rawPlayerName.cleanPlayerName(displayName = true)
         if (!waypoints.containsKey(name)) {
-            ChatUtils.chat("$displayName §l§efound an inquisitor at §l§c${x.toInt()} ${y.toInt()} ${z.toInt()}!")
+            ChatUtils.chat("$playerDisplayName §l§efound $optionalAn $mobName at §l§c${x.toInt()} ${y.toInt()} ${z.toInt()}!")
             if (name != PlayerUtils.getName()) {
-                TitleManager.sendTitle("§dINQUISITOR §efrom §b$displayName")
+                TitleManager.sendTitle("§d$mobName §efrom §b$playerDisplayName")
                 playUserSound()
             }
         }
-        val inquis = SharedInquisitor(name, displayName, location, SimpleTimeMark.now())
-        _waypoints[name] = inquis
+        _waypoints[name] = SharedRareMob(name, playerDisplayName, location, SimpleTimeMark.now(), mobName)
         GriffinBurrowHelper.update()
         return true
     }
 
     private fun isEnabled() = DianaApi.isDoingDiana() && config.enabled
 
-    fun maybeRemove(inquis: SharedInquisitor) {
-        if (inquisitorsNearby.isEmpty()) {
-            _waypoints.remove(inquis.fromPlayer)
+    fun maybeRemove(sharedMob: SharedRareMob) {
+        if (rareMobsNearby.isEmpty()) {
+            _waypoints.remove(sharedMob.fromPlayer)
             GriffinBurrowHelper.update()
-            ChatUtils.chat("Inquisitor from ${inquis.displayName} §enot found, deleting.")
+            ChatUtils.chat("${sharedMob.mobName} from ${sharedMob.playerDisplayName} §enot found, deleting.")
         }
     }
 

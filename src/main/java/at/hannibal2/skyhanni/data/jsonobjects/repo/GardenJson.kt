@@ -16,7 +16,8 @@ data class GardenJson(
     @Expose @SerializedName("organic_matter") val organicMatter: Map<NeuInternalName, Double>,
     @Expose val fuel: Map<NeuInternalName, Double>,
     @Expose @SerializedName("personal_best_increment") val personalBestIncrement: Map<CropType, Int>,
-    @Expose @SerializedName("pest_rare_drops") val pestRareDrops: Map<PestType, Map<NeuInternalName, Int>>
+    @Expose @SerializedName("pest_rare_drops") val pestRareDrops: Map<PestType, Map<NeuInternalName, Int>>,
+    @Expose @SerializedName("extra_farming_tools") val extraFarmingTools: Set<NeuInternalName>,
 )
 
 data class GardenVisitor(

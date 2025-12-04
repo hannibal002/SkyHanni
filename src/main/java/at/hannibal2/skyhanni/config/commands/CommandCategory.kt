@@ -14,7 +14,7 @@ enum class CommandCategory(val color: String, val categoryName: String, val desc
     USERS_RESET(
         "§e",
         "Normal Reset Command",
-        "Normal Command that resents some data",
+        "Normal Command that resets some data",
     ),
     USERS_BUG_FIX(
         "§f",

@@ -80,7 +80,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         fun makePickblock() {
             if (this.clickedButton == 2 && this.clickType == ClickType.MIDDLE) return
             slot?.slotNumber?.let { slotNumber ->
-                InventoryUtils.clickSlot(slotNumber, container.windowId, mouseButton = 2, mode = 3)
+                InventoryUtils.clickSlot(slotNumber, container.windowId, mouseButton = 2, mode = ClickType.MIDDLE)
                 cancel()
             }
         }
