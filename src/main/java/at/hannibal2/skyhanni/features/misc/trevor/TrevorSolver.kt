@@ -61,16 +61,14 @@ object TrevorSolver {
             val name = entity.name
             val isTrevor = mob?.let { it.name != name && isTrevorMob(it) } ?: false
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
-            currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) || it.entityName.contains(name) }
+            currentMob = TrevorMob.findByName(name)
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
 
-                val currentMob = currentMob ?: run {
-                    ErrorManager.skyHanniError(
-                        "Found trevor mob but current mob is null",
-                        "entity" to entity,
-                        "mobDataMob" to mob,
-                    )
-                }
+                val currentMob = currentMob ?: ErrorManager.skyHanniError(
+                    "Found trevor mob but current mob is null",
+                    "entity" to entity,
+                    "mobDataMob" to mob,
+                )
 
                 if (foundID == entity.entityId) {
                     val isOasisMob = currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP
