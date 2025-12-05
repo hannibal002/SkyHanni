@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -32,6 +33,8 @@ object LassoDisplay {
         config.lassoDisplayPosition.renderRenderable(display, posLabel = "Lasso Display")
     }
 
+    // TODO: use entity events
+    @OptIn(AllEntitiesGetter::class)
     @HandleEvent(SkyHanniTickEvent::class, onlyOnSkyblock = true)
     fun onTick() {
         if (!config.lassoDisplay) return

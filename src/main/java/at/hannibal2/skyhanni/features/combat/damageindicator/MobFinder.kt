@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
@@ -590,6 +591,9 @@ class MobFinder {
         }
     }
 
+    // While this could be improved to not use getEntities, the performance impact is
+    // minimal enough (only happens in f3/m3 bossfight), that it doesn't matter
+    @OptIn(AllEntitiesGetter::class)
     private fun findGuardians() {
         guardians.clear()
 

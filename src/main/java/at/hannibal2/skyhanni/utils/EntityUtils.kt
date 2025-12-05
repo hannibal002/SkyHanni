@@ -40,6 +40,12 @@ import net.minecraft.entity.SharedMonsterAttributes
 
 //#endif
 
+@RequiresOptIn(
+    "getAllEntities or getEntities should only be used when necessary," +
+        "as they can be expensive, since they iterate through all entities in world."
+)
+annotation class AllEntitiesGetter
+
 @SkyHanniModule
 object EntityUtils {
 
@@ -153,6 +159,7 @@ object EntityUtils {
         return getEntitiesInBox<T>(location, radius) { it.distanceTo(location) < radius && predicate(it) }
     }
 
+    @AllEntitiesGetter
     inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: LorenzVec, radius: Double): Sequence<T> =
         getEntities<T>().filter { it.distanceToIgnoreY(location) < radius }
 
@@ -187,11 +194,7 @@ object EntityUtils {
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
-    // TODO maybe replace this with a new and heavy "getAllEntities" function for the rare cases where we dont want to check distances at all
-    @Deprecated(
-        "Don't use EntityUtils.getEntities(), as its bad for performance. " +
-            "Instead use getEntitiesNextToPlayer or getEntitiesNearby or getEntitiesInBox or getEntitiesInBoundingBox",
-    )
+    @AllEntitiesGetter
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
     inline fun <reified E : Entity> getEntitiesInBox(pos: LorenzVec, radius: Double, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
@@ -216,11 +219,7 @@ object EntityUtils {
     //$$ entitiesForRendering()
     //#endif
 
-    // deprecate
-    @Deprecated(
-        "Don't use EntityUtils.getAllEntities(), as its bad for performance. " +
-            "Instead use getEntitiesNextToPlayer or getEntitiesNearby or getEntitiesInBox or getEntitiesInBoundingBox",
-    )
+    @AllEntitiesGetter
     fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.getAllEntities()?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it
         // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
@@ -242,11 +241,6 @@ object EntityUtils {
     //$$     return blockEntityTickers.mapNotNull { invoker -> invoker.pos?.let { world.getBlockEntity(it) } }
     //$$ }
     //#endif
-
-    @Deprecated("Remove with EntityRemovedEvent")
-    inline fun <reified T : Entity> removeInvalidEntities(list: MutableList<T>) {
-        list.keepOnlyIn(getEntities<T>())
-    }
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5, ignoreFrustum: Boolean = false): Boolean {
         if (isDead) return false

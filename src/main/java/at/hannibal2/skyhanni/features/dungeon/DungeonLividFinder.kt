@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -56,8 +57,11 @@ object DungeonLividFinder {
         private set
 
     private var fakeLivids = mutableSetOf<EntityOtherPlayerMP>()
-    private val lividEntities
-        get() = EntityUtils.getEntities<EntityOtherPlayerMP>().filter { it.isNpc() && lividNamePattern.matches(it.name) }.toList()
+
+    // This only happens when in f5/m5 bossfight, so the performance impact is minimal
+    @OptIn(AllEntitiesGetter::class)
+    private val lividEntities: List<EntityOtherPlayerMP>
+        get() = EntityUtils.getEntities<EntityOtherPlayerMP>().filterTo(mutableListOf()) { it.isNpc() && lividNamePattern.matches(it.name) }
 
     private var color: LorenzColor? = null
     private val lividNameColor = mapOf(

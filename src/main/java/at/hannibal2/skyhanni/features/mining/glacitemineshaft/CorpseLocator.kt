@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -40,6 +41,8 @@ object CorpseLocator {
 
     private val sharedWaypoints: MutableList<LorenzVec> = mutableListOf()
 
+    // TODO: use entity events
+    @OptIn(AllEntitiesGetter::class)
     private fun findCorpse() {
         EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()
             .filterNot { corpse -> MineshaftWaypoints.waypoints.any { it.location.distance(corpse.getLorenzVec()) <= 3 } }

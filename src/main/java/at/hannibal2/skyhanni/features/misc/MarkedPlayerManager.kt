@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -85,8 +86,10 @@ object MarkedPlayerManager {
         }
     }
 
+    // only gets called on command or on config change, so performance impact is minimal
+    @OptIn(AllEntitiesGetter::class)
     private fun findPlayers() {
-        for (entity in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
+        for (entity in EntityUtils.getPlayerEntities()) {
             if (entity in markedPlayers.values) continue
 
             val name = entity.name.lowercase()

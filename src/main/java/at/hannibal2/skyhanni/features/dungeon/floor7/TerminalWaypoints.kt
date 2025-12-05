@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -36,6 +37,8 @@ object TerminalWaypoints {
         TerminalInfo.resetTerminals()
     }
 
+    // Only calls getEntities when terminals get completed, so the performance impact is minimal
+    @OptIn(AllEntitiesGetter::class)
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!inBoss()) return
