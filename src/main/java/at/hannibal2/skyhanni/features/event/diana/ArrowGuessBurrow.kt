@@ -21,6 +21,13 @@ import kotlin.time.Duration.Companion.minutes
 object ArrowGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
+    private const val SHAFT_LENGTH = 20
+    private const val PARTICLE_DETECTION_TOLERANCE = 0.12
+    private const val COUNT_NEAR_TIP = 4
+    private const val COUNT_NEAR_BASE = 2
+    private const val EPSILON = 1e-6
+    private val allowedOffsets = setOf(0.0, 128.0, 255.0)
+
     private val points: MutableSet<LorenzVec> = mutableSetOf()
     private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
 
@@ -33,7 +40,6 @@ object ArrowGuessBurrow {
         if (event.count != 0) return
         if (event.speed != 1.0f) return
 
-        val allowedOffsets = setOf(0.0, 128.0, 255.0)
         if (!event.offset.toDoubleArray().all(allowedOffsets::contains)) return
 
         if (!recentArrowParticles.add(event.location)) return
@@ -56,8 +62,6 @@ object ArrowGuessBurrow {
     private fun findClosestValidBlockToRay(ray: RaycastUtils.Ray): LorenzVec? {
         val bounds = IslandType.HUB.islandData?.boundingBox ?: return null
         val step = 0.9
-
-        if (bounds == null) return null
 
         var closest: LorenzVec? = null
         var closestDistance = Double.MAX_VALUE
@@ -92,32 +96,28 @@ object ArrowGuessBurrow {
         if (!pos.isInLoadedChunk()) {
             return true
         }
-        val isGround = pos.copy().getBlockAt() == Blocks.grass
+        val isGround = pos.getBlockAt() == Blocks.grass
         val isValidBlockAbove = pos.up().getBlockAt() in allowedBlocksAboveGround
         return isGround && isValidBlockAbove
     }
 
-    private fun detectArrow(points: HashSet<LorenzVec>): RaycastUtils.Ray? {
-        val shaftLength = 20
-        val maxDist = 0.12
-
-        val line = findLine(points, shaftLength, maxDist)
+    private fun detectArrow(points: MutableSet<LorenzVec>): RaycastUtils.Ray? {
+        val line = findLine(points, SHAFT_LENGTH, PARTICLE_DETECTION_TOLERANCE)
         if (line.isEmpty()) return null
-
 
         // the head of the arrow intersects with the particle one off the end, findLine only returns a full line with 20 points or an emptyList so this is safe
         val candidate1 = line[1]
         val candidate2 = line[line.size - 2]
-        val count1 = getPointsWithinDistance(points, candidate1, maxDist)
-        val count2 = getPointsWithinDistance(points, candidate2, maxDist)
+        val count1 = getPointsWithinDistance(points, candidate1, PARTICLE_DETECTION_TOLERANCE)
+        val count2 = getPointsWithinDistance(points, candidate2, PARTICLE_DETECTION_TOLERANCE)
 
         // One should be 2 (base) and the other 4 (tip)
-        if (!((count1 == 2 && count2 == 4) || (count1 == 4 && count2 == 2))) return null
+        if (!((count1 == COUNT_NEAR_BASE && count2 == COUNT_NEAR_TIP) || (count1 == COUNT_NEAR_TIP && count2 == COUNT_NEAR_BASE))) return null
 
         val base: LorenzVec
         val tip: LorenzVec
 
-        if (count1 == 4) { // if the first point is the base
+        if (count1 == COUNT_NEAR_TIP) { // if the first point is the base
             tip = line.first()
             base = line.last()
         } else {
@@ -126,8 +126,8 @@ object ArrowGuessBurrow {
         }
 
         // arrow is a block above the center of the start block
-        val adjustedBase = base.minus(LorenzVec(0.0, 1.5, 0.0))
-        val adjustedTip = tip.minus(LorenzVec(0.0, 1.5, 0.0))
+        val adjustedBase = base.down(1.5)
+        val adjustedTip = tip.down(1.5)
 
         return RaycastUtils.Ray(adjustedBase, adjustedTip.minus(adjustedBase).normalize())
     }
@@ -138,30 +138,18 @@ object ArrowGuessBurrow {
         maxDist: Double
     ): Int {
         val maxDistSq = maxDist * maxDist
-        var count = 0
-
-        for (point in points) {
-            // exclude the origin itself
-            if (point == origin) continue
-
-            val distSq = point.distanceSq(origin)
-            if (distSq <= maxDistSq) {
-                count++
-            }
-        }
-
-        return count
+        return points.count { it != origin && it.distanceSq(origin) <= maxDistSq }
     }
 
-    private fun findLine(points: HashSet<LorenzVec>, shaftLength: Int, maxDist: Double): List<LorenzVec> {
+    private fun findLine(points: Iterable<LorenzVec>, shaftLength: Int, maxDist: Double): List<LorenzVec> {
         for (point in points) {
-            val line = ArrayList<LorenzVec>(shaftLength)
-            val visited = HashSet<LorenzVec>()
+            val line = mutableListOf<LorenzVec>()
+            val visited = mutableSetOf<LorenzVec>()
             line.add(point)
             visited.add(point)
 
             if (extendLine(line, visited, points, shaftLength, maxDist)) {
-                return line
+                return line.toList()
             }
         }
         return emptyList()
@@ -170,7 +158,7 @@ object ArrowGuessBurrow {
     private fun extendLine(
         line: MutableList<LorenzVec>,
         visited: MutableSet<LorenzVec>,
-        points: Set<LorenzVec>,
+        points: Iterable<LorenzVec>,
         numPoints: Int,
         maxDist: Double
     ): Boolean {
@@ -212,8 +200,7 @@ object ArrowGuessBurrow {
         val ab = b.minus(a)
         val ac = c.minus(a)
         val cross = ab.crossProduct(ac)
-        val epsilon = 1e-6
-        return cross.lengthSquared() < epsilon
+        return cross.lengthSquared() < EPSILON
     }
 
     private fun isEnabled() = DianaApi.isDoingDiana() && config.guess && config.guessFromArrow
