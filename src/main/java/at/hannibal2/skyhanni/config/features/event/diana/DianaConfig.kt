@@ -8,7 +8,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.glfw.GLFW
@@ -83,18 +82,11 @@ class DianaConfig {
     @ConfigOption(
         name = "Guess From Arrow",
         desc = "Guess next burrow location in chain instantly from the particle arrow.\n" +
+            "Install bobby mod and increase render distant for better results.\n" +
             "§eRequires Guess Next Burrow.",
     )
     @ConfigEditorBoolean
     var guessFromArrow: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Title On Chain Completion",
-        desc = "Text to send as title when you complete a chain of burrows, leave empty to turn off."
-    )
-    @ConfigEditorText
-    var titleOnCompletion: String = ""
 
     @Expose
     @ConfigOption(
