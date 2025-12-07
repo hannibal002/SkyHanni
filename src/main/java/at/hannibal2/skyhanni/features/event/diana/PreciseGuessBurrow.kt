@@ -52,7 +52,11 @@ object PreciseGuessBurrow {
 
         val guessPosition = guessBurrowLocation() ?: return
 
-        BurrowGuessEvent(guessPosition.down(0.5).roundToBlock(), precise = bezierFitter.count() > 5, new = GriffinBurrowHelper.newBurrow).post()
+        BurrowGuessEvent(
+            guessPosition.down(0.5).roundToBlock(),
+            precise = bezierFitter.count() > 5,
+            new = GriffinBurrowHelper.newBurrow
+        ).post()
         GriffinBurrowHelper.newBurrow = false
     }
 

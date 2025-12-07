@@ -21,8 +21,8 @@ import kotlin.time.Duration.Companion.minutes
 object ArrowGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private var points: HashSet<LorenzVec> = HashSet()
-    private var recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
+    private val points: HashSet<LorenzVec> = HashSet()
+    private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -76,7 +76,7 @@ object ArrowGuessBurrow {
             if (!bounds.isInside(current)) break
 
             val pos = current.roundToBlock()
-            val center = pos.add(0.5,0.5,0.5)
+            val center = pos.add(0.5, 0.5, 0.5)
 
             if (seen.add(pos) && isBlockValid(pos)) {
                 val distance = RaycastUtils.findDistanceToRay(ray, center)
@@ -129,8 +129,8 @@ object ArrowGuessBurrow {
         }
 
         // arrow is a block above the center of the start block
-        val adjustedBase = base.minus(LorenzVec(0.0,1.5,0.0))
-        val adjustedTip = tip.minus(LorenzVec(0.0,1.5,0.0))
+        val adjustedBase = base.minus(LorenzVec(0.0, 1.5, 0.0))
+        val adjustedTip = tip.minus(LorenzVec(0.0, 1.5, 0.0))
 
         return RaycastUtils.Ray(adjustedBase, adjustedTip.minus(adjustedBase).normalize())
     }
@@ -218,8 +218,6 @@ object ArrowGuessBurrow {
         val epsilon = 1e-6
         return cross.lengthSquared() < epsilon
     }
-
-    //TODO onDebug or whatever
 
     private fun isEnabled() = DianaApi.isDoingDiana() && config.guess && config.guessFromArrow
 }
