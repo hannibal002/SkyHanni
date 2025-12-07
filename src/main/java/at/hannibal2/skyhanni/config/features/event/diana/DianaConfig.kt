@@ -81,12 +81,10 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Guess From Arrow",
-        desc = "Guess next burrow location in chain instantly from the particle arrow.\n" +
-            "Install bobby mod and increase render distant for better results.\n" +
-            "§eRequires Guess Next Burrow.",
+        desc = "Guess next burrow location in chain instantly from the particle arrow.\n"
     )
     @ConfigEditorBoolean
-    var guessFromArrow: Boolean = false
+    var guessFromArrow: Boolean = true
 
     @Expose
     @ConfigOption(

@@ -230,7 +230,7 @@ object GriffinBurrowHelper {
         particleBurrows = particleBurrows.editCopy { remove(location) }
         removePreciseGuess(location)
         update()
-        newBurrow = true;
+        newBurrow = true
     }
 
     @HandleEvent

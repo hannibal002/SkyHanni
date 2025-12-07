@@ -71,6 +71,7 @@ object ArrowGuessBurrow {
         // travel the ray
         var iteration = 0
         while (true) {
+            if (iteration > 2000) break
             val current = ray.origin + ray.direction.times(step * iteration)
             if (!bounds.isInside(current)) break
 
