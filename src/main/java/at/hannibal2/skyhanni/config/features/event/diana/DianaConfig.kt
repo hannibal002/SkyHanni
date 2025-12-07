@@ -80,6 +80,16 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(
+        name = "Guess From Arrow",
+        desc = "Guess next burrow location in chain instantly from the particle arrow.\n" +
+            "Install bobby mod and increase render distant for better results.\n" +
+            "§eRequires Guess Next Burrow.",
+    )
+    @ConfigEditorBoolean
+    var guessFromArrow: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Nearest Warp",
         desc = "Warp to the nearest warp point on the hub, if closer to the next burrow.",
     )

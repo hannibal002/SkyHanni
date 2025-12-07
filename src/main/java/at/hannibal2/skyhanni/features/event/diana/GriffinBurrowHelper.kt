@@ -56,7 +56,7 @@ object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val allowedBlocksAboveGround = buildList {
+    val allowedBlocksAboveGround = buildList {
         add(Blocks.air)
         add(Blocks.yellow_flower)
         add(Blocks.spruce_fence)
@@ -78,6 +78,7 @@ object GriffinBurrowHelper {
         }
     }
 
+    var newBurrow = true
     private var latestGuess: Guess? = null
     private val additionalGuesses = mutableListOf<Guess>()
 
@@ -229,6 +230,7 @@ object GriffinBurrowHelper {
         particleBurrows = particleBurrows.editCopy { remove(location) }
         removePreciseGuess(location)
         update()
+        newBurrow = true;
     }
 
     @HandleEvent
