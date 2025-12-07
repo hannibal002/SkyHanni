@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.minutes
 object ArrowGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val points: HashSet<LorenzVec> = HashSet()
+    private val points: MutableSet<LorenzVec> = mutableSetOf()
     private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
@@ -34,12 +34,9 @@ object ArrowGuessBurrow {
         if (event.speed != 1.0f) return
 
         val allowedOffsets = setOf(0.0, 128.0, 255.0)
-        if (event.offset.x !in allowedOffsets) return
-        if (event.offset.y !in allowedOffsets) return
-        if (event.offset.z !in allowedOffsets) return
+        if (!event.offset.toDoubleArray().all(allowedOffsets::contains)) return
 
-        if (recentArrowParticles.contains(event.location)) return
-        recentArrowParticles.add(event.location)
+        if (!recentArrowParticles.add(event.location)) return
         points.add(event.location)
 
         val arrow = detectArrow(points) ?: return
@@ -57,7 +54,7 @@ object ArrowGuessBurrow {
     }
 
     private fun findClosestValidBlockToRay(ray: RaycastUtils.Ray): LorenzVec? {
-        val bounds = IslandType.HUB.islandData?.boundingBox
+        val bounds = IslandType.HUB.islandData?.boundingBox ?: return null
         val step = 0.9
 
         if (bounds == null) return null
@@ -65,7 +62,7 @@ object ArrowGuessBurrow {
         var closest: LorenzVec? = null
         var closestDistance = Double.MAX_VALUE
 
-        val seen = HashSet<LorenzVec>()
+        val seen = mutableSetOf<LorenzVec>()
         seen.add(ray.origin.roundToBlock())
 
         // travel the ray
@@ -96,7 +93,7 @@ object ArrowGuessBurrow {
             return true
         }
         val isGround = pos.copy().getBlockAt() == Blocks.grass
-        val isValidBlockAbove = pos.copy(y = pos.y + 1).getBlockAt() in allowedBlocksAboveGround
+        val isValidBlockAbove = pos.up().getBlockAt() in allowedBlocksAboveGround
         return isGround && isValidBlockAbove
     }
 
