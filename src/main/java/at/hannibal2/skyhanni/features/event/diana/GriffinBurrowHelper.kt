@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
@@ -45,6 +46,7 @@ import at.hannibal2.skyhanni.utils.compat.addTallGrass
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
@@ -90,6 +92,12 @@ object GriffinBurrowHelper {
 
     private var testList = listOf<LorenzVec>()
     private var testGriffinSpots = false
+
+    private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
+    private val finishedChainPattern by patternGroup.pattern(
+        "chain-finished",
+        "§eYou finished the Griffin burrow chain! §r§7\\(\\d+/\\d+\\)"
+    )
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -251,6 +259,10 @@ object GriffinBurrowHelper {
         // talking to Diana NPC
         if (event.message == "§6Poof! §r§eYou have cleared your griffin burrows!") {
             resetAllData()
+        }
+
+        if (finishedChainPattern.matches(event.message) && !config.titleOnCompletion.isEmpty()) {
+            TitleManager.sendTitle(config.titleOnCompletion, duration = 1.seconds)
         }
     }
 
