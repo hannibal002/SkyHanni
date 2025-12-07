@@ -81,7 +81,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Guess From Arrow",
-        desc = "Guess next burrow location in chain instantly from the particle arrow.\n"
+        desc = "Guess next burrow location in chain instantly from the particle arrow."
     )
     @ConfigEditorBoolean
     var guessFromArrow: Boolean = true
