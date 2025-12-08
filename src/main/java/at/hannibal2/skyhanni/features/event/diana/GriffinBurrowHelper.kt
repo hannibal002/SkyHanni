@@ -206,7 +206,7 @@ object GriffinBurrowHelper {
         update()
     }
 
-    private fun removePreciseGuess(location: LorenzVec) {
+    fun removePreciseGuess(location: LorenzVec) {
         latestGuess?.let {
             if (it.precise && location == it.getLocation()) {
                 latestGuess = null
