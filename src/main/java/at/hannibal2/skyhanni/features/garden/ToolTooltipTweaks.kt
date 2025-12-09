@@ -80,10 +80,8 @@ object ToolTooltipTweaks {
                 val greenThumbFortune = FarmingFortuneDisplay.greenThumbFortune
                 val pesterminatorFortune = FarmingFortuneDisplay.pesterminatorFortune
 
-                // TODO Rework/remove this feature
                 if (config.fortuneTooltipKeybind.isKeyHeld()) {
                     iterator.addStat("  §7Base: §6+", baseFortune)
-                    iterator.addStat("  §7Tool: §6+", toolFortune)
                     iterator.addStat("  §7${reforgeName ?: "Reforge"}: §9+", reforgeFortune)
                     iterator.addStat("  §7Gemstone: §d+", gemstoneFortune)
                     iterator.addStat("  §7Ability: §2+", abilityFortune)
@@ -93,6 +91,7 @@ object ToolTooltipTweaks {
                     iterator.addStat("  §7Harvesting: §a+", harvestingFortune)
                     iterator.addStat("  §7Cultivating: §a+", cultivatingFortune)
                     iterator.addStat("  §7Farming for Dummies: §2+", ffdFortune)
+                    iterator.addStat("  §7Tool: §6+", toolFortune)
                     iterator.addStat("  §7Counter: §6+", counterFortune)
                     iterator.addStat("  §7Collection: §6+", collectionFortune)
                     iterator.addStat("  §7Dedication: §6+", dedicationFortune)
