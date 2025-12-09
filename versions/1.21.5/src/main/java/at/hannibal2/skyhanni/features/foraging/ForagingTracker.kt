@@ -239,14 +239,24 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         if (!openBonusGiftLoop) return
         ForagingTrackerLegacy.bonusGiftRewardPattern.matchMatcher(message) {
             val item = group("item")
-            val itemInternalName = ForagingTrackerLegacy.enchantedBookPattern.matchMatcher(item) {
+            var itemInternalName = ForagingTrackerLegacy.enchantedBookPattern.matchMatcher(item) {
                 val book = group("book")
                 val tier = group("tier").romanToDecimal()
                 NeuInternalName.fromItemNameOrNull("$book $tier")
             } ?: NeuInternalName.fromItemNameOrNull(item) ?: return@matchMatcher
 
             // Stretching Sticks handled separately due to stack size not being given in message
-            if (itemInternalName == STRETCHING_STICKS) return@matchMatcher
+            // (no, that's not how this works, they should be handled alongside everything else)
+            // if (itemInternalName == STRETCHING_STICKS) return@matchMatcher
+
+            /**
+             * the runes need to have their internal names forcibly set due to using internal names
+             * wildly different from what the tracker will read them to be. I think. maybe
+             */
+            when (itemInternalName) {
+                "◆_FADING_WHITE_RUNE;1".toInternalName() -> itemInternalName = "AXE_FADING_WHITE_RUNE;1".toInternalName()
+                "◆_FADING_GREEN_RUNE;1".toInternalName() -> itemInternalName = "AXE_FADING_GREEN_RUNE;1".toInternalName()
+            }
 
             loot.addOrPut(itemInternalName, 1)
 
