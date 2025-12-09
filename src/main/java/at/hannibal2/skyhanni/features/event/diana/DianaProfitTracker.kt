@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.itemabilities.CrownOfAvariceCounter.isAvariceConsuming
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -63,7 +64,7 @@ object DianaProfitTracker {
     ) { drawDisplay(it) }
 
     data class Data(
-        @Expose var burrowsDug: Long = 0
+        @Expose var burrowsDug: Long = 0,
     ) : ItemTrackerData() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / burrowsDug
@@ -133,10 +134,12 @@ object DianaProfitTracker {
             }
             tryHide(event)
         }
-        chatDugOutCoinsPattern.matchMatcher(message) {
-            BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
-            tryAddItem(NeuInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
-            tryHide(event)
+        if (!(isAvariceConsuming())) {
+            chatDugOutCoinsPattern.matchMatcher(message) {
+                BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
+                tryAddItem(NeuInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
+                tryHide(event)
+            }
         }
 
         if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
