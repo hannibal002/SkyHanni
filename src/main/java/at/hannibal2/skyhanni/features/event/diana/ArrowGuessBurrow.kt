@@ -65,20 +65,21 @@ object ArrowGuessBurrow {
 
         fun printData() {
             val warnings = if (bad > 0) "|  WARNING bad things happened $bad times" else ""
-            val output = """
-            |=== Arrow Guess Debug Session ===
-            |Active: $debugActive
-            |Running for: ${timeStarted.passedSince().format()}
-            |Distance function: $distanceDivisor
-            |
-            |Statistics:
-            |  Total guesses made: $guessesMade
-            |  Incorrect guesses: $incorrectGuesses
-            |  Precise guesses: $preciseGuesses
-            |  Non-start burrows w/o arrow guess: $nonStartBurrowsFoundWithoutArrowGuess
-            |  Could not find guess: $couldNotFindGuess
-            |  Accuracy: ${"%.1f".format((guessesMade - incorrectGuesses) * 100.0 / guessesMade)}%
-            $warnings""".trimMargin()
+            val output =
+                """
+                |=== Arrow Guess Debug Session ===
+                |Active: $debugActive
+                |Running for: ${timeStarted.passedSince().format()}
+                |Distance function: $distanceDivisor
+                |
+                |Statistics:
+                |  Total guesses made: $guessesMade
+                |  Incorrect guesses: $incorrectGuesses
+                |  Precise guesses: $preciseGuesses
+                |  Non-start burrows w/o arrow guess: $nonStartBurrowsFoundWithoutArrowGuess
+                |  Could not find guess: $couldNotFindGuess
+                |  Accuracy: ${"%.1f".format((guessesMade - incorrectGuesses) * 100.0 / guessesMade)}%
+                $warnings""".trimMargin()
 
             println(output)
         }
@@ -202,8 +203,8 @@ object ArrowGuessBurrow {
 
         val diff = endPoint.minus(ray.origin).toDoubleArray()
         val axisIndex = diff.withIndex()
-            .filter { (_, value) -> abs(value) > 0.9 }  // only if the axis isn't the same block
-            .minByOrNull { (_, value) -> abs(value) }   // find the axis with the least change
+            .filter { (_, value) -> abs(value) > 0.9 } // only if the axis isn't the same block
+            .minByOrNull { (_, value) -> abs(value) } // find the axis with the least change
             ?.index
             ?: return null
 
@@ -231,8 +232,9 @@ object ArrowGuessBurrow {
         }
 
         val sortedEntries = candidates.entries.sortedBy { it.value }
+        if (sortedEntries.isEmpty()) return null
         val possibilities = sortedEntries.filterIndexed { index, entry ->
-            if (index == 0) true  // Always include the smallest
+            if (index == 0) true // Always include the smallest
             else entry.value < sortedEntries[0].value * 2
         }.map { it.key }
 
@@ -267,8 +269,8 @@ object ArrowGuessBurrow {
         val count2 = getPointsWithinDistance(points, candidate2, PARTICLE_DETECTION_TOLERANCE)
 
         // One should be 2 (base) and the other 4 (tip)
-        if (!((count1 == COUNT_NEAR_BASE && count2 == COUNT_NEAR_TIP)
-                || (count1 == COUNT_NEAR_TIP && count2 == COUNT_NEAR_BASE))
+        if (!((count1 == COUNT_NEAR_BASE && count2 == COUNT_NEAR_TIP) ||
+                (count1 == COUNT_NEAR_TIP && count2 == COUNT_NEAR_BASE))
         ) return null
 
         val base: LorenzVec
