@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.garden
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
@@ -24,6 +25,25 @@ class TooltipTweaksConfig {
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
     var fortuneTooltipKeybind: Int = Keyboard.KEY_LSHIFT
+
+    @Expose
+    @ConfigOption(
+        name = "Tooltip Format",
+        desc = "Show crop-specific Farming Fortune in tooltip.\n" +
+            "§fShow: §7Crop-specific Fortune indicated as §6[+196]\n" +
+            "§fReplace: §7Edits the total Fortune to include crop-specific Fortune."
+    )
+    @ConfigEditorDropdown
+    var cropTooltipFortune: CropTooltipFortuneEntry = CropTooltipFortuneEntry.SHOW
+
+    enum class CropTooltipFortuneEntry(private val displayName: String) {
+        DEFAULT("Default"),
+        SHOW("Show"),
+        REPLACE("Replace"),
+        ;
+
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(

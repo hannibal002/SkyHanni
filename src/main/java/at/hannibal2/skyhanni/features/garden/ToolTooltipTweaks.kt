@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getAbilityFortune
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummie
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.text.DecimalFormat
+import kotlin.math.roundToInt
 
 @SkyHanniModule
 object ToolTooltipTweaks {
@@ -60,6 +62,8 @@ object ToolTooltipTweaks {
         val abilityFortune = getAbilityFortune(internalName, itemLore)
 
         val ffdFortune = itemStack.getFarmingForDummiesCount() ?: 0
+        val hiddenFortune =
+            (toolFortune + counterFortune + collectionFortune + turboCropFortune + dedicationFortune + abilityFortune)
         val iterator = event.toolTip.listIterator()
 
         var removingFarmhandDescription = false
@@ -74,14 +78,34 @@ object ToolTooltipTweaks {
 
                 FarmingFortuneDisplay.loadFortuneLineData(itemStack, enchantmentFortune)
 
+                val displayedFortune = FarmingFortuneDisplay.displayedFortune
                 val reforgeFortune = FarmingFortuneDisplay.reforgeFortune
                 val gemstoneFortune = FarmingFortuneDisplay.gemstoneFortune
                 val baseFortune = FarmingFortuneDisplay.itemBaseFortune
                 val greenThumbFortune = FarmingFortuneDisplay.greenThumbFortune
                 val pesterminatorFortune = FarmingFortuneDisplay.pesterminatorFortune
 
+                val totalFortune = displayedFortune + hiddenFortune
+
+                val ffdString = if (ffdFortune != 0) " §2(+${ffdFortune.formatStat()})" else ""
+                val reforgeString = if (reforgeFortune != 0.0) " §9(+${reforgeFortune.formatStat()})" else ""
+                val cropString = if (hiddenFortune != 0.0) " §6[+${hiddenFortune.roundToInt()}]" else ""
+                val gemstoneString = if (gemstoneFortune != 0.0) " §6[+${gemstoneFortune.formatStat()}]" else ""
+
+                val fortuneLine = when (config.cropTooltipFortune) {
+                    CropTooltipFortuneEntry.SHOW ->
+                        "§7Farming Fortune: §6+${displayedFortune.formatStat()}$ffdString$reforgeString$gemstoneString$cropString"
+
+                    CropTooltipFortuneEntry.REPLACE ->
+                        "§7Farming Fortune: §6+${totalFortune.formatStat()}$ffdString$reforgeString$gemstoneString$cropString"
+
+                    else -> line
+                }
+                iterator.set(fortuneLine)
+
                 if (config.fortuneTooltipKeybind.isKeyHeld()) {
                     iterator.addStat("  §7Base: §6+", baseFortune)
+                    iterator.addStat("  §7Tool: §6+", toolFortune)
                     iterator.addStat("  §7${reforgeName ?: "Reforge"}: §9+", reforgeFortune)
                     iterator.addStat("  §7Gemstone: §d+", gemstoneFortune)
                     iterator.addStat("  §7Ability: §2+", abilityFortune)
@@ -91,7 +115,6 @@ object ToolTooltipTweaks {
                     iterator.addStat("  §7Harvesting: §a+", harvestingFortune)
                     iterator.addStat("  §7Cultivating: §a+", cultivatingFortune)
                     iterator.addStat("  §7Farming for Dummies: §2+", ffdFortune)
-                    iterator.addStat("  §7Tool: §6+", toolFortune)
                     iterator.addStat("  §7Counter: §6+", counterFortune)
                     iterator.addStat("  §7Collection: §6+", collectionFortune)
                     iterator.addStat("  §7Dedication: §6+", dedicationFortune)
