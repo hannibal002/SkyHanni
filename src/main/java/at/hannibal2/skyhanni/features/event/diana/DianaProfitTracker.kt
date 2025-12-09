@@ -134,7 +134,7 @@ object DianaProfitTracker {
             }
             tryHide(event)
         }
-        if (!(isAvariceConsuming())) {
+        if (!isAvariceConsuming()) {
             chatDugOutCoinsPattern.matchMatcher(message) {
                 BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
                 tryAddItem(NeuInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
