@@ -106,10 +106,8 @@ object CrownOfAvariceCounter {
         update()
     }
 
-    fun isAvariceConsuming(): Boolean {
-        if (!isWearingCrown) return false
-        return totalCoins?.toDouble() != MAX_AVARICE_COINS
-    }
+    fun isAvariceConsuming(): Boolean =
+        isWearingCrown && (totalCoins ?: 0) < MAX_AVARICE_COINS
 
     @HandleEvent(IslandChangeEvent::class)
     fun onIslandChange() {
