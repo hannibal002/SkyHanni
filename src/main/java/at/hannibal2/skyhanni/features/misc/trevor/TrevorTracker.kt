@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures.TrapperState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -144,8 +145,8 @@ object TrevorTracker {
         if (!config.dataTracker) return false
         if (TrevorFeatures.inTrapperDen) return true
         return when (config.displayType) {
-            true -> (TrevorFeatures.inBetweenQuests || TrevorFeatures.questActive)
-            else -> TrevorFeatures.questActive
+            true -> (TrevorFeatures.state == TrapperState.ACTIVE || TrevorFeatures.state == TrapperState.COOLDOWN)
+            else -> TrevorFeatures.state == TrapperState.ACTIVE
         }
     }
 

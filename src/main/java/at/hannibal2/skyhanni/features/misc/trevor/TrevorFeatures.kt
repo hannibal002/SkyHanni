@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -28,11 +29,11 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -42,6 +43,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -77,13 +79,6 @@ object TrevorFeatures {
         "You are at the exact height!",
     )
 
-    /**
-     * REGEX-TEST: Location: Mushroom Gorge
-     */
-    private val locationPattern by patternGroup.pattern(
-        "zone",
-        "Location: (?<zone>.*)",
-    )
     private val mobDiedPattern by patternGroup.pattern(
         "mob.died",
         "§aReturn to the Trapper soon to get a new animal to hunt!",
@@ -101,29 +96,52 @@ object TrevorFeatures {
         "Trapper's Den",
     )
 
-    private var timeUntilNextReady = 0
-    private var trapperReady: Boolean = true
-    private var currentStatus = TrapperStatus.READY
-    private var currentLabel = "§2Ready"
+    var state = TrapperState.READY
+    var lastTitle: TitleContext? = null
+    var inTrapperDen = false
+    private var lastChatPromptTime = SimpleTimeMark.farPast()
+    private var lastChatPrompt = ""
+    private var lastQuestStart = SimpleTimeMark.farPast()
+    private var timeLastWarped = SimpleTimeMark.farPast()
+
+    private val totalCooldown get() = if (Perk.PELT_POCALYPSE.isActive) 16.seconds else 21.seconds
+    private val WARP_DELAY: Duration = 700.milliseconds
     private const val TRAPPER_ID: Int = 56
     private const val BACKUP_TRAPPER_ID: Int = 17
-    private var timeLastWarped = SimpleTimeMark.farPast()
-    private var lastChatPrompt = ""
-    private var lastChatPromptTime = SimpleTimeMark.farPast()
-
-    var questActive = false
-    var inBetweenQuests = false
-    var inTrapperDen = false
-    var lastTitle: TitleContext? = null
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
+    private fun getDisplayLabel(): String {
+        return when (state) {
+            TrapperState.COOLDOWN -> {
+                val remaining = totalCooldown - lastQuestStart.passedSince()
+                val seconds = remaining.inWholeSeconds.coerceAtLeast(0)
+                "${TrapperState.COOLDOWN.colorCode}${if (seconds == 1L) "1 second left" else "$seconds seconds left"}"
+            }
+
+            else -> state.colorCode + state.label
+        }
+    }
+
     @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onSecondPassed() {
-        updateTrapper()
+        if (state == TrapperState.PENDING && lastChatPromptTime.passedSince() > 5.seconds) {
+            state = TrapperState.READY
+        }
+
+        if (state == TrapperState.COOLDOWN && lastQuestStart.passedSince() >= totalCooldown) {
+            state = TrapperState.READY
+            if (config.readyTitle) {
+                lastTitle?.stop()
+                lastTitle = TitleManager.sendTitle("§2Trapper Ready")
+                SoundUtils.playBeepSound()
+            }
+        }
+
         TrevorTracker.update()
         TrevorTracker.calculatePeltsPerHour()
-        if (config.solver && questActive) {
+
+        if (config.solver && state == TrapperState.ACTIVE) {
             TrevorSolver.findMob()
         }
     }
@@ -139,26 +157,17 @@ object TrevorFeatures {
                 lastTitle = TitleManager.sendTitle("§2Mob Died")
                 SoundUtils.playBeepSound()
             }
-            trapperReady = true
             TrevorSolver.mobLocation = TrapperMobArea.NONE
-            if (timeUntilNextReady <= 0) {
-                currentStatus = TrapperStatus.READY
-                currentLabel = "§2Ready"
-            } else {
-                currentStatus = TrapperStatus.WAITING
-                currentLabel = if (timeUntilNextReady == 1) "§31 second left" else "§3$timeUntilNextReady seconds left"
-            }
-            TrevorSolver.mobLocation = TrapperMobArea.NONE
+            state = if (lastQuestStart.passedSince() >= totalCooldown) TrapperState.READY else TrapperState.COOLDOWN
         }
 
         trapperPattern.matchMatcher(formattedMessage) {
-            timeUntilNextReady = if (Perk.PELT_POCALYPSE.isActive) 16 else 21
-            currentStatus = TrapperStatus.ACTIVE
-            currentLabel = "§cActive Quest"
-            trapperReady = false
+            state = TrapperState.ACTIVE
+            lastQuestStart = SimpleTimeMark.now()
             TrevorTracker.startQuest(this)
-            updateTrapper()
             lastChatPromptTime = SimpleTimeMark.farPast()
+            val chatLocation = group("location").removeColor()
+            TrevorSolver.mobLocation = TrapperMobArea.entries.firstOrNull { it.location == chatLocation } ?: TrapperMobArea.NONE
         }
 
         talbotPatternAbove.matchMatcher(formattedMessage) {
@@ -184,6 +193,7 @@ object TrevorFeatures {
                 if (clickEvent.contains("YES")) {
                     lastChatPromptTime = SimpleTimeMark.now()
                     lastChatPrompt = clickEvent.substringAfter(" ")
+                    state = TrapperState.PENDING
                 }
             }
         }
@@ -193,68 +203,22 @@ object TrevorFeatures {
     fun onRenderOverlay() {
         if (!config.cooldownGui) return
 
-        val cooldownMessage = if (timeUntilNextReady <= 0) "Trapper Ready"
-        else if (timeUntilNextReady == 1) "1 second left"
-        else "$timeUntilNextReady seconds left"
+        val message = when (state) {
+            TrapperState.READY -> "Trapper Ready"
+            TrapperState.ACTIVE -> "Active Quest"
+            TrapperState.COOLDOWN -> {
+                val remaining = totalCooldown - lastQuestStart.passedSince()
+                val seconds = remaining.inWholeSeconds.coerceAtLeast(0)
+                if (seconds == 1L) "1 second left" else "$seconds seconds left"
+            }
 
-        config.cooldownGuiPosition.renderString(
-            "${currentStatus.colorCode}Trapper Cooldown: $cooldownMessage",
+            TrapperState.PENDING -> "Starting Quest"
+        }
+
+        config.cooldownGuiPosition.renderRenderables(
+            buildList { addString("${state.colorCode}Trapper: $message") },
             posLabel = "Trapper Cooldown GUI",
         )
-    }
-
-    private fun updateTrapper() {
-        timeUntilNextReady -= 1
-        if (trapperReady && timeUntilNextReady > 0) {
-            currentStatus = TrapperStatus.WAITING
-            currentLabel = if (timeUntilNextReady == 1) "§31 second left" else "§3$timeUntilNextReady seconds left"
-        }
-
-        if (timeUntilNextReady <= 0 && trapperReady) {
-            if (timeUntilNextReady == 0) {
-                if (config.readyTitle) {
-                    lastTitle?.stop()
-                    lastTitle = TitleManager.sendTitle("§2Trapper Ready")
-                    SoundUtils.playBeepSound()
-                }
-            }
-            currentStatus = TrapperStatus.READY
-            currentLabel = "§2Ready"
-        }
-
-        var found = false
-        var active = false
-        val previousLocation = TrevorSolver.mobLocation
-        // TODO work with trapper widget, widget api, repo patterns, when not found, warn in chat and dont update
-        for (line in TabListData.getTabList()) {
-            val formattedLine = line.removeColor().drop(1)
-            if (formattedLine.startsWith("Time Left: ")) {
-                trapperReady = false
-                currentStatus = TrapperStatus.ACTIVE
-                currentLabel = "§cActive Quest"
-                active = true
-            }
-
-            TrapperMobArea.entries.firstOrNull { it.location == formattedLine }?.let {
-                TrevorSolver.mobLocation = it
-                found = true
-            }
-            locationPattern.matchMatcher(formattedLine) {
-                val zone = group("zone")
-                TrevorSolver.mobLocation = TrapperMobArea.entries.firstOrNull { it.location == zone } ?: TrapperMobArea.NONE
-                found = true
-            }
-        }
-        if (!found) TrevorSolver.mobLocation = TrapperMobArea.NONE
-        if (!active) {
-            trapperReady = true
-        } else {
-            inBetweenQuests = true
-        }
-        if (TrevorSolver.mobCoordinates != LorenzVec(0.0, 0.0, 0.0) && active) {
-            TrevorSolver.mobLocation = previousLocation
-        }
-        questActive = active
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
@@ -265,12 +229,12 @@ object TrevorFeatures {
             // Solve for the fact that Moby also has the same ID as the Trapper
             val entityMob = MobData.entityToMob[entityTrapper] ?: return
             if (entityMob.name == "Moby") return
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color) {
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, state.color) {
                 config.cooldown
             }
             entityTrapper.getLorenzVec().let {
                 if (it.distanceToPlayer() < 15) {
-                    event.drawString(it.up(2.23), currentLabel)
+                    event.drawString(it.up(2.23), getDisplayLabel())
                 }
             }
         }
@@ -303,15 +267,51 @@ object TrevorFeatures {
         if (config.acceptQuest) {
             val timeSince = lastChatPromptTime.passedSince()
             if (timeSince > 200.milliseconds && timeSince < 5.seconds) {
-                lastChatPromptTime = SimpleTimeMark.farPast()
                 HypixelCommands.chatPrompt(lastChatPrompt)
                 lastChatPrompt = ""
-                timeLastWarped = SimpleTimeMark.now()
+                state = TrapperState.PENDING
                 return
             }
         }
 
-        if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds) {
+        if (timeLastWarped.passedSince() < WARP_DELAY) return
+
+        if (state == TrapperState.ACTIVE && config.warpToClosest) {
+            val mobLocation = TrevorSolver.mobLocation
+            if (mobLocation == TrapperMobArea.NONE) return
+            val mobCoordinates = mobLocation.coordinates
+
+            // Not actual /warp trapper coords, but his cave entrance (better estimation)
+            val trapperCoordinates = LorenzVec(287.5, 102.0, -571.5)
+            val desertCoordinates = LorenzVec(160.5, 77.0, -370.5)
+
+            val currentDistanceSqToMob = mobCoordinates.distanceSqToPlayer()
+            var warpTarget: String? = null
+            var bestDistanceSq = currentDistanceSqToMob
+
+            // filter mobLocation to GORGE for safer estimation
+            if (mobLocation == TrapperMobArea.GORGE) {
+                val distSqFromTrapper = trapperCoordinates.distanceSq(mobCoordinates)
+                if (distSqFromTrapper < bestDistanceSq) {
+                    bestDistanceSq = distSqFromTrapper
+                    warpTarget = "trapper"
+                }
+            }
+
+            // filter mobLocation to SETTLEMENT and OASIS for safer estimation
+            if (mobLocation == TrapperMobArea.SETTLEMENT || mobLocation == TrapperMobArea.OASIS) {
+                val distSqFromDesert = desertCoordinates.distanceSq(mobCoordinates)
+                if (distSqFromDesert < bestDistanceSq) {
+                    bestDistanceSq = distSqFromDesert
+                    warpTarget = "desert"
+                }
+            }
+
+            if (warpTarget != null) {
+                HypixelCommands.warp(warpTarget)
+                timeLastWarped = SimpleTimeMark.now()
+            }
+        } else if (config.warpToTrapper && state != TrapperState.PENDING) {
             HypixelCommands.warp("trapper")
             timeLastWarped = SimpleTimeMark.now()
         }
@@ -325,10 +325,7 @@ object TrevorFeatures {
 
     private fun resetTrapper() {
         TrevorSolver.resetLocation()
-        currentStatus = TrapperStatus.READY
-        currentLabel = "§2Ready"
-        questActive = false
-        inBetweenQuests = false
+        state = TrapperState.READY
     }
 
     @HandleEvent
@@ -336,15 +333,23 @@ object TrevorFeatures {
         resetTrapper()
     }
 
-    @HandleEvent
+    @HandleEvent(GraphAreaChangeEvent::class)
     fun onGraphAreaChange(event: GraphAreaChangeEvent) {
         inTrapperDen = areaTrappersDenPattern.matches(event.area)
     }
 
-    enum class TrapperStatus(baseColor: LorenzColor) {
-        READY(LorenzColor.DARK_GREEN),
-        WAITING(LorenzColor.DARK_AQUA),
-        ACTIVE(LorenzColor.DARK_RED),
+    enum class TrapperState(val label: String, baseColor: LorenzColor) {
+        // Ready to be started. Trapper is ready when we first come to him
+        READY("Ready", LorenzColor.DARK_GREEN),
+
+        // Quest is initiated, but not started - clicked on trapper, he started dialogue, but [YES] is not clicked yet
+        PENDING("Pending", LorenzColor.DARK_AQUA),
+
+        // Quest is active - go kill the mob
+        ACTIVE("Active Quest", LorenzColor.DARK_RED),
+
+        // Mob is killed, now waiting for the cooldown (if killed too quickly)
+        COOLDOWN("", LorenzColor.DARK_AQUA),
         ;
 
         val color = baseColor.toColor().addAlpha(75)
