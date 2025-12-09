@@ -91,6 +91,8 @@ object GriffinBurrowHelper {
     private var testList = listOf<LorenzVec>()
     private var testGriffinSpots = false
 
+    val guessCount get() = allGuessLocations.size
+
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Helper")

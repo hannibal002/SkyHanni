@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper.allowedBlocksAboveGround
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.math.abs
@@ -40,6 +42,7 @@ object ArrowGuessBurrow {
     private val points: MutableSet<LorenzVec> = mutableSetOf()
     private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
 
+    // TODO clear on island change
     private val allGuesses = mutableListOf<List<LorenzVec>>() // the first entry is the best guess other entries are other possibilities
 
     private var distanceDivisor = 0.0
@@ -71,6 +74,9 @@ object ArrowGuessBurrow {
                 |Active: $debugActive
                 |Running for: ${timeStarted.passedSince().format()}
                 |Distance function: $distanceDivisor
+                |Current size of allGuesses: ${allGuesses.size}
+                |Bobby detected: ${PlatformUtils.isModInstalled("bobby")}
+                |Current rendered guesses: ${GriffinBurrowHelper.guessCount}
                 |
                 |Statistics:
                 |  Total guesses made: $guessesMade
@@ -117,8 +123,22 @@ object ArrowGuessBurrow {
         } else {
             if (DebugSesh.debugActive) DebugSesh.incorrectGuesses++
             containingList.forEach { GriffinBurrowHelper.removePreciseGuess(it) }
+            allGuesses.remove(containingList)
         }
 
+    }
+
+    @HandleEvent
+    fun onBurrowDug(event: BurrowDugEvent) {
+        val toRemove = allGuesses.filter { event.burrowLocation in it }
+        val count = toRemove.size
+
+        if (count > 0) {
+            allGuesses.removeAll(toRemove)
+            if (DebugSesh.debugActive) {
+                DebugSesh.nonStartBurrowsFoundWithoutArrowGuess -= count
+            }
+        }
     }
 
     @HandleEvent
