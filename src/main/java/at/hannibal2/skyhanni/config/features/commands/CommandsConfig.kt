@@ -59,6 +59,25 @@ class CommandsConfig {
     @FeatureToggle
     var shortenWarp: Boolean = false
 
+    @ConfigOption(
+        name = "Shorten §e/call",
+        desc = "Allows calling without the need for the §ecall §7prefix.\n(§e/call maddox §7-> §e/maddox§7)",
+    )
+    @Expose
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var shortenCall: Boolean = false
+
+    @ConfigOption(
+        name = "Warp or call on shortening conflicts (e.g. §e/forge§7)",
+        desc = "If both §e/warp§7 and §e/call§7 shortening features enabled, controls behaviour on conflicts\n" +
+            "Example for §e/forge§7: when disabled, §e/forge§7 does §e/warp forge§7. Otherwise §e/forge§7 does " +
+            "§e/call forge§7. Or you can just use §e/fred§7",
+    )
+    @Expose
+    @ConfigEditorBoolean
+    var preferCallOverWarp: Boolean = false
+
     @Expose
     @ConfigOption(name = "Replace §e/warp is", desc = "Add §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
     @ConfigEditorBoolean

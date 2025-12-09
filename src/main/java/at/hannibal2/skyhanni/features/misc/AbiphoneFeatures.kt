@@ -59,13 +59,19 @@ object AbiphoneFeatures {
         AbiphoneFeatures.acceptUUID = null
     }
 
-    private var abiphoneContacts: Set<String>? = null
+    var abiphoneContacts: Set<String>? = null
+        private set
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val constant = event.getConstant<Map<String, AbiphoneContactInfo>>("abiphone", NeuAbiphoneJson.TYPE)
         abiphoneContacts = constant.flatMap { (key, value) ->
-            value.callNames ?: listOf(key.removeAllNonLettersAndNumbers().replace(" ", ""))
+            val cleanKey = key.removeAllNonLettersAndNumbers().replace(" ", "").lowercase()
+            value.callNames.orEmpty().let { callNames ->
+                if (callNames.isEmpty()) listOf(cleanKey)
+                // just in case, it is not explicitly stated anywhere that they are guaranteed to be lowercase
+                else callNames.map { it.lowercase() }
+            }
         }.toSet()
     }
 
