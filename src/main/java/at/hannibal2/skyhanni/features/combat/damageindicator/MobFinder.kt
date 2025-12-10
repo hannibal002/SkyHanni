@@ -425,7 +425,7 @@ class MobFinder {
         if (mob.name != "Arachne") return null
         return when (mob.levelOrTier) {
             300 -> EntityResult(bossType = BossType.ARACHNE_SMALL)
-            500 -> EntityResult(bossType = BossType.ARACHNE_SMALL)
+            500 -> EntityResult(bossType = BossType.ARACHNE_BIG)
             else -> null
         }
     }
