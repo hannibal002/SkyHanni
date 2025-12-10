@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
-import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper.allowedBlocksAboveGround
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,15 +18,18 @@ import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RaycastUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ArrowGuessBurrow {
@@ -44,6 +47,23 @@ object ArrowGuessBurrow {
 
     // TODO clear on island change
     private val allGuesses = mutableListOf<List<LorenzVec>>() // the first entry is the best guess other entries are other possibilities
+
+    private var lastBlockClicked: LorenzVec? = null
+
+    private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
+
+    /**
+     * REGEX-TEST: §eYou dug out a Griffin Burrow! §r§7(4/4)
+     */
+    private val dugBorrowPattern by patternGroup.pattern(
+        "burrow-dug",
+        "§eYou dug out a Griffin Burrow! §r§7\\((\\d+)/(\\d+)\\)"
+    )
+
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onBlockClick(event: BlockClickEvent) {
+        lastBlockClicked = event.position
+    }
 
     private var distanceDivisor = 0.0
         set(value) {
@@ -70,7 +90,7 @@ object ArrowGuessBurrow {
             val warnings = if (bad > 0) "|  WARNING bad things happened $bad times" else ""
             val output =
                 """
-                |=== Arrow Guess Debug Session ===
+                |=== Arrow Guess Debug Session (new) ===
                 |Active: $debugActive
                 |Running for: ${timeStarted.passedSince().format()}
                 |Distance function: $distanceDivisor
@@ -102,11 +122,15 @@ object ArrowGuessBurrow {
         }
     }
 
-    @HandleEvent
-    fun onBurrowDetect(event: BurrowDetectEvent) {
+    fun onBurrowDug(location: LorenzVec, chainNumber: Int, max: Int) {
+        if (chainNumber != max) {
+            points.clear()
+            newArrow = true
+        }
+
         // removes incorrect guesses
-        if (event.type == BurrowType.START) return
-        val location = event.burrowLocation
+        if (chainNumber == 1) return
+
         val containingLists = allGuesses.filter { location in it }
         if (containingLists.size > 1) {
             if (DebugSesh.debugActive) DebugSesh.bad++
@@ -126,19 +150,6 @@ object ArrowGuessBurrow {
             allGuesses.remove(containingList)
         }
 
-    }
-
-    @HandleEvent
-    fun onBurrowDug(event: BurrowDugEvent) {
-        val toRemove = allGuesses.filter { event.burrowLocation in it }
-        val count = toRemove.size
-
-        if (count > 0) {
-            allGuesses.removeAll(toRemove)
-            if (DebugSesh.debugActive) {
-                DebugSesh.nonStartBurrowsFoundWithoutArrowGuess -= count
-            }
-        }
     }
 
     @HandleEvent
@@ -172,11 +183,15 @@ object ArrowGuessBurrow {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onChat(event: SkyHanniChatEvent) {
-        if (event.message.startsWith("§eYou dug out a Griffin Burrow!")) {
-            points.clear()
-            newArrow = true
+        if (dugBorrowPattern.matches(event.message)) {
+            val matcher = dugBorrowPattern.matcher(event.message)
+            if (matcher.find()) {
+                val current = matcher.group(1).toInt()
+                val max = matcher.group(2).toInt()
+                lastBlockClicked?.let { onBurrowDug(it, current, max) }
+            }
         }
     }
 
@@ -201,6 +216,9 @@ object ArrowGuessBurrow {
         val guess = findClosestValidBlockToRayNew(arrow) ?: run {
             if (DebugSesh.debugActive) {
                 DebugSesh.couldNotFindGuess++
+            }
+            if (config.warnIfInaccurateArrowGuess) {
+                TitleManager.sendTitle("§eUse Spade", duration = 2.seconds)
             }
             return
         }
@@ -263,6 +281,10 @@ object ArrowGuessBurrow {
         if (DebugSesh.debugActive) {
             DebugSesh.guessesMade++
             if (possibilities.size == 1) DebugSesh.preciseGuesses++
+        }
+
+        if (possibilities.size > 1 && config.warnIfInaccurateArrowGuess) {
+            TitleManager.sendTitle("§eUse Spade")
         }
 
         return possibilities[0]

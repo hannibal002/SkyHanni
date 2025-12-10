@@ -88,6 +88,14 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(
+        name = "Warn If Inaccurate",
+        desc = "Sends a title message telling you to use your spade if arrow guess has a high chance of being wrong."
+    )
+    @ConfigEditorBoolean
+    var warnIfInaccurateArrowGuess: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Nearest Warp",
         desc = "Warp to the nearest warp point on the hub, if closer to the next burrow.",
     )
