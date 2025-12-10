@@ -4,19 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
-import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper.allowedBlocksAboveGround
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -45,12 +44,20 @@ object ArrowGuessBurrow {
     private val points: MutableSet<LorenzVec> = mutableSetOf()
     private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
 
-    // TODO clear on island change
+    // TODO make timelimitedlist or clearonleavinghub
     private val allGuesses = mutableListOf<List<LorenzVec>>() // the first entry is the best guess other entries are other possibilities
 
     private var lastBlockClicked: LorenzVec? = null
 
     private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
+
+    /**
+     * REGEX-TEST: §eYou finished the Griffin burrow chain! §r§7(4/4)
+     */
+    private val finishedChainPattern by patternGroup.pattern(
+        "chain-finished-capture",
+        "§eYou finished the Griffin burrow chain! §r§7\\(\\d+/(\\d+)\\)"
+    )
 
     /**
      * REGEX-TEST: §eYou dug out a Griffin Burrow! §r§7(4/4)
@@ -65,14 +72,6 @@ object ArrowGuessBurrow {
         lastBlockClicked = event.position
     }
 
-    private var distanceDivisor = 0.0
-        set(value) {
-            if (field == value) return
-            DebugSesh.clear()
-            field = value
-            DebugSesh.printData()
-        }
-
     private var newArrow = true
 
     private object DebugSesh {
@@ -82,18 +81,14 @@ object ArrowGuessBurrow {
         var guessesMade = 0
         var incorrectGuesses = 0
         var preciseGuesses = 0
-        var nonStartBurrowsFoundWithoutArrowGuess = 0
         var couldNotFindGuess = 0
-        var bad = 0
 
         fun printData() {
-            val warnings = if (bad > 0) "|  WARNING bad things happened $bad times" else ""
             val output =
                 """
-                |=== Arrow Guess Debug Session (new) ===
+                |=== Arrow Guess Debug Session ===
                 |Active: $debugActive
                 |Running for: ${timeStarted.passedSince().format()}
-                |Distance function: $distanceDivisor
                 |Current size of allGuesses: ${allGuesses.size}
                 |Bobby detected: ${PlatformUtils.isModInstalled("bobby")}
                 |Current rendered guesses: ${GriffinBurrowHelper.guessCount}
@@ -102,23 +97,22 @@ object ArrowGuessBurrow {
                 |  Total guesses made: $guessesMade
                 |  Incorrect guesses: $incorrectGuesses
                 |  Precise guesses: $preciseGuesses
-                |  Non-start burrows w/o arrow guess: $nonStartBurrowsFoundWithoutArrowGuess
                 |  Could not find guess: $couldNotFindGuess
                 |  Accuracy: ${"%.1f".format((guessesMade - incorrectGuesses) * 100.0 / guessesMade)}%
-                $warnings""".trimMargin()
+                |  Precision rate: ${"%.1f".format(preciseGuesses * 100.0 / guessesMade)}%
+                """.trimMargin()
 
             println(output)
         }
 
         fun clear() {
             printData()
+            allGuesses.clear()
             timeStarted = SimpleTimeMark.now()
             guessesMade = 0
             incorrectGuesses = 0
             preciseGuesses = 0
-            nonStartBurrowsFoundWithoutArrowGuess = 0
             couldNotFindGuess = 0
-            bad = 0
         }
     }
 
@@ -128,28 +122,19 @@ object ArrowGuessBurrow {
             newArrow = true
         }
 
-        // removes incorrect guesses
         if (chainNumber == 1) return
 
-        val containingLists = allGuesses.filter { location in it }
-        if (containingLists.size > 1) {
-            if (DebugSesh.debugActive) DebugSesh.bad++
-            return
-        }
-        if (containingLists.isEmpty()) {
-            if (DebugSesh.debugActive) DebugSesh.nonStartBurrowsFoundWithoutArrowGuess++
-            return
-        }
-        val containingList = containingLists.first()
-        // we were correct
-        if (containingList.first() == location) {
-            allGuesses.remove(containingList)
-        } else {
-            if (DebugSesh.debugActive) DebugSesh.incorrectGuesses++
-            containingList.forEach { GriffinBurrowHelper.removePreciseGuess(it) }
-            allGuesses.remove(containingList)
+        val containingLists = allGuesses.filter { guessList ->
+            guessList.any { guess -> guess.distance(location) <= 3 }
         }
 
+        if (DebugSesh.debugActive) {
+            val correct = containingLists.firstOrNull { list -> list[0].distance(location) <= 3 }
+            if (correct == null) DebugSesh.incorrectGuesses++
+        }
+
+        containingLists.forEach { list -> list.forEach { GriffinBurrowHelper.removePreciseGuess(it) } }
+        allGuesses.removeAll(containingLists)
     }
 
     @HandleEvent
@@ -174,12 +159,6 @@ object ArrowGuessBurrow {
             literalCallback("status") {
                 DebugSesh.printData()
             }
-
-            literal("setDistanceDivisor") {
-                argCallback("divisor", BrigadierArguments.double(), emptyList()) { divisor ->
-                    distanceDivisor = divisor
-                }
-            }
         }
     }
 
@@ -191,6 +170,12 @@ object ArrowGuessBurrow {
                 val current = matcher.group(1).toInt()
                 val max = matcher.group(2).toInt()
                 lastBlockClicked?.let { onBurrowDug(it, current, max) }
+            }
+        } else if (finishedChainPattern.matches(event.message)) {
+            val matcher = finishedChainPattern.matcher(event.message)
+            if (matcher.find()) {
+                val max = matcher.group(1).toInt()
+                lastBlockClicked?.let { onBurrowDug(it, max, max) }
             }
         }
     }
@@ -218,7 +203,7 @@ object ArrowGuessBurrow {
                 DebugSesh.couldNotFindGuess++
             }
             if (config.warnIfInaccurateArrowGuess) {
-                TitleManager.sendTitle("§eUse Spade", duration = 2.seconds)
+                TitleManager.sendTitle("§eUse Spade", duration = 3.seconds)
             }
             return
         }
@@ -258,23 +243,18 @@ object ArrowGuessBurrow {
             val candidateBlock = candidatePoint.roundToBlock()
             if (!isBlockValid(candidateBlock)) continue
             val blockCenter = candidateBlock.add(0.5, 0.5, 0.5)
-            val distanceToRay = RaycastUtils.findDistanceToRay(ray, blockCenter) * 50000
+            val distanceToRay = RaycastUtils.findDistanceToRay(ray, blockCenter)
 
             val distanceFromOrigin = candidatePoint.distance(ray.origin)
 
-            // testing required
-            var scaledDistance = distanceToRay
-            if (distanceDivisor != 0.0) scaledDistance = (distanceToRay) / (1 + distanceFromOrigin / distanceDivisor)
+            // take the ratio to account for errors
+            val scaledDistance = (distanceToRay * 500000 / distanceFromOrigin).roundTo(5)
 
             candidates[candidateBlock] = scaledDistance
         }
 
-        val sortedEntries = candidates.entries.sortedBy { it.value }
-        if (sortedEntries.isEmpty()) return null
-        val possibilities = sortedEntries.filterIndexed { index, entry ->
-            if (index == 0) true // Always include the smallest
-            else entry.value < sortedEntries[0].value * 2
-        }.map { it.key }
+        val minValue = candidates.values.minOrNull() ?: return null
+        val possibilities = candidates.filterValues { it == minValue }.map { it.key }
 
         allGuesses.add(possibilities)
 
@@ -295,7 +275,7 @@ object ArrowGuessBurrow {
             return true
         }
         val isGround = pos.getBlockAt() == Blocks.grass
-        val isValidBlockAbove = pos.up().getBlockAt() in allowedBlocksAboveGround
+        val isValidBlockAbove = pos.up().getBlockAt() in GriffinBurrowHelper.allowedBlocksAboveGround
         return isGround && isValidBlockAbove
     }
 
