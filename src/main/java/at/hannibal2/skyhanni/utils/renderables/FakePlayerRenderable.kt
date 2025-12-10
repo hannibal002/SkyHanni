@@ -108,6 +108,7 @@ fun Renderable.Companion.fakePlayer(
 //$$     mouseY: Float,
 //$$     entity: LivingEntity,
 //$$ ) {
+//#if MC < 1.21.11
 //$$     val f = (x1 + x2) / 2.0f
 //$$     val g = (y1 + y2) / 2.0f
 //$$     val h = atan(((f - mouseX) / 40.0f).toDouble()).toFloat()
@@ -134,5 +135,8 @@ fun Renderable.Companion.fakePlayer(
 //$$     entity.pitch = l
 //$$     entity.lastHeadYaw = m
 //$$     entity.headYaw = n
+//#else
+//$$ InventoryScreen.drawEntity(context, x1, y1, x2, y2, size, scale, mouseX, mouseY, entity)
+//#endif
 //$$ }
 //#endif

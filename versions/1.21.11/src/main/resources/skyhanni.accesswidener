@@ -21,10 +21,10 @@ accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPa
 accessible field net/minecraft/world/World blockEntityTickers Ljava/util/List;
 accessible class net/minecraft/client/font/TextRenderer$Drawer
 accessible method net/minecraft/client/gui/hud/ChatHud refresh ()V
-accessible field net/minecraft/client/render/RenderLayer$MultiPhase phases Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
-accessible field net/minecraft/client/render/RenderLayer$MultiPhaseParameters target Lnet/minecraft/client/render/RenderPhase$Target;
-accessible method net/minecraft/client/render/RenderLayer$MultiPhase <init> (Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)V
-extendable class net/minecraft/client/render/RenderLayer$MultiPhase
+#accessible field net/minecraft/client/render/RenderLayer$MultiPhase phases Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
+#accessible field net/minecraft/client/render/RenderLayer$MultiPhaseParameters target Lnet/minecraft/client/render/RenderPhase$Target;
+#accessible method net/minecraft/client/render/RenderLayer$MultiPhase <init> (Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)V
+#extendable class net/minecraft/client/render/RenderLayer$MultiPhase
 accessible class net/minecraft/client/font/TextHandler$LineWrappingCollector
 accessible class net/minecraft/client/font/TextHandler$StyledString
 accessible method net/minecraft/text/TextColor <init> (ILjava/lang/String;)V
@@ -39,9 +39,13 @@ accessible field net/minecraft/client/gui/hud/ChatHud scrolledLines I
 #accessible method net/minecraft/client/gui/hud/ChatHud toChatLineY (D)D
 
 # 1.21.7 stuff
-accessible field net/minecraft/client/render/RenderLayer$MultiPhase pipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+#accessible field net/minecraft/client/render/RenderLayer$MultiPhase pipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;
 accessible method net/minecraft/client/gui/screen/ingame/HandledScreen drawBackground (Lnet/minecraft/client/gui/DrawContext;FII)V
 
 # 1.21.9 stuff
 #accessible class net/minecraft/client/font/BakedGlyphImpl$DrawnGlyph
 accessible field net/minecraft/client/option/StickyKeyBinding toggleGetter Ljava/util/function/BooleanSupplier;
+
+# 1.21.11 stuff
+accessible field net/minecraft/client/render/Camera pos Lnet/minecraft/util/math/Vec3d;
+accessible method net/minecraft/client/gui/hud/ChatHud getWidth ()I
