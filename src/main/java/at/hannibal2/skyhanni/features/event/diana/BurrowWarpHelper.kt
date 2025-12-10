@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
@@ -48,7 +48,7 @@ object BurrowWarpHelper {
             " §7(§ePress $keyName§7)"
         } else ""
 
-        val warpText = Renderable.text(text + keybindSuffix, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
+        val warpText = Renderable.text(text + keybindSuffix)
 
         config.warpGuiPosition.renderRenderable(warpText, posLabel = "Diana Nearest Warp")
     }
@@ -66,6 +66,10 @@ object BurrowWarpHelper {
         lastWarpTime = SimpleTimeMark.now()
         HypixelCommands.warp(warp.name)
         lastWarp = currentWarp
+        GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
+        TitleManager.conditionallyStopTitle { currentTitle ->
+            currentTitle.startsWith("§bWarp to ")
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
