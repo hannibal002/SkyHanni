@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -8,6 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.input.Keyboard
@@ -106,6 +109,18 @@ class DianaConfig {
     @ConfigOption(name = "Warp Key", desc = "Press this key to warp to nearest burrow waypoint.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var keyBindWarp: Int = Keyboard.KEY_NONE
+
+    @Expose
+    @ConfigOption(
+        name = "Warp Distance",
+        desc = "the warp distance subtracted from player distance required to show warp suggestion.",
+    )
+    @ConfigEditorSlider(minValue = 0.0f, maxValue = 200.0f, minStep = 1.0f)
+    var warpDistanceDifference: Int = 10
+
+    @Expose
+    @ConfigLink(owner = DianaConfig::class, field = "burrowNearestWarp")
+    val warpGuiPosition: Position = Position(327, 125, scale = 2.6f)
 
     @Expose
     @ConfigOption(name = "Ignored Warps", desc = "")

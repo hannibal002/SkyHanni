@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
@@ -48,7 +47,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
-import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -262,6 +260,12 @@ object GriffinBurrowHelper {
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
 
+        if (config.warnIfInaccurateArrowGuess) {
+            TitleManager.conditionallyStopTitle { currentTitle ->
+                currentTitle == "§eUse Spade"
+            }
+        }
+
         additionalGuesses.removeIf {
             it.getLocation().distanceToPlayerIgnoreY() < 10
         }
@@ -336,8 +340,6 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
 
         showTestLocations(event)
-
-        showWarpSuggestions()
 
         val playerLocation = LocationUtils.playerLocation()
         if (config.inquisitorSharing.enabled) {
@@ -444,21 +446,6 @@ object GriffinBurrowHelper {
                     particleBurrows = particleBurrows.editCopy { keys.remove(location) }
                 }
             }
-        }
-    }
-
-    private fun showWarpSuggestions() {
-        if (!config.burrowNearestWarp) return
-        val warp = BurrowWarpHelper.currentWarp ?: return
-
-        val text = "§bWarp to " + warp.displayName
-        val keybindSuffix = if (config.keyBindWarp != Keyboard.KEY_NONE) {
-            val keyName = KeyboardManager.getKeyName(config.keyBindWarp)
-            " §7(§ePress $keyName§7)"
-        } else ""
-        if (lastTitleSentTime.passedSince() > 2.seconds) {
-            lastTitleSentTime = SimpleTimeMark.now()
-            TitleManager.sendTitle(text + keybindSuffix, duration = 2.seconds)
         }
     }
 
