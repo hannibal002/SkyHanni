@@ -55,7 +55,7 @@ public class MixinEntityRenderer {
     //$$ @WrapOperation(method = "updateRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"))
     //$$ public boolean shouldAlsoGlow(MinecraftClient client, Entity entity, Operation<Boolean> original, @Local(argsOnly = true) EntityRenderState state) {
     //$$     Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
-    //$$     if (glowColor == null || entity.isInvisible()) {
+    //$$     if (glowColor == null) {
     //$$         return original.call(client, entity);
     //$$     }
     //$$     ((EntityRenderStateStore) state).skyhanni$setUsingCustomOutline();
@@ -65,7 +65,7 @@ public class MixinEntityRenderer {
     //$$ @WrapOperation(method = "updateRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getTeamColorValue()I"))
     //$$ public int getCustomGlowColor(Entity entity, Operation<Integer> original) {
     //$$     Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
-    //$$     if (glowColor == null || entity.isInvisible()) {
+    //$$     if (glowColor == null) {
     //$$         return original.call(entity);
     //$$     }
     //$$     return glowColor;
