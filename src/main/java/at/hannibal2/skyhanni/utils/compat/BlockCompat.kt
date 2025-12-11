@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.block.Block
-import net.minecraft.block.BlockDoublePlant
-import net.minecraft.block.properties.IProperty
 import net.minecraft.block.properties.PropertyEnum
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
+//#if MC < 1.21
+import net.minecraft.block.properties.IProperty
+//#endif
 
 object BlockCompat {
     fun getAllLogs(): List<Block> {
@@ -52,14 +54,43 @@ object BlockCompat {
         //#endif
     }
 
-    fun IBlockState.isSunflower(): Boolean {
+    fun IBlockState.getFlowerType(pos: LorenzVec): String? {
         //#if MC < 1.21
-        val vari = this.getValue(BlockDoublePlant.VARIANT)
-        val res = this.getValue(BlockDoublePlant.VARIANT).meta == 0
-        println(vari)
-        println(res)
-        return res
+        val property = (this.block.blockState.properties.find { it.name == "variant" } as? PropertyEnum) ?: return null
+        val halfProperty = (this.block.blockState.properties.find { it.name == "half" } as? PropertyEnum) ?: return null
+        val flower = getValue(property as? IProperty<*>).toString()
+        val upper = getValue(halfProperty as? IProperty<*>)
+        if (upper.toString() == "upper") {
+            val lowerState = pos.down(1).getBlockStateAt()
+            // this is really cursed
+            // fuck blockstates
+            val stateString = lowerState.toString()
+            if (stateString.contains("variant=sunflower")) return "sunflower"
+            if (stateString.contains("variant=syringa")) return "syringa"
+            if (stateString.contains("variant=double_grass")) return "double_grass"
+            if (stateString.contains("variant=double_fern")) return "double_fern"
+            if (stateString.contains("variant=double_rose")) return "double_rose"
+            if (stateString.contains("variant=paeonia")) return "paeonia"
+        }
+        return flower
         //#else
+        //$$ return "dont use on 1.21"
+        //#endif
+    }
+
+    fun IBlockState.isSunflower(pos: LorenzVec): Boolean {
+        //#if MC < 1.21
+        return this.getFlowerType(pos) == "sunflower"
+        //#else
+        //$$ return this.block == Blocks.SUNFLOWER
+        //#endif
+    }
+
+    fun IBlockState.isWildRose(pos: LorenzVec): Boolean {
+        //#if MC < 1.21
+        return this.getFlowerType(pos) == "double_rose"
+        //#else
+        //$$ return this.block == Blocks.ROSE_BUSH
         //#endif
     }
 

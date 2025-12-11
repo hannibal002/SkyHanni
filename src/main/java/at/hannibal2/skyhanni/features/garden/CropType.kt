@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.BlockCompat.isSunflower
+import at.hannibal2.skyhanni.utils.compat.BlockCompat.isWildRose
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
@@ -102,7 +105,7 @@ enum class CropType(
 
         fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid crop type '$name'")
 
-        fun IBlockState.getCropType(): CropType? {
+        fun IBlockState.getCropType(pos: LorenzVec): CropType? {
             return when (block) {
                 Blocks.wheat -> WHEAT
                 Blocks.carrots -> CARROT
@@ -114,11 +117,24 @@ enum class CropType(
                 Blocks.cocoa -> COCOA_BEANS
                 Blocks.red_mushroom, Blocks.brown_mushroom -> MUSHROOM
                 Blocks.nether_wart -> NETHER_WART
+                //#if MC < 1.21
                 Blocks.double_plant -> {
-                    return if (this.isSunflower()) SUNFLOWER/*  whatFlowerIsIt() */ else WILD_ROSE
+                    return if (this.isSunflower(pos)) getTimeFlower() else if (this.isWildRose(pos)) WILD_ROSE else null
                 }
+                //#else
+                //$$ Blocks.ROSE_BUSH -> WILD_ROSE
+                //$$ Blocks.SUNFLOWER -> getTimeFlower()
+                //#endif
                 else -> null
             }
+        }
+
+        fun getTimeFlower(): CropType? {
+            val timeSymbol = CustomScoreboardUtils.getTimeSymbol()
+            // pretty sure great spook will break this
+            if (timeSymbol == "☽") return MOONFLOWER
+            if (timeSymbol == "☀") return SUNFLOWER
+            else return null
         }
 
         fun CropType.getTurboCrop() = "turbo_${this.enchantName.lowercase()}"
