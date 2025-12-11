@@ -10,10 +10,13 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RaycastUtils
@@ -21,10 +24,14 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.minutes
@@ -43,12 +50,14 @@ object ArrowGuessBurrow {
 
     private val points: MutableSet<LorenzVec> = mutableSetOf()
     private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
+    private val allGuesses = ConcurrentHashMap<LorenzVec, List<LorenzVec>>()
 
-    // TODO make timelimitedlist or clearonleavinghub
-    private val allGuesses = mutableListOf<List<LorenzVec>>() // the first entry is the best guess other entries are other possibilities
+    private var newArrow = true
 
-    private var lastBlockClicked: LorenzVec? = null
+    // deific spade insta breaks grass and hits the block behind it before chat messages if you left-click
+    private var recentBlocksClicked = TimeLimitedSet<LorenzVec>(0.5.seconds)
 
+    // TODO Repo pattern `finishedChainPattern` must not contain unnamed capture groups. [RepoPatternUnnamedGroup]
     private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
 
     /**
@@ -67,15 +76,9 @@ object ArrowGuessBurrow {
         "§eYou dug out a Griffin Burrow! §r§7\\((\\d+)/(\\d+)\\)"
     )
 
-    @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onBlockClick(event: BlockClickEvent) {
-        lastBlockClicked = event.position
-    }
-
-    private var newArrow = true
-
     private object DebugSesh {
         var debugActive = false
+        var renderAll = false
         var timeStarted = SimpleTimeMark.farPast()
 
         var guessesMade = 0
@@ -109,6 +112,7 @@ object ArrowGuessBurrow {
             printData()
             allGuesses.clear()
             timeStarted = SimpleTimeMark.now()
+            renderAll = false
             guessesMade = 0
             incorrectGuesses = 0
             preciseGuesses = 0
@@ -116,25 +120,26 @@ object ArrowGuessBurrow {
         }
     }
 
-    fun onBurrowDug(location: LorenzVec, chainNumber: Int, max: Int) {
-        if (chainNumber != max) {
-            points.clear()
-            newArrow = true
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        if (DebugSesh.debugActive && DebugSesh.renderAll) {
+            allGuesses.forEach { entry ->
+                event.drawColor(entry.key.up(2), LorenzColor.BLUE.toChromaColor())
+                entry.value.forEach { value ->
+                    event.drawColor(value.up(2), LorenzColor.GREEN.toChromaColor())
+                }
+            }
         }
+    }
 
-        if (chainNumber == 1) return
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onBlockClick(event: BlockClickEvent) {
+        recentBlocksClicked.add(event.position)
+    }
 
-        val containingLists = allGuesses.filter { guessList ->
-            guessList.any { guess -> guess.distance(location) <= 3 }
-        }
-
-        if (DebugSesh.debugActive) {
-            val correct = containingLists.firstOrNull { list -> list[0].distance(location) <= 3 }
-            if (correct == null) DebugSesh.incorrectGuesses++
-        }
-
-        containingLists.forEach { list -> list.forEach { GriffinBurrowHelper.removePreciseGuess(it) } }
-        allGuesses.removeAll(containingLists)
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onIslandChange() {
+        allGuesses.clear()
     }
 
     @HandleEvent
@@ -144,6 +149,7 @@ object ArrowGuessBurrow {
             category = CommandCategory.DEVELOPER_DEBUG
 
             literalCallback("start") {
+                ChatUtils.chat("debug session started")
                 if (!DebugSesh.debugActive) {
                     DebugSesh.debugActive = true
                     DebugSesh.timeStarted = SimpleTimeMark.now()
@@ -152,12 +158,19 @@ object ArrowGuessBurrow {
             }
 
             literalCallback("stop") {
+                ChatUtils.chat("check your console/latestlog to see data")
                 DebugSesh.debugActive = false
                 DebugSesh.clear()
             }
 
             literalCallback("status") {
+                ChatUtils.chat("check your console/latestlog to see data")
                 DebugSesh.printData()
+            }
+
+            literalCallback("toggleRenderAllGuesses") {
+                DebugSesh.renderAll = !DebugSesh.renderAll
+                ChatUtils.chat("render all now ${DebugSesh.renderAll}")
             }
         }
     }
@@ -169,13 +182,13 @@ object ArrowGuessBurrow {
             if (matcher.find()) {
                 val current = matcher.group(1).toInt()
                 val max = matcher.group(2).toInt()
-                lastBlockClicked?.let { onBurrowDug(it, current, max) }
+                recentBlocksClicked.forEach { onBurrowDug(it, current, max) }
             }
         } else if (finishedChainPattern.matches(event.message)) {
             val matcher = finishedChainPattern.matcher(event.message)
             if (matcher.find()) {
                 val max = matcher.group(1).toInt()
-                lastBlockClicked?.let { onBurrowDug(it, max, max) }
+                recentBlocksClicked.forEach { onBurrowDug(it, max, max) }
             }
         }
     }
@@ -218,6 +231,42 @@ object ArrowGuessBurrow {
 
     }
 
+    fun checkMoveGuess(particleBurrows: Map<LorenzVec, BurrowType>) {
+        val burrows = particleBurrows.filter { it.value != BurrowType.START }.map { it.key }
+        val keysCopy = allGuesses.keys.toList()
+        for (guess in keysCopy) {
+            if (!burrows.contains(guess) && guess.distanceSq(MinecraftCompat.localPlayer.position.toLorenzVec()) < 100) { // and has been holding spade for 2 seconds or player clicks the block
+                val otherGuesses = allGuesses[guess] ?: continue
+                GriffinBurrowHelper.removePreciseGuess(guess)
+                val newGuess = otherGuesses.getOrNull(1) ?: continue
+                GriffinBurrowHelper.newBurrow = true // spade is probably not pointing to the burrow we are moving
+                BurrowGuessEvent(newGuess, precise = true, new = true).post()
+                val newList = otherGuesses.drop(1)
+                allGuesses[guess] = newList
+                return
+            }
+        }
+    }
+
+    fun onBurrowDug(location: LorenzVec, chainNumber: Int, maxChains: Int) {
+        if (chainNumber != maxChains) {
+            points.clear()
+            newArrow = true
+        }
+
+        if (chainNumber == 1) return
+
+        val incorrectGuessEntries = allGuesses.entries.filter { entry -> entry.value.contains(location) }
+
+        if (DebugSesh.debugActive) DebugSesh.incorrectGuesses += incorrectGuessEntries.size
+
+        allGuesses.remove(location) // remove the dug borrow and all its other potential guesses
+        if (incorrectGuessEntries.isNotEmpty()) incorrectGuessEntries.forEach {
+            allGuesses.remove(it.key)
+            GriffinBurrowHelper.removePreciseGuess(it.key)
+        }
+    }
+
     private fun findClosestValidBlockToRayNew(ray: RaycastUtils.Ray): LorenzVec? {
         val bounds = IslandType.HUB.islandData?.boundingBox ?: return null
         if (!bounds.isInside(ray.origin)) return null // guarantees exit point is first intersect
@@ -248,15 +297,15 @@ object ArrowGuessBurrow {
             val distanceFromOrigin = candidatePoint.distance(ray.origin)
 
             // take the ratio to account for errors
-            val scaledDistance = (distanceToRay * 500000 / distanceFromOrigin).roundTo(5)
+            val scaledDistance = (distanceToRay * 500000 / distanceFromOrigin)
 
-            candidates[candidateBlock] = scaledDistance
+            candidates[candidateBlock] = scaledDistance.roundTo(5)
         }
 
         val minValue = candidates.values.minOrNull() ?: return null
         val possibilities = candidates.filterValues { it == minValue }.map { it.key }
 
-        allGuesses.add(possibilities)
+        allGuesses[possibilities[0]] = possibilities.drop(1)
 
         if (DebugSesh.debugActive) {
             DebugSesh.guessesMade++

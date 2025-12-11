@@ -128,9 +128,9 @@ object RaycastUtils {
         if (abs(dirComponent) < EPSILON) {
             // Ray parallel to that axis
             return if (abs(originArray[axis] - targetValue) < EPSILON) {
-                ray.origin  // Ray is exactly at that coordinate
+                ray.origin // Ray is exactly at that coordinate
             } else {
-                null  // Can't reach target coordinate
+                null // Can't reach target coordinate
             }
         }
 
