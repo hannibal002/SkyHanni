@@ -50,7 +50,7 @@ object ArrowGuessBurrow {
 
     private val points: MutableSet<LorenzVec> = mutableSetOf()
     private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
-    private val allGuesses = ConcurrentHashMap<LorenzVec, List<LorenzVec>>()
+    private val allGuesses = mutableListOf<GuessEntry>()
 
     private var newArrow = true
 
@@ -75,6 +75,24 @@ object ArrowGuessBurrow {
         "burrow-dug",
         "§eYou dug out a Griffin Burrow! §r§7\\((\\d+)/(\\d+)\\)"
     )
+
+    data class GuessEntry(
+        val guesses: List<LorenzVec>,
+        private var currentIndex: Int = 0
+    ) {
+        fun getCurrent(): LorenzVec = guesses[currentIndex]
+        fun contains(vec: LorenzVec): Boolean = guesses.contains(vec)
+        fun moveToNext(): Boolean {
+            val nextIndex = currentIndex + 1
+            return if (nextIndex in guesses.indices) {
+                currentIndex = nextIndex
+                true
+            } else {
+                false
+            }
+        }
+        fun removeGuesses() { guesses.forEach { GriffinBurrowHelper.removePreciseGuess(it) } }
+    }
 
     private object DebugSesh {
         var debugActive = false
@@ -123,10 +141,11 @@ object ArrowGuessBurrow {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (DebugSesh.debugActive && DebugSesh.renderAll) {
-            allGuesses.forEach { entry ->
-                event.drawColor(entry.key.up(2), LorenzColor.BLUE.toChromaColor())
-                entry.value.forEach { value ->
-                    event.drawColor(value.up(2), LorenzColor.GREEN.toChromaColor())
+            allGuesses.forEach { guessEntry ->
+                val color = if (guessEntry.guesses.size == 1) LorenzColor.BLUE.toChromaColor()
+                else LorenzColor.GREEN.toChromaColor()
+                guessEntry.guesses.forEach { value ->
+                    event.drawColor(value.up(2), color)
                 }
             }
         }
@@ -232,20 +251,28 @@ object ArrowGuessBurrow {
     }
 
     fun checkMoveGuess(particleBurrows: Map<LorenzVec, BurrowType>) {
-        val burrows = particleBurrows.filter { it.value != BurrowType.START }.map { it.key }
-        val keysCopy = allGuesses.keys.toList()
-        for (guess in keysCopy) {
-            if (!burrows.contains(guess) && guess.distanceSq(MinecraftCompat.localPlayer.position.toLorenzVec()) < 100) { // and has been holding spade for 2 seconds or player clicks the block
-                val otherGuesses = allGuesses[guess] ?: continue
-                GriffinBurrowHelper.removePreciseGuess(guess)
-                val newGuess = otherGuesses.getOrNull(1) ?: continue
-                GriffinBurrowHelper.newBurrow = true // spade is probably not pointing to the burrow we are moving
-                BurrowGuessEvent(newGuess, precise = true, new = true).post()
-                val newList = otherGuesses.drop(1)
-                allGuesses[guess] = newList
-                return
+        try {
+            val burrows = particleBurrows.filter { it.value != BurrowType.START }.map { it.key }
+            for (guessEntry in allGuesses) {
+                if (!burrows.contains(guessEntry.getCurrent()) &&
+                    guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.position.toLorenzVec()) < 100) { // and has been holding spade for 2 seconds or player clicks the block
+
+                    GriffinBurrowHelper.removePreciseGuess(guessEntry.getCurrent())
+                    if (guessEntry.moveToNext()) {
+                        val newGuess = guessEntry.getCurrent()
+                        println("new guess $newGuess")
+                        GriffinBurrowHelper.newBurrow = true // spade is probably not pointing to the burrow we are moving
+                        BurrowGuessEvent(newGuess, precise = true, new = true).post()
+                        return
+                    }
+                }
             }
+        } catch (e: Exception) {
+            println("caught EROOR")
+            e.printStackTrace()
+            println("^^^" + e.message)
         }
+
     }
 
     fun onBurrowDug(location: LorenzVec, chainNumber: Int, maxChains: Int) {
@@ -254,16 +281,10 @@ object ArrowGuessBurrow {
             newArrow = true
         }
 
-        if (chainNumber == 1) return
-
-        val incorrectGuessEntries = allGuesses.entries.filter { entry -> entry.value.contains(location) }
-
-        if (DebugSesh.debugActive) DebugSesh.incorrectGuesses += incorrectGuessEntries.size
-
-        allGuesses.remove(location) // remove the dug borrow and all its other potential guesses
-        if (incorrectGuessEntries.isNotEmpty()) incorrectGuessEntries.forEach {
-            allGuesses.remove(it.key)
-            GriffinBurrowHelper.removePreciseGuess(it.key)
+        if (chainNumber != 1) {
+            val toRemove = allGuesses.filter { it.contains(location) }
+            toRemove.forEach { it.removeGuesses() } // remove any potential incorrect guesses on screen
+            allGuesses.removeAll(toRemove)
         }
     }
 
@@ -302,10 +323,10 @@ object ArrowGuessBurrow {
             candidates[candidateBlock] = scaledDistance.roundTo(5)
         }
 
-        val minValue = candidates.values.minOrNull() ?: return null
+        if (candidates.isEmpty()) return null
+        val minValue = candidates.values.min()
         val possibilities = candidates.filterValues { it == minValue }.map { it.key }
-
-        allGuesses[possibilities[0]] = possibilities.drop(1)
+        allGuesses.add(GuessEntry(possibilities))
 
         if (DebugSesh.debugActive) {
             DebugSesh.guessesMade++
