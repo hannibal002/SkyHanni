@@ -142,6 +142,8 @@ object GardenOptimalSpeed {
             CropType.SUGAR_CANE -> sugarCane
             CropType.CACTUS -> cactus
             CropType.MUSHROOM -> mushroom
+            CropType.SUNFLOWER, CropType.MOONFLOWER -> sunMoonFlower
+            CropType.WILD_ROSE -> wildRose
         }
     }
 

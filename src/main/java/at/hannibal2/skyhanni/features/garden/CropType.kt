@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
+import at.hannibal2.skyhanni.utils.compat.BlockCompat
+import at.hannibal2.skyhanni.utils.compat.BlockCompat.isSunflower
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
@@ -62,6 +64,18 @@ enum class CropType(
         { ItemStack(Blocks.red_mushroom_block) }, "mushroom", FarmingItemType.MUSHROOM,
         enchantName = "mushrooms"
     ),
+    MOONFLOWER(
+        "Moonflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
+        { BlockCompat.createBlueOrchid() }, "moonflower", FarmingItemType.NONE
+    ),
+    SUNFLOWER(
+        "Sunflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
+        { BlockCompat.createSunFlower() }, "sunflower", FarmingItemType.NONE
+    ),
+    WILD_ROSE(
+        "Wild Rose", "THEORETICAL_HOE_WILD_ROSE", "HELIANTHUS", 2.0,
+        { BlockCompat.createWildRose() }, "wild_rose", FarmingItemType.NONE
+    ),
     ;
 
     val icon by lazy { iconSupplier() }
@@ -100,6 +114,9 @@ enum class CropType(
                 Blocks.cocoa -> COCOA_BEANS
                 Blocks.red_mushroom, Blocks.brown_mushroom -> MUSHROOM
                 Blocks.nether_wart -> NETHER_WART
+                Blocks.double_plant -> {
+                    return if (this.isSunflower()) SUNFLOWER/*  whatFlowerIsIt() */ else WILD_ROSE
+                }
                 else -> null
             }
         }

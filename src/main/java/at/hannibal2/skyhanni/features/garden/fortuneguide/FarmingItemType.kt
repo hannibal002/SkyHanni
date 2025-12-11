@@ -39,6 +39,7 @@ enum class FarmingItemType(
     BEE(ItemCategory.PET, FFStats::getPetFFData),
     SLUG(ItemCategory.PET, FFStats::getPetFFData),
     HEDGEHOG(ItemCategory.PET, FFStats::getPetFFData),
+    NONE(ItemCategory.NONE),
     ;
 
     var selectedState = false
