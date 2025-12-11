@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -79,6 +80,8 @@ object GardenApi {
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
     private var extraFarmingTools: Set<NeuInternalName> = setOf()
+
+    var greenhouseReleased = true
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSendPacket(event: ItemInHandChangeEvent) {
@@ -266,6 +269,8 @@ object GardenApi {
         gardenExperience = data.gardenExp
         totalAmountVisitorsExisting = data.visitors.size
         extraFarmingTools = data.extraFarmingTools
+        val disabledFeatures = event.getConstant<DisabledFeaturesJson>("DisabledFeatures")
+        greenhouseReleased = disabledFeatures.features?.get("greenhouse_released") ?: true
     }
 
     private var gardenExperience = listOf<Int>()

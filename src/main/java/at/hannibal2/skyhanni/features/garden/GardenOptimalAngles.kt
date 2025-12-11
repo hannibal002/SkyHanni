@@ -107,6 +107,8 @@ object GardenOptimalAngles {
             CropType.COCOA_BEANS -> cocoaBeansYaw to cocoaBeansPitch
             CropType.SUGAR_CANE -> sugarCaneYaw to sugarCanePitch
             CropType.MUSHROOM -> mushroomYaw to mushroomPitch
+            // todo fix
+            else -> sugarCaneYaw to sugarCanePitch
         }
     }
 }

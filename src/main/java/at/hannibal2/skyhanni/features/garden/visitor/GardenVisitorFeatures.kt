@@ -330,7 +330,7 @@ object GardenVisitorFeatures {
         if (config.shoppingList.itemPreview) {
             val items = GardenVisitorColorNames.visitorItems[visitor.removeColor()]
             if (items == null) {
-                val text = "Visitor '$visitor' has no items in repo!"
+                val text = "Visitor '$visitor§7' has no items in repo!"
                 logger.log(text)
                 ChatUtils.debug(text)
                 list.addString(" §7(§c?§7)")

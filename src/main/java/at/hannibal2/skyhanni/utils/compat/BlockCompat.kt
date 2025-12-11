@@ -1,6 +1,11 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
 import net.minecraft.block.Block
+import net.minecraft.block.BlockDoublePlant
+import net.minecraft.block.properties.IProperty
+import net.minecraft.block.properties.PropertyEnum
+import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
@@ -20,6 +25,41 @@ object BlockCompat {
         return ItemStack(Blocks.stone, 1, net.minecraft.block.BlockStone.EnumType.DIORITE_SMOOTH.metadata)
         //#else
         //$$ return ItemStack(Blocks.POLISHED_DIORITE)
+        //#endif
+    }
+
+    fun createBlueOrchid(): ItemStack {
+        //#if MC < 1.21
+        return ItemStack(Blocks.red_flower, 1, 1)
+        //#else
+        //$$ return ItemStack(Blocks.BLUE_ORCHID)
+        //#endif
+    }
+
+    fun createSunFlower(): ItemStack {
+        //#if MC < 1.21
+        return ItemStack(Blocks.double_plant)
+        //#else
+        //$$ return ItemStack(Blocks.SUNFLOWER)
+        //#endif
+    }
+
+    fun createWildRose(): ItemStack {
+        //#if MC < 1.21
+        return ItemStack(Blocks.double_plant, 1, 4)
+        //#else
+        //$$ return ItemStack(Blocks.ROSE_BUSH)
+        //#endif
+    }
+
+    fun IBlockState.isSunflower(): Boolean {
+        //#if MC < 1.21
+        val vari = this.getValue(BlockDoublePlant.VARIANT)
+        val res = this.getValue(BlockDoublePlant.VARIANT).meta == 0
+        println(vari)
+        println(res)
+        return res
+        //#else
         //#endif
     }
 
