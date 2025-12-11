@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -83,7 +82,6 @@ object GriffinBurrowHelper {
     private var allGuessLocations: List<LorenzVec> = emptyList()
 
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
-    var lastTitleSentTime = SimpleTimeMark.farPast()
     private var shouldFocusOnRareMob = false
 
     private var testList = listOf<LorenzVec>()
@@ -155,6 +153,8 @@ object GriffinBurrowHelper {
                 BurrowWarpHelper.shouldUseWarps(it)
             }
         }
+
+        ArrowGuessBurrow.checkMoveGuess(this.particleBurrows)
     }
 
     // TODO add option to only focus on last guess - highly requersted method that is less optimal for money per hour. users choice

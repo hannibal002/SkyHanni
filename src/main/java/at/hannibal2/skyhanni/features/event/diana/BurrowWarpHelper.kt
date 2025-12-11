@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -66,10 +65,6 @@ object BurrowWarpHelper {
         lastWarpTime = SimpleTimeMark.now()
         HypixelCommands.warp(warp.name)
         lastWarp = currentWarp
-        GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
-        TitleManager.conditionallyStopTitle { currentTitle ->
-            currentTitle.startsWith("§bWarp to ")
-        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
