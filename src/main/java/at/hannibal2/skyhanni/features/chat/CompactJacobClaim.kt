@@ -142,6 +142,7 @@ object CompactJacobClaim {
         bookPattern.matchMatcher(message) {
             val crop = CropType.getByNameOrNull(group("crop")) ?: when (group("crop").lowercase()) {
                 "cacti" -> CropType.CACTUS
+                "rose" -> CropType.WILD_ROSE
                 else -> return@matchMatcher
             }
             val amount = group("amount").formatInt()
