@@ -40,7 +40,7 @@ object ArmorDropTracker {
      */
     private val armorPattern by RepoPattern.pattern(
         "garden.armordrops.armor",
-        "(?:FERMENTO|CROPIE|SQUASH|MELON)_(?:LEGGINGS|CHESTPLATE|BOOTS|HELMET)",
+        "(?:HELIANTHUS|FERMENTO|CROPIE|SQUASH|MELON)_(?:LEGGINGS|CHESTPLATE|BOOTS|HELMET)",
     )
 
     private var hasArmor = false
@@ -59,6 +59,7 @@ object ArmorDropTracker {
         CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
         SQUASH("§5Squash", "§6§lRARE CROP! §r§f§r§5Squash §r§b(Armor Set Bonus)"),
         FERMENTO("§6Fermento", "§6§lRARE CROP! §r§f§r§6Fermento §r§b(Armor Set Bonus)"),
+        HELIANTHUS("§6Helianthus", "§6§lRARE CROP! §r§f§r§6Helianthus §r§b(Armor Set Bonus)"),
     }
 
     @HandleEvent
@@ -143,7 +144,7 @@ object ArmorDropTracker {
             val armorName = armorDropInfo[armorDropName]?.armorType ?: return 0.0
             val pieceCount = InventoryUtils.getArmor()
                 .mapNotNull { it?.getInternalName()?.asString() }
-                .count { it.contains(armorName) || it.contains("FERMENTO") }
+                .count { it.contains(armorName) || it.contains("FERMENTO") || it.contains("HELIANTHUS") }
 
             val dropRates = armorDropInfo[armorDropName]?.chance ?: return 0.0
             var dropRate = 0.0
