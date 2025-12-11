@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -34,7 +33,10 @@ class ForagingTrackerConfig {
 
 
     @Expose
-    @ConfigOption(name = "Compact Gifts Bonus Drops", desc = "Lets you decide what types of bonus drops should be included in Compact Gifts messages.")
+    @ConfigOption(
+        name = "Compact Gifts Bonus Drops",
+        desc = "Lets you decide what types of bonus drops should be included in Compact Gifts messages."
+    )
     @ConfigEditorDraggableList
     val compactGiftBonusDropsList: Property<MutableList<TreeGiftBonusDropCategory>> = Property.of(
         mutableListOf(
