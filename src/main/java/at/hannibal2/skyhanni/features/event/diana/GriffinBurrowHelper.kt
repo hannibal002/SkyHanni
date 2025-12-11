@@ -117,6 +117,7 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
         update()
         loadTestGriffinSpots()
+        ArrowGuessBurrow.checkMoveGuess(particleBurrows)
     }
 
     private fun loadTestGriffinSpots() {
@@ -153,8 +154,6 @@ object GriffinBurrowHelper {
                 BurrowWarpHelper.shouldUseWarps(it)
             }
         }
-
-        ArrowGuessBurrow.checkMoveGuess(this.particleBurrows)
     }
 
     // TODO add option to only focus on last guess - highly requersted method that is less optimal for money per hour. users choice
@@ -238,6 +237,7 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
         if (event.distance > 10 && event.isLocalPlayer) {
             update()
+            ArrowGuessBurrow.checkMoveGuess(particleBurrows)
         }
     }
 
