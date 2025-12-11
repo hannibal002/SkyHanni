@@ -5,9 +5,12 @@ import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ForagingTrackerConfig {
 
@@ -28,6 +31,35 @@ class ForagingTrackerConfig {
     @OnlyModern
     @FeatureToggle
     var compactGiftChats: Boolean = true
+
+
+    @Expose
+    @ConfigOption(name = "Compact Gifts Bonus Drops", desc = "Lets you decide what types of bonus drops should be included in Compact Gifts messages.")
+    @ConfigEditorDraggableList
+    val compactGiftBonusDropsList: Property<MutableList<TreeGiftBonusDropCategory>> = Property.of(
+        mutableListOf(
+            TreeGiftBonusDropCategory.UNCOMMON_DROPS,
+            TreeGiftBonusDropCategory.ENCHANTED_BOOKS,
+            TreeGiftBonusDropCategory.PHANTOMS,
+            TreeGiftBonusDropCategory.BOOSTERS,
+            TreeGiftBonusDropCategory.SHARDS,
+            TreeGiftBonusDropCategory.RUNES,
+            TreeGiftBonusDropCategory.TREE_THE_FISH,
+        ),
+    )
+
+    @Suppress("MaxLineLength")
+    enum class TreeGiftBonusDropCategory(private val displayName: String) {
+        UNCOMMON_DROPS("§fUncommon Tree-Specific Drops\n§7(e.g. §aStretching Sticks§7)"),
+        ENCHANTED_BOOKS("§fUltimate Enchantments\n§7(§d§lFirst Impression I §7& §d§lMissile I §7Books)"),
+        PHANTOMS("§fHuntable Mobs\n§7(Phantoms)"),
+        BOOSTERS("§fBoosters\n§7(Sweep, Foraging Wisdom)"),
+        SHARDS("§fDirect Shard Drops\n§7(§bHummingbirds§7, §6Chameleons§7)"),
+        RUNES("§fRunes\n§7(§fFading White §7and §aFading Green§7)"),
+        TREE_THE_FISH("§cTree The Fish");
+
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(name = "Only Holding Axe", desc = "Only show the tracker while holding an axe.")

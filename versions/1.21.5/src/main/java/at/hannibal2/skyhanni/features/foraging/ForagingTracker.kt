@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -192,6 +193,33 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         addItem(treeType, STRETCHING_STICKS, change, command = false)
     }
 
+    private val BonusDropsUncommonDropsList = listOf<NeuInternalName>(
+        "STRETCHING_STICKS".toInternalName(),
+        "DEEP_ROOT".toInternalName(),
+    )
+    private val BonusDropsEnchantedBooksList = listOf<NeuInternalName>(
+        "ULTIMATE_FIRST_IMPRESSION;1".toInternalName(),
+        "ULTIMATE_MISSILE;1".toInternalName(),
+    )
+    private val BonusDropsBoostersList = listOf<NeuInternalName>(
+        "SWEEP_BOOSTER".toInternalName(),
+        "FORAGING_WISDOM_BOOSTER".toInternalName(),
+    )
+    private val BonusDropsShardsList = listOf<NeuInternalName>(
+        "ATTRIBUTE_SHARD_CHOP;1".toInternalName(),
+        "ATTRIBUTE_SHARD_REPTILOID;1".toInternalName(),
+    )
+    private val BonusDropsMobsList = listOf<String>(
+        "Phanpyre",
+        "Phanflare",
+        "Dreadwing",
+    )
+    private val BonusDropsRunesList = listOf<NeuInternalName>(
+        "AXE_FADING_WHITE_RUNE;1".toInternalName(),
+        "AXE_FADING_GREEN_RUNE;1".toInternalName(),
+    )
+    private val BonusDropsTreeTheFish = "TREE_THE_FISH".toInternalName()
+
     private fun SkyHanniChatEvent.tryReadLoot() {
         ForagingTrackerLegacy.openCloseRewardPattern.matchMatcher(message) {
             openLootLoop = !openLootLoop
@@ -236,32 +264,62 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
             }
         }
 
-        if (!openBonusGiftLoop) return
-        ForagingTrackerLegacy.bonusGiftRewardPattern.matchMatcher(message) {
-            val item = group("item")
-            var itemInternalName = ForagingTrackerLegacy.enchantedBookPattern.matchMatcher(item) {
-                val book = group("book")
-                val tier = group("tier").romanToDecimal()
-                NeuInternalName.fromItemNameOrNull("$book $tier")
-            } ?: NeuInternalName.fromItemNameOrNull(item) ?: return@matchMatcher
+        if (openBonusGiftLoop) {
+            ForagingTrackerLegacy.bonusGiftRewardPattern.matchMatcher(message) {
+                val item = group("item")
+                var itemInternalName = ForagingTrackerLegacy.enchantedBookPattern.matchMatcher(item) {
+                    val book = group("book")
+                    val tier = group("tier").romanToDecimal()
+                    NeuInternalName.fromItemNameOrNull("$book $tier")
+                } ?: NeuInternalName.fromItemNameOrNull(item) ?: return@matchMatcher
 
-            // Stretching Sticks handled separately due to stack size not being given in message
-            // (no, that's not how this works, they should be handled alongside everything else)
-            // if (itemInternalName == STRETCHING_STICKS) return@matchMatcher
+                /**
+                 * this is a failsafe in the event of runes lackin' NEU repo sufficient data to automagically
+                 * fetch their correct internal names, and thus translatin' their in-game names into internal
+                 * names literally
+                 */
+                when (itemInternalName) {
+                    "◆_FADING_WHITE_RUNE;1".toInternalName() -> itemInternalName = "AXE_FADING_WHITE_RUNE;1".toInternalName()
+                    "◆_FADING_GREEN_RUNE;1".toInternalName() -> itemInternalName = "AXE_FADING_GREEN_RUNE;1".toInternalName()
+                }
 
-            /**
-             * the runes need to have their internal names forcibly set due to using internal names
-             * wildly different from what the tracker will read them to be. I think. maybe
-             */
-            when (itemInternalName) {
-                "◆_FADING_WHITE_RUNE;1".toInternalName() -> itemInternalName = "AXE_FADING_WHITE_RUNE;1".toInternalName()
-                "◆_FADING_GREEN_RUNE;1".toInternalName() -> itemInternalName = "AXE_FADING_GREEN_RUNE;1".toInternalName()
+                loot.addOrPut(itemInternalName, 1)
+
+                // val percentage = group("percentage").formatDoubleOrNull() ?: return@matchMatcher
+                if (BonusDropsUncommonDropsList.contains(itemInternalName)
+                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.UNCOMMON_DROPS)) {
+                    rareDrops.add(item)
+                }
+                if (BonusDropsEnchantedBooksList.contains(itemInternalName)
+                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.ENCHANTED_BOOKS)) {
+                    rareDrops.add(item)
+                }
+                if (BonusDropsBoostersList.contains(itemInternalName)
+                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.BOOSTERS)) {
+                    rareDrops.add(item)
+                }
+                if (BonusDropsShardsList.contains(itemInternalName)
+                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.SHARDS)) {
+                    rareDrops.add(item)
+                }
+                if (BonusDropsRunesList.contains(itemInternalName)
+                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.RUNES)) {
+                    rareDrops.add(item)
+                }
+                if (itemInternalName == BonusDropsTreeTheFish
+                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.TREE_THE_FISH)) {
+                    rareDrops.add(item)
+                }
             }
+        }
 
-            loot.addOrPut(itemInternalName, 1)
+        ForagingTrackerLegacy.phantomSpawnPattern.matchMatcher(message) {
+            val mob = group("phantom")
 
-            val percentage = group("percentage").formatDoubleOrNull() ?: return@matchMatcher
-            if (percentage <= 1.0) rareDrops.add(item)
+            if (BonusDropsMobsList.contains(mob)
+                && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.PHANTOMS)) {
+                rareDrops.add("A wild §d$mob §fappeared!")
+            }
         }
     }
 
