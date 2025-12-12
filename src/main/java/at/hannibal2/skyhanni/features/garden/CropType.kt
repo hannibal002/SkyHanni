@@ -95,7 +95,6 @@ enum class CropType(
         fun getByNameOrNull(itemName: String): CropType? {
             if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") return MUSHROOM
             if (itemName == "Seeds") return WHEAT
-            if (itemName == "Melon Slice") return MELON
             return entries.firstOrNull {
                 it.cropName.equals(itemName, ignoreCase = true) ||
                     it.simpleName.equals(itemName, ignoreCase = true) ||
@@ -129,11 +128,10 @@ enum class CropType(
             }
         }
 
-        fun getTimeFlower(): CropType? {
+        fun getTimeFlower(): CropType {
             val time = MinecraftCompat.localWorld.worldTime % 24000
             // pretty sure great spook will break this
-            if (time >= 12000) return MOONFLOWER
-            else return SUNFLOWER
+            return if (time >= 12000) MOONFLOWER else SUNFLOWER
         }
 
         fun CropType.getTurboCrop() = "turbo_${this.enchantName.lowercase()}"
