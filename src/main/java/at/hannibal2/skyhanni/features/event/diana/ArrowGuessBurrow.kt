@@ -11,10 +11,12 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -31,7 +33,6 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.minutes
@@ -57,6 +58,7 @@ object ArrowGuessBurrow {
     // deific spade insta breaks grass and hits the block behind it before chat messages if you left-click
     private var recentBlocksClicked = TimeLimitedSet<LorenzVec>(0.5.seconds)
 
+    // TODO on death
     // TODO Repo pattern `finishedChainPattern` must not contain unnamed capture groups. [RepoPatternUnnamedGroup]
     private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
 
@@ -84,12 +86,13 @@ object ArrowGuessBurrow {
         fun contains(vec: LorenzVec): Boolean = guesses.contains(vec)
         fun moveToNext(): Boolean {
             val nextIndex = currentIndex + 1
-            return if (nextIndex in guesses.indices) {
+            if (nextIndex in guesses.indices) {
+                if (!isBlockValid(guesses[nextIndex])) {
+                    return moveToNext()
+                }
                 currentIndex = nextIndex
-                true
-            } else {
-                false
-            }
+                return true
+            } else return false
         }
         fun removeGuesses() { guesses.forEach { GriffinBurrowHelper.removePreciseGuess(it) } }
     }
@@ -213,7 +216,7 @@ object ArrowGuessBurrow {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) { //TODO store color and check distance
         if (!isEnabled()) return
         if (!newArrow) return
 
@@ -251,28 +254,23 @@ object ArrowGuessBurrow {
     }
 
     fun checkMoveGuess(particleBurrows: Map<LorenzVec, BurrowType>) {
-        try {
-            val burrows = particleBurrows.filter { it.value != BurrowType.START }.map { it.key }
-            for (guessEntry in allGuesses) {
-                if (!burrows.contains(guessEntry.getCurrent()) &&
-                    guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.position.toLorenzVec()) < 100) { // and has been holding spade for 2 seconds or player clicks the block
+        val burrows = particleBurrows.filter { it.value != BurrowType.START }.map { it.key }
+        for (guessEntry in allGuesses) {
+            val shouldBeLoaded = InventoryUtils.getItemInHandAtTime(SimpleTimeMark.now() - 0.5.seconds)?.isDianaSpade
+            if (shouldBeLoaded == true &&
+                !burrows.contains(guessEntry.getCurrent()) && // burrow is not found
+                guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.position.toLorenzVec()) < 900 // within 30 blocks
+            ) {
 
-                    GriffinBurrowHelper.removePreciseGuess(guessEntry.getCurrent())
-                    if (guessEntry.moveToNext()) {
-                        val newGuess = guessEntry.getCurrent()
-                        println("new guess $newGuess")
-                        GriffinBurrowHelper.newBurrow = true // spade is probably not pointing to the burrow we are moving
-                        BurrowGuessEvent(newGuess, precise = true, new = true).post()
-                        return
-                    }
+                GriffinBurrowHelper.removePreciseGuess(guessEntry.getCurrent())
+                if (guessEntry.moveToNext()) {
+                    val newGuess = guessEntry.getCurrent()
+                    GriffinBurrowHelper.newBurrow = true // spade is probably not pointing to the burrow we are moving
+                    BurrowGuessEvent(newGuess, precise = true, new = true).post()
+                    return
                 }
             }
-        } catch (e: Exception) {
-            println("caught EROOR")
-            e.printStackTrace()
-            println("^^^" + e.message)
         }
-
     }
 
     fun onBurrowDug(location: LorenzVec, chainNumber: Int, maxChains: Int) {

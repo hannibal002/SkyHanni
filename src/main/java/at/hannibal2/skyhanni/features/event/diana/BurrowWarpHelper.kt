@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
@@ -47,7 +48,7 @@ object BurrowWarpHelper {
             " §7(§ePress $keyName§7)"
         } else ""
 
-        val warpText = Renderable.text(text + keybindSuffix)
+        val warpText = Renderable.text(text + keybindSuffix, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
 
         config.warpGuiPosition.renderRenderable(warpText, posLabel = "Diana Nearest Warp")
     }
