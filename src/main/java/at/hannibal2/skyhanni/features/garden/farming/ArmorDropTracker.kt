@@ -83,7 +83,7 @@ object ArmorDropTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         for (dropType in ArmorDropType.entries) {
-            if (dropType.chatPattern.matches(event.message)) continue
+            if (!dropType.chatPattern.matches(event.message)) continue
             addDrop(dropType)
             if (config.hideChat) {
                 event.blockedReason = "farming_armor_drops"
