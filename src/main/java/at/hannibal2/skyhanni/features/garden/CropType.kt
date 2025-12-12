@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.BlockCompat.isSunflower
 import at.hannibal2.skyhanni.utils.compat.BlockCompat.isWildRose
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -130,11 +130,10 @@ enum class CropType(
         }
 
         fun getTimeFlower(): CropType? {
-            val timeSymbol = CustomScoreboardUtils.getTimeSymbol()
+            val time = Minecraft.getMinecraft().theWorld.worldTime
             // pretty sure great spook will break this
-            if (timeSymbol == "☽") return MOONFLOWER
-            if (timeSymbol == "☀") return SUNFLOWER
-            else return null
+            if (time >= 12000) return MOONFLOWER
+            else return SUNFLOWER
         }
 
         fun CropType.getTurboCrop() = "turbo_${this.enchantName.lowercase()}"

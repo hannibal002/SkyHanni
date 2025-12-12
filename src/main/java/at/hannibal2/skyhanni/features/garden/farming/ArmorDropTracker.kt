@@ -55,10 +55,11 @@ object ArmorDropTracker {
     ) : TrackerData()
 
     // Todo use repo pattern
+    // Todo use repo pattern
     enum class ArmorDropType(val dropName: String, val chatMessage: String) {
-        CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
-        SQUASH("§5Squash", "§6§lRARE CROP! §r§f§r§5Squash §r§b(Armor Set Bonus)"),
-        FERMENTO("§6Fermento", "§6§lRARE CROP! §r§f§r§6Fermento §r§b(Armor Set Bonus)"),
+        CROPIE("§aCropie", "§6§lRARE CROP! §r§f§r§aCropie §r§b(Armor Set Bonus)"),
+        SQUASH("§9Squash", "§6§lRARE CROP! §r§f§r§9Squash §r§b(Armor Set Bonus)"),
+        FERMENTO("§5Fermento", "§6§lRARE CROP! §r§f§r§5Fermento §r§b(Armor Set Bonus)"),
         HELIANTHUS("§6Helianthus", "§6§lRARE CROP! §r§f§r§6Helianthus §r§b(Armor Set Bonus)"),
     }
 

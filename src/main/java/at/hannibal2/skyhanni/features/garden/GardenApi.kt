@@ -174,6 +174,9 @@ object GardenApi {
 
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
+        if (internalName.startsWith("THEORETICAL_HOE_SUNFLOWER")) {
+            return CropType.getTimeFlower()
+        }
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
