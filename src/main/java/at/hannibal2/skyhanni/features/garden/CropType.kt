@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.BlockCompat.isSunflower
 import at.hannibal2.skyhanni.utils.compat.BlockCompat.isWildRose
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -130,7 +130,7 @@ enum class CropType(
         }
 
         fun getTimeFlower(): CropType? {
-            val time = Minecraft.getMinecraft().theWorld.worldTime
+            val time = MinecraftCompat.localWorld.worldTime % 24000
             // pretty sure great spook will break this
             if (time >= 12000) return MOONFLOWER
             else return SUNFLOWER

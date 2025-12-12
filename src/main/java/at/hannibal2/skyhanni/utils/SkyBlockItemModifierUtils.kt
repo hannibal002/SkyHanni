@@ -49,7 +49,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getCultivatingCounter() = getAttributeLong("farmed_cultivating")
 
-    fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
+    fun ItemStack.getOldHoeCounter() = getAttributeLong("mined_crops")
+    fun ItemStack.getHoeExp() = getAttributeDouble("levelable_exp")?.toLong()
 
     fun ItemStack.getSilexCount() = getHypixelEnchantments()?.get("efficiency")?.let {
         it - 5 - getBaseSilexCount()
@@ -356,6 +357,9 @@ object SkyBlockItemModifierUtils {
 
     private fun ItemStack.getAttributeLong(label: String) =
         getExtraAttributes()?.getLong(label)?.takeUnless { it == 0L }
+
+    private fun ItemStack.getAttributeDouble(label: String) =
+        getExtraAttributes()?.getDouble(label)?.takeUnless { it == 0.0 }
 
     private fun ItemStack.getAttributeBoolean(label: String) =
         getExtraAttributes()?.getBoolean(label) ?: false

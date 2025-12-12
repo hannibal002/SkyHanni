@@ -44,7 +44,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -180,7 +181,7 @@ object GardenApi {
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
-    fun readCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter()
+    fun readCounter(itemStack: ItemStack): Long? = itemStack.getHoeExp() ?: itemStack.getCultivatingCounter() ?: itemStack.getOldHoeCounter()
 
     fun CropType.getItemStackCopy(iconId: String): ItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
 
