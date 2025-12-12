@@ -114,7 +114,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Warp Distance",
-        desc = "the warp distance subtracted from player distance required to show warp suggestion.",
+        desc = "How much closer a warp needs to be than you to suggest it.",
     )
     @ConfigEditorSlider(minValue = 0.0f, maxValue = 200.0f, minStep = 1.0f)
     var warpDistanceDifference: Int = 10
