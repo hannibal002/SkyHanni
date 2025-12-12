@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -57,8 +58,8 @@ object ArrowGuessBurrow {
 
     // deific spade insta breaks grass and hits the block behind it before chat messages if you left-click
     private var recentBlocksClicked = TimeLimitedSet<LorenzVec>(0.5.seconds)
+    private var lastBurrowPos = emptyList<LorenzVec>()
 
-    // TODO on death
     // TODO Repo pattern `finishedChainPattern` must not contain unnamed capture groups. [RepoPatternUnnamedGroup]
     private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
 
@@ -144,6 +145,18 @@ object ArrowGuessBurrow {
         }
     }
 
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onPlayerDeath(event: PlayerDeathEvent) {
+        points.clear()
+        newArrow = true
+
+        lastBurrowPos.forEach { point ->
+            val toRemove = allGuesses.filter { it.contains(point) }
+            toRemove.forEach { it.removeGuesses() }
+            allGuesses.removeAll(toRemove)
+        }
+    }
+
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (DebugSesh.debugActive && DebugSesh.renderAll) {
@@ -200,6 +213,7 @@ object ArrowGuessBurrow {
         }
     }
 
+    // these could be combined but only if someone else touches the regex for me
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onChat(event: SkyHanniChatEvent) {
         if (dugBorrowPattern.matches(event.message)) {
@@ -207,12 +221,14 @@ object ArrowGuessBurrow {
             if (matcher.find()) {
                 val current = matcher.group(1).toInt()
                 val max = matcher.group(2).toInt()
+                lastBurrowPos = recentBlocksClicked.toList()
                 recentBlocksClicked.forEach { onBurrowDug(it, current, max) }
             }
         } else if (finishedChainPattern.matches(event.message)) {
             val matcher = finishedChainPattern.matcher(event.message)
             if (matcher.find()) {
                 val max = matcher.group(1).toInt()
+                lastBurrowPos = recentBlocksClicked.toList()
                 recentBlocksClicked.forEach { onBurrowDug(it, max, max) }
             }
         }
