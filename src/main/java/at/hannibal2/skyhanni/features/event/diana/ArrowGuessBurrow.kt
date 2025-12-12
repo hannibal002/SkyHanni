@@ -85,12 +85,15 @@ object ArrowGuessBurrow {
         fun getCurrent(): LorenzVec = guesses[currentIndex]
         fun contains(vec: LorenzVec): Boolean = guesses.contains(vec)
         fun moveToNext(): Boolean {
+            GriffinBurrowHelper.removePreciseGuess(getCurrent())
             val nextIndex = currentIndex + 1
             if (nextIndex in guesses.indices) {
                 if (!isBlockValid(guesses[nextIndex])) {
                     return moveToNext()
                 }
                 currentIndex = nextIndex
+                GriffinBurrowHelper.newBurrow = true // spade is probably not pointing to the burrow we are moving
+                BurrowGuessEvent(guesses[nextIndex], precise = true, new = true).post()
                 return true
             } else return false
         }
@@ -256,17 +259,15 @@ object ArrowGuessBurrow {
     fun checkMoveGuess(particleBurrows: Map<LorenzVec, BurrowType>) {
         val burrows = particleBurrows.filter { it.value != BurrowType.START }.map { it.key }
         for (guessEntry in allGuesses) {
+            if (!isBlockValid(guessEntry.getCurrent())) guessEntry.moveToNext()
+
             val shouldBeLoaded = InventoryUtils.getItemInHandAtTime(SimpleTimeMark.now() - 0.5.seconds)?.isDianaSpade
             if (shouldBeLoaded == true &&
                 !burrows.contains(guessEntry.getCurrent()) && // burrow is not found
                 guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.position.toLorenzVec()) < 900 // within 30 blocks
             ) {
-
-                GriffinBurrowHelper.removePreciseGuess(guessEntry.getCurrent())
                 if (guessEntry.moveToNext()) {
-                    val newGuess = guessEntry.getCurrent()
-                    GriffinBurrowHelper.newBurrow = true // spade is probably not pointing to the burrow we are moving
-                    BurrowGuessEvent(newGuess, precise = true, new = true).post()
+
                     return
                 }
             }
