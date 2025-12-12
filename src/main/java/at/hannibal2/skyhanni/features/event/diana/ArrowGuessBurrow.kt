@@ -48,7 +48,6 @@ object ArrowGuessBurrow {
     private const val COUNT_NEAR_TIP = 4
     private const val COUNT_NEAR_BASE = 2
     private const val EPSILON = 1e-6
-    private val allowedOffsets = setOf(0.0, 128.0, 255.0)
 
     private val points: MutableSet<LorenzVec> = mutableSetOf()
     private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
@@ -60,23 +59,15 @@ object ArrowGuessBurrow {
     private var recentBlocksClicked = TimeLimitedSet<LorenzVec>(0.5.seconds)
     private var lastBurrowPos = emptyList<LorenzVec>()
 
-    // TODO Repo pattern `finishedChainPattern` must not contain unnamed capture groups. [RepoPatternUnnamedGroup]
     private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
 
     /**
-     * REGEX-TEST: §eYou finished the Griffin burrow chain! §r§7(4/4)
+     * REGEX-TEST: §eYou finished the Griffin burrow chain! §r§7(8/8)
+     * REGEX-TEST: §eYou dug out a Griffin Burrow! §r§7(4/8)
      */
-    private val finishedChainPattern by patternGroup.pattern(
-        "chain-finished-capture",
-        "§eYou finished the Griffin burrow chain! §r§7\\(\\d+/(\\d+)\\)"
-    )
-
-    /**
-     * REGEX-TEST: §eYou dug out a Griffin Burrow! §r§7(4/4)
-     */
-    private val dugBorrowPattern by patternGroup.pattern(
-        "burrow-dug",
-        "§eYou dug out a Griffin Burrow! §r§7\\((\\d+)/(\\d+)\\)"
+    private val burrowDugPattern by patternGroup.pattern(
+        "burrow-dug-capture",
+        "§eYou (?<type>finished the Griffin burrow chain!|dug out a Griffin Burrow!) §r§7\\((?<current>\\d+)/(?<max>\\d+)\\)"
     )
 
     data class GuessEntry(
@@ -213,29 +204,21 @@ object ArrowGuessBurrow {
         }
     }
 
-    // these could be combined but only if someone else touches the regex for me
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onChat(event: SkyHanniChatEvent) {
-        if (dugBorrowPattern.matches(event.message)) {
-            val matcher = dugBorrowPattern.matcher(event.message)
+        if (burrowDugPattern.matches(event.message)) {
+            val matcher = burrowDugPattern.matcher(event.message)
             if (matcher.find()) {
-                val current = matcher.group(1).toInt()
-                val max = matcher.group(2).toInt()
+                val current = matcher.group("current").toInt()
+                val max = matcher.group("max").toInt()
                 lastBurrowPos = recentBlocksClicked.toList()
                 recentBlocksClicked.forEach { onBurrowDug(it, current, max) }
-            }
-        } else if (finishedChainPattern.matches(event.message)) {
-            val matcher = finishedChainPattern.matcher(event.message)
-            if (matcher.find()) {
-                val max = matcher.group(1).toInt()
-                lastBurrowPos = recentBlocksClicked.toList()
-                recentBlocksClicked.forEach { onBurrowDug(it, max, max) }
             }
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) { //TODO store color and check distance
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!newArrow) return
 
@@ -244,7 +227,8 @@ object ArrowGuessBurrow {
         if (event.count != 0) return
         if (event.speed != 1.0f) return
 
-        if (!event.offset.toDoubleArray().all(allowedOffsets::contains)) return
+        // offset is color for some reason
+        val range = getArrowRange(event.offset) ?: return
 
         if (!recentArrowParticles.add(event.location)) return
         points.add(event.location)
@@ -252,7 +236,7 @@ object ArrowGuessBurrow {
         val arrow = detectArrow(points) ?: return
         newArrow = false
         points.clear()
-        val guess = findClosestValidBlockToRayNew(arrow) ?: run {
+        val guess = findClosestValidBlockToRayNew(arrow, range) ?: run {
             if (DebugSesh.debugActive) {
                 DebugSesh.couldNotFindGuess++
             }
@@ -270,6 +254,15 @@ object ArrowGuessBurrow {
             new = true
         ).post()
 
+    }
+
+    fun getArrowRange(offset: LorenzVec): IntRange? {
+        return when (offset) {
+            LorenzVec(0, 128, 0) -> IntRange(0, 120) // yellow
+            LorenzVec(255, 255, 0) -> IntRange(120, 280) // red
+            LorenzVec(255, 0, 0) -> IntRange(280, 600) // black
+            else -> null
+        }
     }
 
     fun checkMoveGuess(particleBurrows: Map<LorenzVec, BurrowType>) {
@@ -303,7 +296,7 @@ object ArrowGuessBurrow {
         }
     }
 
-    private fun findClosestValidBlockToRayNew(ray: RaycastUtils.Ray): LorenzVec? {
+    private fun findClosestValidBlockToRayNew(ray: RaycastUtils.Ray, range: IntRange): LorenzVec? {
         val bounds = IslandType.HUB.islandData?.boundingBox ?: return null
         if (!bounds.isInside(ray.origin)) return null // guarantees exit point is first intersect
         // you technically don't need to find the endpoint for this, but it makes it simpler so why not
@@ -316,7 +309,7 @@ object ArrowGuessBurrow {
             ?.index
             ?: return null
 
-        val candidates = mutableMapOf<LorenzVec, Double>()
+        val candidates = mutableMapOf<LorenzVec, Pair<Double, Double>>() // position mapped to scaledDistToRay and distFromOrigin
         val endPointArray = endPoint.toDoubleArray()
         val originArray = ray.origin.toDoubleArray()
         val directionArray = ray.direction.toDoubleArray()
@@ -335,24 +328,30 @@ object ArrowGuessBurrow {
             // take the ratio to account for errors
             val scaledDistance = (distanceToRay * 500000 / distanceFromOrigin)
 
-            candidates[candidateBlock] = scaledDistance.roundTo(5)
+            candidates[candidateBlock] = Pair(scaledDistance.roundTo(5), distanceFromOrigin)
         }
 
         if (candidates.isEmpty()) return null
-        val minValue = candidates.values.min()
-        val possibilities = candidates.filterValues { it == minValue }.map { it.key }
-        allGuesses.add(GuessEntry(possibilities))
+        val minValue = candidates.values.minOf { it.first }
+        val possibilities = candidates.filterValues { it.first == minValue }
+        var withinRange = possibilities.filterValues { it.second.toInt() in range }.map { it.key }
+        if (withinRange.isEmpty()) {
+            ChatUtils.chat("no guesses within range found for range $IntRange please report this to SidOfThe7Cs - all options were $possibilities")
+            withinRange = possibilities.map { it.key }
+        }
+
+        allGuesses.add(GuessEntry(withinRange))
 
         if (DebugSesh.debugActive) {
             DebugSesh.guessesMade++
-            if (possibilities.size == 1) DebugSesh.preciseGuesses++
+            if (withinRange.size == 1) DebugSesh.preciseGuesses++
         }
 
-        if (possibilities.size > 1 && config.warnIfInaccurateArrowGuess) {
+        if (withinRange.size > 1 && config.warnIfInaccurateArrowGuess) {
             TitleManager.sendTitle("§eUse Spade")
         }
 
-        return possibilities[0]
+        return withinRange[0]
     }
 
     private fun isBlockValid(pos: LorenzVec): Boolean {
