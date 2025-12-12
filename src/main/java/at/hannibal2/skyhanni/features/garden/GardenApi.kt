@@ -184,7 +184,10 @@ object GardenApi {
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
-    fun readCounter(itemStack: ItemStack): Long? = itemStack.getCultivatingCounter() ?: itemStack.getHoeExp() ?: itemStack.getOldHoeCounter()
+    fun readCounter(itemStack: ItemStack): Long? =
+        if (greenhouseReleased) itemStack.getCultivatingCounter() ?: itemStack.getHoeExp()
+        ?: itemStack.getOldHoeCounter()
+        else itemStack.getOldHoeCounter() ?: itemStack.getCultivatingCounter()
 
     fun CropType.getItemStackCopy(iconId: String): ItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
 

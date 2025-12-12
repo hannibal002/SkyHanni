@@ -54,6 +54,7 @@ object BlockCompat {
         //#endif
     }
 
+    @Suppress("ReturnCount")
     fun IBlockState.getFlowerType(pos: LorenzVec): String? {
         //#if MC < 1.21
         val property = (this.block.blockState.properties.find { it.name == "variant" } as? PropertyEnum) ?: return null

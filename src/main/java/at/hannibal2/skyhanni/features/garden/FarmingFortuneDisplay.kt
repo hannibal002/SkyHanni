@@ -408,7 +408,7 @@ object FarmingFortuneDisplay {
     }
 
     fun getCounterFortune(tool: ItemStack?): Double {
-        //todo
+        // todo
         val counter = tool?.getHoeExp() ?: return 0.0
         val digits = floor(log10(counter.toDouble()))
         return (16 * digits - 48).coerceAtLeast(0.0)
