@@ -254,9 +254,9 @@ object ArrowGuessBurrow {
 
     fun getArrowRange(offset: LorenzVec): IntRange? {
         return when (offset) {
-            LorenzVec(0, 128, 0) -> IntRange(0, 120) // yellow
-            LorenzVec(255, 255, 0) -> IntRange(120, 280) // red
-            LorenzVec(255, 0, 0) -> IntRange(280, 600) // black
+            LorenzVec(0, 128, 0) -> IntRange(0, 121) // yellow
+            LorenzVec(255, 255, 0) -> IntRange(119, 281) // red
+            LorenzVec(255, 0, 0) -> IntRange(279, 600) // black
             else -> null
         }
     }
@@ -333,7 +333,7 @@ object ArrowGuessBurrow {
         var withinRange = possibilities.filterValues { it.second.toInt() in range }.map { it.key }
         if (withinRange.isEmpty()) {
             ChatUtils.chat(
-                "no guesses within range found for range $IntRange" +
+                "no guesses within range found for range $range" +
                     " please report this to SidOfThe7Cs - all options were $possibilities"
             )
             withinRange = possibilities.map { it.key }
