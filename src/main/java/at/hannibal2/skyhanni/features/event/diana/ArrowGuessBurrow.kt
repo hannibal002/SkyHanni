@@ -88,10 +88,10 @@ object ArrowGuessBurrow {
             GriffinBurrowHelper.removePreciseGuess(getCurrent())
             val nextIndex = currentIndex + 1
             if (nextIndex in guesses.indices) {
+                currentIndex = nextIndex
                 if (!isBlockValid(guesses[nextIndex])) {
                     return moveToNext()
                 }
-                currentIndex = nextIndex
                 GriffinBurrowHelper.newBurrow = true // spade is probably not pointing to the burrow we are moving
                 BurrowGuessEvent(guesses[nextIndex], precise = true, new = true).post()
                 return true
