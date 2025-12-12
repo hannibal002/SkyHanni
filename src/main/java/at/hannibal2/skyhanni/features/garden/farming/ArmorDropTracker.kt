@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
@@ -33,13 +34,15 @@ object ArmorDropTracker {
 
     private val config get() = GardenApi.config.armorDropTracker
 
+    private val patternGroup = RepoPattern.group("garden.armordrops")
+
     /**
      * REGEX-TEST: FERMENTO_CHESTPLATE
      * REGEX-TEST: CROPIE_BOOTS
      * REGEX-TEST: SQUASH_HELMET
      */
-    private val armorPattern by RepoPattern.pattern(
-        "garden.armordrops.armor",
+    private val armorPattern by patternGroup.pattern(
+        "armor",
         "(?:HELIANTHUS|FERMENTO|CROPIE|SQUASH|MELON)_(?:LEGGINGS|CHESTPLATE|BOOTS|HELMET)",
     )
 
@@ -51,16 +54,25 @@ object ArmorDropTracker {
 
     data class Data(
         @Expose
-        var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
+        var drops: MutableMap<ArmorDropType, Int> = mutableMapOf(),
     ) : TrackerData()
 
-    // Todo use repo pattern
-    // Todo use repo pattern
-    enum class ArmorDropType(val dropName: String, val chatMessage: String) {
+    init {
+        ArmorDropType.entries.forEach { it.chatPattern }
+    }
+
+    // todo before merge need to change these colors back to what they are on main, then once greenhouse releases fix it
+    enum class ArmorDropType(val dropName: String, chatMessage: String) {
         CROPIE("§aCropie", "§6§lRARE CROP! §r§f§r§aCropie §r§b(Armor Set Bonus)"),
         SQUASH("§9Squash", "§6§lRARE CROP! §r§f§r§9Squash §r§b(Armor Set Bonus)"),
         FERMENTO("§5Fermento", "§6§lRARE CROP! §r§f§r§5Fermento §r§b(Armor Set Bonus)"),
         HELIANTHUS("§6Helianthus", "§6§lRARE CROP! §r§f§r§6Helianthus §r§b(Armor Set Bonus)"),
+        ;
+
+        val chatPattern by patternGroup.pattern(
+            name.lowercase(),
+            chatMessage,
+        )
     }
 
     @HandleEvent
@@ -71,7 +83,7 @@ object ArmorDropTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         for (dropType in ArmorDropType.entries) {
-            if (dropType.chatMessage != event.message) continue
+            if (dropType.chatPattern.matches(event.message)) continue
             addDrop(dropType)
             if (config.hideChat) {
                 event.blockedReason = "farming_armor_drops"

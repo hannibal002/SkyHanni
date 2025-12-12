@@ -46,7 +46,7 @@ enum class CropType(
         { ItemStack(Blocks.pumpkin) }, "pumpkin", FarmingItemType.PUMPKIN
     ),
     MELON(
-        "Melon", "MELON_DICER", "SQUASH", 5.0,
+        "Melon Slice", "MELON_DICER", "SQUASH", 5.0,
         { ItemStack(Items.melon) }, "melon", FarmingItemType.MELON
     ),
     COCOA_BEANS(
