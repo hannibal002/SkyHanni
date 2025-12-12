@@ -98,7 +98,6 @@ object ArrowGuessBurrow {
         var timeStarted = SimpleTimeMark.farPast()
 
         var guessesMade = 0
-        var incorrectGuesses = 0
         var preciseGuesses = 0
         var couldNotFindGuess = 0
 
@@ -114,10 +113,8 @@ object ArrowGuessBurrow {
                 |
                 |Statistics:
                 |  Total guesses made: $guessesMade
-                |  Incorrect guesses: $incorrectGuesses
                 |  Precise guesses: $preciseGuesses
                 |  Could not find guess: $couldNotFindGuess
-                |  Accuracy: ${"%.1f".format((guessesMade - incorrectGuesses) * 100.0 / guessesMade)}%
                 |  Precision rate: ${"%.1f".format(preciseGuesses * 100.0 / guessesMade)}%
                 """.trimMargin()
 
@@ -130,7 +127,6 @@ object ArrowGuessBurrow {
             timeStarted = SimpleTimeMark.now()
             renderAll = false
             guessesMade = 0
-            incorrectGuesses = 0
             preciseGuesses = 0
             couldNotFindGuess = 0
         }
