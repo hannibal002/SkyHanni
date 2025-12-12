@@ -530,5 +530,13 @@ object GardenNextJacobContest {
         val base = "garden.jacobContest.nextContest"
         event.move(101, "misc.inventoryLoadPos", "$base.inventoryPosition")
         event.move(101, "$base.pos", "$base.position")
+
+        event.transform(111, "$base.warnFor") { element ->
+            element.asJsonArray.apply {
+                add(JsonPrimitive(CropType.SUNFLOWER.name))
+                add(JsonPrimitive(CropType.MOONFLOWER.name))
+                add(JsonPrimitive(CropType.WILD_ROSE.name))
+            }
+        }
     }
 }

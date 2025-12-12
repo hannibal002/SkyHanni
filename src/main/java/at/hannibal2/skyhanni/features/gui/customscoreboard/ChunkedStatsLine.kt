@@ -68,7 +68,7 @@ enum class ChunkedStatsLine(
         displayPair = { "§c${getSowdust()}" },
         showWhen = { !(hideEmptyLines && getSowdust() == "0") && ScoreboardElementSowdust.showWhen() },
         showIsland = { ScoreboardElementSowdust.showIsland() },
-        configLine = "§cSowdust",
+        configLine = "§2Sowdust",
     ),
     GEMS(
         displayPair = { "§a${getGems()}" },
