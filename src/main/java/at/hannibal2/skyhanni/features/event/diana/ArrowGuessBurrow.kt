@@ -56,7 +56,7 @@ object ArrowGuessBurrow {
     private var newArrow = true
 
     // deific spade insta breaks grass and hits the block behind it before chat messages if you left-click
-    private var recentBlocksClicked = TimeLimitedSet<LorenzVec>(0.5.seconds)
+    private val recentBlocksClicked = TimeLimitedSet<LorenzVec>(0.5.seconds)
     private var lastBurrowPos = emptyList<LorenzVec>()
 
     private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
@@ -332,7 +332,8 @@ object ArrowGuessBurrow {
         val possibilities = candidates.filterValues { it.first == minValue }
         var withinRange = possibilities.filterValues { it.second.toInt() in range }.map { it.key }
         if (withinRange.isEmpty()) {
-            ChatUtils.chat("no guesses within range found for range $IntRange please report this to SidOfThe7Cs - all options were $possibilities")
+            ChatUtils.chat("no guesses within range found for range $IntRange" +
+                " please report this to SidOfThe7Cs - all options were $possibilities")
             withinRange = possibilities.map { it.key }
         }
 
@@ -371,9 +372,7 @@ object ArrowGuessBurrow {
         val count2 = getPointsWithinDistance(points, candidate2, PARTICLE_DETECTION_TOLERANCE)
 
         // One should be 2 (base) and the other 4 (tip)
-        if (!((count1 == COUNT_NEAR_BASE && count2 == COUNT_NEAR_TIP) ||
-                (count1 == COUNT_NEAR_TIP && count2 == COUNT_NEAR_BASE))
-        ) return null
+        if (setOf(count1, count2) != setOf(COUNT_NEAR_BASE, COUNT_NEAR_TIP)) return null
 
         val base: LorenzVec
         val tip: LorenzVec
