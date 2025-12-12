@@ -164,7 +164,7 @@ object NumberUtil {
                 }
 
                 else -> {
-                    throw IllegalArgumentException("Encountered invalid character while parsing Roman numeral: '$c'")
+                    throw IllegalArgumentException("Encountered invalid character '$c' while parsing Roman numeral: '$this'")
                 }
             }
         }
