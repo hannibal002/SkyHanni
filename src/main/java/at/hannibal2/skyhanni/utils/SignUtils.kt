@@ -83,7 +83,8 @@ object SignUtils {
 
     fun GuiEditSign.isRancherSign(): Boolean {
         val signText = getSignLines() ?: return false
-        return signText[1] == "^^^^^^" && signText[2] == "Set your" && signText[3] == "speed cap!"
+        // one of the signs say "Set your Garden's" but because its too long (on 1.8) the word garden doesnt get rendered
+        return signText[1] == "^^^^^^" && signText[2].startsWith("Set your") && signText[3].endsWith("speed cap!")
     }
 
     fun GuiEditSign.isMousematSign(): Boolean {
