@@ -13,7 +13,9 @@ import com.google.gson.JsonPrimitive
 object CustomScoreboardConfigFix {
 
     private const val PREFIX = "gui.customScoreboard"
+    private const val SCOREBOARD_ENTRIES_KEY = "$PREFIX.scoreboardEntries"
     private const val DISPLAY_PREFIX = "$PREFIX.display"
+    private const val CHUNKED_STATS_KEY = "$DISPLAY_PREFIX.chunkedStats.chunkedStats"
     private const val DISPLAY_CONFIG_PREFIX = "$PREFIX.displayConfig"
     private const val EVENTS_CONFIG_KEY = "$DISPLAY_CONFIG_PREFIX.eventsConfig"
     private const val ALIGNMENT_KEY = "$DISPLAY_PREFIX.alignment"
@@ -102,10 +104,33 @@ object CustomScoreboardConfigFix {
         event.transform(90, EVENT_ENTRIES_KEY) { element ->
             JsonArray().apply { element.asJsonArray.toSet().forEach(::add) }
         }
+
+        event.addScoreboardEntry(111, ScoreboardConfigElement.SOWDUST)
+        event.addChunkedStat(111, ChunkedStatsLine.SOWDUST)
     }
 
     private fun ConfigUpdaterMigrator.ConfigFixEvent.addEvent(version: Int, vararg keys: ScoreboardConfigEventElement) {
         transform(version, EVENT_ENTRIES_KEY) { element ->
+            element.asJsonArray.apply {
+                keys.forEach { key ->
+                    add(JsonPrimitive(key.name))
+                }
+            }
+        }
+    }
+
+    private fun ConfigUpdaterMigrator.ConfigFixEvent.addScoreboardEntry(version: Int, vararg keys: ScoreboardConfigElement) {
+        transform(version, SCOREBOARD_ENTRIES_KEY) { element ->
+            element.asJsonArray.apply {
+                keys.forEach { key ->
+                    add(JsonPrimitive(key.name))
+                }
+            }
+        }
+    }
+
+    private fun ConfigUpdaterMigrator.ConfigFixEvent.addChunkedStat(version: Int, vararg keys: ChunkedStatsLine) {
+        transform(version, CHUNKED_STATS_KEY) { element ->
             element.asJsonArray.apply {
                 keys.forEach { key ->
                     add(JsonPrimitive(key.name))

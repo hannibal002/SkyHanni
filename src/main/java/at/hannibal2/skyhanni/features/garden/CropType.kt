@@ -77,7 +77,7 @@ enum class CropType(
     ),
     WILD_ROSE(
         "Wild Rose", "THEORETICAL_HOE_WILD_ROSE", "HELIANTHUS", 2.0,
-        { BlockCompat.createWildRose() }, "wild_rose", FarmingItemType.NONE
+        { BlockCompat.createWildRose() }, "rose", FarmingItemType.NONE
     ),
     ;
 
