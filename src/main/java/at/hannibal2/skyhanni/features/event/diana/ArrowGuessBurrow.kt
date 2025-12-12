@@ -334,7 +334,7 @@ object ArrowGuessBurrow {
         if (withinRange.isEmpty()) {
             ChatUtils.chat(
                 "no guesses within range found for range $IntRange" +
-                " please report this to SidOfThe7Cs - all options were $possibilities"
+                    " please report this to SidOfThe7Cs - all options were $possibilities"
             )
             withinRange = possibilities.map { it.key }
         }
