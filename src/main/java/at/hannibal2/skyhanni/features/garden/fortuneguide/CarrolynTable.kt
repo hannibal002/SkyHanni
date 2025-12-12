@@ -41,6 +41,12 @@ enum class CarrolynTable(val crop: CropType, val label: String, completeMessage:
         "Half Eaten Mushroom",
         "MUSHROOMS EXPORTATION COMPLETE!",
         "[NPC] Carrolyn: Thank you for the mushrooms.",
+    ),
+    PRICKLY_KISS(
+        CropType.WILD_ROSE,
+        "Prickly Kiss",
+        "WILD ROSE EXPORTATION COMPLETE!",
+        "[NPC] Carrolyn: Thank you for the roses.",
     )
     ;
 
