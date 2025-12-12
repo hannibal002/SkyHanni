@@ -254,9 +254,9 @@ object ArrowGuessBurrow {
 
     fun getArrowRange(offset: LorenzVec): IntRange? {
         return when (offset) {
-            LorenzVec(0, 128, 0) -> IntRange(0, 121) // yellow
-            LorenzVec(255, 255, 0) -> IntRange(119, 281) // red
-            LorenzVec(255, 0, 0) -> IntRange(279, 600) // black
+            LorenzVec(0, 128, 0) -> IntRange(0, 117) // yellow
+            LorenzVec(255, 255, 0) -> IntRange(112, 282) // red
+            LorenzVec(255, 0, 0) -> IntRange(281, 600) // black
             else -> null
         }
     }
