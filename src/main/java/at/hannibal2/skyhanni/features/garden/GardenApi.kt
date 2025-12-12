@@ -186,7 +186,7 @@ object GardenApi {
 
     fun readCounter(itemStack: ItemStack): Long? =
         if (greenhouseReleased) itemStack.getCultivatingCounter() ?: itemStack.getHoeExp()
-        ?: itemStack.getOldHoeCounter()
+            ?: itemStack.getOldHoeCounter()
         else itemStack.getOldHoeCounter() ?: itemStack.getCultivatingCounter()
 
     fun CropType.getItemStackCopy(iconId: String): ItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
