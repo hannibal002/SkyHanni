@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
+import at.hannibal2.skyhanni.features.garden.CropType.Companion.isTimeFlower
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.checkCurrentPlot
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
@@ -85,7 +86,7 @@ object GardenApi {
     var greenhouseReleased = true
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSendPacket(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
         checkItemInHand()
     }
 
@@ -105,6 +106,8 @@ object GardenApi {
         if (!inGarden()) return
         if (event.isMod(10, 1)) {
             inBarn = barnArea.isPlayerInside()
+            if (cropInHand.isTimeFlower()) checkItemInHand()
+
 
             // We ignore random hypixel moments
             Minecraft.getMinecraft().currentScreen ?: return
@@ -146,7 +149,7 @@ object GardenApi {
         val toolItem = InventoryUtils.getItemInHand()
         val crop = toolItem?.getCropType()
         val newTool = getToolInHand(toolItem, crop)
-        if (toolInHand != newTool) {
+        if (toolInHand != newTool || crop != cropInHand) {
             toolInHand = newTool
             cropInHand = crop
             itemInHand = toolItem

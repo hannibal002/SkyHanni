@@ -134,6 +134,10 @@ enum class CropType(
             return if (time >= 12000) MOONFLOWER else SUNFLOWER
         }
 
+        fun CropType?.isTimeFlower(): Boolean {
+            return this == SUNFLOWER || this == MOONFLOWER
+        }
+
         fun CropType.getTurboCrop() = "turbo_${this.enchantName.lowercase()}"
     }
 }
