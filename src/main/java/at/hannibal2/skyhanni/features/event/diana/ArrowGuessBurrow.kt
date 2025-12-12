@@ -332,8 +332,10 @@ object ArrowGuessBurrow {
         val possibilities = candidates.filterValues { it.first == minValue }
         var withinRange = possibilities.filterValues { it.second.toInt() in range }.map { it.key }
         if (withinRange.isEmpty()) {
-            ChatUtils.chat("no guesses within range found for range $IntRange" +
-                " please report this to SidOfThe7Cs - all options were $possibilities")
+            ChatUtils.chat(
+                "no guesses within range found for range $IntRange" +
+                " please report this to SidOfThe7Cs - all options were $possibilities"
+            )
             withinRange = possibilities.map { it.key }
         }
 
