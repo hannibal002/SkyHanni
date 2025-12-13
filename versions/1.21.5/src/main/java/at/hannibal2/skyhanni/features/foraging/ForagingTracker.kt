@@ -193,32 +193,31 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         addItem(treeType, STRETCHING_STICKS, change, command = false)
     }
 
-    private val BonusDropsUncommonDropsList = listOf<NeuInternalName>(
+    private val BonusDropsUncommonDropsList = listOf(
         "STRETCHING_STICKS".toInternalName(),
         "DEEP_ROOT".toInternalName(),
     )
-    private val BonusDropsEnchantedBooksList = listOf<NeuInternalName>(
+    private val BonusDropsEnchantedBooksList = listOf(
         "ULTIMATE_FIRST_IMPRESSION;1".toInternalName(),
         "ULTIMATE_MISSILE;1".toInternalName(),
     )
-    private val BonusDropsBoostersList = listOf<NeuInternalName>(
+    private val BonusDropsBoostersList = listOf(
         "SWEEP_BOOSTER".toInternalName(),
         "FORAGING_WISDOM_BOOSTER".toInternalName(),
     )
-    private val BonusDropsShardsList = listOf<NeuInternalName>(
+    private val BonusDropsShardsList = listOf(
         "ATTRIBUTE_SHARD_CHOP;1".toInternalName(),
         "ATTRIBUTE_SHARD_REPTILOID;1".toInternalName(),
     )
-    private val BonusDropsMobsList = listOf<String>(
+    private val BonusDropsMobsList = listOf(
         "Phanpyre",
         "Phanflare",
         "Dreadwing",
     )
-    private val BonusDropsRunesList = listOf<NeuInternalName>(
+    private val BonusDropsRunesList = listOf(
         "AXE_FADING_WHITE_RUNE;1".toInternalName(),
         "AXE_FADING_GREEN_RUNE;1".toInternalName(),
     )
-    private val BonusDropsTreeTheFish = "TREE_THE_FISH".toInternalName()
 
     private fun SkyHanniChatEvent.tryReadLoot() {
         ForagingTrackerLegacy.openCloseRewardPattern.matchMatcher(message) {
@@ -303,7 +302,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
                     && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.RUNES)) {
                     rareDrops.add(item)
                 }
-                if (itemInternalName == BonusDropsTreeTheFish
+                if (itemInternalName == "TREE_THE_FISH".toInternalName()
                     && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.TREE_THE_FISH)) {
                     rareDrops.add(item)
                 }
