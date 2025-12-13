@@ -128,7 +128,7 @@ object ProfileStorageData {
         if (foundSkyBlockTabList) {
             ChatUtils.clickableChat(
                 "§cCannot read profile name from tab list! Open /widget and make sure the Profile Widget " +
-                    "is enabled and visible."
+                    "is enabled and visible.",
                 onClick = {
                     HypixelCommands.widget()
                 },
