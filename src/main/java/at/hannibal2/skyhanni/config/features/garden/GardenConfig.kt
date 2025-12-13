@@ -152,6 +152,11 @@ class GardenConfig {
     val hoeLevelDisplay: HoeLevelsDisplayConfig = HoeLevelsDisplayConfig()
 
     @Expose
+    @ConfigOption(name = "DNA Analyzer Solver", desc = "")
+    @Accordion
+    val dnaAnalyzerSolver: DnaAnalyzerSolverConfig = DnaAnalyzerSolverConfig()
+
+    @Expose
     @ConfigOption(
         name = "Plot Price",
         desc = "Show the price of the plot in coins when inside the Configure Plots inventory.",
