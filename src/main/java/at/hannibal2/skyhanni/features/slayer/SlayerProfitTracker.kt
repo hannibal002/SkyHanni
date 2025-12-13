@@ -107,8 +107,7 @@ object SlayerProfitTracker {
         }
         // TODO spawn costs in repo
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
-            val coinsCap = -300_000
-            // Aura doubled costs, setting this to double Blaze cost and hoping tbh
+            val coinsCap = -350_000
             if (coins < coinsCap || coins > 0) {
                 ChatUtils.debug("Wrong Slayer Spawn Cost! Ignoring!")
                 return
