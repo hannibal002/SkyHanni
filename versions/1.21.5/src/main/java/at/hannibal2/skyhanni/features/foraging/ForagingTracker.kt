@@ -278,14 +278,11 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
                  * fetch their correct internal names, and thus translatin' their in-game names into internal
                  * names literally
                  */
-                when (itemInternalName) {
-                    "◆_FADING_WHITE_RUNE;1".toInternalName() -> itemInternalName = "AXE_FADING_WHITE_RUNE;1".toInternalName()
-                    "◆_FADING_GREEN_RUNE;1".toInternalName() -> itemInternalName = "AXE_FADING_GREEN_RUNE;1".toInternalName()
-                }
+                if (itemInternalName.startsWith(("◆_")))
+                    itemInternalName.replace("◆_", "AXE_")
 
                 loot.addOrPut(itemInternalName, 1)
 
-                // val percentage = group("percentage").formatDoubleOrNull() ?: return@matchMatcher
                 if (BonusDropsUncommonDropsList.contains(itemInternalName)
                     && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.UNCOMMON_DROPS)) {
                     rareDrops.add(item)
