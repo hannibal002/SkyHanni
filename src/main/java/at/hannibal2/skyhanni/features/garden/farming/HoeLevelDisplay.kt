@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.appendString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -94,7 +95,7 @@ object HoeLevelDisplay {
                 if (isEnabled() && config.overflow && overflowLevel != null) {
                     val currentLevel = heldItem.getHoeLevel() ?: return
                     event.chatComponent =
-                        event.chatComponent.appendText(" §8(§3Level ${currentLevel + overflowLevel}§8)")
+                        event.chatComponent.appendString(" §8(§3Level ${currentLevel + overflowLevel}§8)")
                 }
             }
         }
