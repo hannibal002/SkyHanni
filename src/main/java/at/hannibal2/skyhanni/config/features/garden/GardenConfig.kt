@@ -69,11 +69,6 @@ class GardenConfig {
     val eliteFarmingWeights: EliteFarmingWeightConfig = EliteFarmingWeightConfig()
 
     @Expose
-    @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")
-    @Accordion
-    val dicerRngDropTracker: DicerRngDropTrackerConfig = DicerRngDropTrackerConfig()
-
-    @Expose
     @ConfigOption(name = "Money per Hour", desc = "")
     @Accordion
     val moneyPerHours: MoneyPerHourConfig = MoneyPerHourConfig()
