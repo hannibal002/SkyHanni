@@ -32,8 +32,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -409,7 +409,7 @@ object FarmingFortuneDisplay {
 
     fun getCounterFortune(tool: ItemStack?): Double {
         // todo
-        val counter = tool?.getHoeExp() ?: return 0.0
+        val counter = tool?.getOldHoeCounter() ?: return 0.0
         val digits = floor(log10(counter.toDouble()))
         return (16 * digits - 48).coerceAtLeast(0.0)
     }

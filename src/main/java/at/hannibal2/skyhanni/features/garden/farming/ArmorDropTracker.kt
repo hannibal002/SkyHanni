@@ -61,11 +61,15 @@ object ArmorDropTracker {
         ArmorDropType.entries.forEach { it.chatPattern }
     }
 
-    // todo before merge need to change these colors back to what they are on main, then once greenhouse releases fix it
+    // todo change back once greenhouse drops
+    // CROPIE("§aCropie", "§6§lRARE CROP! §r§f§r§aCropie §r§b\\(Armor Set Bonus\\)"),
+    // SQUASH("§9Squash", "§6§lRARE CROP! §r§f§r§9Squash §r§b\\(Armor Set Bonus\\)"),
+    // FERMENTO("§5Fermento", "§6§lRARE CROP! §r§f§r§5Fermento §r§b\\(Armor Set Bonus\\)"),
+    // HELIANTHUS("§6Helianthus", "§6§lRARE CROP! §r§f§r§6Helianthus §r§b\\(Armor Set Bonus\\)"),
     enum class ArmorDropType(val dropName: String, chatMessage: String) {
-        CROPIE("§aCropie", "§6§lRARE CROP! §r§f§r§aCropie §r§b\\(Armor Set Bonus\\)"),
-        SQUASH("§9Squash", "§6§lRARE CROP! §r§f§r§9Squash §r§b\\(Armor Set Bonus\\)"),
-        FERMENTO("§5Fermento", "§6§lRARE CROP! §r§f§r§5Fermento §r§b\\(Armor Set Bonus\\)"),
+        CROPIE("§aCropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b\\(Armor Set Bonus\\)"),
+        SQUASH("§9Squash", "§6§lRARE CROP! §r§f§r§5Squash §r§b\\(Armor Set Bonus\\)"),
+        FERMENTO("§5Fermento", "§6§lRARE CROP! §r§f§r§6Fermento §r§b\\(Armor Set Bonus\\)"),
         HELIANTHUS("§6Helianthus", "§6§lRARE CROP! §r§f§r§6Helianthus §r§b\\(Armor Set Bonus\\)"),
         ;
 
