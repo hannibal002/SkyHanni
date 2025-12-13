@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class DnaAnalyzerSolverConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Solves the DNA Analyser.")
+    @ConfigOption(name = "Enabled", desc = "Solves the DNA Analyzer.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("Analyser")
     var enabled: Boolean = true
 
     @Expose
@@ -18,7 +20,8 @@ class DnaAnalyzerSolverConfig {
     var useMiddleClick: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Hide tooltips", desc = "Hide the item tooltips inside the DNA Analyser.")
+    @ConfigOption(name = "Hide tooltips", desc = "Hide the item tooltips inside the DNA Analyzer.")
     @ConfigEditorBoolean
+    @SearchTag("Analyser")
     var hideTooltips: Boolean = true
 }
