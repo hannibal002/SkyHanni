@@ -71,7 +71,9 @@ object FFStats {
         FarmingFortuneDisplay.loadFortuneLineData(tool, 0.0)
 
         when (crop) {
-            CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART -> {
+            CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART,
+            CropType.SUNFLOWER, CropType.MOONFLOWER, CropType.WILD_ROSE,
+            -> {
                 FortuneStats.BASE_TOOL.set(FarmingFortuneDisplay.getToolFortune(tool), 50.0)
                 FortuneStats.COUNTER.set(FarmingFortuneDisplay.getCounterFortune(tool), 96.0)
                 FortuneStats.HARVESTING.set(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)

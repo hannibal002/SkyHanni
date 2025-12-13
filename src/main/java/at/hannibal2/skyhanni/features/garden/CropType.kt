@@ -21,63 +21,63 @@ enum class CropType(
     val simpleName: String,
     val farmingItem: FarmingItemType,
     val replenish: Boolean = false,
-    val enchantName: String = cropName.lowercase()
+    val enchantName: String = cropName.lowercase(),
 ) {
 
     WHEAT(
         "Wheat", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0,
-        { ItemStack(Items.wheat) }, "wheat", FarmingItemType.WHEAT
+        { ItemStack(Items.wheat) }, "wheat", FarmingItemType.WHEAT,
     ),
     CARROT(
         "Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0,
-        { ItemStack(Items.carrot) }, "carrot", FarmingItemType.CARROT, replenish = true
+        { ItemStack(Items.carrot) }, "carrot", FarmingItemType.CARROT, replenish = true,
     ),
     POTATO(
         "Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0,
-        { ItemStack(Items.potato) }, "potato", FarmingItemType.POTATO, replenish = true
+        { ItemStack(Items.potato) }, "potato", FarmingItemType.POTATO, replenish = true,
     ),
     NETHER_WART(
         "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
         { ItemStack(Items.nether_wart) }, "wart", FarmingItemType.NETHER_WART, replenish = true,
-        enchantName = "warts"
+        enchantName = "warts",
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
-        { ItemStack(Blocks.pumpkin) }, "pumpkin", FarmingItemType.PUMPKIN
+        { ItemStack(Blocks.pumpkin) }, "pumpkin", FarmingItemType.PUMPKIN,
     ),
     MELON(
         "Melon Slice", "MELON_DICER", "SQUASH", 5.0,
-        { ItemStack(Items.melon) }, "melon", FarmingItemType.MELON
+        { ItemStack(Items.melon) }, "melon", FarmingItemType.MELON,
     ),
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
         { DyeCompat.BROWN.createStack() }, "cocoa",
-        FarmingItemType.COCOA_BEANS, replenish = true, enchantName = "coco"
+        FarmingItemType.COCOA_BEANS, replenish = true, enchantName = "coco",
     ),
     SUGAR_CANE(
         "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
-        { ItemStack(Items.reeds) }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane"
+        { ItemStack(Items.reeds) }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane",
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
-        { ItemStack(Blocks.cactus) }, "cactus", FarmingItemType.CACTUS
+        { ItemStack(Blocks.cactus) }, "cactus", FarmingItemType.CACTUS,
     ),
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
         { ItemStack(Blocks.red_mushroom_block) }, "mushroom", FarmingItemType.MUSHROOM,
-        enchantName = "mushrooms"
-    ),
-    MOONFLOWER(
-        "Moonflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { BlockCompat.createBlueOrchid() }, "moonflower", FarmingItemType.NONE
+        enchantName = "mushrooms",
     ),
     SUNFLOWER(
         "Sunflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { BlockCompat.createSunFlower() }, "sunflower", FarmingItemType.NONE
+        { BlockCompat.createSunFlower() }, "sunflower", FarmingItemType.SUNFLOWER,
+    ),
+    MOONFLOWER(
+        "Moonflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
+        { BlockCompat.createBlueOrchid() }, "moonflower", FarmingItemType.MOONFLOWER,
     ),
     WILD_ROSE(
         "Wild Rose", "THEORETICAL_HOE_WILD_ROSE", "HELIANTHUS", 2.0,
-        { BlockCompat.createWildRose() }, "rose", FarmingItemType.NONE
+        { BlockCompat.createWildRose() }, "rose", FarmingItemType.WILD_ROSE,
     ),
     ;
 
