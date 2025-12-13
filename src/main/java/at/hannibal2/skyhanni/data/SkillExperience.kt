@@ -62,7 +62,7 @@ object SkillExperience {
                 if (next) {
                     val split = name.split(" ")
                     val skillName = split[0].lowercase()
-                    val level = split[1].romanToDecimal()
+                    val level = split[1].romanToDecimalIfNecessary()
                     val baseExp = getExpForLevel(level)
                     inventoryPattern.matchMatcher(line) {
                         val overflow = group("number").formatLong()
