@@ -20,7 +20,7 @@ class DnaAnalyzerSolverConfig {
     var useMiddleClick: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Block Clock Button", desc = "Blocks accidentally clicking the close button while in the puzzle.")
+    @ConfigOption(name = "Block Close Button", desc = "Blocks accidentally clicking the close button while in the puzzle.")
     @ConfigEditorBoolean
     var blockAccidentalClosing: Boolean = true
 
