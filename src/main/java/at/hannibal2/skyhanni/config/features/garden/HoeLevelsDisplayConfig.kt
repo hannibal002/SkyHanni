@@ -24,7 +24,6 @@ class HoeLevelsDisplayConfig {
         desc = "Displays overflow levels for level 50 hoes."
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     var overflow: Boolean = true
 
     @Expose

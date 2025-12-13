@@ -56,7 +56,6 @@ object HoeLevelDisplay {
         var next = hoeOverflow
         val hoeLevels = hoeLevels ?: return
 
-
         if (hoeLevel <= hoeLevels.size) {
             next = hoeLevels.let { it[hoeLevel - 1] }
         }
@@ -80,7 +79,6 @@ object HoeLevelDisplay {
         val formattedXpToNext = next.addSeparators()
         list.add(Renderable.text("$colorPrefix$formattedXp§8/§e$formattedXpToNext"))
 
-
         display = list
     }
 
@@ -90,13 +88,11 @@ object HoeLevelDisplay {
             val heldItem = InventoryUtils.getItemInHand() ?: return
             val leveledUpTool = group("tool")
             val heldItemName = heldItem.displayName.removeColor()
-            if (heldItemName.contains(leveledUpTool)) {
-                val overflowLevel = addOverflowHoeLevel(heldItem.getItemUuid())
-                if (isEnabled() && config.overflow && overflowLevel != null) {
-                    val currentLevel = heldItem.getHoeLevel() ?: return
-                    event.chatComponent =
-                        event.chatComponent.appendString(" §8(§3Level ${currentLevel + overflowLevel}§8)")
-                }
+            if (!heldItemName.contains(leveledUpTool)) return
+            val overflowLevel = addOverflowHoeLevel(heldItem.getItemUuid())
+            if (isEnabled() && config.overflow && overflowLevel != null) {
+                val currentLevel = heldItem.getHoeLevel() ?: return
+                event.chatComponent = event.chatComponent.appendString(" §8(§3Level ${currentLevel + overflowLevel}§8)")
             }
         }
     }

@@ -233,7 +233,6 @@ enum class PestType(
             "SLUG;3" to SLUG,
             "SLUG;4" to SLUG,
 
-
             // Dragonfly deterministic drops
             "ENCHANTED_SUNFLOWER" to DRAGONFLY,
             "COMPACTED_SUNFLOWER" to DRAGONFLY,
@@ -251,7 +250,6 @@ enum class PestType(
             "COMPACTED_MOONFLOWER" to FIREFLY,
             "FIRE_IN_A_BOTTLE" to FIREFLY,
             "VINYL_FIREFLY" to FIREFLY,
-
 
             // Spray drops only send chat message from mice
             "COMPOST" to FIELD_MOUSE,

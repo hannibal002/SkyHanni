@@ -108,7 +108,6 @@ object GardenApi {
             inBarn = barnArea.isPlayerInside()
             if (cropInHand.isTimeFlower()) checkItemInHand()
 
-
             // We ignore random hypixel moments
             Minecraft.getMinecraft().currentScreen ?: return
             checkItemInHand()

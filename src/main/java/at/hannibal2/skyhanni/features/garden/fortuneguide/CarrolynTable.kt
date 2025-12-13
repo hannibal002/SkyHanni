@@ -47,7 +47,7 @@ enum class CarrolynTable(val crop: CropType, val label: String, completeMessage:
         "Prickly Kiss",
         "WILD ROSE EXPORTATION COMPLETE!",
         "[NPC] Carrolyn: Thank you for the roses.",
-    )
+    ),
     ;
 
     /** Pattern without color codes */

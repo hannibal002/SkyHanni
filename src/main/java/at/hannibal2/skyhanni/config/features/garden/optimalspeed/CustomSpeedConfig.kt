@@ -93,7 +93,7 @@ class CustomSpeedConfig {
             "ask google",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 400f, minStep = 1f)
-    val sunMoonFlower: Property<Float> = Property.of(1f)
+    val sunMoonFlower: Property<Float> = Property.of(155f)
 
     @Expose
     @ConfigOption(
@@ -102,7 +102,7 @@ class CustomSpeedConfig {
             "ask google",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 400f, minStep = 1f)
-    val wildRose: Property<Float> = Property.of(1f)
+    val wildRose: Property<Float> = Property.of(155f)
 
     @Expose
     @ConfigOption(

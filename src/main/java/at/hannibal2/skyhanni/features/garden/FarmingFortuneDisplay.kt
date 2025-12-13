@@ -408,6 +408,7 @@ object FarmingFortuneDisplay {
     }
 
     fun getCounterFortune(tool: ItemStack?): Double {
+        if (GardenApi.greenhouseReleased) return 0.0
         // todo
         val counter = tool?.getOldHoeCounter() ?: return 0.0
         val digits = floor(log10(counter.toDouble()))

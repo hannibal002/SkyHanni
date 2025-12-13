@@ -19,7 +19,7 @@ data class GardenJson(
     @Expose @SerializedName("pest_rare_drops") val pestRareDrops: Map<PestType, Map<NeuInternalName, Int>>,
     @Expose @SerializedName("extra_farming_tools") val extraFarmingTools: Set<NeuInternalName>,
     @Expose @SerializedName("hoe_exp_levels") val hoeExpLevels: List<Int>,
-    @Expose @SerializedName("hoe_exp_overflow") val hoeExpOverflow: Int
+    @Expose @SerializedName("hoe_exp_overflow") val hoeExpOverflow: Int,
 )
 
 data class GardenVisitor(
