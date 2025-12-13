@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.greenhouse
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -24,7 +23,7 @@ object DnaAnalyzerSolver {
 
     private var inInventory = false
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inInventory = event.inventoryName.endsWith(" DNA")
     }
@@ -35,14 +34,14 @@ object DnaAnalyzerSolver {
         currentBoard = null
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled() || !config.hideTooltips) return
         if (event.slot?.slotIndex !in 9..44) return
         event.cancel()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slotId == 49 && config.blockAccidentalClosing) {
@@ -54,7 +53,7 @@ object DnaAnalyzerSolver {
 
     private var currentBoard: DnaBoard? = null
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
         val initialBoard = MutableList(9) { MutableList(4) { Colors.GREEN } }
@@ -67,7 +66,7 @@ object DnaAnalyzerSolver {
         currentBoard = DnaBoard(initialBoard)
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         val board = currentBoard ?: return
