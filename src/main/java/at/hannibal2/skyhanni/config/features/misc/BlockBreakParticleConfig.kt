@@ -18,7 +18,7 @@ class BlockBreakParticleConfig {
 
     @JvmField
     @Expose
-    @ConfigOption(name = "Only on Garden", desc = "Hide Block Break particles only on garden.")
+    @ConfigOption(name = "Only on Garden", desc = "Hide Block Break particles only on the Garden.")
     @SearchTag("breaking")
     @ConfigEditorBoolean
     @FeatureToggle
