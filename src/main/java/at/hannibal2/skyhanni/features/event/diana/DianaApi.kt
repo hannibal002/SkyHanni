@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
+import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
@@ -27,7 +28,7 @@ object DianaApi {
 
     fun hasSpadeInHand() = InventoryUtils.itemInHandId in spades
 
-    private fun isRitualActive() = (Perk.MYTHOLOGICAL_RITUAL.isActive || Perk.PERKPOCALYPSE.isActive) ||
+    private fun isRitualActive() = (Perk.MYTHOLOGICAL_RITUAL.isActive || Perk.PERKPOCALYPSE.isActive || ElectionApi.isAura) ||
         SkyHanniMod.feature.dev.debug.assumeMayor.get() == ElectionCandidate.DIANA
 
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
