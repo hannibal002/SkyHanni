@@ -2,39 +2,65 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeLevel
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object HoeLevelDisplay {
 
     val pos = Position(100, 100)
-    var hoeLevels: List<Int>? = null
-    var hoeOverflow = 200000
-    var display: List<Renderable>? = null
+    private var hoeLevels: List<Int>? = null
+    private var hoeOverflow = 200000
+    private var display: List<Renderable>? = null
+    private val gardenStorage get() = GardenApi.storage
 
-    @HandleEvent
+    private val patternGroup = RepoPattern.group("hoe.levels")
+
+    val levelUpPattern by patternGroup.pattern(
+        "levelup",
+        "§3§lOVERFLOW! §r§7Your (?:§.)+(?<tool>.*) §r§7has just dropped a §r§9Tool Exp Capsule§r§7!",
+    )
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
         display = null
         val list = mutableListOf<Renderable>()
         list.add(Renderable.text("§6Hoe Levels"))
-        val hoeExp = InventoryUtils.getItemInHand()?.getHoeExp() ?: return
-        val hoeLevel = InventoryUtils.getItemInHand()?.getHoeLevel() ?: return
+        val heldItem = InventoryUtils.getItemInHand()
+        val hoeExp = heldItem?.getHoeExp() ?: return
+        var hoeLevel = heldItem.getHoeLevel() ?: return
         var next = hoeOverflow
+
         if (hoeLevel < 50) {
-            list.add(Renderable.text("§7Level §8$hoeLevel➜§3${hoeLevel+1}"))
             next = hoeLevels?.let { it[hoeLevel-1] } ?: return
         }
+
+        if (hoeLevel == 50) {
+            val uuid = heldItem.getItemUuid()
+            val overflowLevel = getOverflowHoeLevel(uuid)
+            if (overflowLevel != null) {
+                hoeLevel = overflowLevel + 50
+            }
+        }
+        list.add(Renderable.text("§7Level §8$hoeLevel➜§3${hoeLevel+1}"))
+
         hoeLevels ?: return
         var colorPrefix = "§e"
         if (hoeExp > next) {
@@ -50,7 +76,37 @@ object HoeLevelDisplay {
         display = list
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onChat(event: SkyHanniChatEvent) {
+        levelUpPattern.matchMatcher(event.message) {
+            val heldItem = InventoryUtils.getItemInHand() ?: return
+            val leveledUpTool = group("tool")
+            val heldItemName = heldItem.displayName.removeColor()
+            if (heldItemName.contains(leveledUpTool)) {
+                addOverflowHoeLevel(heldItem.getItemUuid())
+            }
+        }
+    }
+
+    private fun getOverflowHoeLevel(uuid: String?): Int? {
+        uuid ?: return null
+        val storage = gardenStorage?.overflowHoeLevels ?: return null
+        if (storage.contains(uuid)) {
+            return storage[uuid]
+        } else {
+            storage[uuid] = 0
+            return 0
+        }
+    }
+
+    private fun addOverflowHoeLevel(uuid: String?) {
+        uuid ?: return
+        val storage = gardenStorage?.overflowHoeLevels ?: return
+        val currentLevel = getOverflowHoeLevel(uuid) ?: return
+        storage[uuid] = currentLevel+1
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         val renderable = display ?: return
         pos.renderRenderables(renderable, posLabel = "amazing")
