@@ -20,6 +20,11 @@ class DnaAnalyzerSolverConfig {
     var useMiddleClick: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Block Clock Button", desc = "Blocks accidentally clicking the close button while in the puzzle.")
+    @ConfigEditorBoolean
+    var blockAccidentalClosing: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Hide tooltips", desc = "Hide the item tooltips inside the DNA Analyzer.")
     @ConfigEditorBoolean
     @SearchTag("Analyser")

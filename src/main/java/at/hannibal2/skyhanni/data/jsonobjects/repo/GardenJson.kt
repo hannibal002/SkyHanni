@@ -20,6 +20,7 @@ data class GardenJson(
     @Expose @SerializedName("extra_farming_tools") val extraFarmingTools: Set<NeuInternalName>,
     @Expose @SerializedName("hoe_exp_levels") val hoeExpLevels: List<Int>,
     @Expose @SerializedName("hoe_exp_overflow") val hoeExpOverflow: Int,
+    @Expose @SerializedName("dna_solver_allows_ends") val dnaSolverAllowsEnds: Boolean = false,
 )
 
 data class GardenVisitor(
