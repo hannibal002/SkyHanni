@@ -35,6 +35,9 @@ object HoeLevelDisplay {
 
     private val patternGroup = RepoPattern.group("hoe.levels")
 
+    /**
+     * REGEX-TEST: §3§lOVERFLOW! §r§7Your §r§5Turing Sugar Cane Hoe Mk. III §r§7has just dropped a §r§9Tool Exp Capsule§r§7!
+     */
     val levelUpPattern by patternGroup.pattern(
         "levelup",
         "§3§lOVERFLOW! §r§7Your (?:§.)+(?<tool>.*) §r§7has just dropped a §r§9Tool Exp Capsule§r§7!",
@@ -54,7 +57,7 @@ object HoeLevelDisplay {
 
 
         if (hoeLevel <= hoeLevels.size) {
-            next = hoeLevels.let { it[hoeLevel-1] }
+            next = hoeLevels.let { it[hoeLevel - 1] }
         }
 
         if (hoeLevel > hoeLevels.size && config.overflow) {
@@ -64,7 +67,7 @@ object HoeLevelDisplay {
                 hoeLevel += overflowLevel
             }
         }
-        list.add(Renderable.text("§7Level §8$hoeLevel➜§3${hoeLevel+1}"))
+        list.add(Renderable.text("§7Level §8$hoeLevel➜§3${hoeLevel + 1}"))
 
         var colorPrefix = "§e"
         if (hoeExp > next) {
