@@ -9,9 +9,11 @@ import at.hannibal2.skyhanni.data.Perk.Companion.getPerkFromName
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorElection
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ForcedRepoPerks
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
@@ -307,4 +309,18 @@ object ElectionApi {
     fun Int.derpy() = if (isDerpy) this / 2 else if (isAura && false) (this / 11 * 10) else this
 
     fun Int.ignoreDerpy() = if (isDerpy) this * 2 else if (isAura) (this * 1.1).toInt() else this
+
+    var repoPerks: List<Perk>? = null
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ForcedRepoPerks>("misc/ForcedRepoPerks")
+        repoPerks?.forEach { it.isActive = false }
+        repoPerks = data.perks
+        if (data.perks != null) {
+            val mayor = currentMayor
+            mayor?.addAdditionalPerks(data.perks)
+            currentMayor = mayor
+        }
+    }
 }
