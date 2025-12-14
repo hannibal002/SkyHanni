@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.Hidden
+import at.hannibal2.skyhanni.config.OnlyLegacy
+import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import com.google.gson.annotations.Expose
@@ -240,7 +241,8 @@ class DebugConfig {
     @Expose
     @ConfigOption(name = "Aura Propaganda", desc = "Make sure to vote for hannibal2 :)")
     @ConfigEditorBoolean
-    @Hidden
+    @OnlyModern
+    @OnlyLegacy
     var auraPropaganda: Boolean = true
 
     @Expose
