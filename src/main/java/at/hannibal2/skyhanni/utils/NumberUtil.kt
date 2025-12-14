@@ -25,6 +25,11 @@ object NumberUtil {
 
     private val romanSymbols = TreeMap(
         mapOf(
+            // hannibal numerals (new standard)
+            10000 to "B",
+            9000 to "MB",
+            5000 to "H",
+            4000 to "MH",
             1000 to "M",
             900 to "CM",
             500 to "D",
