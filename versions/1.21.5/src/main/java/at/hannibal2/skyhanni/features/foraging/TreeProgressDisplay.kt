@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -30,6 +31,8 @@ object TreeProgressDisplay {
         config.position.renderRenderable(display, posLabel = "Tree Progress")
     }
 
+    // TODO: optimize to not use getEntities
+    @OptIn(AllEntitiesGetter::class)
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onTick() {
         if (!config.enabled) return
@@ -37,8 +40,7 @@ object TreeProgressDisplay {
             display = null
             return
         }
-        for (entity in EntityUtils.getAllEntities()) {
-            if (entity !is ArmorStandEntity) continue
+        for (entity in EntityUtils.getEntities<ArmorStandEntity>()) {
             val name = entity.displayName.formattedTextCompat()
             ModernPatterns.currentTreeProgressPattern.matchMatcher(name) {
                 if (config.compact) {
