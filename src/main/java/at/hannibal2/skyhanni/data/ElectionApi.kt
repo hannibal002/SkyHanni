@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.Perk.Companion.getPerkFromName
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorElection
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ForcedRepoPerks
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ForcedRepoPerksJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -314,7 +314,7 @@ object ElectionApi {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ForcedRepoPerks>("misc/ForcedRepoPerks")
+        val data = event.getConstant<ForcedRepoPerksJson>("misc/ForcedRepoPerks")
         repoPerks?.forEach { it.isActive = false }
         repoPerks = data.perks
         if (data.perks != null) {
