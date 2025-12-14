@@ -2,15 +2,11 @@ package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.awt.Color
 
 class ExperimentsSuperpairsConfig {
 
