@@ -28,7 +28,7 @@ object DianaApi {
 
     fun hasSpadeInHand() = InventoryUtils.itemInHandId in spades
 
-    private fun isRitualActive() = (Perk.MYTHOLOGICAL_RITUAL.isActive || Perk.PERKPOCALYPSE.isActive || ElectionApi.isAura) ||
+    private fun isRitualActive() = (Perk.MYTHOLOGICAL_RITUAL.isActive || Perk.PERKPOCALYPSE.isActive) ||
         SkyHanniMod.feature.dev.debug.assumeMayor.get() == ElectionCandidate.DIANA
 
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
