@@ -67,6 +67,10 @@
 + Added additional fortune sources to /ff. - brettt89 (https://github.com/hannibal002/SkyHanni/pull/4814)
 + Added greenhouse support to all the garden features. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
 + Made sixth visitor options findable by searching for 6th. - Luna (https://github.com/hannibal002/SkyHanni/pull/4928)
++ Improved DNA analyser solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4934)
+  + Made the solution also allow swapping end columns as apparently you can do that.
+  + Made it work if you abiphone Jake.
+  + Blocked accidentally clicking the close puzzle button.
 
 #### Mining
 
@@ -99,6 +103,8 @@
 + Added tracker uptime. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4629)
   + Tracks how long a tracker has been active, and pauses if it has not been modified for some time (default 5m).
   + Only enabled on sessions by default; uptime was not tracked before this and will be wrong on total mode.
++ Made Block Break Prticle Hider searchable by typing breaking. - Luna (https://github.com/hannibal002/SkyHanni/pull/4931)
++ Made warnings about missing tab list info less frequent and aggressive. - Luna (https://github.com/hannibal002/SkyHanni/pull/4933)
 
 ### Fixes
 
@@ -179,7 +185,8 @@
 + Fixed gems error in the community centre. - nopo (https://github.com/hannibal002/SkyHanni/pull/4903)
 + Fixed crash with Smooth Scrolling installed. - nopo (https://github.com/hannibal002/SkyHanni/pull/4923)
 + Fixed glowing invisible mobs on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/4913)
-
++ Fixed error when opening Your Skills menu with Roman numerals disabled in Hypixel settings. - Luna (https://github.com/hannibal002/SkyHanni/pull/4932)
++ Fixed overflow features not having support for hannibal numerals. - nopo (https://github.com/hannibal002/SkyHanni/pull/4935)
 
 ### Technical Details
 
@@ -198,6 +205,10 @@
 + Made EntityHealthDisplayEvent use Text instead of strings. - nopo (https://github.com/hannibal002/SkyHanni/pull/4895)
 + `NumberUtils.romanToDecimal{,IfNecessary}` now throws an exception when the input contains illegal characters. - Luna (https://github.com/hannibal002/SkyHanni/pull/4927)
 + Refactored trivial callback lambdas with function references. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4870)
++ Added `@Hidden` annotation to hide config options from the GUI. - Luna (https://github.com/hannibal002/SkyHanni/pull/4908)
+  + They can still be edited via `/shconfig`.
++ Added the ability to change current mayor perks via repo. - nopo (https://github.com/hannibal002/SkyHanni/pull/4936)
++ Using `@OnlyLegacy` and `@OnlyModern` together on the same config option now throws a compile-time (and runtime) error. - Luna (https://github.com/hannibal002/SkyHanni/pull/4908)
 
 ### Removed Features
 
