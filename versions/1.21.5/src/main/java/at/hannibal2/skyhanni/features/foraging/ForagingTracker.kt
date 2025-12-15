@@ -195,23 +195,11 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         addItem(treeType, STRETCHING_STICKS, change, command = false)
     }
 
-    private var bonusDropsUncommonDropsList = listOf<NeuInternalName>()
-    private var bonusDropsEnchantedBooksList = listOf<NeuInternalName>()
-    private var bonusDropsBoostersList = listOf<NeuInternalName>()
-    private var bonusDropsShardsList = listOf<NeuInternalName>()
-    private var bonusDropsMobsList = listOf<String>()
-    private var bonusDropsRunesList = listOf<NeuInternalName>()
-    private var bonusDropsMiscDropsList = listOf<NeuInternalName>()
+    private lateinit var dropsJson: TreeGiftBonusDropsJson
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
-        bonusDropsUncommonDropsList = dropsJson.uncommonDrops
-        bonusDropsEnchantedBooksList = dropsJson.enchantedBooks
-        bonusDropsBoostersList = dropsJson.boosters
-        bonusDropsShardsList = dropsJson.shards
-        bonusDropsMobsList = dropsJson.mobs
-        bonusDropsRunesList = dropsJson.runes
+        dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
     }
 
     private fun SkyHanniChatEvent.tryReadLoot() {
@@ -261,11 +249,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         ForagingTrackerLegacy.phantomSpawnPattern.matchMatcher(message) {
             val mob = group("phantom")
 
-            if (bonusDropsMobsList.contains(mob)
-                && config.compactGiftBonusDropsList.contains(DropCategory.MOBS)
-            ) {
+            if (dropsJson.mobs.contains(mob) && config.compactGiftBonusDropsList.contains(DropCategory.MOBS))
                 rareDrops.add("A wild §d$mob §fappeared!")
-            }
         }
 
         if (!openBonusGiftLoop)
@@ -289,17 +274,17 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         loot.addOrPut(itemInternalName, 1)
 
         val bonusDropTypeList = config.compactGiftBonusDropsList
-        if (bonusDropsUncommonDropsList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.UNCOMMON_DROPS))
+        if (dropsJson.uncommonDrops.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.UNCOMMON_DROPS))
             rareDrops.add(item)
-        if (bonusDropsEnchantedBooksList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.ENCHANTED_BOOKS))
+        if (dropsJson.enchantedBooks.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.ENCHANTED_BOOKS))
             rareDrops.add(item)
-        if (bonusDropsBoostersList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.BOOSTERS))
+        if (dropsJson.boosters.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.BOOSTERS))
             rareDrops.add(item)
-        if (bonusDropsShardsList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.SHARDS))
+        if (dropsJson.shards.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.SHARDS))
             rareDrops.add(item)
-        if (bonusDropsRunesList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.RUNES))
+        if (dropsJson.runes.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.RUNES))
             rareDrops.add(item)
-        if (bonusDropsMiscDropsList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.MISC))
+        if (dropsJson.miscDrops.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.MISC))
             rareDrops.add(item)
     }
 
