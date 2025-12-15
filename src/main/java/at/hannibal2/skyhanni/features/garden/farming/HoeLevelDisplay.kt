@@ -120,7 +120,7 @@ object HoeLevelDisplay {
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val renderable = display ?: return
-        pos.renderRenderables(renderable, posLabel = "amazing")
+        pos.renderRenderables(renderable, posLabel = "Hoe Level Display")
     }
 
     @HandleEvent
