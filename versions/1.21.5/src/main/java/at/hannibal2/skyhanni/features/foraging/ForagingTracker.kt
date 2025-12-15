@@ -7,10 +7,12 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.TreeGiftBonusDropsJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.foraging.ForagingTracker.drawDisplay
@@ -193,31 +195,25 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         addItem(treeType, STRETCHING_STICKS, change, command = false)
     }
 
-    private val BonusDropsUncommonDropsList = listOf(
-        "STRETCHING_STICKS".toInternalName(),
-        "DEEP_ROOT".toInternalName(),
-    )
-    private val BonusDropsEnchantedBooksList = listOf(
-        "ULTIMATE_FIRST_IMPRESSION;1".toInternalName(),
-        "ULTIMATE_MISSILE;1".toInternalName(),
-    )
-    private val BonusDropsBoostersList = listOf(
-        "SWEEP_BOOSTER".toInternalName(),
-        "FORAGING_WISDOM_BOOSTER".toInternalName(),
-    )
-    private val BonusDropsShardsList = listOf(
-        "ATTRIBUTE_SHARD_CHOP;1".toInternalName(),
-        "ATTRIBUTE_SHARD_REPTILOID;1".toInternalName(),
-    )
-    private val BonusDropsMobsList = listOf(
-        "Phanpyre",
-        "Phanflare",
-        "Dreadwing",
-    )
-    private val BonusDropsRunesList = listOf(
-        "AXE_FADING_WHITE_RUNE;1".toInternalName(),
-        "AXE_FADING_GREEN_RUNE;1".toInternalName(),
-    )
+    private var bonusDropsUncommonDropsList = listOf<NeuInternalName>()
+    private var bonusDropsEnchantedBooksList = listOf<NeuInternalName>()
+    private var bonusDropsBoostersList = listOf<NeuInternalName>()
+    private var bonusDropsShardsList = listOf<NeuInternalName>()
+    private var bonusDropsMobsList = listOf<String>()
+    private var bonusDropsRunesList = listOf<NeuInternalName>()
+    private var bonusDropsMiscDropsList = listOf<NeuInternalName>()
+
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
+        bonusDropsUncommonDropsList = dropsJson.uncommonDrops
+        bonusDropsEnchantedBooksList = dropsJson.enchantedBooks
+        bonusDropsBoostersList = dropsJson.boosters
+        bonusDropsShardsList = dropsJson.shards
+        bonusDropsMobsList = dropsJson.mobs
+        bonusDropsRunesList = dropsJson.runes
+    }
 
     private fun SkyHanniChatEvent.tryReadLoot() {
         ForagingTrackerLegacy.openCloseRewardPattern.matchMatcher(message) {
@@ -278,32 +274,32 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
                  * names literally
                  */
                 if (itemInternalName.startsWith(("◆_")))
-                    itemInternalName.replace("◆_", "AXE_")
+                    itemInternalName = itemInternalName.replace("◆_", "AXE_")
 
                 loot.addOrPut(itemInternalName, 1)
 
-                if (BonusDropsUncommonDropsList.contains(itemInternalName)
+                if (bonusDropsUncommonDropsList.contains(itemInternalName)
                     && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.UNCOMMON_DROPS)) {
                     rareDrops.add(item)
                 }
-                if (BonusDropsEnchantedBooksList.contains(itemInternalName)
+                if (bonusDropsEnchantedBooksList.contains(itemInternalName)
                     && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.ENCHANTED_BOOKS)) {
                     rareDrops.add(item)
                 }
-                if (BonusDropsBoostersList.contains(itemInternalName)
+                if (bonusDropsBoostersList.contains(itemInternalName)
                     && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.BOOSTERS)) {
                     rareDrops.add(item)
                 }
-                if (BonusDropsShardsList.contains(itemInternalName)
+                if (bonusDropsShardsList.contains(itemInternalName)
                     && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.SHARDS)) {
                     rareDrops.add(item)
                 }
-                if (BonusDropsRunesList.contains(itemInternalName)
+                if (bonusDropsRunesList.contains(itemInternalName)
                     && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.RUNES)) {
                     rareDrops.add(item)
                 }
-                if (itemInternalName == "TREE_THE_FISH".toInternalName()
-                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.TREE_THE_FISH)) {
+                if (bonusDropsMiscDropsList.contains(itemInternalName)
+                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.MISC)) {
                     rareDrops.add(item)
                 }
             }
@@ -312,8 +308,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         ForagingTrackerLegacy.phantomSpawnPattern.matchMatcher(message) {
             val mob = group("phantom")
 
-            if (BonusDropsMobsList.contains(mob)
-                && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.PHANTOMS)) {
+            if (bonusDropsMobsList.contains(mob)
+                && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.MOBS)) {
                 rareDrops.add("A wild §d$mob §fappeared!")
             }
         }

@@ -42,11 +42,11 @@ class ForagingTrackerConfig {
         mutableListOf(
             TreeGiftBonusDropCategory.UNCOMMON_DROPS,
             TreeGiftBonusDropCategory.ENCHANTED_BOOKS,
-            TreeGiftBonusDropCategory.PHANTOMS,
+            TreeGiftBonusDropCategory.MOBS,
             TreeGiftBonusDropCategory.BOOSTERS,
             TreeGiftBonusDropCategory.SHARDS,
             TreeGiftBonusDropCategory.RUNES,
-            TreeGiftBonusDropCategory.TREE_THE_FISH,
+            TreeGiftBonusDropCategory.MISC,
         ),
     )
 
@@ -54,11 +54,11 @@ class ForagingTrackerConfig {
     enum class TreeGiftBonusDropCategory(private val displayName: String) {
         UNCOMMON_DROPS("§fUncommon Tree-Specific Drops\n§7(e.g. §aStretching Sticks§7)"),
         ENCHANTED_BOOKS("§fUltimate Enchantments\n§7(§d§lFirst Impression I §7& §d§lMissile I §7Books)"),
-        PHANTOMS("§fHuntable Mobs\n§7(Phantoms)"),
+        MOBS("§fHuntable Mobs\n§7(Phantoms)"),
         BOOSTERS("§fBoosters\n§7(Sweep, Foraging Wisdom)"),
         SHARDS("§fDirect Shard Drops\n§7(§bHummingbirds§7, §6Chameleons§7)"),
         RUNES("§fRunes\n§7(§fFading White §7and §aFading Green§7)"),
-        TREE_THE_FISH("§cTree The Fish");
+        MISC("§cTree The Fish");
 
         override fun toString() = displayName
     }
