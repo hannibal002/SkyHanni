@@ -166,12 +166,6 @@ class GardenConfig {
     var plotPrice: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var fungiCutterWarn: Boolean = true
-
-    @Expose
     @ConfigOption(
         name = "Burrowing Spores",
         desc = "Show a notification when a Burrowing Spores spawns while farming mushrooms.",
