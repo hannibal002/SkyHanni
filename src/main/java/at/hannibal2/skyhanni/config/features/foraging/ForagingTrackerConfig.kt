@@ -52,8 +52,8 @@ class ForagingTrackerConfig {
         UNCOMMON_DROPS("§fUncommon Tree-Specific Drops\n§7(e.g. §aStretching Sticks§7)"),
         ENCHANTED_BOOKS("§fUltimate Enchantments\n§7(§d§lFirst Impression I §7& §d§lMissile I §7Books)"),
         MOBS("§fHuntable Mobs\n§7(Phantoms)"),
-        BOOSTERS("§fBoosters\n§7(Sweep, Foraging Wisdom)"),
-        SHARDS("§fDirect Shard Drops\n§7(§bHummingbirds§7, §6Chameleons§7)"),
+        BOOSTERS("§fBoosters\n§7(Sweep and Foraging Wisdom)"),
+        SHARDS("§fDirect Shard Drops\n§7(§9Hummingbirds§7 and §6Chameleons§7)"),
         RUNES("§fRunes\n§7(§fFading White §7and §aFading Green§7)"),
         MISC("§cTree The Fish");
 
