@@ -38,16 +38,14 @@ class ForagingTrackerConfig {
         desc = "Lets you decide what types of bonus drops should be included in Compact Gifts messages."
     )
     @ConfigEditorDraggableList
-    val compactGiftBonusDropsList: Property<MutableList<TreeGiftBonusDropCategory>> = Property.of(
-        mutableListOf(
-            TreeGiftBonusDropCategory.UNCOMMON_DROPS,
-            TreeGiftBonusDropCategory.ENCHANTED_BOOKS,
-            TreeGiftBonusDropCategory.MOBS,
-            TreeGiftBonusDropCategory.BOOSTERS,
-            TreeGiftBonusDropCategory.SHARDS,
-            TreeGiftBonusDropCategory.RUNES,
-            TreeGiftBonusDropCategory.MISC,
-        ),
+    val compactGiftBonusDropsList: MutableList<TreeGiftBonusDropCategory> = mutableListOf(
+        TreeGiftBonusDropCategory.UNCOMMON_DROPS,
+        TreeGiftBonusDropCategory.ENCHANTED_BOOKS,
+        TreeGiftBonusDropCategory.MOBS,
+        TreeGiftBonusDropCategory.BOOSTERS,
+        TreeGiftBonusDropCategory.SHARDS,
+        TreeGiftBonusDropCategory.RUNES,
+        TreeGiftBonusDropCategory.MISC,
     )
 
     @Suppress("MaxLineLength")

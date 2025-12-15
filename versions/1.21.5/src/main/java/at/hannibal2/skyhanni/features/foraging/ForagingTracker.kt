@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig
+import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig.TreeGiftBonusDropCategory as DropCategory
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TreeGiftBonusDropsJson
@@ -203,10 +203,9 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private var bonusDropsRunesList = listOf<NeuInternalName>()
     private var bonusDropsMiscDropsList = listOf<NeuInternalName>()
 
-
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
+        var dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
         bonusDropsUncommonDropsList = dropsJson.uncommonDrops
         bonusDropsEnchantedBooksList = dropsJson.enchantedBooks
         bonusDropsBoostersList = dropsJson.boosters
@@ -259,60 +258,49 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
             }
         }
 
-        if (openBonusGiftLoop) {
-            ForagingTrackerLegacy.bonusGiftRewardPattern.matchMatcher(message) {
-                val item = group("item")
-                var itemInternalName = ForagingTrackerLegacy.enchantedBookPattern.matchMatcher(item) {
-                    val book = group("book")
-                    val tier = group("tier").romanToDecimal()
-                    NeuInternalName.fromItemNameOrNull("$book $tier")
-                } ?: NeuInternalName.fromItemNameOrNull(item) ?: return@matchMatcher
-
-                /**
-                 * this is a failsafe in the event of runes lackin' NEU repo sufficient data to automagically
-                 * fetch their correct internal names, and thus translatin' their in-game names into internal
-                 * names literally
-                 */
-                if (itemInternalName.startsWith(("◆_")))
-                    itemInternalName = itemInternalName.replace("◆_", "AXE_")
-
-                loot.addOrPut(itemInternalName, 1)
-
-                if (bonusDropsUncommonDropsList.contains(itemInternalName)
-                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.UNCOMMON_DROPS)) {
-                    rareDrops.add(item)
-                }
-                if (bonusDropsEnchantedBooksList.contains(itemInternalName)
-                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.ENCHANTED_BOOKS)) {
-                    rareDrops.add(item)
-                }
-                if (bonusDropsBoostersList.contains(itemInternalName)
-                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.BOOSTERS)) {
-                    rareDrops.add(item)
-                }
-                if (bonusDropsShardsList.contains(itemInternalName)
-                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.SHARDS)) {
-                    rareDrops.add(item)
-                }
-                if (bonusDropsRunesList.contains(itemInternalName)
-                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.RUNES)) {
-                    rareDrops.add(item)
-                }
-                if (bonusDropsMiscDropsList.contains(itemInternalName)
-                    && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.MISC)) {
-                    rareDrops.add(item)
-                }
-            }
-        }
-
         ForagingTrackerLegacy.phantomSpawnPattern.matchMatcher(message) {
             val mob = group("phantom")
 
             if (bonusDropsMobsList.contains(mob)
-                && config.compactGiftBonusDropsList.get().contains(ForagingTrackerConfig.TreeGiftBonusDropCategory.MOBS)) {
+                && config.compactGiftBonusDropsList.contains(DropCategory.MOBS)
+            ) {
                 rareDrops.add("A wild §d$mob §fappeared!")
             }
         }
+
+        if (!openBonusGiftLoop)
+            return
+
+        val item = ForagingTrackerLegacy.bonusGiftRewardPattern.matchMatcher(message) { group("item") } ?: return
+        var itemInternalName = ForagingTrackerLegacy.enchantedBookPattern.matchMatcher(item) {
+            val book = group("book")
+            val tier = group("tier").romanToDecimal()
+            NeuInternalName.fromItemNameOrNull("$book $tier")
+        } ?: NeuInternalName.fromItemNameOrNull(item) ?: return
+
+        /**
+         * this is a failsafe in the event of runes lackin' sufficient NEU repo data to automagically
+         * fetch their correct internal names, and thus translatin' their in-game names into internal
+         * names literally
+         */
+        if (itemInternalName.startsWith(("◆_")))
+            itemInternalName = itemInternalName.replace("◆_", "AXE_")
+
+        loot.addOrPut(itemInternalName, 1)
+
+        val bonusDropTypeList = config.compactGiftBonusDropsList
+        if (bonusDropsUncommonDropsList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.UNCOMMON_DROPS))
+            rareDrops.add(item)
+        if (bonusDropsEnchantedBooksList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.ENCHANTED_BOOKS))
+            rareDrops.add(item)
+        if (bonusDropsBoostersList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.BOOSTERS))
+            rareDrops.add(item)
+        if (bonusDropsShardsList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.SHARDS))
+            rareDrops.add(item)
+        if (bonusDropsRunesList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.RUNES))
+            rareDrops.add(item)
+        if (bonusDropsMiscDropsList.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.MISC))
+            rareDrops.add(item)
     }
 
     private fun SkyHanniChatEvent.tryBlock() {
