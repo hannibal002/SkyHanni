@@ -19,7 +19,7 @@ public class MixinTextVisitFactory {
         ),
         ordinal = 2
     )
-    private static Style onColorCodeCheck(Style style, @Local(argsOnly = true) String text, @Local(ordinal = 0) char colorCode) {
+    private static Style onColorCodeCheck(Style style, @Local(argsOnly = true) String text, @Local(index = 9) char colorCode) {
         return ChromaFontManagerKt.setChromaColorStyle(style, text, colorCode);
     }
 

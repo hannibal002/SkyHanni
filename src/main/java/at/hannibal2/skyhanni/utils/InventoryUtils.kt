@@ -40,7 +40,12 @@ object InventoryUtils {
 
     val recentItemsInHand = TimeLimitedSet<NeuInternalName>(30.seconds)
     var latestItemInHand: ItemStack? = null
+    val pastItemsInHand = mutableListOf<Pair<SimpleTimeMark, NeuInternalName>>()
     private val normalChestInternalNames = setOf("container.chest", "container.chestDouble")
+
+    fun getItemInHandAtTime(time: SimpleTimeMark): NeuInternalName? {
+        return pastItemsInHand.lastOrNull { it.first <= time }?.second
+    }
 
     fun getItemsInOpenChest(): List<Slot> {
         return getItemsInOpenChestWithNull().filter { it.stack.isNotEmpty() }

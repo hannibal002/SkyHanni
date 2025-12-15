@@ -19,7 +19,7 @@ object GlowingMushroomHighlighter {
     private val config get() = SkyHanniMod.feature.misc.glowingMushroomHighlighter
 
     private val blockHighlighter = SkyHanniBlockHighlighter<TimedHighlightBlock>(
-        highlightCondition = { isEnabled() },
+        highlightCondition = ::isEnabled,
         blockCondition = { it.block == Blocks.red_mushroom || it.block == Blocks.brown_mushroom },
         colorProvider = { config.mushroomColor },
     )

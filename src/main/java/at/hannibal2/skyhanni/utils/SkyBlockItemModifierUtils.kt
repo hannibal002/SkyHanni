@@ -49,7 +49,9 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getCultivatingCounter() = getAttributeLong("farmed_cultivating")
 
-    fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
+    fun ItemStack.getOldHoeCounter() = getAttributeLong("mined_crops")
+    fun ItemStack.getHoeExp() = getAttributeDouble("levelable_exp")?.toLong()
+    fun ItemStack.getHoeLevel() = getAttributeInt("levelable_lvl")
 
     fun ItemStack.getSilexCount() = getHypixelEnchantments()?.get("efficiency")?.let {
         it - 5 - getBaseSilexCount()
@@ -258,9 +260,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getSecondsHeld() = when (getItemId()) { // TODO move item IDs and attribute tags to repo
         "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
-        "DARK_CACAO_TRUFFLE", "MOBY_DUCK" -> getAttributeInt("seconds_held")
         "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
-        else -> null
+        else -> getAttributeInt("seconds_held")
     }
 
     fun ItemStack.getEdition() = getAttributeInt("edition")
@@ -356,6 +357,9 @@ object SkyBlockItemModifierUtils {
 
     private fun ItemStack.getAttributeLong(label: String) =
         getExtraAttributes()?.getLong(label)?.takeUnless { it == 0L }
+
+    private fun ItemStack.getAttributeDouble(label: String) =
+        getExtraAttributes()?.getDouble(label)?.takeUnless { it == 0.0 }
 
     private fun ItemStack.getAttributeBoolean(label: String) =
         getExtraAttributes()?.getBoolean(label) ?: false

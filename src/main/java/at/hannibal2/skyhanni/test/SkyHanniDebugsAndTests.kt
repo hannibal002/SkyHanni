@@ -294,7 +294,7 @@ object SkyHanniDebugsAndTests {
                 ChatUtils.clickableChat(
                     "Stopped ${modules.size} listener classes. " +
                         "If you want to re-enable them, run /shreloadlisteners or click this message.",
-                    onClick = { reloadListeners() },
+                    onClick = ::reloadListeners,
                 )
             },
         )

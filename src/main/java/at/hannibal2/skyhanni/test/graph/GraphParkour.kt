@@ -122,7 +122,7 @@ object GraphParkour {
         IslandGraphs.pathFind(
             vec, "Node error",
             LorenzColor.RED.toColor(),
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         )
     }
 
@@ -134,7 +134,7 @@ object GraphParkour {
         IslandGraphs.pathFind(
             locations.first(),
             "Start of parkour",
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         )
         ChatUtils.chat("Graph Editor loaded a parkour from clipboard!")
     }

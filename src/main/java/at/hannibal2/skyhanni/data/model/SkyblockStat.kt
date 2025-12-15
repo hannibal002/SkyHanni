@@ -127,6 +127,9 @@ enum class SkyblockStat(
     NETHER_WART_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Nether Wart Fortune $VALUE_PATTERN"),
     COCOA_BEANS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cocoa Beans Fortune $VALUE_PATTERN"),
     SUGAR_CANE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sugar Cane Fortune $VALUE_PATTERN"),
+    SUNFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sunflower Fortune $VALUE_PATTERN"),
+    MOONFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Moonflower Fortune $VALUE_PATTERN"),
+    WILD_ROSE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Wild Rose Fortune $VALUE_PATTERN"),
 
     MINING_SPREAD(
         "§e▚",

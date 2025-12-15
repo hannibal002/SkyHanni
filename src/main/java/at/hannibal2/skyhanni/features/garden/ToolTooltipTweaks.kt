@@ -42,6 +42,7 @@ object ToolTooltipTweaks {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
+        if (true) return
         val itemStack = event.itemStack
         val itemLore = itemStack.getLore()
         val internalName = itemStack.getInternalName()

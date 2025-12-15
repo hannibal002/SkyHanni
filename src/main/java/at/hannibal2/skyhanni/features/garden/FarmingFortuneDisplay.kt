@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.EnumUtils.enumJoinToPattern
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -31,8 +32,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -63,7 +64,7 @@ object FarmingFortuneDisplay {
     @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific",
-        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon Slice|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)",
+        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: §r§6☘(?<fortune>\\d+)",
     )
     private val collectionPattern by patternGroup.pattern(
         "collection",
@@ -407,7 +408,9 @@ object FarmingFortuneDisplay {
     }
 
     fun getCounterFortune(tool: ItemStack?): Double {
-        val counter = tool?.getHoeCounter() ?: return 0.0
+        if (GardenApi.greenhouseReleased) return 0.0
+        // todo
+        val counter = tool?.getOldHoeCounter() ?: return 0.0
         val digits = floor(log10(counter.toDouble()))
         return (16 * digits - 48).coerceAtLeast(0.0)
     }

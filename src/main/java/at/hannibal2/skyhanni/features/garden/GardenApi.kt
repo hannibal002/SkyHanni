@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
+import at.hannibal2.skyhanni.features.garden.CropType.Companion.isTimeFlower
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.checkCurrentPlot
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
@@ -43,7 +45,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -80,8 +83,10 @@ object GardenApi {
 
     private var extraFarmingTools: Set<NeuInternalName> = setOf()
 
+    var greenhouseReleased = true
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSendPacket(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
         checkItemInHand()
     }
 
@@ -101,6 +106,7 @@ object GardenApi {
         if (!inGarden()) return
         if (event.isMod(10, 1)) {
             inBarn = barnArea.isPlayerInside()
+            if (cropInHand.isTimeFlower()) checkItemInHand()
 
             // We ignore random hypixel moments
             Minecraft.getMinecraft().currentScreen ?: return
@@ -142,7 +148,7 @@ object GardenApi {
         val toolItem = InventoryUtils.getItemInHand()
         val crop = toolItem?.getCropType()
         val newTool = getToolInHand(toolItem, crop)
-        if (toolInHand != newTool) {
+        if (toolInHand != newTool || crop != cropInHand) {
             toolInHand = newTool
             cropInHand = crop
             itemInHand = toolItem
@@ -171,10 +177,16 @@ object GardenApi {
 
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
+        if (internalName.startsWith("THEORETICAL_HOE_SUNFLOWER")) {
+            return CropType.getTimeFlower()
+        }
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
-    fun readCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter()
+    fun readCounter(itemStack: ItemStack): Long? =
+        if (greenhouseReleased) itemStack.getCultivatingCounter() ?: itemStack.getHoeExp()
+            ?: itemStack.getOldHoeCounter()
+        else itemStack.getOldHoeCounter() ?: itemStack.getCultivatingCounter()
 
     fun CropType.getItemStackCopy(iconId: String): ItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
 
@@ -205,7 +217,7 @@ object GardenApi {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
         val blockState = event.getBlockState
-        val cropBroken = blockState.getCropType() ?: return
+        val cropBroken = blockState.getCropType(event.position) ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
 
         val position = event.position
@@ -266,6 +278,8 @@ object GardenApi {
         gardenExperience = data.gardenExp
         totalAmountVisitorsExisting = data.visitors.size
         extraFarmingTools = data.extraFarmingTools
+        val disabledFeatures = event.getConstant<DisabledFeaturesJson>("DisabledFeatures")
+        greenhouseReleased = disabledFeatures.features?.get("greenhouse_released") ?: true
     }
 
     private var gardenExperience = listOf<Int>()

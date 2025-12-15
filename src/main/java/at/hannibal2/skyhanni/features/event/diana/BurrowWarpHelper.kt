@@ -4,19 +4,26 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
+import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -28,6 +35,23 @@ object BurrowWarpHelper {
 
     private var lastWarpTime = SimpleTimeMark.farPast()
     private var lastWarp: WarpPoint? = null
+
+    @HandleEvent(GuiRenderEvent::class, onlyOnIsland = IslandType.HUB)
+    fun onRenderOverlay() {
+        if (!config.burrowNearestWarp) return
+        if (!DianaApi.isDoingDiana()) return
+        val warp = currentWarp ?: return
+
+        val text = "§bWarp to " + warp.displayName
+        val keybindSuffix = if (config.keyBindWarp != Keyboard.KEY_NONE) {
+            val keyName = KeyboardManager.getKeyName(config.keyBindWarp)
+            " §7(§ePress $keyName§7)"
+        } else ""
+
+        val warpText = Renderable.text(text + keybindSuffix, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
+
+        config.warpGuiPosition.renderRenderable(warpText, posLabel = "Diana Nearest Warp")
+    }
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
@@ -42,10 +66,6 @@ object BurrowWarpHelper {
         lastWarpTime = SimpleTimeMark.now()
         HypixelCommands.warp(warp.name)
         lastWarp = currentWarp
-        GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
-        TitleManager.conditionallyStopTitle { currentTitle ->
-            currentTitle.startsWith("§bWarp to ")
-        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -106,7 +126,7 @@ object BurrowWarpHelper {
         debug?.add("warpDistance: ${warpDistance.roundTo(1)}")
         val difference = playerDistance - warpDistance
         debug?.add("difference: ${difference.roundTo(1)}")
-        val setWarpPoint = difference > 10
+        val setWarpPoint = difference > config.warpDistanceDifference
         debug?.add("setWarpPoint: $setWarpPoint")
         currentWarp = if (setWarpPoint) warpPoint else null
     }

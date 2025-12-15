@@ -65,6 +65,9 @@ enum class ItemCategory {
     WATER_SHARD,
     FOREST_SHARD,
     COMBAT_SHARD,
+    GARDEN_CHIP,
+    MUTATION,
+    WATERING_CAN,
 
     NONE,
     ;

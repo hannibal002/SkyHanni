@@ -7,20 +7,26 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ArmorDropTrackerConfig {
-    @Expose
-    @ConfigOption(name = "Enabled", desc = "Track all §aCropie§7, §9Squash§7, §5Fermento §7and §6Helianthus §7dropped.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var enabled: Boolean = false
+class HoeLevelsDisplayConfig {
 
     @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when receiving a farming armor drop.")
+    @ConfigOption(
+        name = "Enabled",
+        desc = "Displays an overlay for hoe leveling progress."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideChat: Boolean = false
+    var enabled: Boolean = true
 
     @Expose
-    @ConfigLink(owner = ArmorDropTrackerConfig::class, field = "enabled")
-    val position: Position = Position(16, -232)
+    @ConfigOption(
+        name = "Show Overflow",
+        desc = "Displays overflow levels for level 50 hoes."
+    )
+    @ConfigEditorBoolean
+    var overflow: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = HoeLevelsDisplayConfig::class, field = "enabled")
+    val position: Position = Position(100, 100, true)
 }

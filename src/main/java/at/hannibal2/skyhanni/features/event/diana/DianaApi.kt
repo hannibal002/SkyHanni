@@ -36,6 +36,8 @@ object DianaApi {
 
     val ItemStack.isDianaSpade get() = getInternalName() in spades
 
+    val NeuInternalName.isDianaSpade get() = this in spades
+
     private fun hasSpadeInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isDianaSpade }
 
     var mythologicalCreatures = emptyMap<String, MythologicalCreatureType>()

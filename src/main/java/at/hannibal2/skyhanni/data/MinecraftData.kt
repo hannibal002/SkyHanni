@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -11,8 +12,10 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
+import kotlin.time.Duration.Companion.seconds
 //#if MC < 1.21
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
 //#else
@@ -88,11 +91,20 @@ object MinecraftData {
         val newItem = hand?.getInternalName() ?: NeuInternalName.NONE
         val oldItem = InventoryUtils.itemInHandId
         if (newItem != oldItem) {
-            if (newItem != NeuInternalName.NONE) InventoryUtils.recentItemsInHand.add(newItem)
+            if (newItem != NeuInternalName.NONE) {
+                InventoryUtils.recentItemsInHand.add(newItem)
+                InventoryUtils.pastItemsInHand.add(Pair(SimpleTimeMark.now(), newItem))
+            }
             InventoryUtils.itemInHandId = newItem
             InventoryUtils.latestItemInHand = hand
             ItemInHandChangeEvent(newItem, oldItem).post()
         }
+    }
+
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        val cutoff = SimpleTimeMark.now() - 50.seconds
+        InventoryUtils.pastItemsInHand.removeAll { it.first < cutoff }
     }
 
     @HandleEvent

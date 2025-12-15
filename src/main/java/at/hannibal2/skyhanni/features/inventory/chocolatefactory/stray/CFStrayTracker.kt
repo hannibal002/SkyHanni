@@ -138,7 +138,7 @@ object CFStrayTracker {
     )
     // </editor-fold>
 
-    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
+    private val tracker = SkyHanniTracker("Stray Tracker", ::Data, { it.chocolateFactory.strayTracker }) {
         drawDisplay(it)
     }
 

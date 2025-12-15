@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -62,7 +62,7 @@ object SkillExperience {
                 if (next) {
                     val split = name.split(" ")
                     val skillName = split[0].lowercase()
-                    val level = split[1].romanToDecimal()
+                    val level = split[1].romanToDecimalIfNecessary()
                     val baseExp = getExpForLevel(level)
                     inventoryPattern.matchMatcher(line) {
                         val overflow = group("number").formatLong()

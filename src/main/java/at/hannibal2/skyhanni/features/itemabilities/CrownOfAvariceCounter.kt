@@ -57,7 +57,7 @@ object CrownOfAvariceCounter {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { isEnabled() && isWearingCrown },
-            onRender = { renderDisplay() },
+            onRender = ::renderDisplay,
         )
     }
 
@@ -105,6 +105,9 @@ object CrownOfAvariceCounter {
 
         update()
     }
+
+    fun isAvariceConsuming(): Boolean =
+        isWearingCrown && (totalCoins ?: 0) < MAX_AVARICE_COINS
 
     @HandleEvent(IslandChangeEvent::class)
     fun onIslandChange() {
