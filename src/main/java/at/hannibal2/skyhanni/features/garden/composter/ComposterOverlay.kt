@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -593,6 +594,13 @@ object ComposterOverlay {
 
     @HandleEvent(NeuRepositoryReloadEvent::class)
     fun onNeuRepoReload() {
+        updateOrganicMatterFactors()
+    }
+
+    // hopefully fix the display not working properly
+    @HandleEvent
+    fun onIslandSwap(event: IslandChangeEvent) {
+        if (event.newIsland != IslandType.GARDEN) return
         updateOrganicMatterFactors()
     }
 
