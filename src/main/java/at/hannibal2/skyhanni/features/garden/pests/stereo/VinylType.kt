@@ -16,7 +16,7 @@ enum class VinylType(val displayName: String, internalNameOverride: String? = nu
     NOT_JUST_A_PEST("Not Just a Pest", "VINYL_BEETLE"),
     FIREFLY_IN_THE_HOLE("Firefly in the Hole", "VINYL_FIREFLY"),
     IMAGINE_DRAGONFLIES("Imagine Dragonflies"),
-    PRAY_FOR_ME("Pray for Me"),
+    PRAY_FOR_ME("Pray For Me"),
     NONE("None"),
     ;
 
