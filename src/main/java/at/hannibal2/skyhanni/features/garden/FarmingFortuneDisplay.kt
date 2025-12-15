@@ -407,12 +407,9 @@ object FarmingFortuneDisplay {
         return collectionPattern.matchMatcher(string) { group("ff").toDoubleOrNull() } ?: 0.0
     }
 
+    // todo remove this properly
     fun getCounterFortune(tool: ItemStack?): Double {
-        if (GardenApi.greenhouseReleased) return 0.0
-        // todo
-        val counter = tool?.getOldHoeCounter() ?: return 0.0
-        val digits = floor(log10(counter.toDouble()))
-        return (16 * digits - 48).coerceAtLeast(0.0)
+        return 0.0
     }
 
     fun getDedicationFortune(tool: ItemStack?, cropType: CropType?): Double {
