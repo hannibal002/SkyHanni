@@ -205,7 +205,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        var dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
+        val dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
         bonusDropsUncommonDropsList = dropsJson.uncommonDrops
         bonusDropsEnchantedBooksList = dropsJson.enchantedBooks
         bonusDropsBoostersList = dropsJson.boosters
