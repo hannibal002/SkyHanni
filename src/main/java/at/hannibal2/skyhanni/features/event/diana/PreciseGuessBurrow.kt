@@ -27,7 +27,6 @@ object PreciseGuessBurrow {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onIslandChange() {
         bezierFitter.reset()
-        GriffinBurrowHelper.newBurrow = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
@@ -53,11 +52,11 @@ object PreciseGuessBurrow {
         val guessPosition = guessBurrowLocation() ?: return
 
         BurrowGuessEvent(
-            guessPosition.down(0.5).roundToBlock(),
-            precise = bezierFitter.count() > 5,
-            new = GriffinBurrowHelper.newBurrow
+            GriffinBurrowHelper.GuessEntry(
+                listOf(guessPosition.down(0.5).roundToBlock()),
+                range = if (bezierFitter.count() > 5) 0 else 50,
+            )
         ).post()
-        GriffinBurrowHelper.newBurrow = false
     }
 
     private fun guessBurrowLocation(): LorenzVec? = bezierFitter.solve()

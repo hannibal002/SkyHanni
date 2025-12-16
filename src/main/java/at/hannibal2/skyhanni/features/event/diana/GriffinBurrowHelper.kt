@@ -25,15 +25,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addDoublePlant
 import at.hannibal2.skyhanni.utils.compat.addLeaves
@@ -43,6 +43,8 @@ import at.hannibal2.skyhanni.utils.compat.addTallGrass
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
@@ -64,30 +66,56 @@ object GriffinBurrowHelper {
         addRedFlower()
     }
 
+    private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
+
+    /**
+     * REGEX-TEST: §eYou finished the Griffin burrow chain! §r§7(8/8)
+     * REGEX-TEST: §eYou dug out a Griffin Burrow! §r§7(4/8)
+     */
+    private val burrowDugPattern by patternGroup.pattern(
+        "burrow-dug-capture",
+        "§eYou (?<type>finished the Griffin burrow chain!|dug out a Griffin Burrow!) §r§7\\((?<current>\\d+)/(?<max>\\d+)\\)"
+    )
+
     var targetLocation: LorenzVec? = null
 
-    class Guess(private val location: LorenzVec, val precise: Boolean) {
+    private val allGuesses = mutableListOf<GuessEntry>() // TODO timelimit to 30minutes
+    private val recentBlocksClicked = mutableListOf<LorenzVec>() //TODO
 
-        fun getLocation(): LorenzVec = if (precise) {
-            location
-        } else {
-            findBlock(location)
+    private var shouldFocusOnRareMob = false
+
+    data class GuessEntry(
+        val guesses: List<LorenzVec>,
+        var burrowType: BurrowType = BurrowType.UNKNOWN,
+        var range: Int = 0, //TODO
+        var currentIndex: Int = 0
+    ) {
+        fun getCurrent(): LorenzVec = guesses[currentIndex]
+        fun contains(vec: LorenzVec): Boolean = guesses.contains(vec)
+        fun moveToNext(): Boolean {
+            val nextIndex = currentIndex + 1
+            if (nextIndex in guesses.indices) {
+                currentIndex = nextIndex
+                if (!isBlockValid(guesses[nextIndex])) {
+                    return moveToNext()
+                }
+                BurrowGuessEvent(this).post()
+                checkMoveGuess()
+                return true
+            } else return false
         }
     }
 
-    var newBurrow = true
-    private var latestGuess: Guess? = null
-    private val additionalGuesses = mutableListOf<Guess>()
+    fun removeGuess(location: LorenzVec) {
+        println("allGuesses $allGuesses")
+        val toRemove = allGuesses.filter { it.contains(location) }
+        println("removing $toRemove")
+        allGuesses.removeAll(toRemove)
+    }
 
-    private var allGuessLocations: List<LorenzVec> = emptyList()
-
-    private var particleBurrows = mapOf<LorenzVec, BurrowType>()
-    private var shouldFocusOnRareMob = false
-
-    private var testList = listOf<LorenzVec>()
-    private var testGriffinSpots = false
-
-    val guessCount get() = allGuessLocations.size
+    fun getKnownBurrows(): List<GuessEntry> {
+       return allGuesses.filter { it.burrowType != BurrowType.UNKNOWN }
+    }
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -100,14 +128,9 @@ object GriffinBurrowHelper {
 
         event.addData {
             add("targetLocation: ${targetLocation?.printWithAccuracy(1)}")
-            add("guessLocation: ${latestGuess?.getLocation()?.printWithAccuracy(1)}")
-            add("additionalGuesses: ${additionalGuesses.size}")
-            for (guess in additionalGuesses) {
-                add("  ${guess.getLocation().printWithAccuracy(1)} (precise=${guess.precise})")
-            }
-            add("particleBurrows: ${particleBurrows.size}")
-            for ((location, type) in particleBurrows) {
-                add("  ${location.printWithAccuracy(1)} (${type.name})")
+            add("additionalGuesses: ${allGuesses.size}")
+            for (guess in allGuesses) {
+                add("  ${guess.getCurrent().printWithAccuracy(1)} (size=${guess.guesses.size}) (type=${guess.burrowType})")
             }
         }
     }
@@ -116,30 +139,10 @@ object GriffinBurrowHelper {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         update()
-        loadTestGriffinSpots()
-        ArrowGuessBurrow.checkMoveGuess(particleBurrows)
-    }
-
-    private fun loadTestGriffinSpots() {
-        if (!testGriffinSpots) return
-        val center = LocationUtils.playerLocation().roundToBlock()
-        val list = mutableListOf<LorenzVec>()
-        for (x in -5 until 5) {
-            for (z in -5 until 5) {
-                list.add(findBlock(center.add(x, 0, z)))
-            }
-        }
-        testList = list
+        checkMoveGuess()
     }
 
     fun update() {
-        if (config.burrowsNearbyDetection) {
-            checkRemoveNearbyGuess()
-        }
-
-        val additionalGuesses = if (config.multiGuesses) additionalGuesses else emptyList()
-        allGuessLocations = (latestGuess?.let { additionalGuesses + it } ?: additionalGuesses).map { it.getLocation() }
-
         val newLocation = calculateNewTarget()
         if (targetLocation != newLocation) {
             targetLocation = newLocation
@@ -156,7 +159,30 @@ object GriffinBurrowHelper {
         }
     }
 
+    fun checkMoveGuess() { //TODO or delete burrow (already does kinda)
+        val burrows = getKnownBurrows().flatMap { it.guesses }
+        val toDelete = mutableListOf<GuessEntry>()
+        for (guessEntry in allGuesses) {
+            var shouldMove = false
+            if (!isBlockValid(guessEntry.getCurrent())) shouldMove = true
+
+            val shouldBeLoaded = InventoryUtils.getItemInHandAtTime(SimpleTimeMark.now() - 0.5.seconds)?.isDianaSpade //TODO better
+            if (shouldBeLoaded == true &&
+                !burrows.contains(guessEntry.getCurrent()) && // burrow is not found //TODO how is this passing
+                guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.position.toLorenzVec()) < 900 // within 30 blocks
+            ) {
+                shouldMove = true
+            }
+
+            if (shouldMove) {
+                if (!guessEntry.moveToNext()) toDelete.add(guessEntry)
+            }
+        }
+        allGuesses.removeAll(toDelete)
+    }
+
     // TODO add option to only focus on last guess - highly requersted method that is less optimal for money per hour. users choice
+    // TODO pathfind alg / check closest to any warp point
     private fun calculateNewTarget(): LorenzVec? {
         val locations = mutableListOf<LorenzVec>()
 
@@ -167,9 +193,7 @@ object GriffinBurrowHelper {
         }
         shouldFocusOnRareMob = config.inquisitorSharing.focusInquisitor && locations.isNotEmpty()
         if (!shouldFocusOnRareMob) {
-            locations.addAll(particleBurrows.keys.toMutableList())
-
-            locations.addAll(allGuessLocations)
+            allGuesses.forEach { locations.add(it.getCurrent()) }
             locations.addAll(RareMobWaypointShare.waypoints.values.map { it.location })
         }
         val newLocation = locations.minByOrNull { it.distanceToPlayer() }
@@ -179,18 +203,20 @@ object GriffinBurrowHelper {
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
-        val newLocation = event.guessLocation
+
+        if (allGuesses.flatMap { it.guesses }.any { event.guess.contains(it) }) return
+
+        val newLocation = event.guess.getCurrent()
         val playerLocation = LocationUtils.playerLocation()
 
         if (newLocation.distance(playerLocation) < 6) return
+        if (!IslandType.HUB.isInBounds(newLocation)) return
 
-        latestGuess?.let {
-            if (it.precise && config.multiGuesses && event.new && it.getLocation() !in particleBurrows) {
-                additionalGuesses.add(it)
-            }
+        for (guessEntry in allGuesses) {
+            if (guessEntry.contains(newLocation)) return
         }
 
-        latestGuess = if (IslandType.HUB.isInBounds(newLocation)) Guess(newLocation, event.precise) else null
+        allGuesses.add(event.guess)
 
         update()
     }
@@ -199,37 +225,25 @@ object GriffinBurrowHelper {
     fun onBurrowDetect(event: BurrowDetectEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val burrowLocation = event.burrowLocation
-        particleBurrows = particleBurrows.editCopy { this[burrowLocation] = event.type }
 
-        removePreciseGuess(burrowLocation)
+        val currentEntry = allGuesses.firstOrNull { it.contains(burrowLocation) }
+        if (currentEntry == null) allGuesses.add(GuessEntry(listOf(burrowLocation), burrowType = event.type))
+        else {
+            val correctIndex = currentEntry.guesses.indices // safe because of the .contains and null checks above
+                .first { index -> currentEntry.guesses[index] == burrowLocation }
+            currentEntry.burrowType = event.type
+            currentEntry.currentIndex = correctIndex
+        }
+
         update()
-    }
-
-    fun removePreciseGuess(location: LorenzVec) {
-        latestGuess?.let {
-            if (it.precise && location == it.getLocation()) {
-                latestGuess = null
-            }
-        }
-        additionalGuesses.removeIf { it.getLocation() == location }
-    }
-
-    private fun checkRemoveNearbyGuess() {
-        val guess = latestGuess ?: return
-        val distance = if (guess.precise) 5 else 50
-        val location = guess.getLocation()
-        if (particleBurrows.any { location.distance(it.key) < distance }) {
-            latestGuess = null
-        }
     }
 
     @HandleEvent
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
-        particleBurrows = particleBurrows.editCopy { remove(location) }
-        removePreciseGuess(location)
+        println("dug burrow at: $location")
+        removeGuess(location)
         update()
-        newBurrow = true
     }
 
     @HandleEvent
@@ -237,15 +251,33 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
         if (event.distance > 10 && event.isLocalPlayer) {
             update()
-            ArrowGuessBurrow.checkMoveGuess(particleBurrows)
+            checkMoveGuess()
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
-            particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
+            // TODO remove based on last blocks clicked
+        }
+
+        if (burrowDugPattern.matches(event.message)) {
+            val matcher = burrowDugPattern.matcher(event.message)
+            if (matcher.find()) {
+                val current = matcher.group("current").toInt()
+                val max = matcher.group("max").toInt()
+
+                val burrows = allGuesses.flatMap { it.guesses }
+                for (block in recentBlocksClicked.asReversed()) {
+                    if (burrows.contains(block)) {
+                        BurrowDugEvent(block, current, max).post()
+                        return
+                    }
+                }
+                recentBlocksClicked.clear()
+
+            }
         }
 
         // talking to Diana NPC
@@ -265,17 +297,12 @@ object GriffinBurrowHelper {
                 currentTitle == "§eUse Spade"
             }
         }
-
-        additionalGuesses.removeIf {
-            it.getLocation().distanceToPlayerIgnoreY() < 10
-        }
     }
 
     private fun resetAllData() {
-        latestGuess = null
-        additionalGuesses.clear()
+        allGuesses.clear()
+        recentBlocksClicked.clear()
         targetLocation = null
-        particleBurrows = emptyMap()
         GriffinBurrowParticleFinder.reset()
 
         BurrowWarpHelper.currentWarp = null
@@ -287,6 +314,15 @@ object GriffinBurrowHelper {
     @HandleEvent
     fun onWorldChange() {
         resetAllData()
+    }
+
+    fun isBlockValid(pos: LorenzVec): Boolean {
+        if (!pos.isInLoadedChunk()) {
+            return true
+        }
+        val isGround = pos.getBlockAt() == Blocks.grass
+        val isValidBlockAbove = pos.up().getBlockAt() in allowedBlocksAboveGround
+        return isGround && isValidBlockAbove
     }
 
     private fun findBlock(point: LorenzVec): LorenzVec {
@@ -339,8 +375,6 @@ object GriffinBurrowHelper {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
-        showTestLocations(event)
-
         val playerLocation = LocationUtils.playerLocation()
         if (config.inquisitorSharing.enabled) {
             for (rareMob in RareMobWaypointShare.waypoints.values) {
@@ -379,8 +413,9 @@ object GriffinBurrowHelper {
                 targetLocation?.blockCenter() ?: return
             }
 
-            val lineWidth = if (targetLocation in particleBurrows) {
-                color = particleBurrows[targetLocation]!!.color
+            val targetType = allGuesses.firstOrNull { it.getCurrent() == targetLocation }?.burrowType
+            val lineWidth = if (targetType != null && targetType != BurrowType.UNKNOWN) {
+                color = targetType.color
                 3
             } else 2
             if (currentWarp == null) {
@@ -392,37 +427,31 @@ object GriffinBurrowHelper {
             return
         }
 
-        if (config.burrowsNearbyDetection) {
-            for (burrow in particleBurrows) {
-                val location = burrow.key
-                val distance = location.distance(playerLocation)
-                val burrowType = burrow.value
-                event.drawColor(location, burrowType.color, distance > 10)
-                event.drawDynamicText(location.up(), burrowType.text, 1.5)
-            }
-        }
+        for (guess in allGuesses) {
+            val location = guess.getCurrent()
+            val distance = location.distance(playerLocation)
+            val burrowType = guess.burrowType
+            var text = burrowType.text
 
-        if (config.guess) {
-            for (guessLocation in allGuessLocations) {
-                if (guessLocation in particleBurrows) continue
-                val distance = guessLocation.distance(playerLocation)
-                // TODO add chroma color support via config
-                event.drawColor(guessLocation, LorenzColor.WHITE.toChromaColor(), distance > 10)
-                val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"
-                event.drawDynamicText(guessLocation.up(), "${color}Guess", 1.5)
-                if (distance > 5) {
-                    val formattedDistance = distance.toInt().addSeparators()
-                    event.drawDynamicText(guessLocation.up(), "§e${formattedDistance}m", 1.7, yOff = 10f)
+            if (!config.burrowsNearbyDetection) {
+                if (burrowType != BurrowType.UNKNOWN) return
+            }
+
+            if (burrowType == BurrowType.UNKNOWN) {
+                if (!config.guess) return
+                else {
+                    val textColor = if (currentWarp != null && targetLocation == location) "§b" else "§f"
+                    text = "${textColor}Guess"
+                    if (distance > 5) {
+                        val formattedDistance = distance.toInt().addSeparators()
+                        event.drawDynamicText(location.up(), "§e${formattedDistance}m", 1.7, yOff = 10f)
+                    }
                 }
             }
-        }
-    }
 
-    private fun showTestLocations(event: SkyHanniRenderWorldEvent) {
-        if (!testGriffinSpots) return
-        for (location in testList) {
             // TODO add chroma color support via config
-            event.drawColor(location, LorenzColor.WHITE.toChromaColor())
+            event.drawColor(location, burrowType.color, distance > 10)
+            event.drawDynamicText(location.up(), text, 1.5)
         }
     }
 
@@ -437,16 +466,7 @@ object GriffinBurrowHelper {
 
         val location = event.position
         if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
-        removePreciseGuess(location)
-
-        if (particleBurrows.containsKey(location)) {
-            DelayedRun.runDelayed(1.seconds) {
-                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds && particleBurrows.containsKey(location)) {
-                    // workaround
-                    particleBurrows = particleBurrows.editCopy { keys.remove(location) }
-                }
-            }
-        }
+        recentBlocksClicked.add(location)
     }
 
     private fun isEnabled() = DianaApi.isDoingDiana()
@@ -488,7 +508,7 @@ object GriffinBurrowHelper {
 
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val location = LocationUtils.playerLocation().roundLocation()
-        particleBurrows = particleBurrows.editCopy { this[location] = type }
+        allGuesses.add(GuessEntry(listOf(location), burrowType = type))
         update()
     }
 
@@ -499,15 +519,6 @@ object GriffinBurrowHelper {
             category = CommandCategory.DEVELOPER_TEST
             arg("type", BrigadierArguments.string()) { type ->
                 callback { setTestBurrow(getArg(type)) }
-            }
-        }
-        event.registerBrigadier("shtestgriffinspots") {
-            description = "Show potential griffin spots around you."
-            category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback {
-                testGriffinSpots = !testGriffinSpots
-                val state = if (testGriffinSpots) "§aenabled" else "§cdisabled"
-                ChatUtils.chat("Test Griffin Spots $state§e.")
             }
         }
     }

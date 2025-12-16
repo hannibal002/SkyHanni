@@ -113,7 +113,7 @@ object GriffinBurrowParticleFinder {
                 if (burrow.burrowTimeToLive >= 0) continue
                 // TODO differentiate between user clicking the burrow and the burrow dissapears after a while,
                 //  important bc of wasCorrectPetAlready in GriffinPetWarning
-                BurrowDugEvent(location).post()
+                //BurrowDugEvent(location).post() //TODO
                 burrows.remove(location)
                 lastDugParticleBurrow = null
             }
@@ -178,7 +178,7 @@ object GriffinBurrowParticleFinder {
         recentlyDugParticleBurrows.add(location)
         lastDugParticleBurrow = null
 
-        BurrowDugEvent(burrow.location).post()
+        //BurrowDugEvent(burrow.location).post() //TODO
         return true
     }
 

@@ -6,33 +6,19 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RaycastUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.math.abs
 import kotlin.math.sign
@@ -51,48 +37,13 @@ object ArrowGuessBurrow {
 
     private val points: MutableSet<LorenzVec> = mutableSetOf()
     private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
-    private val allGuesses = mutableListOf<GuessEntry>()
 
     private var newArrow = true
 
     // deific spade insta breaks grass and hits the block behind it before chat messages if you left-click
-    private val recentBlocksClicked = TimeLimitedSet<LorenzVec>(0.5.seconds)
-    private var lastBurrowPos = emptyList<LorenzVec>()
+    private var lastBurrowPos = emptyList<LorenzVec>() // TODO used for newBurrow
 
-    private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
-
-    /**
-     * REGEX-TEST: §eYou finished the Griffin burrow chain! §r§7(8/8)
-     * REGEX-TEST: §eYou dug out a Griffin Burrow! §r§7(4/8)
-     */
-    private val burrowDugPattern by patternGroup.pattern(
-        "burrow-dug-capture",
-        "§eYou (?<type>finished the Griffin burrow chain!|dug out a Griffin Burrow!) §r§7\\((?<current>\\d+)/(?<max>\\d+)\\)"
-    )
-
-    data class GuessEntry(
-        val guesses: List<LorenzVec>,
-        private var currentIndex: Int = 0
-    ) {
-        fun getCurrent(): LorenzVec = guesses[currentIndex]
-        fun contains(vec: LorenzVec): Boolean = guesses.contains(vec)
-        fun moveToNext(): Boolean {
-            GriffinBurrowHelper.removePreciseGuess(getCurrent())
-            val nextIndex = currentIndex + 1
-            if (nextIndex in guesses.indices) {
-                currentIndex = nextIndex
-                if (!isBlockValid(guesses[nextIndex])) {
-                    return moveToNext()
-                }
-                GriffinBurrowHelper.newBurrow = true // spade is probably not pointing to the burrow we are moving
-                BurrowGuessEvent(guesses[nextIndex], precise = true, new = true).post()
-                return true
-            } else return false
-        }
-        fun removeGuesses() { guesses.forEach { GriffinBurrowHelper.removePreciseGuess(it) } }
-    }
-
-    private object DebugSesh {
+    private object DebugSesh { //TODO move/delete
         var debugActive = false
         var renderAll = false
         var timeStarted = SimpleTimeMark.farPast()
@@ -107,9 +58,7 @@ object ArrowGuessBurrow {
                 |=== Arrow Guess Debug Session ===
                 |Active: $debugActive
                 |Running for: ${timeStarted.passedSince().format()}
-                |Current size of allGuesses: ${allGuesses.size}
                 |Bobby detected: ${PlatformUtils.isModInstalled("bobby")}
-                |Current rendered guesses: ${GriffinBurrowHelper.guessCount}
                 |
                 |Statistics:
                 |  Total guesses made: $guessesMade
@@ -123,48 +72,12 @@ object ArrowGuessBurrow {
 
         fun clear() {
             printData()
-            allGuesses.clear()
             timeStarted = SimpleTimeMark.now()
             renderAll = false
             guessesMade = 0
             preciseGuesses = 0
             couldNotFindGuess = 0
         }
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onPlayerDeath(event: PlayerDeathEvent) {
-        points.clear()
-        newArrow = true
-
-        lastBurrowPos.forEach { point ->
-            val toRemove = allGuesses.filter { it.contains(point) }
-            toRemove.forEach { it.removeGuesses() }
-            allGuesses.removeAll(toRemove)
-        }
-    }
-
-    @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (DebugSesh.debugActive && DebugSesh.renderAll) {
-            allGuesses.forEach { guessEntry ->
-                val color = if (guessEntry.guesses.size == 1) LorenzColor.BLUE.toChromaColor()
-                else LorenzColor.GREEN.toChromaColor()
-                guessEntry.guesses.forEach { value ->
-                    event.drawColor(value.up(2), color)
-                }
-            }
-        }
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onBlockClick(event: BlockClickEvent) {
-        recentBlocksClicked.add(event.position)
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onIslandChange() {
-        allGuesses.clear()
     }
 
     @HandleEvent
@@ -200,19 +113,6 @@ object ArrowGuessBurrow {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onChat(event: SkyHanniChatEvent) {
-        if (burrowDugPattern.matches(event.message)) {
-            val matcher = burrowDugPattern.matcher(event.message)
-            if (matcher.find()) {
-                val current = matcher.group("current").toInt()
-                val max = matcher.group("max").toInt()
-                lastBurrowPos = recentBlocksClicked.toList()
-                recentBlocksClicked.forEach { onBurrowDug(it, current, max) }
-            }
-        }
-    }
-
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
@@ -233,23 +133,12 @@ object ArrowGuessBurrow {
         newArrow = false
         points.clear()
         val guess = findClosestValidBlockToRayNew(arrow, range) ?: run {
-            if (DebugSesh.debugActive) {
-                DebugSesh.couldNotFindGuess++
-            }
+            // TODO log null count
             if (config.warnIfInaccurateArrowGuess) {
                 TitleManager.sendTitle("§eUse Spade", duration = 3.seconds)
             }
             return
         }
-
-        // if you dig a burrow while its tracking particles it doesn't create a new waypoint I think but this is rare and non-fatal
-        GriffinBurrowHelper.newBurrow = false
-        BurrowGuessEvent(
-            guess,
-            precise = true,
-            new = true
-        ).post()
-
     }
 
     fun getArrowRange(offset: LorenzVec): IntRange? {
@@ -261,34 +150,11 @@ object ArrowGuessBurrow {
         }
     }
 
-    fun checkMoveGuess(particleBurrows: Map<LorenzVec, BurrowType>) {
-        val burrows = particleBurrows.filter { it.value != BurrowType.START }.map { it.key }
-        for (guessEntry in allGuesses) {
-            if (!isBlockValid(guessEntry.getCurrent())) guessEntry.moveToNext()
-
-            val shouldBeLoaded = InventoryUtils.getItemInHandAtTime(SimpleTimeMark.now() - 0.5.seconds)?.isDianaSpade
-            if (shouldBeLoaded == true &&
-                !burrows.contains(guessEntry.getCurrent()) && // burrow is not found
-                guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.position.toLorenzVec()) < 900 // within 30 blocks
-            ) {
-                if (guessEntry.moveToNext()) {
-
-                    return
-                }
-            }
-        }
-    }
-
-    fun onBurrowDug(location: LorenzVec, chainNumber: Int, maxChains: Int) {
-        if (chainNumber != maxChains) {
+    @HandleEvent
+    fun onBurrowDug(event: BurrowDugEvent) {
+        if (event.current != event.max) {
             points.clear()
             newArrow = true
-        }
-
-        if (chainNumber != 1) {
-            val toRemove = allGuesses.filter { it.contains(location) }
-            toRemove.forEach { it.removeGuesses() } // remove any potential incorrect guesses on screen
-            allGuesses.removeAll(toRemove)
         }
     }
 
@@ -315,7 +181,7 @@ object ArrowGuessBurrow {
             val axisValue = originArray[axisIndex] + i * sign(directionArray[axisIndex])
             val candidatePoint = RaycastUtils.findPointOnRay(ray, axisIndex, axisValue) ?: continue
             val candidateBlock = candidatePoint.roundToBlock()
-            if (!isBlockValid(candidateBlock)) continue
+            if (!GriffinBurrowHelper.isBlockValid(candidateBlock)) continue
             val blockCenter = candidateBlock.add(0.5, 0.5, 0.5)
             val distanceToRay = RaycastUtils.findDistanceToRay(ray, blockCenter)
 
@@ -339,27 +205,13 @@ object ArrowGuessBurrow {
             withinRange = possibilities.map { it.key }
         }
 
-        allGuesses.add(GuessEntry(withinRange))
-
-        if (DebugSesh.debugActive) {
-            DebugSesh.guessesMade++
-            if (withinRange.size == 1) DebugSesh.preciseGuesses++
-        }
+        BurrowGuessEvent(GriffinBurrowHelper.GuessEntry(withinRange)).post()
 
         if (withinRange.size > 1 && config.warnIfInaccurateArrowGuess) {
             TitleManager.sendTitle("§eUse Spade")
         }
 
         return withinRange[0]
-    }
-
-    private fun isBlockValid(pos: LorenzVec): Boolean {
-        if (!pos.isInLoadedChunk()) {
-            return true
-        }
-        val isGround = pos.getBlockAt() == Blocks.grass
-        val isValidBlockAbove = pos.up().getBlockAt() in GriffinBurrowHelper.allowedBlocksAboveGround
-        return isGround && isValidBlockAbove
     }
 
     private fun detectArrow(points: MutableSet<LorenzVec>): RaycastUtils.Ray? {
