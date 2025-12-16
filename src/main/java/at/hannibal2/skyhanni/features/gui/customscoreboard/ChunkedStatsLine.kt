@@ -65,7 +65,7 @@ enum class ChunkedStatsLine(
         configLine = "§cCopper",
     ),
     SOWDUST(
-        displayPair = { "§c${getSowdust()}" },
+        displayPair = { "§2${getSowdust()}" },
         showWhen = { !(hideEmptyLines && getSowdust() == "0") && ScoreboardElementSowdust.showWhen() },
         showIsland = { ScoreboardElementSowdust.showIsland() },
         configLine = "§2Sowdust",
