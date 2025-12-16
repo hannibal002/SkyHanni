@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object HoeLevelDisplay {
 
-    val pos = Position(100, 100)
     private var hoeLevels: List<Int>? = null
     private var hoeOverflow = 200000
     private var display: List<Renderable>? = null
@@ -124,7 +123,7 @@ object HoeLevelDisplay {
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val renderable = display ?: return
-        pos.renderRenderables(renderable, posLabel = "Hoe Level Display")
+        config.position.renderRenderables(renderable, posLabel = "Hoe Level Display")
     }
 
     @HandleEvent
