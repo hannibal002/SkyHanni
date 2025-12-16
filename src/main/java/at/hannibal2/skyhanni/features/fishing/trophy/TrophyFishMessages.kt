@@ -77,7 +77,6 @@ object TrophyFishMessages {
             "§6♔ §6§lTROPHY FISH! $designFormat".asComponent()
         } else event.chatComponent.createCopy()
 
-
         if (config.totalAmount) {
             val total = trophyFishCounts.sumAllValues()
             edited.appendComponent((" §7(${total.addSeparators()}${total.ordinal()} total)").asComponent())
