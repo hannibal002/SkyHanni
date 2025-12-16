@@ -338,7 +338,11 @@ object GardenVisitorFeatures {
                 return
             }
             if (items.isEmpty()) {
-                list.addString(" §7(§fAny§7)")
+                if (visitor.unknownRewards == true) {
+                    list.addString(" §7(§fUnknown§7)")
+                } else {
+                    list.addString(" §7(§fAny§7)")
+                }
             } else {
                 for (item in items) {
                     list.addItemStack(NeuInternalName.fromItemName(item).getItemStack())
