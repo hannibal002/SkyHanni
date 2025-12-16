@@ -57,6 +57,7 @@
 + Hide Mythological Creatures Since text for creatures you haven't gotten. - Empa (https://github.com/hannibal002/SkyHanni/pull/4861)
 + Improved Diana burrow guessing. - SidOfThe7Cs (https://github.com/hannibal002/SkyHanni/pull/4916)
   + Added an option to instantly detect the next burrow from the arrow.
++ Only Show Coa counter during diana. - nopo (https://github.com/hannibal002/SkyHanni/pull/4942)
 
 #### Hunting
 
@@ -71,6 +72,7 @@
   + Made the solution also allow swapping end columns as apparently you can do that.
   + Made it work if you abiphone Jake.
   + Blocked accidentally clicking the close puzzle button.
++ Added support for Moonflower, Sunflower, and Wild Rose in Basket of Seeds for Not Clickable Items. - Luna (https://github.com/hannibal002/SkyHanni/pull/4954)
 
 #### Mining
 
@@ -155,6 +157,15 @@
 
 + Fixed Burrowing Spores notification not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/4883)
 + Fixed Fungi Cutter Warning not working on 1.21. - Luna (https://github.com/hannibal002/SkyHanni/pull/4896)
++ Fixed composter overlay not working sometimes (hopefully). - nopo (https://github.com/hannibal002/SkyHanni/pull/4944)
++ Fixed error when getting a tool capsule. - nopo (https://github.com/hannibal002/SkyHanni/pull/4943)
++ Fixed Hoe Level Display not saving its location. - nopo (https://github.com/hannibal002/SkyHanni/pull/4958)
++ Fixed Jacob's Contest spam around SB new year. - nopo (https://github.com/hannibal002/SkyHanni/pull/4955)
++ Fixed Nether Wart Fortune stat not being properly detected on items. - Luna (https://github.com/hannibal002/SkyHanni/pull/4947)
++ Fixed Organic matter display going negative. - nopo (https://github.com/hannibal002/SkyHanni/pull/4957)
++ Fixed Skill error during crop fever. - nopo (https://github.com/hannibal002/SkyHanni/pull/4950)
++ Fixed vinyl error in the vacuum. - nopo (https://github.com/hannibal002/SkyHanni/pull/4949)
++ Made armor drop tracker work with the greenhouse update. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4953)
 
 #### Chocolate Factory
 
@@ -187,6 +198,10 @@
 + Fixed glowing invisible mobs on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/4913)
 + Fixed error when opening Your Skills menu with Roman numerals disabled in Hypixel settings. - Luna (https://github.com/hannibal002/SkyHanni/pull/4932)
 + Fixed overflow features not having support for hannibal numerals. - nopo (https://github.com/hannibal002/SkyHanni/pull/4935)
++ Fixed error when getting a trophy fish. - nopo (https://github.com/hannibal002/SkyHanni/pull/4943)
++ Fixed Hideonleaf finder navigating when typing. - nopo (https://github.com/hannibal002/SkyHanni/pull/4945)
++ Fixed some box rendering on modern. - nopo (https://github.com/hannibal002/SkyHanni/pull/4940)
++ Fixed Tablist not rendering over other elements when using toggle tab. - nopo (https://github.com/hannibal002/SkyHanni/pull/4941)
 
 ### Technical Details
 
@@ -215,6 +230,10 @@
 + Removed Fix NEU Heavy Pearls. - nopo (https://github.com/hannibal002/SkyHanni/pull/4881)
   + The bug in NEU was fixed long time ago.
 + Removed the Tool Tooltip Tweaks feature. - nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
++ Removed dicer rng tracker. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4953)
+  + Dicers no longer drop crops like that.
++ Removed Fungi Cutter Warning. - Luna (https://github.com/hannibal002/SkyHanni/pull/4951)
+  + Fungi Cutters no longer have a mode.
 
 ## Version 5.0.0
 
