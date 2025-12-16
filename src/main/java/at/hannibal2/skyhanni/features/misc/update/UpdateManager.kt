@@ -73,6 +73,9 @@ object UpdateManager {
         processor.registerConfigEditor(ConfigVersionDisplay::class.java) { option, _ ->
             GuiOptionEditorUpdateCheck(option)
         }
+        processor.registerConfigEditor(ConfigVersionDeprecatedDisplay::class.java) { option, _ ->
+            GuiOptionEditorDeprecatedVersion(option)
+        }
     }
 
     private val config get() = SkyHanniMod.feature.about
