@@ -203,7 +203,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     }
 
     private fun SkyHanniChatEvent.tryReadLoot() {
-        val confirmedDropsJson = dropsJson ?: return
+        val dropsJson = dropsJson ?: return
 
         ForagingTrackerLegacy.openCloseRewardPattern.matchMatcher(message) {
             openLootLoop = !openLootLoop
@@ -251,7 +251,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         ForagingTrackerLegacy.phantomSpawnPattern.matchMatcher(message) {
             val mob = group("phantom")
 
-            if (confirmedDropsJson.mobs.contains(mob) && config.compactGiftBonusDropsList.contains(DropCategory.MOBS))
+            if (dropsJson.mobs.contains(mob) && config.compactGiftBonusDropsList.contains(DropCategory.MOBS))
                 rareDrops.add("A wild §d$mob §fappeared!")
         }
 
@@ -276,17 +276,17 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         loot.addOrPut(itemInternalName, 1)
 
         val bonusDropTypeList = config.compactGiftBonusDropsList
-        if (confirmedDropsJson.uncommonDrops.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.UNCOMMON_DROPS))
+        if (dropsJson.uncommonDrops.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.UNCOMMON_DROPS))
             rareDrops.add(item)
-        if (confirmedDropsJson.enchantedBooks.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.ENCHANTED_BOOKS))
+        if (dropsJson.enchantedBooks.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.ENCHANTED_BOOKS))
             rareDrops.add(item)
-        if (confirmedDropsJson.boosters.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.BOOSTERS))
+        if (dropsJson.boosters.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.BOOSTERS))
             rareDrops.add(item)
-        if (confirmedDropsJson.shards.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.SHARDS))
+        if (dropsJson.shards.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.SHARDS))
             rareDrops.add(item)
-        if (confirmedDropsJson.runes.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.RUNES))
+        if (dropsJson.runes.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.RUNES))
             rareDrops.add(item)
-        if (confirmedDropsJson.miscDrops.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.MISC))
+        if (dropsJson.miscDrops.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.MISC))
             rareDrops.add(item)
     }
 
