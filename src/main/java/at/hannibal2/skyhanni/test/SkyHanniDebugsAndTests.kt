@@ -213,14 +213,14 @@ object SkyHanniDebugsAndTests {
         var errors = 0
 
         displayList = buildList {
-            for (item in GardenVisitorColorNames.visitorItems) {
+            for (item in GardenVisitorColorNames.visitorMap) {
                 val name = item.key
 
                 addLine {
                     val coloredName = GardenVisitorColorNames.getColoredName(name)
                     addString("$coloredName§7 (")
 
-                    for (itemName in item.value) {
+                    for (itemName in item.value.needItems) {
                         try {
                             val internalName = NeuInternalName.fromItemName(itemName)
                             addItemStack(internalName.getItemStack())
@@ -229,7 +229,7 @@ object SkyHanniDebugsAndTests {
                             errors++
                         }
                     }
-                    if (item.value.isEmpty()) {
+                    if (item.value.needItems.isEmpty()) {
                         addString("Any")
                     }
                     addString("§7) ")
