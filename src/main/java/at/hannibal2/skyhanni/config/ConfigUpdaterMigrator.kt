@@ -11,7 +11,7 @@ import com.google.gson.JsonPrimitive
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 112
+    const val CONFIG_VERSION = 113
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -49,7 +49,7 @@ object ConfigUpdaterMigrator {
                 return
             }
             if (since > CONFIG_VERSION) {
-                error("Illegally new version $since > $CONFIG_VERSION")
+                error("Illegal new version $since > $CONFIG_VERSION")
             }
             if (since > oldVersion + 1) {
                 logger.log("Skipping add of $value to $path (will be done in another pass)")
@@ -85,7 +85,7 @@ object ConfigUpdaterMigrator {
                 return
             }
             if (since > CONFIG_VERSION) {
-                error("Illegally new version $since > $CONFIG_VERSION")
+                error("Illegal new version $since > $CONFIG_VERSION")
             }
             if (since > oldVersion + 1) {
                 logger.log("Skipping move from $oldPath to $newPath (will be done in another pass)")
@@ -124,6 +124,49 @@ object ConfigUpdaterMigrator {
             movesPerformed++
             newParentElement.add(np.last(), transform(oldElem.shDeepCopy()))
             logger.log("Moved element from $oldPath to $newPath")
+            val oldParentElement = old.at(op.dropLast(1), false)
+            if (oldParentElement !is JsonObject) {
+                logger.log("Warning: element at path $old could not be removed from its previous location")
+                return
+            }
+            oldParentElement.remove(op.last())
+        }
+
+        fun remove(since: Int, oldPath: String) {
+            if (since <= oldVersion) {
+                logger.log("Skipping removal of $oldPath ($since <= $oldVersion)")
+                return
+            }
+            if (since > CONFIG_VERSION) {
+                error("Illegal new version $since > $CONFIG_VERSION")
+            }
+            if (since > oldVersion + 1) {
+                logger.log("Skipping removal of $oldPath (will be done in another pass)")
+                return
+            }
+
+            val op = oldPath.split(".")
+            if (op.first().startsWith("#")) {
+                val realPrefixes = dynamicPrefix[op.first()]
+                if (realPrefixes == null) {
+                    logger.log("Could not resolve dynamic prefix $oldPath")
+                    return
+                }
+                for (realPrefix in realPrefixes) {
+                    remove(since, "$realPrefix.${oldPath.substringAfter('.')}")
+                }
+            }
+            val oldElem = old.at(op, false)
+            if (oldElem == null) {
+                logger.log("Skipping removal of $oldPath ($oldPath not present)")
+                return
+            }
+            val oldParentElement = old.at(op.dropLast(1), false)
+            if (oldParentElement !is JsonObject) {
+                logger.log("Warning: element at path $old could not be removed")
+                return
+            }
+            oldParentElement.remove(op.last())
         }
     }
 
