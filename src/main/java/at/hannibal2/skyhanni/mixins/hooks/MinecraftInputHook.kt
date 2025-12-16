@@ -17,120 +17,95 @@ import net.minecraft.util.MovingObjectPosition
 
 object MinecraftInputHook {
     @JvmStatic
-    fun shouldCancelMouseRightClick(blockHitResult: MovingObjectPosition?): Boolean {
-        if (blockHitResult == null) return false
-
-        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post()
-
-        val cancelled = when (blockHitResult.typeOfHit) {
-            MovingObjectPosition.MovingObjectType.MISS -> {
-                clickCancelled
-            }
-
-            MovingObjectPosition.MovingObjectType.BLOCK -> {
-                val position = blockHitResult.blockPos.toLorenzVec()
-                BlockClickEvent(
-                    ClickType.RIGHT_CLICK,
-                    position,
-                    InventoryUtils.getItemInHand(),
-                ).also {
-                    if (clickCancelled) it.cancel()
-                }.post()
-            }
-
-            MovingObjectPosition.MovingObjectType.ENTITY -> {
-                EntityClickEvent(
-                    ClickType.RIGHT_CLICK,
-                    C02PacketUseEntity.Action.INTERACT_AT,
-                    //#if MC < 1.21
-                    blockHitResult.entityHit,
-                    //#else
-                    //$$ (blockHitResult as EntityHitResult).getEntity(),
-                    //#endif
-                    InventoryUtils.getItemInHand(),
-                ).also {
-                    if (clickCancelled) it.cancel()
-                }.post()
-            }
-        }
-
-        return cancelled
-    }
+    fun shouldCancelMouseRightClick(hitResult: MovingObjectPosition?): Boolean =
+        handleClick(
+            hitResult,
+            ClickType.RIGHT_CLICK,
+            C02PacketUseEntity.Action.INTERACT_AT,
+        )
 
     @JvmStatic
-    fun shouldCancelMouseLeftClick(blockHitResult: MovingObjectPosition?): Boolean {
-        if (blockHitResult == null) return false
-
-        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
-
-        val cancelled = when (blockHitResult.typeOfHit) {
-            MovingObjectPosition.MovingObjectType.MISS -> {
-                clickCancelled
-            }
-
-            MovingObjectPosition.MovingObjectType.BLOCK -> {
-                val position =
-                    //#if MC < 1.21
-                    blockHitResult.blockPos
-                //#else
-                //$$     (blockHitResult as BlockHitResult).blockPos
-                //#endif
-
-                BlockClickEvent(
-                    ClickType.LEFT_CLICK,
-                    position.toLorenzVec(),
-                    InventoryUtils.getItemInHand(),
-                ).also {
-                    if (clickCancelled) it.cancel()
-                }.post()
-            }
-
-            MovingObjectPosition.MovingObjectType.ENTITY -> {
-                EntityClickEvent(
-                    ClickType.LEFT_CLICK,
-                    C02PacketUseEntity.Action.ATTACK,
-                    //#if MC < 1.21
-                    blockHitResult.entityHit,
-                    //#else
-                    //$$ (blockHitResult as EntityHitResult).getEntity(),
-                    //#endif
-                    InventoryUtils.getItemInHand(),
-                ).also {
-                    if (clickCancelled) it.cancel()
-                }.post()
-            }
-        }
-
-        return cancelled
-    }
+    fun shouldCancelMouseLeftClick(hitResult: MovingObjectPosition?): Boolean =
+        handleClick(
+            hitResult,
+            ClickType.LEFT_CLICK,
+            C02PacketUseEntity.Action.ATTACK,
+        )
 
     @JvmStatic
     fun shouldCancelContinuedBlockBreak(
-        blockHitResult: MovingObjectPosition?,
-        currentBlockPos: BlockPos
+        hitResult: MovingObjectPosition?,
+        currentBlockPos: BlockPos,
     ): Boolean {
-        if (blockHitResult == null || blockHitResult.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return false
+        if (hitResult == null || hitResult.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return false
 
-        val position =
-            //#if MC < 1.21
-            blockHitResult.blockPos
-        //#else
-        //$$     (blockHitResult as BlockHitResult).blockPos
-        //#endif
+        val position = hitResult.getBlockPosCompat()
 
         if (currentBlockPos == position) return false
 
-        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
+        val itemInHand = InventoryUtils.getItemInHand()
 
-        val cancelled = BlockClickEvent(
+        val clickCancelled = ItemClickEvent(itemInHand, ClickType.LEFT_CLICK).post()
+
+        return BlockClickEvent(
             ClickType.LEFT_CLICK,
             position.toLorenzVec(),
-            InventoryUtils.getItemInHand(),
+            itemInHand,
         ).also {
             if (clickCancelled) it.cancel()
         }.post()
-
-
-        return cancelled
     }
+
+    private fun handleClick(
+        hitResult: MovingObjectPosition?,
+        clickType: ClickType,
+        entityAction: C02PacketUseEntity.Action,
+    ): Boolean {
+        if (hitResult == null) return false
+
+        val itemInHand = InventoryUtils.getItemInHand()
+
+        val clickCancelled = ItemClickEvent(itemInHand, clickType).post()
+
+        return when (hitResult.typeOfHit) {
+            MovingObjectPosition.MovingObjectType.MISS ->
+                clickCancelled
+
+            MovingObjectPosition.MovingObjectType.BLOCK -> {
+                val pos = hitResult.getBlockPosCompat()
+                BlockClickEvent(
+                    clickType,
+                    pos.toLorenzVec(),
+                    itemInHand,
+                ).also {
+                    if (clickCancelled) it.cancel()
+                }.post()
+            }
+
+            MovingObjectPosition.MovingObjectType.ENTITY -> {
+                EntityClickEvent(
+                    clickType,
+                    entityAction,
+                    hitResult.getEntityCompat(),
+                    itemInHand,
+                ).also {
+                    if (clickCancelled) it.cancel()
+                }.post()
+            }
+        }
+    }
+
+    private fun MovingObjectPosition.getBlockPosCompat(): BlockPos =
+        //#if MC < 1.21
+        this.blockPos
+        //#else
+    //$$     (this as BlockHitResult).blockPos
+        //#endif
+
+    private fun MovingObjectPosition.getEntityCompat() =
+        //#if MC < 1.21
+        this.entityHit
+    //#else
+    //$$ (this as EntityHitResult).getEntity()
+    //#endif
 }
