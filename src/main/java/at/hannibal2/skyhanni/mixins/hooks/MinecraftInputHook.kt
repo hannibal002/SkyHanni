@@ -99,7 +99,7 @@ object MinecraftInputHook {
         //#if MC < 1.21
         this.blockPos
         //#else
-    //$$     (this as BlockHitResult).blockPos
+    //$$ (blockHitResult as BlockHitResult).blockPos
         //#endif
 
     private fun MovingObjectPosition.getEntityCompat() =
