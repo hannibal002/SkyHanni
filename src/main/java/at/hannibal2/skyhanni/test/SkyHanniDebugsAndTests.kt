@@ -309,7 +309,7 @@ object SkyHanniDebugsAndTests {
         }
         lastManualContestDataUpdate = SimpleTimeMark.now()
 
-        GardenNextJacobContest.resetContestData()
+        GardenNextJacobContest.resetContestData(true)
     }
 
     private fun copyLocation(args: Array<String>) {
