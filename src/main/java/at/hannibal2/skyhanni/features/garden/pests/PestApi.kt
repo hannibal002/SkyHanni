@@ -129,13 +129,13 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST: §a§lPEST TRAP #3§r
-     * REGEX-TEST: §9§lMOUSE TRAP #2§r
-     * REGEX-TEST: §9§lMOUSE TRAP #2
+     * REGEX-TEST: §9§lPEST TRAP #3§r
+     * REGEX-TEST: §5§lMOUSE TRAP #2§r
+     * REGEX-TEST: §6§lVERMIN TRAP #2
      */
     private val pestTrapPattern by patternGroup.pattern(
         "entity.pest-trap",
-        "(?:§.)+§l(?<type>PEST|MOUSE) TRAP(?: #(?<number>\\d+))?(?:§.)*",
+        "(?:§.)+§l(?<type>PEST|MOUSE|VERMIN) TRAP(?: #(?<number>\\d+))?(?:§.)*",
     )
 
     /**
