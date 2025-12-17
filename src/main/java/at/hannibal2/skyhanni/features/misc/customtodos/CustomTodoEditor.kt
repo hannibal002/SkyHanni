@@ -22,7 +22,7 @@ class CustomTodoEditor(
     var label: String = from.label
 
     @field:Bind
-    var enabled: Boolean = from.enabled
+    var enabled: Boolean = from.isEnabled
 
     @field:Bind
     var timer: String = from.timer.toString()
@@ -59,7 +59,7 @@ class CustomTodoEditor(
             showOnlyWhenReady,
             target, matchMode,
             from.readyAt,
-            from.enabled,
+            from.isEnabled,
             from.ignoreColorCodes
         )
     }
@@ -76,7 +76,7 @@ class CustomTodoEditor(
 
     @Bind
     fun setScoreboard() {
-        target = CustomTodo.TriggerTarget.SCOREBOARD
+        target = CustomTodo.TriggerTarget.SIDEBAR
     }
 
     @Bind
@@ -100,7 +100,7 @@ class CustomTodoEditor(
 
     @Bind
     fun getScoreboard(): StructuredText {
-        return StructuredText.of(colorFromBool(target == CustomTodo.TriggerTarget.SCOREBOARD) + "Scoreboard")
+        return StructuredText.of(colorFromBool(target == CustomTodo.TriggerTarget.SIDEBAR) + "Scoreboard")
     }
 
     @Bind

@@ -40,7 +40,7 @@ object CustomTodosGui {
     @HandleEvent(onlyOnSkyblock = true)
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         todos.forEach { todo ->
-            if (todo.triggerTarget != CustomTodo.TriggerTarget.SCOREBOARD) return@forEach
+            if (todo.triggerTarget != CustomTodo.TriggerTarget.SIDEBAR) return@forEach
             event.new.forEach { line ->
                 if (matchString(todo, line)) todo.setDoneNow()
             }

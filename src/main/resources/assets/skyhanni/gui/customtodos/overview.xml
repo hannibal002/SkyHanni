@@ -11,7 +11,7 @@
             <Spacer height="5"/>
 <!--             TODO make this less -->
 <!--             <ScrollPanel width="350" height="200"> -->
-            <ScrollPanel width="1000" height="1000">
+            <ScrollPanel width="600" height="450">
                 <Array data="@todos">
                     <Row>
                         <Text text="@getLabel" width="200"/>

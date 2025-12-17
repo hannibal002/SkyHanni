@@ -22,15 +22,21 @@ data class CustomTodo(
     @Expose var triggerTarget: TriggerTarget = TriggerTarget.CHAT,
     @Expose var triggerMatcher: TriggerMatcher = TriggerMatcher.CONTAINS,
     @Expose var readyAt: MutableMap<String, SimpleTimeMark> = mutableMapOf(),
-    @Expose var enabled: Boolean = true,
+    @Expose var isEnabled: Boolean = true,
     @Expose var ignoreColorCodes: Boolean = true,
 ) {
     enum class TriggerMatcher {
-        REGEX, STARTS_WITH, CONTAINS, EQUALS
+        REGEX,
+        STARTS_WITH,
+        CONTAINS,
+        EQUALS
     }
 
     enum class TriggerTarget {
-        CHAT, ACTION_BAR, TAB_LIST, SCOREBOARD
+        CHAT,
+        ACTION_BAR,
+        TAB_LIST,
+        SIDEBAR
     }
 
     fun isValid(): Boolean {
@@ -60,17 +66,23 @@ data class CustomTodo(
 
 
     companion object {
-        const val TEMPLATE_PREFIX = "NEU:CUSTOMTODO/"
+        private const val NEU_TEMPLATE_PREFIX = "NEU:CUSTOMTODO/"
+        private const val TEMPLATE_PREFIX = "SH:CUSTOMTODO/"
         const val SECONDS_IN_A_DAY = (24 * 60 * 60 * 100)
+
         fun fromTemplate(data: String): CustomTodo? {
-            return TemplateUtil.maybeDecodeTemplate(TEMPLATE_PREFIX, data, CustomTodo::class.java)?.also { it.readyAt.clear() }
+            val maybeDecoded = TemplateUtil.maybeDecodeTemplate(TEMPLATE_PREFIX, data, CustomTodo::class.java) ?:
+                TemplateUtil.maybeDecodeTemplate(NEU_TEMPLATE_PREFIX, data, CustomTodo::class.java)
+            return maybeDecoded?.also {
+                it.readyAt.clear()
+            }
         }
     }
 
     fun toTemplate(): String {
         return TemplateUtil.encodeTemplate(
             TEMPLATE_PREFIX,
-            this.copy(readyAt = mutableMapOf())
+            this.copy(readyAt = mutableMapOf()),
         )
     }
 }

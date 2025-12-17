@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.XmlUtils
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
@@ -42,8 +43,10 @@ class CustomTodos(
     fun pasteTodo() {
         SkyHanniMod.launchIOCoroutine("import custom todos") {
             val customTodo = CustomTodo.fromTemplate(ClipboardUtils.readFromClipboard() ?: return@launchIOCoroutine)
-            todos.add(CustomTodoEditor(customTodo ?: return@launchIOCoroutine, todos))
-            save()
+            DelayedRun.runNextTick {
+                todos.add(CustomTodoEditor(customTodo ?: return@runNextTick, todos))
+                save()
+            }
         }
     }
 
