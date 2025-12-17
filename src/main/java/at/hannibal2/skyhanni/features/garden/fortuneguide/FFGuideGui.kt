@@ -64,9 +64,11 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
                         val name = PlayerUtils.getName()
                         var profile = HypixelData.profileName
                         if (profile.isNotEmpty()) profile += "/"
-                        ChatUtils.clickableLinkChat("§cSkyHannis /ff display is no longer being developed! " +
-                                "§6Click §bhere §6to see your updated fortune progress and cheapest upgrades on elitebot.dev instead!",
-                            "https://elitebot.dev/@$name/${profile}fortune?utm_source=SkyHanni#fortune")
+                        ChatUtils.clickableLinkChat(
+                            "§cSkyHannis /ff display is no longer being developed! " +
+                            "§6Click §bhere §6to see your updated fortune progress and cheapest upgrades on elitebot.dev instead!",
+                            "https://elitebot.dev/@$name/${profile}fortune?utm_source=SkyHanni#fortune"
+                        )
                     }
                 }
             }
