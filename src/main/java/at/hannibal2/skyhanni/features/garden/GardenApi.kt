@@ -67,6 +67,7 @@ object GardenApi {
         get() = CurrentPetApi.isCurrentPetOrHigherRarity(RARE_MOOSHROOM_COW_PET_ITEM)
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
+    val onUnfarmablePlot get() = inGarden() && (inBarn || GardenPlotApi.inGreenhouse())
     val storage get() = ProfileStorageData.profileSpecific?.garden
     val config get() = SkyHanniMod.feature.garden
     var totalAmountVisitorsExisting = 0

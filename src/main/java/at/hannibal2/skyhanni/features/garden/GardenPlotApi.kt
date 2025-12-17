@@ -60,6 +60,14 @@ object GardenPlotApi {
     )
 
     /**
+     * REGEX-TEST: §7Greenhouse Plot
+     */
+    private val greenhousePlotPattern by patternGroup.pattern(
+        "greenhouse",
+        "§7Greenhouse Plot",
+    )
+
+    /**
      * REGEX-TEST: §7Cleanup: §b0% Completed
      */
     private val uncleanedPlotPattern by patternGroup.pattern(
@@ -117,6 +125,10 @@ object GardenPlotApi {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
+    fun inGreenhouse(): Boolean {
+        return currentPlot?.greenhouse ?: false
+    }
+
     class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
 
     private var currentPlot: Plot? = null
@@ -162,6 +174,9 @@ object GardenPlotApi {
 
         @Expose
         var uncleared: Boolean,
+
+        @Expose
+        var greenhouse: Boolean,
     )
 
     data class SprayData(
@@ -181,6 +196,7 @@ object GardenPlotApi {
             isPestCountInaccurate = false,
             locked = true,
             uncleared = false,
+            greenhouse = false,
         )
     }
 
@@ -230,6 +246,12 @@ object GardenPlotApi {
         get() = this.getData()?.locked ?: false
         set(value) {
             this.getData()?.locked = value
+        }
+
+    var Plot.greenhouse: Boolean
+        get() = this.getData()?.greenhouse ?: false
+        set(value) {
+            this.getData()?.greenhouse = value
         }
 
     fun Plot.markExpiredSprayAsNotified() {
@@ -355,12 +377,16 @@ object GardenPlotApi {
             }
             plot.locked = false
             plot.isBeingPasted = false
+            plot.greenhouse = false
             for (line in lore) {
                 if (line.contains("§7Cost:")) plot.locked = true
                 if (line.contains("§7Pasting in progress:")) plot.isBeingPasted = true
                 plot.uncleared = false
                 uncleanedPlotPattern.matchMatcher(line) {
                     plot.uncleared = true
+                }
+                greenhousePlotPattern.matchMatcher(line) {
+                    plot.greenhouse = true
                 }
             }
         }

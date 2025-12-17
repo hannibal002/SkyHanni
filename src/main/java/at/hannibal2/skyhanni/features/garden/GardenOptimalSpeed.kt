@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -163,13 +163,16 @@ object GardenOptimalSpeed {
 
         val colorCode = if (recentlySwitchedTool) "7" else if (speed != currentSpeed) "c" else "a"
 
-        if (config.showOnHUD) config.pos.renderString("§$colorCode$text", posLabel = "Garden Optimal Speed")
+        if (config.showOnHUD) config.pos.renderRenderable(
+            Renderable.text("§$colorCode$text"),
+            posLabel = "Garden Optimal Speed"
+        )
         if (speed != currentSpeed && !recentlySwitchedTool) warn(speed)
     }
 
     private fun warn(optimalSpeed: Int) {
         if (!MinecraftCompat.localPlayer.onGround) return
-        if (GardenApi.onBarnPlot) return
+        if (GardenApi.onUnfarmablePlot) return
         if (!config.warning) return
         if (!GardenApi.isCurrentlyFarming()) return
         if (lastWarnTime.passedSince() < 20.seconds) return
