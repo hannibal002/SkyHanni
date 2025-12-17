@@ -3,10 +3,14 @@ package at.hannibal2.skyhanni.features.misc.customtodos
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -63,8 +67,18 @@ object CustomTodosGui {
         }
     }
 
+    @HandleEvent
+    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (todos.isEmpty()) return
+        for ((index, todo) in todos.withIndex()) {
+            val renderable = todo.getRenderable() ?: continue
+            todo.position.renderRenderable(renderable, posLabel = "${todo.label} $index")
+        }
+    }
+
     fun parseItem(icon: String): ItemStack {
-        return ItemStack(Items.painting)
+        if (icon.isEmpty()) return ItemStack(Items.painting)
+        return NeuInternalName.fromItemName(icon).getItemStack()
     }
 
 }

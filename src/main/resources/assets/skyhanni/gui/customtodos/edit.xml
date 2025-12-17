@@ -9,7 +9,7 @@
                 <Button onClick="@close">
                     <Text text="←"/>
                 </Button>
-                <Text text="@getTitle"/>
+                <Text text="@getTitle" width="400"/>
             </Row>
             <Row>
                 <Text text="Enabled: " width="150"/>

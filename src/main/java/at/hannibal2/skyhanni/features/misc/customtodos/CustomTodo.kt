@@ -1,12 +1,20 @@
 package at.hannibal2.skyhanni.features.misc.customtodos
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TemplateUtil
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.annotations.Expose
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 // Taken and modified from Not Enough Updates https://github.com/NotEnoughUpdates/NotEnoughUpdates
@@ -24,6 +32,7 @@ data class CustomTodo(
     @Expose var readyAt: MutableMap<String, SimpleTimeMark> = mutableMapOf(),
     @Expose var isEnabled: Boolean = true,
     @Expose var ignoreColorCodes: Boolean = true,
+    @Expose var position: Position = Position(10, 10),
 ) {
     enum class TriggerMatcher {
         REGEX,
@@ -48,7 +57,8 @@ data class CustomTodo(
         val now = SimpleTimeMark.now()
         readyAt[HypixelData.profileName] =
             if (isResetOffset) {
-                (now.toMillis() + SECONDS_IN_A_DAY - now.toMillis() % SECONDS_IN_A_DAY + timer * 1000L).asTimeMark()
+                val asTimeMark = (now.toMillis() - now.toMillis() % MS_IN_A_DAY + timer * 1000L).asTimeMark()
+                if (asTimeMark.isInPast()) asTimeMark + 1.days else asTimeMark
             } else {
                 now + timer.seconds
             }
@@ -68,11 +78,14 @@ data class CustomTodo(
     companion object {
         private const val NEU_TEMPLATE_PREFIX = "NEU:CUSTOMTODO/"
         private const val TEMPLATE_PREFIX = "SH:CUSTOMTODO/"
-        const val SECONDS_IN_A_DAY = (24 * 60 * 60 * 100)
+        const val MS_IN_A_DAY = (24 * 60 * 60 * 1000)
 
         fun fromTemplate(data: String): CustomTodo? {
             val maybeDecoded = TemplateUtil.maybeDecodeTemplate(TEMPLATE_PREFIX, data, CustomTodo::class.java) ?:
                 TemplateUtil.maybeDecodeTemplate(NEU_TEMPLATE_PREFIX, data, CustomTodo::class.java)
+            if (maybeDecoded == null) {
+                ChatUtils.chat("§cInvalid Todo")
+            }
             return maybeDecoded?.also {
                 it.readyAt.clear()
             }
@@ -84,5 +97,20 @@ data class CustomTodo(
             TEMPLATE_PREFIX,
             this.copy(readyAt = mutableMapOf()),
         )
+    }
+
+    fun getRenderable(): Renderable? {
+        if (!this.isEnabled || !this.isValid()) return null
+        val readyAt = this.readyAtOnCurrentProfile ?: return null
+        if (this.showOnlyWhenReady && readyAt.isInFuture()) return null
+        if (this.showWhen != 0 && readyAt.timeUntil().inWholeSeconds > this.showWhen) return null
+
+        val timer = if (readyAt.isInPast()) "§aReady" else readyAt.timeUntil().format(maxUnits = 2)
+        val label = this.label.replace("&&", "§")
+        val textRenderable = Renderable.text("§3$label: §c$timer")
+
+        if (this.icon.isEmpty()) return textRenderable
+        return Renderable.horizontal(Renderable.item(CustomTodosGui.parseItem(this.icon)), textRenderable)
+
     }
 }

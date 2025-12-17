@@ -49,6 +49,7 @@ class CustomTodoEditor(
     var matchMode = from.triggerMatcher
 
     fun into(): CustomTodo {
+        if (from.readyAtOnCurrentProfile == null) markAsReady()
         return CustomTodo(
             label,
             timer.toIntOrNull() ?: 0,
@@ -60,7 +61,8 @@ class CustomTodoEditor(
             target, matchMode,
             from.readyAt,
             from.isEnabled,
-            from.ignoreColorCodes
+            from.ignoreColorCodes,
+            from.position,
         )
     }
 
@@ -188,7 +190,7 @@ class CustomTodoEditor(
         if (showOnlyWhenReady) {
             return "Shown only when task is ready".asStructuredText()
         }
-        val wholeSeconds = timer.toIntOrNull() ?: return "§3Invalid Time".asStructuredText()
+        val wholeSeconds = showWhen.toIntOrNull() ?: return "§3Invalid Time".asStructuredText()
         if (wholeSeconds == 0) {
             return "Always shown".asStructuredText()
         }
@@ -272,12 +274,12 @@ class CustomTodoEditor(
 
     @Bind
     fun getLabel(): StructuredText {
-        return label.asStructuredText()
+        return label.replace("&&", "§").asStructuredText()
     }
 
     @Bind
     fun getTitle(): StructuredText {
-        return "Editing $label".asStructuredText()
+        return "Editing ${label.replace("&&", "§")}".asStructuredText()
     }
 
     @Bind
