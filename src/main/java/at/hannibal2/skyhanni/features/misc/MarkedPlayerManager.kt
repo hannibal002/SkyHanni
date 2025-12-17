@@ -7,10 +7,11 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -74,8 +75,21 @@ object MarkedPlayerManager {
         }
     }
 
+    @HandleEvent
+    fun onEntityEnterWorld(event: EntityEnterWorldEvent<EntityOtherPlayerMP>) {
+        if (!isEnabled()) return
+        val entity = event.entity
+        val name = entity.name.lowercase()
+        if (name in playerNamesToMark) {
+            markedPlayers[name] = entity
+            entity.setColor()
+        }
+    }
+
+    // only gets called on command or on config change, so performance impact is minimal
+    @OptIn(AllEntitiesGetter::class)
     private fun findPlayers() {
-        for (entity in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
+        for (entity in EntityUtils.getPlayerEntities()) {
             if (entity in markedPlayers.values) continue
 
             val name = entity.name.lowercase()
@@ -102,7 +116,7 @@ object MarkedPlayerManager {
     fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
 
     private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MARKED_PLAYERS.isSelected()) &&
-        config.highlightInWorld
+        config.highlightInWorld.get()
 
     fun replaceInChat(string: String): String {
         if (!config.highlightInChat) return string
@@ -131,13 +145,7 @@ object MarkedPlayerManager {
         config.joinLeaveMessage.playersList.onToggle {
             personOfInterest = config.joinLeaveMessage.playersList.get().split(",").map { it.trim() }
         }
-    }
-
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-
-        findPlayers()
+        config.highlightInWorld.onToggle(::findPlayers)
     }
 
     @HandleEvent

@@ -73,6 +73,7 @@
   + Made it work if you abiphone Jake.
   + Blocked accidentally clicking the close puzzle button.
 + Added support for Moonflower, Sunflower, and Wild Rose in Basket of Seeds for Not Clickable Items. - Luna (https://github.com/hannibal002/SkyHanni/pull/4954)
++ Added chips to visitor drop rewards display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4960)
 
 #### Mining
 
@@ -107,6 +108,7 @@
   + Only enabled on sessions by default; uptime was not tracked before this and will be wrong on total mode.
 + Made Block Break Prticle Hider searchable by typing breaking. - Luna (https://github.com/hannibal002/SkyHanni/pull/4931)
 + Made warnings about missing tab list info less frequent and aggressive. - Luna (https://github.com/hannibal002/SkyHanni/pull/4933)
++ Improved performance of entity features. - Empa (https://github.com/hannibal002/SkyHanni/pull/4900)
 
 ### Fixes
 
@@ -152,6 +154,7 @@
 + Fixed Slayer spawn costs not being tracked during aura. - nopo (https://github.com/hannibal002/SkyHanni/pull/4905)
 + Fixed Broodmother chat messages sending twice or incorrectly. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4918)
 + Fixed Slayer Spawn Cost not Counting during Aura. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4919)
++ Fixed Fire Pillar Display disappearing sometimes wrongly. - Empa (https://github.com/hannibal002/SkyHanni/pull/4900)
 
 #### Farming
 
@@ -166,6 +169,7 @@
 + Fixed Skill error during crop fever. - nopo (https://github.com/hannibal002/SkyHanni/pull/4950)
 + Fixed vinyl error in the vacuum. - nopo (https://github.com/hannibal002/SkyHanni/pull/4949)
 + Made armor drop tracker work with the greenhouse update. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4953)
++ Fixed sowdust displaying incorrectly in chunked stats on custom scoreboard. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4963)
 
 #### Chocolate Factory
 
@@ -202,6 +206,7 @@
 + Fixed Hideonleaf finder navigating when typing. - nopo (https://github.com/hannibal002/SkyHanni/pull/4945)
 + Fixed some box rendering on modern. - nopo (https://github.com/hannibal002/SkyHanni/pull/4940)
 + Fixed Tablist not rendering over other elements when using toggle tab. - nopo (https://github.com/hannibal002/SkyHanni/pull/4941)
++ Fixed potential config wipe. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4961)
 
 ### Technical Details
 
@@ -224,6 +229,8 @@
   + They can still be edited via `/shconfig`.
 + Added the ability to change current mayor perks via repo. - nopo (https://github.com/hannibal002/SkyHanni/pull/4936)
 + Using `@OnlyLegacy` and `@OnlyModern` together on the same config option now throws a compile-time (and runtime) error. - Luna (https://github.com/hannibal002/SkyHanni/pull/4908)
++ Added the ability to remove something from the config. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4961)
++ Made config moves actually remove the old data. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4961)
 
 ### Removed Features
 

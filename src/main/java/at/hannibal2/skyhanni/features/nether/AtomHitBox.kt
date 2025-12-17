@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.getWornSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
@@ -38,8 +38,8 @@ object AtomHitBox {
     fun onTick() {
         if (!config.enabled) return
 
-        for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
-            val atom = AtomType.entries.firstOrNull { entity.wearingSkullTexture(it.skullTexture) } ?: continue
+        for (entity in EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(50.0)) {
+            val atom = entity.getWornSkullTexture()?.let(AtomType::fromTexture) ?: continue
             if (!atom.isSelected()) continue
             atomsList[entity] = atom
         }
@@ -75,6 +75,10 @@ object AtomHitBox {
         val skullTexture by lazy { SkullTextureHolder.getTexture(textureId) }
 
         override fun toString(): String = displayName
+
+        companion object {
+            fun fromTexture(texture: String) = entries.find { it.skullTexture == texture }
+        }
     }
 
     private fun AtomType.isSelected() = config.atomsEntries.contains(this)

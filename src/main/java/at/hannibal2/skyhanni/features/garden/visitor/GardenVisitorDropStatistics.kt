@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonPrimitive
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -328,6 +329,13 @@ object GardenVisitorDropStatistics {
             }
 
             ConfigManager.gson.toJsonTree(map, MutableMap::class.java)
+        }
+
+        event.transform(113, "${newPrefix}textFormat") { element ->
+            element.asJsonArray.apply {
+                add(JsonPrimitive("HYPERCHARGE_CHIP"))
+                add(JsonPrimitive("QUICKDRAW_CHIP"))
+            }
         }
     }
 
