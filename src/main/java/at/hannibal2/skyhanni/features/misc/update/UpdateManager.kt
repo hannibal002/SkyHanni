@@ -234,7 +234,8 @@ object UpdateManager {
         }
     }
 
-    private var discontinuedVersions: Map<String, DiscontinuedMinecraftVersion> = mapOf()
+    var discontinuedVersions: Map<String, DiscontinuedMinecraftVersion> = mapOf()
+        private set
     private var hasWarned = false
 
     @HandleEvent
@@ -250,7 +251,7 @@ object UpdateManager {
         if (hasWarned) return
 
         if (PlatformUtils.MC_VERSION in discontinuedVersions) {
-            val extraInfo = discontinuedVersions[PlatformUtils.MC_VERSION]?.extraInfo.orEmpty()
+            val extraInfo = discontinuedVersions[PlatformUtils.MC_VERSION]?.extraInfo ?: return
 
             val notification = SkyHanniNotification(
                 listOf(
