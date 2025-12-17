@@ -196,10 +196,20 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     }
 
     private var dropsJson: TreeGiftBonusDropsJson? = null
+    private var dropsJsonCategories: Array<Pair<DropCategory, List<NeuInternalName>>> = arrayOf()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
+        val dropsJson = dropsJson ?: return
+        dropsJsonCategories = arrayOf(
+            Pair(DropCategory.UNCOMMON_DROPS, dropsJson.uncommonDrops),
+            Pair(DropCategory.ENCHANTED_BOOKS, dropsJson.enchantedBooks),
+            Pair(DropCategory.BOOSTERS, dropsJson.boosters),
+            Pair(DropCategory.SHARDS, dropsJson.shards),
+            Pair(DropCategory.RUNES, dropsJson.runes),
+            Pair(DropCategory.MISC, dropsJson.miscDrops)
+        )
     }
 
     private fun SkyHanniChatEvent.tryReadLoot() {
@@ -276,18 +286,11 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         loot.addOrPut(itemInternalName, 1)
 
         val bonusDropTypeList = config.compactGiftBonusDropsList
-        if (dropsJson.uncommonDrops.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.UNCOMMON_DROPS))
-            rareDrops.add(item)
-        if (dropsJson.enchantedBooks.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.ENCHANTED_BOOKS))
-            rareDrops.add(item)
-        if (dropsJson.boosters.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.BOOSTERS))
-            rareDrops.add(item)
-        if (dropsJson.shards.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.SHARDS))
-            rareDrops.add(item)
-        if (dropsJson.runes.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.RUNES))
-            rareDrops.add(item)
-        if (dropsJson.miscDrops.contains(itemInternalName) && bonusDropTypeList.contains(DropCategory.MISC))
-            rareDrops.add(item)
+        for ((category, itemList) in dropsJsonCategories)
+        {
+            if (itemList.contains(itemInternalName) && bonusDropTypeList.contains(category))
+                rareDrops.add(item)
+        }
     }
 
     private fun SkyHanniChatEvent.tryBlock() {
