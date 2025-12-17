@@ -81,8 +81,8 @@ data class CustomTodo(
         const val MS_IN_A_DAY = (24 * 60 * 60 * 1000)
 
         fun fromTemplate(data: String): CustomTodo? {
-            val maybeDecoded = TemplateUtil.maybeDecodeTemplate(TEMPLATE_PREFIX, data, CustomTodo::class.java) ?:
-                TemplateUtil.maybeDecodeTemplate(NEU_TEMPLATE_PREFIX, data, CustomTodo::class.java)
+            val maybeDecoded = TemplateUtil.maybeDecodeTemplate(TEMPLATE_PREFIX, data, CustomTodo::class.java)
+                ?: TemplateUtil.maybeDecodeTemplate(NEU_TEMPLATE_PREFIX, data, CustomTodo::class.java)
             if (maybeDecoded == null) {
                 ChatUtils.chat("§cInvalid Todo")
             }

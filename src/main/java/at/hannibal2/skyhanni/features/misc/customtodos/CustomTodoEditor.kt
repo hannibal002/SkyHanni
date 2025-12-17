@@ -13,6 +13,7 @@ import io.github.notenoughupdates.moulconfig.xml.Bind
 import kotlin.time.Duration.Companion.seconds
 
 // Taken and modified from Not Enough Updates https://github.com/NotEnoughUpdates/NotEnoughUpdates
+@Suppress("TooManyFunctions")
 class CustomTodoEditor(
     private val from: CustomTodo,
     private val todos: ObservableList<CustomTodoEditor>,
