@@ -48,7 +48,6 @@ object ToolTooltipTweaks {
         val internalName = itemStack.getInternalName()
         val crop = itemStack.getCropType()
         val toolFortune = FarmingFortuneDisplay.getToolFortune(internalName)
-        val counterFortune = FarmingFortuneDisplay.getCounterFortune(itemStack)
         val collectionFortune = FarmingFortuneDisplay.getCollectionFortune(itemStack)
         val turboCropFortune = FarmingFortuneDisplay.getTurboCropFortune(itemStack, crop)
         val dedicationFortune = FarmingFortuneDisplay.getDedicationFortune(itemStack, crop)
@@ -64,7 +63,7 @@ object ToolTooltipTweaks {
 
         val ffdFortune = itemStack.getFarmingForDummiesCount() ?: 0
         val hiddenFortune =
-            (toolFortune + counterFortune + collectionFortune + turboCropFortune + dedicationFortune + abilityFortune)
+            (toolFortune + collectionFortune + turboCropFortune + dedicationFortune + abilityFortune)
         val iterator = event.toolTip.listIterator()
 
         var removingFarmhandDescription = false
@@ -116,7 +115,6 @@ object ToolTooltipTweaks {
                     iterator.addStat("  §7Harvesting: §a+", harvestingFortune)
                     iterator.addStat("  §7Cultivating: §a+", cultivatingFortune)
                     iterator.addStat("  §7Farming for Dummies: §2+", ffdFortune)
-                    iterator.addStat("  §7Counter: §6+", counterFortune)
                     iterator.addStat("  §7Collection: §6+", collectionFortune)
                     iterator.addStat("  §7Dedication: §6+", dedicationFortune)
                     iterator.addStat("  §7Turbo-Crop: §6+", turboCropFortune)

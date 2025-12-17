@@ -90,7 +90,7 @@ object HideNotClickableItems {
      */
     private val seedsPattern by patternGroup.pattern(
         "inventory.hidenotclickable.seeds",
-        "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3",
+        "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3|DOUBLE_PLANT|MOONFLOWER|WILD_ROSE",
     )
 
     private val netherWart = "NETHER_STALK".toInternalName()

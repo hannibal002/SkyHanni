@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -25,6 +26,8 @@ object ProfitPerDragon {
     private val ENCHANTED_ENDER_PEARL = "ENCHANTED_ENDER_PEARL".toInternalName()
     private val ENDER_PEARL = "ENDER_PEARL".toInternalName()
 
+    // This can probably be optimized to not use getEntities, but it's not a big issue right now
+    @OptIn(AllEntitiesGetter::class)
     private fun scanForLoot() {
         val entities = EntityUtils.getEntities<EntityArmorStand>()
 

@@ -33,9 +33,9 @@ object SkillExperience {
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
 
         actionBarPattern.matchMatcher(event.actionBar) {
-            val skill = group("skill").lowercase()
-            val overflow = group("overflow").formatLong()
-            val neededForNextLevel = group("needed").formatLong()
+            val skill = group("skill").removeColor().lowercase()
+            val overflow = group("overflow").removeColor().formatLong()
+            val neededForNextLevel = group("needed").removeColor().formatLong()
             val nextLevel = getLevelForExpExactly(neededForNextLevel)
             val baseExp = getExpForLevel(nextLevel - 1)
             val totalExp = baseExp + overflow

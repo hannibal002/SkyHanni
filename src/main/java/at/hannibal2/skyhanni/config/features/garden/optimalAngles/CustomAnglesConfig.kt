@@ -121,7 +121,7 @@ class CustomAnglesConfig {
     @Expose
     @ConfigOption(name = "Sunflower & Moonflower Yaw", desc = "Set Yaw for sunflower & moonflower farming.")
     @ConfigEditorSlider(minValue = -180f, maxValue = 180f, minStep = 0.1f)
-    val sunMoonFlowerYaw: Property<Float> = Property.of(90f)
+    val sunMoonFlowerYaw: Property<Float> = Property.of(45f)
 
     @Expose
     @ConfigOption(name = "Sunflower & Moonflower  Pitch", desc = "Set Pitch for sunflower & moonflower farming.")
@@ -132,7 +132,7 @@ class CustomAnglesConfig {
     @Expose
     @ConfigOption(name = "Wild Rose Yaw", desc = "Set Yaw for wild rose farming.")
     @ConfigEditorSlider(minValue = -180f, maxValue = 180f, minStep = 0.1f)
-    val wildRoseYaw: Property<Float> = Property.of(90f)
+    val wildRoseYaw: Property<Float> = Property.of(45f)
 
     @Expose
     @ConfigOption(name = "Wild Rose Pitch", desc = "Set Pitch for wild rose farming.")

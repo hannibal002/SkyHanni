@@ -90,10 +90,10 @@ object GardenNextJacobContest {
         contest.crops.contains(cropName) && config.otherGuis
     } ?: false
 
-    fun resetContestData() {
+    fun resetContestData(force: Boolean = false) {
         knownContests = listOf()
         fetchedFromElite = false
-        lastFetchAttempted = SimpleTimeMark.farPast()
+        if (force) lastFetchAttempted = SimpleTimeMark.farPast()
         fetchContestsIfAble()
     }
 

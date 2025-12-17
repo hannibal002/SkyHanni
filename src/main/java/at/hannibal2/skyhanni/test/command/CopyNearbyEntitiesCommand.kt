@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
@@ -42,6 +43,8 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object CopyNearbyEntitiesCommand {
 
+    // Only runs on the command, so performance impact is minimal
+    @OptIn(AllEntitiesGetter::class)
     private fun command(args: Array<String>) {
         var searchRadius = 10
         if (args.size == 1) {

@@ -19,4 +19,8 @@ enum class TrevorMob(val mobName: String, val renderDistance: Double) {
     //#endif
 
     val entityName get() = I18n.format(i18n)
+
+    companion object {
+        fun findByName(name: String) = entries.find { it.mobName.contains(name) || it.entityName.contains(name) }
+    }
 }

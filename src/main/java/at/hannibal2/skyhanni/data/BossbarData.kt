@@ -40,7 +40,7 @@ object BossbarData {
         //$$ var multipleBossBars = false
         //$$ for (bossBar in MinecraftClient.getInstance().inGameHud.bossBarHud.bossBars.values) {
         //$$     if (multipleBossBars) {
-        //$$         ErrorManager.skyHanniError("Multiple Bossbars")
+        //$$         return
         //$$     }
         //$$     multipleBossBars = true
         //$$     val bossbarLine = bossBar.name.unformattedTextCompat()

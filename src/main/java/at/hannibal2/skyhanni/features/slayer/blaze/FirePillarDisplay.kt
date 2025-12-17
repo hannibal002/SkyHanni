@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
@@ -26,13 +27,19 @@ object FirePillarDisplay {
 
     private var display = ""
 
-    @HandleEvent
-    fun onTick() {
-        if (!isEnabled()) return
+    private var entityId: Int = 0
 
-        val entityNames = EntityUtils.getEntities<EntityArmorStand>().map { it.name }
-        val seconds = entityNamePattern.firstMatcher(entityNames) { group("seconds") }
-        display = seconds?.let { "§cFire Pillar: §b${it}s" }.orEmpty()
+    @HandleEvent
+    fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<EntityArmorStand>) {
+        if (!isEnabled()) return
+        val seconds = entityNamePattern.matchGroup(event.newName ?: return, "seconds") ?: return
+        entityId = event.entity.entityId
+        display = "§cFire Pillar: §b${seconds}s"
+    }
+
+    @HandleEvent
+    fun onEntityRemoved(event: EntityRemovedEvent<EntityArmorStand>) {
+        if (event.entity.entityId == entityId) display = ""
     }
 
     @HandleEvent

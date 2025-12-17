@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonMobManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -33,6 +34,8 @@ object HideFarEntities {
     private var ignored = emptySet<Int>()
     private var neverHide = emptySet<Int>()
 
+    // TODO: use entity events
+    @OptIn(AllEntitiesGetter::class)
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (GlobalRender.renderDisabled) return
@@ -66,6 +69,8 @@ object HideFarEntities {
      * dungeon mini bosses: sa, frozen adventurer
      * 1b hp mob in dungeon
      */
+    // TODO: use entity events
+    @OptIn(AllEntitiesGetter::class)
     private fun updateNeverHide() {
         val list = mutableSetOf<Entity>()
         val allEntities = EntityUtils.getAllEntities()

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.projectile.EntitySmallFireball
 import net.minecraft.util.EnumParticleTypes
 
@@ -40,13 +39,7 @@ object ParticleHider {
         if (config.hideFireballParticles &&
             (type == EnumParticleTypes.SMOKE_NORMAL || type == EnumParticleTypes.SMOKE_LARGE)
         ) {
-            for (entity in EntityUtils.getEntities<EntitySmallFireball>()) {
-                val distance = entity.getLorenzVec().distance(event.location)
-                if (distance < 5) {
-                    event.cancel()
-                    return
-                }
-            }
+            if (EntityUtils.getEntitiesNearby<EntitySmallFireball>(event.location, 5.0).isNotEmpty()) event.cancel()
         }
     }
 

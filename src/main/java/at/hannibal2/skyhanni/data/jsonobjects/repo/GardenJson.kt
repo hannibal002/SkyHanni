@@ -30,6 +30,7 @@ data class GardenVisitor(
     @Expose var skinOrType: String?,
     @Expose val mode: String,
     @Expose @SerializedName("need_items") val needItems: List<String>,
+    @Expose @SerializedName("unknown_rewards") val unknownRewards: Boolean?,
 ) {
     val rarity: LorenzRarity
         get() = _newRarity ?: _rarity

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -27,7 +26,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object HoeLevelDisplay {
 
-    val pos = Position(100, 100)
     private var hoeLevels: List<Int>? = null
     private var hoeOverflow = 200000
     private var display: List<Renderable>? = null
@@ -92,7 +90,11 @@ object HoeLevelDisplay {
             val overflowLevel = addOverflowHoeLevel(heldItem.getItemUuid())
             if (isEnabled() && config.overflow && overflowLevel != null) {
                 val currentLevel = heldItem.getHoeLevel() ?: return
+                //#if MC < 1.21
                 event.chatComponent = event.chatComponent.appendString(" §8(§3Level ${currentLevel + overflowLevel}§8)")
+                //#else
+                //$$ event.chatComponent = event.chatComponent.copy().append(" §8(§3Level ${currentLevel + overflowLevel}§8)")
+                //#endif
             }
         }
     }
@@ -120,7 +122,7 @@ object HoeLevelDisplay {
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val renderable = display ?: return
-        pos.renderRenderables(renderable, posLabel = "amazing")
+        config.position.renderRenderables(renderable, posLabel = "Hoe Level Display")
     }
 
     @HandleEvent

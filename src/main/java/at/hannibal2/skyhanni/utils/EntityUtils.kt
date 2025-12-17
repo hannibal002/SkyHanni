@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.keepOnlyIn
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
@@ -39,6 +38,12 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.entity.SharedMonsterAttributes
 
 //#endif
+
+@RequiresOptIn(
+    "getAllEntities or getEntities should only be used when necessary," +
+        "as they can be expensive, since they iterate through all entities in world."
+)
+annotation class AllEntitiesGetter
 
 @SkyHanniModule
 object EntityUtils {
@@ -148,11 +153,12 @@ object EntityUtils {
     inline fun <reified T : Entity> getEntitiesNearby(
         location: LorenzVec,
         radius: Double,
-        noinline predicate: (T) -> Boolean = ALWAYS
+        noinline predicate: (T) -> Boolean = ALWAYS,
     ): List<T> {
         return getEntitiesInBox<T>(location, radius) { it.distanceTo(location) < radius && predicate(it) }
     }
 
+    @AllEntitiesGetter
     inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: LorenzVec, radius: Double): Sequence<T> =
         getEntities<T>().filter { it.distanceToIgnoreY(location) < radius }
 
@@ -164,7 +170,8 @@ object EntityUtils {
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
-    fun EntityArmorStand.wearingSkullTexture(skin: String) = getStandHelmet()?.getSkullTexture() == skin
+    fun EntityArmorStand.getWornSkullTexture(): String? = getStandHelmet()?.getSkullTexture()
+    fun EntityArmorStand.wearingSkullTexture(skin: String) = getWornSkullTexture() == skin
     fun EntityArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
 
     fun EntityPlayer.isNpc() = !isRealPlayer()
@@ -186,6 +193,7 @@ object EntityUtils {
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
+    @AllEntitiesGetter
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
     inline fun <reified E : Entity> getEntitiesInBox(pos: LorenzVec, radius: Double, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
@@ -210,6 +218,7 @@ object EntityUtils {
     //$$ entitiesForRendering()
     //#endif
 
+    @AllEntitiesGetter
     fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.getAllEntities()?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it
         // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
@@ -231,11 +240,6 @@ object EntityUtils {
     //$$     return blockEntityTickers.mapNotNull { invoker -> invoker.pos?.let { world.getBlockEntity(it) } }
     //$$ }
     //#endif
-
-    @Deprecated("Remove with EntityRemovedEvent")
-    inline fun <reified T : Entity> removeInvalidEntities(list: MutableList<T>) {
-        list.keepOnlyIn(getEntities<T>())
-    }
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5, ignoreFrustum: Boolean = false): Boolean {
         if (isDead) return false

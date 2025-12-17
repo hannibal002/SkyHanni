@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.rgb
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
@@ -81,11 +82,13 @@ object FlareDisplay {
         config.position.renderRenderables(display, posLabel = "Flare Timer")
     }
 
+    // TODO: replace getEntities with entity events
+    @OptIn(AllEntitiesGetter::class)
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!enabled) return
         flares.removeIf { !it.entity.isEntityAlive }
-        for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
+        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (!entity.canBeSeen()) continue
             if (entity.ticksExisted.ticks > MAX_FLARE_TIME) continue
             if (isAlreadyKnownFlare(entity)) continue

@@ -69,11 +69,6 @@ class GardenConfig {
     val eliteFarmingWeights: EliteFarmingWeightConfig = EliteFarmingWeightConfig()
 
     @Expose
-    @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")
-    @Accordion
-    val dicerRngDropTracker: DicerRngDropTrackerConfig = DicerRngDropTrackerConfig()
-
-    @Expose
     @ConfigOption(name = "Money per Hour", desc = "")
     @Accordion
     val moneyPerHours: MoneyPerHourConfig = MoneyPerHourConfig()
@@ -164,12 +159,6 @@ class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var plotPrice: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var fungiCutterWarn: Boolean = true
 
     @Expose
     @ConfigOption(

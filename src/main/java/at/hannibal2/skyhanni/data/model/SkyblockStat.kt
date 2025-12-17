@@ -124,7 +124,7 @@ enum class SkyblockStat(
     MELON_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Melon Slice Fortune $VALUE_PATTERN"),
     MUSHROOM_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Mushroom Fortune $VALUE_PATTERN"),
     CACTUS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cactus Fortune $VALUE_PATTERN"),
-    NETHER_WART_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Nether Wart Fortune $VALUE_PATTERN"),
+    NETHER_STALK_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Nether Wart Fortune $VALUE_PATTERN"),
     COCOA_BEANS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cocoa Beans Fortune $VALUE_PATTERN"),
     SUGAR_CANE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sugar Cane Fortune $VALUE_PATTERN"),
     SUNFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sunflower Fortune $VALUE_PATTERN"),
@@ -277,6 +277,8 @@ enum class SkyblockStat(
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(69, "#profile.stats.TRUE_DEFENCE", "#profile.stats.TRUE_DEFENSE")
+            event.move(112, "#profile.stats.NETHER_WART_FORTUNE", "#profile.stats.NETHER_STALK_FORTUNE")
+            event.remove(113, "#profile.stats.null")
         }
     }
 }

@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -48,7 +47,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
-import kotlin.math.log10
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -405,14 +403,6 @@ object FarmingFortuneDisplay {
     fun getCollectionFortune(tool: ItemStack?): Double {
         val string = tool?.getLore()?.nextAfter("§6Collection Analysis", 3) ?: return 0.0
         return collectionPattern.matchMatcher(string) { group("ff").toDoubleOrNull() } ?: 0.0
-    }
-
-    fun getCounterFortune(tool: ItemStack?): Double {
-        if (GardenApi.greenhouseReleased) return 0.0
-        // todo
-        val counter = tool?.getOldHoeCounter() ?: return 0.0
-        val digits = floor(log10(counter.toDouble()))
-        return (16 * digits - 48).coerceAtLeast(0.0)
     }
 
     fun getDedicationFortune(tool: ItemStack?, cropType: CropType?): Double {

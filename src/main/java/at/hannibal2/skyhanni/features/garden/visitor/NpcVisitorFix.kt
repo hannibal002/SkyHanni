@@ -97,12 +97,8 @@ object NpcVisitorFix {
     }
 
     private fun findNametags(visitorName: String): MutableList<EntityArmorStand> {
-        val foundVisitorNameTags = mutableListOf<EntityArmorStand>()
-        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
-            if (entity.name.removeColor() == visitorName) {
-                foundVisitorNameTags.add(entity)
-            }
-        }
-        return foundVisitorNameTags
+        return EntityUtils.getEntitiesInBoundingBox<EntityArmorStand>(GardenApi.barnArea) {
+            it.name.removeColor() == visitorName
+        }.toMutableList()
     }
 }

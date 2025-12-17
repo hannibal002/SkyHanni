@@ -240,16 +240,6 @@ object NeuItems {
                     internalItemId = "CACTUS".toInternalName()
                 }
 
-                // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE".toInternalName() && internalItemId == "WHEAT".toInternalName()) {
-                    continue
-                }
-
-                // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT".toInternalName() && internalItemId == "GOLDEN_CARROT".toInternalName()) {
-                    continue
-                }
-
                 // ignore rabbit hide in leather
                 if (internalName == "LEATHER".toInternalName() && internalItemId == "RABBIT_HIDE".toInternalName()) {
                     continue
