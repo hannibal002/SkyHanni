@@ -19,7 +19,7 @@ class GuiOptionEditorDeprecatedVersion(option: ProcessedOption) : GuiOptionEdito
         context.drawColoredRect(x + width.toFloat() - 2, y.toFloat(), (x + width).toFloat(), y + 55f, Color.RED.rgb)
 
         for ((index, s) in versionData.withIndex()) {
-            context.drawStringScaledMaxWidth(s.asStructuredText(), fr, x + 10, y + 10 + 11 * index, false, width-20, -1)
+            context.drawStringScaledMaxWidth(s.asStructuredText(), fr, x + 10, y + 10 + 11 * index, false, width - 20, -1)
         }
 
     }
