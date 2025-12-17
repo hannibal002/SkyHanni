@@ -61,13 +61,6 @@ class FarmingFortuneConfig {
     @Accordion
     val sound: PestBuffWarningSoundConfig = PestBuffWarningSoundConfig()
 
-    @ConfigOption(
-        name = "Farming Fortune Guide",
-        desc = "Open a guide that breaks down your Farming Fortune.\n§eCommand: /ff"
-    )
-    @ConfigEditorButton(buttonText = "Open")
-    val open: Runnable = Runnable(FFGuideGui::onCommand)
-
     @Expose
     @ConfigLink(owner = FarmingFortuneConfig::class, field = "display")
     val position: Position = Position(5, -180)
