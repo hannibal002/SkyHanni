@@ -239,13 +239,6 @@ class DebugConfig {
     var addonsDebug: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Aura Propaganda", desc = "Make sure to vote for hannibal2 :)")
-    @ConfigEditorBoolean
-    @OnlyModern
-    @OnlyLegacy
-    var auraPropaganda: Boolean = true
-
-    @Expose
     @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
     val addonsDebugPosition: Position = Position(300, 300)
 
