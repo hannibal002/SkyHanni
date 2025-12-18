@@ -176,6 +176,8 @@
 + Fixed vinyl error in the vacuum. - nopo (https://github.com/hannibal002/SkyHanni/pull/4949)
 + Made armor drop tracker work with the greenhouse update. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4953)
 + Fixed sowdust displaying incorrectly in chunked stats on custom scoreboard. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4963)
++ Fixed Jerry easter egg triggering on St. Jerry. - nopo (https://github.com/hannibal002/SkyHanni/pull/4975)
++ Fixed Stereo Harmony Crop Display not showing the new crops. - nopo (https://github.com/hannibal002/SkyHanni/pull/4976)
 
 #### Chocolate Factory
 
@@ -213,6 +215,7 @@
 + Fixed some box rendering on modern. - nopo (https://github.com/hannibal002/SkyHanni/pull/4940)
 + Fixed Tablist not rendering over other elements when using toggle tab. - nopo (https://github.com/hannibal002/SkyHanni/pull/4941)
 + Fixed potential config wipe. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4961)
++ Fixed Performance issues on the garden due to fire pit warning. - nopo (https://github.com/hannibal002/SkyHanni/pull/4974)
 
 ### Technical Details
 
