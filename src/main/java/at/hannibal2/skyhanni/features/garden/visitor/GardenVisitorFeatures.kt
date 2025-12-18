@@ -550,7 +550,7 @@ object GardenVisitorFeatures {
             ChatUtils.chat("$displayName §eis visiting your garden!")
         }
 
-        if (name.removeColor().contains("Jerry")) {
+        if (name.removeColor() == "Jerry") {
             logger.log("Jerry!")
             ItemBlink.setBlink(LEGENDARY_JERRY.getItemStackOrNull(), 5_000)
         }
