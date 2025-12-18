@@ -58,7 +58,7 @@ object CheckInReminder {
             addType = TitleManager.TitleAddType.FORCE_FIRST,
         )
         ChatUtils.clickToActionOrDisable(
-            "Talk to the Surveillance Goon to get rid of your §c10% stat debuff§e!",
+            "Talk to a Surveillance Goon to get rid of your §c10% stat debuff§e!",
             config::checkInReminder,
             actionName = "warp to the Hub",
             action = { HypixelCommands.warp("hub") },
