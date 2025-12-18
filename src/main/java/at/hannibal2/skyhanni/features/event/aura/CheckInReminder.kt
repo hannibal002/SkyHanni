@@ -23,6 +23,7 @@ object CheckInReminder {
 
     private val config get() = SkyHanniMod.feature.event.aura
 
+    @Suppress("MaxLineLength")
     private val checkInPattern by RepoPattern.list(
         "misc.aura.checkin",
         "§e\\[NPC] Goon§f: §rAura thanks you for your cooperation\\. Come back in 30 minutes if you do not want to face the §oconsequences\\.",

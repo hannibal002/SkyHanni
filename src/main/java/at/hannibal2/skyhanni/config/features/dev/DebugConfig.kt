@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.OnlyLegacy
-import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import com.google.gson.annotations.Expose
