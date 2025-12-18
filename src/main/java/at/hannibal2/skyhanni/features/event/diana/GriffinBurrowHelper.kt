@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addDoublePlant
 import at.hannibal2.skyhanni.utils.compat.addLeaves
@@ -48,6 +49,7 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -79,8 +81,8 @@ object GriffinBurrowHelper {
 
     var targetLocation: LorenzVec? = null
 
-    private val allGuesses = mutableListOf<GuessEntry>() // TODO timelimit to 30minutes
-    private val recentBlocksClicked = mutableListOf<LorenzVec>() //TODO
+    private val allGuesses = TimeLimitedSet<GuessEntry>(30.minutes) // hypixel itself removes burrows after 30m
+    private val recentBlocksClicked = mutableListOf<LorenzVec>()
 
     private var shouldFocusOnRareMob = false
 
@@ -91,7 +93,21 @@ object GriffinBurrowHelper {
         var currentIndex: Int = 0
     ) {
         fun getCurrent(): LorenzVec = guesses[currentIndex]
-        fun contains(vec: LorenzVec): Boolean = guesses.contains(vec)
+        fun contains(vec: LorenzVec): Boolean {
+            // exact match
+            if (guesses.contains(vec)) return true
+
+            // check if within range
+            if (range > 0) {
+                val withinRange = guesses.any { guess ->
+                    val distanceSq = guess.distanceSq(vec)
+                    distanceSq <= range * range
+                }
+                if (withinRange) return true
+            }
+
+            return false
+        }
         fun moveToNext(): Boolean {
             val nextIndex = currentIndex + 1
             if (nextIndex in guesses.indices) {
@@ -107,10 +123,27 @@ object GriffinBurrowHelper {
     }
 
     fun removeGuess(location: LorenzVec) {
-        println("allGuesses $allGuesses")
         val toRemove = allGuesses.filter { it.contains(location) }
-        println("removing $toRemove")
-        allGuesses.removeAll(toRemove)
+        println("allGuesses: $allGuesses")
+        println("toRemove: $toRemove")
+        var removed = 0
+        for (item in toRemove) {
+            println("Item hashCode: ${item.hashCode()}")
+            for (key in allGuesses.cache.keys) {
+                println("  Key: $key (hash: ${key.hashCode()})")
+                println("  Equal to item? ${key == item}")
+                println("  Same object? ${key === item}")
+            }
+            println("Attempting to remove: $item")
+            println("Cache contains item: ${allGuesses.cache.containsKey(item)}")
+            println("Cache: ${allGuesses.cache.keys}")
+            val result = allGuesses.remove(item)
+            println("remove() returned: $result")
+            if (result) removed++
+        }
+        println("removed? $removed")
+        println("cache after: ${allGuesses.cache.keys}")
+        println("allGuessesAfter: $allGuesses")
     }
 
     fun getKnownBurrows(): List<GuessEntry> {
@@ -241,7 +274,7 @@ object GriffinBurrowHelper {
     @HandleEvent
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
-        println("dug burrow at: $location")
+        println("burrow dug at: $location")
         removeGuess(location)
         update()
     }

@@ -50,11 +50,11 @@ object PreciseGuessBurrow {
         bezierFitter.addPoint(currLoc)
 
         val guessPosition = guessBurrowLocation() ?: return
+        if (bezierFitter.count() <= 5) return
 
         BurrowGuessEvent(
             GriffinBurrowHelper.GuessEntry(
                 listOf(guessPosition.down(0.5).roundToBlock()),
-                range = if (bezierFitter.count() > 5) 0 else 50,
             )
         ).post()
     }
