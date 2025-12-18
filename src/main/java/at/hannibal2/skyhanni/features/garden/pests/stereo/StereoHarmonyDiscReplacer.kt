@@ -26,7 +26,7 @@ object StereoHarmonyDiscReplacer {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.replaceMenuIcons) return
         if (!PestApi.stereoInventory.isInside()) return
-        if (event.slot !in 11..15 && event.slot !in 20..24) return
+        if (event.slot !in 11..15 && event.slot !in 20..24 && event.slot !in 29..31) return
 
         val item = event.originalItem
         val internalName = item?.getInternalNameOrNull() ?: return
