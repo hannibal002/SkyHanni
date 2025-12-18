@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addDoublePlant
 import at.hannibal2.skyhanni.utils.compat.addLeaves
@@ -81,7 +80,8 @@ object GriffinBurrowHelper {
 
     var targetLocation: LorenzVec? = null
 
-    private val allGuesses = TimeLimitedSet<GuessEntry>(30.minutes) // hypixel itself removes burrows after 30m
+    private val allGuessesTimers = mutableMapOf<GuessEntry, SimpleTimeMark>() // hypixel itself removes burrows after 30m
+    private val allGuesses = mutableListOf<GuessEntry>()
     private val recentBlocksClicked = mutableListOf<LorenzVec>()
 
     private var shouldFocusOnRareMob = false
@@ -124,26 +124,15 @@ object GriffinBurrowHelper {
 
     fun removeGuess(location: LorenzVec) {
         val toRemove = allGuesses.filter { it.contains(location) }
-        println("allGuesses: $allGuesses")
-        println("toRemove: $toRemove")
-        var removed = 0
         for (item in toRemove) {
-            println("Item hashCode: ${item.hashCode()}")
-            for (key in allGuesses.cache.keys) {
-                println("  Key: $key (hash: ${key.hashCode()})")
-                println("  Equal to item? ${key == item}")
-                println("  Same object? ${key === item}")
-            }
-            println("Attempting to remove: $item")
-            println("Cache contains item: ${allGuesses.cache.containsKey(item)}")
-            println("Cache: ${allGuesses.cache.keys}")
-            val result = allGuesses.remove(item)
-            println("remove() returned: $result")
-            if (result) removed++
+            allGuesses.remove(item)
+            allGuessesTimers.remove(item)
         }
-        println("removed? $removed")
-        println("cache after: ${allGuesses.cache.keys}")
-        println("allGuessesAfter: $allGuesses")
+    }
+
+    fun addGuess(guess: GuessEntry) {
+        allGuesses.add(guess)
+        allGuessesTimers[guess] = SimpleTimeMark.now()
     }
 
     fun getKnownBurrows(): List<GuessEntry> {
@@ -194,24 +183,31 @@ object GriffinBurrowHelper {
 
     fun checkMoveGuess() { //TODO or delete burrow (already does kinda)
         val burrows = getKnownBurrows().flatMap { it.guesses }
-        val toDelete = mutableListOf<GuessEntry>()
+        val toDelete = mutableSetOf<GuessEntry>()
         for (guessEntry in allGuesses) {
+
+            allGuessesTimers[guessEntry]?.passedSince()?.let {
+                if (it > 30.minutes) {
+                    toDelete.add(guessEntry)
+                    continue
+                }
+            }
+
             var shouldMove = false
             if (!isBlockValid(guessEntry.getCurrent())) shouldMove = true
 
             val shouldBeLoaded = InventoryUtils.getItemInHandAtTime(SimpleTimeMark.now() - 0.5.seconds)?.isDianaSpade //TODO better
             if (shouldBeLoaded == true &&
-                !burrows.contains(guessEntry.getCurrent()) && // burrow is not found //TODO how is this passing
+                !burrows.contains(guessEntry.getCurrent()) && // burrow is not found
                 guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.position.toLorenzVec()) < 900 // within 30 blocks
-            ) {
-                shouldMove = true
-            }
+            ) { shouldMove = true }
 
             if (shouldMove) {
                 if (!guessEntry.moveToNext()) toDelete.add(guessEntry)
             }
         }
         allGuesses.removeAll(toDelete)
+        allGuessesTimers.keys.removeAll(toDelete)
     }
 
     // TODO add option to only focus on last guess - highly requersted method that is less optimal for money per hour. users choice
@@ -249,7 +245,7 @@ object GriffinBurrowHelper {
             if (guessEntry.contains(newLocation)) return
         }
 
-        allGuesses.add(event.guess)
+        addGuess(event.guess)
 
         update()
     }
@@ -260,7 +256,7 @@ object GriffinBurrowHelper {
         val burrowLocation = event.burrowLocation
 
         val currentEntry = allGuesses.firstOrNull { it.contains(burrowLocation) }
-        if (currentEntry == null) allGuesses.add(GuessEntry(listOf(burrowLocation), burrowType = event.type))
+        if (currentEntry == null) addGuess(GuessEntry(listOf(burrowLocation), burrowType = event.type))
         else {
             val correctIndex = currentEntry.guesses.indices // safe because of the .contains and null checks above
                 .first { index -> currentEntry.guesses[index] == burrowLocation }
@@ -334,6 +330,7 @@ object GriffinBurrowHelper {
 
     private fun resetAllData() {
         allGuesses.clear()
+        allGuessesTimers.clear()
         recentBlocksClicked.clear()
         targetLocation = null
         GriffinBurrowParticleFinder.reset()
