@@ -15,11 +15,11 @@ object RepoPatternDumpTest: FabricClientGameTest {
 
     @GameTest
     override fun runTest(context: ClientGameTestContext) {
+        val dumpDirective = System.getenv("SKYHANNI_DUMP_REGEXES")
+        if (dumpDirective.isNullOrBlank()) return
         context.waitFor { mc ->
             mc.currentScreen is TitleScreen
         }
-        val dumpDirective = System.getenv("SKYHANNI_DUMP_REGEXES")
-        if (dumpDirective.isNullOrBlank()) return
         val (sourceLabel, path) = dumpDirective.split(":", limit = 2)
         RepoPatternManager.dump(sourceLabel, File(path))
         logger.info("Exiting after dumping RepoPattern regex patterns to $path")
