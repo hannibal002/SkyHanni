@@ -390,7 +390,7 @@ object InstanceChestProfit {
             else "§a"
 
             add("")
-            add("$color§lProfit $color ${total.formatCoin()}")
+            add("$color§lProfit $color${total.formatCoin()}")
         }
         chestDisplay = Renderable.vertical(list.map { Renderable.text(it) }, spacing = 1)
     }
