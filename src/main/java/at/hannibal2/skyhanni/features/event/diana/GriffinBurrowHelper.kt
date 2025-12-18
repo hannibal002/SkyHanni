@@ -272,6 +272,17 @@ object GriffinBurrowHelper {
         val location = event.burrowLocation
         println("burrow dug at: $location")
         removeGuess(location)
+
+        // finished chain
+        if (event.current == event.max && config.warnOnChainComp) {
+            // finished chain
+            if (config.warnOnChainComp) {
+                val playerLoc = MinecraftCompat.localPlayer.position.toLorenzVec()
+                val anyClose = allGuesses.filter { it.getCurrent().distanceSq(playerLoc) < 8100 }
+                if (anyClose.isEmpty()) TitleManager.sendTitle("§eUse Spade")
+            }
+        }
+
         update()
     }
 
@@ -321,7 +332,7 @@ object GriffinBurrowHelper {
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
 
-        if (config.warnIfInaccurateArrowGuess) {
+        if (config.warnOnFail || config.warnOnChainComp) {
             TitleManager.conditionallyStopTitle { currentTitle ->
                 currentTitle == "§eUse Spade"
             }

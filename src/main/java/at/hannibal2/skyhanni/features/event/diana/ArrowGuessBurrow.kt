@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -134,7 +135,7 @@ object ArrowGuessBurrow {
         points.clear()
         val guess = findClosestValidBlockToRayNew(arrow, range) ?: run {
             // TODO log null count
-            if (config.warnIfInaccurateArrowGuess) {
+            if (config.warnOnFail) {
                 TitleManager.sendTitle("§eUse Spade", duration = 3.seconds)
             }
             return
@@ -148,6 +149,11 @@ object ArrowGuessBurrow {
             LorenzVec(255, 0, 0) -> IntRange(281, 600) // black
             else -> null
         }
+    }
+
+    @HandleEvent
+    fun onBurrowDetect(event: BurrowDetectEvent) {
+        GriffinBurrowHelper.removeGuess(event.burrowLocation)
     }
 
     @HandleEvent
@@ -190,26 +196,16 @@ object ArrowGuessBurrow {
             // take the ratio to account for errors
             val scaledDistance = (distanceToRay * 500000 / distanceFromOrigin)
 
-            candidates[candidateBlock] = Pair(scaledDistance.roundTo(5), distanceFromOrigin)
+            candidates[candidateBlock] = Pair(scaledDistance.roundTo(2), distanceFromOrigin)
         }
 
         if (candidates.isEmpty()) return null
         val minValue = candidates.values.minOf { it.first }
         val possibilities = candidates.filterValues { it.first == minValue }
-        var withinRange = possibilities.filterValues { it.second.toInt() in range }.map { it.key }
-        if (withinRange.isEmpty()) {
-            ChatUtils.chat(
-                "no guesses within range found for range $range" +
-                    " please report this to SidOfThe7Cs - all options were $possibilities"
-            )
-            withinRange = possibilities.map { it.key }
-        }
+        val withinRange = possibilities.filterValues { it.second.toInt() in range }.map { it.key }
+        if (withinRange.isEmpty()) return null
 
         BurrowGuessEvent(GriffinBurrowHelper.GuessEntry(withinRange)).post()
-
-        if (withinRange.size > 1 && config.warnIfInaccurateArrowGuess) {
-            TitleManager.sendTitle("§eUse Spade")
-        }
 
         return withinRange[0]
     }

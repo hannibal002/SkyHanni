@@ -92,11 +92,19 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(
-        name = "Warn If Inaccurate",
-        desc = "Sends a title message telling you to use your spade if arrow guess has a high chance of being wrong."
+        name = "Warn On Failure",
+        desc = "Sends \"Use Spade\" title when arrow guess fails"
     )
     @ConfigEditorBoolean
-    var warnIfInaccurateArrowGuess: Boolean = false
+    var warnOnFail: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Warn On Chain Complete",
+        desc = "Sends \"Use Spade\" title when you complete a chain and there is not a burrow within 90 blocks"
+    )
+    @ConfigEditorBoolean
+    var warnOnChainComp: Boolean = true
 
     @Expose
     @ConfigOption(
