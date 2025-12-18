@@ -528,3 +528,12 @@ abstract class ShotApplicationJarProcessor @Inject constructor(private val shots
 
     private data class ShotSpec(val shots: Shots) : MinecraftJarProcessor.Spec, Serializable
 }
+
+fabricApi {
+    configureTests {
+        modId = "skyhanni"
+        enableGameTests = false // Default is true
+        enableClientGameTests = true // Default is true
+        eula = true // By setting this to true, you agree to the Minecraft EULA.
+    }
+}
