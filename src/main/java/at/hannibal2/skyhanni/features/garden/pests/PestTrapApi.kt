@@ -42,7 +42,7 @@ object PestTrapApi {
     private var timeEnteredGarden: SimpleTimeMark? = null
     var MAX_TRAPS = 3
         private set
-    private val inventoryNames = setOf("Mouse Trap", "Pest Trap")
+    private val inventoryNames = setOf("Pest Trap", "Mouse Trap", "Vermin Trap")
     val inInventory get() = InventoryUtils.openInventoryName() in inventoryNames
 
     @HandleEvent

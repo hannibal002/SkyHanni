@@ -39,8 +39,8 @@ object GardenCropMilestoneInventory {
         if (InventoryUtils.openInventoryName() != "Crop Milestones" || !config.number.averageCropMilestone) return
         if (average == null) updateAverage()
 
-        if (event.slot.slotNumber == 38) {
-            event.offsetY = -23
+        if (event.slot.slotNumber == 2) {
+            event.offsetY = -38
             event.offsetX = -50
             event.alignLeft = false
             event.stackTip = "§6Average Crop Milestone: §e$average"

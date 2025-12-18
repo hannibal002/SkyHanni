@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
@@ -93,6 +94,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
      * Used for on-the-fly generation of entities. Driven by event handlers in a decentralized fashion
      */
     private fun computeAndCacheEntitiesToChooseFrom() {
+        @OptIn(AllEntitiesGetter::class)
         val entities: List<Entity> = EntityUtils.getAllEntities().toList()
         // Only render outlines around non-null entities within the camera frustum
         entitiesToChooseFrom = HashSet(entities.size)

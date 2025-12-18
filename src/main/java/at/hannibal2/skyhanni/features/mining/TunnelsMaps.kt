@@ -318,7 +318,7 @@ object TunnelsMaps {
 
     init {
         RenderDisplayHelper(
-            condition = { isEnabled() },
+            condition = ::isEnabled,
             inOwnInventory = true,
         ) {
             display = drawDisplay()

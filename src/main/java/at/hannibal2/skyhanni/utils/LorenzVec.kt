@@ -220,21 +220,24 @@ data class LorenzVec(
 
     private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
-    private val normX = if (x == 0.0) 0.0 else x
-    private val normY = if (y == 0.0) 0.0 else y
-    private val normZ = if (z == 0.0) 0.0 else z
-
+    /**
+     * Kotlin compiles the default equals method of data classes for doubles by comparing them, like
+     * ```kt
+     * Double.compare(this.x, other.x) != 0
+     * ```
+     * which returns false when comparing `0.0` and `-0.0`
+     */
     override fun equals(other: Any?): Boolean {
-        if (other is LorenzVec) {
-            val v2: LorenzVec = other
-            if (this.x == v2.x && this.y == v2.y && this.z == v2.z) {
-                return true
-            }
-        }
-        return false
+        return this === other || other is LorenzVec && x == other.x && y == other.y && z == other.z
     }
 
-    override fun hashCode() = 31 * (31 * normX.hashCode() + normY.hashCode()) + normZ.hashCode()
+    // Adding 0.0 is the best way to sanitize -0.0 as 0.0
+    override fun hashCode(): Int {
+        var result = x.plus(0.0).hashCode()
+        result = 31 * result + y.plus(0.0).hashCode()
+        result = 31 * result + z.plus(0.0).hashCode()
+        return result
+    }
 
     companion object {
 

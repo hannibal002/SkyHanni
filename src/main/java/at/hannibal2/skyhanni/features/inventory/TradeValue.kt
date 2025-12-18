@@ -54,7 +54,7 @@ object TradeValue {
     init {
         RenderDisplayHelper(
             inventory,
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         ) {
             config.otherPosition.renderRenderables(otherDisplay, posLabel = "Trade Value")
             config.yourPosition.renderRenderables(yourDisplay, posLabel = "Trade Value")

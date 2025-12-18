@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
+import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
@@ -457,9 +458,6 @@ class ProfileSpecificStorage(
         var savedCropAccessory: CropAccessory? = CropAccessory.NONE
 
         @Expose
-        var dicerDropTracker: DicerRngDropTracker.Data = DicerRngDropTracker.Data()
-
-        @Expose
         var informedAboutLowMatter: SimpleTimeMark = farPast()
 
         @Expose
@@ -616,6 +614,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var activeVinyl: VinylType? = null
+
+        @Expose
+        var overflowHoeLevels: MutableMap<String, Int> = mutableMapOf()
     }
 
     // - gui

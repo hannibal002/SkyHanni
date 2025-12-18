@@ -21,6 +21,8 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     JUNGLE_KEY("JUNGLE_KEY", "§5Jungle Key"),
     FRUIT_BOWL("FRUIT_BOWL", "§9Fruit Bowl"),
     HARVEST_HARBINGER("POTION_HARVEST_HARBINGER;5", "§9Harvest Harbinger V"),
+    HYPERCHARGE_CHIP("HYPERCHARGE_GARDEN_CHIP", "§9Hypercharge Chip"),
+    QUICKDRAW_CHIP("QUICKDRAW_GARDEN_CHIP", "§9Quickdraw Chip"),
     ;
 
     private val internalName = rawInternalName.toInternalName()

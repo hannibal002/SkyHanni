@@ -151,7 +151,7 @@ object WorldRenderUtils {
         drawVerticalBarriers: Boolean = true,
         seeThroughBlocks: Boolean = false,
     ) {
-        drawFilledBoundingBox(aabb, c.toColor(), alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers)
+        drawFilledBoundingBox(aabb, c.toColor(), alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, seeThroughBlocks)
     }
 
     // TODO make deprecated

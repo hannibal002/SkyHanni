@@ -25,6 +25,9 @@ enum class FarmingItemType(
     SUGAR_CANE(ItemCategory.HOE),
     CACTUS(ItemCategory.HOE),
     MUSHROOM(ItemCategory.HOE),
+    SUNFLOWER(ItemCategory.HOE),
+    MOONFLOWER(ItemCategory.HOE),
+    WILD_ROSE(ItemCategory.HOE),
     HELMET(ItemCategory.HELMET, FFStats::getArmorFFData),
     CHESTPLATE(ItemCategory.CHESTPLATE, FFStats::getArmorFFData),
     LEGGINGS(ItemCategory.LEGGINGS, FFStats::getArmorFFData),
@@ -39,6 +42,7 @@ enum class FarmingItemType(
     BEE(ItemCategory.PET, FFStats::getPetFFData),
     SLUG(ItemCategory.PET, FFStats::getPetFFData),
     HEDGEHOG(ItemCategory.PET, FFStats::getPetFFData),
+    NONE(ItemCategory.NONE),
     ;
 
     var selectedState = false

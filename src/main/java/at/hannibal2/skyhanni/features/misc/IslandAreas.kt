@@ -315,7 +315,7 @@ object IslandAreas {
                 update()
             },
             allowRerouting = true,
-            condition = { isPathfinderEnabled() },
+            condition = ::isPathfinderEnabled,
         )
         update()
     }

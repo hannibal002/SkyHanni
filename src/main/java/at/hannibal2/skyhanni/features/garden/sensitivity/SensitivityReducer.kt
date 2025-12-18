@@ -14,8 +14,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 
 @SkyHanniModule
@@ -57,7 +59,7 @@ object SensitivityReducer {
     }
 
     private fun updatePlayerStatus() {
-        val newInBarn = GardenApi.onBarnPlot
+        val newInBarn = GardenApi.onUnfarmablePlot
         val newOnGround = MinecraftCompat.localPlayer.onGround
 
         if (inBarn != newInBarn) {
@@ -147,7 +149,10 @@ object SensitivityReducer {
     fun onRenderOverlay() {
         if (!isActive) return
         if (!config.showGui) return
-        config.position.renderString("§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
+        config.position.renderRenderable(
+            Renderable.text("§eSensitivity Lowered"),
+            posLabel = "Sensitivity Lowered"
+        )
     }
 
     @HandleEvent

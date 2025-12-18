@@ -9,8 +9,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -22,7 +20,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.projectile.EntityFishHook
-import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -81,25 +78,12 @@ object LegionBobbinOverlay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
         if (!isEnabled()) return
-        var bobbers = 0
-        var players = 0
-        val playerPos = LocationUtils.playerLocation()
-        for (entity in EntityUtils.getAllEntities()) {
-            when (entity) {
-                is EntityFishHook -> {
-                    if (entity.distanceTo(playerPos) > BOBBERS_DISTANCE) continue
-                    ++bobbers
-                }
-
-                is EntityPlayer -> {
-                    if (entity.isLocalPlayer || !entity.isRealPlayer()) continue
-                    if (entity.distanceTo(playerPos) > LEGION_DISTANCE) continue
-                    ++players
-                }
-            }
+        val bobbers = EntityUtils.getEntitiesNextToPlayer<EntityFishHook>(BOBBERS_DISTANCE).size
+        val players = EntityUtils.getEntitiesNextToPlayer<EntityPlayer>(LEGION_DISTANCE).count {
+            !it.isLocalPlayer && it.isRealPlayer()
         }
-        modifyValue(::nearbyBobbers, bobbers.coerceAtMost(BOBBERS_LIMIT))
-        modifyValue(::nearbyPlayers, players.coerceAtMost(LEGION_LIMIT))
+        nearbyBobbers = modifyValue(nearbyBobbers, bobbers.coerceAtMost(BOBBERS_LIMIT))
+        nearbyPlayers = modifyValue(nearbyPlayers, players.coerceAtMost(LEGION_LIMIT))
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -120,15 +104,13 @@ object LegionBobbinOverlay {
             newLegionBuff += data.legion * LEGION_MULT
             newBobbinBuff += data.bobbin * BOBBIN_MULT
         }
-        modifyValue(::armorLegionBuff, newLegionBuff)
-        modifyValue(::armorBobbinBuff, newBobbinBuff)
+        armorLegionBuff = modifyValue(armorLegionBuff, newLegionBuff)
+        armorBobbinBuff = modifyValue(armorBobbinBuff, newBobbinBuff)
     }
 
-    // Modifies the passed property with the new value, and if the value is different it resets the display
-    private fun <T> modifyValue(property: KMutableProperty0<T>, newValue: T) {
-        if (property.get() == newValue) return
-        property.set(newValue)
-        display = null
+    private fun <T> modifyValue(old: T, new: T): T {
+        if (old != new) display = null
+        return new
     }
 
     @HandleEvent(onlyOnSkyblock = true)

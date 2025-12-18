@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -8,6 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.input.Keyboard
@@ -80,6 +83,23 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(
+        name = "Guess From Arrow",
+        desc = "Guess next burrow location in chain instantly from the particle arrow.\n" +
+            "It is recommended to use bobby for better results."
+    )
+    @ConfigEditorBoolean
+    var guessFromArrow: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Warn If Inaccurate",
+        desc = "Sends a title message telling you to use your spade if arrow guess has a high chance of being wrong."
+    )
+    @ConfigEditorBoolean
+    var warnIfInaccurateArrowGuess: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Nearest Warp",
         desc = "Warp to the nearest warp point on the hub, if closer to the next burrow.",
     )
@@ -90,6 +110,18 @@ class DianaConfig {
     @ConfigOption(name = "Warp Key", desc = "Press this key to warp to nearest burrow waypoint.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var keyBindWarp: Int = Keyboard.KEY_NONE
+
+    @Expose
+    @ConfigOption(
+        name = "Warp Distance",
+        desc = "How much closer a warp needs to be than you to suggest it.",
+    )
+    @ConfigEditorSlider(minValue = 0.0f, maxValue = 200.0f, minStep = 1.0f)
+    var warpDistanceDifference: Int = 10
+
+    @Expose
+    @ConfigLink(owner = DianaConfig::class, field = "burrowNearestWarp")
+    val warpGuiPosition: Position = Position(327, 125, scale = 2.6f)
 
     @Expose
     @ConfigOption(name = "Ignored Warps", desc = "")

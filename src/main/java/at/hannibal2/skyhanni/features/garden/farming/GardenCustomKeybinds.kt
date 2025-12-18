@@ -115,7 +115,7 @@ object GardenCustomKeybinds {
             .let { values -> values.size != values.toSet().size }
     }
 
-    private fun isEnabled() = GardenApi.inGarden() && config.enabled && !(GardenApi.onBarnPlot && config.excludeBarn)
+    private fun isEnabled() = GardenApi.inGarden() && config.enabled && !(GardenApi.onUnfarmablePlot && config.excludeBarn)
 
     private fun isActive(): Boolean =
         isEnabled() && GardenApi.toolInHand != null && !isDuplicate && !hasGuiOpen() && lastWindowOpenTime.passedSince() > 300.milliseconds

@@ -52,7 +52,7 @@ object ExperimentsProfitTracker {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
     private val tracker = SkyHanniItemTracker(
         "Experiments Profit Tracker",
-        { Data() },
+        ::Data,
         { it.experimentation.experimentsProfitTracker },
     ) { drawDisplay(it) }
 

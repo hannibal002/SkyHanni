@@ -2,9 +2,12 @@ package at.hannibal2.skyhanni.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -14,41 +17,39 @@ import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntitySilverfish
-import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object VerminHighlighter {
     private val config get() = RiftApi.config.area.westVillage.verminHighlight
 
-    private val checkedEntities = TimeLimitedSet<Int>(1.minutes)
-
     private val VERMIN_FLY_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_FLY") }
     private val VERMIN_SPIDER_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_SPIDER") }
 
     @HandleEvent
-    fun onTick() {
-        if (!isEnabled()) return
-
-        for (entity in EntityUtils.getEntities<EntityLivingBase>()) {
-            val id = entity.entityId
-            if (id in checkedEntities) continue
-            checkedEntities.add(id)
-
-            if (!isVermin(entity)) continue
-            val color = config.color.get().toColor().addAlpha(60)
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, color) { isEnabled() }
-        }
+    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<EntityArmorStand>) {
+        if (isEnabled()) tryAdd(event.entity)
     }
 
     @HandleEvent
+    fun onEntityMaxHealthUpdate(event: EntityMaxHealthUpdateEvent) {
+        if (isEnabled()) tryAdd(event.entity)
+    }
+
+    fun tryAdd(entity: EntityLivingBase) {
+        if (!isVermin(entity)) return
+        val color = config.color.get().toColor().addAlpha(60)
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, color) { isEnabled() }
+    }
+
+    // This only gets called on config change, so the performance impact is minimal
+    @OptIn(AllEntitiesGetter::class)
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.color) {
-            // running setEntityColorWithNoHurtTime() again
-            checkedEntities.clear()
+            EntityUtils.getEntities<EntityLivingBase>().forEach(::tryAdd)
         }
     }
 

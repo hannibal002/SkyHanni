@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
@@ -19,6 +20,7 @@ import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand
 import kotlin.time.Duration.Companion.minutes
 
+// TODO: optimize this to not use EntityUtils.getEntities()
 @SkyHanniModule
 object SummoningSoulsName {
 
@@ -35,6 +37,8 @@ object SummoningSoulsName {
         check()
     }
 
+    // This needs to get optimized to  not use this
+    @OptIn(AllEntitiesGetter::class)
     private fun check() {
         for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (entity in souls) continue

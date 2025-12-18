@@ -36,7 +36,7 @@ object ExcavatorProfitTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Fossil Excavation Profit Tracker",
-        { Data() },
+        ::Data,
         { it.mining.fossilExcavatorProfitTracker },
     ) { drawDisplay(it) }
 

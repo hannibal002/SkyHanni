@@ -170,7 +170,7 @@ object RareMobWaypointShare {
             val message = "§l§bYou found a Rare Diana Mob! Click §l§chere §l§bor press §c$keyName to share the location!"
             ChatUtils.clickableChat(
                 message,
-                onClick = { sendRareMob() },
+                onClick = ::sendRareMob,
                 "§eClick to share!",
                 oneTimeClick = true,
             )
