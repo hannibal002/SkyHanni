@@ -78,6 +78,11 @@ class EventConfig {
     @Expose
     val yearOfThePig: YearOfThePigConfig = YearOfThePigConfig()
 
+    @ConfigOption(name = "Aura", desc = "Features for Mayor Aura.")
+    @Accordion
+    @Expose
+    val aura: AuraConfig = AuraConfig()
+
     @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose
     val lobbyWaypoints: LobbyWaypointsConfig = LobbyWaypointsConfig()
