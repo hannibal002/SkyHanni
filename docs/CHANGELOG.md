@@ -35,6 +35,7 @@
   + Modes are Default, Muted, Custom, and Plumber.
 + Added DNA Analyser Solver. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
 + Added Hoe Level Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
++ Mute Hoe Level Up Sound. - nopo (https://github.com/hannibal002/SkyHanni/pull/4966)
 
 #### Foraging
 
@@ -74,6 +75,11 @@
   + Blocked accidentally clicking the close puzzle button.
 + Added support for Moonflower, Sunflower, and Wild Rose in Basket of Seeds for Not Clickable Items. - Luna (https://github.com/hannibal002/SkyHanni/pull/4954)
 + Added chips to visitor drop rewards display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4960)
++ Added support for the new Mouse Trap upgrade (Vermin Trap). - Luna (https://github.com/hannibal002/SkyHanni/pull/4969)
++ Disabled Custom Garden Keybinds while on the greenhouse. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4965)
++ Disabled Saving last farmed location on the greenhouse. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4965)
++ Disabled Sensitivity Reducer while on the greenhouse. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4965)
++ Replaced /ff with a link to elitebot.dev's fortune page. - nopo (https://github.com/hannibal002/SkyHanni/pull/4970)
 
 #### Mining
 
@@ -231,6 +237,7 @@
 + Using `@OnlyLegacy` and `@OnlyModern` together on the same config option now throws a compile-time (and runtime) error. - Luna (https://github.com/hannibal002/SkyHanni/pull/4908)
 + Added the ability to remove something from the config. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4961)
 + Made config moves actually remove the old data. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4961)
++ Added message in the config when your mc version is no longer supported. - nopo (https://github.com/hannibal002/SkyHanni/pull/4967)
 
 ### Removed Features
 
