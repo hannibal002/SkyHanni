@@ -61,7 +61,8 @@ object BlazeSlayerFirePitsWarning {
     }
 
     private fun isEnabled() =
-        SkyBlockUtils.inSkyBlock && config.firePitsWarning && SlayerApi.isInBossFight() && DamageIndicatorManager.isBossSpawned(
+        SkyBlockUtils.inSkyBlock && config.firePitsWarning
+                && SlayerApi.isInBossFight() && DamageIndicatorManager.isBossSpawned(
             BossType.SLAYER_BLAZE_3,
             BossType.SLAYER_BLAZE_4,
             BossType.SLAYER_BLAZE_QUAZII_3,
