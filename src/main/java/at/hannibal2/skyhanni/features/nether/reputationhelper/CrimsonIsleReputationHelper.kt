@@ -152,7 +152,6 @@ object CrimsonIsleReputationHelper {
             it == null || it is InventoryScreen
         }
         if (!isAllowedGui) return false
-        if (NeuItems.neuHasFocus()) return false
 
         return config.hotkey.isKeyHeld()
     }

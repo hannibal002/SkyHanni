@@ -134,13 +134,7 @@ object CarnivalZombieShootout {
             val entity = EntityUtils.getEntityByID(zombie.id) ?: continue
             val isSmall = (entity as? Zombie)?.isBaby ?: false
 
-            val boundingBox = entity.boundingBox.let {
-                if (PlatformUtils.IS_LEGACY && isSmall) {
-                    it.inflate(0.0, -0.4, 0.0).move(0.0, -0.4, 0.0)
-                } else {
-                    it
-                }
-            }
+            val boundingBox = entity.boundingBox
 
             drawHitbox(
                 boundingBox.inflate(0.1, 0.05, 0.0).move(0.0, 0.05, 0.0),

@@ -348,7 +348,6 @@ object VampireSlayerFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (PlatformUtils.IS_LEGACY) return
         if (!isEnabled()) return
         if (!configKillerSpring.fixSoundSpam) return
 

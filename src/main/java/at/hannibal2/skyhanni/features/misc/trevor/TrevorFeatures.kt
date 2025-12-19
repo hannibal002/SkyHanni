@@ -297,7 +297,6 @@ object TrevorFeatures {
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onKeyPress(event: KeyPressEvent) {
         if (Minecraft.getInstance().screen != null) return
-        if (NeuItems.neuHasFocus()) return
 
         if (event.keyCode != config.keyBind) return
 

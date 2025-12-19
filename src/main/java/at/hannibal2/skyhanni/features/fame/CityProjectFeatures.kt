@@ -197,7 +197,7 @@ object CityProjectFeatures {
                 BazaarApi.searchForBazaarItem(name, amount)
             }
         },
-    ) { inInventory && !NeuItems.neuHasFocus() }
+    ) { inInventory }
 
     private fun fetchMaterials(item: ItemStack, materials: MutableMap<NeuInternalName, Int>) {
         var next = false

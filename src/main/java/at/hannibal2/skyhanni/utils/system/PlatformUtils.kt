@@ -20,7 +20,6 @@ import kotlin.system.exitProcess
 object PlatformUtils {
 
     val MC_VERSION: String = net.minecraft.SharedConstants.getCurrentVersion().name
-    val IS_LEGACY: Boolean = false
 
     val isDevEnvironment: Boolean by lazy {
         FabricLoader.getInstance().isDevelopmentEnvironment
@@ -86,8 +85,6 @@ object PlatformUtils {
     fun isModInstalled(modId: String): Boolean {
         return FabricLoader.getInstance().isModLoaded(modId)
     }
-
-    fun isNeuLoaded() = false
 
     fun isMcAbove(version: String): Boolean {
         return MCVersion.fromString(version) > MCVersion.currentMcVersion

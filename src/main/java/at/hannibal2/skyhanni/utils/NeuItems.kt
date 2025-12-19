@@ -266,10 +266,6 @@ object NeuItems {
 
     fun getRecipes(internalName: NeuInternalName): Set<PrimitiveRecipe> = EnoughUpdatesManager.getRecipesFor(internalName)
 
-    fun neuHasFocus(): Boolean {
-        return false
-    }
-
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
         val jsonObject = EnoughUpdatesManager.stackToJson(item)
         if (!jsonObject.has("internalname")) {

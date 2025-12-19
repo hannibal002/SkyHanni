@@ -93,8 +93,7 @@ object TrophyFishManager {
             }
         }
         if (changed) {
-            val message = if (PlatformUtils.IS_LEGACY) "Click here to load Trophy Fishing data from NEU PV!"
-            else "Click here to load Trophy Fishing data from SkyBlock Profile Viewer!"
+            val message = "Click here to load Trophy Fishing data from SkyBlock Profile Viewer!"
 
             ChatUtils.clickableChat(
                 message,
@@ -164,14 +163,12 @@ object TrophyFishManager {
             val current = saved[rarity] ?: 0
             if (newValue > current) {
                 saved[rarity] = newValue
-                val message = if (PlatformUtils.IS_LEGACY) "Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue"
-                else "Updated trophy fishing data from SkyBlock Profile Viewer:  $name $rarity: $current -> $newValue"
+                val message = "Updated trophy fishing data from SkyBlock Profile Viewer:  $name $rarity: $current -> $newValue"
                 ChatUtils.debug(message)
             }
         }
         TrophyFishDisplay.update()
-        val message = if (PlatformUtils.IS_LEGACY) "Updated Trophy Fishing data via NEU PV!"
-        else "Updated Trophy Fishing data via SkyBlock Profile Viewer!"
+        val message = "Updated Trophy Fishing data via SkyBlock Profile Viewer!"
         ChatUtils.chat(message)
     }
 

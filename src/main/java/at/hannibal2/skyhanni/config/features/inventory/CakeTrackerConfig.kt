@@ -20,14 +20,6 @@ class CakeTrackerConfig {
     @FeatureToggle
     var enabled: Boolean = false
 
-    @ConfigOption(
-        name = "Note",
-        desc = "This feature is not compatible with the NEU Storage Overlay." +
-            "Backpacks/Ender Chest will not be scanned correctly with it enabled."
-    )
-    @ConfigEditorInfoText
-    var incompatibleNote: Boolean = false
-
     @Expose
     @ConfigLink(owner = CakeTrackerConfig::class, field = "enabled")
     val cakeTrackerPosition: Position = Position(300, 300)

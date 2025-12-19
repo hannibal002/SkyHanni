@@ -139,7 +139,6 @@ object BazaarApi {
 
     fun searchForBazaarItem(displayName: String, amount: Int? = null) {
         if (!SkyBlockUtils.inSkyBlock) return
-        if (NeuItems.neuHasFocus()) return
         if (SkyBlockUtils.noTradeMode) return
         if (DungeonApi.inDungeon() || KuudraApi.inKuudra) return
         HypixelCommands.bazaar(displayName.removeColor())

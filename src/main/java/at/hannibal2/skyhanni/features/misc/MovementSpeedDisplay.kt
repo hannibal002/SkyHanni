@@ -22,14 +22,12 @@ object MovementSpeedDisplay {
     private val config get() = SkyHanniMod.feature.misc
 
     private var display = ""
-    private val soulSandSpeeds = mutableListOf<Double>()
 
     /**
      * This speed value represents the movement speed in blocks per second.
      * This has nothing to do with the speed stat.
      */
     var speed = 0.0
-    var usingLegacySoulSandSpeed = false
 
     init {
         // TODO use LorenzTickEvent
@@ -48,19 +46,6 @@ object MovementSpeedDisplay {
             // Distance from previous tick, multiplied by TPS
             oldPos.distance(newPos) * 20
         }
-
-        // 1.15+ has consistent soul sand speed
-        val movingOnSoulSand = PlatformUtils.IS_LEGACY && LocationUtils.playerLocation().getBlockAt() == Blocks.SOUL_SAND && speed > 0.0
-        if (movingOnSoulSand) {
-            soulSandSpeeds.add(speed)
-            if (soulSandSpeeds.size > 6) {
-                speed = soulSandSpeeds.average()
-                soulSandSpeeds.removeAt(0)
-            }
-        } else {
-            soulSandSpeeds.clear()
-        }
-        usingLegacySoulSandSpeed = movingOnSoulSand && soulSandSpeeds.size == 6
 
         if (isEnabled()) {
             display = "Movement Speed: ${speed.roundTo(2)}"

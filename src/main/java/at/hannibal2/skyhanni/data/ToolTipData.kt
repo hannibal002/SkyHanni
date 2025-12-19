@@ -66,13 +66,6 @@ object ToolTipData {
             if (ToolTipEvent(slot, itemStack, toolTip).post()) {
                 toolTip.clear()
             }
-            if (PlatformUtils.IS_LEGACY) {
-                val textTooltip = toolTip.map { Component.nullToEmpty(it) }.toMutableList()
-                toolTip.clear()
-                if (!ToolTipTextEvent(slot, itemStack, textTooltip).post()) {
-                    toolTip.addAll(textTooltip.map { it.string }.toMutableList())
-                }
-            }
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
                 e, "Error in item tool tip parsing or rendering detected",

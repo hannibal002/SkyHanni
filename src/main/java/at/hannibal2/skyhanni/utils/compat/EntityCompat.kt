@@ -40,7 +40,7 @@ val Entity.deceased: Boolean
 
 fun LivingEntity.findHealthReal(): Float {
     val entityHealth = health
-    if (entityHealth == 1024f && !PlatformUtils.IS_LEGACY) {
+    if (entityHealth == 1024f) {
         return baseMaxHealth.toFloat()
     }
     return entityHealth

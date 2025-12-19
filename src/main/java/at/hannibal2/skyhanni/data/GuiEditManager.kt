@@ -56,7 +56,6 @@ object GuiEditManager {
         }
 
         if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
-        if (NeuItems.neuHasFocus()) return
         lastHotkeyPressed = SimpleTimeMark.now()
 
         openGuiPositionEditor(hotkeyReminder = false)

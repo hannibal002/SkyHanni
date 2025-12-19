@@ -231,7 +231,7 @@ object GardenVisitorFeatures {
                     "$name §ex${amount.addSeparators()}",
                     tips = internalName.createBuyTip(),
                     onLeftClick = {
-                        if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickable
+                        if (!GardenApi.inGarden()) return@clickable
                         if (Minecraft.getInstance().screen is SignEditScreen) {
                             SignUtils.setTextIntoSign("$amount")
                         } else {
@@ -303,7 +303,7 @@ object GardenVisitorFeatures {
                             HypixelCommands.viewRecipe(internalName)
                         }
                     },
-                ) { GardenApi.inGarden() && !NeuItems.neuHasFocus() },
+                ) { GardenApi.inGarden() },
             )
             list.addString("§7)")
         }

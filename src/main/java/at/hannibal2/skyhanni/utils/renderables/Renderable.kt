@@ -323,23 +323,17 @@ interface Renderable {
             val isConfigScreen = !ConfigUtils.configScreenCurrentlyOpen
 
             val openGui = guiScreen.javaClass.name ?: "none"
-            val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
-            val neuFocus = NeuItems.neuHasFocus()
             val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
             val isInSkytilsSettings =
                 openGui.let { it.startsWith("gg.skytils.vigilance.gui.") || it.startsWith("gg.skytils.skytilsmod.gui.") }
-            val isInNeuSettings = openGui.startsWith("io.github.moulberry.notenoughupdates.")
 
             val result =
                 isGuiPositionEditor &&
                     inMenu &&
                     isNotInSignAndOnSlot &&
                     isConfigScreen &&
-                    !isInNeuPv &&
                     !isInSkytilsPv &&
-                    !neuFocus &&
-                    !isInSkytilsSettings &&
-                    !isInNeuSettings
+                    !isInSkytilsSettings
 
             if (debug) {
                 if (!result) {
@@ -349,11 +343,8 @@ interface Renderable {
                     if (!inMenu) logger.log("inMenu")
                     if (!isNotInSignAndOnSlot) logger.log("isNotInSignAndOnSlot")
                     if (!isConfigScreen) logger.log("isConfigScreen")
-                    if (isInNeuPv) logger.log("isInNeuPv")
-                    if (neuFocus) logger.log("neuFocus")
                     if (isInSkytilsPv) logger.log("isInSkytilsPv")
                     if (isInSkytilsSettings) logger.log("isInSkytilsSettings")
-                    if (isInNeuSettings) logger.log("isInNeuSettings")
                     logger.log("")
                 } else {
                     logger.log("allowed click")
