@@ -16,14 +16,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
-//#if FORGE
-//$$ import net.minecraftforge.client.ClientCommandHandler
-//#endif
 
 @SkyHanniModule
 object QuickModMenuSwitch {
@@ -155,9 +151,6 @@ object QuickModMenuSwitch {
         currentlyOpeningMod = mod.name
         update()
         try {
-            //#if FORGE
-            //$$ ClientCommandHandler.instance.executeCommand(MinecraftCompat.localPlayer, "/" + mod.command)
-            //#endif
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error trying to open the gui for mod " + mod.name)
         }

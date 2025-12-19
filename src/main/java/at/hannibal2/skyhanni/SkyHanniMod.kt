@@ -58,8 +58,6 @@ import kotlin.time.Duration.Companion.seconds
 object SkyHanniMod {
 
     fun preInit() {
-        PlatformUtils.checkIfNeuIsLoaded()
-
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
@@ -90,11 +88,7 @@ object SkyHanniMod {
         if (screenTicks != 5) return
         val title = InventoryUtils.openInventoryName()
         if (shouldCloseScreen) {
-            //#if MC < 1.21
-            //$$ MinecraftCompat.localPlayer.closeScreen()
-            //#else
             MinecraftCompat.localPlayer.closeContainer()
-            //#endif
             OtherInventoryData.close(title)
         }
         shouldCloseScreen = true

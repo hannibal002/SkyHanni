@@ -15,57 +15,49 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
-import at.hannibal2.skyhanni.utils.compat.getLocation
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.world.entity.Entity
 import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.common.ServerboundKeepAlivePacket
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Rot
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.PosRot
-import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket
-import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
 import net.minecraft.network.protocol.common.ClientboundKeepAlivePacket
-import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
-import net.minecraft.network.protocol.game.ClientboundSetTimePacket
-import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
-import net.minecraft.network.protocol.game.ClientboundSetHealthPacket
-import net.minecraft.network.protocol.game.ClientboundAnimatePacket
+import net.minecraft.network.protocol.common.ServerboundKeepAlivePacket
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
-import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
-import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
-import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
-import net.minecraft.network.protocol.game.ClientboundEntityEventPacket
-import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
-import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket
-import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket
-import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
-import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket
+import net.minecraft.network.protocol.game.ClientboundAnimatePacket
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
-import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
+import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
 import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
+import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
+import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket
+import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
+import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket
+import net.minecraft.network.protocol.game.ClientboundSetHealthPacket
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket
-import net.minecraft.network.protocol.game.ClientboundSetScorePacket
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
+import net.minecraft.network.protocol.game.ClientboundSetScorePacket
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket
+import net.minecraft.network.protocol.game.ClientboundSoundPacket
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
+import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket
+import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.PosRot
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Rot
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
+import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket
+import net.minecraft.world.entity.Entity
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket.Pos as EntityRelMove
-import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket.Rot as EntityLook
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket.PosRot as EntityLookMove
-//#if MC < 1.21
-//$$ import net.minecraft.network.packet.c2s.play.ConfirmScreenActionC2SPacket
-//$$ import net.minecraft.network.packet.s2c.play.ConfirmScreenActionS2CPacket
-//$$ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
-//$$ import net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket
-//#endif
-
+import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket.Rot as EntityLook
 
 @SkyHanniModule
 object PacketTest {
@@ -108,19 +100,14 @@ object PacketTest {
         val packetName = packet.javaClass.simpleName
 
         if (packetName == ServerboundKeepAlivePacket::class.simpleName) return
-        //#if MC < 1.21
-        //$$ if (packetName == ConfirmScreenActionC2SPacket::class.simpleName) return
-        //#endif
         if (packetName == Pos::class.simpleName) return
 
         if (packetName == ServerboundSetCarriedItemPacket::class.simpleName) return
         if (packetName == PosRot::class.simpleName) return
         if (packetName == ServerboundPlayerCommandPacket::class.simpleName) return
         if (packetName == Rot::class.simpleName) return
-        //#if MC > 1.21
         if (packetName == net.minecraft.network.protocol.common.ServerboundPongPacket::class.simpleName) return
         if (packetName == net.minecraft.network.protocol.game.ServerboundClientTickEndPacket::class.simpleName) return
-        //#endif
         if (packetName == ServerboundMovePlayerPacket::class.simpleName) return
 
         println("Send: [$packetName]")
@@ -147,12 +134,8 @@ object PacketTest {
         // Keep alive
         if (packetName == ClientboundKeepAlivePacket::class.simpleName) return
         if (packetName == ServerboundKeepAlivePacket::class.simpleName) return
-        //#if MC < 1.21
-        //$$ if (packetName == ConfirmScreenActionS2CPacket::class.simpleName) return
-        //#else
         if (packetName == net.minecraft.network.protocol.common.ClientboundPingPacket::class.simpleName) return
         if (packetName == net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket::class.simpleName) return
-        //#endif
 
         // Gui
         if (packetName == ClientboundSetObjectivePacket::class.simpleName) return
@@ -168,11 +151,9 @@ object PacketTest {
         if (packetName == ClientboundLevelChunkWithLightPacket::class.simpleName) return
         if (packetName == ClientboundSectionBlocksUpdatePacket::class.simpleName) return
         if (packetName == ClientboundBlockUpdatePacket::class.simpleName) return
-        //#if MC > 1.21
         if (packetName == net.minecraft.network.protocol.game.ClientboundBlockEventPacket::class.simpleName) return
         if (packetName == net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket::class.simpleName) return
         if (packetName == net.minecraft.network.protocol.game.ClientboundSetChunkCacheCenterPacket::class.simpleName) return
-        //#endif
 
         // Chat
         if (packetName == ClientboundSystemChatPacket::class.simpleName) return
@@ -180,9 +161,7 @@ object PacketTest {
         // Others
         if (packetName == ClientboundSoundPacket::class.simpleName) return
         if (!full && packetName == ClientboundLevelParticlesPacket::class.simpleName) return
-        //#if MC > 1.21
         if(packetName == net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket::class.simpleName) return
-        //#endif
 
         // Entity
         if (this is ClientboundRemoveEntitiesPacket) {
@@ -197,10 +176,8 @@ object PacketTest {
             if (packetName == EntityLookMove::class.simpleName) return
             if (packetName == ClientboundRotateHeadPacket::class.simpleName) return
             if (packetName == EntityLook::class.simpleName) return
-            //#if MC > 1.21
             if(packetName == net.minecraft.network.protocol.game.ClientboundBossEventPacket::class.simpleName) return
             if(packetName == net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket::class.simpleName) return
-            //#endif
             if (packetName == ClientboundSetEntityMotionPacket::class.simpleName) return
             if (packetName == ClientboundSetEntityDataPacket::class.simpleName) return
             if (packetName == ClientboundUpdateAttributesPacket::class.simpleName) return
@@ -252,17 +229,9 @@ object PacketTest {
         if (packet is ClientboundAddEntityPacket) {
             return LorenzVec(packet.x, packet.y, packet.z)
         }
-        //#if MC < 1.21
-        //$$ if (packet is EntitySpawnS2CPacket) {
-        //$$     return LorenzVec(packet.x, packet.y, packet.z)
-        //$$ }
-        //$$ if (packet is MobSpawnS2CPacket) {
-        //$$     return LorenzVec(packet.x, packet.y, packet.z)
-        //$$ }
-        //#endif
 
         if (packet is ServerboundMovePlayerPacket) {
-            return packet.getLocation()
+            return LorenzVec(packet.getX(0.0), packet.getY(0.0), packet.getZ(0.0))
         }
         if (packet is ClientboundLevelEventPacket) {
             return packet.pos.toLorenzVec()
@@ -280,11 +249,6 @@ object PacketTest {
         if (packet is ClientboundMoveEntityPacket) {
             return packet.getEntity(world)
         }
-        //#if MC < 1.21
-        //$$ if (packet is EntitySetHeadYawS2CPacket) {
-        //$$     return packet.getEntity(world)
-        //$$ }
-        //#endif
         if (packet is ClientboundEntityEventPacket) {
             return packet.getEntity(world)
         }
@@ -306,12 +270,6 @@ object PacketTest {
             is ClientboundTeleportEntityPacket -> id()
             is ClientboundUpdateMobEffectPacket -> entityId
             is ClientboundAddEntityPacket -> id
-            //#if MC < 1.21
-            //$$ is MobSpawnS2CPacket -> id
-            //$$ is EntitySpawnS2CPacket -> id
-            //$$ is EntitySetHeadYawS2CPacket ->
-            //$$     javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
-            //#endif
             is ClientboundEntityEventPacket ->
                 javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
             /* is S14PacketEntity.S15PacketEntityRelMove ->

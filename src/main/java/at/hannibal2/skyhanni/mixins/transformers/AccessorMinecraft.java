@@ -9,9 +9,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AccessorMinecraft {
 
     @Accessor("deltaTracker")
-    //#if MC < 1.21
-    //$$ RenderTickCounter getTimer();
-    //#else
     DeltaTracker.Timer getTimer();
-    //#endif
 }

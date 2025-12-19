@@ -16,11 +16,7 @@ enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
     ENCHANTING("Enchanting", Blocks.ENCHANTING_TABLE, 60),
     ALCHEMY("Alchemy", Items.BREWING_STAND, 50),
     CARPENTRY("Carpentry", Blocks.CRAFTING_TABLE, 50),
-    //#if MC < 1.16
-    //$$ TAMING("Taming", Items.spawn_egg, 60),
-    //#else
     TAMING("Taming", Items.POLAR_BEAR_SPAWN_EGG, 60),
-    //#endif
     HUNTING("Hunting", Items.LEAD, 25),
     ;
 

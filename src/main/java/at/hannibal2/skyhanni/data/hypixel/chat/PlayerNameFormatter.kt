@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.hypixel.chat import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat import at.hannibal2.skyhanni.utils.compat.returnThis
+package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.style
 import at.hannibal2.skyhanni.utils.compat.appendComponent
 import at.hannibal2.skyhanni.utils.compat.appendString
 import at.hannibal2.skyhanni.utils.compat.changeColor
+import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
@@ -267,7 +268,7 @@ object PlayerNameFormatter {
 
         config.playerRankHider ->
             removeColor.asComponent()
-                .setStyle(name.sampleStyleAtStart()?.returnThis())
+                .setStyle(name.sampleStyleAtStart())
                 .style { withColor(ChatFormatting.AQUA) }
                 .intoSpan()
 

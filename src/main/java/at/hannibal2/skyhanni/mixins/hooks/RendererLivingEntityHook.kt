@@ -1,32 +1,15 @@
-package at.hannibal2.skyhanni.mixins.hooks import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.misc.ContributorManager
-import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.world.entity.LivingEntity
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.world.entity.player.Player
 
 object RendererLivingEntityHook {
     private val config get() = SkyHanniMod.feature.dev
 
-    @JvmStatic
-    fun setOutlineColor(red: Float, green: Float, blue: Float, alpha: Float, entity: LivingEntity) {
-        //#if MC < 1.21
-        //$$ val color = EntityOutlineRenderer.getCustomOutlineColor(entity)?.rgb
-        //$$
-        //$$ if (color != null) {
-        //$$     val colorRed = (color shr 16 and 255).toFloat() / 255f
-        //$$     val colorGreen = (color shr 8 and 255).toFloat() / 255f
-        //$$     val colorBlue = (color and 255).toFloat() / 255f
-        //$$     RenderSystem.color(colorRed, colorGreen, colorBlue, alpha)
-        //$$ } else {
-        //$$     RenderSystem.color(red, green, blue, alpha)
-        //$$ }
-        //#endif
-    }
 
     /**
      * Check if the player is on the cool person list and if they should be flipped.
@@ -46,12 +29,9 @@ object RendererLivingEntityHook {
     fun rotatePlayer(player: Player): Float? {
         if (!SkyBlockUtils.inSkyBlock) return null
         if (!config.rotateContributors && !TimeUtils.isAprilFoolsDay) return null
-        val name = player.name.formattedTextCompatLessResets() ?: return null
+        val name = player.name.formattedTextCompatLessResets()
         if (!ContributorManager.shouldSpin(name)) return null
         val rotation = ((player.tickCount % 90) * 4).toFloat()
-        //#if MC < 1.21
-        //$$ RenderSystem.rotate(rotation, 0f, 1f, 0f)
-        //#endif
         return player.yRot + rotation
     }
 }

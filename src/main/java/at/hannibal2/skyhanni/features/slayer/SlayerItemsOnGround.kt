@@ -12,11 +12,8 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.world.entity.item.ItemEntity
-import net.minecraft.world.item.Items
-import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.16
 import net.minecraft.world.item.SpawnEggItem
-//#endif
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SlayerItemsOnGround {
@@ -30,11 +27,7 @@ object SlayerItemsOnGround {
         if (!isEnabled()) return
         for (entityItem in EntityUtils.getEntitiesNextToPlayer<ItemEntity>(15.0)) {
             val itemStack = entityItem.item
-            //#if MC < 1.16
-            //$$ if (itemStack.item == Items.spawn_egg) continue
-            //#else
             if (itemStack.item is SpawnEggItem) continue
-            //#endif
             if (itemStack.getInternalName() == NeuInternalName.NONE) continue
             val (name, price) = SlayerApi.getItemNameAndPrice(itemStack.getInternalName(), itemStack.count)
             if (config.minimumPrice > price) continue

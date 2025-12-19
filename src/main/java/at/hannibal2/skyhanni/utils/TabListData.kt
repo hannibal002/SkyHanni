@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -18,19 +18,16 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
-import kotlin.time.Duration.Companion.seconds
-//#if MC < 1.16
-//$$ import net.minecraft.world.WorldSettings
-//#else
 import net.minecraft.world.level.GameType
-//#endif
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TabListData {
@@ -111,18 +108,10 @@ object TabListData {
         override fun compare(o1: PlayerInfo, o2: PlayerInfo): Int {
             val team1 = o1.team
             val team2 = o2.team
-            return ComparisonChain.start().compareTrueFirst(
-                //#if MC < 1.16
-                //$$ o1.gameType != WorldSettings.GameType.SPECTATOR,
-                //$$ o2.gameType != WorldSettings.GameType.SPECTATOR,
-                //#else
-                o1.gameMode != GameType.SPECTATOR,
-                o2.gameMode != GameType.SPECTATOR,
-                //#endif
-            )
+            return ComparisonChain.start().compareTrueFirst(o1.gameMode != GameType.SPECTATOR, o2.gameMode != GameType.SPECTATOR)
                 .compare(
                     if (team1 != null) team1.name else "",
-                    if (team2 != null) team2.name else ""
+                    if (team2 != null) team2.name else "",
                 )
                 .compare(o1.profile.name, o2.profile.name).result()
         }
@@ -130,20 +119,12 @@ object TabListData {
 
     private fun readTabList(): List<String>? {
         val player = MinecraftCompat.localPlayerOrNull ?: return null
-        //#if MC < 1.16
-        //$$ val players = playerOrdering.sortedCopy(player.sendQueue.playerInfoMap)
-        //#else
         val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
-        //#endif
         val result = mutableListOf<String>()
         tabListGuard = true
         for (info in players) {
             val name = Minecraft.getInstance().gui.tabList.getNameForDisplay(info)
-            //#if MC < 1.16
-            //$$ result.add(name.stripHypixelMessage())
-            //#else
             result.add(name.formattedTextCompat().stripHypixelMessage())
-            //#endif
         }
         tabListGuard = false
         return if (result.size < 80) result.dropLast(1)

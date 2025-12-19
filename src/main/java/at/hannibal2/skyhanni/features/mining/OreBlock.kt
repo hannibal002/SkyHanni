@@ -12,22 +12,14 @@ import at.hannibal2.skyhanni.data.MiningApi.inSpidersDen
 import at.hannibal2.skyhanni.data.MiningApi.inTunnels
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import net.minecraft.world.item.DyeColor
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.StainedGlassBlock
 import net.minecraft.world.level.block.StainedGlassPaneBlock
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.item.DyeColor
 import kotlin.math.ceil
 import kotlin.math.round
-//#if MC < 1.16
-//$$ import net.minecraft.block.BlockColored
-//$$ import net.minecraft.block.BlockSand
-//$$ import net.minecraft.block.BlockSilverfish
-//$$ import net.minecraft.block.BlockStone
-//$$ import net.minecraft.block.BlockStoneSlab
-//$$ import net.minecraft.block.BlockStoneSlabNew
-//#endif
 
 enum class OreCategory {
     BLOCK,
@@ -157,67 +149,29 @@ enum class OreBlock(
 }
 
 private fun isLowTierMithril(state: BlockState): Boolean = when (state.block) {
-    //#if MC < 1.16
-    //$$ Blocks.wool -> state.getValue(BlockColored.COLOR) == EnumDyeColor.GRAY
-    //$$ Blocks.stained_hardened_clay -> state.getValue(BlockColored.COLOR) == EnumDyeColor.CYAN
-    //#else
     Blocks.GRAY_WOOL -> true
     Blocks.CYAN_TERRACOTTA -> true
-    //#endif
     else -> false
 }
 
 private fun isMidTierMithril(state: BlockState): Boolean {
-    //#if MC < 1.16
-    //$$ return state.block == Blocks.prismarine
-    //#else
     return state.block == Blocks.PRISMARINE || state.block == Blocks.PRISMARINE_BRICKS || state.block == Blocks.DARK_PRISMARINE
-    //#endif
 }
 
 private fun isHighTierMithril(state: BlockState): Boolean {
-    //#if MC < 1.16
-    //$$ return (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.LIGHT_BLUE)
-    //#else
     return state.block == Blocks.LIGHT_BLUE_WOOL
-    //#endif
 }
 
 fun isTitanium(state: BlockState): Boolean {
-    //#if MC < 1.16
-    //$$ return (state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.DIORITE_SMOOTH)
-    //#else
     return state.block == Blocks.POLISHED_DIORITE
-    //#endif
 }
 
 private fun isStone(state: BlockState): Boolean {
-    //#if MC < 1.16
-    //$$ return (state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE)
-    //#else
     return state.block == Blocks.STONE
-    //#endif
 }
 
 private fun isHardStoneHollows(state: BlockState): Boolean {
     return when (state.block) {
-        //#if MC < 1.16
-        //$$ Blocks.wool -> {
-        //$$     val color = state.getValue(BlockColored.COLOR)
-        //$$     color == EnumDyeColor.GRAY || color == EnumDyeColor.GREEN
-        //$$ }
-        //$$
-        //$$ Blocks.stained_hardened_clay -> when (state.getValue(BlockColored.COLOR)) {
-        //$$     EnumDyeColor.CYAN, EnumDyeColor.BROWN, EnumDyeColor.GRAY, EnumDyeColor.BLACK,
-        //$$     EnumDyeColor.LIME, EnumDyeColor.GREEN, EnumDyeColor.BLUE, EnumDyeColor.RED,
-        //$$     EnumDyeColor.SILVER,
-        //$$     -> true
-        //$$
-        //$$     else -> false
-        //$$ }
-        //$$
-        //$$ Blocks.clay, Blocks.stonebrick, Blocks.stone -> true
-        //#else
         Blocks.GRAY_WOOL -> true
         Blocks.GREEN_WOOL -> true
         Blocks.CYAN_TERRACOTTA -> true
@@ -238,75 +192,39 @@ private fun isHardStoneHollows(state: BlockState): Boolean {
         Blocks.DIORITE -> true
         Blocks.GRANITE -> true
         Blocks.ANDESITE -> true
-        //#endif
         else -> false
     }
 }
 
 private fun isHardstoneTunnels(state: BlockState): Boolean =
-    //#if MC < 1.16
-    //$$ (state.block == Blocks.monster_egg && state.getValue(BlockSilverfish.VARIANT) == BlockSilverfish.EnumType.STONE) ||
-    //$$     (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.SILVER)
-//#else
-state.block == Blocks.INFESTED_STONE || state.block == Blocks.LIGHT_GRAY_WOOL
-//#endif
+    state.block == Blocks.INFESTED_STONE || state.block == Blocks.LIGHT_GRAY_WOOL
 
 private fun isHardstoneMineshaft(state: BlockState): Boolean =
-    //#if MC < 1.16
-    //$$ (state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE) ||
-    //$$     (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.SILVER)
-//#else
-state.block == Blocks.STONE || state.block == Blocks.LIGHT_GRAY_WOOL
-//#endif
+    state.block == Blocks.STONE || state.block == Blocks.LIGHT_GRAY_WOOL
 
 private fun isRedSand(state: BlockState): Boolean =
-    //#if MC < 1.16
-    //$$ (state.block == Blocks.sand && state.getValue(BlockSand.VARIANT) == BlockSand.EnumType.RED_SAND)
-//#else
-state.block == Blocks.RED_SAND
-//#endif
+    state.block == Blocks.RED_SAND
 
 private fun isLowTierUmber(state: BlockState): Boolean =
     state.block == Blocks.TERRACOTTA
 
 private fun isMidTierUmber(state: BlockState): Boolean =
-    //#if MC < 1.16
-    //$$ (state.block == Blocks.stained_hardened_clay && state.getValue(BlockColored.COLOR) == EnumDyeColor.BROWN)
-//#else
-state.block == Blocks.BROWN_TERRACOTTA
-//#endif
+    state.block == Blocks.BROWN_TERRACOTTA
 
 private fun isHighTierUmber(state: BlockState): Boolean =
-    //#if MC < 1.16
-    //$$ (state.block == Blocks.double_stone_slab2 && state.getValue(BlockStoneSlabNew.VARIANT) == BlockStoneSlabNew.EnumType.RED_SANDSTONE)
-//#else
-state.block == Blocks.SMOOTH_RED_SANDSTONE
-//#endif
+    state.block == Blocks.SMOOTH_RED_SANDSTONE
 
 private fun isLowTierTungstenTunnels(state: BlockState): Boolean =
-    //#if MC < 1.16
-    //$$ state.block == Blocks.monster_egg && state.getValue(BlockSilverfish.VARIANT) == BlockSilverfish.EnumType.COBBLESTONE
-//#else
-state.block == Blocks.INFESTED_COBBLESTONE
-//#endif
+    state.block == Blocks.INFESTED_COBBLESTONE
 
 private fun isLowTierTungstenMineshaft(state: BlockState): Boolean = when (state.block) {
-    //#if MC < 1.16
-    //$$ Blocks.stone_slab -> state.getValue(BlockStoneSlab.VARIANT) == BlockStoneSlab.EnumType.COBBLESTONE
-    //#else
     Blocks.COBBLESTONE_SLAB -> true
-    //#endif
     Blocks.COBBLESTONE, Blocks.COBBLESTONE_STAIRS -> true
     else -> false
 }
 
 private fun BlockState.isGemstoneWithColor(color: DyeColor): Boolean = when (block) {
-    //#if MC < 1.16
-    //$$ Blocks.stained_glass -> color == getValue(BlockStainedGlass.COLOR)
-    //$$ Blocks.stained_glass_pane -> color == getValue(BlockStainedGlassPane.COLOR)
-    //#else
     is StainedGlassBlock -> (block as StainedGlassBlock).color == color
     is StainedGlassPaneBlock -> (block as StainedGlassPaneBlock).color == color
-    //#endif
     else -> false
 }

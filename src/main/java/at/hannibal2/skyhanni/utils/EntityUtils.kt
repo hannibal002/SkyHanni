@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
 import at.hannibal2.skyhanni.utils.compat.getHandItem
-import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.render.FrustumUtils
@@ -62,7 +61,7 @@ object EntityUtils {
 
     fun getPlayerEntities(): MutableList<RemotePlayer> {
         val list = mutableListOf<RemotePlayer>()
-        for (entity in MinecraftCompat.localWorldOrNull?.getLoadedPlayers().orEmpty()) {
+        for (entity in MinecraftCompat.localWorldOrNull?.players().orEmpty()) {
             if (!entity.isNpc() && entity is RemotePlayer) {
                 list.add(entity)
             }

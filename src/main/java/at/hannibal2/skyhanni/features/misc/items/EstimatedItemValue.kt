@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.items import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -301,17 +302,5 @@ object EstimatedItemValue {
         event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
 
         event.move(94, "inventory.estimatedItemValues.itemPriceDataPos", "inventory.estimatedItemValues.position")
-    }
-
-    fun renderInNeuStorageOverlay() {
-        if (!config.enabled) return
-
-        //#if MC < 1.16
-        //$$ // render the estimated item value over NEU Storage
-        //$$ DrawContextUtils.translate(0f, 0f, 200f)
-        //$$ tryRendering()
-        //$$ DrawContextUtils.translate(0f, 0f, -200f)
-        //$$ renderedItems++
-        //#endif
     }
 }

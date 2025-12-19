@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.hooks import at.hannibal2.skyhanni.utils.compat.container
+package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.data.GuiData
@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
-import net.minecraft.client.gui.GuiGraphics
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NEUApi
-import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.Slot
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -20,19 +20,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 class GuiContainerHook(guiAny: Any) {
 
     private val gui: SkyHanniGuiContainer = guiAny as SkyHanniGuiContainer
-    private val container: AbstractContainerMenu
-        get() =
-            //#if MC < 1.16
-            //$$ gui.inventorySlots
-    //#else
-    gui.menu
-    //#endif
+    private val container: AbstractContainerMenu get() = gui.menu
 
-    //#if MC < 1.21
-    //$$ fun closeWindowPressed(ci: CallbackInfo) {
-        //#else
-        fun closeWindowPressed(ci: org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Boolean>) {
-        //#endif
+    fun closeWindowPressed(ci: org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Boolean>) {
         if (CloseWindowEvent(gui, container).post()) ci.cancel()
     }
 

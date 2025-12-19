@@ -292,9 +292,6 @@ object CustomWardrobe {
         val fakePlayer = FakePlayer()
         var scale = playerWidth
 
-        //#if MC < 1.16
-        //$$ fakePlayer.inventory.armorInventory = slot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
-        //#else
         for (equipment in net.minecraft.world.entity.player.Inventory.EQUIPMENT_SLOT_MAPPING.values) {
             val armorOrdinal = equipment.ordinal - 2
             if (armorOrdinal < 0 || armorOrdinal > 3) continue
@@ -302,7 +299,6 @@ object CustomWardrobe {
             if (stack == null) stack = ItemStack.EMPTY
             fakePlayer.inventory.equipment.set(equipment, stack)
         }
-        //#endif
 
         val playerColor = if (!slot.isInCurrentPage()) {
             scale *= 0.9

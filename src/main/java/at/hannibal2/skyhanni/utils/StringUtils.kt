@@ -1,23 +1,27 @@
-package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.toChatFormatting
+import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 import at.hannibal2.skyhanni.utils.compat.value
+import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.components.ComponentRenderUtils
 import net.minecraft.network.chat.ClickEvent
+import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.Style
-import net.minecraft.ChatFormatting
-import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.TextColor
 import java.util.Base64
 import java.util.Locale
 import java.util.NavigableMap
@@ -25,13 +29,6 @@ import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-//#if FORGE
-//$$ import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
-//#else
-import net.minecraft.client.gui.components.ComponentRenderUtils
-import net.minecraft.network.chat.TextColor
-import at.hannibal2.skyhanni.utils.compat.toChatFormatting
-//#endif
 
 @Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object StringUtils {
@@ -202,19 +199,11 @@ object StringUtils {
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
     fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) this.toInt().toString() else this.toString()
 
-    //#if FORGE
-    //$$ fun String.splitLines(width: Int): String = ForgeFontRenderer(Minecraft.getInstance().font).splitText(
-    //$$     this.asStructuredText(),
-    //$$     width,
-    //$$ ).joinToString("\n") { it.text.removePrefix("§r") }
-    //#else
     fun String.splitLines(width: Int): String = splitText(
-    this,
-    width,
-    ).joinToString("\n") { it.toString().removePrefix("§r") }
-    //#endif
+        this,
+        width,
+    ).joinToString("\n") { it.removePrefix("§r") }
 
-    //#if MC > 1.21
     private fun splitText(text: String, width: Int): List<String> {
         val lines = ComponentRenderUtils.wrapComponents(Component.literal(text), width, Minecraft.getInstance().font)
         val strings: MutableList<String> = ArrayList(lines.size)
@@ -250,7 +239,6 @@ object StringUtils {
         }
         return strings
     }
-    //#endif
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).

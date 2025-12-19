@@ -1,12 +1,10 @@
-package at.hannibal2.skyhanni.mixins.hooks import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
+package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import net.minecraft.network.chat.HoverEvent
+import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.Style
-//#if MC < 1.21
-//$$ import net.minecraft.text.Text
-//#endif
 
 object GuiChatHook {
 
@@ -31,11 +29,7 @@ object GuiChatHook {
         // Initialise new component
         val newComponent = replacement.unformattedTextForChatCompat().asComponent {
             style = replacement.style
-            //#if MC < 1.21
-            //$$ style.chatHoverEvent = hoverEvent
-            //#else
             style.withHoverEvent(hoverEvent)
-            //#endif
         }
 
         replacement = newComponent

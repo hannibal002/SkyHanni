@@ -85,9 +85,6 @@ object GriffinBurrowParticleFinder {
         val oldBurrowType = burrow.type
 
         when (type) {
-            //#if MC < 1.16
-            //$$ ParticleType.FOOTSTEP -> burrow.hasFootstep = true
-            //#endif
             ParticleType.ENCHANT -> burrow.hasEnchant = true
             ParticleType.EMPTY -> burrow.type = 0
             ParticleType.MOB -> burrow.type = 1
@@ -135,13 +132,6 @@ object GriffinBurrowParticleFinder {
         TREASURE(
             { type == ParticleTypes.DRIPPING_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
         ),
-
-        //#if MC < 1.16
-        //$$ FOOTSTEP(
-        //$$     { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0f && offset.roundTo(2) == LorenzVec(0.05, 0.0, 0.05) },
-        //$$ ),
-        //$$
-        //#endif
         ENCHANT(
             {
                 type == ParticleTypes.ENCHANT && count == 5 && speed == 0.05f && offset.roundTo(2) ==
@@ -220,11 +210,7 @@ object GriffinBurrowParticleFinder {
 
     class Burrow(
         var location: LorenzVec,
-        //#if MC < 1.16
-        //$$ var hasFootstep: Boolean = false,
-        //#else
         var hasFootstep: Boolean = true,
-        //#endif
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,

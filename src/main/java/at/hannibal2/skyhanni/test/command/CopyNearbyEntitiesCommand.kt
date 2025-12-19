@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.player.RemotePlayer
@@ -81,7 +80,7 @@ object CopyNearbyEntitiesCommand {
                 add("-  rotationYaw: $rotationYaw")
                 add("-  rotationPitch: $rotationPitch")
 
-                val firstPassenger = entity.getFirstPassenger()
+                val firstPassenger = entity.firstPassenger
                 add("firstPassenger: $firstPassenger")
                 val ridingEntity = entity.vehicle
                 add("ridingEntity: $ridingEntity")
@@ -190,9 +189,6 @@ object CopyNearbyEntitiesCommand {
         val stackDisplayName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val cleanName = stack.cleanName()
         val itemEnchanted = stack.isEnchanted
-        //#if MC < 1.16
-        //$$ val itemDamage = stack.itemDamage
-        //#endif
         val stackSize = stack.count
         val maxStackSize = stack.maxStackSize
         val skullTexture = stack.getSkullTexture()
@@ -200,9 +196,6 @@ object CopyNearbyEntitiesCommand {
         add("-  stackDisplayName: '$stackDisplayName'")
         add("-  cleanName: '$cleanName'")
         add("-  itemEnchanted: '$itemEnchanted'")
-        //#if MC < 1.16
-        //$$ add("-  itemDamage: '$itemDamage'")
-        //#endif
         add("-  stackSize: '$stackSize'")
         add("-  maxStackSize: '$maxStackSize'")
         skullTexture?.let { add("-  skullTexture: '$it'") }
@@ -217,14 +210,8 @@ object CopyNearbyEntitiesCommand {
 
     private fun MutableList<String>.addCreeper(entity: Creeper) {
         add("EntityCreeper:")
-        //#if MC < 1.16
-        //$$ val creeperState = entity.creeperState
-        //#endif
         val ignite = entity.isIgnited
         val powered = entity.isPowered
-        //#if MC < 1.16
-        //$$ add("-  creeperState: '$creeperState'")
-        //#endif
         add("-  ignite: '$ignite'")
         add("-  powered: '$powered'")
     }

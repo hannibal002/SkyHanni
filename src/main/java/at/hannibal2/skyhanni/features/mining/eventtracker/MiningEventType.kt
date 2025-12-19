@@ -21,12 +21,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-private fun createPlayerHead(): ItemStack =
-    //#if MC < 1.16
-    //$$ ItemStack(Items.skull, 1, 3)
-//#else
-ItemStack(Items.PLAYER_HEAD)
-//#endif
+private fun createPlayerHead(): ItemStack = ItemStack(Items.PLAYER_HEAD)
 
 enum class MiningEventType(
     val eventName: String,

@@ -7,9 +7,6 @@ import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
-//#if MC < 1.21
-//$$ import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -270,19 +267,6 @@ object ChatUtils {
 
     private val chatGui get() = Minecraft.getInstance().gui.chat
 
-    //#if MC < 1.21
-    //$$ var chatLines: MutableList<ChatHudLine>
-    //$$     get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
-    //$$     set(value) {
-    //$$         (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni = value
-    //$$     }
-    //$$
-    //$$ var drawnChatLines: MutableList<ChatHudLine>
-    //$$     get() = (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni
-    //$$     set(value) {
-    //$$         (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
-    //$$     }
-    //#else
     var chatLines: MutableList<GuiMessage>
         get() = chatGui.allMessages
         set(value) {
@@ -294,7 +278,6 @@ object ChatUtils {
         set(value) {
             chatGui.trimmedMessages = value
         }
-    //#endif
 
     /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
     fun editFirstMessage(
@@ -427,16 +410,8 @@ object ChatUtils {
             (this as ChatLineData).skyHanni_fullComponent = value
         }
 
-    //#if MC < 1.16
-    //$$ val ChatLine.chatMessage get() = chatComponent.formattedText.stripHypixelMessage()
-    //$$ fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
-    //#elseif MC < 1.21
-    //$$ val ChatHudLine<Text>.chatMessage get() = text.formattedTextCompat().stripHypixelMessage()
-    //$$ fun ChatHudLine<Text>.passedSinceSent() = (MinecraftClient.getInstance().inGameHud.ticks - creationTick).ticks
-    //#else
     val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
     fun GuiMessage.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime()).ticks
-    //#endif
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)

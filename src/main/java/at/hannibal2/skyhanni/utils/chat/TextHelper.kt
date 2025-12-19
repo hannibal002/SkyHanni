@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.chat import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
@@ -7,19 +7,14 @@ import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendString
 import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
-import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.Style
 import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import java.awt.Color
-//#if MC < 1.21
-//$$ import net.minecraft.text.Text
-//$$ import net.minecraft.text.LiteralText
-//#endif
-//#if MC > 1.16
 import net.minecraft.network.chat.MutableComponent
-//#endif
+import net.minecraft.network.chat.Style
+import java.awt.Color
 
 object TextHelper {
 
@@ -28,16 +23,8 @@ object TextHelper {
     val SPACE = " ".asComponent()
     val EMPTY = "".asComponent()
 
-    //#if MC < 1.16
-    //$$ fun text(text: String, init: IChatComponent.() -> Unit = {}) = text.asComponent(init)
-    //$$ fun String.asComponent(init: IChatComponent.() -> Unit = {}) = ChatComponentText(this).also(init)
-    //#elseif MC < 1.21
-    //$$ fun text(text: String, init: MutableText.() -> Unit = {}) = text.asComponent(init)
-    //$$ fun String.asComponent(init: MutableText.() -> Unit = {}) = (LiteralText(this) as MutableText).also(init)
-    //#else
     fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
     fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent = (Component.nullToEmpty(this) as MutableComponent).also(init)
-    //#endif
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
     fun join(vararg components: Any?, separator: Component? = null): Component {

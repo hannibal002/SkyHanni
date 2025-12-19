@@ -11,9 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//#if MC > 1.21
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-//#endif
 
 @Mixin(Minecraft.class)
 public class MixinMinecraftInputs {
@@ -44,21 +42,10 @@ public class MixinMinecraftInputs {
         method = "startAttack",
         cancellable = true
     )
-    public void handleLeftClickMouse(
-        //#if MC < 1.21
-        //$$ CallbackInfo ci
-        //#else
-        CallbackInfoReturnable<Boolean> cir
-        //#endif
-    ) {
+    public void handleLeftClickMouse(CallbackInfoReturnable<Boolean> cir) {
         if (this.missTime > 0) return;
 
-        if (MinecraftInputHook.shouldCancelMouseLeftClick(this.hitResult))
-            //#if MC < 1.21
-            //$$ ci.cancel();
-        //#else
-        cir.setReturnValue(false);
-        //#endif
+        if (MinecraftInputHook.shouldCancelMouseLeftClick(this.hitResult)) cir.setReturnValue(false);
     }
 
     @ModifyVariable(

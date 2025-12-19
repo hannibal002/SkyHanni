@@ -8,9 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-//#if MC > 1.21
 import net.minecraft.client.ToggleKeyMapping;
-//#endif
 
 @Mixin(KeyMapping.class)
 public class MixinKeyBinding {
@@ -19,13 +17,11 @@ public class MixinKeyBinding {
     public void noIsKeyDown(CallbackInfoReturnable<Boolean> cir) {
         KeyMapping keyBinding = (KeyMapping) (Object) this;
         GardenCustomKeybinds.isKeyDown(keyBinding, cir);
-        //#if MC > 1.21
         if (keyBinding instanceof ToggleKeyMapping stickyKeyBinding) {
             if (stickyKeyBinding.needsToggle.getAsBoolean()) {
                 return;
             }
         }
-        //#endif
         TextInput.Companion.onMinecraftInput(keyBinding, cir);
         GraphEditor.INSTANCE.onMinecraftInput(keyBinding, cir);
     }
@@ -34,13 +30,11 @@ public class MixinKeyBinding {
     public void noIsPressed(CallbackInfoReturnable<Boolean> cir) {
         KeyMapping keyBinding = (KeyMapping) (Object) this;
         GardenCustomKeybinds.isKeyPressed(keyBinding, cir);
-        //#if MC > 1.21
         if (keyBinding instanceof ToggleKeyMapping stickyKeyBinding) {
             if (stickyKeyBinding.needsToggle.getAsBoolean()) {
                 return;
             }
         }
-        //#endif
         TextInput.Companion.onMinecraftInput(keyBinding, cir);
         GraphEditor.INSTANCE.onMinecraftInput(keyBinding, cir);
     }

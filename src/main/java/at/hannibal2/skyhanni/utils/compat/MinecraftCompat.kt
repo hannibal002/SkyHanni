@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
-import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.Entity
 
 object MinecraftCompat {
@@ -22,9 +22,7 @@ object MinecraftCompat {
 
     val localWorldExists get(): Boolean = localWorldOrNull != null
 
-    //#if MC < 1.16
-    //$$ val showDebugHud get(): Boolean = Minecraft.getMinecraft().gameSettings.showDebugInfo
-    //#elseif MC < 1.21.9
+    //#if MC < 1.21.9
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugOverlay.showDebugScreen()
     //#else
     //$$ val showDebugHud get(): Boolean = MinecraftClient.getInstance().debugHudEntryList.isF3Enabled

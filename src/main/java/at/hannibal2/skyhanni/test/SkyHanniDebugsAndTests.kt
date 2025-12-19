@@ -67,9 +67,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.nbt.CompoundTag
-//#if FORGE
-//$$ import net.minecraftforge.common.MinecraftForge
-//#endif
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -256,18 +253,12 @@ object SkyHanniDebugsAndTests {
         for (original in modules.toMutableList()) {
             val javaClass = original.javaClass
             val simpleName = javaClass.simpleName
-            //#if FORGE
-            //$$ MinecraftForge.EVENT_BUS.unregister(original)
-            //#endif
             SkyHanniEvents.unregister(original)
             println("Unregistered listener $simpleName")
 
             if (simpleName !in blockedFeatures) {
                 modules.remove(original)
                 modules.add(original)
-                //#if FORGE
-                //$$ MinecraftForge.EVENT_BUS.register(original)
-                //#endif
                 SkyHanniEvents.register(original)
                 println("Registered listener $simpleName")
             } else {
@@ -285,9 +276,6 @@ object SkyHanniDebugsAndTests {
                 for (original in modules.toMutableList()) {
                     val javaClass = original.javaClass
                     val simpleName = javaClass.simpleName
-                    //#if FORGE
-                    //$$ MinecraftForge.EVENT_BUS.unregister(original)
-                    //#endif
                     SkyHanniEvents.unregister(original)
                     println("Unregistered listener $simpleName")
                 }

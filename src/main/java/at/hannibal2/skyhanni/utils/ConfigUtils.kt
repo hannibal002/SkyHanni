@@ -6,19 +6,15 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
-import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
-import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
-import net.minecraft.client.Minecraft
-import kotlin.reflect.KProperty0
-import kotlin.reflect.jvm.javaField
-//#if FORGE
-//$$ import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-//#else
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
+import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
+import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
+import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-//#endif
+import kotlin.reflect.KProperty0
+import kotlin.reflect.jvm.javaField
 
 object ConfigUtils {
 
@@ -61,20 +57,11 @@ object ConfigUtils {
     }
 
     fun openEditor(editor: MoulConfigEditor<*>) {
-        //#if FORGE
-        //$$ SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
-        //#else
         SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Component.empty(), GuiContext(GuiElementComponent(editor)), null)
-        //#endif
     }
 
     val configScreenCurrentlyOpen: Boolean
-        get() =
-            //#if FORGE
-            //$$ Minecraft.getInstance().screen is GuiScreenElementWrapper
-    //#else
-    Minecraft.getInstance().screen is MoulConfigScreenComponent
-    //#endif
+        get() = Minecraft.getInstance().screen is MoulConfigScreenComponent
 
     fun String.asStructuredText() = StructuredText.of(this)
 }

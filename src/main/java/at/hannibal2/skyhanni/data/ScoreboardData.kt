@@ -154,18 +154,7 @@ object ScoreboardData {
         val objective = scoreboard.getSidebarObjective() ?: return emptyList()
         var scores = scoreboard.listPlayerScores(objective)
         val list = scores.getPlayerNames(scoreboard)
-        //#if MC < 1.21
-        //$$ scores = if (list.size > 15) {
-        //$$     list.drop(15)
-        //$$ } else {
-        //$$     list
-        //$$ }
-        //$$ return scores.map {
-        //$$     Team.formatPlayerName(scoreboard.getPlayerTeam(it.playerName), it.playerName)
-        //$$ }
-        //#else
         return list.map { it.formattedTextCompatLessResets() }
-        //#endif
     }
 
     /**

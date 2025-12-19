@@ -7,12 +7,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SoundUtils
-//#if MC < 1.16
-//$$ import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket
-//$$ import net.minecraft.network.play.server.S44PacketWorldBorder
-//#else
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket
-//#endif
 
 @SkyHanniModule
 object DungeonShadowAssassinNotification {
@@ -24,13 +19,7 @@ object DungeonShadowAssassinNotification {
         if (!isEnabled()) return
         if (DungeonApi.dungeonFloor?.contains("3") == true && DungeonApi.inBossRoom) return
 
-        //#if MC < 1.16
-        //$$ val packet = event.packet as? AccessorWorldBorderPacket ?: return
-        //$$ val action = packet.action
-        //$$ if (action != S44PacketWorldBorder.Action.INITIALIZE) return
-        //#else
         val packet = event.packet as? ClientboundInitializeBorderPacket ?: return
-        //#endif
         val warningTime = packet.warningTime
 
         if (warningTime == 10000) {

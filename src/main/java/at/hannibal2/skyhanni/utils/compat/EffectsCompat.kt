@@ -1,36 +1,16 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import net.minecraft.world.entity.LivingEntity
+import net.minecraft.core.Holder
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
-//#if MC > 1.16
 import net.minecraft.world.effect.MobEffects
-//#endif
-//#if MC > 1.21
-import net.minecraft.core.Holder
-//#endif
+import net.minecraft.world.entity.LivingEntity
 
 enum class EffectsCompat(
-    //#if MC < 1.21
-    //$$ val potion: StatusEffect,
-    //#else
     val potion: Holder<MobEffect>,
-    //#endif
 ) {
-    INVISIBILITY(
-        //#if MC < 1.16
-        //$$ Potion.invisibility
-        //#else
-        MobEffects.INVISIBILITY
-        //#endif
-    ),
-    BLINDNESS(
-        //#if MC < 1.16
-        //$$ Potion.blindness
-        //#else
-        MobEffects.BLINDNESS
-        //#endif
-    ),
+    INVISIBILITY(MobEffects.INVISIBILITY),
+    BLINDNESS(MobEffects.BLINDNESS),
     ;
 
     companion object {

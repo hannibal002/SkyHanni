@@ -1,149 +1,74 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.LorenzVec
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.state.properties.EnumProperty
-import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.item.ItemStack
-//#if MC < 1.21
-//$$ import net.minecraft.block.properties.IProperty
-//#endif
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
 
 object BlockCompat {
     fun getAllLogs(): List<Block> {
         val logs = mutableListOf<Block>()
         logs.addLog()
         logs.addLog2()
-        //#if MC > 1.21
         logs.addModernLogs()
-        //#endif
         return logs
     }
 
     fun createSmoothDiorite(): ItemStack {
-        //#if MC < 1.21
-        //$$ return ItemStack(Blocks.STONE, 1, net.minecraft.block.BlockStone.EnumType.DIORITE_SMOOTH.metadata)
-        //#else
         return ItemStack(Blocks.POLISHED_DIORITE)
-        //#endif
     }
 
     fun createBlueOrchid(): ItemStack {
-        //#if MC < 1.21
-        //$$ return ItemStack(Blocks.RED_FLOWER, 1, 1)
-        //#else
         return ItemStack(Blocks.BLUE_ORCHID)
-        //#endif
     }
 
     fun createSunFlower(): ItemStack {
-        //#if MC < 1.21
-        //$$ return ItemStack(Blocks.DOUBLE_PLANT)
-        //#else
         return ItemStack(Blocks.SUNFLOWER)
-        //#endif
     }
 
     fun createWildRose(): ItemStack {
-        //#if MC < 1.21
-        //$$ return ItemStack(Blocks.DOUBLE_PLANT, 1, 4)
-        //#else
         return ItemStack(Blocks.ROSE_BUSH)
-        //#endif
-    }
-
-    @Suppress("ReturnCount")
-    fun BlockState.getFlowerType(pos: LorenzVec): String? {
-        //#if MC < 1.21
-        //$$ val property = (this.block.stateManager.properties.find { it.name == "variant" } as? EnumProperty) ?: return null
-        //$$ val halfProperty = (this.block.stateManager.properties.find { it.name == "half" } as? EnumProperty) ?: return null
-        //$$ val flower = get(property as? IProperty<*>).toString()
-        //$$ val upper = get(halfProperty as? IProperty<*>)
-        //$$ if (upper.toString() == "upper") {
-        //$$     val lowerState = pos.down(1).getBlockStateAt()
-        //$$     // this is really cursed
-        //$$     // fuck blockstates
-        //$$     val stateString = lowerState.toString()
-        //$$     if (stateString.contains("variant=sunflower")) return "sunflower"
-        //$$     if (stateString.contains("variant=syringa")) return "syringa"
-        //$$     if (stateString.contains("variant=double_grass")) return "double_grass"
-        //$$     if (stateString.contains("variant=double_fern")) return "double_fern"
-        //$$     if (stateString.contains("variant=double_rose")) return "double_rose"
-        //$$     if (stateString.contains("variant=paeonia")) return "paeonia"
-        //$$ }
-        //$$ return flower
-        //#else
-        return "dont use on 1.21"
-        //#endif
     }
 
     fun BlockState.isSunflower(pos: LorenzVec): Boolean {
-        //#if MC < 1.21
-        //$$ return this.getFlowerType(pos) == "sunflower"
-        //#else
         return this.block == Blocks.SUNFLOWER
-        //#endif
     }
 
     fun BlockState.isWildRose(pos: LorenzVec): Boolean {
-        //#if MC < 1.21
-        //$$ return this.getFlowerType(pos) == "double_rose"
-        //#else
         return this.block == Blocks.ROSE_BUSH
-        //#endif
     }
 
     fun getAllLeaves(): List<Block> = buildList { addLeaves() }
 }
 
 fun MutableList<Block>.addLeaves() {
-    //#if MC < 1.21
-    //$$ this.add(Blocks.LEAVES)
-    //#else
     this.add(Blocks.OAK_LEAVES)
     this.add(Blocks.SPRUCE_LEAVES)
     this.add(Blocks.BIRCH_LEAVES)
     this.add(Blocks.JUNGLE_LEAVES)
-    //#endif
 }
 
 fun MutableList<Block>.addLeaves2() {
-    //#if MC < 1.21
-    //$$ this.add(Blocks.LEAVES2)
-    //#else
     this.add(Blocks.ACACIA_LEAVES)
     this.add(Blocks.DARK_OAK_LEAVES)
-    //#endif
 }
 
 fun MutableList<Block>.addTallGrass() {
-    //#if MC < 1.21
-    //$$ this.add(Blocks.TALLGRASS)
-    //#else
     this.add(Blocks.SHORT_GRASS)
     this.add(Blocks.FERN)
-    //#endif
 }
 
 fun MutableList<Block>.addDoublePlant() {
-    //#if MC < 1.21
-    //$$ this.add(Blocks.DOUBLE_PLANT)
-    //#else
     this.add(Blocks.SUNFLOWER)
     this.add(Blocks.LILAC)
     this.add(Blocks.TALL_GRASS)
     this.add(Blocks.LARGE_FERN)
     this.add(Blocks.ROSE_BUSH)
     this.add(Blocks.PEONY)
-    //#endif
 }
 
 fun MutableList<Block>.addRedFlower() {
-    //#if MC < 1.21
-    //$$ this.add(Blocks.RED_FLOWER)
-    //#else
     this.add(Blocks.POPPY)
     this.add(Blocks.BLUE_ORCHID)
     this.add(Blocks.ALLIUM)
@@ -153,34 +78,21 @@ fun MutableList<Block>.addRedFlower() {
     this.add(Blocks.WHITE_TULIP)
     this.add(Blocks.PINK_TULIP)
     this.add(Blocks.OXEYE_DAISY)
-    //#endif
 }
 
 fun MutableList<Block>.addRedstoneOres() {
     this.add(Blocks.REDSTONE_ORE)
-    //#if MC < 1.16
-    //$$ this.add(Blocks.lit_redstone_ore)
-    //#endif
 }
 
 fun MutableList<Block>.addWaters() {
     this.add(Blocks.WATER)
-    //#if MC < 1.16
-    //$$ this.add(Blocks.flowing_water)
-    //#endif
 }
 
 fun MutableList<Block>.addLavas() {
     this.add(Blocks.LAVA)
-    //#if MC < 1.16
-    //$$ this.add(Blocks.flowing_lava)
-    //#endif
 }
 
 fun MutableList<Block>.addLog() {
-    //#if MC < 1.16
-    //$$ this.add(Blocks.log)
-    //#else
     this.add(Blocks.OAK_LOG)
     this.add(Blocks.OAK_WOOD)
     this.add(Blocks.SPRUCE_LOG)
@@ -189,21 +101,15 @@ fun MutableList<Block>.addLog() {
     this.add(Blocks.BIRCH_WOOD)
     this.add(Blocks.JUNGLE_LOG)
     this.add(Blocks.JUNGLE_WOOD)
-    //#endif
 }
 
 fun MutableList<Block>.addLog2() {
-    //#if MC < 1.16
-    //$$ this.add(Blocks.log2)
-    //#else
     this.add(Blocks.ACACIA_LOG)
     this.add(Blocks.ACACIA_WOOD)
     this.add(Blocks.DARK_OAK_LOG)
     this.add(Blocks.DARK_OAK_WOOD)
-    //#endif
 }
 
-//#if MC > 1.21
 fun MutableList<Block>.addModernLogs() {
     this.add(Blocks.WARPED_STEM)
     this.add(Blocks.WARPED_HYPHAE)
@@ -216,4 +122,3 @@ fun MutableList<Block>.addModernLogs() {
     this.add(Blocks.PALE_OAK_LOG)
     this.add(Blocks.PALE_OAK_WOOD)
 }
-//#endif

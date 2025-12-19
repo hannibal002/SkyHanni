@@ -30,11 +30,7 @@ class ExtendedChatColor(
     }
 
     fun asText(): Component {
-        //#if MC < 1.21
-        //$$ return Text.of(this.toString())
-        //#else
         return (Component.nullToEmpty("") as MutableComponent).withColor(rgb)
-        //#endif
     }
 
     @SkyHanniModule

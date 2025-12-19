@@ -1,16 +1,30 @@
-package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
-import at.hannibal2.skyhanni.utils.compat.createWitherSkeleton
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import net.minecraft.client.Minecraft
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import net.minecraft.client.renderer.entity.RenderLivingBase
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ambient.Bat
+import net.minecraft.world.entity.animal.AbstractCow
+import net.minecraft.world.entity.animal.Chicken
+import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.animal.MushroomCow
+import net.minecraft.world.entity.animal.Ocelot
+import net.minecraft.world.entity.animal.Pig
+import net.minecraft.world.entity.animal.Rabbit
+import net.minecraft.world.entity.animal.SnowGolem
+import net.minecraft.world.entity.animal.Squid
+import net.minecraft.world.entity.animal.horse.Horse
+import net.minecraft.world.entity.animal.sheep.Sheep
+import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.boss.wither.WitherBoss
 import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.AbstractSkeleton
 import net.minecraft.world.entity.monster.Blaze
 import net.minecraft.world.entity.monster.CaveSpider
 import net.minecraft.world.entity.monster.Creeper
@@ -19,28 +33,15 @@ import net.minecraft.world.entity.monster.Endermite
 import net.minecraft.world.entity.monster.Ghast
 import net.minecraft.world.entity.monster.Giant
 import net.minecraft.world.entity.monster.Guardian
-import net.minecraft.world.entity.animal.IronGolem
 import net.minecraft.world.entity.monster.MagmaCube
-import net.minecraft.world.entity.monster.ZombifiedPiglin
 import net.minecraft.world.entity.monster.Silverfish
-import net.minecraft.world.entity.monster.AbstractSkeleton
 import net.minecraft.world.entity.monster.Slime
-import net.minecraft.world.entity.animal.SnowGolem
 import net.minecraft.world.entity.monster.Spider
 import net.minecraft.world.entity.monster.Witch
+import net.minecraft.world.entity.monster.WitherSkeleton
 import net.minecraft.world.entity.monster.Zombie
-import net.minecraft.world.entity.ambient.Bat
-import net.minecraft.world.entity.animal.Chicken
-import net.minecraft.world.entity.animal.AbstractCow
-import net.minecraft.world.entity.animal.horse.Horse
-import net.minecraft.world.entity.animal.MushroomCow
-import net.minecraft.world.entity.animal.Ocelot
-import net.minecraft.world.entity.animal.Pig
-import net.minecraft.world.entity.animal.Rabbit
-import net.minecraft.world.entity.animal.sheep.Sheep
-import net.minecraft.world.entity.animal.Squid
+import net.minecraft.world.entity.monster.ZombifiedPiglin
 import net.minecraft.world.entity.npc.Villager
-import net.minecraft.world.entity.animal.wolf.Wolf
 import org.lwjgl.opengl.GL11
 
 /**
@@ -131,7 +132,7 @@ object HolographicEntities {
     val wither = HolographicBase(WitherBoss(null))
     val enderman = HolographicBase(EnderMan(null))
     val mooshroom = HolographicBase(MushroomCow(null))
-    val witherSkeleton = HolographicBase(createWitherSkeleton(null))
+    val witherSkeleton = HolographicBase(WitherSkeleton(null))
     val cow = HolographicBase(AbstractCow(null))
     val pig = HolographicBase(Pig(null))
     val giant = HolographicBase(Giant(null))

@@ -6,14 +6,11 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.core.BlockPos
-import net.minecraft.world.phys.HitResult
-
-//#if MC > 1.21
+import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
-//#endif
+import net.minecraft.world.phys.HitResult
 
 object MinecraftInputHook {
     @JvmStatic
@@ -42,11 +39,7 @@ object MinecraftInputHook {
                 EntityClickEvent(
                     ClickType.RIGHT_CLICK,
                     ServerboundInteractPacket.ActionType.INTERACT_AT,
-                    //#if MC < 1.21
-                    //$$ blockHitResult.entityHit,
-                    //#else
-                    (blockHitResult as EntityHitResult).getEntity(),
-                    //#endif
+                    (blockHitResult as EntityHitResult).entity,
                     InventoryUtils.getItemInHand(),
                 ).also {
                     if (clickCancelled) it.cancel()
@@ -69,13 +62,7 @@ object MinecraftInputHook {
             }
 
             HitResult.Type.BLOCK -> {
-                val position =
-                    //#if MC < 1.21
-                    //$$ blockHitResult.pos
-                //#else
-                    (blockHitResult as BlockHitResult).blockPos
-                //#endif
-
+                val position = (blockHitResult as BlockHitResult).blockPos
                 BlockClickEvent(
                     ClickType.LEFT_CLICK,
                     position.toLorenzVec(),
@@ -89,11 +76,7 @@ object MinecraftInputHook {
                 EntityClickEvent(
                     ClickType.LEFT_CLICK,
                     ServerboundInteractPacket.ActionType.ATTACK,
-                    //#if MC < 1.21
-                    //$$ blockHitResult.entityHit,
-                    //#else
-                    (blockHitResult as EntityHitResult).getEntity(),
-                    //#endif
+                    (blockHitResult as EntityHitResult).entity,
                     InventoryUtils.getItemInHand(),
                 ).also {
                     if (clickCancelled) it.cancel()
@@ -107,16 +90,11 @@ object MinecraftInputHook {
     @JvmStatic
     fun shouldCancelContinuedBlockBreak(
         blockHitResult: HitResult?,
-        currentBlockPos: BlockPos
+        currentBlockPos: BlockPos,
     ): Boolean {
         if (blockHitResult == null || blockHitResult.type != HitResult.Type.BLOCK) return false
 
-        val position =
-            //#if MC < 1.21
-            //$$ blockHitResult.pos
-        //#else
-            (blockHitResult as BlockHitResult).blockPos
-        //#endif
+        val position = (blockHitResult as BlockHitResult).blockPos
 
         if (currentBlockPos == position) return false
 

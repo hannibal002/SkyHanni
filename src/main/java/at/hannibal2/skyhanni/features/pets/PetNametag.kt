@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.pets import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+package at.hannibal2.skyhanni.features.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -9,11 +9,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
-//#if MC > 1.16
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-//#endif
 
 @SkyHanniModule
 object PetNametag {
@@ -33,12 +31,7 @@ object PetNametag {
     fun onNameTagRender(event: EntityDisplayNameEvent<ArmorStand>) {
         if (!isEnabled()) return
 
-        val standName: String =
-            //#if MC < 1.16
-            //$$ event.chatComponent.unformattedText
-        //#else
-        event.chatComponent.formattedTextCompatLessResets()
-        //#endif
+        val standName: String = event.chatComponent.formattedTextCompatLessResets()
 
         petNametagPattern.matchMatcher(standName) {
             val start = group("start")
