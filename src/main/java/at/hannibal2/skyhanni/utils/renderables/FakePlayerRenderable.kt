@@ -93,7 +93,6 @@ fun Renderable.Companion.fakePlayer(
 //$$ ) {
 //$$     val n: Float = (x1 + x2).toFloat() / 2.0f
 //$$     val o: Float = (y1 + y2).toFloat() / 2.0f
-//$$     guiGraphics.enableScissor(x1, y1, x2, y2)
 //$$     val p = atan(((n - mouseX) / 40.0f).toDouble()).toFloat()
 //$$     val q = atan(((o - mouseY) / 40.0f).toDouble()).toFloat()
 //$$     val quaternionf = Quaternionf().rotateZ(3.1415927f)
