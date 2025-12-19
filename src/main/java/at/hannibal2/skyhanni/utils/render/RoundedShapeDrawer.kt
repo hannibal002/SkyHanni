@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.BufferBuilder
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
-import com.mojang.blaze3d.vertex.BufferBuilder
 import net.minecraft.resources.ResourceLocation
 //#if MC > 1.21.6
 //$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniCircleUniform

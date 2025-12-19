@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.hotx import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+package at.hannibal2.skyhanni.data.hotx
 
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import org.lwjgl.glfw.GLFW
 
 abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val hotx: HotxType, private val displayText: String) {

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule

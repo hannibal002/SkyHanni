@@ -1,9 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.ColorUtils.component1
-import at.hannibal2.skyhanni.utils.ColorUtils.component2
-import at.hannibal2.skyhanni.utils.ColorUtils.component3
-import at.hannibal2.skyhanni.utils.ColorUtils.component4
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
@@ -11,25 +7,28 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.mojang.blaze3d.platform.Lighting
+import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import com.mojang.blaze3d.platform.Lighting
-import net.minecraft.world.item.ItemStack
-import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.phys.Vec3
-import org.lwjgl.opengl.GL11
-import java.awt.Color
-import java.text.DecimalFormat
-import kotlin.math.min
-import at.hannibal2.skyhanni.utils.compat.RenderCompat
-import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
+import org.lwjgl.opengl.GL11
+import java.text.DecimalFormat
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.component3
+import kotlin.math.min
+
 //#if MC > 1.21.6
 //$$ import kotlin.math.sqrt
 //$$ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat

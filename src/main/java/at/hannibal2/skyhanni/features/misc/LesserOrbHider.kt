@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
-import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object LesserOrbHider {

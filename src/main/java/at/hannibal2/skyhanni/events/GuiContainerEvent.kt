@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import net.minecraft.client.gui.GuiGraphics
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack

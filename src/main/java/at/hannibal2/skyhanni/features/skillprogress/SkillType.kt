@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.utils.ItemUtils
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.item.Items
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 
 enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
     COMBAT("Combat", Items.GOLDEN_SWORD, 60),

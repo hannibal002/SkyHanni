@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.util.FormattedCharSequence
-import net.minecraft.network.chat.Style
-import net.minecraft.util.StringDecomposer
 import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Style
+import net.minecraft.util.FormattedCharSequence
+import net.minecraft.util.StringDecomposer
 import kotlin.time.Duration.Companion.minutes
 
 object OrderedTextUtils {

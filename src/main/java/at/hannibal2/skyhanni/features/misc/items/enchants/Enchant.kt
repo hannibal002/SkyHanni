@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.items.enchants import at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault
+package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
+import at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.world.item.ItemStack

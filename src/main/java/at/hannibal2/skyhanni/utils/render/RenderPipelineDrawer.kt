@@ -6,12 +6,12 @@ import at.hannibal2.skyhanni.utils.compat.RenderCompat.drawIndexed
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
-import net.minecraft.client.Minecraft
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.MeshData
-import com.mojang.blaze3d.vertex.Tesselator
-//#if MC < 1.21.6
 import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.Tesselator
+import net.minecraft.client.Minecraft
+//#if MC < 1.21.6
 //#else
 //$$ import org.joml.Matrix3x2f
 //#endif

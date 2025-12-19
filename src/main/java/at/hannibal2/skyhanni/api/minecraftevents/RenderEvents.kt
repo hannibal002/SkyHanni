@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.client.DeltaTracker
 import net.minecraft.resources.ResourceLocation
 //#if MC < 1.21.6
 import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback

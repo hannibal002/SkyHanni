@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -20,10 +20,11 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
 import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
-import net.minecraft.client.Minecraft
 import net.minecraft.client.GuiMessage
+import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import java.util.LinkedList
 import java.util.Queue

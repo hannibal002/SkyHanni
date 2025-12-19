@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import net.minecraft.client.Minecraft
-import net.minecraft.world.phys.AABB
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 
 @SkyHanniModule

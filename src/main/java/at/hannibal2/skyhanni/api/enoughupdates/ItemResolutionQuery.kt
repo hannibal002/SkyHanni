@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.api.enoughupdates import at.hannibal2.skyhanni.utils.compat.getStringOrDefault import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault import at.hannibal2.skyhanni.utils.compat.getIntOrDefault import at.hannibal2.skyhanni.utils.compat.container
+package at.hannibal2.skyhanni.api.enoughupdates
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -16,18 +16,22 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.compat.container
+import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
+import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
+import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
-import net.minecraft.world.item.Items
-import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.core.component.DataComponentMap
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.Container
+import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.item.Items
 import java.util.regex.Matcher
-import net.minecraft.core.component.DataComponentMap
 
 // Code taken from NotEnoughUpdates
 class ItemResolutionQuery {

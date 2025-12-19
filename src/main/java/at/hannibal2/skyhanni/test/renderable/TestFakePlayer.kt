@@ -1,17 +1,18 @@
 package at.hannibal2.skyhanni.test.renderable
 
+//#if MC > 1.8.9
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.fakePlayer
-import net.minecraft.world.item.Items
+import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import kotlin.random.Random
-//#if MC > 1.8.9
-import net.minecraft.world.entity.player.Inventory
+
 //#endif
 
 @SkyHanniModule(devOnly = true)

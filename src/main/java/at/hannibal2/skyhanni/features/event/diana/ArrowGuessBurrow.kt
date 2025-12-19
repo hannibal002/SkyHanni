@@ -32,8 +32,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.level.block.Blocks
 import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.minutes

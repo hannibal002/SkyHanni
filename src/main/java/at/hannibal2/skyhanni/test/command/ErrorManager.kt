@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.CrashReport
+import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.minutes
 
 /** Crashes if [value] is false and in developer environment */

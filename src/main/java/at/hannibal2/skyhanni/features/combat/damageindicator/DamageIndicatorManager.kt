@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.combat.damageindicator import at.hannibal2.skyhanni.utils.compat.deceased import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets import at.hannibal2.skyhanni.utils.compat.findHealthReal
+package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -54,18 +54,21 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import com.google.gson.JsonArray
 import net.minecraft.client.player.RemotePlayer
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.MagmaCube
 import net.minecraft.world.entity.monster.Zombie
-import net.minecraft.world.entity.animal.wolf.Wolf
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration

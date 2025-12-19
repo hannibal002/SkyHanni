@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils.json
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import net.minecraft.nbt.NbtIo
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtIo
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.Base64

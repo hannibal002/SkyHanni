@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.test.command import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -10,6 +10,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule

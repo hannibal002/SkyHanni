@@ -14,18 +14,17 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
-import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import com.google.gson.JsonObject
 import com.mojang.serialization.JsonOps
 import net.minecraft.core.component.DataComponents
-import net.minecraft.world.item.component.DyedItemColor
-import net.minecraft.world.item.component.CustomData
-import net.minecraft.world.item.component.ResolvableProfile
-import net.minecraft.world.item.ItemStack
 import net.minecraft.nbt.NbtOps
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Unit
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.DyedItemColor
+import net.minecraft.world.item.component.ResolvableProfile
 import kotlin.jvm.optionals.getOrNull
 
 object ComponentUtils {

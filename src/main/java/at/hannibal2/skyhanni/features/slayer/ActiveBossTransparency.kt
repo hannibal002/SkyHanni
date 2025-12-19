@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
+import net.minecraft.world.entity.LivingEntity
 
 @SkyHanniModule
 object ActiveBossTransparency {

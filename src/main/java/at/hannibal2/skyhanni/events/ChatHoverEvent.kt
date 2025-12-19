@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.HoverEvent
 
 /**
  * This event is mainly used for doing things on chat hover and reading the chat component

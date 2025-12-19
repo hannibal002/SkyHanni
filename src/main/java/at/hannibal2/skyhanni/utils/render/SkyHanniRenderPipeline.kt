@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonR
 import com.mojang.blaze3d.pipeline.BlendFunction
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.platform.DepthTestFunction
-import com.mojang.blaze3d.vertex.VertexFormat
-import net.minecraft.client.renderer.RenderPipelines
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
+import com.mojang.blaze3d.vertex.VertexFormat
+import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.ResourceLocation
 
 enum class SkyHanniRenderPipeline(

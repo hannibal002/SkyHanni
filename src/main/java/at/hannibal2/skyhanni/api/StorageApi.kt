@@ -26,8 +26,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
-import net.minecraft.world.level.block.ChestBlock
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.ChestBlock
 import java.util.NavigableMap
 import java.util.TreeMap
 

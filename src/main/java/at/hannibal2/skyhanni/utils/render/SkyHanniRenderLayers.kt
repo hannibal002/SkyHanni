@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer
-import java.util.OptionalDouble
-import java.util.concurrent.ConcurrentHashMap
+import net.minecraft.Util
+import net.minecraft.client.renderer.RenderStateShard
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.RenderType.CompositeRenderType
 import net.minecraft.client.renderer.RenderType.CompositeState
-import net.minecraft.client.renderer.RenderStateShard
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.TriState
-import net.minecraft.Util
+import java.util.OptionalDouble
+import java.util.concurrent.ConcurrentHashMap
 
 object SkyHanniRenderLayers {
 

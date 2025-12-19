@@ -25,8 +25,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.player.Inventory
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule

@@ -20,14 +20,14 @@ import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
+import com.mojang.blaze3d.platform.NativeImage
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
-import com.mojang.blaze3d.platform.NativeImage
 import net.minecraft.client.renderer.texture.DynamicTexture
-import net.minecraft.world.item.ItemStack
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.Slot
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.BufferedReader
@@ -56,6 +56,9 @@ object BetterContainers {
     private val dynamic54Button = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54_button_ctm.png")
     private val customDynamicChest = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_chest_inventory.png")
 
+    /**
+     * REGEX-TEST: navigate the maze
+     */
     private val disallowedInventoryPattern by patternGroup.pattern(
         "disallowed",
         "(?i)navigate the maze.*"

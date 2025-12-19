@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.renderables.interactables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.interactables.toDragItem
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.world.item.Items
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 
 @SkyHanniModule(devOnly = true)
 object TestDragNDrop : RenderableTestSuite.TestRenderable("drag") {

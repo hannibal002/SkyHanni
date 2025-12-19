@@ -16,10 +16,10 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.item.Items
-import net.minecraft.world.item.ItemStack
 import net.minecraft.core.Direction
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule(devOnly = true)
 object TestRenderItems : RenderableTestSuite.TestRenderable("items") {

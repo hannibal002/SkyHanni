@@ -36,8 +36,8 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
-import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import net.minecraft.client.player.LocalPlayer
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule

@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.world.item.DyeColor
 import net.minecraft.ChatFormatting
+import net.minecraft.world.item.DyeColor
 import java.awt.Color
 
 enum class LorenzColor(val chatColorCode: Char, private val color: Color, private val coloredLabel: String) {

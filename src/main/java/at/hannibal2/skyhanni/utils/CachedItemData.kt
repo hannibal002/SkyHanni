@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.world.item.ItemStack
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
 
 data class CachedItemData(

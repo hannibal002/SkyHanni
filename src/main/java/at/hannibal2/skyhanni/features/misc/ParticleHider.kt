@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.world.entity.projectile.SmallFireball
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.entity.projectile.SmallFireball
 
 @SkyHanniModule
 object ParticleHider {

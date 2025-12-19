@@ -3,14 +3,12 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
-import at.hannibal2.skyhanni.utils.compat.BlockCompat.isSunflower
-import at.hannibal2.skyhanni.utils.compat.BlockCompat.isWildRose
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.item.Items
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
 
 enum class CropType(
     val cropName: String,

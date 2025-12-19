@@ -31,9 +31,9 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.projectile.FishingHook
 import net.minecraft.world.item.ItemStack
-import net.minecraft.core.particles.ParticleTypes
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.seconds
 

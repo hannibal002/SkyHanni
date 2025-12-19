@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import at.hannibal2.skyhanni.utils.compat.value
 import net.minecraft.network.chat.ClickEvent
-import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.HoverEvent
 
 @SkyHanniModule
 object PlayerChatModifier {

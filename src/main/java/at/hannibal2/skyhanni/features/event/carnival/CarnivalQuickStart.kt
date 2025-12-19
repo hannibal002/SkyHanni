@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.carnival import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
+package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -11,9 +11,10 @@ import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.LivingEntity
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule

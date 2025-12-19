@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.discordrpc import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault import at.hannibal2.skyhanni.utils.compat.getIntOrDefault import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // SkyblockAddons code, adapted for SkyHanni with some additions and fixes
 
@@ -29,6 +29,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
+import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 

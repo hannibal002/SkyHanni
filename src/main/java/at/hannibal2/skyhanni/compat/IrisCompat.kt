@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.compat
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.utils.InitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import com.mojang.blaze3d.pipeline.RenderPipeline
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.mojang.blaze3d.pipeline.RenderPipeline
 import java.lang.reflect.Method
 
 @SkyHanniModule

@@ -1,10 +1,11 @@
-package at.hannibal2.skyhanni.features.chat.playerchat import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.features.chat.playerchat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.PlayerChatFilterJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MultiFilter
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule

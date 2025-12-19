@@ -45,8 +45,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import kotlinx.coroutines.runBlocking
-import net.minecraft.client.Minecraft
 import net.minecraft.client.KeyMapping
+import net.minecraft.client.Minecraft
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
 import kotlin.math.min

@@ -1,19 +1,20 @@
-package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.mixins.hooks.renderToolTip
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
-import at.hannibal2.skyhanni.mixins.hooks.renderToolTip
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 
 // Please use ToolTipTextEvent over ToolTipEvent, ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
 object ToolTipData {

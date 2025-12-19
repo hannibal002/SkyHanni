@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable
-import net.minecraft.world.item.ItemStack
 import net.minecraft.core.Direction.Axis
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import kotlin.math.sin
 import kotlin.time.Duration

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.jerry.frozentreasure import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+package at.hannibal2.skyhanni.features.event.jerry.frozentreasure
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.blockhighlight.SkyHanniBlockHighlighter
 import at.hannibal2.skyhanni.utils.blockhighlight.TimedHighlightBlock
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.system.PlatformUtils

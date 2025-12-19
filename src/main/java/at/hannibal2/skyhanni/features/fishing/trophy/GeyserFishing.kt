@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import net.minecraft.world.phys.AABB
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
 object GeyserFishing {

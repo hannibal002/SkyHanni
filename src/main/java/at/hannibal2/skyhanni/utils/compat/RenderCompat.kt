@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import com.mojang.blaze3d.pipeline.RenderTarget
 import com.mojang.blaze3d.systems.GpuDevice
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.pipeline.RenderTarget
 import java.util.OptionalDouble
 import java.util.OptionalInt
 //#if MC < 1.21.6

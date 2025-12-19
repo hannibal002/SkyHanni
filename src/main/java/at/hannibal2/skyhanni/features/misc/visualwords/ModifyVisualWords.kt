@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils.requiredStyleChangeString
 import net.minecraft.client.Minecraft
-import net.minecraft.util.FormattedCharSequence
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.network.chat.Style
+import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.StringDecomposer
 import java.util.Optional
 import kotlin.time.Duration.Companion.minutes

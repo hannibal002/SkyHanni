@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.combat.damageindicator import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets import at.hannibal2.skyhanni.utils.compat.findHealthReal
+package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.data.ElectionApi.ignoreDerpy
 import at.hannibal2.skyhanni.data.IslandType
@@ -17,26 +17,28 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.ambient.Bat
+import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.animal.horse.Horse
+import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon
 import net.minecraft.world.entity.boss.wither.WitherBoss
+import net.minecraft.world.entity.monster.AbstractSkeleton
 import net.minecraft.world.entity.monster.Blaze
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.Ghast
 import net.minecraft.world.entity.monster.Giant
 import net.minecraft.world.entity.monster.Guardian
-import net.minecraft.world.entity.animal.IronGolem
 import net.minecraft.world.entity.monster.MagmaCube
-import net.minecraft.world.entity.monster.ZombifiedPiglin
 import net.minecraft.world.entity.monster.Silverfish
-import net.minecraft.world.entity.monster.AbstractSkeleton
 import net.minecraft.world.entity.monster.Spider
 import net.minecraft.world.entity.monster.Zombie
-import net.minecraft.world.entity.ambient.Bat
-import net.minecraft.world.entity.animal.horse.Horse
-import net.minecraft.world.entity.animal.wolf.Wolf
+import net.minecraft.world.entity.monster.ZombifiedPiglin
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds

@@ -11,10 +11,11 @@ import at.hannibal2.skyhanni.utils.compat.RenderCompat.enableRenderPassScissorSt
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.MeshData
 import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.Minecraft
-import com.mojang.blaze3d.vertex.MeshData
 import net.minecraft.client.renderer.RenderType.CompositeRenderType
+
 //#if MC > 1.21.6
 //$$ import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
 //$$ import org.joml.Vector4f

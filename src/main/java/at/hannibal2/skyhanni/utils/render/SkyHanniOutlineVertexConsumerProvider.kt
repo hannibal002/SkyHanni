@@ -6,11 +6,11 @@ import com.mojang.blaze3d.textures.AddressMode
 import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.TextureFormat
+import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.OutlineBufferSource
 import net.minecraft.client.renderer.RenderType
-import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.client.renderer.MultiBufferSource
 //#if MC > 1.21.6
 //$$ import com.mojang.blaze3d.textures.GpuTextureView
 //#endif
