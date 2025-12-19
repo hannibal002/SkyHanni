@@ -160,7 +160,7 @@ object RepoPatternManager {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexes"))
+        loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexesModern"))
     }
 
     fun loadPatternsFromDump(dump: RepoPatternDump) {
