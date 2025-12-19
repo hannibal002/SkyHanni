@@ -14,7 +14,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.font.TextDrawable;
+//$$ import net.minecraft.client.gui.font.TextRenderable;
+//$$ import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph;
 //#endif
 
 @Mixin(Font.StringRenderOutput.class)
@@ -30,9 +31,9 @@ public class MixinTextRendererDrawer {
         ChromaFontManagerKt.checkIfGlyphIsChroma(drawnGlyph);
     }
     //#else
-    //$$ @Inject(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer$GlyphDrawer;drawGlyph(Lnet/minecraft/client/font/TextDrawable;)V"))
-    //$$ private void checkIfGlyphIsChroma(CallbackInfo ci, @Local TextDrawable textDrawable) {
-    //$$     if (textDrawable instanceof BakedGlyphImpl.DrawnGlyph drawnGlyph) {
+    //$$ @Inject(method = "visit", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font$GlyphVisitor;acceptGlyph(Lnet/minecraft/client/gui/font/TextRenderable;)V"))
+    //$$ private void checkIfGlyphIsChroma(CallbackInfo ci, @Local TextRenderable textDrawable) {
+    //$$     if (textDrawable instanceof BakedSheetGlyph.GlyphInstance drawnGlyph) {
     //$$         ChromaFontManagerKt.checkIfGlyphIsChroma(drawnGlyph);
     //$$     }
     //$$ }
@@ -41,7 +42,7 @@ public class MixinTextRendererDrawer {
     //#if MC < 1.21.9
     @WrapOperation(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Style;getColor()Lnet/minecraft/network/chat/TextColor;"))
     //#else
-    //$$ @WrapOperation(method = "accept(ILnet/minecraft/text/Style;Lnet/minecraft/client/font/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Style;getColor()Lnet/minecraft/text/TextColor;"))
+    //$$ @WrapOperation(method = "accept(ILnet/minecraft/network/chat/Style;Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Style;getColor()Lnet/minecraft/network/chat/TextColor;"))
     //#endif
     private TextColor wrapGetColor(Style original, Operation<TextColor> operation) {
         return ChromaFontManagerKt.forceWhiteTextColorForChroma(original.getColor());
@@ -50,7 +51,7 @@ public class MixinTextRendererDrawer {
     //#if MC < 1.21.9
     @ModifyArg(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/font/glyphs/BakedGlyph$GlyphInstance;<init>(FFIILnet/minecraft/client/gui/font/glyphs/BakedGlyph;Lnet/minecraft/network/chat/Style;FF)V"))
     //#else
-    //$$ @ModifyArg(method = "accept(ILnet/minecraft/text/Style;Lnet/minecraft/client/font/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/BakedGlyph;create(FFIILnet/minecraft/text/Style;FF)Lnet/minecraft/client/font/TextDrawable;"))
+    //$$ @ModifyArg(method = "accept(ILnet/minecraft/network/chat/Style;Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;createGlyph(FFIILnet/minecraft/network/chat/Style;FF)Lnet/minecraft/client/gui/font/TextRenderable;"))
     //#endif
     private Style forceChromaIfNecessary(Style style) {
         return ChromaFontManagerKt.forceChromaStyleIfNecessary(style);

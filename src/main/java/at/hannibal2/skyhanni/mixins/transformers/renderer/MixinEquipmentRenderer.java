@@ -33,13 +33,13 @@ public class MixinEquipmentRenderer {
         return original.call(vertexConsumerProvider, renderLayer, b);
     }
     //#else
-    //$$ @ModifyArg(method = "render(Lnet/minecraft/client/render/entity/equipment/EquipmentModel$LayerType;Lnet/minecraft/registry/RegistryKey;Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;ILnet/minecraft/util/Identifier;II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/RenderCommandQueue;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/RenderLayer;IIILnet/minecraft/client/texture/Sprite;ILnet/minecraft/client/render/command/ModelCommandRenderer$CrumblingOverlayCommand;)V", ordinal = 1), index = 3)
-    //$$ private RenderLayer replaceVertexConsumer(RenderLayer original, @Local(ordinal = 1) Identifier identifier) {
+    //$$ @ModifyArg(method = "renderLayers(Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/ResourceLocation;II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OrderedSubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V", ordinal = 1), index = 3)
+    //$$ private RenderType replaceVertexConsumer(RenderType original, @Local(ordinal = 1) ResourceLocation identifier) {
     //$$     if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
     //$$         Integer entityAlpha = EntityOpacityManager.getEntityOpacity(livingEntity);
     //$$         if (entityAlpha == null) return original;
     //$$
-    //$$         return RenderLayer.createArmorTranslucent(identifier);
+    //$$         return RenderType.armorTranslucent(identifier);
     //$$     }
     //$$     return original;
     //$$ }

@@ -79,15 +79,15 @@ object ClientEvents {
                 }
                 //#else
                 //$$ override fun reload(
-                //$$     store: ResourceReloader.Store,
+                //$$     store: PreparableReloadListener.SharedState,
                 //$$     prepareExecutor: Executor,
-                //$$     reloadSynchronizer: ResourceReloader.Synchronizer,
+                //$$     reloadSynchronizer: PreparableReloadListener.PreparationBarrier,
                 //$$     applyExecutor: Executor,
                 //$$ ): CompletableFuture<Void> {
                 //$$     return CompletableFuture.runAsync(
-                //$$         { ResourcePackReloadEvent(store.resourceManager).post() },
+                //$$         { ResourcePackReloadEvent(store.resourceManager()).post() },
                 //$$         applyExecutor,
-                //$$     ).thenCompose(reloadSynchronizer::whenPrepared)
+                //$$     ).thenCompose(reloadSynchronizer::wait)
                 //$$ }
                 //#endif
             },

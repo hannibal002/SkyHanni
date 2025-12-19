@@ -17,10 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 //$$ import com.llamalad7.mixinextras.sugar.Local;
-//$$ import net.minecraft.client.MinecraftClient;
-//$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-//$$ import net.minecraft.client.render.state.CameraRenderState;
-//$$ import net.minecraft.entity.Entity;
+//$$ import net.minecraft.client.Minecraft;
+//$$ import net.minecraft.client.renderer.SubmitNodeCollector;
+//$$ import net.minecraft.client.renderer.state.CameraRenderState;
+//$$ import net.minecraft.world.entity.Entity;
 //$$ import at.hannibal2.skyhanni.mixins.hooks.EntityRenderStateStore;
 //#endif
 
@@ -31,7 +31,7 @@ public class MixinEntityRenderer {
     //#if MC < 1.21.9
     public void onRenderLabelHead(EntityRenderState state, Component text, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
         //#else
-        //$$ public void onRenderLabelHead(EntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState, CallbackInfo ci) {
+        //$$ public void onRenderLabelHead(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         //#endif
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             if (new SkyHanniRenderEntityEvent.Specials.Pre<>(livingEntity, state.x, state.y, state.z).post()) {
@@ -44,7 +44,7 @@ public class MixinEntityRenderer {
     //#if MC < 1.21.9
     public void onRenderLabelTail(EntityRenderState state, Component text, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
         //#else
-        //$$ public void onRenderLabelTail(EntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState, CallbackInfo ci) {
+        //$$ public void onRenderLabelTail(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         //#endif
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             new SkyHanniRenderEntityEvent.Specials.Post<>(livingEntity, state.x, state.y, state.z).post();
@@ -52,8 +52,8 @@ public class MixinEntityRenderer {
     }
 
     //#if MC > 1.21.8
-    //$$ @WrapOperation(method = "updateRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"))
-    //$$ public boolean shouldAlsoGlow(MinecraftClient client, Entity entity, Operation<Boolean> original, @Local(argsOnly = true) EntityRenderState state) {
+    //$$ @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;shouldEntityAppearGlowing(Lnet/minecraft/world/entity/Entity;)Z"))
+    //$$ public boolean shouldAlsoGlow(Minecraft client, Entity entity, Operation<Boolean> original, @Local(argsOnly = true) EntityRenderState state) {
     //$$     Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
     //$$     if (glowColor == null) {
     //$$         return original.call(client, entity);
@@ -62,7 +62,7 @@ public class MixinEntityRenderer {
     //$$     return true;
     //$$ }
     //$$
-    //$$ @WrapOperation(method = "updateRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getTeamColorValue()I"))
+    //$$ @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getTeamColor()I"))
     //$$ public int getCustomGlowColor(Entity entity, Operation<Integer> original) {
     //$$     Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
     //$$     if (glowColor == null) {
@@ -71,7 +71,7 @@ public class MixinEntityRenderer {
     //$$     return glowColor;
     //$$ }
     //$$
-    //$$ @Inject(method = "updateRenderState", at = @At("TAIL"))
+    //$$ @Inject(method = "extractRenderState", at = @At("TAIL"))
     //$$ public void setEntity(Entity entity, EntityRenderState state, float tickProgress, CallbackInfo ci) {
     //$$     ((EntityRenderStateStore) state).skyhanni$setEntity(entity);
     //$$ }

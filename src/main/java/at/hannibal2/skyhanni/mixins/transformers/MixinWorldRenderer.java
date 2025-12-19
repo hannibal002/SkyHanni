@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.render.entity.state.EntityRenderState;
+//$$ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 //#endif
 
 @Mixin(LevelRenderer.class)
@@ -27,7 +27,7 @@ public class MixinWorldRenderer {
     @Inject(method = "collectVisibleEntities", at = @At(value = "HEAD"))
     public void resetRealGlowing(CallbackInfoReturnable<Boolean> cir) {
         //#else
-        //$$ @Inject(method = "fillEntityRenderStates", at = @At(value = "HEAD"))
+        //$$ @Inject(method = "extractVisibleEntities", at = @At(value = "HEAD"))
         //$$ public void resetRealGlowing(CallbackInfo ci) {
         //#endif
         RenderLivingEntityHelper.check();
@@ -46,7 +46,7 @@ public class MixinWorldRenderer {
         return true;
     }
     //#else
-    //$$ @WrapOperation(method = "fillEntityRenderStates", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/state/EntityRenderState;hasOutline()Z"))
+    //$$ @WrapOperation(method = "extractVisibleEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/state/EntityRenderState;appearsGlowing()Z"))
     //$$ public boolean shouldAlsoGlow(EntityRenderState instance, Operation<Boolean> original, @Local Entity entity) {
     //$$     Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
     //$$     if (glowColor == null) {

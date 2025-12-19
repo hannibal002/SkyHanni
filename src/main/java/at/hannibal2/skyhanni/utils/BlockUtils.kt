@@ -41,7 +41,7 @@ object BlockUtils {
         //#elseif MC < 1.21.9
         return this.ownerProfile?.id?.get()?.toString()
         //#else
-        //$$ return this.owner?.gameProfile?.id.toString()
+        //$$ return this.ownerProfile?.partialProfile()?.id.toString()
         //#endif
     }
 

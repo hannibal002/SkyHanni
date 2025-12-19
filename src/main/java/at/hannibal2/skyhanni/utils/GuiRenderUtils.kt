@@ -595,10 +595,10 @@ object GuiRenderUtils {
     //$$     itemRenderStateButCool.render(matrices, consumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY)
     //$$     consumers.endBatch()
     //#else
-    //$$     val dispatcher = client.gameRenderer.entityRenderDispatcher
-    //$$     val consumers = dispatcher.queue
-    //$$     itemRenderStateButCool.render(matrices, consumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
-    //$$     dispatcher.render()
+    //$$     val dispatcher = client.gameRenderer.featureRenderDispatcher
+    //$$     val consumers = dispatcher.submitNodeStorage
+    //$$     itemRenderStateButCool.submit(matrices, consumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
+    //$$     dispatcher.endFrame()
     //#endif
     //$$     matrices.popPose()
     //$$     RenderSystem.teardownOverlayColor()

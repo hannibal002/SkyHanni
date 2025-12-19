@@ -16,7 +16,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.state.GlyphRenderState
 import net.minecraft.client.gui.render.state.GuiElementRenderState
 //#if MC > 1.21.8
-//$$ net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
+//$$ import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
 //#endif
 
 object GuiRendererHook {

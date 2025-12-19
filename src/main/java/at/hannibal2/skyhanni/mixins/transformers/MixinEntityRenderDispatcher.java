@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.render.state.CameraRenderState;
-//$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+//$$ import net.minecraft.client.renderer.state.CameraRenderState;
+//$$ import net.minecraft.client.renderer.SubmitNodeCollector;
 //#endif
 
 @Mixin(EntityRenderDispatcher.class)
@@ -31,8 +31,8 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
         }
         EntityRenderDispatcherHookKt.setEntity(entity);
         //#else
-        //$$ @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
-        //$$ public void onRenderPre(S renderState, CameraRenderState cameraRenderState, double d, double e, double f, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, CallbackInfo ci) {
+        //$$ @Inject(method = "submit", at = @At(value = "HEAD"), cancellable = true)
+        //$$ public void onRenderPre(EntityRenderState renderState, CameraRenderState cameraRenderState, double d, double e, double f, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
         //$$     EntityRenderDispatcherHookKt.setEntity(renderState);
         //$$     Entity entity = EntityRenderDispatcherHookKt.getEntity();
         //$$     if (entity instanceof LivingEntity livingEntity) {
@@ -51,8 +51,8 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
             new SkyHanniRenderEntityEvent.Post<>(livingEntity, x, y, z).post();
         }
         //#else
-        //$$ @Inject(method = "render", at = @At(value = "RETURN"))
-        //$$ public void onRenderPost(S renderState, CameraRenderState cameraRenderState, double d, double e, double f, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, CallbackInfo ci) {
+        //$$ @Inject(method = "submit", at = @At(value = "RETURN"))
+        //$$ public void onRenderPost(EntityRenderState entityRenderState, CameraRenderState cameraRenderState, double d, double e, double f, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
         //$$     Entity entity = EntityRenderDispatcherHookKt.getEntity();
         //$$     if (entity instanceof LivingEntity livingEntity) {
         //$$         // TODO confirm these are the right values for position

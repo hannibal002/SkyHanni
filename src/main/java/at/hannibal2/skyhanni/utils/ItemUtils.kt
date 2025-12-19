@@ -289,7 +289,7 @@ object ItemUtils {
         //#if MC < 1.21.9
         return this.get(DataComponents.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
         //#else
-        //$$ return this.get(DataComponentTypes.PROFILE)?.gameProfile?.properties?.get("textures")?.firstOrNull()?.value
+        //$$ return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.value
         //#endif
 
     }
@@ -299,7 +299,7 @@ object ItemUtils {
         //#if MC < 1.21.9
         return this.get(DataComponents.PROFILE)?.id?.get().toString()
         //#else
-        //$$ return this.get(DataComponentTypes.PROFILE)?.gameProfile?.id.toString()
+        //$$ return this.get(DataComponents.PROFILE)?.partialProfile()?.id.toString()
         //#endif
     }
 
@@ -318,7 +318,7 @@ object ItemUtils {
         //$$ val builder = ImmutableMultimap.builder<String, Property>()
         //$$ builder.put("textures", Property("textures", value))
         //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo", PropertyMap(builder.build()))
-        //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent.ofStatic(profile))
+        //$$ stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(profile))
         //#endif
         stack.setCustomItemName(displayName)
         stack.setLore(lore.toList())

@@ -64,7 +64,7 @@ object ComponentUtils {
             //#if MC < 1.21.9
             stack.set(DataComponents.PROFILE, ResolvableProfile(skullOwner.toGameProfile()))
             //#else
-            //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent.ofStatic(skullOwner.toGameProfile()))
+            //$$ stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(skullOwner.toGameProfile()))
             //#endif
         }
 
@@ -77,8 +77,8 @@ object ComponentUtils {
         val profileProperties = profile?.properties?.get("textures")?.firstOrNull()
         val uuid = profile?.id?.getOrNull() ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
         //#else
-        //$$ val profileProperties = profile?.gameProfile?.properties?.get("textures")?.firstOrNull()
-        //$$ val uuid = profile?.gameProfile?.id ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
+        //$$ val profileProperties = profile?.partialProfile()?.properties?.get("textures")?.firstOrNull()
+        //$$ val uuid = profile?.partialProfile()?.id ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
         //#endif
         val value = profileProperties?.value
         val signature = profileProperties?.signature
@@ -87,7 +87,7 @@ object ComponentUtils {
             uuid = uuid.toString(),
             properties = propertiesInfo,
             hypixelPopulated = NbtBoolean(true),
-            name = profile?.name?.getOrNull(),
+            name = profile?.name()?.getOrNull(),
         )
         val lore = stack.getLore()
         val color = stack.get(DataComponents.DYED_COLOR)?.rgb

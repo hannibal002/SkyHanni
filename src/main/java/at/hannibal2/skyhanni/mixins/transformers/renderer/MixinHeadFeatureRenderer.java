@@ -11,7 +11,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+//$$ import net.minecraft.client.renderer.SubmitNodeCollector;
+//$$ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 //#endif
 
 @Mixin(CustomHeadLayer.class)
@@ -21,8 +22,8 @@ public class MixinHeadFeatureRenderer {
     @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;FF)V", at = @At("HEAD"), cancellable = true)
     private void onRenderArmor(PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int light, LivingEntityRenderState renderState, float f, float g, CallbackInfo ci) {
         //#else
-        //$$ @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;ILnet/minecraft/client/render/entity/state/LivingEntityRenderState;FF)V", at = @At("HEAD"), cancellable = true)
-        //$$ private void onRenderArmor(MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, int i, LivingEntityRenderState livingEntityRenderState, float f, float g, CallbackInfo ci) {
+        //$$ @Inject(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/EntityRenderState;FF)V", at = @At("HEAD"), cancellable = true)
+        //$$ private void onRenderArmor(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, EntityRenderState entityRenderState, float f, float g, CallbackInfo ci) {
         //#endif
         if (HideArmorHookKt.shouldHideArmor()) {
             ci.cancel();

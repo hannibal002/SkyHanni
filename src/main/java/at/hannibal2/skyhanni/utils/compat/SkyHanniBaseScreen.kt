@@ -6,9 +6,9 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.gui.Click
-//$$ import net.minecraft.client.input.CharInput
-//$$ import net.minecraft.client.input.KeyInput
+//$$ import net.minecraft.client.input.MouseButtonEvent
+//$$ import net.minecraft.client.input.CharacterEvent
+//$$ import net.minecraft.client.input.KeyEvent
 //#endif
 
 @Suppress("UnusedParameter")
@@ -48,7 +48,7 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
         return super.mouseClicked(mouseX, mouseY, mouseButton)
     }
     //#else
-    //$$ override fun mouseClicked(click: Click, doubled: Boolean): Boolean {
+    //$$ override fun mouseClicked(click: MouseButtonEvent, doubled: Boolean): Boolean {
     //$$     postMouseClicked(click.x.toInt(), click.y.toInt(), click.button())
     //$$     postHandleMouseInput()
     //$$     return super.mouseClicked(click, doubled)
@@ -76,12 +76,12 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
         return super.charTyped(chr, modifiers)
     }
     //#else
-    //$$ override fun keyPressed(input: KeyInput): Boolean {
+    //$$ override fun keyPressed(input: KeyEvent): Boolean {
     //$$     postKeyTyped(null, input.key)
     //$$     return super.keyPressed(input)
     //$$ }
     //$$
-    //$$ override fun charTyped(input: CharInput): Boolean {
+    //$$ override fun charTyped(input: CharacterEvent): Boolean {
     //$$     postKeyTyped(input.codepoint.toChar(), null)
     //$$     return super.charTyped(input)
     //$$ }
@@ -104,7 +104,7 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
         return super.mouseReleased(mouseX, mouseY, button)
     }
     //#else
-    //$$ override fun mouseReleased(click: Click): Boolean {
+    //$$ override fun mouseReleased(click: MouseButtonEvent): Boolean {
     //$$     postMouseReleased(click.x.toInt(), click.y.toInt(), click.button())
     //$$     postHandleMouseInput()
     //$$     return super.mouseReleased(click)
@@ -129,7 +129,7 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
     }
     //#else
-    //$$ override fun mouseDragged(click: Click, mouseX: Double, mouseY: Double): Boolean {
+    //$$ override fun mouseDragged(click: MouseButtonEvent, mouseX: Double, mouseY: Double): Boolean {
     //$$     // TODO idk if mouseX is correct or if it should be click.x
     //$$     postMouseClickMove(mouseX.toInt(), mouseY.toInt(), click.button(), 0L)
     //$$     postHandleMouseInput()

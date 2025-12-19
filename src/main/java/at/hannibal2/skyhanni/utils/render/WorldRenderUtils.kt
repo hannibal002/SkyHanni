@@ -63,10 +63,10 @@ object WorldRenderUtils {
             0.25f,
             //#else
             //$$ matrices,
-            //$$ MinecraftClient.getInstance().gameRenderer.entityRenderDispatcher.queue,
+            //$$ Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
             //$$ beaconBeam,
             //$$ 1f,
-            //$$ Math.floorMod(MinecraftCompat.localWorld.time, 40) + partialTicks,
+            //$$ Math.floorMod(MinecraftCompat.localWorld.gameTime, 40) + partialTicks,
             //$$ 0,
             //$$ 319,
             //$$ rgb,

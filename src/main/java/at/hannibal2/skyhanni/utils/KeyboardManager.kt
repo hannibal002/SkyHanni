@@ -10,7 +10,7 @@ import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
 import com.mojang.blaze3d.platform.InputConstants
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.input.KeyInput
+//$$ import net.minecraft.client.input.KeyEvent
 //#endif
 
 object KeyboardManager {
@@ -55,10 +55,10 @@ object KeyboardManager {
         if (isShiftKeyDown()) return false
 
         val isClose =
-            //#if MC < 1.21.9
+        //#if MC < 1.21.9
         Minecraft.getInstance().options.keyInventory.matches(keycode, keycode) || keycode == GLFW.GLFW_KEY_ESCAPE
         //#else
-        //$$ MinecraftClient.getInstance().options.inventoryKey.matchesKey(KeyInput(keycode, keycode, 0)) || keycode == GLFW.GLFW_KEY_ESCAPE
+        //$$ Minecraft.getInstance().options.keyInventory.matches(KeyEvent(keycode, keycode, 0)) || keycode == GLFW.GLFW_KEY_ESCAPE
         //#endif
 
         if (!isClose) return false
@@ -97,7 +97,7 @@ object KeyboardManager {
         //#if MC < 1.21.9
         else -> InputConstants.isKeyDown(Minecraft.getInstance().window.window, this)
         //#else
-        //$$ else -> InputUtil.isKeyPressed(MinecraftClient.getInstance().window, this)
+        //$$ else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
         //#endif
     }
 

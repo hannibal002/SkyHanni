@@ -12,7 +12,7 @@ object ClipboardUtils {
                 //#if MC < 1.21.9
                 com.mojang.blaze3d.platform.ClipboardManager().setClipboard(Minecraft.getInstance().window.window, text)
                 //#else
-                //$$ net.minecraft.client.util.Clipboard().set(MinecraftClient.getInstance().window, text)
+                //$$ com.mojang.blaze3d.platform.ClipboardManager().setClipboard(Minecraft.getInstance().window, text)
                 //#endif
             } catch (e: Exception) {
                 if (step == 3) {
@@ -30,7 +30,7 @@ object ClipboardUtils {
     //#if MC < 1.21.9
         0,
     //#else
-    //$$     MinecraftClient.getInstance().window,
+    //$$     Minecraft.getInstance().window,
     //#endif
         ) { _, _ ->
             shouldRetry = true

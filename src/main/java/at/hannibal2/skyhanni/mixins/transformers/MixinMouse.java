@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.input.MouseInput;
+//$$ import net.minecraft.client.input.MouseButtonInfo;
 //#endif
 
 @Mixin(MouseHandler.class)
@@ -45,7 +45,7 @@ public class MixinMouse {
     //#if MC < 1.21.9
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
         //#else
-        //$$ private void onMouseButton(long window, MouseInput input, int action, CallbackInfo ci) {
+        //$$ private void onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
         //$$     int button = input.button();
         //#endif
         if (action == 1) {

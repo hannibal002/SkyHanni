@@ -30,8 +30,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.gui.Click;
-//$$ import net.minecraft.client.input.KeyInput;
+//$$ import net.minecraft.client.input.MouseButtonEvent;
+//$$ import net.minecraft.client.input.KeyEvent;
 //#endif
 
 import java.util.ArrayList;
@@ -83,8 +83,8 @@ public abstract class MixinHandledScreen {
     //#if MC < 1.21.9
     private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         //#else
-        //$$ private void keyPressed(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
-        //$$     int keyCode = input.getKeycode();
+        //$$ private void keyPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
+        //$$     int keyCode = input.input();
         //#endif
         TextInput.Companion.onGuiInput(cir);
         boolean shouldCancelInventoryClose = KeyboardManager.checkIsInventoryClosure(keyCode);
@@ -97,7 +97,7 @@ public abstract class MixinHandledScreen {
     //#if MC < 1.21.9
     private void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         //#else
-        //$$ private void mouseClicked(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+        //$$ private void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         //#endif
         if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this).post()) {
             cir.setReturnValue(false);

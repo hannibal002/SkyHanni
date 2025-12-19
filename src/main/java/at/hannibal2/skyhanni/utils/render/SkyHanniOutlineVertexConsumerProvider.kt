@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.MultiBufferSource
 //#if MC < 1.21.9
 class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSource) : OutlineBufferSource(parent) {
     //#else
-    //$$ class SkyHanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immediate) : OutlineVertexConsumerProvider() {
+    //$$ class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSource) : OutlineBufferSource() {
     //#endif
 
     override fun endOutlineBatch() {

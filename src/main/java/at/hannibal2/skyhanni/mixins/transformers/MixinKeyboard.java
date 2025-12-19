@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.input.CharInput;
-//$$ import net.minecraft.client.input.KeyInput;
+//$$ import net.minecraft.client.input.CharacterEvent;
+//$$ import net.minecraft.client.input.KeyEvent;
 //#endif
 
 @Mixin(KeyboardHandler.class)
@@ -24,7 +24,7 @@ public class MixinKeyboard {
     //#if MC < 1.21.9
     private void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
         //#else
-        //$$ private void onKey(long window, int action, KeyInput input, CallbackInfo ci) {
+        //$$ private void onKey(long window, int action, KeyEvent input, CallbackInfo ci) {
         //$$     int key = input.key();
         //#endif
         if (Minecraft.getInstance().player == null) return;
@@ -66,8 +66,8 @@ public class MixinKeyboard {
         new CharEvent(codePoint).post();
     }
     //#else
-    //$$ private void onChar(long window, CharInput input, CallbackInfo ci) {
-    //$$     if (MinecraftClient.getInstance().player == null) return;
+    //$$ private void onChar(long window, CharacterEvent input, CallbackInfo ci) {
+    //$$     if (Minecraft.getInstance().player == null) return;
     //$$     new CharEvent(input.codepoint()).post();
     //$$ }
     //#endif

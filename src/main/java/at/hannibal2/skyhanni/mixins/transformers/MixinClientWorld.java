@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#if MC > 1.21.8
 //$$ import at.hannibal2.skyhanni.features.misc.ParticleHider;
-//$$ import net.minecraft.block.BlockState;
-//$$ import net.minecraft.util.math.BlockPos;
-//$$ import net.minecraft.util.math.Direction;
+//$$ import net.minecraft.world.level.block.state.BlockState;
+//$$ import net.minecraft.core.BlockPos;
+//$$ import net.minecraft.core.Direction;
 //#endif
 
 @Mixin(ClientLevel.class)
@@ -23,15 +23,15 @@ public class MixinClientWorld {
     }
 
     //#if MC > 1.21.8
-    //$$ @Inject(method = "addBlockBreakParticles", at = @At("HEAD"), cancellable = true)
-    //$$ private void onAddBlockBreakParticles(BlockPos pos, BlockState state, CallbackInfo ci) {
+    //$$ @Inject(method = "addDestroyBlockEffect", at = @At("HEAD"), cancellable = true)
+    //$$ private void onAddBlockBreakParticles(BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
     //$$     if (ParticleHider.shouldHideBlockParticles()) {
     //$$         ci.cancel();
     //$$     }
     //$$ }
     //$$
-    //$$ @Inject(method = "spawnBlockBreakingParticle", at = @At("HEAD"), cancellable = true)
-    //$$ private void onAddBlockBreakingParticles(BlockPos pos, Direction side, CallbackInfo ci) {
+    //$$ @Inject(method = "addBreakingBlockEffect", at = @At("HEAD"), cancellable = true)
+    //$$ private void onAddBlockBreakingParticles(BlockPos blockPos, Direction direction, CallbackInfo ci) {
     //$$     if (ParticleHider.shouldHideBlockParticles()) {
     //$$         ci.cancel();
     //$$     }

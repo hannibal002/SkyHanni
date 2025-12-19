@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.input.KeyInput;
+//$$ import net.minecraft.client.input.KeyEvent;
 //#endif
 
 @Mixin(AbstractContainerScreen.class)
@@ -39,7 +39,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     //#if MC < 1.21.9
     private void closeWindowPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         //#else
-        //$$ private void closeWindowPressed(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
+        //$$ private void closeWindowPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
         //#endif
         skyHanni$hook.closeWindowPressed(cir);
     }

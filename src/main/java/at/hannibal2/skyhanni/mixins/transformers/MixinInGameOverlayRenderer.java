@@ -19,7 +19,7 @@ abstract class MixinInGameOverlayRenderer {
     //#if MC < 1.21.9
     private static void renderFire(PoseStack matrices, MultiBufferSource vertexConsumers, CallbackInfo ci) {
         //#else
-        //$$ private static void renderFire(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Sprite sprite, CallbackInfo ci) {
+        //$$ private static void renderFire(PoseStack poseStack, MultiBufferSource multiBufferSource, TextureAtlasSprite textureAtlasSprite, CallbackInfo ci) {
         //#endif
         if (new BlockOverlayRenderEvent(OverlayType.FIRE).post()) ci.cancel();
     }

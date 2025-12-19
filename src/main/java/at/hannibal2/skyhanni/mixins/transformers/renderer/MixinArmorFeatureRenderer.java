@@ -12,8 +12,8 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.client.model.HumanoidModel;
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-//$$ import net.minecraft.client.render.entity.state.BipedEntityRenderState;
+//$$ import net.minecraft.client.renderer.SubmitNodeCollector;
+//$$ import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 //#endif
 
 @Mixin(HumanoidArmorLayer.class)
@@ -23,7 +23,7 @@ public class MixinArmorFeatureRenderer {
         //#if MC < 1.21.9
         PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, ItemStack stack, EquipmentSlot slot, int light, HumanoidModel armorModel, CallbackInfo ci
         //#else
-        //$$ MatrixStack matrices, OrderedRenderCommandQueue orderedRenderCommandQueue, ItemStack stack, EquipmentSlot slot, int light, BipedEntityRenderState bipedEntityRenderState, CallbackInfo ci
+        //$$ PoseStack poseStack, SubmitNodeCollector submitNodeCollector, ItemStack itemStack, EquipmentSlot slot, int i, HumanoidRenderState humanoidRenderState, CallbackInfo ci
         //#endif
     ) {
         if (HideArmorHookKt.shouldHideHead(slot)) {
