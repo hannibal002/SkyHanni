@@ -6,9 +6,6 @@ import at.skyhanni.sharedvariables.versionString
 import com.google.devtools.ksp.gradle.KspTaskJvm
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
-import net.fabricmc.loom.api.processor.MinecraftJarProcessor
-import net.fabricmc.loom.api.processor.ProcessorContext
-import net.fabricmc.loom.api.processor.SpecContext
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
@@ -17,12 +14,6 @@ import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
 import skyhannibuildsystem.PublishToModrinth
-import java.io.Serializable
-import java.nio.file.Path
-import java.util.zip.ZipFile
-import java.util.zip.ZipOutputStream
-import kotlin.io.path.moveTo
-import kotlin.io.path.outputStream
 
 plugins {
     idea
@@ -34,7 +25,6 @@ plugins {
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
     `maven-publish`
-    id("moe.nea.shot") version "1.0.0"
     id("io.gitlab.arturbosch.detekt")
 }
 
@@ -79,11 +69,7 @@ loom {
     }
     runs {
         named("client") {
-            if (false) {
-                isIdeConfigGenerated = true
-                appendProjectPathToConfigName.set(false)
-                this.runDir(runDirectory.relativeTo(projectDir).toString())
-            } else if (target.isModern) {
+            if (target.isModern) {
                 isIdeConfigGenerated = true
                 appendProjectPathToConfigName.set(true)
                 this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
@@ -97,13 +83,6 @@ loom {
             programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
         }
         removeIf { it.name == "server" }
-    }
-}
-
-if (false) {
-    sourceSets.main {
-        resources.destinationDirectory.set(kotlin.destinationDirectory)
-        output.setResourcesDir(kotlin.destinationDirectory)
     }
 }
 
@@ -210,17 +189,6 @@ dependencies {
         shadowImpl("com.mojang:brigadier:1.0.18")
     }
 
-    modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
-        exclude(module = "unspecified")
-        isTransitive = false
-    }
-    // December 29, 2024, 07:30 PM EST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.6.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.6.0:all") {
-        exclude(module = "unspecified")
-        isTransitive = false
-    }
-
     if (target.isModern) {
         val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
         shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
@@ -233,12 +201,7 @@ dependencies {
     if (!target.isModern) {
         shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     }
-    implementation(libs.hotswapagentforge)
 
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
-        exclude(module = "unspecified")
-        isTransitive = false
-    }
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.mockk:mockk:1.12.5")
 

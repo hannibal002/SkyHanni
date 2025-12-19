@@ -21,7 +21,7 @@ import java.util.zip.ZipInputStream;
 public class SkyHanniMixinPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
-        InjectionPoint.register(BeforeForLoopInjectionPoint.class);
+
     }
 
     @Override

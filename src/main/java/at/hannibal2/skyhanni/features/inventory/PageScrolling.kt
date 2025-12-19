@@ -59,7 +59,6 @@ object PageScrolling {
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
-        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return
         if (!currentlyScrollable && cooldown.isInFuture()) return
         if (!scroll.isMouseEventValid()) return
 

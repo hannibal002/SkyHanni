@@ -37,8 +37,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
 import org.lwjgl.glfw.GLFW
@@ -79,24 +77,6 @@ object EstimatedItemValue {
         stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
 
-    private fun isInNeuOverlay(): Boolean {
-        val inPv = Minecraft.getInstance().screen is GuiProfileViewer
-        val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
-
-        // Use reflection to make sure tradeMenu exists
-        val neuConfig = NotEnoughUpdates.INSTANCE.config
-        val tradeField = neuConfig.javaClass.getDeclaredField("tradeMenu")
-        val trade = tradeField[neuConfig]
-
-        val booleanField = trade.javaClass.getDeclaredField("enableCustomTrade")
-        val customTradeEnabled = booleanField[trade] as Boolean
-
-        val inNeuTrade = inTrade && customTradeEnabled
-        val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
-
-        return inPv || inNeuTrade || inStorage
-    }
-
     fun onNeuDrawEquipment(stack: ItemStack) {
         renderedItems++
         updateItem(stack)
@@ -106,19 +86,13 @@ object EstimatedItemValue {
     fun onTooltip(event: ItemHoverEvent) {
         if (!config.enabled) return
         if (!PlatformUtils.isNeuLoaded()) return
-        if (!isInNeuOverlay()) return
 
         if (renderedItems == 0) {
             updateItem(event.itemStack)
         }
-        val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
-        // we use renderInNeuStorageOverlay() for this
-        if (inStorage) return
 
         // render the estimated item value over NEU PV
-        DrawContextUtils.translate(0f, 0f, 200f)
         tryRendering()
-        DrawContextUtils.translate(0f, 0f, -200f)
 
         renderedItems++
     }

@@ -17,11 +17,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PetUtils
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 
 @SkyHanniModule
 object PetExpTooltip {
@@ -95,22 +92,11 @@ object PetExpTooltip {
         index = toolTip.indexOfFirst { it.contains("Progress to Level") }
         if (index != -1) {
 
-            val offset = if (PlatformUtils.isNeuLoaded() && isNeuExtendedExpEnabled) 4 else 3
+            val offset = 3
             return index + offset
         }
 
         return null
-    }
-
-    private val isNeuExtendedExpEnabled get() = fieldPetExtendExp.get(objectNeuTooltipTweaks) as Boolean
-
-    private val objectNeuTooltipTweaks by lazy {
-        val field = NotEnoughUpdates.INSTANCE.config.javaClass.getDeclaredField("tooltipTweaks")
-        field.makeAccessible().get(NotEnoughUpdates.INSTANCE.config)
-    }
-
-    private val fieldPetExtendExp by lazy {
-        objectNeuTooltipTweaks.javaClass.getDeclaredField("petExtendExp").makeAccessible()
     }
 
     private fun getMaxValues(petName: String, petExperience: Double, internalName: NeuInternalName): Pair<Int, Int> {

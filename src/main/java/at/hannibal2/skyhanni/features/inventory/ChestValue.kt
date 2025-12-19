@@ -233,9 +233,7 @@ object ChestValue {
         if (MinionFeatures.minionInventoryOpen) return false
         if (MinionFeatures.minionStorageInventoryOpen) return false
 
-
-        if ((name.contains("Backpack") && name.contains("Slot #") || name.startsWith("Ender Chest (")) &&
-            !InventoryUtils.isNeuStorageEnabled
+        if ((name.contains("Backpack") && name.contains("Slot #") || name.startsWith("Ender Chest ("))
         ) {
             return true
         }

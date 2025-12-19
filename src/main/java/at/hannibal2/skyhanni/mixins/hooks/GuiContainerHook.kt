@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.Slot
@@ -40,7 +39,6 @@ class GuiContainerHook(guiAny: Any) {
     ) {
         if (GlobalRender.renderDisabled) return
         if (GuiContainerEvent.PreDraw(context, gui, container, mouseX, mouseY, partialTicks).post()) {
-            if (PlatformUtils.isNeuLoaded()) NEUApi.setInventoryButtonsToDisabled()
             GuiData.preDrawEventCancelled = true
             ci.cancel()
         } else {

@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
@@ -113,24 +112,6 @@ object InventoryUtils {
         slot?.index?.let { slotNumber ->
             clickSlot(slotNumber, container.containerId, mouseButton = 0, mode = ClickType.SHIFT)
             this.cancel()
-        }
-    }
-
-    val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
-        if (!PlatformUtils.isNeuLoaded()) {
-            return@RecalculatingValue false
-        }
-        try {
-            val config = NotEnoughUpdates.INSTANCE.config
-
-            val storageField = config.javaClass.getDeclaredField("storageGUI")
-            val storage = storageField[config]
-
-            val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
-            booleanField[storage] as Boolean
-        } catch (e: Throwable) {
-            ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is enabled.")
-            false
         }
     }
 

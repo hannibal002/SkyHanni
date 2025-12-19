@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import org.lwjgl.glfw.GLFW
@@ -75,12 +74,5 @@ object GuiData {
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         preDrawEventCancelled = false
-    }
-
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onGuiOpen(event: GuiScreenOpenEvent) {
-        if (preDrawEventCancelled) {
-            if (PlatformUtils.isNeuLoaded()) NEUApi.setInventoryButtonsToDisabled()
-        }
     }
 }
