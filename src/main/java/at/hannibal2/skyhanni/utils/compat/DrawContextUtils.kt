@@ -69,7 +69,7 @@ object DrawContextUtils {
         //#if MC < 1.21.6
         drawContext.pose().translate(x, y, z)
         //#else
-        //$$ drawContext.matrices.translate(x.toFloat(), y.toFloat())
+        //$$ drawContext.pose().translate(x.toFloat(), y.toFloat())
         //#endif
     }
 
@@ -77,7 +77,7 @@ object DrawContextUtils {
         //#if MC < 1.21.6
         drawContext.pose().translate(x, y, z)
         //#else
-        //$$ drawContext.matrices.translate(x, y)
+        //$$ drawContext.pose().translate(x, y)
         //#endif
     }
 
@@ -108,7 +108,7 @@ object DrawContextUtils {
         //#if MC < 1.21.6
         drawContext.pose().scale(x, y, z)
         //#else
-        //$$ drawContext.matrices.scale(x, y)
+        //$$ drawContext.pose().scale(x, y)
         //#endif
     }
 
@@ -117,7 +117,7 @@ object DrawContextUtils {
         //#if MC < 1.21.6
         drawContext.pose().pushPose()
         //#else
-        //$$ drawContext.matrices.pushMatrix()
+        //$$ drawContext.pose().pushMatrix()
         //#endif
     }
 
@@ -126,7 +126,7 @@ object DrawContextUtils {
         //#if MC < 1.21.6
         drawContext.pose().popPose()
         //#else
-        //$$ drawContext.matrices.popMatrix()
+        //$$ drawContext.pose().popMatrix()
         //#endif
     }
 
@@ -164,7 +164,7 @@ object DrawContextUtils {
         //#if MC < 1.21.6
         drawContext.pose().setIdentity()
         //#else
-        //$$ drawContext.matrices.identity()
+        //$$ drawContext.pose().identity()
         //#endif
     }
 }

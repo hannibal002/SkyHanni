@@ -10,7 +10,7 @@ import java.util.OptionalInt
 import net.minecraft.client.renderer.RenderType
 //#else
 //$$ import com.mojang.blaze3d.pipeline.RenderPipeline
-//$$ import net.minecraft.client.gl.RenderPipelines
+//$$ import net.minecraft.client.renderer.RenderPipelines
 //#endif
 
 object RenderCompat {
@@ -28,8 +28,8 @@ object RenderCompat {
         }
         //#else
         //$$ val scissorState = RenderSystem.getScissorStateForRenderTypeDraws()
-        //$$ if (scissorState.method_72091()) {
-        //$$     this.enableScissor(scissorState.method_72092(), scissorState.method_72093(), scissorState.method_72094(), scissorState.method_72095())
+        //$$ if (scissorState.enabled()) {
+        //$$     this.enableScissor(scissorState.x(), scissorState.y(), scissorState.width(), scissorState.height())
         //$$ }
         //#endif
     }
@@ -46,14 +46,14 @@ object RenderCompat {
         //#if MC < 1.21.6
         this.colorTexture
     //#else
-    //$$ this.colorAttachmentView
+    //$$ this.colorTextureView
     //#endif
 
     private fun RenderTarget.findDepthAttachment() =
         //#if MC < 1.21.6
         if (this.useDepth) this.depthTexture else null
     //#else
-    //$$ if (this.useDepthAttachment) this.depthAttachmentView else null
+    //$$ if (this.useDepth) this.depthTextureView else null
     //#endif
 
     fun GpuDevice.createRenderPass(name: String, framebuffer: RenderTarget): RenderPass {

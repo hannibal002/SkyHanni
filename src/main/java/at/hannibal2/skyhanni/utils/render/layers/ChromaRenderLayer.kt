@@ -47,7 +47,7 @@ class ChromaRenderLayer(
 
         //#if MC > 1.21.6
         //$$ var dynamicTransforms = RenderSystem.getDynamicUniforms()
-        //$$     .write(
+        //$$     .writeTransform(
         //$$         RenderSystem.getModelViewMatrix(),
         //$$ 		 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
         //#if MC < 1.21.9

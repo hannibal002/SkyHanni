@@ -364,7 +364,7 @@ fun Component.convertToJsonString(): String {
     //#elseif MC < 1.21.6
     return Component.SerializerAdapter(net.minecraft.core.RegistryAccess.EMPTY).serialize(this, null, null).toString()
     //#else
-    //$$ return net.minecraft.text.TextCodecs.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
+    //$$ return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
     //#endif
 }
 

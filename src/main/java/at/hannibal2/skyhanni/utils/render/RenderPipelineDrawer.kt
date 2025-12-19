@@ -20,7 +20,7 @@ object RenderPipelineDrawer {
     //#if MC < 1.21.6
     val matrices: PoseStack.Pose get() = DrawContextUtils.drawContext.pose().last()
     //#else
-    //$$ val matrices: Matrix3x2f get() = Matrix3x2f(DrawContextUtils.drawContext.matrices)
+    //$$ val matrices: Matrix3x2f get() = Matrix3x2f(DrawContextUtils.drawContext.pose())
     //#endif
     fun getBuffer(
         pipeline: RenderPipeline,

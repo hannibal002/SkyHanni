@@ -55,7 +55,7 @@ object RenderEvents {
         //#else
         //$$ HudElementRegistry.attachElementBefore(
         //$$     VanillaHudElements.SLEEP,
-        //$$     Identifier.of("skyhanni", "gui_render_layer"),
+        //$$     ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
         //$$     RenderEvents::postGui
         //$$ )
         //#endif

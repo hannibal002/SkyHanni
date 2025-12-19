@@ -20,8 +20,8 @@ import net.minecraft.resources.ResourceLocation
 //$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedOutlineUniform
 //$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedUniform
 //$$ import com.mojang.blaze3d.buffers.GpuBufferSlice
-//$$ import com.mojang.blaze3d.systems.ProjectionType
-//$$ import net.minecraft.client.render.ProjectionMatrix2
+//$$ import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+//$$ import com.mojang.blaze3d.ProjectionType
 //$$ import org.joml.Matrix4f
 //$$ import org.joml.Vector4f
 //#endif
@@ -32,7 +32,7 @@ import net.minecraft.resources.ResourceLocation
 object RoundedShapeDrawer {
 
     //#if MC > 1.21.6
-    //$$ val projectionMatrix = ProjectionMatrix2("SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true)
+    //$$ val projectionMatrix = CachedOrthoProjectionMatrixBuffer("SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true)
     //$$ var roundedUniform = SkyHanniRoundedUniform()
     //$$ var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
     //$$ var circleUniform = SkyHanniCircleUniform()
@@ -81,10 +81,12 @@ object RoundedShapeDrawer {
         with(RenderPipelineDrawer) {
             val buffer = getBuffer(pipeline)
             floatPairs.forEachIndexed { i, (x, y) ->
-                //#if MC < 1.21.9
+                //#if MC < 1.21.6
                 buffer.addVertex(matrices, x, y, 0f).apply {
+                    //#elseif MC < 1.21.9
+                    //$$ buffer.addVertexWith2DPose(matrices, x, y, 0f).apply {
                     //#else
-                    //$$ buffer.vertex(matrices, x, y).apply {
+                    //$$ buffer.addVertexWith2DPose(matrices, x, y).apply {
                     //#endif
                     val postOp = postVertexOps.getOrNull(i)
                         ?: postVertexOps.getOrNull(0)
@@ -97,16 +99,16 @@ object RoundedShapeDrawer {
             //$$ // Need to backup current projection matrix and set current to an orthographic
             //$$ // projection matrix, since orthographic gui elements in 1.21.7 are now deferred
             //$$ // so we just set the correct matrix here are restore the perspective one afterwards
-            //$$ val window = MinecraftClient.getInstance().window
+            //$$ val window = Minecraft.getInstance().window
             //$$ RenderSystem.backupProjectionMatrix()
             //$$ RenderSystem.setProjectionMatrix(
-            //$$     projectionMatrix.set(
-            //$$         window.framebufferWidth.toFloat() / window.scaleFactor.toFloat(),
-            //$$         window.framebufferHeight.toFloat() / window.scaleFactor.toFloat()),
+            //$$     projectionMatrix.getBuffer(
+            //$$         window.width.toFloat() / window.guiScale.toFloat(),
+            //$$         window.height.toFloat() / window.guiScale.toFloat()),
             //$$     ProjectionType.ORTHOGRAPHIC
             //$$ )
             //$$ var dynamicTransforms = RenderSystem.getDynamicUniforms()
-            //$$     .write(
+            //$$     .writeTransform(
             //$$         Matrix4f().setTranslation(0.0f, 0.0f, -11000.0f),
             //$$ 		 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
             //#if MC < 1.21.9
@@ -147,7 +149,7 @@ object RoundedShapeDrawer {
         //#if MC < 1.21.6
         val glTex = Minecraft.getInstance().textureManager.getTexture(texture).texture
         //#else
-        //$$ val glTex = MinecraftClient.getInstance().textureManager.getTexture(texture).glTextureView
+        //$$ val glTex = Minecraft.getInstance().textureManager.getTexture(texture).textureView
         //#endif
         RenderSystem.assertOnRenderThread()
         RenderSystem.setShaderTexture(0, glTex)

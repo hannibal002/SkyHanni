@@ -20,8 +20,8 @@ public class MixinSoundSystem {
     @Inject(method = "play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V", at = @At("HEAD"), cancellable = true)
     public void play(SoundInstance sound, CallbackInfo ci) {
         //#else
-        //$$ @Inject(method = "play(Lnet/minecraft/client/sound/SoundInstance;)Lnet/minecraft/client/sound/SoundSystem$PlayResult;", at = @At("HEAD"), cancellable = true)
-        //$$ public void play(SoundInstance sound, CallbackInfoReturnable<SoundSystem.PlayResult> cir) {
+        //$$ @Inject(method = "play", at = @At("HEAD"), cancellable = true)
+        //$$ public void play(SoundInstance sound, CallbackInfoReturnable<SoundEngine.PlayResult> cir) {
         //#endif
         if (sound == null) return;
         if (sound.getLocation() == null) return;
@@ -31,7 +31,7 @@ public class MixinSoundSystem {
             //#if MC < 1.21.6
             if (soundId.contains("entity.phantom.")) ci.cancel();
             //#else
-            //$$ if (soundId.contains("entity.phantom.")) cir.setReturnValue(SoundSystem.PlayResult.NOT_STARTED);
+            //$$ if (soundId.contains("entity.phantom.")) cir.setReturnValue(SoundEngine.PlayResult.NOT_STARTED);
             //#endif
         }
     }

@@ -24,7 +24,7 @@ public class MixinTextRendererDrawer {
     //#if MC < 1.21.6
     @Inject(method = "renderCharacters", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/gui/font/glyphs/BakedGlyph$GlyphInstance;glyph()Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;"))
     //#else
-    //$$ @Inject(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer$GlyphDrawer;drawGlyph(Lnet/minecraft/client/font/BakedGlyph$DrawnGlyph;)V"))
+    //$$ @Inject(method = "visit", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font$GlyphVisitor;acceptGlyph(Lnet/minecraft/client/gui/font/glyphs/BakedGlyph$GlyphInstance;)V"))
     //#endif
     private void checkIfGlyphIsChroma(CallbackInfo ci, @Local BakedGlyph.GlyphInstance drawnGlyph) {
         ChromaFontManagerKt.checkIfGlyphIsChroma(drawnGlyph);

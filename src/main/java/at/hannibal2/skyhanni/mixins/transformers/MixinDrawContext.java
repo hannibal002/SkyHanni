@@ -18,8 +18,8 @@ public class MixinDrawContext {
     @Inject(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;IIII)V", at = @At("RETURN"))
     private void drawItemPost(LivingEntity entity, Level world, ItemStack stack, int x, int y, int seed, int z, CallbackInfo ci) {
     //#else
-    //$$ @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;III)V", at = @At("RETURN"))
-    //$$ private void drawItemPost(LivingEntity entity, World world, ItemStack stack, int x, int y, int seed, CallbackInfo ci) {
+    //$$ @Inject(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V", at = @At("RETURN"))
+    //$$ private void drawItemPost(LivingEntity entity, Level world, ItemStack stack, int x, int y, int seed, CallbackInfo ci) {
     //#endif
         RenderItemHookKt.renderItemReturn((GuiGraphics) (Object) this, stack, x, y);
     }

@@ -29,7 +29,7 @@ public class MixinClientConnection {
     @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;Z)V", at = @At(value = "HEAD"), cancellable = true)
     private void sendPacketNew(Packet<?> packet, PacketSendListener callbacks, boolean flush, CallbackInfo ci) {
         //#else
-        //$$ @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;Z)V", at = @At(value = "HEAD"), cancellable = true)
+        //$$ @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;Z)V", at = @At(value = "HEAD"), cancellable = true)
         //$$ private void sendPacketNew(Packet<?> packet, ChannelFutureListener channelFutureListener, boolean flush, CallbackInfo ci) {
         //#endif
         if (new PacketSentEvent(packet).post()) {

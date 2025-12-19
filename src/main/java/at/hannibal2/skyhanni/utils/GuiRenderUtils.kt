@@ -41,16 +41,16 @@ import net.minecraft.network.chat.Component
 import org.joml.Matrix4f
 //#endif
 //#if MC > 1.21.6
-//$$ import com.mojang.blaze3d.systems.ProjectionType
-//$$ import net.minecraft.client.util.math.MatrixStack
-//$$ import net.minecraft.item.ItemDisplayContext
-//$$ import net.minecraft.client.render.OverlayTexture
-//$$ import net.minecraft.util.math.RotationAxis
-//$$ import net.minecraft.client.render.ProjectionMatrix2
 //$$ import kotlin.math.sqrt
-//$$ import net.minecraft.client.render.LightmapTextureManager
-//$$ import net.minecraft.client.render.item.ItemRenderState
 //$$ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+//$$ import com.mojang.blaze3d.ProjectionType
+//$$ import com.mojang.blaze3d.vertex.PoseStack
+//$$ import com.mojang.math.Axis
+//$$ import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+//$$ import net.minecraft.client.renderer.LightTexture
+//$$ import net.minecraft.client.renderer.item.ItemStackRenderState
+//$$ import net.minecraft.client.renderer.texture.OverlayTexture
+//$$ import net.minecraft.world.item.ItemDisplayContext
 //#endif
 
 // todo 1.21 impl needed
@@ -403,8 +403,8 @@ object GuiRenderUtils {
     //  see if we can adjust this to maybe 100f -> 200f.
     //  if we do change this, the 1.21.6 zT below will need to be adjusted as well.
     //#if MC > 1.21.6
-    //$$ private val projectionMatrix by lazy { ProjectionMatrix2("SkyHanni Item Rendering", 1000f, 11000f, true) }
-    //$$ private val itemRenderStateButCool by lazy { ItemRenderState() }
+    //$$ private val projectionMatrix by lazy { CachedOrthoProjectionMatrixBuffer("SkyHanni Item Rendering", 1000f, 11000f, true) }
+    //$$ private val itemRenderStateButCool by lazy { ItemStackRenderState() }
     //#endif
 
     private val SKULL_SCALE = if (PlatformUtils.IS_LEGACY) (4f / 3f) else (5f / 4f)
@@ -425,9 +425,9 @@ object GuiRenderUtils {
         val rotZ = ((rotationDegrees?.z ?: 0.0) % 360).toFloat()
 
         //#if MC > 1.21.6
-        //$$ MinecraftClient.getInstance().itemModelManager.clearAndUpdate(itemRenderStateButCool, item, ItemDisplayContext.FIXED, MinecraftCompat.localWorld, MinecraftCompat.localPlayer, 0)
+        //$$ Minecraft.getInstance().itemModelResolver.updateForTopItem(itemRenderStateButCool, item, ItemDisplayContext.FIXED, MinecraftCompat.localWorld, MinecraftCompat.localPlayer, 0)
         //#if MC < 1.21.9
-        //$$ val baseItemScale = if (isItemSkull || itemRenderStateButCool.isSideLit) SKULL_SCALE else 1f
+        //$$ val baseItemScale = if (isItemSkull || itemRenderStateButCool.usesBlockLight()) SKULL_SCALE else 1f
         //#else
         //$$ val baseItemScale = if (isItemSkull) SKULL_SCALE else 1f
         //#endif
@@ -517,14 +517,14 @@ object GuiRenderUtils {
             //#endif
         }
         //#else
-        //$$ val matrices2D = DrawContextUtils.drawContext.matrices
+        //$$ val matrices2D = DrawContextUtils.drawContext.pose()
         //$$
         //$$ // And similarly, we need to extract the scaling from the GUI editor as well, since we're building our own stack.
         //$$ val guiScaleX = sqrt(matrices2D.m00() * matrices2D.m00() + matrices2D.m01() * matrices2D.m01())
         //$$ val guiScaleY = sqrt(matrices2D.m10() * matrices2D.m10() + matrices2D.m11() * matrices2D.m11())
         //$$ val totalItemScale = ((guiScaleX + guiScaleY) * 0.5f) * finalItemScale
         //$$
-        //$$ if (rotationDegrees != null || (totalItemScale > 1 && itemRenderStateButCool.isSideLit)) {
+        //$$ if (rotationDegrees != null || (totalItemScale > 1 && itemRenderStateButCool.usesBlockLight())) {
         //#if MC < 1.21.9
         //$$     val adjX = matrices2D.m20 + (x * guiScaleX) - (totalItemScale * 1.8f)
         //$$     val adjY = matrices2D.m21 + (y * guiScaleY) - (totalItemScale * 1.8f)
@@ -545,21 +545,21 @@ object GuiRenderUtils {
     //$$     x: Float, y: Float, finalItemScale: Float,
     //$$     rotX: Float, rotY: Float, rotZ: Float,
     //$$ ) {
-    //$$     val client = MinecraftClient.getInstance()
+    //$$     val client = Minecraft.getInstance()
     //$$     val window = client.window
     //$$
     //$$     // Thank Vixid for this -  I would have never figured out how to do this.
     //$$     RenderSystem.backupProjectionMatrix()
-    //$$     val guiWidth = window.framebufferWidth.toFloat() / window.scaleFactor.toFloat()
-    //$$     val guiHeight = window.framebufferHeight.toFloat() / window.scaleFactor.toFloat()
-    //$$     val slice = projectionMatrix.set(guiWidth, guiHeight)
+    //$$     val guiWidth = window.width.toFloat() / window.guiScale.toFloat()
+    //$$     val guiHeight = window.height.toFloat() / window.guiScale.toFloat()
+    //$$     val slice = projectionMatrix.getBuffer(guiWidth, guiHeight)
     //$$     RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
     //$$     RenderSystem.setupDefaultState()
     //$$     RenderSystem.resetTextureMatrix()
     //$$
     //$$     // We have to use our own MatrixStack, because the DrawContext matrices are a 2D matrix now
-    //$$     val matrices = MatrixStack()
-    //$$     matrices.push()
+    //$$     val matrices = PoseStack()
+    //$$     matrices.pushPose()
     //$$     // TODO -1100f comes from projectionMatrix above, needs changing
     //$$     matrices.translate(x, y, -1100f)
     //$$
@@ -576,31 +576,31 @@ object GuiRenderUtils {
     //$$     matrices.translate(8f, 8f, 8f)
     //$$
     //$$     // 'planned' rotations are done now.
-    //$$     if (rotX != 0f) matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
-    //$$     if (rotY != 0f) matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotY))
-    //$$     if (rotZ != 0f) matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotZ))
+    //$$     if (rotX != 0f) matrices.mulPose(Axis.XP.rotationDegrees(rotX))
+    //$$     if (rotY != 0f) matrices.mulPose(Axis.YP.rotationDegrees(rotY))
+    //$$     if (rotZ != 0f) matrices.mulPose(Axis.ZP.rotationDegrees(rotZ))
     //$$
     //$$     // With the ItemRenderer call, all blocks and skulls are rendered from a true side view, rather than
     //$$     // the old "angled down" view. This rotation set re-creates the old view.
-    //$$     matrices.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(30f))
-    //$$     matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(45f))
+    //$$     matrices.mulPose(Axis.XN.rotationDegrees(30f))
+    //$$     matrices.mulPose(Axis.YP.rotationDegrees(45f))
     //$$
     //$$     // We need to scale up before rendering - for some reason the default is 1 x 1 x 1
     //$$     matrices.scale(16f, 16f, 16f)
     //$$
-    //$$     client.gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
+    //$$     client.gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
     //$$
     //#if MC < 1.21.9
-    //$$     val consumers = client.bufferBuilders.entityVertexConsumers
-    //$$     itemRenderStateButCool.render(matrices, consumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV)
-    //$$     consumers.draw()
+    //$$     val consumers = client.renderBuffers().bufferSource()
+    //$$     itemRenderStateButCool.render(matrices, consumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY)
+    //$$     consumers.endBatch()
     //#else
     //$$     val dispatcher = client.gameRenderer.entityRenderDispatcher
     //$$     val consumers = dispatcher.queue
-    //$$     itemRenderStateButCool.render(matrices, consumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, 0)
+    //$$     itemRenderStateButCool.render(matrices, consumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
     //$$     dispatcher.render()
     //#endif
-    //$$     matrices.pop()
+    //$$     matrices.popPose()
     //$$     RenderSystem.teardownOverlayColor()
     //$$     RenderSystem.restoreProjectionMatrix()
     //$$ }
@@ -612,7 +612,7 @@ object GuiRenderUtils {
     //$$
     //$$         RenderSystem.assertOnRenderThread()
     //$$
-    //$$         MinecraftClient.getInstance().gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
+    //$$         Minecraft.getInstance().gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
     //$$
     //$$         DrawContextUtils.drawItem(this, 0, 0)
     //$$     }

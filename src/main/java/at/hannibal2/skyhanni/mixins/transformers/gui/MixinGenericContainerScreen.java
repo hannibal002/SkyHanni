@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 //#if MC > 1.21.6
 //$$ import at.hannibal2.skyhanni.data.GuiData;
-//$$ import net.minecraft.client.gui.DrawContext;
+//$$ import net.minecraft.client.gui.GuiGraphics;
 //$$ import org.spongepowered.asm.mixin.injection.Inject;
 //$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#endif
@@ -26,7 +26,7 @@ abstract class MixinGenericContainerScreen {
             //#if MC < 1.21.6
             target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"
             //#else
-            //$$ target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIFFIIII)V"
+            //$$ target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"
             //#endif
         ),
         index = 1
@@ -36,8 +36,8 @@ abstract class MixinGenericContainerScreen {
     }
 
     //#if MC > 1.21.6
-    //$$ @Inject(method = "drawBackground", at = @At(value = "HEAD"), cancellable = true)
-    //$$ private void cancelWardrobeBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY, CallbackInfo ci) {
+    //$$ @Inject(method = "renderBg", at = @At(value = "HEAD"), cancellable = true)
+    //$$ private void cancelWardrobeBackground(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
     //$$     if (GuiData.INSTANCE.getPreDrawEventCancelled()) {
     //$$         ci.cancel();
     //$$     }

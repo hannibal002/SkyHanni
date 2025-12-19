@@ -67,7 +67,7 @@ class GuiPositionEditor(
         drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
             //#if MC > 1.21.5
-            //$$ oldScreen.drawBackground(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
+            //$$ oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
             //#endif
             //#if MC < 1.21
             //$$ val accessor = oldScreen as AccessorGuiContainer

@@ -61,7 +61,7 @@ object ShaderRenderUtils {
         //#endif
         //#endif
         //#if MC > 1.21.6
-        //$$ val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.matrices)
+        //$$ val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.pose())
         //$$ this.modelViewMatrix = Matrix4f()
         //$$     .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
         //$$     .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)

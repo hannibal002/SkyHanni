@@ -76,32 +76,32 @@ public class MixinGuiIngame {
         return GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color);
     }
     //#else
-    //$$ @Inject(method = "renderMainHud", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/bar/Bar;renderBar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", shift = At.Shift.BEFORE), cancellable = true)
-    //$$ public void renderExperienceBar(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    //$$ @Inject(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.BEFORE), cancellable = true)
+    //$$ public void renderExperienceBar(GuiGraphics context, DeltaTracker deltaTracker, CallbackInfo ci) {
     //$$     if (RenderEvents.postExperienceBarLayerEventPre(context)) {
     //$$         ci.cancel();
     //$$     }
     //$$ }
     //$$
-    //$$ @Inject(method = "renderMainHud", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/bar/Bar;renderBar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", shift = At.Shift.AFTER))
-    //$$ public void renderExperienceBarTail(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    //$$ @Inject(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.AFTER))
+    //$$ public void renderExperienceBarTail(GuiGraphics context, DeltaTracker deltaTracker, CallbackInfo ci) {
     //$$     RenderEvents.postExperienceBarLayerEventPost(context);
     //$$ }
     //$$
-    //$$ @Inject(method = "renderMainHud", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/bar/Bar;drawExperienceLevel(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/font/TextRenderer;I)V", shift = At.Shift.BEFORE), cancellable = true)
-    //$$ public void renderExperienceLevel(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    //$$ @Inject(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;renderExperienceLevel(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;I)V", shift = At.Shift.BEFORE), cancellable = true)
+    //$$ public void renderExperienceLevel(GuiGraphics context, DeltaTracker deltaTracker, CallbackInfo ci) {
     //$$     if (RenderEvents.postExperienceNumberLayerEventPre(context)) {
     //$$         ci.cancel();
     //$$     }
     //$$ }
     //$$
-    //$$ @Inject(method = "renderMainHud", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/bar/Bar;drawExperienceLevel(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/font/TextRenderer;I)V", shift = At.Shift.AFTER))
-    //$$ public void renderExperienceLevelTail(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    //$$ @Inject(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;renderExperienceLevel(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;I)V", shift = At.Shift.AFTER))
+    //$$ public void renderExperienceLevelTail(GuiGraphics context, DeltaTracker deltaTracker, CallbackInfo ci) {
     //$$     RenderEvents.postExperienceNumberLayerEventPost(context);
     //$$ }
     //$$
-    //$$ @Redirect(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)V"))
-    //$$ private void renderItemOverlayPost(DrawContext drawContext, TextRenderer textRenderer, Text text, int x, int y, int color, boolean shadow) {
+    //$$ @Redirect(method = "displayScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"))
+    //$$ private void renderItemOverlayPost(GuiGraphics drawContext, Font textRenderer, Component text, int x, int y, int color, boolean bl) {
     //$$     GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color);
     //$$ }
     //#endif

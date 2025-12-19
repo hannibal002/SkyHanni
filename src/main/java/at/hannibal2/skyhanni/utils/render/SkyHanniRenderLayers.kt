@@ -108,7 +108,7 @@ object SkyHanniRenderLayers {
                 //#if MC < 1.21.6
                 .setTextureState(RenderStateShard.TextureStateShard(texture, TriState.FALSE, false))
                 //#else
-                //$$ .texture(RenderPhase.Texture(texture, false))
+                //$$ .setTextureState(RenderStateShard.TextureStateShard(texture, false))
                 //#endif
                 .createCompositeState(false),
         )
