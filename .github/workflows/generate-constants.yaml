@@ -26,6 +26,10 @@ jobs:
                     cache: gradle
             -   name: Setup gradle
                 uses: gradle/gradle-build-action@v2
+            -   name: Disable preprocessor
+                run: |
+                    mkdir -p .gradle
+                    echo skyhanni.multi-version=off > .gradle/private.properties
             -   name: Generate Repo Patterns using Gradle w/retry
                 uses: ./.github/actions/gradle-retry
                 with:
