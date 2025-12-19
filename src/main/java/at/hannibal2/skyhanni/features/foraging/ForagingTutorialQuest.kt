@@ -100,7 +100,7 @@ object ForagingTutorialQuest {
         IslandGraphs.pathFind(
             quest.nextPortal,
             "Next Quest",
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         )
     }
 
@@ -113,7 +113,7 @@ object ForagingTutorialQuest {
         IslandGraphs.pathFind(
             step.npcLocation,
             step.npcName,
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         )
     }
 

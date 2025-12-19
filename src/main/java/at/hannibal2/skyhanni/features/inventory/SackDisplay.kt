@@ -49,7 +49,7 @@ object SackDisplay {
     init {
         RenderDisplayHelper(
             inventory = SackApi.inventory,
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         ) {
             config.position.renderRenderables(
                 display, extraSpace = config.extraSpace, posLabel = "Sacks Items",
@@ -62,7 +62,7 @@ object SackDisplay {
         if (!SackApi.inventory.isInside()) return
         if (!config.highlightFull) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val lore = slot.stack.getLore()
+            val lore = slot.item.getLore()
             if (lore.any { it.startsWith("§7Stored: §a") }) {
                 slot.highlight(LorenzColor.RED)
             }

@@ -4,11 +4,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.compat.Text
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
 import java.awt.Color
-//#if MC > 1.21
-//$$ import net.minecraft.text.MutableText
-//#endif
 
 class ExtendedChatColor(
     val rgb: Int,
@@ -29,12 +27,8 @@ class ExtendedChatColor(
         return stringBuilder.toString()
     }
 
-    fun asText(): Text {
-        //#if MC < 1.21
-        return Text.of(this.toString())
-        //#else
-        //$$ return (Text.of("") as MutableText).withColor(rgb)
-        //#endif
+    fun asText(): Component {
+        return (Component.nullToEmpty("") as MutableComponent).withColor(rgb)
     }
 
     @SkyHanniModule

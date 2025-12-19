@@ -16,10 +16,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.Entity
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityGuardian
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Guardian
 
 @SkyHanniModule
 object DungeonCleanEnd {
@@ -80,7 +80,7 @@ object DungeonCleanEnd {
         if (!config.enabled) return
         if (bossDone) return
         if (lastBossId == -1) return
-        if (event.entity.entityId != lastBossId) return
+        if (event.entity.id != lastBossId) return
 
         if (event.health <= 0.5) {
             val dungeonFloor = DungeonApi.dungeonFloor
@@ -99,14 +99,14 @@ object DungeonCleanEnd {
 
         if (config.f3IgnoreGuardians &&
             DungeonApi.isOneOf("F3", "M3") &&
-            entity is EntityGuardian &&
-            entity.entityId != lastBossId &&
-            MinecraftCompat.localPlayer.isSneaking
+            entity is Guardian &&
+            entity.id != lastBossId &&
+            MinecraftCompat.localPlayer.isShiftKeyDown
         ) {
             return
         }
 
-        if (chestsSpawned && ((entity is EntityArmorStand && !entity.hasCustomName()) || entity is EntityOtherPlayerMP)) {
+        if (chestsSpawned && ((entity is ArmorStand && !entity.hasCustomName()) || entity is RemotePlayer)) {
             return
         }
 

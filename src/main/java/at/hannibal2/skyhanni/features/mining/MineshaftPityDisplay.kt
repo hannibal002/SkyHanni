@@ -43,8 +43,8 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object MineshaftPityDisplay {
@@ -378,19 +378,19 @@ object MineshaftPityDisplay {
             "Glacite",
             listOf(OreType.GLACITE),
             4,
-            ItemStack(Blocks.packed_ice),
+            ItemStack(Blocks.PACKED_ICE),
         ),
         TUNGSTEN(
             "Tungsten",
             listOf(OreType.TUNGSTEN),
             4,
-            ItemStack(Blocks.clay),
+            ItemStack(Blocks.CLAY),
         ),
         UMBER(
             "Umber",
             listOf(OreType.UMBER),
             4,
-            ItemStack(Blocks.red_sandstone),
+            ItemStack(Blocks.RED_SANDSTONE),
         ),
 
         TITANIUM(

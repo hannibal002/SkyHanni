@@ -18,8 +18,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
+import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 
 @SkyHanniModule
@@ -28,7 +28,7 @@ object WorldEdit {
     private var leftPos = null as BlockPos?
     private var rightPos = null as BlockPos?
 
-    private fun funAABB(left: BlockPos, right: BlockPos) = AxisAlignedBB(
+    private fun funAABB(left: BlockPos, right: BlockPos) = AABB(
         minOf(left.x, left.x + 1, right.x, right.x + 1).toDouble(),
         minOf(left.y, left.y + 1, right.y, right.y + 1).toDouble(),
         minOf(left.z, left.z + 1, right.z, right.z + 1).toDouble(),

@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.init.Blocks
+import net.minecraft.world.level.block.Blocks
 import kotlin.concurrent.fixedRateTimer
 
 @SkyHanniModule
@@ -42,15 +42,15 @@ object MovementSpeedDisplay {
         if (!SkyBlockUtils.onHypixel) return
 
         speed = with(MinecraftCompat.localPlayer) {
-            val oldPos = LorenzVec(prevPosX, prevPosY, prevPosZ)
-            val newPos = LorenzVec(posX, posY, posZ)
+            val oldPos = LorenzVec(xOld, yOld, zOld)
+            val newPos = LorenzVec(position().x, position().y, position().z)
 
             // Distance from previous tick, multiplied by TPS
             oldPos.distance(newPos) * 20
         }
 
         // 1.15+ has consistent soul sand speed
-        val movingOnSoulSand = PlatformUtils.IS_LEGACY && LocationUtils.playerLocation().getBlockAt() == Blocks.soul_sand && speed > 0.0
+        val movingOnSoulSand = PlatformUtils.IS_LEGACY && LocationUtils.playerLocation().getBlockAt() == Blocks.SOUL_SAND && speed > 0.0
         if (movingOnSoulSand) {
             soulSandSpeeds.add(speed)
             if (soulSandSpeeds.size > 6) {

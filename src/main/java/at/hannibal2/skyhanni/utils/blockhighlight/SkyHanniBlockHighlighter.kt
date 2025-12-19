@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.block.state.IBlockState
+import net.minecraft.world.level.block.state.BlockState
 
 /**
  * A [SkyHanniBlockHighlighter] is used to highlight blocks based on a certain condition
@@ -18,7 +18,7 @@ import net.minecraft.block.state.IBlockState
  */
 class SkyHanniBlockHighlighter<T : AbstractHighlightedBlock>(
     val highlightCondition: () -> Boolean,
-    val blockCondition: (IBlockState) -> Boolean,
+    val blockCondition: (BlockState) -> Boolean,
     val colorProvider: () -> ChromaColour,
 ) {
 
@@ -55,7 +55,7 @@ class SkyHanniBlockHighlighter<T : AbstractHighlightedBlock>(
         synchronized(blocksLock) {
             if (blocksToHighlight.isEmpty()) return
             for (block in blocksToHighlight) {
-                val aabb = block.location.boundingToOffset(1.0, 1.0, 1.0).expand(0.001)
+                val aabb = block.location.boundingToOffset(1.0, 1.0, 1.0).inflate(0.001)
                 event.drawFilledBoundingBox(aabb, colorProvider(), renderRelativeToCamera = false)
             }
         }

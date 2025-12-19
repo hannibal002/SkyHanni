@@ -10,14 +10,10 @@ import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
+import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.xml.Bind
 import io.github.notenoughupdates.moulconfig.xml.XMLUniverse
-//#if FORGE
-import io.github.notenoughupdates.moulconfig.gui.GuiComponentWrapper
-//#else
-//$$ import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
-//$$ import net.minecraft.text.Text
-//#endif
+import net.minecraft.network.chat.Component
 
 /**
  * Gui for analyzing [RepoPattern]s
@@ -40,11 +36,7 @@ class RepoPatternGui private constructor() {
                     val location = MyResourceLocation("skyhanni", "gui/regexes.xml")
                     val universe = XMLUniverse.getDefaultUniverse()
                     val context = GuiContext(universe.load(RepoPatternGui(), location))
-                    //#if FORGE
-                    SkyHanniMod.screenToOpen = GuiComponentWrapper(context)
-                    //#else
-                    //$$ SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Text.empty(), context, null)
-                    //#endif
+                    SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Component.empty(), context, null)
                 }
             }
         }

@@ -9,16 +9,18 @@ import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.monster.EntityEndermite
-import net.minecraft.entity.monster.EntityIronGolem
-import net.minecraft.entity.monster.EntityMagmaCube
-import net.minecraft.entity.monster.EntitySlime
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.monster.Endermite
+import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.Slime
 
 @SkyHanniModule
 object HighlightMiningCommissionMobs {
@@ -29,33 +31,35 @@ object HighlightMiningCommissionMobs {
     private var active = listOf<MobType>()
 
     // TODO Commission API
-    enum class MobType(val commissionName: String, val isMob: (EntityLivingBase) -> Boolean) {
+    enum class MobType(val commissionName: String, val isMob: (LivingEntity) -> Boolean) {
 
         // Dwarven Mines
-        DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Goblin " }),
-        STAR_PUNCHER("Star Sentry Puncher", { it.name == "Crystal Sentry" }),
-        ICE_WALKER("Glacite Walker Slayer", { it.name == "Ice Walker" }),
-        GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.contains("Golden Goblin") }),
-        TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name == "Treasuer Hunter" }), // typo is intentional
+        DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name.formattedTextCompatLessResets() == "Goblin " }),
+        STAR_PUNCHER("Star Sentry Puncher", { it.name.formattedTextCompatLessResets() == "Crystal Sentry" }),
+        ICE_WALKER("Glacite Walker Slayer", { it.name.formattedTextCompatLessResets() == "Ice Walker" }),
+        GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.formattedTextCompatLessResets().contains("Golden Goblin") }),
+        TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name.formattedTextCompatLessResets() == "Treasuer Hunter" }), // typo is intentional
 
         // Crystal Hollows
-        AUTOMATON("Automaton Slayer", { it is EntityIronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) }),
-        TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name == "Team Treasurite" }),
-        YOG("Yog Slayer", { it is EntityMagmaCube && it.hasMaxHealth(35_000) }),
-        THYST("Thyst Slayer", { it is EntityEndermite && it.hasMaxHealth(5_000) }),
-        CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name == "Team Treasurite" }),
-        SLUDGE("Sludge Slayer", { it is EntitySlime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000)) }),
-        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }),
+        AUTOMATON("Automaton Slayer", { it is IronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) }),
+        TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name.formattedTextCompatLessResets() == "Team Treasurite" }),
+        YOG("Yog Slayer", { it is MagmaCube && it.hasMaxHealth(35_000) }),
+        THYST("Thyst Slayer", { it is Endermite && it.hasMaxHealth(5_000) }),
+        CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name.formattedTextCompatLessResets() == "Team Treasurite" }),
+        SLUDGE("Sludge Slayer", { it is Slime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000)) }),
+        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name.formattedTextCompatLessResets() == "Weakling " }),
 
         // new commissions
     }
 
+    @OptIn(AllEntitiesGetter::class)
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
 
-        val entities = EntityUtils.getEntities<EntityLivingBase>()
+        // TODO: optimize to just update when the commissions change
+        val entities = EntityUtils.getEntities<LivingEntity>()
         for ((type, entity) in active.flatMap { type -> entities.map { type to it } }) {
             if (type.isMob(entity)) {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(

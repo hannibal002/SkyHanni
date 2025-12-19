@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.util.BlockPos
+import net.minecraft.core.BlockPos
 import java.util.TreeMap
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds

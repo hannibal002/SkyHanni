@@ -26,9 +26,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object AnitaMedalProfit {
@@ -161,7 +162,7 @@ object AnitaMedalProfit {
     private fun isInvalidItemName(itemName: String): Boolean = itemName in invalidItemNames
 
     private fun getItemName(item: ItemStack): String {
-        val name = item.displayName
+        val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
             item.repoItemName
@@ -218,7 +219,7 @@ object AnitaMedalProfit {
                     ErrorManager.logErrorStateWithData(
                         "Error in Anita Medal Contest", "Could not read item amount",
                         "rawItemName" to rawItemName,
-                        "name" to item.displayName,
+                        "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                         "lore" to lore,
                     )
                     continue

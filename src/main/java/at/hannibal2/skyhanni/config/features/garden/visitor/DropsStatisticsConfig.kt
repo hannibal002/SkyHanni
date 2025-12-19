@@ -36,7 +36,9 @@ class DropsStatisticsConfig {
             DropsStatisticsTextEntry.OVERGROWN_GRASS,
             DropsStatisticsTextEntry.GREEN_BANDANA,
             DropsStatisticsTextEntry.DEDICATION_IV,
-            DropsStatisticsTextEntry.COPPER_DYE
+            DropsStatisticsTextEntry.COPPER_DYE,
+            DropsStatisticsTextEntry.HYPERCHARGE_CHIP,
+            DropsStatisticsTextEntry.QUICKDRAW_CHIP,
         )
     )
 
@@ -75,6 +77,8 @@ class DropsStatisticsConfig {
         JUNGLE_KEY("§b1 §5Jungle Key"),
         FRUIT_BOWL("§b1 §9Fruit Bowl"),
         HARVEST_HARBINGER("§b1 §9Harvest Harbinger V"),
+        HYPERCHARGE_CHIP("§b3 §9Hypercharge Chip"),
+        QUICKDRAW_CHIP("§b7 §9Quickdraw Chip"),
         ;
 
         override fun toString() = displayName

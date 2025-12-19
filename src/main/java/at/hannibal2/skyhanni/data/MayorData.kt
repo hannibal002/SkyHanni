@@ -122,6 +122,10 @@ enum class ElectionCandidate(
         perks.forEach { it.isActive = true }
     }
 
+    fun addAdditionalPerks(perks: List<Perk>) {
+        perks.forEach { it.isActive = true }
+    }
+
     fun addAllPerks(): ElectionCandidate {
         this.perks.forEach { it.isActive = true }
         return this
@@ -148,6 +152,7 @@ enum class ElectionCandidate(
             }
 
             mayor.addPerks(perksJson.mapNotNull { it.toPerk() })
+            ElectionApi.repoPerks?.let { mayor.addAdditionalPerks(it) }
             return mayor
         }
     }

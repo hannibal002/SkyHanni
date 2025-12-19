@@ -22,7 +22,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class GuiConfig {
     @Expose
@@ -48,13 +48,13 @@ class GuiConfig {
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var keyBindOpen: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var keyBindOpen: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Reset Hotkey", desc = "Key to press hovering a gui element to reset it's position and scale in the GUI Editor.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_R)
-    var keyBindReset: Int = Keyboard.KEY_R
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_R)
+    var keyBindReset: Int = GLFW.GLFW_KEY_R
 
     @Expose
     @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all SkyHanni GUIs.")

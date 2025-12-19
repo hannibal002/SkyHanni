@@ -578,6 +578,9 @@ object FarmingWeightDisplay {
         CropType.MUSHROOM to 90_944.27,
         CropType.COCOA_BEANS to 276_733.75,
         CropType.CACTUS to 178_730.65,
+        CropType.MOONFLOWER to 200_000.0,
+        CropType.SUNFLOWER to 200_000.0,
+        CropType.WILD_ROSE to 200_000.0,
     )
 
     @HandleEvent

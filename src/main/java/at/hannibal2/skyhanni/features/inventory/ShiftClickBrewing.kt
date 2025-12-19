@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.makeShiftClick
-import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
 
 @SkyHanniModule
 object ShiftClickBrewing {
@@ -16,7 +16,7 @@ object ShiftClickBrewing {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!SkyHanniMod.feature.inventory.shiftClickBrewing) return
 
-        if (event.gui !is GuiChest) return
+        if (event.gui !is ContainerScreen) return
 
         if (event.slot == null || event.slotId == closeButtonIndex) return
 

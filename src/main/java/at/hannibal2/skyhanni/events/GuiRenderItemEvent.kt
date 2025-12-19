@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
-import at.hannibal2.skyhanni.utils.compat.DrawContext
-import net.minecraft.item.ItemStack
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.world.item.ItemStack
 
-abstract class GuiRenderItemEvent(context: DrawContext) : RenderingSkyHanniEvent(context) {
+abstract class GuiRenderItemEvent(context: GuiGraphics) : RenderingSkyHanniEvent(context) {
     abstract class RenderOverlayEvent(
-        context: DrawContext,
+        context: GuiGraphics,
         open val stack: ItemStack?,
         open val x: Int,
         open val y: Int,
@@ -14,7 +14,7 @@ abstract class GuiRenderItemEvent(context: DrawContext) : RenderingSkyHanniEvent
     ) : GuiRenderItemEvent(context) {
 
         data class GuiRenderItemPost(
-            override val context: DrawContext,
+            override val context: GuiGraphics,
             override val stack: ItemStack?,
             override val x: Int,
             override val y: Int,

@@ -30,8 +30,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.block.BlockChest
-import net.minecraft.block.state.IBlockState
+import net.minecraft.world.level.block.ChestBlock
+import net.minecraft.world.level.block.state.BlockState
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -205,7 +205,7 @@ object PowderChestTimer {
 
     private fun LorenzVec.isOpened() = !chests.containsKey(this)
 
-    private fun IBlockState.isChest() = block is BlockChest
+    private fun BlockState.isChest() = block is ChestBlock
 
     private fun isEnabled() = config.enabled && (!config.onlyMaxGreatExplorer || HotmData.GREAT_EXPLORER.isMaxLevel)
 }

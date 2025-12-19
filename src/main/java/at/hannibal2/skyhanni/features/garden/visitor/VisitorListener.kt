@@ -30,14 +30,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.network.play.client.C02PacketUseEntity
+import net.minecraft.network.protocol.game.ServerboundInteractPacket
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.21
-//$$ import net.minecraft.server.world.ServerWorld
-//#endif
 
 @SkyHanniModule
 object VisitorListener {
@@ -59,14 +58,10 @@ object VisitorListener {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSendEvent(event: PacketSentEvent) {
         val packet = event.packet
-        if (packet !is C02PacketUseEntity) return
+        if (packet !is ServerboundInteractPacket) return
 
-        //#if MC < 1.21
-        val entity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
-        //#else
-        //$$ val entity = MinecraftCompat.localWorld.getEntityById(packet.entityId) ?: return
-        //#endif
-        val entityId = entity.entityId
+        val entity = MinecraftCompat.localWorld.getEntity(packet.entityId) ?: return
+        val entityId = entity.id
 
         lastClickedNpc = entityId
     }
@@ -103,13 +98,13 @@ object VisitorListener {
         if (!VisitorApi.isVisitorInfo(lore)) return
 
         val offerItem = event.inventoryItems[ACCEPT_SLOT] ?: return
-        if (offerItem.displayName != "§aAccept Offer") return
+        if (offerItem.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aAccept Offer") return
 
         VisitorApi.inInventory = true
 
         val visitorOffer = VisitorApi.VisitorOffer(offerItem)
 
-        var name = npcItem.displayName
+        var name = npcItem.hoverName.formattedTextCompatLeadingWhiteLessResets()
         if (name.length == name.removeColor().length + 4) {
             name = name.substring(2)
         }
@@ -143,12 +138,12 @@ object VisitorListener {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!GardenApi.onBarnPlot) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
-        if (entity.name == "§e§lCLICK") {
+        if (entity.name.formattedTextCompatLessResets() == "§e§lCLICK") {
             event.cancel()
         }
     }

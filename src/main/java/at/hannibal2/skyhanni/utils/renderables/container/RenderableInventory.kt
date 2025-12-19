@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.math.ceil
 
 object RenderableInventory {

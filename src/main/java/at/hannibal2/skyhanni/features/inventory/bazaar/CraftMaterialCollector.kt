@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 @SkyHanniModule
@@ -40,8 +41,8 @@ object CraftMaterialCollector {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val items = event.inventoryItems
-        val correctItem = items[23]?.displayName == "§aCrafting Table"
-        val correctSuperCraftItem = items[32]?.displayName == "§aSupercraft"
+        val correctItem = items[23]?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aCrafting Table"
+        val correctSuperCraftItem = items[32]?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aSupercraft"
 
         inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return

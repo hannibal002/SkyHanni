@@ -134,7 +134,7 @@ object PestFinder {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { shouldShowDisplay() },
+            condition = ::shouldShowDisplay,
             onRender = {
                 config.position.renderRenderables(display, posLabel = "Pest Finder")
             },
@@ -223,7 +223,7 @@ object PestFinder {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onKeyPress(event: KeyPressEvent) {
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         if (NeuItems.neuHasFocus()) return
 
         if (event.keyCode != config.teleportHotkey) return

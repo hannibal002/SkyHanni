@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
-import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
@@ -66,7 +65,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
@@ -447,9 +446,6 @@ class ProfileSpecificStorage(
         var savedCropAccessory: CropAccessory? = CropAccessory.NONE
 
         @Expose
-        var dicerDropTracker: DicerRngDropTracker.Data = DicerRngDropTracker.Data()
-
-        @Expose
         var informedAboutLowMatter: SimpleTimeMark = farPast()
 
         @Expose
@@ -606,6 +602,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var activeVinyl: VinylType? = null
+
+        @Expose
+        var overflowHoeLevels: MutableMap<String, Int> = mutableMapOf()
     }
 
     // - gui

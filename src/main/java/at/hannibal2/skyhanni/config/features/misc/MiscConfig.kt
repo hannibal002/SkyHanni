@@ -21,7 +21,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class MiscConfig {
     @Expose
@@ -494,8 +494,8 @@ class MiscConfig {
 
     @Expose
     @ConfigOption(name = "Abiphone Hotkey", desc = "Answer incoming abiphone calls with a hotkey.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var abiphoneAcceptKey: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var abiphoneAcceptKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(

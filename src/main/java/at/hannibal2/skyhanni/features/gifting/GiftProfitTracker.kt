@@ -126,7 +126,7 @@ object GiftProfitTracker {
     ).map { it.toPattern() }
     // </editor-fold>
 
-    private val tracker = SkyHanniItemTracker("Gift Tracker", { Data() }, { it.giftProfitTracker }) {
+    private val tracker = SkyHanniItemTracker("Gift Tracker", ::Data, { it.giftProfitTracker }) {
         drawDisplay(it)
     }
 

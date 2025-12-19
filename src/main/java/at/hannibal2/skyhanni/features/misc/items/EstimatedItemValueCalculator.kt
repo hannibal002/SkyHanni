@@ -76,8 +76,11 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
+import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.util.Locale
 
 // TODO split into smaller sub classes
@@ -209,11 +212,11 @@ object EstimatedItemValueCalculator {
                 val oneBelow = itemRarity.oneBelow(logError = false)
                 if (oneBelow == null) {
                     ErrorManager.logErrorStateWithData(
-                        "Wrong item rarity detected in estimated item value for item ${stack.displayName}",
+                        "Wrong item rarity detected in estimated item value for item ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                         "Recombobulated item is common",
                         "internal name" to stack.getInternalName(),
                         "itemRarity" to itemRarity,
-                        "item name" to stack.displayName,
+                        "item name" to stack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                         "item nbt" to stack.readNbtDump(),
                     )
                     return null
@@ -224,12 +227,12 @@ object EstimatedItemValueCalculator {
 
         return reforgeCosts[itemRarity]?.toInt() ?: run {
             ErrorManager.logErrorStateWithData(
-                "Could not calculate reforge cost for item ${stack.displayName}",
+                "Could not calculate reforge cost for item ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                 "Item not in NEU repo reforge cost",
                 "reforgeCosts" to reforgeCosts,
                 "itemRarity" to itemRarity,
                 "internal name" to stack.getInternalName(),
-                "item name" to stack.displayName,
+                "item name" to stack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                 "reforgeStone" to reforgeStone,
                 "item nbt" to stack.readNbtDump(),
             )
@@ -448,7 +451,7 @@ object EstimatedItemValueCalculator {
             kuudraArmorTiers.getOrNull(index)?.let { tierName ->
                 EstimatedItemValue.crimsonPrestigeCosts[tierName] ?: run {
                     ErrorManager.logErrorStateWithData(
-                        "Could not find crimson prestige cost for ${stack.displayName}",
+                        "Could not find crimson prestige cost for ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                         "EstimatedItemValue has no crimsonPrestigeCosts for $tierName tier",
                         "internalName" to internalName,
                         "tierIndex" to tierIndex,
@@ -873,7 +876,7 @@ object EstimatedItemValueCalculator {
 
     private fun ItemStack.readUnlockedSlots(): String? {
         // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
-        val unlockedSlots = getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return null
+        val unlockedSlots = getExtraAttributes()?.getCompoundOrDefault("gems")?.get("unlocked_slots")?.toString() ?: return null
 
         // TODO detection for old items which doesn't have gems.unlocked_slots NBT array
 //        if (unlockedSlots == "null") return 0.0
@@ -885,11 +888,11 @@ object EstimatedItemValueCalculator {
             // Do not error out on items if their data was changed.
             if (getLore().any { it.contains("This item has unused Gemstones!") }) return null
             ErrorManager.logErrorStateWithData(
-                "Could not find gemstone slot price for ${this.displayName}",
+                "Could not find gemstone slot price for ${this.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
                 "internal name" to internalName,
                 "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
-                "item name" to displayName,
+                "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                 "item nbt" to readNbtDump(),
             )
             return null
@@ -900,10 +903,10 @@ object EstimatedItemValueCalculator {
 
     private fun ItemStack.readBoosters(): List<NeuInternalName> {
         val list = NbtCompat.getStringTagList(extraAttributes, "boosters")
-        if (list.tagCount() == 0) return emptyList()
+        if (list.size == 0) return emptyList()
         val boosters = mutableListOf<NeuInternalName>()
-        for (i in 0..list.tagCount()) {
-            var internalName = list.getStringTagAt(i)
+        for (i in 0..list.size) {
+            var internalName = list.getStringOrDefault(i)
             if (internalName.isBlank()) continue
             internalName += "_BOOSTER"
             boosters.add(internalName.toInternalName())
