@@ -11,16 +11,13 @@ import net.minecraft.network.chat.Component
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
-//#if MC > 1.21
 import at.hannibal2.skyhanni.mixins.hooks.renderToolTip
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
-//#endif
 
 // Please use ToolTipTextEvent over ToolTipEvent, ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
 object ToolTipData {
 
-    //#if MC > 1.21
     init {
         ItemTooltipCallback.EVENT.register { stack, context, type, originalToolTip ->
             val slot = lastSlot
@@ -59,7 +56,6 @@ object ToolTipData {
         }
         return newTooltip
     }
-    //#endif
 
     @JvmStatic
     fun getTooltip(stack: ItemStack, toolTip: MutableList<String>) {

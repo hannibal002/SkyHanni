@@ -82,7 +82,7 @@ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadin
     var wasFormatted = false
     for (component in iterator()) {
         val chatStyle = component.style.chatStyle()
-        if (chatStyle.isNotEmpty() && (leadingWhite || (wasFormatted && (sb.length != 2 || sb.get(0) != '§' || sb.get(1) != 'r')) || chatStyle != "§f")) {
+        if (chatStyle.isNotEmpty() && (leadingWhite || (wasFormatted && (sb.length != 2 || sb[0] != '§' || sb[1] != 'r')) || chatStyle != "§f")) {
             sb.append(chatStyle)
             wasFormatted = true
         }

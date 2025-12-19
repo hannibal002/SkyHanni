@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.mob import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -22,24 +22,21 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
+import net.minecraft.network.protocol.game.ClientboundLoginPacket
+import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ambient.Bat
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.Creeper
-import net.minecraft.world.entity.ambient.Bat
 import net.minecraft.world.entity.npc.Villager
 import net.minecraft.world.entity.player.Player
-import net.minecraft.network.protocol.game.ClientboundLoginPacket
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
-import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.level.Level
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
-//#if MC < 1.21
-//$$ import net.minecraft.network.packet.s2c.play.PlayerSpawnS2CPacket
-//$$ import net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket
-//#endif
 
 @SkyHanniModule
 object MobDetection {
@@ -364,10 +361,6 @@ object MobDetection {
     fun onEntitySpawnPacket(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
             is ClientboundAddEntityPacket -> addEntityUpdate(packet.id)
-            //#if MC < 1.21
-            //$$ is MobSpawnS2CPacket -> addEntityUpdate(packet.id)
-            //$$ is EntitySpawnS2CPacket -> addEntityUpdate(packet.id)
-            //#endif
             is ClientboundLoginPacket -> {
                 // one of the first packets that is sent when switching servers inside the BungeeCord Network
                 // (please some prove this, I just found it out via Testing)

@@ -5,10 +5,8 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.network.chat.Component
-import java.awt.Color
-//#if MC > 1.21
 import net.minecraft.network.chat.MutableComponent
-//#endif
+import java.awt.Color
 
 class ExtendedChatColor(
     val rgb: Int,

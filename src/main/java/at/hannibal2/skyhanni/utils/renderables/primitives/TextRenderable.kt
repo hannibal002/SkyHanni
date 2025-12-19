@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.utils.renderables.primitives
 
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import net.minecraft.network.chat.Component
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
 import java.awt.Color
 
 // Extension Functions are not inside there Companion Object as it would be ambiguous on import.
@@ -69,13 +69,7 @@ class TextRenderable internal constructor(
         RenderableUtils.renderString(fixStupid(text), scale, color, inverseScale)
     }
 
-    //#if MC < 1.21
-    //$$ private fun fixStupid(text: Text): String {
-    //$$     return text.text
-    //$$ }
-    //#else
     private fun fixStupid(text: Component): Component {
         return text
     }
-    //#endif
 }

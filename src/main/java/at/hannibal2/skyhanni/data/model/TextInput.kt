@@ -14,7 +14,6 @@ import kotlinx.coroutines.runBlocking
 import net.minecraft.client.KeyMapping
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 open class TextInput {
@@ -40,12 +39,7 @@ open class TextInput {
 
     fun makeActive() = if (!isActive) activate(this) else Unit
     fun disable() = if (isActive) Companion.disable() else Unit
-    fun handle() =
-        //#if MC < 1.21
-        //$$ handleTextInput()
-    //#else
-    handleTextInput(null)
-    //#endif
+    fun handle() = handleTextInput(null)
 
     fun clear() {
         textBox = ""
@@ -76,9 +70,6 @@ open class TextInput {
 
         fun activate(instance: TextInput) {
             activeInstance = instance
-            //#if MC < 1.21
-            //$$ timeSinceKeyEvent = GLFW.getEventNanoseconds()
-            //#endif
         }
 
         fun disable() {
@@ -98,22 +89,12 @@ open class TextInput {
             }
         }
 
-        fun onGuiInput(
-            //#if MC < 1.21
-            //$$ ci: CallbackInfo,
-            //#else
-            ci: CallbackInfoReturnable<Boolean>
-            //#endif
-        ) {
+        fun onGuiInput(ci: CallbackInfoReturnable<Boolean>) {
             if (activeInstance != null) {
                 if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) {
                     disable()
                 } else {
-                    //#if MC < 1.21
-                    //$$ ci.cancel()
-                    //#else
                     ci.setReturnValue(false)
-                    //#endif
                 }
                 return
             }
@@ -140,18 +121,12 @@ open class TextInput {
             }
         }
 
-        //#if MC > 1.21
         @HandleEvent
         fun onChar(event: at.hannibal2.skyhanni.events.minecraft.CharEvent) {
             handleTextInput(event.keyCode.toChar())
         }
-        //#endif
 
-        private fun handleTextInput(
-            //#if MC > 1.21
-            char: Char?,
-            //#endif
-        ) {
+        private fun handleTextInput(char: Char?) {
             if (KeyboardManager.isCopyingKeysDown()) {
                 OSUtils.copyToClipboard(textBox)
                 return
@@ -177,19 +152,12 @@ open class TextInput {
                 }
                 return
             }
-            //#if MC > 1.21
             if (GLFW.GLFW_KEY_BACKSPACE.isKeyClicked() || (SystemUtils.IS_OS_MAC && GLFW.GLFW_KEY_DELETE.isKeyClicked())) {
                 textBox = onRemove()
                 updated()
                 return
             }
-            //#endif
 
-            //#if MC < 1.21
-            //$$ if (timeSinceKeyEvent == GLFW.getEventNanoseconds()) return
-            //$$ timeSinceKeyEvent = GLFW.getEventNanoseconds()
-            //$$ val char: Char? = GLFW.getEventCharacter()
-            //#endif
             textBox = when (char) {
                 Char(0) -> return
                 '\b' -> onRemove()

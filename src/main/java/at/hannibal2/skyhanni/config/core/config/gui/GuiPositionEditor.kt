@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.OtherInventoryData
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -33,11 +32,12 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
-import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
+import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberProperties
@@ -69,12 +69,7 @@ class GuiPositionEditor(
             //#if MC > 1.21.5
             //$$ oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
             //#endif
-            //#if MC < 1.21
-            //$$ val accessor = oldScreen as AccessorGuiContainer
-            //$$ accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
-            //#else
             oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
-            //#endif
         }
 
         ModernGlStateManager.disableLighting()
@@ -275,13 +270,11 @@ class GuiPositionEditor(
         hovered.scale += if (scroll > 0) .1F else -.1F
     }
 
-    //#if MC > 1.21
     override fun onClose() {
-    if (oldScreen == null) {
-        super.onClose()
-    } else {
-        net.minecraft.client.Minecraft.getInstance().screen = oldScreen
+        if (oldScreen == null) {
+            super.onClose()
+        } else {
+            Minecraft.getInstance().screen = oldScreen
+        }
     }
-    }
-    //#endif
 }

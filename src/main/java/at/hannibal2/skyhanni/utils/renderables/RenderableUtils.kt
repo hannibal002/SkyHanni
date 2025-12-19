@@ -21,13 +21,11 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.ScrollTable.Compa
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.network.chat.Component
 import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.reflect.KMutableProperty0
-//#if MC > 1.21
-import net.minecraft.network.chat.Component
-//#endif
 
 @Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
@@ -184,7 +182,6 @@ internal object RenderableUtils {
         DrawContextUtils.translate(-1.0, -1.0, 0.0)
     }
 
-    //#if MC > 1.21
     fun renderString(
         text: Component,
         scale: Double = 1.0,
@@ -197,7 +194,6 @@ internal object RenderableUtils {
         DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
         DrawContextUtils.translate(-1.0, -1.0, 0.0)
     }
-    //#endif
 
     inline fun <T> MutableList<Searchable>.addNullableButton(
         label: String,

@@ -121,7 +121,7 @@ enum class DyeCompat(
          */
         fun ItemStack.isDye(metadata: Int = -1): Boolean {
             if (metadata == -1) {
-                return entries.firstOrNull { this.item == item } != null
+                return entries.any { this.item == item }
             }
 
             return this.item == fromDyeColor(metadata).stackType

@@ -1,7 +1,7 @@
 /**
  * @author Linnea Gräf
  */
-package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
+package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.findStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
@@ -11,14 +11,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.appendComponent
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
+import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import java.util.Stack
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-//#if MC < 1.21
-//$$ import net.minecraft.text.Text
-//#endif
 
 object ComponentMatcherUtils {
 
@@ -32,7 +31,7 @@ object ComponentMatcherUtils {
             this,
             text,
             0,
-            text.length
+            text.length,
         )
     }
 
@@ -227,8 +226,8 @@ class ComponentSpan internal constructor(
                     Triple(
                         currentComponent,
                         (rawText.length + index).coerceAtLeast(0),
-                        (rawText.length + index + length).coerceAtMost(rawText.length)
-                    )
+                        (rawText.length + index + length).coerceAtMost(rawText.length),
+                    ),
                 )
             }
             lastComponent = currentComponent
@@ -256,11 +255,7 @@ class ComponentSpan internal constructor(
         parent.style = defaultStyleConstructor
         for ((component, start, end) in sampleSlicedComponents()) {
             val copy = component.unformattedTextForChatCompat().substring(start, end).asComponent()
-            //#if MC < 1.21
-            //$$ copy.style = component.style.createDeepCopy()
-            //#else
             copy.style = component.style
-            //#endif
             parent.append(copy)
         }
         return parent

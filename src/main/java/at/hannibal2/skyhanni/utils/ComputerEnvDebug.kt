@@ -227,27 +227,6 @@ object ComputerEnvDebug {
     private fun performanceMods(event: DebugDataCollectEvent) {
         if (PlatformUtils.isDevEnvironment) return
         event.title("Performance Mods")
-        //#if MC < 1.21
-        //$$ val hasOptifine = FMLClientHandler.instance().hasOptifine()
-        //$$ val hasPatcher = Loader.isModLoaded("patcher")
-        //$$ if (!hasOptifine || !hasPatcher) {
-        //$$     event.addData {
-        //$$         add("Optifine is ${if (hasOptifine) "" else "not"} installed")
-        //$$         add("Patcher is ${if (hasPatcher) "" else "not"} installed")
-        //$$         add("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
-        //$$         if (!hasOptifine) {
-        //$$             add("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
-        //$$         }
-        //$$         if (!hasPatcher) {
-        //$$             add("https://modrinth.com/mod/patcher")
-        //$$         }
-        //$$     }
-        //$$ } else {
-        //$$     event.addIrrelevant {
-        //$$         add("Optifine and Patcher are installed")
-        //$$     }
-        //$$ }
-        //#else
         val hasSodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")
         if (!hasSodium) {
             event.addData {
@@ -260,7 +239,6 @@ object ComputerEnvDebug {
                 add("Sodium is installed")
             }
         }
-        //#endif
     }
 
     @HandleEvent

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.getStringOrDefault import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault import at.hannibal2.skyhanni.utils.compat.getIntOrDefault import at.hannibal2.skyhanni.utils.compat.getLongOrDefault import at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault import at.hannibal2.skyhanni.utils.compat.getBooleanOrDefault import at.hannibal2.skyhanni.utils.compat.getByteOrDefault import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.fishing.FishingApi
@@ -14,21 +14,26 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.getBooleanOrDefault
+import at.hannibal2.skyhanni.utils.compat.getByteOrDefault
+import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
+import at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault
+import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
+import at.hannibal2.skyhanni.utils.compat.getLongOrDefault
+import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import java.util.Locale
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
-//#if MC > 1.21
-import net.minecraft.core.component.DataComponents
-import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
-//#endif
 
 @Suppress("TooManyFunctions")
 object SkyBlockItemModifierUtils {
@@ -291,24 +296,14 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getItemId() = getAttributeString("id")
 
-    //#if MC < 1.21
-    //$$ fun ItemStack.getMinecraftId() = Item.itemRegistry.getNameForObject(item) as Identifier
-    //#else
     fun ItemStack.getMinecraftId() = BuiltInRegistries.ITEM.getKey(item)
-    //#endif
 
-    //#if MC < 1.21
-    //$$ fun isVanillaItem(itemId: String): Boolean {
-    //$$     return Item.itemRegistry.getObject(Identifier(itemId)) != null
-    //$$ }
-    //#else
     private val identifierPattern = "[a-z0-9_\\-.:]+".toRegex()
 
     fun isVanillaItem(itemId: String): Boolean {
         if (!identifierPattern.matches(itemId)) return false
         return BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(itemId)) != Items.AIR
     }
-    //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()
@@ -367,20 +362,16 @@ object SkyBlockItemModifierUtils {
     private fun ItemStack.getAttributeByte(label: String) =
         getExtraAttributes()?.getByteOrDefault(label) ?: 0
 
-    //#if MC < 1.21
-    //$$ fun ItemStack.getExtraAttributes(): NbtCompound? = tag?.extraAttributes
-    //#else
     fun ItemStack.getExtraAttributes(): CompoundTag? {
-       val data = cachedData
-       if (data.lastExtraAttributesFetchTime.passedSince() < 0.1.seconds) {
-           return data.lastExtraAttributes
-       }
-       val extraAttributes = get(DataComponents.CUSTOM_DATA)?.copyTag()
-       data.lastExtraAttributes = extraAttributes
-       data.lastExtraAttributesFetchTime = SimpleTimeMark.now()
-       return extraAttributes
+        val data = cachedData
+        if (data.lastExtraAttributesFetchTime.passedSince() < 0.1.seconds) {
+            return data.lastExtraAttributes
+        }
+        val extraAttributes = get(DataComponents.CUSTOM_DATA)?.copyTag()
+        data.lastExtraAttributes = extraAttributes
+        data.lastExtraAttributesFetchTime = SimpleTimeMark.now()
+        return extraAttributes
     }
-    //#endif
 
     class GemstoneSlot(private val type: GemstoneType, private val quality: GemstoneQuality) {
         fun getInternalName() = "${quality.name}_${type.name}_GEM".toInternalName()

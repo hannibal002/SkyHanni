@@ -8,15 +8,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlinx.coroutines.delay
 import net.minecraft.client.Minecraft
-import net.minecraft.client.resources.sounds.SoundInstance
-import net.minecraft.sounds.SoundSource
-import net.minecraft.resources.ResourceLocation
-//#if MC < 1.21
-//$$ import net.minecraft.client.audio.PositionedSound
-//#else
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
+import net.minecraft.client.resources.sounds.SoundInstance
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
-//#endif
+import net.minecraft.sounds.SoundSource
 
 @SkyHanniModule
 object SoundUtils {
@@ -30,11 +26,7 @@ object SoundUtils {
 
     fun SoundInstance.playSound() {
         DelayedRun.onThread.execute {
-            //#if MC < 1.21
-            //$$ val category = SoundCategory.PLAYERS
-            //#else
             val category = this.source
-            //#endif
 
             val oldLevel = Minecraft.getInstance().options.getSoundSourceVolume(category)
             if (!config.maintainGameVolume) category.setLevel(1f)
@@ -69,22 +61,9 @@ object SoundUtils {
     //#endif
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
-        //#if MC < 1.21
-        //$$ val sound: SoundInstance = object : PositionedSound(Identifier(name)) {
-        //$$     init {
-        //$$         this.volume = volume
-        //$$         repeat = false
-        //$$         repeatDelay = 0
-        //$$         attenuationType = SoundInstance.AttenuationType.NONE
-        //$$         this.pitch = pitch
-        //$$     }
-        //$$ }
-        //$$ return sound
-        //#else
         val newSound = at.hannibal2.skyhanni.utils.compat.SoundCompat.getModernSoundName(name)
         val identifier = ResourceLocation.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
         return SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
-        //#endif
     }
 
     fun playBeepSound(pitch: Float = 1f) {

@@ -116,14 +116,8 @@ enum class CropType(
                 Blocks.COCOA -> COCOA_BEANS
                 Blocks.RED_MUSHROOM, Blocks.BROWN_MUSHROOM -> MUSHROOM
                 Blocks.NETHER_WART -> NETHER_WART
-                //#if MC < 1.21
-                //$$ Blocks.DOUBLE_PLANT -> {
-                //$$     return if (this.isSunflower(pos)) getTimeFlower() else if (this.isWildRose(pos)) WILD_ROSE else null
-                //$$ }
-                //#else
                 Blocks.ROSE_BUSH -> WILD_ROSE
                 Blocks.SUNFLOWER -> getTimeFlower()
-                //#endif
                 else -> null
             }
         }

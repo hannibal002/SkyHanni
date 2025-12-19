@@ -33,31 +33,14 @@ fun Renderable.Companion.fakePlayer(
     override val height = height + 2 * padding
     override val horizontalAlign = HorizontalAlignment.LEFT
     override val verticalAlign = VerticalAlignment.TOP
-    val playerHeight = entityScale * 2
-    val playerX = width / 2 + padding
-    val playerY = height / 2 + playerHeight / 2 + padding
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         ModernGlStateManager.color(1f, 1f, 1f, 1f)
         if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
         val mouse = currentRenderPassMousePosition ?: return
-        val (mouseXRelativeToPlayer, mouseYRelativeToPlayer) = if (followMouse) {
-            val newOffsetX = (mouseOffsetX + playerX - mouse.first).toFloat()
-            val newOffsetY = (mouseOffsetY + playerY - mouse.second - 1.62 * entityScale).toFloat()
-            newOffsetX to newOffsetY
-        } else eyesX to eyesY
         DrawContextUtils.pushMatrix()
         DrawContextUtils.translate(0f, 0f, 100f)
-        //#if MC < 1.21
-        //$$ InventoryScreen.drawEntityOnScreen(
-        //$$     playerX,
-        //$$     playerY,
-        //$$     entityScale,
-        //$$     mouseXRelativeToPlayer,
-        //$$     mouseYRelativeToPlayer,
-        //$$     player,
-        //$$ )
-        //#elseif MC < 1.21.7
+        //#if MC < 1.21.7
         InventoryScreen.renderEntityInInventoryFollowsMouse(
             DrawContextUtils.drawContext,
             padding,

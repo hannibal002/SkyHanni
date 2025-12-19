@@ -1,12 +1,13 @@
-package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import net.minecraft.network.chat.Component
 
@@ -18,14 +19,10 @@ object SignUtils {
     fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getInstance().screen
         if (gui !is AbstractSignEditScreen) return
-        //#if MC < 1.21
-        //$$ gui.signText[line] = text.asComponent()
-        //#else
         val oldRow = gui.line
         gui.line = line
         gui.setMessage(text)
         gui.line = oldRow
-        //#endif
     }
 
     private fun addTextIntoSign(addedText: String) {
@@ -114,9 +111,5 @@ object SignUtils {
     }
 
     private val AbstractSignEditScreen.signText: Array<Component>
-        //#if MC < 1.21
-        //$$ get() = this.tileSign.signText
-    //#else
-    get() = this.text.getMessages(false)
-    //#endif
+        get() = this.text.getMessages(false)
 }

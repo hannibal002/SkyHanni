@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -17,16 +17,14 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getPlayerNames
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket
-import net.minecraft.network.protocol.game.ClientboundSetScorePacket
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
+import net.minecraft.network.protocol.game.ClientboundSetScorePacket
 import net.minecraft.world.scores.criteria.ObjectiveCriteria
-import net.minecraft.world.scores.PlayerTeam
-//#if MC > 1.21
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-//#endif
 
 @SkyHanniModule
 object ScoreboardData {
@@ -162,7 +160,7 @@ object ScoreboardData {
      * @param text The line to check and possibly replace
      * @return The replaced line, or null if it should be hidden
      */
-    fun tryToReplaceScoreboardLine(text: String): String? {
+    fun tryToReplaceScoreboardLine(text: String): String {
         try {
             return tryToReplaceScoreboardLineHarder(text)
         } catch (t: Throwable) {
@@ -175,12 +173,7 @@ object ScoreboardData {
         }
     }
 
-    private fun tryToReplaceScoreboardLineHarder(text: String): String? {
-        //#if MC < 1.21
-        //$$ if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
-        //$$     return null
-        //$$ }
-        //#endif
+    private fun tryToReplaceScoreboardLineHarder(text: String): String {
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
             PurseApi.piggyPattern.matchMatcher(text) {
                 val coins = group("coins")
@@ -241,7 +234,7 @@ object ScoreboardData {
         event.register("shdebugscoreboard") {
             description =
                 "Monitors the scoreboard changes: " +
-                "Prints the raw scoreboard lines in the console after each update, with time since last update."
+                    "Prints the raw scoreboard lines in the console after each update, with time since last update."
             category = CommandCategory.DEVELOPER_DEBUG
             callback {
                 monitor = !monitor

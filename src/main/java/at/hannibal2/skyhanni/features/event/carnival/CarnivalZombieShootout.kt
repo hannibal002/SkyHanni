@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.carnival import at.hannibal2.skyhanni.utils.compat.findHealthReal import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -17,6 +17,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
@@ -32,18 +34,15 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.world.entity.monster.Zombie
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.item.Items
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
-
-//#if MC > 1.21
-import net.minecraft.world.level.block.state.properties.BlockStateProperties
-//#endif
 
 @SkyHanniModule
 object CarnivalZombieShootout {
@@ -173,19 +172,9 @@ object CarnivalZombieShootout {
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !started) return
 
-        //#if MC < 1.21
-        //$$ val old = event.old
-        //$$ val new = event.new
-        //$$
-        //$$ lamp = when {
-        //$$     old == "redstone_lamp" && new == "lit_redstone_lamp" -> ShootoutLamp(event.location, SimpleTimeMark.now())
-        //$$     old == "lit_redstone_lamp" && new == "redstone_lamp" -> null
-        //$$     else -> lamp
-        //$$ }
-        //#else
         val blockOld = event.old
         val blockNew = event.new
-        if(blockOld == "redstone_lamp" && blockNew == "redstone_lamp") {
+        if (blockOld == "redstone_lamp" && blockNew == "redstone_lamp") {
             val old = event.oldState.getValue(BlockStateProperties.LIT)
             val new = event.newState.getValue(BlockStateProperties.LIT)
             lamp = when {
@@ -194,7 +183,6 @@ object CarnivalZombieShootout {
                 else -> lamp
             }
         }
-        //#endif
     }
 
     @HandleEvent
@@ -267,11 +255,7 @@ object CarnivalZombieShootout {
                     "helmet" to helmet,
                     "helmet.displayName" to helmet.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "helmet.item" to helmet.item,
-                    //#if MC < 1.21
-                    //$$ "helmet.unlocalizedName" to helmet.unlocalizedName,
-                    //#else
                     "helmet.unlocalizedName" to helmet.item.descriptionId,
-                    //#endif
                 )
                 return@mapNotNull null
             }

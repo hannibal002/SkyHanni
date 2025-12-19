@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -19,18 +19,17 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
-import net.minecraft.client.Minecraft
-import net.minecraft.client.GuiMessage
-import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.game.ServerboundChatPacket
 import net.minecraft.ChatFormatting
-import net.minecraft.network.chat.Component
-import kotlin.time.Duration.Companion.seconds
-
-//#if MC > 1.21
+import net.minecraft.client.GuiMessage
 import net.minecraft.client.GuiMessageTag
-//#endif
+import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
+import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ServerboundChatCommandPacket
+import net.minecraft.network.protocol.game.ServerboundChatPacket
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChatManager {
@@ -56,7 +55,7 @@ object ChatManager {
         backingMessageHistory,
         postUpdate = { key, value ->
             if (value == null) replacementReasonMap.remove(key)
-        }
+        },
     )
 
     private val replacementReasonMap: MutableMap<IdentityCharacteristics<Component>, String> = mutableMapOf()
@@ -143,9 +142,7 @@ object ChatManager {
     private fun getMessageFromPacket(packet: Packet<*>): String? {
         return when (packet) {
             is ServerboundChatPacket -> packet.message()
-            //#if MC > 1.21
-            is net.minecraft.network.protocol.game.ServerboundChatCommandPacket -> "/${packet.command}"
-            //#endif
+            is ServerboundChatCommandPacket -> "/${packet.command}"
             else -> null
         }
     }
@@ -233,17 +230,10 @@ object ChatManager {
                 predicate(it)
             }.takeIf { it != -1 }?.let {
                 val chatLine = this[it]
-                //#if MC < 1.21
-                //$$ val counter = chatLine.addedTime
-                //$$ val id = chatLine.id
-                //$$ val oldComponent = chatLine.chatComponent
-                //$$ val newComponent = component(chatLine.chatComponent)
-                //#else
                 val counter = chatLine.addedTime()
                 val id = chatLine.signature
                 val oldComponent = chatLine.content
                 val newComponent = component(chatLine.content)
-                //#endif
 
                 val key = IdentityCharacteristics(oldComponent)
 
@@ -254,12 +244,7 @@ object ChatManager {
                         history.actionReason = reason.uppercase()
                     }
                 }
-
-                //#if MC < 1.21
-                //$$ this[it] = ChatHudLine(counter, newComponent, id)
-                //#else
                 this[it] = GuiMessage(counter, newComponent, id, GuiMessageTag.system())
-                //#endif
             }
         }
     }
@@ -282,11 +267,7 @@ object ChatManager {
                 if (predicate(chatLine)) {
                     iterator.remove()
                     removed++
-                    //#if MC < 1.21
-                    //$$ val key = IdentityCharacteristics(chatLine.chatComponent)
-                    //#else
                     val key = IdentityCharacteristics(chatLine.content)
-                    //#endif
                     reason?.let {
                         messageHistory[key]?.let { history ->
                             history.actionKind = ActionKind.RETRACTED

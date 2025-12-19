@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
@@ -497,15 +498,11 @@ object HypixelData {
     private fun checkHypixel() {
         if (!hasScoreboardUpdated) return
         val mc = Minecraft.getInstance()
-        val player = MinecraftCompat.localPlayerOrNull ?: return
+        MinecraftCompat.localPlayerOrNull ?: return
 
         var hypixel = false
 
-        //#if MC < 1.21
-        //$$ val clientBrand = player.clientBrand
-        //#else
         val clientBrand = mc.connection?.serverBrand()
-        //#endif
         clientBrand?.let {
             if (it.contains("hypixel", ignoreCase = true)) {
                 hypixel = true

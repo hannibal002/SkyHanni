@@ -3,27 +3,21 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
-import net.minecraft.client.Minecraft
 import net.minecraft.client.KeyMapping
+import net.minecraft.client.Minecraft
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
-import com.mojang.blaze3d.platform.InputConstants
 //#if MC > 1.21.8
 //$$ import net.minecraft.client.input.KeyEvent
 //#endif
 
 object KeyboardManager {
 
-    //#if MC < 1.21
-    //$$ const val LEFT_MOUSE = -100
-    //$$ const val RIGHT_MOUSE = -99
-    //$$ const val MIDDLE_MOUSE = -98
-    //#else
     const val LEFT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_LEFT
     const val RIGHT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_RIGHT
     const val MIDDLE_MOUSE = GLFW.GLFW_MOUSE_BUTTON_MIDDLE
-    //#endif
 
     private var lastClickedMouseButton = -1
 
@@ -56,7 +50,7 @@ object KeyboardManager {
 
         val isClose =
         //#if MC < 1.21.9
-        Minecraft.getInstance().options.keyInventory.matches(keycode, keycode) || keycode == GLFW.GLFW_KEY_ESCAPE
+            Minecraft.getInstance().options.keyInventory.matches(keycode, keycode) || keycode == GLFW.GLFW_KEY_ESCAPE
         //#else
         //$$ Minecraft.getInstance().options.keyInventory.matches(KeyEvent(keycode, keycode, 0)) || keycode == GLFW.GLFW_KEY_ESCAPE
         //#endif

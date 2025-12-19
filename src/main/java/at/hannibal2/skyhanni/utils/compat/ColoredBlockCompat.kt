@@ -1,16 +1,11 @@
 package at.hannibal2.skyhanni.utils.compat
 
-//#if MC < 1.21
-//$$ import net.minecraft.block.BlockCarpet
-//#else
 import at.hannibal2.skyhanni.utils.LorenzColor
 import net.minecraft.world.item.DyeColor
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
-
-//#endif
 
 /**
  * Enum class that represents colored blocks in Minecraft, stained clay, wool, stained-glass, and stained-glass panes.

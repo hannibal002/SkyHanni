@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.minion import at.hannibal2.skyhanni.utils.compat.deceased import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -47,6 +47,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -119,15 +122,13 @@ object MinionFeatures {
         if (!isEnabled()) return
         if (event.action != ClickAction.RIGHT_CLICK_BLOCK) return
 
-        //#if MC < 1.21
-        //$$ val vec = event.face
-        //#else
-        val vec = event.face?.unitVec3i
-        //#endif
+        val vec = event.face?.unitVec3i ?: return
         val lookingAt = event.pos?.offset(vec)?.toLorenzVec() ?: return
         val equipped = InventoryUtils.getItemInHand() ?: return
 
-        if (equipped.hoverName.formattedTextCompatLeadingWhiteLessResets().contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.AIR) {
+        if (equipped.hoverName.formattedTextCompatLeadingWhiteLessResets()
+                .contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.AIR
+        ) {
             newMinion = lookingAt.add(0.5, 0.0, 0.5)
             newMinionName = getMinionName(equipped.cleanName())
         } else {

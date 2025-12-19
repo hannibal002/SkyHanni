@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.api.enoughupdates import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault import at.hannibal2.skyhanni.utils.compat.getStringOrDefault import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+package at.hannibal2.skyhanni.api.enoughupdates
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -9,15 +9,19 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ComponentUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
+import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import com.google.gson.JsonArray
@@ -26,29 +30,15 @@ import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.item.Items
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.StringTag
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import net.minecraft.nbt.TagParser
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
 import java.io.File
 import java.util.TreeMap
 import kotlin.math.floor
-//#if MC > 1.21
-import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceLocation
-import net.minecraft.nbt.StringTag
-import net.minecraft.network.chat.Component
-import net.minecraft.core.component.DataComponents
-import net.minecraft.world.item.component.ItemLore
-import at.hannibal2.skyhanni.utils.ComponentUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
-//#else
-//$$ import net.minecraft.nbt.NbtString
-//$$
-//#endif
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
@@ -165,19 +155,12 @@ object EnoughUpdatesManager {
     }
 
     fun stackToJson(stack: ItemStack): JsonObject {
-        val tag = stack.components ?: CompoundTag()
-
         val lore = stack.getLore()
 
         val json = JsonObject()
         json.addProperty("itemid", stack.item.getIdentifierString())
         json.addProperty("displayname", stack.hoverName.formattedTextCompatLeadingWhiteLessResets())
-        //#if MC < 1.21
-        //$$ json.addProperty("nbttag", tag.toString())
-        //$$ json.addProperty("damage", stack.itemDamage)
-        //#else
         json.add("nbttag", ComponentUtils.convertToNeuNbtInfoJson(stack))
-        //#endif
 
         val jsonLore = JsonArray()
         for (line in lore) {
@@ -204,58 +187,6 @@ object EnoughUpdatesManager {
     }
 
     fun jsonToStack(json: JsonObject?, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack {
-        //#if MC < 1.21
-        //$$ json ?: return ItemStack(Items.PAINTING)
-        //$$ var usingCache = useCache && !useReplacements
-        //$$ val internalName = json["internalname"].asString
-        //$$ if (internalName == "_") usingCache = false
-        //$$
-        //$$ if (usingCache) {
-        //$$     val cachedStack = itemStackCache[internalName]
-        //$$     if (cachedStack != null) return cachedStack.copy()
-        //$$ }
-        //$$
-        //$$ // todo modern doesnt have the "meta" number
-        //$$ val stack = ItemStack(json["itemid"].asString.getVanillaItem() ?: return ItemStack(Item.fromBlock(Blocks.STONE), 0, 255))
-        //$$ stack.item ?: return ItemStack(Item.fromBlock(Blocks.STONE), 0, 255)
-        //$$
-        //$$ json["count"]?.asInt?.let { stack.count = it }
-        //$$ json["damage"]?.asInt?.let { stack.itemDamage = it }
-        //$$ try {
-        //$$     val nbtString = json["nbttag"]?.let { rawJsonNbt ->
-        //$$         if (rawJsonNbt.isJsonObject) rawJsonNbt.toString()
-        //$$         else rawJsonNbt.asString
-        //$$     }
-        //$$     val tag = StringNbtReader.parse(nbtString)
-        //$$     stack.tagCompound = tag
-        //$$ } catch (_: Exception) {
-        //$$     println("json was malformed: ${json["nbttag"]}")
-        //$$     println("whole json: $json")
-        //$$ }
-        //$$
-        //$$ var replacements = mapOf<String, String>()
-        //$$ if (useReplacements) {
-        //$$     replacements = getPetLoreReplacements(stack, -1)
-        //$$     json["displayname"]?.asString?.let {
-        //$$         var name = it
-        //$$         for ((key, value) in replacements) {
-        //$$             name = name.replace("{$key}", value)
-        //$$         }
-        //$$         stack.setCustomItemName(name)
-        //$$     }
-        //$$ }
-        //$$
-        //$$ json["lore"]?.asJsonArray?.let { lore ->
-        //$$     val displayTag = stack.tag?.getCompound("display") ?: NbtCompound()
-        //$$     displayTag.put("Lore", processLore(lore, replacements))
-        //$$     val tag = stack.tag ?: NbtCompound()
-        //$$     tag.put("display", displayTag)
-        //$$     stack.tagCompound = tag
-        //$$ }
-        //$$
-        //$$ if (usingCache) itemStackCache[internalName] = stack
-        //$$ return stack.copy()
-        //#else
         json ?: return ItemStack(Items.PAINTING)
         var usingCache = useCache && !useReplacements
         val internalName = json["internalname"].asString
@@ -311,7 +242,6 @@ object EnoughUpdatesManager {
 
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
-        //#endif
     }
 
     private fun getPetLoreReplacements(stack: ItemStack?, level: Int): Map<String, String> {
@@ -443,11 +373,7 @@ object EnoughUpdatesManager {
             for ((key, value) in replacements) {
                 loreLine.replace("{$key}", value)
             }
-            //#if MC < 1.21
-            //$$ loreList.add(NbtString(loreLine))
-            //#else
             loreList.add(StringTag.valueOf(loreLine))
-            //#endif
         }
         return loreList
     }

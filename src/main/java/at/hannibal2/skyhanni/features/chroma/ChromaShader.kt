@@ -21,11 +21,7 @@ abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, f
             ChromaManager.config.chromaSize * (GuiScreenUtils.displayWidth / 100f)
         }
         registerUniform(Uniform.UniformType.FLOAT, "timeOffset") {
-            //#if MC < 1.21
-            //$$ var ticks = (ClientEvents.totalTicks) + (MinecraftClient.getInstance() as AccessorMinecraft).timer.renderPartialTicks
-            //#else
             var ticks = (ClientEvents.totalTicks) + (Minecraft.getInstance() as AccessorMinecraft).timer.getGameTimeDeltaPartialTick(true)
-            //#endif
 
             ticks = when (ChromaManager.config.chromaDirection) {
                 Direction.FORWARD_RIGHT, Direction.BACKWARD_RIGHT -> ticks

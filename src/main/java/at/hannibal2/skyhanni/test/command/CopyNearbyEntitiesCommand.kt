@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.test.command import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets import at.hannibal2.skyhanni.utils.compat.formattedTextCompat import at.hannibal2.skyhanni.utils.compat.findHealthReal import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -20,22 +20,30 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.animal.Panda
+import net.minecraft.world.entity.animal.TropicalFish
+import net.minecraft.world.entity.animal.frog.Frog
 import net.minecraft.world.entity.boss.wither.WitherBoss
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.Shulker
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 
@@ -88,11 +96,9 @@ object CopyNearbyEntitiesCommand {
                 if (entity.isInvisible) {
                     add("Invisible: true")
                 }
-                //#if MC > 1.21
                 if (entity.isCurrentlyGlowing) {
                     add("Glowing: true")
                 }
-                //#endif
 
                 if (entity is LivingEntity) {
                     add("EntityLivingBase:")
@@ -107,7 +113,7 @@ object CopyNearbyEntitiesCommand {
                     if (armor != null) {
                         add("armor:")
                         for ((i, itemStack) in armor.withIndex()) {
-                            val name = itemStack?.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: "null"
+                            val name = itemStack?.hoverName.formattedTextCompatLeadingWhiteLessResets()
                             add("-  at: $i: $name")
                         }
                     }
@@ -121,14 +127,12 @@ object CopyNearbyEntitiesCommand {
                     is RemotePlayer -> addOtherPlayer(entity)
                     is Creeper -> addCreeper(entity)
                     is WitherBoss -> addWither(entity)
-                    //#if MC > 1.21
-                    is net.minecraft.world.entity.Display.ItemDisplay -> addItemDisplayEntity(entity)
-                    is net.minecraft.world.entity.animal.TropicalFish -> addTropicalFish(entity)
-                    is net.minecraft.world.entity.monster.Shulker -> addShulker(entity)
-                    is net.minecraft.world.entity.animal.Panda -> addPanda(entity)
-                    is net.minecraft.world.entity.Display.BlockDisplay -> addBlockDisplayEntity(entity)
-                    is net.minecraft.world.entity.animal.frog.Frog -> addFrogEntity(entity)
-                    //#endif
+                    is Display.ItemDisplay -> addItemDisplayEntity(entity)
+                    is TropicalFish -> addTropicalFish(entity)
+                    is Shulker -> addShulker(entity)
+                    is Panda -> addPanda(entity)
+                    is Display.BlockDisplay -> addBlockDisplayEntity(entity)
+                    is Frog -> addFrogEntity(entity)
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
                     add("MobInfo: ")
@@ -224,8 +228,7 @@ object CopyNearbyEntitiesCommand {
         add("-  armored: '$isArmored'")
     }
 
-    //#if MC > 1.21
-    private fun MutableList<String>.addItemDisplayEntity(entity: net.minecraft.world.entity.Display.ItemDisplay) {
+    private fun MutableList<String>.addItemDisplayEntity(entity: Display.ItemDisplay) {
         add("EntityItemDisplay:")
         val stack = entity.itemStack
         val rotation = entity.lookAngle
@@ -235,7 +238,7 @@ object CopyNearbyEntitiesCommand {
         add("-  rotation: $rotation")
     }
 
-    private fun MutableList<String>.addTropicalFish(entity: net.minecraft.world.entity.animal.TropicalFish) {
+    private fun MutableList<String>.addTropicalFish(entity: TropicalFish) {
         add("EntityTropicalFish:")
         val variety = entity.pattern
         val patternColor = entity.patternColor
@@ -245,7 +248,7 @@ object CopyNearbyEntitiesCommand {
         add("-  baseColor: $baseColor")
     }
 
-    private fun MutableList<String>.addShulker(entity: net.minecraft.world.entity.monster.Shulker) {
+    private fun MutableList<String>.addShulker(entity: Shulker) {
         add("EntityShulker:")
         val color = entity.color
         val attachedFace = entity.attachFace
@@ -253,7 +256,7 @@ object CopyNearbyEntitiesCommand {
         add("-  attachedFace: $attachedFace")
     }
 
-    private fun MutableList<String>.addPanda(entity: net.minecraft.world.entity.animal.Panda) {
+    private fun MutableList<String>.addPanda(entity: Panda) {
         add("EntityPanda:")
         val mainGene = entity.mainGene
         val hiddenGene = entity.hiddenGene
@@ -261,7 +264,7 @@ object CopyNearbyEntitiesCommand {
         add("-  hiddenGene: $hiddenGene")
     }
 
-    private fun MutableList<String>.addBlockDisplayEntity(entity: net.minecraft.world.entity.Display.BlockDisplay) {
+    private fun MutableList<String>.addBlockDisplayEntity(entity: Display.BlockDisplay) {
         add("EntityBlockDisplay:")
         val block = entity.blockState.block
         val rotation = entity.lookAngle
@@ -270,13 +273,12 @@ object CopyNearbyEntitiesCommand {
         add("-  rotation: $rotation")
     }
 
-    private fun MutableList<String>.addFrogEntity(entity: net.minecraft.world.entity.animal.frog.Frog) {
+    private fun MutableList<String>.addFrogEntity(entity: Frog) {
         add("EntityFrog:")
         val variant = entity.variant
 
         add("-  Variant: $variant")
     }
-    //#endif
 
     private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
         if (stack != null) {

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.visitor import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
@@ -30,14 +30,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.21
-import net.minecraft.server.level.ServerLevel
-//#endif
 
 @SkyHanniModule
 object VisitorListener {
@@ -61,11 +60,7 @@ object VisitorListener {
         val packet = event.packet
         if (packet !is ServerboundInteractPacket) return
 
-        //#if MC < 1.21
-        //$$ val entity = packet.getEntity(MinecraftCompat.localWorld) ?: return
-        //#else
         val entity = MinecraftCompat.localWorld.getEntity(packet.entityId) ?: return
-        //#endif
         val entityId = entity.id
 
         lastClickedNpc = entityId

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.deceased import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets import at.hannibal2.skyhanni.utils.compat.findHealthReal
+package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
@@ -10,37 +10,34 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
 import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.render.FrustumUtils
-import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.RemotePlayer
-import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
-//#if MC > 1.21
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import net.minecraft.world.entity.ai.attributes.Attributes
-import net.minecraft.world.entity.EquipmentSlot
-//#else
-//$$ import net.minecraft.entity.SharedMonsterAttributes
-//$$
-//#endif
 
 @RequiresOptIn(
     "getAllEntities or getEntities should only be used when necessary," +
-        "as they can be expensive, since they iterate through all entities in world."
+        "as they can be expensive, since they iterate through all entities in world.",
 )
 annotation class AllEntitiesGetter
 
@@ -175,10 +172,6 @@ object EntityUtils {
 
     fun Player.isNpc() = !isRealPlayer()
 
-    //#if MC < 1.21
-    //$$ fun LivingEntity.getArmorInventory(): Array<ItemStack?>? =
-    //$$     if (this is PlayerEntity) inventory.armor.normalizeAsArray() else null
-    //#else
     fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
         if (this !is Player) return null
         return buildList {
@@ -188,7 +181,6 @@ object EntityUtils {
             add(inventory.equipment.get(EquipmentSlot.HEAD).orNull())
         }.normalizeAsArray()
     }
-    //#endif
 
     fun EnderMan.getBlockInHand(): BlockState? = carriedBlock
 
@@ -203,33 +195,17 @@ object EntityUtils {
     // and then filters both for entity type and with the predicate for entities inside those chunks.
     inline fun <reified E : Entity> getEntitiesInBoundingBox(aabb: AABB, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
         val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
-        //#if MC < 1.21
-        //$$ return world.getEntitiesWithinAABB(E::class.java, aabb) { it != null && predicate(it) }
-        //#else
         return world.getEntitiesOfClass<E>(E::class.java, aabb, predicate)
-        //#endif
     }
 
-    private fun ClientLevel.getAllEntities(): Iterable<Entity> =
-        //#if MC < 1.14
-        //$$ loadedEntityList
-    //#else
-    entitiesForRendering()
-    //#endif
-
     @AllEntitiesGetter
-    fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.getAllEntities()?.let {
+    fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.entitiesForRendering()?.let {
         if (Minecraft.getInstance().isSameThread) it
         // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
         //  but *does* make crashes because of it rarer.
         else it.toMutableList()
     }?.asSequence().orEmpty()
 
-    //#if MC < 1.21
-    //$$ fun getAllTileEntities(): Sequence<BlockEntity> = MinecraftCompat.localWorldOrNull?.loadedTileEntityList?.let {
-    //$$     if (MinecraftClient.getInstance().isOnThread) it else it.toMutableList()
-    //$$ }?.asSequence()?.filterNotNull().orEmpty()
-    //#else
     fun getAllTileEntities(): Sequence<BlockEntity> {
         val world = MinecraftCompat.localWorldOrNull ?: return emptySequence()
         val blockEntityTickers = world.blockEntityTickers.let {
@@ -238,7 +214,6 @@ object EntityUtils {
 
         return blockEntityTickers.mapNotNull { invoker -> invoker.pos?.let { world.getBlockEntity(it) } }
     }
-    //#endif
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5, ignoreFrustum: Boolean = false): Boolean {
         if (deceased) return false
@@ -257,9 +232,5 @@ object EntityUtils {
 
     // TODO use derpy() on every use case
     val LivingEntity.baseMaxHealth: Int
-        //#if MC < 1.21
-        //$$ get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
-    //#else
-    get() = this.getAttributeBaseValue(Attributes.MAX_HEALTH).toInt()
-    //#endif
+        get() = this.getAttributeBaseValue(Attributes.MAX_HEALTH).toInt()
 }

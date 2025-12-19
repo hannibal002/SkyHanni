@@ -84,11 +84,7 @@ object TrophyFishMessages {
 
         if (config.tooltip) {
             getTooltip(internalName)?.let {
-                //#if MC < 1.21
-                //$$ edited.style = it
-                //#else
                 edited.toFlatList(it)
-                //#endif
             }
         }
 

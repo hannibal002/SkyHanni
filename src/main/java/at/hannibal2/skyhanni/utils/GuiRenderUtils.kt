@@ -18,28 +18,18 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import com.mojang.blaze3d.platform.Lighting
-import com.mojang.blaze3d.vertex.Tesselator
-import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import net.minecraft.world.item.ItemStack
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.phys.Vec3
 import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.math.min
-//#if MC < 1.21
-//$$ import net.minecraft.client.util.GlAllocationUtils
-//$$ import net.minecraft.client.renderer.OpenGlHelper
-//$$ import java.nio.FloatBuffer
-//#else
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.network.chat.Component
 import org.joml.Matrix4f
-//#endif
 //#if MC > 1.21.6
 //$$ import kotlin.math.sqrt
 //$$ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -69,24 +59,19 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
-    //#if MC > 1.21
     private fun drawStringCentered(str: Component, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.width(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.lineHeight / 2f
         DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
-    //#endif
 
     fun drawStringCentered(str: String, x: Int, y: Int) {
         drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
     }
-
-    //#if MC > 1.21
     fun drawStringCentered(str: Component, x: Int, y: Int) {
         drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
     }
-    //#endif
 
     fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
         DrawContextUtils.pushMatrix()
@@ -106,7 +91,6 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
     }
 
-    //#if MC > 1.21
     fun drawString(str: Component, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
         DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
@@ -114,7 +98,6 @@ object GuiRenderUtils {
     fun drawString(str: Component, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
     }
-    //#endif
 
     fun drawStrings(strings: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         drawStrings(strings.split("\n"), x, y, color, shadow)
@@ -128,7 +111,6 @@ object GuiRenderUtils {
         }
     }
 
-    //#if MC > 1.21
     fun drawTexts(strings: List<Component>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         var newY = y
         for (string in strings) {
@@ -136,7 +118,6 @@ object GuiRenderUtils {
             newY += 9
         }
     }
-    //#endif
 
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
         left <= x && x < left + width && top <= y && y < top + height
@@ -200,7 +181,6 @@ object GuiRenderUtils {
         drawRect(x, y, x + 16, y + 16, color)
     }
 
-    /** @Mojang */
     fun drawGradientRect(
         left: Int,
         top: Int,
@@ -210,33 +190,7 @@ object GuiRenderUtils {
         endColor: Int = -0xfeffff0,
         zLevel: Double = 0.0,
     ) {
-        val (startAlpha, startRed, startGreen, startBlue) = Color(startColor, true)
-        val (endAlpha, endRed, endGreen, endBlue) = Color(endColor, true)
-        //#if MC < 1.21
-        //$$ RenderSystem.disableTexture2D()
-        //$$ RenderSystem.enableBlend()
-        //$$ RenderSystem.disableAlpha()
-        //$$ RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        //$$ RenderSystem.shadeModel(7425)
-        //$$ val tessellator = Tessellator.getInstance()
-        //$$ val worldRenderer = tessellator.buffer
-        //$$ worldRenderer.begin(7, VertexFormats.POSITION_COLOR)
-        //$$ worldRenderer.pos(right.toDouble(), top.toDouble(), zLevel)
-        //$$     .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        //$$ worldRenderer.pos(left.toDouble(), top.toDouble(), zLevel)
-        //$$     .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        //$$ worldRenderer.pos(left.toDouble(), bottom.toDouble(), zLevel)
-        //$$     .color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        //$$ worldRenderer.pos(right.toDouble(), bottom.toDouble(), zLevel)
-        //$$     .color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        //$$ tessellator.draw()
-        //$$ RenderSystem.shadeModel(7424)
-        //$$ RenderSystem.disableBlend()
-        //$$ RenderSystem.enableAlpha()
-        //$$ RenderSystem.enableTexture2D()
-        //#else
         DrawContextUtils.drawContext.fillGradient(left, top, right, bottom, startColor, endColor)
-        //#endif
     }
 
     fun drawTexturedRect(x: Float, y: Float, texture: ResourceLocation, alpha: Float = 1f) {
@@ -279,7 +233,6 @@ object GuiRenderUtils {
         )
     }
 
-    // Taken from NEU
     private fun drawTexturedRect(
         x: Float,
         y: Float,
@@ -293,34 +246,7 @@ object GuiRenderUtils {
         alpha: Float = 1f,
         filter: Int = GL11.GL_NEAREST,
     ) {
-        //#if MC < 1.21
-        //$$ MinecraftClient.getInstance().textureManager.bindTexture(texture)
-        //$$ RenderSystem.color(1f, 1f, 1f, alpha)
-        //$$ RenderSystem.enableTexture2D()
-        //$$ RenderSystem.enableBlend()
-        //$$ RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
-        //$$ GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
-        //$$
-        //$$ GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, filter)
-        //$$ GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, filter)
-        //$$
-        //$$ val tessellator = Tessellator.getInstance()
-        //$$ val worldRenderer = tessellator.buffer
-        //$$ worldRenderer.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE)
-        //$$ worldRenderer.pos(x.toDouble(), (y + height).toDouble(), 0.0).tex(uMin.toDouble(), vMax.toDouble()).endVertex()
-        //$$ worldRenderer.pos((x + width).toDouble(), (y + height).toDouble(), 0.0).tex(uMax.toDouble(), vMax.toDouble()).endVertex()
-        //$$ worldRenderer.pos((x + width).toDouble(), y.toDouble(), 0.0).tex(uMax.toDouble(), vMin.toDouble()).endVertex()
-        //$$ worldRenderer.pos(x.toDouble(), y.toDouble(), 0.0).tex(uMin.toDouble(), vMin.toDouble()).endVertex()
-        //$$ tessellator.draw()
-        //$$
-        //$$ GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST)
-        //$$ GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST)
-        //$$
-        //$$ RenderSystem.disableBlend()
-        //$$ RenderSystem.color(1f, 1f, 1f, 1f)
-        //#else
         DrawContextUtils.drawContext.blit(RenderCompat.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
-        //#endif
     }
 
     fun enableScissor(left: Int, top: Int, right: Int, bottom: Int) {
@@ -340,15 +266,7 @@ object GuiRenderUtils {
         dark: Int = -0xefefea,
         shadow: Boolean = true,
     ) {
-        //#if MC < 1.21
-        //$$ var alpha = -0x10000000
-        //$$
-        //$$ if (!OpenGlHelper.isFramebufferEnabled()) {
-        //$$     alpha = -0x1000000
-        //$$ }
-        //#else
         val alpha = -0x1000000
-        //#endif
 
         val main = alpha or 0x202026
         drawRect(x, y, x + 1, y + height, light) // Left
@@ -615,27 +533,6 @@ object GuiRenderUtils {
     //$$         Minecraft.getInstance().gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
     //$$
     //$$         DrawContextUtils.drawItem(this, 0, 0)
-    //$$     }
-    //$$ }
-    //#endif
-
-    //#if MC < 1.21
-    //$$ private object AdjustStandardItemLighting {
-    //$$
-    //$$     private const val lightScaling = 2.47f // Adjust as needed
-    //$$     private const val g = 0.6f // Original Value taken from RenderHelper
-    //$$     private const val lightIntensity = lightScaling * g
-    //$$     private val itemLightBuffer = GlAllocationUtils.allocateFloatBuffer(16)
-    //$$
-    //$$     init {
-    //$$         itemLightBuffer.clear()
-    //$$         itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1f)
-    //$$         itemLightBuffer.flip()
-    //$$     }
-    //$$
-    //$$     fun adjust() {
-    //$$         GL11.glLight(16384, 4609, itemLightBuffer)
-    //$$         GL11.glLight(16385, 4609, itemLightBuffer)
     //$$     }
     //$$ }
     //#endif

@@ -12,13 +12,10 @@ import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.milliseconds
-//#if MC < 1.21
-//$$ import net.minecraft.text.Text
-//#endif
 
 @SkyHanniModule
 object EntityData {

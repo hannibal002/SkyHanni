@@ -13,14 +13,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.network.protocol.game.ClientboundSoundPacket
-import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
-import kotlin.time.Duration.Companion.seconds
-//#if MC < 1.21
-//$$ import net.minecraft.network.packet.s2c.play.ConfirmScreenActionS2CPacket
-//#else
 import net.minecraft.network.protocol.common.ClientboundPingPacket
-//#endif
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
+import net.minecraft.network.protocol.game.ClientboundSoundPacket
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MinecraftData {
@@ -30,11 +26,7 @@ object MinecraftData {
         when (val packet = event.packet) {
             is ClientboundSoundPacket -> {
                 if (PlaySoundEvent(
-                        //#if MC < 1.21
-                        //$$ packet.soundName,
-                        //#else
                         packet.sound.value().location().toString().removePrefix("minecraft:"),
-                        //#endif
                         LorenzVec(packet.x, packet.y, packet.z), packet.pitch, packet.volume,
                     ).post()
                 ) {
@@ -44,33 +36,21 @@ object MinecraftData {
 
             is ClientboundLevelParticlesPacket -> {
                 if (ReceiveParticleEvent(
-                        //#if MC < 1.21
-                        //$$ packet.particleType,
-                        //#else
                         packet.particle.type,
-                        //#endif
                         LorenzVec(packet.x, packet.y, packet.z),
                         packet.count,
                         packet.maxSpeed,
                         LorenzVec(packet.xDist, packet.yDist, packet.zDist),
                         packet.isOverrideLimiter,
-                        //#if MC < 1.21
-                        //$$ packet.particleArgs,
-                        //#endif
                     ).post()
                 ) {
                     event.cancel()
                 }
             }
 
-            //#if MC < 1.21
-            //$$ is ConfirmScreenActionS2CPacket -> {
-            //$$     if (packet.actionId > 0) return
-                //#else
-                is ClientboundPingPacket -> {
+            is ClientboundPingPacket -> {
                 if (lastPingParameter == packet.id) return
                 lastPingParameter = packet.id
-                //#endif
 
                 totalServerTicks++
                 ServerTickEvent.post()
@@ -78,9 +58,7 @@ object MinecraftData {
         }
     }
 
-    //#if MC > 1.21
     private var lastPingParameter = 0
-    //#endif
 
     var totalServerTicks: Long = 0L
         private set

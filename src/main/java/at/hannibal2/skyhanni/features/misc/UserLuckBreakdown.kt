@@ -49,11 +49,7 @@ object UserLuckBreakdown {
     private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
 
     private var fillerItem: ItemStack? = null
-    //#if MC < 1.21
-    //$$ private val fillerID = Item.fromBlock(Blocks.STAINED_GLASS_PANE)
-    //#else
     private val fillerID = Blocks.BLACK_STAINED_GLASS_PANE.asItem()
-    //#endif
 
     private var showAllStats = true
 
@@ -390,7 +386,6 @@ object UserLuckBreakdown {
     fun modernLuck(event: UserLuckCalculateEvent) {
         if (PlatformUtils.IS_LEGACY) return
         event.addLuck(5f)
-        //#if MC > 1.21
         val stack = ItemUtils.createItemStack(
             Items.TRIDENT,
             "§a✴ Modern Minecraft Bonus",
@@ -404,7 +399,6 @@ object UserLuckBreakdown {
             ),
         )
         event.addItem(stack)
-        //#endif
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)

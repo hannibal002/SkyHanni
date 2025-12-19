@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.world.entity.player.PlayerModelPart
+import net.minecraft.client.gui.components.PlayerFaceRenderer
 
 @SkyHanniModule
 object TabListRenderer {
@@ -182,18 +182,9 @@ object TabListRenderer {
                         //#if MC > 1.21.8
                         //$$ .id()
                         //#endif
-                        //#if MC < 1.21
-                        //$$ GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 8 / 64f, 16 / 64f, 8 / 64f, 16 / 64f, texture)
-                        //$$
-                        //$$ val player = tabLine.getEntity(playerInfo)
-                        //$$ if (player != null && player.isPartVisible(PlayerModelPart.HAT)) {
-                        //$$     GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 40 / 64f, 48 / 64f, 8 / 64f, 16 / 64f, texture)
-                        //$$ }
-                        //#else
-                        net.minecraft.client.gui.components.PlayerFaceRenderer.draw(
-                            DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.showHat(), false, -1
+                        PlayerFaceRenderer.draw(
+                            DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.showHat(), false, -1,
                         )
-                        //#endif
                     }
                     middleX += 8 + 2
                 }

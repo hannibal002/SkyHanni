@@ -1,17 +1,14 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
-
-//#if MC > 1.21
-import kotlin.jvm.optionals.getOrNull
-import net.minecraft.nbt.StringTag
 import net.minecraft.nbt.ByteTag
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.DoubleTag
 import net.minecraft.nbt.FloatTag
 import net.minecraft.nbt.IntTag
+import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.LongTag
-//#endif
+import net.minecraft.nbt.StringTag
+import kotlin.jvm.optionals.getOrNull
 
 object NbtCompat {
 
@@ -31,40 +28,23 @@ object NbtCompat {
     const val TAG_ANY_NUMERIC = 99
 
     fun containsList(list: CompoundTag, key: String): Boolean {
-        //#if MC < 1.21
-        //$$ return list.contains(key, TAG_LIST)
-        //#else
         return list.contains(key) && list.get(key) is ListTag
-        //#endif
     }
 
     fun containsCompound(compound: CompoundTag, key: String): Boolean {
-        //#if MC < 1.21
-        //$$ return compound.contains(key, TAG_COMPOUND)
-        //#else
         return compound.contains(key) && compound.get(key) is CompoundTag
-        //#endif
     }
 
     fun getStringTagList(list: CompoundTag, key: String): ListTag {
-        //#if MC < 1.21
-        //$$ return list.getList(key, TAG_STRING)
-        //#else
         val nbtList = list.getList(key).getOrNull() ?: ListTag()
         return getList(nbtList, TAG_STRING)
-        //#endif
     }
 
     fun getCompoundTagList(list: CompoundTag, key: String): ListTag {
-        //#if MC < 1.21
-        //$$ return list.getList(key, TAG_COMPOUND)
-        //#else
         val nbtList = list.getList(key).getOrNull() ?: ListTag()
         return getList(nbtList, TAG_COMPOUND)
-        //#endif
     }
 
-    //#if MC > 1.21
     private fun getList(list: ListTag, type: Int): ListTag {
         for (nbtElement in list) {
             when (type) {
@@ -79,13 +59,10 @@ object NbtCompat {
         }
         return list
     }
-    //#endif
 }
 
-//#if MC > 1.21
-
 fun CompoundTag.getStringOrDefault(key: String): String {
-    return this.getString(key).getOrNull() ?: ""
+    return this.getString(key).getOrNull().orEmpty()
 }
 
 fun CompoundTag.getIntOrDefault(key: String?): Int {
@@ -93,7 +70,7 @@ fun CompoundTag.getIntOrDefault(key: String?): Int {
 }
 
 fun CompoundTag.getLongOrDefault(key: String): Long {
-    return this.getLong(key).getOrNull()  ?: 0
+    return this.getLong(key).getOrNull() ?: 0
 }
 
 fun CompoundTag.getFloatOrDefault(key: String): Float {
@@ -105,7 +82,7 @@ fun CompoundTag.getDoubleOrDefault(key: String): Double {
 }
 
 fun CompoundTag.getBooleanOrDefault(key: String): Boolean {
-    return this.getBoolean(key).getOrNull()  ?: false
+    return this.getBoolean(key).getOrNull() ?: false
 }
 
 fun CompoundTag.getByteOrDefault(key: String): Byte? {
@@ -120,10 +97,9 @@ fun CompoundTag.getCompoundOrDefault(key: String): CompoundTag {
 }
 
 fun ListTag.getStringOrDefault(index: Int): String {
-    return this.getString(index).getOrNull() ?: ""
+    return this.getString(index).getOrNull().orEmpty()
 }
 
 fun ListTag.getCompoundOrDefault(index: Int): CompoundTag {
     return this.getCompound(index).getOrNull() ?: CompoundTag()
 }
-//#endif

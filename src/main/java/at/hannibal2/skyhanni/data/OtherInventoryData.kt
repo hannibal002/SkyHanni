@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -6,18 +6,17 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
-import net.minecraft.world.item.ItemStack
-import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
+import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import net.minecraft.network.protocol.game.ClientboundContainerClosePacket
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
-//#if MC > 1.21
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket
 import net.minecraft.world.inventory.MenuType
-//#endif
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object OtherInventoryData {
@@ -34,14 +33,12 @@ object OtherInventoryData {
         close()
     }
 
-    //#if MC > 1.21
     @HandleEvent
     fun onPacketSent(event: PacketSentEvent) {
         if (event.packet is ServerboundContainerClosePacket) {
             close()
         }
     }
-    //#endif
 
     fun close(title: String = currentInventoryName, reopenSameName: Boolean = false) {
         InventoryCloseEvent(title, reopenSameName).post()
@@ -56,7 +53,6 @@ object OtherInventoryData {
         }
     }
 
-    //#if MC > 1.21
     private val slotCountMap = mapOf(
         MenuType.ANVIL to 3,
         MenuType.BEACON to 1,
@@ -83,7 +79,6 @@ object OtherInventoryData {
         MenuType.SMOKER to 3,
         MenuType.STONECUTTER to 1,
     )
-    //#endif
 
     @HandleEvent
     fun onInventoryDataReceiveEvent(event: PacketReceivedEvent) {
@@ -96,12 +91,8 @@ object OtherInventoryData {
         if (packet is ClientboundOpenScreenPacket) {
             val title = packet.title.unformattedTextCompat()
             val windowId = packet.containerId
-            //#if MC < 1.21
-            //$$ val slotCount = packet.slotCount
-            //#else
             val handlerType = packet.type
             val slotCount = slotCountMap[handlerType] ?: ErrorManager.skyHanniError("Unknown screen handler type!", "screenName" to title)
-            //#endif
             close(reopenSameName = title == currentInventory?.title)
 
             currentInventory = Inventory(windowId, title, slotCount)

@@ -24,7 +24,8 @@ object TextHelper {
     val EMPTY = "".asComponent()
 
     fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
-    fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent = (Component.nullToEmpty(this) as MutableComponent).also(init)
+    fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent =
+        (Component.nullToEmpty(this) as MutableComponent).also(init)
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
     fun join(vararg components: Any?, separator: Component? = null): Component {

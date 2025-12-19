@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.HoverEvent
@@ -73,11 +74,7 @@ object ReplaceRomanNumerals {
         lore.replaceAll { it.tryReplace() }
 
         val chatComponentText = lore.joinToString("\n").asComponent()
-        //#if MC < 1.21
-        //$$ val hoverEvent = HoverEvent(event.component.style.hoverEvent?.action, chatComponentText)
-        //#else
         val hoverEvent = HoverEvent.ShowText(chatComponentText)
-        //#endif
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }

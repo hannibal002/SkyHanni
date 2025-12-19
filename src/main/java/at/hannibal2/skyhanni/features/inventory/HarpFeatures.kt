@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.container import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -20,16 +20,15 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedClay
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.container
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.SimpleContainer
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.21
-import com.mojang.blaze3d.systems.RenderSystem
-//#endif
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
 @SkyHanniModule
@@ -114,16 +113,9 @@ object HarpFeatures {
             }
             return
         }
-        // Copied from Minecraft Code to update the scale
         val minecraft = Minecraft.getInstance()
-        //#if MC < 1.21
-        //$$ val width = GuiScreenUtils.scaledWindowWidth
-        //$$ val height = GuiScreenUtils.scaledWindowHeight
-        //$$ minecraft.currentScreen?.setWorldAndResolution(minecraft, width, height)
-        //#else
         RenderSystem.assertOnRenderThread()
         minecraft.window.calculateScale(minecraft.options.guiScale().get(), minecraft.isEnforceUnicode)
-        //#endif
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -148,48 +140,32 @@ object HarpFeatures {
     private var isGuiScaled = false
 
     private fun setGuiScale() {
-        //#if MC > 1.21
         Minecraft.getInstance().execute {
-        //#endif
-        guiSetting = getMinecraftGuiScale()
-        setMinecraftGuiScale(0)
-        isGuiScaled = true
-        updateScale()
-        //#if MC > 1.21
+            guiSetting = getMinecraftGuiScale()
+            setMinecraftGuiScale(0)
+            isGuiScaled = true
+            updateScale()
         }
-        //#endif
     }
 
     private fun unSetGuiScale() {
         if (!isGuiScaled) return
-        //#if MC > 1.21
         Minecraft.getInstance().execute {
-        //#endif
-        setMinecraftGuiScale(guiSetting)
-        isGuiScaled = false
-        //#if MC > 1.21
+            setMinecraftGuiScale(guiSetting)
+            isGuiScaled = false
         }
-        //#endif
     }
 
     private fun getMinecraftGuiScale(): Int {
         val gameSettings = Minecraft.getInstance().options
-        //#if MC < 1.21
-        //$$ return gameSettings.guiScale
-        //#else
         RenderSystem.assertOnRenderThread()
         return gameSettings.guiScale().get()
-        //#endif
     }
 
     private fun setMinecraftGuiScale(scale: Int) {
         val gameSettings = Minecraft.getInstance().options
-        //#if MC < 1.21
-        //$$ gameSettings.guiScale = scale
-        //#else
         RenderSystem.assertOnRenderThread()
         gameSettings.guiScale().set(scale)
-        //#endif
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -209,15 +185,9 @@ object HarpFeatures {
         if (!isMenuGui(InventoryUtils.openInventoryName())) return
         if (event.slot?.index != CLOSE_BUTTON_SLOT) return
         if (openTime.passedSince() > 2.seconds) return
-        //#if MC < 1.21
-        //$$ val indexOfFirst = event.container.stacks.filterNotNull().indexOfFirst {
-        //$$     songSelectedPattern.anyMatches(it.getLore())
-        //$$ }
-        //#else
         val indexOfFirst = event.container.slots.filterNotNull().indexOfFirst {
-                 songSelectedPattern.anyMatches(it.item.getLore())
-             }
-        //#endif
+            songSelectedPattern.anyMatches(it.item.getLore())
+        }
         indexOfFirst.takeIf { it != -1 }?.let {
             val clickType = event.clickType ?: return
             event.cancel()

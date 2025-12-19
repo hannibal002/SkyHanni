@@ -1,26 +1,21 @@
-package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket
-//#if MC > 1.21
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket
-//#endif
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket
 
 @SkyHanniModule
 object TitleData {
 
     @HandleEvent
     fun onReceiveCurrentShield(event: PacketReceivedEvent) {
-        val packet = event.packet
-
-        val text = when (packet) {
+        val text = when (val packet = event.packet) {
             is ClientboundSetTitleTextPacket -> packet.text ?: return
-            //#if MC > 1.21
             is ClientboundSetSubtitleTextPacket -> packet.text
-            //#endif
             else -> return
         }
 

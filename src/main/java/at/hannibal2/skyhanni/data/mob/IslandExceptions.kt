@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.mob import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.IslandType
@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.getNextEntity
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
@@ -17,21 +16,22 @@ import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.animal.Ocelot
+import net.minecraft.world.entity.animal.Pig
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.CaveSpider
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster.Giant
-import net.minecraft.world.entity.animal.IronGolem
 import net.minecraft.world.entity.monster.MagmaCube
-import net.minecraft.world.entity.monster.ZombifiedPiglin
 import net.minecraft.world.entity.monster.Slime
 import net.minecraft.world.entity.monster.Zombie
-import net.minecraft.world.entity.animal.Ocelot
-import net.minecraft.world.entity.animal.Pig
+import net.minecraft.world.entity.monster.ZombifiedPiglin
 
 object IslandExceptions {
 
@@ -52,9 +52,7 @@ object IslandExceptions {
             IslandType.GARDEN -> garden(baseEntity)
             IslandType.KUUDRA_ARENA -> kuudraArena(baseEntity, nextEntity)
             IslandType.WINTER -> winterIsland(baseEntity)
-            //#if MC > 1.21
             IslandType.GALATEA -> ModernIslandExceptions.galatea(baseEntity, armorStand, nextEntity)
-            //#endif
 
             else -> null
         }
@@ -204,7 +202,8 @@ object IslandExceptions {
                 .makeMobResult { MobFactories.basic(baseEntity, it) }
 
         baseEntity is RemotePlayer &&
-            baseEntity.name.formattedTextCompatLessResets().let { it == "Minos Champion" || it == "Minos Inquisitor" || it == "Minotaur " } &&
+            baseEntity.name.formattedTextCompatLessResets()
+                .let { it == "Minos Champion" || it == "Minos Inquisitor" || it == "Minotaur " } &&
             armorStand != null ->
             MobUtils.getArmorStand(baseEntity, 2)
                 .makeMobResult { MobFactories.basic(baseEntity, it, listOf(armorStand)) }

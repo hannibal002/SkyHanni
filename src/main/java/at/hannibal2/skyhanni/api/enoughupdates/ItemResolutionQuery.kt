@@ -27,19 +27,13 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.nbt.CompoundTag
 import java.util.regex.Matcher
-//#if MC > 1.21
 import net.minecraft.core.component.DataComponentMap
-//#endif
 
 // Code taken from NotEnoughUpdates
 class ItemResolutionQuery {
 
-    //#if MC < 1.21
-    //$$ private var compound: NbtCompound? = null
-    //$$
-    //#else
     private var compound: DataComponentMap? = null
-    //#endif
+
     private var itemType: Item? = null
     private var knownInternalName: String? = null
     private var guiContext: Screen? = null

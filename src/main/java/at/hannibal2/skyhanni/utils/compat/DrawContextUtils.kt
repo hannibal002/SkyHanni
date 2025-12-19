@@ -1,27 +1,16 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.world.item.ItemStack
-import java.nio.FloatBuffer
-//#if MC > 1.21
-import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.world.item.ItemStack
 import org.joml.Matrix4f
 import org.joml.Quaternionf
-//#endif
+import java.nio.FloatBuffer
 
 /**
  * Utils methods related to DrawContext, also known on 1.8 as GLStateManager
  */
 object DrawContextUtils {
-
-    // GL11.GL_MODELVIEW_MATRIX
-    const val GL_MODELVIEW_MATRIX = 2982
-    // GL11.GL_PROJECTION_MATRIX
-    const val GL_PROJECTION_MATRIX = 2983
-    // GL11.GL_CURRENT_COLOR
-    const val GL_CURRENT_COLOR = 2816
 
     private var _drawContext: GuiGraphics? = null
 
@@ -36,12 +25,7 @@ object DrawContextUtils {
     val drawContext: GuiGraphics
         get() = _drawContext ?: run {
             ErrorManager.crashInDevEnv("drawContext is null")
-            //#if MC < 1.21
-            //$$ ErrorManager.logErrorStateWithData("drawContext is null", "drawContext is null, renderDepth: $renderDepth")
-            //$$ DrawContext()
-            //#else
             ErrorManager.skyHanniError("drawContext is null")
-            //#endif
         }
 
     fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.renderItem(item, x, y)
@@ -83,25 +67,19 @@ object DrawContextUtils {
 
     fun rotate(angle: Float, x: Number, y: Number, z: Number) {
         val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
-        //#if MC < 1.21
-        //$$ RenderSystem.rotate(angle, xf, yf, zf)
-        //#elseif MC < 1.21.6
+        //#if MC < 1.21.6
         drawContext.pose().mulPose(Quaternionf().rotationAxis(angle, xf, yf, zf))
         //#endif
     }
 
     fun multMatrix(buffer: FloatBuffer) {
-        //#if MC < 1.21
-        //$$ RenderSystem.multMatrix(buffer)
-        //#elseif MC < 1.21.6
+        //#if MC < 1.21.6
         multMatrix(Matrix4f(buffer))
         //#endif
     }
 
-    //#if MC > 1.21
     //#if MC < 1.21.6
     fun multMatrix(matrix: Matrix4f) = drawContext.pose().mulPose(matrix)
-    //#endif
     //#endif
 
     fun scale(x: Float, y: Float, z: Float) {

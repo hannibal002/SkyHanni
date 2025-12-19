@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.data.hypixel.chat.event
 
 import at.hannibal2.skyhanni.utils.ComponentSpan
-import net.minecraft.network.chat.Component
-//#if MC > 1.21
 import at.hannibal2.skyhanni.utils.compat.toChatFormatting
-//#endif
+import net.minecraft.network.chat.Component
 
 class PlayerAllChatEvent(
     val levelComponent: ComponentSpan?,
@@ -16,12 +14,7 @@ class PlayerAllChatEvent(
     chatComponent: Component,
     blockedReason: String? = null,
 ) : AbstractSourcedChatEvent(authorComponent, messageComponent, chatComponent, blockedReason) {
-    val levelColor =
-        //#if MC < 1.21
-        //$$ levelComponent?.sampleStyleAtStart()?.color
-    //#else
-    levelComponent?.sampleStyleAtStart()?.color?.toChatFormatting()
-    //#endif
+    val levelColor = levelComponent?.sampleStyleAtStart()?.color?.toChatFormatting()
     val level = levelComponent?.getText()?.toInt()
     val isAGuest get() = privateIslandGuest != null
 }

@@ -10,14 +10,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.Monster
 import net.minecraft.world.entity.player.Player
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
-//#if MC < 1.21
-//$$ import net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket
-//#endif
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 
 /**
  * This feature fixes ghost entities sent by hypixel that are not properly deleted in the correct order.
@@ -56,14 +53,7 @@ object FixGhostEntities {
                 }
                 recentlySpawnedEntities.addLast(packet.id)
             }
-            //#if MC < 1.21
-            //$$ is MobSpawnS2CPacket -> {
-            //$$     if (packet.id in recentlyRemovedEntities) {
-            //$$         hiddenEntityIds.add(packet.id)
-            //$$     }
-            //$$     recentlySpawnedEntities.addLast(packet.id)
-            //$$ }
-            //#endif
+
             is ClientboundRemoveEntitiesPacket -> {
                 for (entityID in packet.entityIds) {
                     // ignore entities that got properly spawned and then removed

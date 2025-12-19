@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.chat import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
@@ -11,17 +11,13 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.client.Minecraft
-import net.minecraft.client.GuiMessage
-import net.minecraft.util.Mth
-//#if MC < 1.21
-//$$ import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
-//#else
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
-//#endif
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import net.minecraft.client.GuiMessage
+import net.minecraft.client.Minecraft
+import net.minecraft.util.Mth
 
 object CopyChat {
     private val config get() = SkyHanniMod.feature.chat.copyChat
@@ -50,12 +46,8 @@ object CopyChat {
                 formatted.stripHypixelMessage() to "formatted message"
 
             KeyboardManager.isShiftKeyDown() -> (
-                //#if MC < 1.21
-                //$$ ModifyVisualWords.modifyText(formatted)?.removeColor()
-                    //#else
-                    OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.visualOrderText)).removeColor()
-                    //#endif
-                    ?: formatted
+                OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.visualOrderText))
+                    .removeColor()
                 ) to "modified message"
 
             KeyboardManager.isControlKeyDown() -> chatLine.chatMessage.removeColor() to "line"
@@ -70,27 +62,6 @@ object CopyChat {
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
         val mc = Minecraft.getInstance() ?: return null
         val chatGui = mc.gui.chat ?: return null
-        //#if MC < 1.21
-        //$$ val access = chatGui as AccessorMixinGuiNewChat
-        //$$ val chatScale = chatGui.chatScale
-        //$$ val scaleFactor = GuiScreenUtils.scaleFactor
-        //$$
-        //$$ val x = MathHelper.floor((mouseX / scaleFactor - 3) / chatScale)
-        //$$ val y = MathHelper.floor((mouseY / scaleFactor - 27 - getOffset()) / chatScale)
-        //$$
-        //$$ if (x < 0 || y < 0) return null
-        //$$
-        //$$ val fontHeight = mc.textRenderer.fontHeight
-        //$$ val chatLines = access.drawnChatLines_skyhanni
-        //$$ val maxLines = chatGui.visibleLineCount.coerceAtMost(chatLines.size)
-        //$$ if (x <= MathHelper.floor(chatGui.width.toFloat() / chatGui.chatScale) && y < fontHeight * maxLines + maxLines) {
-        //$$     val lineIndex = y / fontHeight + access.scrollPos_skyhanni
-        //$$     if (lineIndex in 0 until chatLines.size) {
-        //$$         return chatLines[lineIndex]
-        //$$     }
-        //$$ }
-        //$$ return null
-        //#else
         val chatLineY = chatGui.screenToChatY(mouseY.toDouble())
         val chatLineX = chatGui.screenToChatX(mouseX.toDouble())
         val lineIndex = (chatGui.chatScrollbarPos + chatLineY).toInt()
@@ -116,7 +87,6 @@ object CopyChat {
                 } ?: matchingLines.first()
             }
         }
-        //#endif
     }
 
     private val isPatcherLoaded by lazy { PlatformUtils.isModInstalled("patcher") }

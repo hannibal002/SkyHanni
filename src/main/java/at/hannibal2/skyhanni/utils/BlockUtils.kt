@@ -1,19 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addRedstoneOres
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.state.properties.IntegerProperty
-import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.client.Minecraft
-import net.minecraft.world.level.block.entity.SkullBlockEntity
 import net.minecraft.core.BlockPos
-import net.minecraft.world.phys.HitResult
-
-//#if MC > 1.21
 import net.minecraft.world.level.ClipContext
-//#endif
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.entity.SkullBlockEntity
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.IntegerProperty
+import net.minecraft.world.phys.HitResult
 
 object BlockUtils {
 
@@ -23,12 +19,8 @@ object BlockUtils {
 
     fun LorenzVec.getBlockStateAt(): BlockState = world.getBlockState(toBlockPos())
 
-    //#if MC < 1.21
-    //$$ fun LorenzVec.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)
-    //#else
     fun LorenzVec.isInLoadedChunk(): Boolean =
-    world.chunkSource.hasChunk(x.toInt() shr 4, z.toInt() shr 4)
-    //#endif
+        world.chunkSource.hasChunk(x.toInt() shr 4, z.toInt() shr 4)
 
     fun getTextureFromSkull(position: LorenzVec): String? {
         val entity = world.getBlockEntity(position.toBlockPos()) as? SkullBlockEntity ?: return null
@@ -36,9 +28,7 @@ object BlockUtils {
     }
 
     fun SkullBlockEntity.getSkullTexture(): String? {
-        //#if MC < 1.21
-        //$$ return this.serializeNBT().getCompound("Owner").getSkullTexture()
-        //#elseif MC < 1.21.9
+        //#if MC < 1.21.9
         return this.ownerProfile?.id?.get()?.toString()
         //#else
         //$$ return this.ownerProfile?.partialProfile()?.id.toString()
@@ -57,23 +47,17 @@ object BlockUtils {
         return result?.location?.toLorenzVec()
     }
 
-    //#if MC < 1.21
-    //$$ fun rayTrace(start: LorenzVec, end: LorenzVec): HitResult? {
-    //$$     return world.rayTraceBlocks(start.toVec3(), end.toVec3())
-    //$$ }
-    //#else
     fun rayTrace(start: LorenzVec, end: LorenzVec): net.minecraft.world.phys.BlockHitResult? {
-       return world.clip(
-           ClipContext(
-               start.toVec3(),
-               end.toVec3(),
-               ClipContext.Block.COLLIDER,
-               ClipContext.Fluid.NONE,
-               MinecraftCompat.localPlayer,
-           ),
-       )
+        return world.clip(
+            ClipContext(
+                start.toVec3(),
+                end.toVec3(),
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
+                MinecraftCompat.localPlayer,
+            ),
+        )
     }
-    //#endif
 
     fun getTargetedBlock(): LorenzVec? {
         val mouseOverObject = Minecraft.getInstance().hitResult ?: return null

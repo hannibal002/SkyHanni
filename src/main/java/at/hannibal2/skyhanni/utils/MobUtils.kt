@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import net.minecraft.client.resources.language.I18n
 import net.minecraft.world.entity.Entity
@@ -17,12 +18,7 @@ import net.minecraft.world.entity.player.Player
 @SkyHanniModule
 object MobUtils {
 
-    private val defaultArmorStandName get() =
-        //#if MC < 1.21
-        //$$ I18n.translate("entity.ArmorStand.name")
-    //#else
-    I18n.get("entity.minecraft.armor_stand")
-    //#endif
+    private val defaultArmorStandName get() = I18n.get("entity.minecraft.armor_stand")
 
     // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
     fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? ArmorStand
@@ -78,17 +74,12 @@ object MobUtils {
         rayTraceForMobs(entity, partialTicks, offset)?.firstOrNull()
 
     fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
-        //#if MC < 1.21
-        //$$ val pos = entity.setInvisible(partialTicks).toLorenzVec() + offset
-        //$$ val look = entity.getLook(partialTicks).toLorenzVec().normalize()
-        //#else
         val look = entity.lookAngle.toLorenzVec().normalize()
         val pos = entity.eyePosition.toLorenzVec() + offset
-        //#endif
         val possibleEntities = MobData.entityToMob.filterKeys {
             it !is ArmorStand &&
                 it.boundingBox.rayIntersects(
-                    pos, look
+                    pos, look,
                 )
         }.values
         if (possibleEntities.isEmpty()) return null

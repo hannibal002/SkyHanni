@@ -31,11 +31,7 @@ class ReplaceItemEvent(val inventory: Container, val originalItem: ItemStack?, v
             val event = ReplaceItemEvent(inventory, originalItem, slot)
             event.post()
             if (event.shouldRemove) {
-                //#if MC < 1.21
-                //$$ cir.returnValue = null
-                //#else
                 cir.returnValue = ItemStack.EMPTY
-                //#endif
                 return
             }
             event.replacement?.let { cir.returnValue = it }

@@ -8,29 +8,17 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.requireDevEnv
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrInsert
 import com.mojang.brigadier.CommandDispatcher
-//#if MC < 1.21
-//$$ import net.minecraftforge.client.ClientCommandHandler
-//$$
-//#else
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-//#endif
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 
 @SkyHanniModule
 object CommandsRegistry {
-    //#if MC < 1.21
-    //$$ private val dispatcher: CommandDispatcher<Any?> = CommandDispatcher()
-    //#endif
 
     @HandleEvent(PreInitFinishedEvent::class)
     fun onPreInitFinished() {
-        //#if MC < 1.21
-        //$$ CommandRegistrationEvent(dispatcher).post()
-        //#else
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             CommandRegistrationEvent(dispatcher as CommandDispatcher<Any?>).post()
         }
-        //#endif
     }
 
     private fun String.isUnique(builders: List<CommandData>) {
@@ -45,25 +33,15 @@ object CommandsRegistry {
     }
 
     fun BaseBrigadierBuilder.addToRegister(dispatcher: CommandDispatcher<Any?>, builders: MutableList<CommandData>) {
-        //#if MC < 1.21
-        //$$ val command = toCommand(dispatcher)
-        //$$ ClientCommandHandler.instance.registerCommand(command)
-        //#else
         val original = dispatcher.register(builder as LiteralArgumentBuilder<Any?>)
         this.node = original
         aliases.forEach {
             dispatcher.register(LiteralArgumentBuilder.literal<Any?>(it).redirect(original).executes(original.command))
         }
-        //#endif
         addBuilder(builders)
     }
 
     fun <T : CommandBuilderBase> T.addToRegister(dispatcher: CommandDispatcher<Any?>, builders: MutableList<CommandData>) {
-        //#if MC < 1.21
-        //$$ val command = this.toCommand(dispatcher)
-        //$$ ClientCommandHandler.instance.registerCommand(command)
-        //$$ addBuilder(builders)
-        //#else
         if (this !is CommandBuilder) return // complex commands are not supported in 1.21.5 right now
         val builder = BaseBrigadierBuilder(name).apply {
             this.description = this@addToRegister.descriptor
@@ -73,7 +51,6 @@ object CommandsRegistry {
             legacyCallbackArgs(this@addToRegister.getCallback())
         }
         builder.addToRegister(dispatcher, builders)
-        //#endif
     }
 
     // Adds the command to the builders list in a way that all commands are ordered depending on their category and name.
