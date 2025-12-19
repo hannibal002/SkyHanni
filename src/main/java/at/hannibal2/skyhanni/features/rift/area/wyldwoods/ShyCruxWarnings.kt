@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.area.wyldwoods
+package at.hannibal2.skyhanni.features.rift.area.wyldwoods import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -23,7 +23,7 @@ object ShyCruxWarnings {
     }
 
     private fun checkForShy() {
-        if (EntityUtils.getEntitiesNextToPlayer<Entity>(8.0).any { it.name in shyNames }) {
+        if (EntityUtils.getEntitiesNextToPlayer<Entity>(8.0).any { it.name.formattedTextCompatLessResets() in shyNames }) {
             TitleManager.sendTitle("§eLook away!", duration = 150.milliseconds)
         }
     }

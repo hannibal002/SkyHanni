@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.appendComponent
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.player.PlayerEntity
 
 @SkyHanniModule
 object ContributorManager {
@@ -31,9 +31,9 @@ object ContributorManager {
     }
 
     @HandleEvent
-    fun onRenderNametag(event: EntityDisplayNameEvent<EntityPlayer>) {
+    fun onRenderNametag(event: EntityDisplayNameEvent<PlayerEntity>) {
         if (!config.contributorNametags) return
-        if (event.entity.isRealPlayer()) getSuffix(event.entity.name)?.let {
+        if (event.entity.isRealPlayer()) getSuffix(event.entity.name.formattedTextCompatLessResets())?.let {
             event.chatComponent.appendComponent(it.asComponent())
         }
     }

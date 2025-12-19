@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.nether
+package at.hannibal2.skyhanni.features.nether import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackApi
@@ -43,7 +43,7 @@ object PabloHelper {
             group("flower")
         } ?: return
 
-        if (InventoryUtils.countItemsInLowerInventory { it.displayName.contains(itemName) } > 0) return
+        if (InventoryUtils.countItemsInLowerInventory { it.name.formattedTextCompatLeadingWhiteLessResets().contains(itemName) } > 0) return
 
         DelayedRun.runNextTick {
             GetFromSackApi.getFromChatMessageSackItems(

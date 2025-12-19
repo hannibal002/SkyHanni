@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.Text
+import net.minecraft.text.Text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
@@ -38,9 +38,9 @@ object ItemStars {
     fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         val stack = event.itemStack
-        if (stack.stackSize != 1) return
+        if (stack.count != 1) return
         val stars = stack.grabStarCount() ?: return
-        starPattern.findMatcher(stack.displayName) {
+        starPattern.findMatcher(stack.name.formattedTextCompatLeadingWhiteLessResets()) {
             val name = group("name")
             event.toolTip[0] = Text.of("$name §c$stars✪")
         }

@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.FontRenderer
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.font.TextRenderer
 import java.awt.Color
 
 class WrappedStringRenderable private constructor(
@@ -20,9 +20,9 @@ class WrappedStringRenderable private constructor(
     private val internalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
 ) : Renderable {
 
-    private val fontRenderer: FontRenderer by lazy { Minecraft.getMinecraft().fontRendererObj }
+    private val fontRenderer: TextRenderer by lazy { MinecraftClient.getInstance().textRenderer }
     val map by lazy {
-        text.splitLines((setWidth / scale).toInt()).split("\n").associateWith { fontRenderer.getStringWidth(it) }
+        text.splitLines((setWidth / scale).toInt()).split("\n").associateWith { fontRenderer.getWidth(it) }
     }
 
     override val width by lazy { (rawWidth * scale).toInt() + 1 }

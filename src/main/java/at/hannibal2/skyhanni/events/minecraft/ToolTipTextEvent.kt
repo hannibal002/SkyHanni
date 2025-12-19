@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.events.minecraft
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
-import at.hannibal2.skyhanni.utils.compat.Text
-import net.minecraft.inventory.Slot
+import net.minecraft.text.Text
+import net.minecraft.screen.slot.Slot
 import net.minecraft.item.ItemStack
 
 class ToolTipTextEvent(val slot: Slot?, val itemStack: ItemStack, val toolTip: MutableList<Text>) : CancellableSkyHanniEvent()

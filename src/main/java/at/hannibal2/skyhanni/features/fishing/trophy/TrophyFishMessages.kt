@@ -75,7 +75,7 @@ object TrophyFishMessages {
                 else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
             }
             "§6♔ §6§lTROPHY FISH! $designFormat".asComponent()
-        } else event.chatComponent.createCopy()
+        } else event.chatComponent.copy()
 
         if (config.totalAmount) {
             val total = trophyFishCounts.sumAllValues()
@@ -85,9 +85,9 @@ object TrophyFishMessages {
         if (config.tooltip) {
             getTooltip(internalName)?.let {
                 //#if MC < 1.21
-                edited.chatStyle = it
+                //$$ edited.style = it
                 //#else
-                //$$ edited.getWithStyle(it)
+                edited.getWithStyle(it)
                 //#endif
             }
         }

@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import net.minecraft.entity.monster.EntityBlaze
-import net.minecraft.entity.monster.EntityEnderman
-import net.minecraft.entity.monster.EntitySpider
-import net.minecraft.entity.monster.EntityZombie
-import net.minecraft.entity.passive.EntityWolf
+import net.minecraft.entity.mob.BlazeEntity
+import net.minecraft.entity.mob.EndermanEntity
+import net.minecraft.entity.mob.SpiderEntity
+import net.minecraft.entity.mob.ZombieEntity
+import net.minecraft.entity.passive.WolfEntity
 
 enum class SlayerType(
     val displayName: String,
@@ -16,39 +16,39 @@ enum class SlayerType(
     REVENANT(
         "Revenant Horror",
         "revenant",
-        EntityZombie::class.java,
+        ZombieEntity::class.java,
         SlayerMiniBossType.REVENANT,
         listOf("Atoned Horror"),
     ),
     TARANTULA(
         "Tarantula Broodfather",
         "tarantula",
-        EntitySpider::class.java,
+        SpiderEntity::class.java,
         SlayerMiniBossType.TARANTULA,
         listOf("Conjoined Brood"),
     ),
     SVEN(
         "Sven Packmaster",
         "sven",
-        EntityWolf::class.java,
+        WolfEntity::class.java,
         SlayerMiniBossType.SVEN,
     ),
     VOID(
         "Voidgloom Seraph",
         "voidgloom",
-        EntityEnderman::class.java,
+        EndermanEntity::class.java,
         SlayerMiniBossType.VOIDLING,
     ),
     INFERNO(
         "Inferno Demonlord",
         "inferno",
-        EntityBlaze::class.java,
+        BlazeEntity::class.java,
         SlayerMiniBossType.INFERNAL,
     ),
     VAMPIRE(
         "Bloodfiend",
         "vampire",
-        EntityZombie::class.java,
+        ZombieEntity::class.java,
     ) // previously called "Riftstalker Bloodfiend"
     ;
 

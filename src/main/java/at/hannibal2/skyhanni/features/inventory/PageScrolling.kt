@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -75,9 +75,9 @@ object PageScrolling {
         if (dWheel == 0) return
         val patterns = if ((dWheel > 0) xor config.invertScroll) forwardPattern else backwardPattern
         val slot = InventoryUtils.getItemsInOpenChest().firstOrNull {
-            patterns.matches(it.stack?.displayName)
+            patterns.matches(it.stack?.name.formattedTextCompatLeadingWhiteLessResets())
         } ?: return
-        InventoryUtils.clickSlot(slot.slotNumber)
+        InventoryUtils.clickSlot(slot.id)
 
         currentlyScrollable = false
         cooldown = 1.0.seconds.fromNow()

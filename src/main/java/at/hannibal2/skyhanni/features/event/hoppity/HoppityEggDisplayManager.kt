@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.player.PlayerEntity
 
 @SkyHanniModule
 object HoppityEggDisplayManager {
@@ -29,8 +29,8 @@ object HoppityEggDisplayManager {
 
     private var display = listOf<Renderable>()
 
-    private fun canChangeOpacity(entity: EntityPlayer): Boolean {
-        if (entity.isLocalPlayer) return false
+    private fun canChangeOpacity(entity: PlayerEntity): Boolean {
+        if (entity.isMainPlayer) return false
         if (!entity.isRealPlayer()) return false
 
         val shouldHidePlayer = HoppityEggLocator.sharedEggLocation?.let { entity.distanceTo(it) < 4.0 }
@@ -45,7 +45,7 @@ object HoppityEggDisplayManager {
     }
 
     @HandleEvent
-    fun onEntityOpacity(event: EntityOpacityEvent<EntityPlayer>) {
+    fun onEntityOpacity(event: EntityOpacityEvent<PlayerEntity>) {
         if (canChangeOpacity(event.entity)) {
             event.opacity = config.playerOpacity
         }

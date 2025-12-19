@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.entity.Entity
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.math.Box
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -22,9 +22,9 @@ object LocationUtils {
 
     private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean =
         //#if MC < 1.21
-        BlockUtils.rayTrace(a, b) == null
+        //$$ BlockUtils.rayTrace(a, b) == null
     //#else
-    //$$ BlockUtils.rayTrace(a, b)?.missed == true
+    BlockUtils.rayTrace(a, b)?.missed == true
     //#endif
 
     fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()
@@ -50,12 +50,12 @@ object LocationUtils {
     fun playerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val vec = player.getLorenzVec()
-        return vec.up(player.getEyeHeight().toDouble())
+        return vec.up(player.standingEyeHeight.toDouble())
     }
 
-    fun AxisAlignedBB.isInside(vec: LorenzVec) = isVecInside(vec.toVec3())
+    fun Box.isInside(vec: LorenzVec) = contains(vec.toVec3())
 
-    fun AxisAlignedBB.isPlayerInside() = isInside(playerLocation())
+    fun Box.isPlayerInside() = isInside(playerLocation())
 
     fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
@@ -70,11 +70,11 @@ object LocationUtils {
             up(offset).canBeSeen(radius)
         }
 
-    fun AxisAlignedBB.minBox() = LorenzVec(minX, minY, minZ)
+    fun Box.minBox() = LorenzVec(minX, minY, minZ)
 
-    fun AxisAlignedBB.maxBox() = LorenzVec(maxX, maxY, maxZ)
+    fun Box.maxBox() = LorenzVec(maxX, maxY, maxZ)
 
-    fun AxisAlignedBB.rayIntersects(origin: LorenzVec, direction: LorenzVec): Boolean {
+    fun Box.rayIntersects(origin: LorenzVec, direction: LorenzVec): Boolean {
         // Reference for Algorithm https://tavianator.com/2011/ray_box.html
         val rayDirectionInverse = direction.inverse()
         val t1 = (this.minBox() - origin) * rayDirectionInverse
@@ -85,7 +85,7 @@ object LocationUtils {
         return tMax >= tMin && tMax >= 0.0
     }
 
-    fun AxisAlignedBB.union(aabbs: List<AxisAlignedBB>?): AxisAlignedBB? {
+    fun Box.union(aabbs: List<Box>?): Box? {
         if (aabbs.isNullOrEmpty()) {
             return null
         }
@@ -106,28 +106,28 @@ object LocationUtils {
             if (aabb.maxZ > maxZ) maxZ = aabb.maxZ
         }
 
-        return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
+        return Box(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
-    fun AxisAlignedBB.getEdgeLengths() = maxBox() - minBox()
+    fun Box.getEdgeLengths() = maxBox() - minBox()
 
-    fun AxisAlignedBB.getBoxCenter() = getEdgeLengths() * 0.5 + minBox()
+    fun Box.getBoxCenter() = getEdgeLengths() * 0.5 + minBox()
 
-    fun AxisAlignedBB.getTopCenter() = getBoxCenter().up((maxY - minY) / 2)
+    fun Box.getTopCenter() = getBoxCenter().up((maxY - minY) / 2)
 
-    fun AxisAlignedBB.clampTo(other: AxisAlignedBB): AxisAlignedBB {
+    fun Box.clampTo(other: Box): Box {
         val minX = max(this.minX, other.minX)
         val minY = max(this.minY, other.minY)
         val minZ = max(this.minZ, other.minZ)
         val maxX = min(this.maxX, other.maxX)
         val maxY = min(this.maxY, other.maxY)
         val maxZ = min(this.maxZ, other.maxZ)
-        return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
+        return Box(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
     fun calculatePlayerYaw(): Float {
         val player = MinecraftCompat.localPlayer
-        var yaw = player.rotationYaw % 360
+        var yaw = player.yaw % 360
         if (yaw < 0) yaw += 360
         if (yaw > 180) yaw -= 360
 
@@ -162,7 +162,7 @@ object LocationUtils {
         return location
     }
 
-    fun AxisAlignedBB.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
+    fun Box.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
         val bottomLeftFront = LorenzVec(minX, minY, minZ)
         val bottomLeftBack = LorenzVec(minX, minY, maxZ)
         val topLeftFront = LorenzVec(minX, maxY, minZ)
@@ -215,7 +215,7 @@ object LocationUtils {
         return guessPitch
     }
 
-    fun AxisAlignedBB.getCornersAtHeight(y: Double): List<LorenzVec> {
+    fun Box.getCornersAtHeight(y: Double): List<LorenzVec> {
         val cornerOne = LorenzVec(minX, y, minZ)
         val cornerTwo = LorenzVec(minX, y, maxZ)
         val cornerThree = LorenzVec(maxX, y, maxZ)

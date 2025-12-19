@@ -17,13 +17,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.Text
+import net.minecraft.text.Text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //#endif
 
 @SkyHanniModule
@@ -139,9 +139,9 @@ object RiftTimer {
     fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
         if (!config.nametag) return
         //#if MC < 1.21
-        val nametag = event.text.text
+        //$$ val nametag = event.text.text
         //#else
-        //$$ val nametag = event.text.formattedTextCompatLessResets()
+        val nametag = event.text.formattedTextCompatLessResets()
         //#endif
         val time = nametagPattern.matchMatcher(nametag) {
             group("time")?.toIntOrNull()

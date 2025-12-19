@@ -123,23 +123,23 @@ object BrigadierUtils {
         val input = remainingLowerCase
         val isEscaped = input.firstOrNull() == DOUBLE_QUOTE
         //#if MC < 1.21
-        val escaped = if (isEscaped) input.drop(1) else input
-        val lastWhitespace = escaped.lastIndexOf(' ')
-        for (string in collection) {
-            if (lastWhitespace == -1) {
-                if (isEscaped || string.hasWhitespace()) suggest("$DOUBLE_QUOTE$string$DOUBLE_QUOTE")
-                else suggest(string)
-            } else {
-                val suggestion = string.substring(lastWhitespace + 1)
-                if (suggestion.isBlank()) suggest("$DOUBLE_QUOTE")
-                else suggest("$suggestion$DOUBLE_QUOTE")
-            }
-        }
-        //#else
+        //$$ val escaped = if (isEscaped) input.drop(1) else input
+        //$$ val lastWhitespace = escaped.lastIndexOf(' ')
         //$$ for (string in collection) {
-        //$$     if (isEscaped || string.hasWhitespace()) suggest("$DOUBLE_QUOTE$string$DOUBLE_QUOTE")
-        //$$     else suggest(string)
+        //$$     if (lastWhitespace == -1) {
+        //$$         if (isEscaped || string.hasWhitespace()) suggest("$DOUBLE_QUOTE$string$DOUBLE_QUOTE")
+        //$$         else suggest(string)
+        //$$     } else {
+        //$$         val suggestion = string.substring(lastWhitespace + 1)
+        //$$         if (suggestion.isBlank()) suggest("$DOUBLE_QUOTE")
+        //$$         else suggest("$suggestion$DOUBLE_QUOTE")
+        //$$     }
         //$$ }
+        //#else
+        for (string in collection) {
+            if (isEscaped || string.hasWhitespace()) suggest("$DOUBLE_QUOTE$string$DOUBLE_QUOTE")
+            else suggest(string)
+        }
         //#endif
         return this
     }
@@ -150,19 +150,19 @@ object BrigadierUtils {
         if (collection.isEmpty()) return this
         val input = remainingLowerCase
         //#if MC < 1.21
-        val escaped = input.drop(1)
-        val lastWhitespace = escaped.lastIndexOf(' ')
-        for (string in collection) {
-            if (lastWhitespace == -1) {
-                suggest("$DOUBLE_QUOTE$string$DOUBLE_QUOTE")
-            } else {
-                val suggestion = string.substring(lastWhitespace + 1)
-                if (suggestion.isBlank()) suggest("$DOUBLE_QUOTE")
-                else suggest("$suggestion$DOUBLE_QUOTE")
-            }
-        }
+        //$$ val escaped = input.drop(1)
+        //$$ val lastWhitespace = escaped.lastIndexOf(' ')
+        //$$ for (string in collection) {
+        //$$     if (lastWhitespace == -1) {
+        //$$         suggest("$DOUBLE_QUOTE$string$DOUBLE_QUOTE")
+        //$$     } else {
+        //$$         val suggestion = string.substring(lastWhitespace + 1)
+        //$$         if (suggestion.isBlank()) suggest("$DOUBLE_QUOTE")
+        //$$         else suggest("$suggestion$DOUBLE_QUOTE")
+        //$$     }
+        //$$ }
         //#else
-        //$$ for (string in collection) suggest("$DOUBLE_QUOTE$string$DOUBLE_QUOTE")
+        for (string in collection) suggest("$DOUBLE_QUOTE$string$DOUBLE_QUOTE")
         //#endif
         return this
     }
@@ -174,20 +174,20 @@ object BrigadierUtils {
         if (collection.isEmpty()) return this
         val input = remainingLowerCase
         //#if MC < 1.21
-        val isEscaped = input.firstOrNull() == DOUBLE_QUOTE
-        val escaped = if (isEscaped) input.drop(1) else input
-        val lastWhitespace = escaped.lastIndexOf(' ')
-        for (string in collection) {
-            if (lastWhitespace == -1) {
-                if (input == string) continue
-                suggest(string)
-            } else {
-                val suggestion = string.substring(lastWhitespace + 1) + if (isEscaped) DOUBLE_QUOTE else ""
-                if (suggestion.isNotBlank()) suggest(suggestion)
-            }
-        }
+        //$$ val isEscaped = input.firstOrNull() == DOUBLE_QUOTE
+        //$$ val escaped = if (isEscaped) input.drop(1) else input
+        //$$ val lastWhitespace = escaped.lastIndexOf(' ')
+        //$$ for (string in collection) {
+        //$$     if (lastWhitespace == -1) {
+        //$$         if (input == string) continue
+        //$$         suggest(string)
+        //$$     } else {
+        //$$         val suggestion = string.substring(lastWhitespace + 1) + if (isEscaped) DOUBLE_QUOTE else ""
+        //$$         if (suggestion.isNotBlank()) suggest(suggestion)
+        //$$     }
+        //$$ }
         //#else
-        //$$ for (string in collection) suggest(string)
+        for (string in collection) suggest(string)
         //#endif
         return this
     }

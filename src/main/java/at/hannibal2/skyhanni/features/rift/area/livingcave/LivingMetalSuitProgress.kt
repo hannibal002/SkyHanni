@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.area.livingcave
+package at.hannibal2.skyhanni.features.rift.area.livingcave import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -52,7 +52,7 @@ object LivingMetalSuitProgress {
             addLine {
                 addString("§7- ")
                 addItemStack(stack)
-                addString("${stack.displayName}: ")
+                addString("${stack.name.formattedTextCompatLeadingWhiteLessResets()}: ")
                 addString(
                     progress?.let {
                         drawProgressBar(it) + " §b${it.formatPercentage()}"

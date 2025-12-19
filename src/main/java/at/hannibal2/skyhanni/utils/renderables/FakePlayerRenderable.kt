@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
+import net.minecraft.entity.player.PlayerEntity
 import java.awt.Color
 //#if MC > 1.21.5
 //$$ import org.joml.Matrix3x2f
@@ -18,7 +18,7 @@ import java.awt.Color
 //#endif
 
 fun Renderable.Companion.fakePlayer(
-    player: EntityPlayer,
+    player: PlayerEntity,
     followMouse: Boolean = false,
     eyesX: Float = 0f,
     eyesY: Float = 0f,
@@ -38,7 +38,7 @@ fun Renderable.Companion.fakePlayer(
     val playerY = height / 2 + playerHeight / 2 + padding
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-        GlStateManager.color(1f, 1f, 1f, 1f)
+        ModernGlStateManager.color(1f, 1f, 1f, 1f)
         if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
         val mouse = currentRenderPassMousePosition ?: return
         val (mouseXRelativeToPlayer, mouseYRelativeToPlayer) = if (followMouse) {
@@ -49,27 +49,27 @@ fun Renderable.Companion.fakePlayer(
         DrawContextUtils.pushMatrix()
         DrawContextUtils.translate(0f, 0f, 100f)
         //#if MC < 1.21
-        GuiInventory.drawEntityOnScreen(
-            playerX,
-            playerY,
-            entityScale,
-            mouseXRelativeToPlayer,
-            mouseYRelativeToPlayer,
-            player,
-        )
-        //#elseif MC < 1.21.7
-        //$$ InventoryScreen.drawEntity(
-        //$$     DrawContextUtils.drawContext,
-        //$$     padding,
-        //$$     padding,
-        //$$     padding + width,
-        //$$     padding + height,
+        //$$ InventoryScreen.drawEntityOnScreen(
+        //$$     playerX,
+        //$$     playerY,
         //$$     entityScale,
-        //$$     0.0625f,
-        //$$     if (followMouse) mouse.first - mouseOffsetX.toFloat() else eyesX,
-        //$$     if (followMouse) mouse.second - mouseOffsetY.toFloat() else eyesY,
+        //$$     mouseXRelativeToPlayer,
+        //$$     mouseYRelativeToPlayer,
         //$$     player,
         //$$ )
+        //#elseif MC < 1.21.7
+        InventoryScreen.drawEntity(
+            DrawContextUtils.drawContext,
+            padding,
+            padding,
+            padding + width,
+            padding + height,
+            entityScale,
+            0.0625f,
+            if (followMouse) mouse.first - mouseOffsetX.toFloat() else eyesX,
+            if (followMouse) mouse.second - mouseOffsetY.toFloat() else eyesY,
+            player,
+        )
         //#else
         //$$ val peeked = DrawContextUtils.drawContext.matrices.get(Matrix3x2f())
         //$$ val translationX = peeked.m20().toInt()

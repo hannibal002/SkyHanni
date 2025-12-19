@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.nether
+package at.hannibal2.skyhanni.features.nether import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -127,7 +127,7 @@ object RescueMissionWaypoints {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!menuPattern.matches(event.inventoryName)) return
-        val name = event.inventoryItems[22]?.displayName ?: return
+        val name = event.inventoryItems[22]?.name.formattedTextCompatLeadingWhiteLessResets() ?: return
 
         tier = questTierPattern.matchMatcher(name) {
             group("tier").toLetter()

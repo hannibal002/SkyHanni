@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import org.apache.commons.lang3.StringUtils
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -69,9 +69,9 @@ object ShaderManager {
         val source = StringBuilder()
 
         //#if MC < 1.21
-        val inputStream = Minecraft.getMinecraft().resourceManager.getResource(resourceLocation).inputStream
+        //$$ val inputStream = MinecraftClient.getInstance().resourceManager.getResource(resourceLocation).inputStream
         //#else
-        //$$ val inputStream = MinecraftClient.getInstance().resourceManager.getResource(resourceLocation).get().inputStream
+        val inputStream = MinecraftClient.getInstance().resourceManager.getResource(resourceLocation).get().inputStream
         //#endif
         BufferedReader(InputStreamReader(inputStream)).forEachLine {
             source.append(it).append("\n")

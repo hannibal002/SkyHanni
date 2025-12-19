@@ -15,9 +15,9 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NEUApi
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import org.lwjgl.input.Keyboard
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object GuiData {
@@ -43,15 +43,15 @@ object GuiData {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onGuiKeyPress(event: GuiKeyPressEvent) {
-        val allowedKeys = with(Minecraft.getMinecraft().gameSettings) {
+        val allowedKeys = with(MinecraftClient.getInstance().options) {
             listOf(
-                keyBindInventory,
-                keyBindScreenshot,
-                keyBindFullscreen,
+                inventoryKey,
+                screenshotKey,
+                fullscreenKey,
             )
         }
         if (allowedKeys.any { it.isActive() }) return
-        if (Keyboard.KEY_ESCAPE.isKeyHeld()) return
+        if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) return
 
         if (CustomWardrobeKeybinds.allowKeyboardClick()) return
 
@@ -61,7 +61,7 @@ object GuiData {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runNextTick {
-            if (Minecraft.getMinecraft().currentScreen !is GuiChest) {
+            if (MinecraftClient.getInstance().currentScreen !is GenericContainerScreen) {
                 preDrawEventCancelled = false
             }
         }

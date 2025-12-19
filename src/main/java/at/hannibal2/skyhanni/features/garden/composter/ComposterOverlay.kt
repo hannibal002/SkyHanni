@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.composter
+package at.hannibal2.skyhanni.features.garden.composter import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTipLine
@@ -142,7 +142,7 @@ object ComposterOverlay {
     fun onToolTip(event: ToolTipEvent) {
         if (!composterUpgradesInventory.isInside()) return
         for (upgrade in ComposterUpgrade.entries) {
-            val name = event.itemStack.displayName
+            val name = event.itemStack.name.formattedTextCompatLeadingWhiteLessResets()
             if (name.contains(upgrade.displayName)) {
                 maxLevel = ComposterUpgrade.regex.matchMatcher(name) {
                     group("level")?.romanToDecimalIfNecessary() ?: 0

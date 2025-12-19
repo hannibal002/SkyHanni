@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import net.minecraft.client.multiplayer.WorldClient
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.client.world.ClientWorld
+import net.minecraft.entity.player.PlayerEntity
 
-fun WorldClient.getLoadedPlayers(): List<EntityPlayer> =
+fun ClientWorld.getLoadedPlayers(): List<PlayerEntity> =
 //#if MC < 1.14
-    this.playerEntities
+//$$     this.playerEntities
 //#else
-//$$ this.players
+this.players
 //#endif

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.pests.stereo
+package at.hannibal2.skyhanni.features.garden.pests.stereo import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
@@ -40,7 +40,7 @@ object StereoHarmonyDiscReplacer {
             cropType.getItemStackCopy(iconId).apply {
                 if (isActiveVinyl) addEnchantGlint()
                 setLore(lore)
-                setCustomItemName(item.displayName)
+                setCustomItemName(item.name.formattedTextCompatLeadingWhiteLessResets())
             }
         }
 

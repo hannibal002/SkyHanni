@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bingo
+package at.hannibal2.skyhanni.features.bingo import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -30,7 +30,7 @@ object BingoBoopParty {
     @HandleEvent
     fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
-        val message = event.messageComponent.textComponent.formattedText.removeResets()
+        val message = event.messageComponent.textComponent.formattedTextCompat().removeResets()
         if (!boopPattern.matches(message)) return
 
         val username = event.author.cleanPlayerName(displayName = true)

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.skyhanni.features.chat import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
@@ -14,13 +14,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ChatLine
-import net.minecraft.util.MathHelper
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.hud.ChatHudLine
+import net.minecraft.util.math.MathHelper
 //#if MC < 1.21
-import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
+//$$ import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 //#else
-//$$ import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
+import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
 //#endif
 
 object CopyChat {
@@ -43,7 +43,7 @@ object CopyChat {
         } else {
             getChatLine(mouseX, mouseY) ?: return
         }
-        val formatted = chatLine.fullComponent.formattedText
+        val formatted = chatLine.fullComponent.formattedTextCompat()
 
         val (clipboard, infoMessage) = when {
             KeyboardManager.isMenuKeyDown() ->
@@ -51,9 +51,9 @@ object CopyChat {
 
             KeyboardManager.isShiftKeyDown() -> (
                 //#if MC < 1.21
-                ModifyVisualWords.modifyText(formatted)?.removeColor()
+                //$$ ModifyVisualWords.modifyText(formatted)?.removeColor()
                     //#else
-                    //$$ OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.asOrderedText())).removeColor()
+                    OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.asOrderedText())).removeColor()
                     //#endif
                     ?: formatted
                 ) to "modified message"
@@ -67,55 +67,55 @@ object CopyChat {
         ChatUtils.chat("Copied $infoMessage to clipboard!")
     }
 
-    private fun getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
-        val mc = Minecraft.getMinecraft() ?: return null
-        val chatGui = mc.ingameGUI.chatGUI ?: return null
+    private fun getChatLine(mouseX: Int, mouseY: Int): ChatHudLine? {
+        val mc = MinecraftClient.getInstance() ?: return null
+        val chatGui = mc.inGameHud.chatHud ?: return null
         //#if MC < 1.21
-        val access = chatGui as AccessorMixinGuiNewChat
-        val chatScale = chatGui.chatScale
-        val scaleFactor = GuiScreenUtils.scaleFactor
-
-        val x = MathHelper.floor_float((mouseX / scaleFactor - 3) / chatScale)
-        val y = MathHelper.floor_float((mouseY / scaleFactor - 27 - getOffset()) / chatScale)
-
-        if (x < 0 || y < 0) return null
-
-        val fontHeight = mc.fontRendererObj.FONT_HEIGHT
-        val chatLines = access.drawnChatLines_skyhanni
-        val maxLines = chatGui.lineCount.coerceAtMost(chatLines.size)
-        if (x <= MathHelper.floor_float(chatGui.chatWidth.toFloat() / chatGui.chatScale) && y < fontHeight * maxLines + maxLines) {
-            val lineIndex = y / fontHeight + access.scrollPos_skyhanni
-            if (lineIndex in 0 until chatLines.size) {
-                return chatLines[lineIndex]
-            }
-        }
-        return null
-        //#else
-        //$$ val chatLineY = chatGui.toChatLineY(mouseY.toDouble())
-        //$$ val chatLineX = chatGui.toChatLineX(mouseX.toDouble())
-        //$$ val lineIndex = (chatGui.scrolledLines + chatLineY).toInt()
+        //$$ val access = chatGui as AccessorMixinGuiNewChat
+        //$$ val chatScale = chatGui.chatScale
+        //$$ val scaleFactor = GuiScreenUtils.scaleFactor
         //$$
-        //$$ if (chatLineX < -4.0 || chatLineX > MathHelper.floor(chatGui.width.toDouble() / chatGui.chatScale).toDouble()) return null
+        //$$ val x = MathHelper.floor((mouseX / scaleFactor - 3) / chatScale)
+        //$$ val y = MathHelper.floor((mouseY / scaleFactor - 27 - getOffset()) / chatScale)
         //$$
-        //$$ if (lineIndex < 0) return null
-        //$$ val visibleLines = chatGui.visibleMessages
-        //$$ if (lineIndex > visibleLines.size) return null
-        //$$ val visibleLine = visibleLines[lineIndex]
+        //$$ if (x < 0 || y < 0) return null
         //$$
-        //$$ val matchingLines = chatGui.messages.filter {
-        //$$     it.creationTick == visibleLine.addedTime && it.content.formattedTextCompat().isNotBlank()
-        //$$ }
-        //$$
-        //$$ return when {
-        //$$     matchingLines.isEmpty() -> null
-        //$$     matchingLines.size == 1 -> matchingLines.first()
-        //$$     else -> {
-        //$$         matchingLines.firstOrNull {
-        //$$             it.content.formattedTextCompat().stripHypixelMessage().removeColor()
-        //$$                 .contains(OrderedTextUtils.orderedTextToLegacyString(visibleLine.content).removeColor())
-        //$$         } ?: matchingLines.first()
+        //$$ val fontHeight = mc.textRenderer.fontHeight
+        //$$ val chatLines = access.drawnChatLines_skyhanni
+        //$$ val maxLines = chatGui.visibleLineCount.coerceAtMost(chatLines.size)
+        //$$ if (x <= MathHelper.floor(chatGui.width.toFloat() / chatGui.chatScale) && y < fontHeight * maxLines + maxLines) {
+        //$$     val lineIndex = y / fontHeight + access.scrollPos_skyhanni
+        //$$     if (lineIndex in 0 until chatLines.size) {
+        //$$         return chatLines[lineIndex]
         //$$     }
         //$$ }
+        //$$ return null
+        //#else
+        val chatLineY = chatGui.toChatLineY(mouseY.toDouble())
+        val chatLineX = chatGui.toChatLineX(mouseX.toDouble())
+        val lineIndex = (chatGui.scrolledLines + chatLineY).toInt()
+
+        if (chatLineX < -4.0 || chatLineX > MathHelper.floor(chatGui.width.toDouble() / chatGui.chatScale).toDouble()) return null
+
+        if (lineIndex < 0) return null
+        val visibleLines = chatGui.visibleMessages
+        if (lineIndex > visibleLines.size) return null
+        val visibleLine = visibleLines[lineIndex]
+
+        val matchingLines = chatGui.messages.filter {
+            it.creationTick == visibleLine.addedTime && it.content.formattedTextCompat().isNotBlank()
+        }
+
+        return when {
+            matchingLines.isEmpty() -> null
+            matchingLines.size == 1 -> matchingLines.first()
+            else -> {
+                matchingLines.firstOrNull {
+                    it.content.formattedTextCompat().stripHypixelMessage().removeColor()
+                        .contains(OrderedTextUtils.orderedTextToLegacyString(visibleLine.content).removeColor())
+                } ?: matchingLines.first()
+            }
+        }
         //#endif
     }
 

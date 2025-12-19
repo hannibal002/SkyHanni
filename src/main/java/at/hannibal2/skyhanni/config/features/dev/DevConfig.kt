@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class DevConfig {
 
@@ -58,8 +58,8 @@ class DevConfig {
 
     @Expose
     @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var showSlotNumberKey: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var showSlotNumberKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -143,9 +143,9 @@ class DevConfig {
     @ConfigOption(
         name = "Ping API",
         //#if MC < 1.21
-        desc = "Use the Hypixel Mod API to calculate your ping.",
+        //$$ desc = "Use the Hypixel Mod API to calculate your ping.",
         //#else
-        //$$ desc = "Make the client always send ping packets to the server as if the debug HUD was open so that we can calculate your ping.",
+        desc = "Make the client always send ping packets to the server as if the debug HUD was open so that we can calculate your ping.",
         //#endif
     )
     @ConfigEditorBoolean

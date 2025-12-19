@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.api
+package at.hannibal2.skyhanni.api import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -78,7 +78,7 @@ object SkyBlockXPApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!UtilsPatterns.skyblockMenuGuiPattern.matches(event.inventoryName)) return
 
-        val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.displayName) } ?: return
+        val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.name.formattedTextCompatLeadingWhiteLessResets()) } ?: return
 
         var level: Int? = null
         var xp: Int? = null

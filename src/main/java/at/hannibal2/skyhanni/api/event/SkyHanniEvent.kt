@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.api.event
 
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import net.minecraft.client.gui.DrawContext
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 
 /**

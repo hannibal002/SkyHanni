@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.attribute
+package at.hannibal2.skyhanni.features.inventory.attribute import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
@@ -20,7 +20,7 @@ object AttributesShardsInventory {
 
         val internalName = event.stack.getInternalNameOrNull() ?: return
         if (!AttributeShardsData.isAttributeShard(internalName)) return
-        AttributeShardsData.attributeShardNamePattern.matchMatcher(event.stack.displayName) {
+        AttributeShardsData.attributeShardNamePattern.matchMatcher(event.stack.name.formattedTextCompatLeadingWhiteLessResets()) {
             val tier = groupOrNull("tier")?.romanToDecimal() ?: 0
             val color = when (tier) {
                 0 -> "§c"

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.area.colosseum
+package at.hannibal2.skyhanni.features.rift.area.colosseum import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -74,7 +74,7 @@ object BacteApi {
     fun onSecondPassed(event: SecondPassedEvent) {
         val bacte = bacte ?: return
 
-        val name = bacte.armorStand?.name ?: return
+        val name = bacte.armorStand?.name.formattedTextCompatLessResets() ?: return
 
         namePattern.matchMatcher(name) {
             currentPhase = Phase.fromNumber(group("name").length)

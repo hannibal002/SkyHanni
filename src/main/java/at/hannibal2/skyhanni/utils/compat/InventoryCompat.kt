@@ -1,58 +1,58 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.inventory.Container
-import net.minecraft.inventory.Slot
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.network.ClientPlayerEntity
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import net.minecraft.screen.ScreenHandler
+import net.minecraft.screen.slot.Slot
 import net.minecraft.item.ItemStack
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 //#if FABRIC
-//$$ import net.minecraft.screen.slot.SlotActionType
-//$$ import at.hannibal2.skyhanni.compat.ReiCompat
-//$$ import net.minecraft.client.gui.screen.ingame.HandledScreen
+import net.minecraft.screen.slot.SlotActionType
+import at.hannibal2.skyhanni.compat.ReiCompat
+import net.minecraft.client.gui.screen.ingame.HandledScreen
 //#endif
 
-fun EntityPlayerSP.getItemOnCursor(): ItemStack? {
+fun ClientPlayerEntity.getItemOnCursor(): ItemStack? {
     //#if MC < 1.21
-    return this.inventory?.itemStack
+    //$$ return this.inventory?.cursorStack
     //#else
-    //$$ val stack = this.currentScreenHandler?.cursorStack
-    //$$ if (stack?.isEmpty == true) return null
-    //$$ return stack
+    val stack = this.currentScreenHandler?.cursorStack
+    if (stack?.isEmpty == true) return null
+    return stack
     //#endif
 }
 
 fun stackUnderCursor(): ItemStack? {
-    val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return null
+    val screen = MinecraftClient.getInstance().currentScreen as? SkyHanniGuiContainer ?: return null
     //#if FORGE
-    return screen.slotUnderMouse?.stack
+    //$$ return screen.slotUnderMouse?.item
     //#else
-    //$$ var stack = screen.focusedSlot?.stack
-    //$$ if (stack != null) return stack
-    //$$ stack = ReiCompat.getHoveredStackFromRei()
-    //$$ return stack
+    var stack = screen.focusedSlot?.stack
+    if (stack != null) return stack
+    stack = ReiCompat.getHoveredStackFromRei()
+    return stack
     //#endif
 }
 
 fun slotUnderCursor(): Slot? {
-    val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return null
+    val screen = MinecraftClient.getInstance().currentScreen as? SkyHanniGuiContainer ?: return null
     //#if FORGE
-    return screen.slotUnderMouse
+    //$$ return screen.slotUnderMouse
     //#else
-    //$$ return screen.focusedSlot
+    return screen.focusedSlot
     //#endif
 }
 
-val GuiChest.container: Container
+val GenericContainerScreen.container: ScreenHandler
     //#if MC < 1.16
-    get() = this.inventorySlots
+    //$$ get() = this.inventorySlots
 //#else
-//$$ get() = this.screenHandler
+get() = this.screenHandler
 //#endif
 
 object InventoryCompat {
@@ -61,12 +61,12 @@ object InventoryCompat {
      * Internal method, not meant to be called directly. Prefer `InventoryUtils.clickSlot()`.
      */
     fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: Int) {
-        val controller = Minecraft.getMinecraft().playerController ?: return
-        val player = Minecraft.getMinecraft().thePlayer ?: return
+        val controller = MinecraftClient.getInstance().interactionManager ?: return
+        val player = MinecraftClient.getInstance().player ?: return
         //#if FORGE
-        controller.windowClick(windowId, slotId, mouseButton, mode, player)
+        //$$ controller.windowClick(windowId, slotId, mouseButton, mode, player)
         //#else
-        //$$ controller.clickSlot(windowId, slotId, mouseButton, SlotActionType.entries[mode], player)
+        controller.clickSlot(windowId, slotId, mouseButton, SlotActionType.entries[mode], player)
         //#endif
     }
 
@@ -75,35 +75,35 @@ object InventoryCompat {
      */
     fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: Int) {
         if (slot < 0) return
-        val gui = Minecraft.getMinecraft().currentScreen
+        val gui = MinecraftClient.getInstance().currentScreen
         //#if FORGE
-        if (gui is GuiContainer) {
-            val accessor = gui as AccessorGuiContainer
-            val slotObj = gui.inventorySlots.getSlot(slot)
-            accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, mode)
-        }
-        //#else
-        //$$ if (gui is HandledScreen<*>) {
-        //$$     val accessor = gui as AccessorHandledScreen
-        //$$     val slotObj = gui.screenHandler.getSlot(slot)
-        //$$     val actionType = SlotActionType.entries[mode]
-        //$$     accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, actionType)
+        //$$ if (gui is SkyHanniGuiContainer) {
+        //$$     val accessor = gui as AccessorGuiContainer
+        //$$     val slotObj = gui.container.getSlot(slot)
+        //$$     accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, mode)
         //$$ }
+        //#else
+        if (gui is HandledScreen<*>) {
+            val accessor = gui as AccessorHandledScreen
+            val slotObj = gui.screenHandler.getSlot(slot)
+            val actionType = SlotActionType.entries[mode]
+            accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, actionType)
+        }
         //#endif
     }
 
-    fun containerSlots(container: GuiContainer): List<Slot> =
+    fun containerSlots(container: SkyHanniGuiContainer): List<Slot> =
         //#if FORGE
-        container.inventorySlots.inventorySlots
+        //$$ container.container.slots
 //#else
-//$$ container.screenHandler.slots
+container.screenHandler.slots
 //#endif
 
     fun getWindowIdOrNull(): Int? =
         //#if FORGE
-        (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
+        //$$ (Minecraft.getInstance().screen as? ContainerScreen)?.container?.containerId
 //#else
-//$$ (MinecraftClient.getInstance().currentScreen as? GenericContainerScreen)?.screenHandler?.syncId
+(MinecraftClient.getInstance().currentScreen as? GenericContainerScreen)?.screenHandler?.syncId
 //#endif
 
     fun getWindowId(): Int =
@@ -131,15 +131,15 @@ object InventoryCompat {
         }
         this ?: return false
         //#if MC > 1.21
-        //$$ return !this.isEmpty
+        return !this.isEmpty
         //#else
-        return true
+        //$$ return true
         //#endif
     }
 
     fun ItemStack?.orNull(): ItemStack? {
         //#if MC > 1.21
-        //$$ return this?.takeUnless { it.isEmpty }
+        return this?.takeUnless { it.isEmpty }
         //#endif
         return this
     }

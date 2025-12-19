@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.greenhouse
+package at.hannibal2.skyhanni.features.garden.greenhouse import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -37,7 +37,7 @@ object DnaAnalyzerSolver {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled() || !config.hideTooltips) return
-        if (event.slot?.slotIndex !in 9..44) return
+        if (event.slot?.index !in 9..44) return
         event.cancel()
     }
 
@@ -237,7 +237,7 @@ object DnaAnalyzerSolver {
 
         companion object {
             fun ItemStack.toColor(): Colors {
-                val name = this.displayName
+                val name = this.name.formattedTextCompatLeadingWhiteLessResets()
                 if (name.startsWith("§cDNA")) {
                     return RED
                 } else if (name.startsWith("§eDNA")) {

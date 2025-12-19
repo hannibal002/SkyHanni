@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide
+package at.hannibal2.skyhanni.features.garden.fortuneguide import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.PetStorageApi
@@ -219,7 +219,7 @@ object CaptureFarmingGear {
             if (stack.getInternalNameOrNull() == null) {
                 storage.farmingItems.remove(itemType)
                 storage.outdatedItems[itemType] = true
-                ChatUtils.debug("removed invalid farming item: $itemType (${stack.displayName})")
+                ChatUtils.debug("removed invalid farming item: $itemType (${stack.name.formattedTextCompatLeadingWhiteLessResets()})")
             }
         }
     }
@@ -288,7 +288,7 @@ object CaptureFarmingGear {
         storage: ProfileSpecificStorage.GardenStorage.Fortune,
     ) {
         for ((_, item) in items) {
-            if (item.displayName.contains("Garden")) {
+            if (item.name.formattedTextCompatLeadingWhiteLessResets().contains("Garden")) {
                 var fortune = -1.0
                 for (line in item.getLore()) {
                     bestiaryPattern.matchMatcher(line) {
@@ -307,7 +307,7 @@ object CaptureFarmingGear {
         storage: ProfileSpecificStorage.GardenStorage.Fortune,
     ) {
         for ((_, item) in items) {
-            if (item.displayName.contains("Dark Chocolate")) {
+            if (item.name.formattedTextCompatLeadingWhiteLessResets().contains("Dark Chocolate")) {
                 var fortune = -1
                 for (line in item.getLore()) {
                     fortuneFlatPattern.matchMatcher(line) {
@@ -318,7 +318,7 @@ object CaptureFarmingGear {
                     storage.cacao = fortune
                 }
             }
-            if (item.displayName.contains("Relic of Power")) {
+            if (item.name.formattedTextCompatLeadingWhiteLessResets().contains("Relic of Power")) {
                 var fortune = -1.0
                 for (line in item.getLore()) {
                     fortuneFlatPattern.matchMatcher(line) {
@@ -338,7 +338,7 @@ object CaptureFarmingGear {
     ) {
         for ((_, item) in items) {
             // Stats ➜ <Crop> Fortune
-            if (item.displayName.contains("Flat Bonuses")) {
+            if (item.name.formattedTextCompatLeadingWhiteLessResets().contains("Flat Bonuses")) {
                 var fortune = -1.0
                 for (line in item.getLore()) {
                     personalBestPattern.matchMatcher(line) {
@@ -351,7 +351,7 @@ object CaptureFarmingGear {
             }
 
             // <Crop> Fortune ➜ Flat Bonuses
-            if (item.displayName.contains("Anita's Personal Bests")) {
+            if (item.name.formattedTextCompatLeadingWhiteLessResets().contains("Anita's Personal Bests")) {
                 var fortune = -1.0
                 for (line in item.getLore()) {
                     fortuneFlatPattern.matchMatcher(line) {
@@ -370,7 +370,7 @@ object CaptureFarmingGear {
         storage: ProfileSpecificStorage.GardenStorage.Fortune,
     ) {
         for ((_, item) in items) {
-            if (item.displayName.contains("Relic of Power")) {
+            if (item.name.formattedTextCompatLeadingWhiteLessResets().contains("Relic of Power")) {
                 var fortune = -1.0
                 for (line in item.getLore()) {
                     relicOfPowerFarmingFortune.matchMatcher(line) {
@@ -386,7 +386,7 @@ object CaptureFarmingGear {
 
     private fun visitorMilestones(items: Map<Int, ItemStack>) {
         for ((_, item) in items) {
-            if (item.displayName != "§aUnique Visitors Served") continue
+            if (item.name.formattedTextCompatLeadingWhiteLessResets() != "§aUnique Visitors Served") continue
 
             var tier = -1
             var tierProgress = -1
@@ -410,7 +410,7 @@ object CaptureFarmingGear {
     ) {
         var level = -1
         for ((_, item) in items) {
-            if (item.displayName.contains("Extra Farming Fortune")) {
+            if (item.name.formattedTextCompatLeadingWhiteLessResets().contains("Extra Farming Fortune")) {
                 level = 0
 
                 anitaMenuPattern.firstMatcher(item.getLore()) {
@@ -440,13 +440,13 @@ object CaptureFarmingGear {
 
     private fun communityShop(items: Map<Int, ItemStack>) {
         for ((_, item) in items) {
-            if (item.displayName.contains("Garden Farming Fortune")) {
+            if (item.name.formattedTextCompatLeadingWhiteLessResets().contains("Garden Farming Fortune")) {
                 if (item.getLore().contains("§aMaxed out!")) {
                     ProfileStorageData.playerSpecific?.gardenCommunityUpgrade =
-                        item.displayName.split(" ").last().romanToDecimal()
+                        item.name.formattedTextCompatLeadingWhiteLessResets().split(" ").last().romanToDecimal()
                 } else {
                     ProfileStorageData.playerSpecific?.gardenCommunityUpgrade =
-                        item.displayName.split(" ").last().romanToDecimal() - 1
+                        item.name.formattedTextCompatLeadingWhiteLessResets().split(" ").last().romanToDecimal() - 1
                 }
             }
         }
@@ -457,8 +457,8 @@ object CaptureFarmingGear {
         storage: ProfileSpecificStorage.GardenStorage.Fortune,
     ) {
         for ((_, item) in items) {
-            if (item.displayName.contains("Farming ")) {
-                storage.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNecessary()
+            if (item.name.formattedTextCompatLeadingWhiteLessResets().contains("Farming ")) {
+                storage.farmingLevel = item.name.formattedTextCompatLeadingWhiteLessResets().split(" ").last().romanToDecimalIfNecessary()
             }
         }
     }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.everywhere
+package at.hannibal2.skyhanni.features.rift.everywhere import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -34,8 +34,8 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.AbstractClientPlayer
-import net.minecraft.entity.EntityLivingBase
+import net.minecraft.client.network.AbstractClientPlayerEntity
+import net.minecraft.entity.LivingEntity
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -144,12 +144,12 @@ object PunchcardHighlight {
         }
     }
 
-    private fun colorPlayer(entity: EntityLivingBase) {
+    private fun colorPlayer(entity: LivingEntity) {
         val color = config.color.get().toColor()
         RenderLivingEntityHelper.setEntityColor(entity, color) { IslandType.THE_RIFT.isCurrent() }
     }
 
-    private fun removePlayerColor(entity: EntityLivingBase) {
+    private fun removePlayerColor(entity: LivingEntity) {
         RenderLivingEntityHelper.removeEntityColor(entity)
     }
 
@@ -170,9 +170,9 @@ object PunchcardHighlight {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPunch(event: EntityClickEvent) {
         val entity = event.clickedEntity
-        if (entity !is AbstractClientPlayer) return
+        if (entity !is AbstractClientPlayerEntity) return
         if (entity.isNpc()) return
-        val name = entity.name
+        val name = entity.name.formattedTextCompatLessResets()
         if (name in playerList || name in playerQueue) return
         playerQueue.add(name)
         listening = true

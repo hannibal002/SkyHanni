@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -103,8 +103,8 @@ class SkyblockGuideHighlightFeature private constructor(
             if (!isEnabled()) return
             if (activeObject == null) return
 
-            event.container.inventorySlots
-                .filter { missing.contains(it.slotNumber) }
+            event.container.slots
+                .filter { missing.contains(it.id) }
                 .forEach { it.highlight(LorenzColor.RED) }
         }
 
@@ -113,7 +113,7 @@ class SkyblockGuideHighlightFeature private constructor(
             if (!isEnabled()) return
             event.slot ?: return
             val current = activeObject ?: return
-            if (!missing.contains(event.slot.slotNumber)) return
+            if (!missing.contains(event.slot.id)) return
             current.onTooltip.invoke(event)
         }
 
@@ -129,7 +129,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
             for ((slot, item) in event.inventoryItems) {
                 if (slot == 4) continue // Overview Item
-                val loreAndName = listOf(item.displayName) + item.getLore()
+                val loreAndName = listOf(item.name.formattedTextCompatLeadingWhiteLessResets()) + item.getLore()
                 if (!current.conditionPattern.anyMatches(loreAndName)) continue
                 missing.add(slot)
             }

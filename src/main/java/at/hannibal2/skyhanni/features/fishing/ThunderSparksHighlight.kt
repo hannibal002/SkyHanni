@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.skyhanni.features.fishing import at.hannibal2.skyhanni.utils.compat.deceased
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -17,24 +17,24 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 
 @SkyHanniModule
 object ThunderSparksHighlight {
 
     private val config get() = SkyHanniMod.feature.fishing.thunderSpark
     private val THUNDER_SPARK_TEXTURE by lazy { SkullTextureHolder.getTexture("THUNDER_SPARK") }
-    private val sparks = mutableSetOf<EntityArmorStand>()
+    private val sparks = mutableSetOf<ArmorStandEntity>()
 
     @HandleEvent
-    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<EntityArmorStand>) {
+    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStandEntity>) {
         if (!isEnabled()) return
         val entity = event.entity
         if (entity.getWornSkullTexture() == THUNDER_SPARK_TEXTURE) sparks.add(entity)
     }
 
     @HandleEvent
-    fun onEntityRemoved(event: EntityRemovedEvent<EntityArmorStand>) {
+    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStandEntity>) {
         sparks.remove(event.entity)
     }
 
@@ -45,7 +45,7 @@ object ThunderSparksHighlight {
         val color = config.color.toColor()
 
         for (spark in sparks) {
-            if (spark.isDead) continue
+            if (spark.deceased) continue
             val sparkLocation = spark.getLorenzVec()
             val block = sparkLocation.getBlockAt()
             val seeThroughBlocks = sparkLocation.distanceToPlayer() < 6 && (block in FishingApi.lavaBlocks)

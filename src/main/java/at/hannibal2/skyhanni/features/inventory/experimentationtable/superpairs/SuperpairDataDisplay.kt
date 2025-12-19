@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable.superpairs
+package at.hannibal2.skyhanni.features.inventory.experimentationtable.superpairs import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
@@ -133,12 +133,12 @@ object SuperpairDataDisplay {
         val currentTier = ExperimentationTableApi.currentExperimentTier ?: return
 
         val item = event.item ?: return
-        if (isOutOfBounds(event.slotId, currentTier) || item.displayName.removeColor() == "?") return
+        if (isOutOfBounds(event.slotId, currentTier) || item.name.formattedTextCompatLeadingWhiteLessResets().removeColor() == "?") return
 
         val items = uncoveredItems.toMutableMap()
         val itemExistsInData = items.any { it.value.slotId == event.slotId && it.key == items.keys.max() }
         val clicksItem = InventoryUtils.getItemAtSlotIndex(4)
-        val hasRemainingClicks = remainingClicksPattern.matchMatcher(clicksItem?.displayName?.removeColor().orEmpty()) {
+        val hasRemainingClicks = remainingClicksPattern.matchMatcher(clicksItem?.name.formattedTextCompatLeadingWhiteLessResets()?.removeColor().orEmpty()) {
             group("clicks").toInt() > 0
         } ?: false
 
@@ -148,7 +148,7 @@ object SuperpairDataDisplay {
 
     private fun handleItem(items: MutableMap<Int, SuperpairItem>, slot: Int) = DelayedRun.runDelayed(200.milliseconds) {
         val itemNow = InventoryUtils.getItemAtSlotIndex(slot) ?: return@runDelayed
-        val itemName = itemNow.displayName.removeColor()
+        val itemName = itemNow.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
         val reward = itemNow.convertToReward()
         val itemData = SuperpairItem(slot, reward, DyeCompat.toDamage(itemNow))
         val uncovered = items.keys.maxOrNull() ?: -1
@@ -319,9 +319,9 @@ object SuperpairDataDisplay {
         ((currentExperiment.gridSize - 2) / 2) - currentFoundData.filter { it.key != FoundType.POWERUP }.values.sumOf { it.size }
 
     private fun ItemStack.convertToReward() = when {
-        guardianPetInternalNamePattern.matches(getInternalNameOrNull()?.asString().orEmpty()) -> displayName.split("] ")[1]
-        displayName.removeColor() == "Enchanted Book" -> getLore()[2].removeColor()
-        else -> displayName.removeColor()
+        guardianPetInternalNamePattern.matches(getInternalNameOrNull()?.asString().orEmpty()) -> name.formattedTextCompatLeadingWhiteLessResets().split("] ")[1]
+        name.formattedTextCompatLeadingWhiteLessResets().removeColor() == "Enchanted Book" -> getLore()[2].removeColor()
+        else -> name.formattedTextCompatLeadingWhiteLessResets().removeColor()
     }
 
     private fun determinePrefix(index: Int, lastIndex: Int) = if (index == lastIndex) "└" else "├"

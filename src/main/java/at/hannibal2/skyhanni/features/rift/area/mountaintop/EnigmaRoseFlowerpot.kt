@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.math.Box
 
 @SkyHanniModule
 object EnigmaRoseFlowerpot {
     private val config get() = SkyHanniMod.feature.rift.area.mountaintop
 
-    private val area = AxisAlignedBB(25.0, 165.0, 90.0, 52.0, 185.0, 120.0)
+    private val area = Box(25.0, 165.0, 90.0, 52.0, 185.0, 120.0)
     private val dropLocation = LorenzVec(40, 161, 116)
     private var inArea = false
 

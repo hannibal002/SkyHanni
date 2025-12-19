@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.skyhanni.features.dungeon import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -20,9 +20,9 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.Entity
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.item.EntityItem
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.entity.ItemEntity
+import net.minecraft.particle.ParticleTypes
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -30,8 +30,8 @@ object DungeonHideItems {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHider
 
-    private val hideParticles = mutableMapOf<EntityArmorStand, SimpleTimeMark>()
-    private val movingSkeletonSkulls = mutableMapOf<EntityArmorStand, SimpleTimeMark>()
+    private val hideParticles = mutableMapOf<ArmorStandEntity, SimpleTimeMark>()
+    private val movingSkeletonSkulls = mutableMapOf<ArmorStandEntity, SimpleTimeMark>()
 
     private val SOUL_WEAVER_HIDER by lazy { SkullTextureHolder.getTexture("DUNGEONS_SOUL_WEAVER") }
     private val BLESSING_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_BLESSING") }
@@ -42,14 +42,14 @@ object DungeonHideItems {
     private val DAMAGE_ORB_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_DAMAGE_ORB") }
     private val HEALER_FAIRY_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_HEALER_FAIRY") }
 
-    private fun isSkeletonSkull(entity: EntityArmorStand): Boolean = entity.getStandHelmet()?.cleanName() == "Skeleton Skull"
+    private fun isSkeletonSkull(entity: ArmorStandEntity): Boolean = entity.getStandHelmet()?.cleanName() == "Skeleton Skull"
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         val entity = event.entity
 
-        if (entity is EntityItem) {
-            val stack = entity.entityItem
+        if (entity is ItemEntity) {
+            val stack = entity.stack
             if (config.hideReviveStone && stack.cleanName() == "Revive Stone") {
                 event.cancel()
             }
@@ -59,12 +59,12 @@ object DungeonHideItems {
             }
         }
 
-        if (entity !is EntityArmorStand) return
+        if (entity !is ArmorStandEntity) return
 
         val head = entity.getStandHelmet()
         val skullTexture = head?.getSkullTexture()
         if (config.hideSuperboomTNT) {
-            if (entity.name.startsWith("§9Superboom TNT")) {
+            if (entity.name.formattedTextCompatLessResets().startsWith("§9Superboom TNT")) {
                 event.cancel()
             }
 
@@ -75,7 +75,7 @@ object DungeonHideItems {
         }
 
         if (config.hideBlessing) {
-            if (entity.name.startsWith("§dBlessing of ")) {
+            if (entity.name.formattedTextCompatLessResets().startsWith("§dBlessing of ")) {
                 event.cancel()
             }
 
@@ -85,7 +85,7 @@ object DungeonHideItems {
         }
 
         if (config.hideReviveStone) {
-            if (entity.name == "§6Revive Stone") {
+            if (entity.name.formattedTextCompatLessResets() == "§6Revive Stone") {
                 event.cancel()
             }
 
@@ -96,7 +96,7 @@ object DungeonHideItems {
         }
 
         if (config.hidePremiumFlesh) {
-            if (entity.name == "§9Premium Flesh") {
+            if (entity.name.formattedTextCompatLessResets() == "§9Premium Flesh") {
                 event.cancel()
                 hideParticles[entity] = SimpleTimeMark.now()
             }
@@ -117,9 +117,9 @@ object DungeonHideItems {
 
         if (config.hideHealerOrbs) {
             when {
-                entity.name.startsWith("§c§lDAMAGE §e") -> event.cancel()
-                entity.name.startsWith("§c§lABILITY DAMAGE §e") -> event.cancel()
-                entity.name.startsWith("§a§lDEFENSE §e") -> event.cancel()
+                entity.name.formattedTextCompatLessResets().startsWith("§c§lDAMAGE §e") -> event.cancel()
+                entity.name.formattedTextCompatLessResets().startsWith("§c§lABILITY DAMAGE §e") -> event.cancel()
+                entity.name.formattedTextCompatLessResets().startsWith("§a§lDEFENSE §e") -> event.cancel()
             }
 
             when (skullTexture) {
@@ -157,10 +157,10 @@ object DungeonHideItems {
         for (armorStand in hideParticles.filterValues { it.passedSince() < 100.milliseconds }.keys) {
             val distance = packetLocation.distance(armorStand.getLorenzVec())
             if (distance < 2) {
-                if (event.type == EnumParticleTypes.FIREWORKS_SPARK) {
+                if (event.type == ParticleTypes.FIREWORK) {
                     event.cancel()
                 }
-                if (event.type == EnumParticleTypes.REDSTONE) {
+                if (event.type == ParticleTypes.DUST) {
                     event.cancel()
                 }
             }
@@ -168,7 +168,7 @@ object DungeonHideItems {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onArmoStandMove(event: EntityMoveEvent<EntityArmorStand>) {
+    fun onArmoStandMove(event: EntityMoveEvent<ArmorStandEntity>) {
         val entity = event.entity
 
         if (isSkeletonSkull(entity)) {

@@ -20,9 +20,9 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 //#if FORGE
-import net.minecraftforge.client.ClientCommandHandler
+//$$ import net.minecraftforge.client.ClientCommandHandler
 //#endif
 
 @SkyHanniModule
@@ -62,7 +62,7 @@ object QuickModMenuSwitch {
     }
 
     private fun update() {
-        var openGui = Minecraft.getMinecraft().currentScreen?.javaClass?.name ?: "none"
+        var openGui = MinecraftClient.getInstance().currentScreen?.javaClass?.name ?: "none"
         openGui = handleAbstractGuis(openGui)
         if (latestGuiPath != openGui) {
             latestGuiPath = openGui
@@ -98,7 +98,7 @@ object QuickModMenuSwitch {
         if (openGui == "gg.essential.vigilance.gui.SettingsGui") {
             val clazz = Class.forName("gg.essential.vigilance.gui.SettingsGui")
             val titleBarDelegate = clazz.getDeclaredField("titleBar\$delegate").makeAccessible()
-                .get(Minecraft.getMinecraft().currentScreen)
+                .get(MinecraftClient.getInstance().currentScreen)
             val titleBar =
                 titleBarDelegate.javaClass.declaredFields[0].makeAccessible().get(titleBarDelegate)
             val gui = titleBar.javaClass.getDeclaredField("gui").makeAccessible().get(titleBar)
@@ -107,7 +107,7 @@ object QuickModMenuSwitch {
             return config.javaClass.name
         }
         if (openGui == "cc.polyfrost.oneconfig.gui.OneConfigGui") {
-            val actualGui = Minecraft.getMinecraft().currentScreen ?: return openGui
+            val actualGui = MinecraftClient.getInstance().currentScreen ?: return openGui
             val currentPage = actualGui.javaClass.getDeclaredField("currentPage")
                 .makeAccessible()
                 .get(actualGui)
@@ -156,7 +156,7 @@ object QuickModMenuSwitch {
         update()
         try {
             //#if FORGE
-            ClientCommandHandler.instance.executeCommand(MinecraftCompat.localPlayer, "/" + mod.command)
+            //$$ ClientCommandHandler.instance.executeCommand(MinecraftCompat.localPlayer, "/" + mod.command)
             //#endif
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error trying to open the gui for mod " + mod.name)

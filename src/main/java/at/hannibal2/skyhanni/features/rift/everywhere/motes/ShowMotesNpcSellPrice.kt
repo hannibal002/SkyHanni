@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.everywhere.motes
+package at.hannibal2.skyhanni.features.rift.everywhere.motes import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.rift.motes.RiftInventoryValueConfig.NumberFormatEntry
@@ -71,7 +71,7 @@ object ShowMotesNpcSellPrice {
         val baseMotes = itemStack.motesNpcPrice() ?: return
         val burgerStacks = config.burgerStacks
         val burgerText = if (burgerStacks > 0) "(${burgerStacks}x≡) " else ""
-        val size = itemStack.stackSize
+        val size = itemStack.count
         if (size > 1) {
             event.toolTip.add(
                 "§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes " +
@@ -102,7 +102,7 @@ object ShowMotesNpcSellPrice {
     private fun processItems() {
         val inventoryName = InventoryUtils.openInventoryName()
         if (!inventoryName.contains("Rift Storage")) return
-        val stacks = InventoryUtils.getItemsInOpenChest().map { it.slotIndex to it.stack }
+        val stacks = InventoryUtils.getItemsInOpenChest().map { it.index to it.stack }
         itemMap.clear()
         for ((index, stack) in stacks) {
             val itemValue = stack.motesNpcPrice() ?: continue
@@ -144,7 +144,7 @@ object ShowMotesNpcSellPrice {
                 addString("  §7- ")
                 addItemStack(stack)
                 val tips = buildList {
-                    add("§6Item: ${stack.displayName}")
+                    add("§6Item: ${stack.name.formattedTextCompatLeadingWhiteLessResets()}")
                     add("§6Value per: §d$valuePer Motes")
                     add("§6Total in chest: §d${(value / valuePer).toInt()}")
                     add("")
@@ -152,7 +152,7 @@ object ShowMotesNpcSellPrice {
                 }
                 add(
                     Renderable.hoverTips(
-                        "§6${stack.displayName}: §b$price",
+                        "§6${stack.name.formattedTextCompatLeadingWhiteLessResets()}: §b$price",
                         tips,
                         highlightsOnHoverSlots = index,
                         stack = stack,

@@ -47,9 +47,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import net.minecraft.item.ItemStack
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.math.Box
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
@@ -79,7 +79,7 @@ object GardenApi {
             }
         }
     private val cropIconCache = TimeLimitedCache<String, ItemStack>(10.minutes)
-    val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
+    val barnArea = Box(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
     private var extraFarmingTools: Set<NeuInternalName> = setOf()
 
@@ -107,7 +107,7 @@ object GardenApi {
             if (cropInHand.isTimeFlower()) checkItemInHand()
 
             // We ignore random hypixel moments
-            Minecraft.getMinecraft().currentScreen ?: return
+            MinecraftClient.getInstance().currentScreen ?: return
             checkItemInHand()
         }
     }

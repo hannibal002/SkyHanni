@@ -65,7 +65,10 @@ loom {
         }
     }
     if (target.isModern) {
-        val accessWidenerFile = file("src/main/resources/skyhanni.accesswidener")
+        val accessWidenerFile = when (target) {
+            ProjectTarget.MODERN_12105 -> rootProject.file("src/main/resources/skyhanni.accesswidener")
+            else -> file("src/main/resources/skyhanni.accesswidener")
+        }
         if (accessWidenerFile.exists()) {
             accessWidenerPath = accessWidenerFile
         }
@@ -77,7 +80,7 @@ loom {
     }
     runs {
         named("client") {
-            if (target == ProjectTarget.MAIN) {
+            if (false) {
                 isIdeConfigGenerated = true
                 appendProjectPathToConfigName.set(false)
                 this.runDir(runDirectory.relativeTo(projectDir).toString())
@@ -98,7 +101,7 @@ loom {
     }
 }
 
-if (target == ProjectTarget.MAIN) {
+if (false) {
     sourceSets.main {
         resources.destinationDirectory.set(kotlin.destinationDirectory)
         output.setResourcesDir(kotlin.destinationDirectory)
@@ -196,7 +199,7 @@ dependencies {
     ksp(libs.autoservice.ksp)
     implementation(libs.autoservice.annotations)
 
-    val mixinVersion = if (target == ProjectTarget.MAIN) "0.7.11-SNAPSHOT" else "0.8.2"
+    val mixinVersion = "0.8.2"
 
     if (!target.isFabric) {
         shadowImpl("org.spongepowered:mixin:$mixinVersion") {
@@ -212,15 +215,7 @@ dependencies {
         target.modMenuVersion?.let { modImplementation("maven.modrinth:modmenu:$it") }
     }
 
-    if (!target.isModern) {
-        implementation(kotlin("stdlib-jdk8"))
-        shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
-            exclude(group = "org.jetbrains.kotlin")
-        }
-    }
-
-    if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
-    else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     // Brigadier comes bundled with more recent versions of Minecraft
     if (target.minecraftVersion == MinecraftVersion.MC189) {
@@ -238,9 +233,7 @@ dependencies {
         isTransitive = false
     }
 
-    if (target == ProjectTarget.MAIN) {
-        shadowModImpl(libs.moulconfig)
-    } else if (target.isModern) {
+    if (target.isModern) {
         val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
         shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
         include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
@@ -285,9 +278,7 @@ dependencies {
 
 afterEvaluate {
     loom.runs.named("client") {
-        if (target == ProjectTarget.MAIN) {
-            programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
-        } else if (target.isModern) {
+        if (target.isModern) {
             programArgs("--quickPlayMultiplayer", "hypixel.net")
         }
     }
@@ -327,7 +318,8 @@ tasks.processResources {
     } // else do NOT exclude fabric.mod.json. We use fabric.mod.json in order to show a logo in prism launcher.
 }
 
-if (target == ProjectTarget.MAIN) {
+// todo 1.21.5
+if (false) {
     tasks.register("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         dependsOn(tasks.configureLaunch)
@@ -342,7 +334,7 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
-if (target == ProjectTarget.MAIN) {
+if (false) {
     tasks.compileJava {
         dependsOn(tasks.processResources)
     }
@@ -367,8 +359,8 @@ tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
 }
 
-if (target.parent == ProjectTarget.MAIN) {
-    val mainRes = project(ProjectTarget.MAIN.projectPath).tasks.getAt("processResources")
+if (target.parent == ProjectTarget.MODERN_12105) {
+    val mainRes = project(ProjectTarget.MODERN_12105.projectPath).tasks.getAt("processResources")
     tasks.named("processResources") {
         dependsOn(mainRes)
     }
@@ -387,12 +379,6 @@ tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"
-        if (target == ProjectTarget.MAIN) {
-            this["FMLCorePluginContainsFMLMod"] = "true"
-            this["ForceLoadAsMod"] = "true"
-            this["TweakClass"] = "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker"
-            this["MixinConfigs"] = "mixins.skyhanni.json"
-        }
     }
 }
 
@@ -490,7 +476,7 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        target == ProjectTarget.MAIN && project.findProperty("skipDetekt") != "true"
+        target == ProjectTarget.MODERN_12105 && project.findProperty("skipDetekt") != "true"
     }
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached

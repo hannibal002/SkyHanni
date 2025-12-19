@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.pets
+package at.hannibal2.skyhanni.features.pets import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -38,7 +38,7 @@ object PetExpTooltip {
 
         val itemStack = event.itemStack
         val petExperience = itemStack.getPetInfo()?.exp?.roundTo(1) ?: return
-        val name = itemStack.displayName
+        val name = itemStack.name.formattedTextCompatLeadingWhiteLessResets()
         try {
             val index = findIndex(event.toolTip) ?: return
             val fixedIndex = if (index > event.toolTip.size) {

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSecondsHeld
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrInsert
-import at.hannibal2.skyhanni.utils.compat.Text
+import net.minecraft.text.Text
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule

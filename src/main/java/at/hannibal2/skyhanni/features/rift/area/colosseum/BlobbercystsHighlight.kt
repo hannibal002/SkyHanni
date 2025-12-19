@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.area.colosseum
+package at.hannibal2.skyhanni.features.rift.area.colosseum import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -10,21 +10,21 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.network.OtherClientPlayerEntity
 import java.awt.Color
 
 @SkyHanniModule
 object BlobbercystsHighlight {
 
     private val config get() = SkyHanniMod.feature.rift.area.colosseum
-    private val entityList = mutableSetOf<EntityOtherPlayerMP>()
+    private val entityList = mutableSetOf<OtherClientPlayerEntity>()
     private const val BLOBBER_NAME = "Blobbercyst "
 
     @HandleEvent
-    fun onEntityEnterWorld(event: EntityEnterWorldEvent<EntityOtherPlayerMP>) {
+    fun onEntityEnterWorld(event: EntityEnterWorldEvent<OtherClientPlayerEntity>) {
         if (!isEnabled()) return
         val entity = event.entity
-        if (entity.name != BLOBBER_NAME) return
+        if (entity.name.formattedTextCompatLessResets() != BLOBBER_NAME) return
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, Color.RED.addAlpha(80)) { isEnabled() }
         entityList.add(entity)
     }

@@ -5,22 +5,22 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonSyntaxException
-import net.minecraft.client.resources.IResourceManager
-import net.minecraft.util.ResourceLocation
+import net.minecraft.resource.ResourceManager
+import net.minecraft.util.Identifier
 import java.io.IOException
 
 //#if MC > 1.21
-//$$ import kotlin.jvm.optionals.getOrNull
+import kotlin.jvm.optionals.getOrNull
 //#endif
 
 class ResourcePackReloadEvent(
-    val resourceManager: IResourceManager,
+    val resourceManager: ResourceManager,
 ) : SkyHanniEvent() {
-    inline fun <reified T : Any> getJsonResource(location: ResourceLocation): T? {
+    inline fun <reified T : Any> getJsonResource(location: Identifier): T? {
         return try {
             val packOverridesStream = resourceManager.getResource(location)
                 //#if MC > 1.21
-                //$$ .getOrNull()
+                .getOrNull()
                 //#endif
                 ?.inputStream ?: return null
 

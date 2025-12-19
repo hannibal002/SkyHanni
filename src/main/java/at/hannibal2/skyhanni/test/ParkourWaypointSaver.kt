@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -33,7 +33,7 @@ object ParkourWaypointSaver {
     fun onKeyPress(event: KeyPressEvent) {
         @Suppress("InSkyBlockEarlyReturn")
         if (!SkyBlockUtils.inSkyBlock && !config.parkourOutsideSB) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (MinecraftClient.getInstance().currentScreen != null) return
         if (NeuItems.neuHasFocus()) return
         if (SkyHanniMod.feature.dev.devTool.graph.enabled) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return

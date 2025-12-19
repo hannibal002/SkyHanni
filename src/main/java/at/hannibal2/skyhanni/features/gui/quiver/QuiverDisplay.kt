@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import net.minecraft.init.Items
+import net.minecraft.item.Items
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -50,7 +50,7 @@ object QuiverDisplay {
 
     private fun drawDisplay() = buildList {
         val arrow = arrow ?: return@buildList
-        val itemStack = arrow.internalName.getItemStackOrNull() ?: ItemStack(Items.arrow)
+        val itemStack = arrow.internalName.getItemStackOrNull() ?: ItemStack(Items.ARROW)
 
         val rarity = itemStack.getItemRarityOrNull()?.chatColorCode ?: "§f"
         val arrowDisplayName =

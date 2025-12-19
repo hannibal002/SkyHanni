@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.bazaar
+package at.hannibal2.skyhanni.features.inventory.bazaar import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ItemBuyApi.buy
@@ -40,8 +40,8 @@ object CraftMaterialCollector {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val items = event.inventoryItems
-        val correctItem = items[23]?.displayName == "§aCrafting Table"
-        val correctSuperCraftItem = items[32]?.displayName == "§aSupercraft"
+        val correctItem = items[23]?.name.formattedTextCompatLeadingWhiteLessResets() == "§aCrafting Table"
+        val correctSuperCraftItem = items[32]?.name.formattedTextCompatLeadingWhiteLessResets() == "§aSupercraft"
 
         inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return

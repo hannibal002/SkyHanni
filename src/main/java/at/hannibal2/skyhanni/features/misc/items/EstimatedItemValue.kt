@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.items
+package at.hannibal2.skyhanni.features.misc.items import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -38,9 +38,9 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
-import net.minecraft.client.Minecraft
+import net.minecraft.client.MinecraftClient
 import net.minecraft.item.ItemStack
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 import kotlin.math.roundToLong
 
 @SkyHanniModule
@@ -61,7 +61,7 @@ object EstimatedItemValue {
     var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
         private set
 
-    fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
+    fun isCurrentlyShowing() = currentlyShowing && MinecraftClient.getInstance().currentScreen != null
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
@@ -79,7 +79,7 @@ object EstimatedItemValue {
     }
 
     private fun isInNeuOverlay(): Boolean {
-        val inPv = Minecraft.getMinecraft().currentScreen is GuiProfileViewer
+        val inPv = MinecraftClient.getInstance().currentScreen is GuiProfileViewer
         val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
 
         // Use reflection to make sure tradeMenu exists
@@ -140,10 +140,10 @@ object EstimatedItemValue {
         if (!currentlyShowing) return
 
         if (SkyBlockUtils.debug) {
-            if (Keyboard.KEY_RIGHT.isKeyClicked()) {
+            if (GLFW.GLFW_KEY_RIGHT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange += 1
                 cache.clear()
-            } else if (Keyboard.KEY_LEFT.isKeyClicked()) {
+            } else if (GLFW.GLFW_KEY_LEFT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange -= 1
                 cache.clear()
             }
@@ -249,7 +249,7 @@ object EstimatedItemValue {
 
     private fun ItemStack.shouldIgnoreDraw(): Boolean {
         this.getInternalNameOrNull()?.let { internalName ->
-            val name = this.displayName
+            val name = this.name.formattedTextCompatLeadingWhiteLessResets()
             return (
                 this.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK ||
                     name.contains("Salesperson") ||
@@ -307,11 +307,11 @@ object EstimatedItemValue {
         if (!config.enabled) return
 
         //#if MC < 1.16
-        // render the estimated item value over NEU Storage
-        DrawContextUtils.translate(0f, 0f, 200f)
-        tryRendering()
-        DrawContextUtils.translate(0f, 0f, -200f)
-        renderedItems++
+        //$$ // render the estimated item value over NEU Storage
+        //$$ DrawContextUtils.translate(0f, 0f, 200f)
+        //$$ tryRendering()
+        //$$ DrawContextUtils.translate(0f, 0f, -200f)
+        //$$ renderedItems++
         //#endif
     }
 }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.skyhanni.features.dungeon import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -38,7 +38,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrE
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Items
+import net.minecraft.item.Items
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.days
 
@@ -110,7 +110,7 @@ object CroesusChestTracker {
 
         if (!inCroesusInventory || croesusEmpty) return
         for ((run, slot) in InventoryUtils.getItemsInOpenChest()
-            .mapNotNull { slot -> runSlots(slot.slotIndex, slot) }) {
+            .mapNotNull { slot -> runSlots(slot.index, slot) }) {
 
             // If one chest is null every followup chest is null. Therefore, an early return is possible
             if (run.floor == null) return
@@ -161,12 +161,12 @@ object CroesusChestTracker {
             val lore = item.getLore()
 
             if (run.floor == null || run.floor == "F0") run.floor =
-                (if (masterPattern.matches(item.displayName)) "M" else "F") + (
+                (if (masterPattern.matches(item.name.formattedTextCompatLeadingWhiteLessResets())) "M" else "F") + (
                     lore.firstNotNullOfOrNull {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"
                     )
-            if (run.floor == "F0" && kuudraPattern.matches(item.displayName)) run.floor =
+            if (run.floor == "F0" && kuudraPattern.matches(item.name.formattedTextCompatLeadingWhiteLessResets())) run.floor =
                 ("T" + KuudraApi.getKuudraRunTierNumber(lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }))
             run.openState = when {
                 keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
@@ -186,8 +186,8 @@ object CroesusChestTracker {
     private fun pageSetup(event: InventoryFullyOpenedEvent) {
         inCroesusInventory = true
         pageSwitchable = true
-        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.displayName)
-        if (event.inventoryItems[BACK_ARROW_SLOT]?.item != Items.arrow) {
+        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.name.formattedTextCompatLeadingWhiteLessResets())
+        if (event.inventoryItems[BACK_ARROW_SLOT]?.item != Items.ARROW) {
             currentPage = 0
         }
     }
@@ -230,7 +230,7 @@ object CroesusChestTracker {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
-        if (!kismetPattern.matches(event.stack.displayName)) return
+        if (!kismetPattern.matches(event.stack.name.formattedTextCompatLeadingWhiteLessResets())) return
         if (kismetUsedInChestPattern.matches(event.stack.getLore().lastOrNull())) return
         event.stackTip = "§a$kismetAmountCache"
     }
@@ -239,8 +239,8 @@ object CroesusChestTracker {
     fun onRenderInventoryItemTip(event: RenderInventoryItemTipEvent) {
         if (!config.showUsedKismets) return
         if (!inCroesusInventory) return
-        if (event.slot.slotIndex != event.slot.slotNumber) return
-        val run = croesusSlotMapToRun(event.slot.slotIndex) ?: return
+        if (event.slot.index != event.slot.id) return
+        val run = croesusSlotMapToRun(event.slot.index) ?: return
         if (!getKismetUsed(run)) return
         event.offsetY = -1
         event.offsetX = -9
@@ -343,7 +343,7 @@ object CroesusChestTracker {
         else -> null
     }?.let { it + currentPage * 28 }
 
-    private fun ItemStack.isArrow() = this.item == Items.arrow
+    private fun ItemStack.isArrow() = this.item == Items.ARROW
 
     private inline fun <reified T> runSlots(slotId: Int, any: T) =
         croesusSlotMapToRun(slotId)?.getRun()?.let { it to any }

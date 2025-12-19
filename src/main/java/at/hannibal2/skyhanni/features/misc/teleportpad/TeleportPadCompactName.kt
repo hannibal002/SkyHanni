@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.teleportpad
+package at.hannibal2.skyhanni.features.misc.teleportpad import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.decoration.ArmorStandEntity
 
 @SkyHanniModule
 object TeleportPadCompactName {
@@ -30,11 +30,11 @@ object TeleportPadCompactName {
     )
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStandEntity>) {
         if (!SkyHanniMod.feature.misc.teleportPad.compactName) return
         val entity = event.entity
 
-        val name = entity.name
+        val name = entity.name.formattedTextCompatLessResets()
 
         noNamePattern.matchMatcher(name) {
             event.cancel()
@@ -42,9 +42,9 @@ object TeleportPadCompactName {
 
         namePattern.matchMatcher(name) {
             //#if MC < 1.21
-            entity.customNameTag = group("name")
+            //$$ entity.setCustomName(group("name"))
             //#else
-            //$$ entity.setCustomName(net.minecraft.text.Text.of(group("name")))
+            entity.setCustomName(net.minecraft.text.Text.of(group("name")))
             //#endif
         }
     }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.trevor
+package at.hannibal2.skyhanni.features.misc.trevor import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.mob.Mob
@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.EntityLivingBase
+import net.minecraft.client.network.OtherClientPlayerEntity
+import net.minecraft.entity.LivingEntity
 
 object TrevorSolver {
 
@@ -55,12 +55,12 @@ object TrevorSolver {
     fun findMob() {
         val hasBlindness = MinecraftCompat.localPlayer.hasPotionEffect(EffectsCompat.BLINDNESS)
         for (entity in EntityUtils.getAllEntities()) {
-            if (entity is EntityOtherPlayerMP) continue
+            if (entity is OtherClientPlayerEntity) continue
             val mob = MobData.entityToMob[entity]
             if (mob?.isAlive == false) continue
-            val name = entity.name
+            val name = entity.name.formattedTextCompatLessResets()
             val isTrevor = mob?.let { it.name != name && isTrevorMob(it) } ?: false
-            val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
+            val entityHealth = if (entity is LivingEntity) entity.baseMaxHealth.derpy() else 0
             currentMob = TrevorMob.findByName(name)
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
 
@@ -70,7 +70,7 @@ object TrevorSolver {
                     "mobDataMob" to mob,
                 )
 
-                if (foundID == entity.entityId) {
+                if (foundID == entity.id) {
                     val isOasisMob = currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP
                     if (isOasisMob && mobLocation == TrapperMobArea.OASIS && !isTrevor) return
                     val canSee = entity.canBeSeen(currentMob.renderDistance) && !entity.isInvisible && !hasBlindness
@@ -80,10 +80,10 @@ object TrevorSolver {
                             TrevorFeatures.lastTitle = TitleManager.sendTitle("§2Saw ${currentMob.mobName}!")
                         }
                         mobLocation = TrapperMobArea.FOUND
-                        mobCoordinates = entity.position.toLorenzVec()
+                        mobCoordinates = entity.blockPos.toLorenzVec()
                     }
                 } else {
-                    foundID = entity.entityId
+                    foundID = entity.id
                 }
                 return
             }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.findHealthReal
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
@@ -16,7 +16,7 @@ object OtherPlayersSlayerApi {
         val mob = event.mob
 
         // no death, rather despawn because too far away
-        if (mob.baseEntity.health != 0f) return
+        if (mob.baseEntity.findHealthReal() != 0f) return
 
         if (mob.mobType != Mob.Type.SLAYER) return
 

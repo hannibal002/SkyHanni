@@ -64,7 +64,7 @@ object BazaarBestSellMethod {
         var having = internalName.getAmountInInventory()
         lastClickedItem?.let {
             if (it.getInternalName() == internalName) {
-                having += it.stackSize
+                having += it.count
             }
         }
         if (having <= 0) return ""

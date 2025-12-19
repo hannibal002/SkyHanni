@@ -27,12 +27,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.Text
+import net.minecraft.text.Text
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.init.Items
+import net.minecraft.item.Items
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -216,7 +216,7 @@ object FlowstateHelper {
         val luck = calculateFlowstateLuck(personalBest)
         event.addLuck(luck)
         val stack = ItemUtils.createItemStack(
-            Items.enchanted_book,
+            Items.ENCHANTED_BOOK,
             "§a✴ Flowstate Personal Best",
             arrayOf(
                 "§8Enchantment",

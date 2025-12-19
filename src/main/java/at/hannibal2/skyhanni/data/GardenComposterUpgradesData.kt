@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
@@ -15,7 +15,7 @@ object GardenComposterUpgradesData {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Composter Upgrades") return
         for (item in event.inventoryItems.values) {
-            ComposterUpgrade.regex.matchMatcher(item.displayName) {
+            ComposterUpgrade.regex.matchMatcher(item.name.formattedTextCompatLeadingWhiteLessResets()) {
                 val name = group("name")
                 val level = group("level")?.romanToDecimalIfNecessary() ?: 0
                 val composterUpgrade = ComposterUpgrade.getByName(name)!!

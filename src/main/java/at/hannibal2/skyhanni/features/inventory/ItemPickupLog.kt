@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -176,9 +176,9 @@ object ItemPickupLog {
                 val hash = itemStack.hash()
                 val old = itemList[hash]
                 if (old != null) {
-                    itemList[hash] = old.copy(second = old.second + itemStack.stackSize)
+                    itemList[hash] = old.copy(second = old.second + itemStack.count)
                 } else {
-                    itemList[hash] = itemStack to itemStack.stackSize
+                    itemList[hash] = itemStack to itemStack.count
                 }
             }
         }
@@ -248,11 +248,11 @@ object ItemPickupLog {
             ItemCategory.PET -> true
             else -> false
         }
-        return if (compact) getInternalName().repoItemName else displayName
+        return if (compact) getInternalName().repoItemName else name.formattedTextCompatLeadingWhiteLessResets()
     }
 
     private fun ItemStack.hash(): Int {
-        var displayName = this.displayName.removeColor()
+        var displayName = this.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
         shopPattern.matchMatcher(displayName) {
             displayName = group("itemName")
         }

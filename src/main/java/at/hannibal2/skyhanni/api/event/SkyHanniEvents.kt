@@ -103,7 +103,7 @@ object SkyHanniEvents {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         //#if MC > 1.21
-        //$$ try {
+        try {
         //#endif
         val list = handlers.values.toMutableList()
 
@@ -125,9 +125,9 @@ object SkyHanniEvents {
             }
         }
         //#if MC > 1.21
-        //$$ } catch (_: Exception) {
-        //$$ // ignore this error on 1.21 for now
-        //$$ }
+        } catch (_: Exception) {
+        // ignore this error on 1.21 for now
+        }
         //#endif
     }
 

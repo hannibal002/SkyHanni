@@ -29,14 +29,14 @@ object AnvilApi {
         DelayedRun.runNextTick {
             if (!inventory.isInside()) return@runNextTick
             for (slot in InventoryUtils.getItemsInOpenChestWithNull()) {
-                if (slot.slotNumber == 29) {
+                if (slot.id == 29) {
                     val left = slot.stack.orNull()
                     if (this.left?.getInternalName() != left?.getInternalName()) {
                         this.left = left
                         postEvent()
                     }
                 }
-                if (slot.slotNumber == 33) {
+                if (slot.id == 33) {
                     val right = slot.stack.orNull()
                     if (this.right?.getInternalName() != right?.getInternalName()) {
                         this.right = right

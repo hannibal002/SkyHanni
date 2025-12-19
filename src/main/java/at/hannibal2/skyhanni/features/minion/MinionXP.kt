@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.block.BlockChest
+import net.minecraft.block.ChestBlock
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import java.util.EnumMap
@@ -48,7 +48,7 @@ object MinionXP {
     }
 
     private fun toPrimitiveItemStack(itemStack: ItemStack) =
-        PrimitiveItemStack(itemStack.getInternalName(), itemStack.stackSize)
+        PrimitiveItemStack(itemStack.getInternalName(), itemStack.count)
 
     @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
@@ -140,7 +140,7 @@ object MinionXP {
         return positionsToCheck.any { position ->
             val pos = (minionPosition + position).toBlockPos()
             val block = MinecraftCompat.localWorld.getBlockState(pos).block
-            block is BlockChest
+            block is ChestBlock
         }
     }
 

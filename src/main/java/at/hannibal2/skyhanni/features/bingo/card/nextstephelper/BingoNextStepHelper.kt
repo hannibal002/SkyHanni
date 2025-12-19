@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.bingo.card.nextstephelper
+package at.hannibal2.skyhanni.features.bingo.card.nextstephelper import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
@@ -195,7 +195,7 @@ object BingoNextStepHelper {
             if (step is ItemsStep) {
                 var totalCount = 0L
                 for ((itemName, multiplier) in step.variants) {
-                    val count = InventoryUtils.countItemsInLowerInventory { it.displayName.removeColor() == itemName }
+                    val count = InventoryUtils.countItemsInLowerInventory { it.name.formattedTextCompatLeadingWhiteLessResets().removeColor() == itemName }
                     totalCount += count * multiplier
                 }
                 if (step.amountHaving != totalCount) {

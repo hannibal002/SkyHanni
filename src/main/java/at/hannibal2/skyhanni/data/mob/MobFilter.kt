@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.mob
+package at.hannibal2.skyhanni.data.mob import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.IslandType
@@ -22,30 +22,30 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.network.OtherClientPlayerEntity
 import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.boss.EntityDragon
-import net.minecraft.entity.boss.EntityWither
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityCaveSpider
-import net.minecraft.entity.monster.EntityEnderman
-import net.minecraft.entity.monster.EntityGiantZombie
-import net.minecraft.entity.monster.EntityGuardian
-import net.minecraft.entity.monster.EntitySnowman
-import net.minecraft.entity.monster.EntityWitch
-import net.minecraft.entity.monster.EntityZombie
-import net.minecraft.entity.passive.EntityAnimal
-import net.minecraft.entity.passive.EntityBat
-import net.minecraft.entity.passive.EntityChicken
-import net.minecraft.entity.passive.EntityCow
-import net.minecraft.entity.passive.EntityHorse
-import net.minecraft.entity.passive.EntityMooshroom
-import net.minecraft.entity.passive.EntityPig
-import net.minecraft.entity.passive.EntityRabbit
-import net.minecraft.entity.passive.EntitySheep
-import net.minecraft.entity.passive.EntityVillager
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.boss.dragon.EnderDragonEntity
+import net.minecraft.entity.boss.WitherEntity
+import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.entity.mob.CaveSpiderEntity
+import net.minecraft.entity.mob.EndermanEntity
+import net.minecraft.entity.mob.GiantEntity
+import net.minecraft.entity.mob.GuardianEntity
+import net.minecraft.entity.passive.SnowGolemEntity
+import net.minecraft.entity.mob.WitchEntity
+import net.minecraft.entity.mob.ZombieEntity
+import net.minecraft.entity.passive.AnimalEntity
+import net.minecraft.entity.passive.BatEntity
+import net.minecraft.entity.passive.ChickenEntity
+import net.minecraft.entity.passive.AbstractCowEntity
+import net.minecraft.entity.passive.HorseEntity
+import net.minecraft.entity.passive.MooshroomEntity
+import net.minecraft.entity.passive.PigEntity
+import net.minecraft.entity.passive.RabbitEntity
+import net.minecraft.entity.passive.SheepEntity
+import net.minecraft.entity.passive.VillagerEntity
+import net.minecraft.entity.player.PlayerEntity
 import org.intellij.lang.annotations.Language
 
 @Suppress("RegExpRedundantEscape")
@@ -209,27 +209,27 @@ object MobFilter {
     )
 
     fun Entity.isSkyBlockMob(): Boolean = when {
-        this !is EntityLivingBase -> false
-        this is EntityArmorStand -> false
-        this is EntityPlayer && this.isRealPlayer() -> false
+        this !is LivingEntity -> false
+        this is ArmorStandEntity -> false
+        this is PlayerEntity && this.isRealPlayer() -> false
         this.isDisplayNpc() -> false
-        this is EntityWither && this.entityId < 0 -> false
+        this is WitherEntity && this.id < 0 -> false
         else -> true
     }
 
-    fun EntityPlayer.isRealPlayer() = uniqueID?.let { it.version() == 4 } ?: false
+    fun PlayerEntity.isRealPlayer() = uuid?.let { it.version() == 4 } ?: false
 
-    fun EntityLivingBase.isDisplayNpc() =
-        (this is EntityPlayer && isNpc() && displayNpcNameCheck(this.name)) ||
-            (this is EntityVillager && this.maxHealth == 20f) || // Villager NPCs in the Village
-            (this is EntityWitch && this.entityId <= 500) || // Alchemist NPC
-            (this is EntityCow && this.entityId <= 500) || // Shania NPC (in Rift and Outside)
-            (this is EntityPig && this.entityId <= 600) || // Pig Shop
-            (this is EntitySnowman && this.entityId <= 500) // Sherry NPC (in Jerry Island)
+    fun LivingEntity.isDisplayNpc() =
+        (this is PlayerEntity && isNpc() && displayNpcNameCheck(this.name.formattedTextCompatLessResets())) ||
+            (this is VillagerEntity && this.maxHealth == 20f) || // Villager NPCs in the Village
+            (this is WitchEntity && this.id <= 500) || // Alchemist NPC
+            (this is AbstractCowEntity && this.id <= 500) || // Shania NPC (in Rift and Outside)
+            (this is PigEntity && this.id <= 600) || // Pig Shop
+            (this is SnowGolemEntity && this.id <= 500) // Sherry NPC (in Jerry Island)
 
-    fun createDisplayNpc(entity: EntityLivingBase): Boolean {
+    fun createDisplayNpc(entity: LivingEntity): Boolean {
         val clickArmorStand = MobUtils.getArmorStandByRangeAll(entity, 1.5).firstOrNull { armorStand ->
-            listOfClickArmorStand.contains(armorStand.name)
+            listOfClickArmorStand.contains(armorStand.name.formattedTextCompatLessResets())
         } ?: return false
         val armorStand = MobUtils.getArmorStand(clickArmorStand, -1) ?: return false
         MobEvent.Spawn.DisplayNpc(MobFactories.displayNpc(entity, armorStand, clickArmorStand)).post()
@@ -237,8 +237,8 @@ object MobFilter {
     }
 
     /** baseEntity must have passed the .isSkyBlockMob() function */
-    internal fun createSkyblockEntity(baseEntity: EntityLivingBase): MobResult {
-        val nextEntity = MobUtils.getNextEntity(baseEntity, 1) as? EntityLivingBase
+    internal fun createSkyblockEntity(baseEntity: LivingEntity): MobResult {
+        val nextEntity = MobUtils.getNextEntity(baseEntity, 1) as? LivingEntity
 
         exceptions(baseEntity, nextEntity)?.let { return it }
 
@@ -250,9 +250,9 @@ object MobFilter {
         // Stack up the mob
         var caughtSkyblockMob: Mob? = null
         val extraEntityList = generateSequence(nextEntity) {
-            MobUtils.getNextEntity(it, 1) as? EntityLivingBase
+            MobUtils.getNextEntity(it, 1) as? LivingEntity
         }.takeWhileInclusive { entity ->
-            !(entity is EntityArmorStand && !entity.isDefaultValue()) && MobData.entityToMob[entity]?.also {
+            !(entity is ArmorStandEntity && !entity.isDefaultValue()) && MobData.entityToMob[entity]?.also {
                 caughtSkyblockMob = it
             }?.run { false } ?: true
         }.toList()
@@ -261,7 +261,7 @@ object MobFilter {
         // If Late Stack add all entities
         caughtSkyblockMob?.apply { internalAddEntity(extraEntityList.dropLast(1)) }?.also { return MobResult.illegal }
 
-        val armorStand = extraEntityList.lastOrNull() as? EntityArmorStand ?: return MobResult.notYetFound
+        val armorStand = extraEntityList.lastOrNull() as? ArmorStandEntity ?: return MobResult.notYetFound
 
         if (armorStand.isDefaultValue()) return MobResult.notYetFound
         return createSkyblockMob(baseEntity, armorStand, extraEntityList.dropLast(1))?.let { MobResult.found(it) }
@@ -269,9 +269,9 @@ object MobFilter {
     }
 
     private fun createSkyblockMob(
-        baseEntity: EntityLivingBase,
-        armorStand: EntityArmorStand,
-        extraEntityList: List<EntityLivingBase>,
+        baseEntity: LivingEntity,
+        armorStand: ArmorStandEntity,
+        extraEntityList: List<LivingEntity>,
     ): Mob? =
         MobFactories.summon(baseEntity, armorStand, extraEntityList)
             ?: MobFactories.slayer(baseEntity, armorStand, extraEntityList)
@@ -285,11 +285,11 @@ object MobFilter {
                     ?: MobFactories.dojo(baseEntity, armorStand)
                 )
 
-    private fun noArmorStandMobs(baseEntity: EntityLivingBase): MobResult? = when {
-        baseEntity is EntityBat -> createBat(baseEntity)
+    private fun noArmorStandMobs(baseEntity: LivingEntity): MobResult? = when {
+        baseEntity is BatEntity -> createBat(baseEntity)
 
         baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobResult.found(it) }
-        baseEntity is EntityDragon -> when (SkyBlockUtils.currentIsland) {
+        baseEntity is EnderDragonEntity -> when (SkyBlockUtils.currentIsland) {
             IslandType.CATACOMBS -> (8..16).map { MobUtils.getArmorStand(baseEntity, it) }
                 .makeMobResult {
                     MobFactories.boss(baseEntity, it.first(), it.drop(1))
@@ -298,26 +298,26 @@ object MobFilter {
             else -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
         }
 
-        baseEntity is EntityGiantZombie && baseEntity.name == "Dinnerbone" -> MobResult.found(
+        baseEntity is GiantEntity && baseEntity.name.formattedTextCompatLessResets() == "Dinnerbone" -> MobResult.found(
             MobFactories.projectile(
                 baseEntity,
                 "Giant Sword",
             ),
         ) // Will false trigger if there is another Dinnerbone Giant
-        baseEntity is EntityCaveSpider -> MobUtils.getArmorStand(baseEntity, -1)
+        baseEntity is CaveSpiderEntity -> MobUtils.getArmorStand(baseEntity, -1)
             ?.takeIf { summonOwnerPattern.matches(it.cleanName()) }?.let {
                 MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)
                     ?.let { MobResult.illegal }
             }
 
-        baseEntity is EntityWither && baseEntity.invulTime == 800 -> MobResult.found(
+        baseEntity is WitherEntity && baseEntity.invulnerableTimer == 800 -> MobResult.found(
             MobFactories.special(
                 baseEntity,
                 "Mini Wither",
             ),
         )
 
-        baseEntity is EntityOtherPlayerMP && baseEntity.name == "Decoy " -> MobResult.found(
+        baseEntity is OtherClientPlayerEntity && baseEntity.name.formattedTextCompatLessResets() == "Decoy " -> MobResult.found(
             MobFactories.special(
                 baseEntity,
                 "Decoy",
@@ -327,9 +327,9 @@ object MobFilter {
         else -> null
     }
 
-    private fun exceptions(baseEntity: EntityLivingBase, nextEntity: EntityLivingBase?): MobResult? {
+    private fun exceptions(baseEntity: LivingEntity, nextEntity: LivingEntity?): MobResult? {
         noArmorStandMobs(baseEntity)?.also { return it }
-        val armorStand = nextEntity as? EntityArmorStand
+        val armorStand = nextEntity as? ArmorStandEntity
         IslandExceptions.islandSpecificExceptions(baseEntity, armorStand, nextEntity)?.also { return it }
 
         if (armorStand == null) return null
@@ -350,21 +350,21 @@ object MobFilter {
             )
         }
         return when {
-            (baseEntity is EntityPig || baseEntity is EntityHorse) && illegalEntitiesPattern.matches(armorStand.name) -> MobResult.illegal
-            baseEntity is EntityGuardian && armorStand.cleanName()
+            (baseEntity is PigEntity || baseEntity is HorseEntity) && illegalEntitiesPattern.matches(armorStand.name.formattedTextCompatLessResets()) -> MobResult.illegal
+            baseEntity is GuardianEntity && armorStand.cleanName()
                 .matches("^\\d+".toRegex()) -> MobResult.illegal // Wierd Sea Guardian Ability
             else -> null
         }
     }
 
     private fun stackedMobsException(
-        baseEntity: EntityLivingBase,
-        extraEntityList: List<EntityLivingBase>,
+        baseEntity: LivingEntity,
+        extraEntityList: List<LivingEntity>,
     ): MobResult? =
         if (DungeonApi.inDungeon()) {
             when {
-                (baseEntity is EntityEnderman || baseEntity is EntityGiantZombie) &&
-                    extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
+                (baseEntity is EndermanEntity || baseEntity is GiantEntity) &&
+                    extraEntityList.lastOrNull()?.name.formattedTextCompatLessResets() == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
                 else -> null
             }
         } else when (SkyBlockUtils.currentIsland) {
@@ -375,11 +375,11 @@ object MobFilter {
             else -> null
         }
 
-    private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): MobResult? {
-        if (baseEntity !is EntityZombie) return null
+    private fun armorStandOnlyMobs(baseEntity: LivingEntity, armorStand: ArmorStandEntity): MobResult? {
+        if (baseEntity !is ZombieEntity) return null
         when {
-            illegalEntitiesPattern.matches(armorStand.name) -> return MobResult.illegal
-            baseEntity.getFirstPassenger() is EntityPlayer && MobUtils.getArmorStand(baseEntity, 2)
+            illegalEntitiesPattern.matches(armorStand.name.formattedTextCompatLessResets()) -> return MobResult.illegal
+            baseEntity.getFirstPassenger() is PlayerEntity && MobUtils.getArmorStand(baseEntity, 2)
                 ?.wearingSkullTexture(RAT_SKULL_TEXTURE) ?: false -> return MobResult.illegal // Rat Morph
         }
         when (armorStand.getStandHelmet()?.getSkullTexture()) {
@@ -390,21 +390,21 @@ object MobFilter {
         return null
     }
 
-    fun EntityLivingBase.isFarmMob() =
-        this is EntityAnimal && this.baseMaxHealth.derpy()
+    fun LivingEntity.isFarmMob() =
+        this is AnimalEntity && this.baseMaxHealth.derpy()
             .let { it == 50 || it == 20 || it == 130 } && SkyBlockUtils.currentIsland != IslandType.PRIVATE_ISLAND
 
-    private fun createFarmMobs(baseEntity: EntityLivingBase): Mob? = when (baseEntity) {
-        is EntityMooshroom -> MobFactories.basic(baseEntity, "Farm Mooshroom")
-        is EntityCow -> MobFactories.basic(baseEntity, "Farm Cow")
-        is EntityPig -> MobFactories.basic(baseEntity, "Farm Pig")
-        is EntityChicken -> MobFactories.basic(baseEntity, "Farm Chicken")
-        is EntityRabbit -> MobFactories.basic(baseEntity, "Farm Rabbit")
-        is EntitySheep -> MobFactories.basic(baseEntity, "Farm Sheep")
+    private fun createFarmMobs(baseEntity: LivingEntity): Mob? = when (baseEntity) {
+        is MooshroomEntity -> MobFactories.basic(baseEntity, "Farm Mooshroom")
+        is AbstractCowEntity -> MobFactories.basic(baseEntity, "Farm Cow")
+        is PigEntity -> MobFactories.basic(baseEntity, "Farm Pig")
+        is ChickenEntity -> MobFactories.basic(baseEntity, "Farm Chicken")
+        is RabbitEntity -> MobFactories.basic(baseEntity, "Farm Rabbit")
+        is SheepEntity -> MobFactories.basic(baseEntity, "Farm Sheep")
         else -> null
     }
 
-    private fun createBat(baseEntity: EntityLivingBase): MobResult? = when (baseEntity.baseMaxHealth.derpy()) {
+    private fun createBat(baseEntity: LivingEntity): MobResult? = when (baseEntity.baseMaxHealth.derpy()) {
         5_000_000 -> MobResult.found(MobFactories.basic(baseEntity, "Cinderbat"))
         75_000 -> MobResult.found(MobFactories.basic(baseEntity, "Thorn Bat"))
         600 -> if (IslandType.GARDEN.isCurrent()) null else MobResult.notYetFound
@@ -425,7 +425,7 @@ object MobFilter {
         else -> MobResult.notYetFound
     }
 
-    internal fun EntityArmorStand?.makeMobResult(mob: (EntityArmorStand) -> Mob?) =
+    internal fun ArmorStandEntity?.makeMobResult(mob: (ArmorStandEntity) -> Mob?) =
         this?.let { armor ->
             mob.invoke(armor)?.let { MobResult.found(it) } ?: MobResult.somethingWentWrong
         } ?: MobResult.notYetFound

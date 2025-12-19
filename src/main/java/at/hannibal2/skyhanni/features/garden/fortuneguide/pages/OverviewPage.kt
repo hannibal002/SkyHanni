@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
+package at.hannibal2.skyhanni.features.garden.fortuneguide.pages import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFInfos
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
@@ -129,7 +129,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
     private fun armorFortune(): Renderable {
         val moreInfo = "§2Select a piece for more info"
         val wordArmor = if (FarmingItemType.currentArmor == null) "Armor" else "Piece"
-        val armorName = FarmingItemType.currentArmor?.getItem()?.displayName.orEmpty()
+        val armorName = FarmingItemType.currentArmor?.getItem()?.name.formattedTextCompatLeadingWhiteLessResets().orEmpty()
 
         return Renderable.vertical(
             FFInfos.TOTAL_ARMOR.bar(
@@ -169,7 +169,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
     private fun equipmentFortune(): Renderable {
         val moreInfo = "§2Select a piece for more info"
         val wordEquip = if (FarmingItemType.currentEquip == null) "Equipment" else "Piece"
-        val equipmentName = FarmingItemType.currentEquip?.getItem()?.displayName.orEmpty()
+        val equipmentName = FarmingItemType.currentEquip?.getItem()?.name.formattedTextCompatLeadingWhiteLessResets().orEmpty()
 
         return Renderable.vertical(
             FFInfos.TOTAL_EQUIP.bar(

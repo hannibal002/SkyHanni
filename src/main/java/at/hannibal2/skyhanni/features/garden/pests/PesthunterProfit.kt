@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.pests
+package at.hannibal2.skyhanni.features.garden.pests import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -70,7 +70,7 @@ object PesthunterProfit {
     }
 
     private fun readItem(slot: Int, item: ItemStack): DisplayTableEntry? {
-        val itemName = item.displayName.takeIf {
+        val itemName = item.name.formattedTextCompatLeadingWhiteLessResets().takeIf {
             it !in DENY_LIST_ITEMS && it.trim().isNotEmpty()
         } ?: return null
         if (slot == 49) return null

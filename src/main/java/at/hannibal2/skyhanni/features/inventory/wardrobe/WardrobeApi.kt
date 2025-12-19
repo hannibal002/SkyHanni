@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.wardrobe
+package at.hannibal2.skyhanni.features.inventory.wardrobe import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -98,7 +98,7 @@ object WardrobeApi {
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
             EstimatedItemValueCalculator.getTotalPrice(stack)?.let { price ->
-                add("  §7- ${stack.displayName}: §6${price.shortFormat()}")
+                add("  §7- ${stack.name.formattedTextCompatLeadingWhiteLessResets()}: §6${price.shortFormat()}")
                 totalPrice += price
             }
         }
@@ -153,7 +153,7 @@ object WardrobeApi {
                 getWardrobeItem(itemsList[slot.leggingsSlot]),
                 getWardrobeItem(itemsList[slot.bootsSlot]),
             )
-            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.displayName)) {
+            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.name.formattedTextCompatLeadingWhiteLessResets())) {
                 currentSlot = slot.id
                 foundCurrentSlot = true
             }
@@ -196,7 +196,7 @@ object WardrobeApi {
                 } else {
                     add(slotInfo)
                     setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armorName ->
-                        slot.getData()?.armor?.get(id)?.displayName?.let { name ->
+                        slot.getData()?.armor?.get(id)?.name.formattedTextCompatLeadingWhiteLessResets()?.let { name ->
                             add("   $armorName: $name")
                         }
                     }
