@@ -269,20 +269,22 @@ tasks.processResources {
     } // else do NOT exclude fabric.mod.json. We use fabric.mod.json in order to show a logo in prism launcher.
 }
 
-// todo 1.21.5
-if (false) {
-    tasks.register("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).configure {
+if (target == ProjectTarget.MODERN_12105) {
+    fabricApi {
+        configureTests {
+            modId = "skyhanni"
+            enableGameTests = false // Server game tests
+            enableClientGameTests = true
+            eula = true
+        }
+    }
+    tasks.register("generateRepoPatterns", RunGameTask::class, loom.runs.named("clientGameTest").get()).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         dependsOn(tasks.configureLaunch)
-        jvmArgs(
-            "-Dorg.lwjgl.opengl.Display.allowSoftwareOpenGL=true",
-            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006",
-            "-javaagent:${headlessLwjgl.singleFile.absolutePath}",
-        )
         val outputFile = project.file("build/regexes/constants.json")
         environment("SKYHANNI_DUMP_REGEXES", "${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
-        environment("SKYHANNI_DUMP_REGEXES_EXIT", "true")
     }
+    loom.runs.removeIf { it.name == "clientGameTest" }
 }
 
 if (false) {
@@ -443,13 +445,4 @@ tasks.withType<Detekt>().configureEach {
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
-}
-
-fabricApi {
-    configureTests {
-        modId = "skyhanni"
-        enableGameTests = false // Default is true
-        enableClientGameTests = true // Default is true
-        eula = true // By setting this to true, you agree to the Minecraft EULA.
-    }
 }

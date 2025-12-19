@@ -20,7 +20,7 @@ import kotlin.system.exitProcess
 object PlatformUtils {
 
     val MC_VERSION: String = net.minecraft.SharedConstants.getCurrentVersion().name
-    val IS_LEGACY: Boolean = VersionConstants.MC_VERSION == "1.8.9"
+    val IS_LEGACY: Boolean = false
 
     val isDevEnvironment: Boolean by lazy {
         FabricLoader.getInstance().isDevelopmentEnvironment
@@ -33,7 +33,6 @@ object PlatformUtils {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        if (validNeuInstalled) return
         event.registerBrigadier("shmodlist") {
             description = "Get a Discord-formatted list of all loaded mods"
             category = CommandCategory.USERS_ACTIVE
@@ -88,9 +87,7 @@ object PlatformUtils {
         return FabricLoader.getInstance().isModLoaded(modId)
     }
 
-    private var validNeuInstalled = false
-
-    fun isNeuLoaded() = validNeuInstalled
+    fun isNeuLoaded() = false
 
     fun isMcAbove(version: String): Boolean {
         return MCVersion.fromString(version) > MCVersion.currentMcVersion
@@ -106,6 +103,12 @@ object PlatformUtils {
 
     fun isMcBelow(version: MCVersion): Boolean {
         return version < MCVersion.currentMcVersion
+    }
+
+    fun getRepoPatternDumpLocation(): String? {
+        val dumpDirective = System.getenv("SKYHANNI_DUMP_REGEXES")
+        if (dumpDirective.isNullOrBlank()) return null
+        return dumpDirective
     }
 }
 

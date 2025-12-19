@@ -34,7 +34,7 @@ jobs:
                 name: Upload generated repo regexes
                 with:
                     name: Repo Regexes
-                    path: versions/1.8.9/build/regexes/constants.json
+                    path: versions/1.21.5/build/regexes/constants.json
     publish-regexes:
         runs-on: ubuntu-latest
         needs: regexes
@@ -54,15 +54,15 @@ jobs:
                 run: |
                     mkdir -p constants/
                     new_cmp="$(jq -S '.regexes' < constants.json)"
-                    old_cmp="$(jq -S '.regexes' < constants/regexes.json)"
+                    old_cmp="$(jq -S '.regexes' < constants/regexesModern.json)"
                     if [ "$new_cmp" = "$old_cmp" ]; then
                         echo Old and new are the same. We are in a never ending loop.
                         exit 0
                     fi
-                    mv constants.json constants/regexes.json
+                    mv constants.json constants/regexesModern.json
                     git config user.name 'github-actions[bot]'
                     git config user.email 'github-action@users.noreply.github.com'
-                    git add constants/regexes.json
+                    git add constants/regexesModern.json
                     git commit -m "Update regexes based on https://github.com/hannibal002/Skyhanni/commit/$GITHUB_SHA"
             -   name: Publish new repository
                 run: |
