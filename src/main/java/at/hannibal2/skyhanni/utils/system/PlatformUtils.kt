@@ -106,7 +106,8 @@ object PlatformUtils {
     }
 
     fun getRepoPatternDumpLocation(): String? {
-        val dumpDirective = System.getenv("SKYHANNI_DUMP_REGEXES")
+        if (System.getProperty("SkyHanniDumpRegex.enabled") != "true") return null
+        val dumpDirective = System.getProperty("SkyHanniDumpRegex")
         if (dumpDirective.isNullOrBlank()) return null
         return dumpDirective
     }

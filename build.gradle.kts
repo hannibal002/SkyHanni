@@ -6,7 +6,7 @@ import at.skyhanni.sharedvariables.versionString
 import com.google.devtools.ksp.gradle.KspTaskJvm
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
-import net.fabricmc.loom.task.RunGameTask
+import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -278,11 +278,16 @@ if (target == ProjectTarget.MODERN_12105) {
             eula = true
         }
     }
-    tasks.register("generateRepoPatterns", RunGameTask::class, loom.runs.named("clientGameTest").get()).configure {
+    tasks.register("generateRepoPatterns", ClientProductionRunTask::class.java).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         dependsOn(tasks.configureLaunch)
         val outputFile = project.file("build/regexes/constants.json")
-        environment("SKYHANNI_DUMP_REGEXES", "${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
+        mods.from(project.configurations.modImplementation.get())
+
+        jvmArgs.add("-DSkyHanniDumpRegex.enabled=true")
+        jvmArgs.add("-DSkyHanniDumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
+        jvmArgs.add("-Dfabric.client.gametest=true")
+        //useXVFB = true
     }
     loom.runs.removeIf { it.name == "clientGameTest" }
 }
