@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import net.minecraft.util.math.Box
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 
 @SkyHanniModule
@@ -92,7 +92,7 @@ object DeferredDrawer {
     }
 
     fun deferBox(
-        aabb: Box,
+        aabb: AABB,
         color: Color,
         alphaMultiplier: Float,
         depth: Boolean = true,
@@ -139,7 +139,7 @@ object DeferredDrawer {
     }
 
     data class DeferredBox(
-        val aabb: Box,
+        val aabb: AABB,
         val color: Color,
         val alphaMultiplier: Float,
     )

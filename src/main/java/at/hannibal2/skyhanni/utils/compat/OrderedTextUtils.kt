@@ -1,17 +1,17 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.text.OrderedText
-import net.minecraft.text.Style
-import net.minecraft.text.TextVisitFactory
-import net.minecraft.util.Formatting
+import net.minecraft.util.FormattedCharSequence
+import net.minecraft.network.chat.Style
+import net.minecraft.util.StringDecomposer
+import net.minecraft.ChatFormatting
 import kotlin.time.Duration.Companion.minutes
 
 object OrderedTextUtils {
-    private val textToLegacyCache = TimeLimitedCache<OrderedText, String>(5.minutes)
+    private val textToLegacyCache = TimeLimitedCache<FormattedCharSequence, String>(5.minutes)
 
     @JvmStatic
-    fun orderedTextToLegacyString(orderedText: OrderedText?): String {
+    fun orderedTextToLegacyString(orderedText: FormattedCharSequence?): String {
         orderedText ?: return ""
 
         return textToLegacyCache.getOrPut(orderedText) {
@@ -33,18 +33,18 @@ object OrderedTextUtils {
         }
     }
 
-    private val legacyToTextCache = TimeLimitedCache<String, OrderedText>(5.minutes)
+    private val legacyToTextCache = TimeLimitedCache<String, FormattedCharSequence>(5.minutes)
 
     @JvmStatic
-    fun legacyTextToOrderedText(legacyString: String): OrderedText {
+    fun legacyTextToOrderedText(legacyString: String): FormattedCharSequence {
 
         return legacyToTextCache.getOrPut(legacyString) {
             val isNoReplace = legacyString.startsWith("§§")
 
-            OrderedText { visitor ->
+            FormattedCharSequence { visitor ->
                 if (isNoReplace) visitor.accept(0, Style.EMPTY, -1)
 
-                TextVisitFactory.visitFormatted(legacyString, Style.EMPTY) { index: Int, style: Style, codePoint: Int ->
+                StringDecomposer.iterateFormatted(legacyString, Style.EMPTY) { index: Int, style: Style, codePoint: Int ->
                     visitor.accept(index, style, codePoint)
                     true
                 }
@@ -68,7 +68,7 @@ object OrderedTextUtils {
         val sb = StringBuilder()
 
         if (((from.color != to.color) && to.color != null) || (reset && to.color != null)) {
-            if (!exclusive) sb.append(Formatting.RESET.toString())
+            if (!exclusive) sb.append(ChatFormatting.RESET.toString())
 
             if (to.color?.name == "chroma") {
                 sb.append("§z")
@@ -81,23 +81,23 @@ object OrderedTextUtils {
                 }
             }
         } else if (reset) {
-            sb.append(Formatting.RESET.toString())
+            sb.append(ChatFormatting.RESET.toString())
         }
 
         if ((to.isBold && reset) || (to.isBold && !from.isBold)) {
-            sb.append(Formatting.BOLD.toString())
+            sb.append(ChatFormatting.BOLD.toString())
         }
         if ((to.isItalic && reset) || (to.isItalic && !from.isItalic)) {
-            sb.append(Formatting.ITALIC.toString())
+            sb.append(ChatFormatting.ITALIC.toString())
         }
         if ((to.isObfuscated && reset) || (to.isObfuscated && !from.isObfuscated)) {
-            sb.append(Formatting.OBFUSCATED.toString())
+            sb.append(ChatFormatting.OBFUSCATED.toString())
         }
         if ((to.isUnderlined && reset) || (to.isUnderlined && !from.isUnderlined)) {
-            sb.append(Formatting.UNDERLINE.toString())
+            sb.append(ChatFormatting.UNDERLINE.toString())
         }
         if ((to.isStrikethrough && reset) || (to.isStrikethrough && !from.isStrikethrough)) {
-            sb.append(Formatting.STRIKETHROUGH.toString())
+            sb.append(ChatFormatting.STRIKETHROUGH.toString())
         }
 
         return sb.toString()

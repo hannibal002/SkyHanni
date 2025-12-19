@@ -19,11 +19,11 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getPlayerNames
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
-import net.minecraft.network.packet.s2c.play.ScoreboardObjectiveUpdateS2CPacket
-import net.minecraft.network.packet.s2c.play.ScoreboardScoreUpdateS2CPacket
-import net.minecraft.network.packet.s2c.play.TeamS2CPacket
-import net.minecraft.scoreboard.ScoreboardCriterion
-import net.minecraft.scoreboard.Team
+import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket
+import net.minecraft.network.protocol.game.ClientboundSetScorePacket
+import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
+import net.minecraft.world.scores.criteria.ObjectiveCriteria
+import net.minecraft.world.scores.PlayerTeam
 //#if MC > 1.21
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //#endif
@@ -80,22 +80,22 @@ object ScoreboardData {
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
-            is ScoreboardScoreUpdateS2CPacket -> {
+            is ClientboundSetScorePacket -> {
                 if (packet.objectiveName == "update") {
                     dirty = true
                 }
             }
 
-            is TeamS2CPacket -> {
-                if (packet.teamName.startsWith("team_")) {
+            is ClientboundSetPlayerTeamPacket -> {
+                if (packet.name.startsWith("team_")) {
                     dirty = true
                 }
             }
 
-            is ScoreboardObjectiveUpdateS2CPacket -> {
-                val type = packet.type
-                if (type != ScoreboardCriterion.RenderType.INTEGER) return
-                val objectiveName = packet.name
+            is ClientboundSetObjectivePacket -> {
+                val type = packet.renderType
+                if (type != ObjectiveCriteria.RenderType.INTEGER) return
+                val objectiveName = packet.objectiveName
                 if (objectiveName == "health") return
                 val objectiveValue = packet.displayName.formattedTextCompat()
                 ScoreboardTitleUpdateEvent(objectiveValue, objectiveName).post()
@@ -152,7 +152,7 @@ object ScoreboardData {
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = MinecraftCompat.localWorldOrNull?.scoreboard ?: return emptyList()
         val objective = scoreboard.getSidebarObjective() ?: return emptyList()
-        var scores = scoreboard.getScoreboardEntries(objective)
+        var scores = scoreboard.listPlayerScores(objective)
         val list = scores.getPlayerNames(scoreboard)
         //#if MC < 1.21
         //$$ scores = if (list.size > 15) {

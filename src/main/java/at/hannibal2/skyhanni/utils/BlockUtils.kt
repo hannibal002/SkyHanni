@@ -3,16 +3,16 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addRedstoneOres
-import net.minecraft.block.Block
-import net.minecraft.state.property.IntProperty
-import net.minecraft.block.BlockState
-import net.minecraft.client.MinecraftClient
-import net.minecraft.block.entity.SkullBlockEntity
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.hit.HitResult
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.properties.IntegerProperty
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.client.Minecraft
+import net.minecraft.world.level.block.entity.SkullBlockEntity
+import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.HitResult
 
 //#if MC > 1.21
-import net.minecraft.world.RaycastContext
+import net.minecraft.world.level.ClipContext
 //#endif
 
 object BlockUtils {
@@ -27,7 +27,7 @@ object BlockUtils {
     //$$ fun LorenzVec.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)
     //#else
     fun LorenzVec.isInLoadedChunk(): Boolean =
-    world.chunkManager.isChunkLoaded(x.toInt() shr 4, z.toInt() shr 4)
+    world.chunkSource.hasChunk(x.toInt() shr 4, z.toInt() shr 4)
     //#endif
 
     fun getTextureFromSkull(position: LorenzVec): String? {
@@ -39,22 +39,22 @@ object BlockUtils {
         //#if MC < 1.21
         //$$ return this.serializeNBT().getCompound("Owner").getSkullTexture()
         //#elseif MC < 1.21.9
-        return this.owner?.id?.get()?.toString()
+        return this.ownerProfile?.id?.get()?.toString()
         //#else
         //$$ return this.owner?.gameProfile?.id.toString()
         //#endif
     }
 
     fun BlockState.isBabyCrop(): Boolean {
-        val property = (block.stateManager.properties.find { it.name == "age" } as? IntProperty) ?: return false
-        return get(property) == 0
+        val property = (block.stateDefinition.properties.find { it.name == "age" } as? IntegerProperty) ?: return false
+        return getValue(property) == 0
     }
 
     private fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
         val target = start + direction.normalize() * distance
         val result = rayTrace(start, target)
 
-        return result?.pos?.toLorenzVec()
+        return result?.location?.toLorenzVec()
     }
 
     //#if MC < 1.21
@@ -62,13 +62,13 @@ object BlockUtils {
     //$$     return world.rayTraceBlocks(start.toVec3(), end.toVec3())
     //$$ }
     //#else
-    fun rayTrace(start: LorenzVec, end: LorenzVec): net.minecraft.util.hit.BlockHitResult? {
-       return world.raycast(
-           RaycastContext(
+    fun rayTrace(start: LorenzVec, end: LorenzVec): net.minecraft.world.phys.BlockHitResult? {
+       return world.clip(
+           ClipContext(
                start.toVec3(),
                end.toVec3(),
-               RaycastContext.ShapeType.COLLIDER,
-               RaycastContext.FluidHandling.NONE,
+               ClipContext.Block.COLLIDER,
+               ClipContext.Fluid.NONE,
                MinecraftCompat.localPlayer,
            ),
        )
@@ -76,21 +76,21 @@ object BlockUtils {
     //#endif
 
     fun getTargetedBlock(): LorenzVec? {
-        val mouseOverObject = MinecraftClient.getInstance().crosshairTarget ?: return null
+        val mouseOverObject = Minecraft.getInstance().hitResult ?: return null
         if (mouseOverObject.type != HitResult.Type.BLOCK) return null
-        return mouseOverObject.pos.toLorenzVec().roundToBlock()
+        return mouseOverObject.location.toLorenzVec().roundToBlock()
     }
 
     fun getTargetedBlockAtDistance(distance: Double) = rayTrace(
         LocationUtils.playerEyeLocation(),
-        MinecraftCompat.localPlayer.rotationVector.toLorenzVec(),
+        MinecraftCompat.localPlayer.lookAngle.toLorenzVec(),
         distance,
     )?.roundToBlock()
 
     private fun nearbyBlocks(center: LorenzVec, distance: Int): MutableIterable<BlockPos> {
         val from = center.add(-distance, -distance, -distance).toBlockPos()
         val to = center.add(distance, distance, distance).toBlockPos()
-        return BlockPos.iterate(from, to)
+        return BlockPos.betweenClosed(from, to)
     }
 
     fun nearbyBlocks(

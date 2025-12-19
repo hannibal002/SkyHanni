@@ -8,7 +8,7 @@ import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import kotlin.reflect.KProperty0
 import kotlin.reflect.jvm.javaField
 //#if FORGE
@@ -17,7 +17,7 @@ import kotlin.reflect.jvm.javaField
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 //#endif
 
 object ConfigUtils {
@@ -64,7 +64,7 @@ object ConfigUtils {
         //#if FORGE
         //$$ SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
         //#else
-        SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Text.empty(), GuiContext(GuiElementComponent(editor)), null)
+        SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Component.empty(), GuiContext(GuiElementComponent(editor)), null)
         //#endif
     }
 
@@ -73,7 +73,7 @@ object ConfigUtils {
             //#if FORGE
             //$$ Minecraft.getInstance().screen is GuiScreenElementWrapper
     //#else
-    MinecraftClient.getInstance().currentScreen is MoulConfigScreenComponent
+    Minecraft.getInstance().screen is MoulConfigScreenComponent
     //#endif
 
     fun String.asStructuredText() = StructuredText.of(this)

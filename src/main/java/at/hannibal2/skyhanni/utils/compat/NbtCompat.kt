@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtList
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
 
 //#if MC > 1.21
 import kotlin.jvm.optionals.getOrNull
-import net.minecraft.nbt.NbtString
-import net.minecraft.nbt.NbtByte
-import net.minecraft.nbt.NbtDouble
-import net.minecraft.nbt.NbtFloat
-import net.minecraft.nbt.NbtInt
-import net.minecraft.nbt.NbtLong
+import net.minecraft.nbt.StringTag
+import net.minecraft.nbt.ByteTag
+import net.minecraft.nbt.DoubleTag
+import net.minecraft.nbt.FloatTag
+import net.minecraft.nbt.IntTag
+import net.minecraft.nbt.LongTag
 //#endif
 
 object NbtCompat {
@@ -30,51 +30,51 @@ object NbtCompat {
     const val TAG_INT_ARRAY: Int = 11
     const val TAG_ANY_NUMERIC = 99
 
-    fun containsList(list: NbtCompound, key: String): Boolean {
+    fun containsList(list: CompoundTag, key: String): Boolean {
         //#if MC < 1.21
         //$$ return list.contains(key, TAG_LIST)
         //#else
-        return list.contains(key) && list.get(key) is NbtList
+        return list.contains(key) && list.get(key) is ListTag
         //#endif
     }
 
-    fun containsCompound(compound: NbtCompound, key: String): Boolean {
+    fun containsCompound(compound: CompoundTag, key: String): Boolean {
         //#if MC < 1.21
         //$$ return compound.contains(key, TAG_COMPOUND)
         //#else
-        return compound.contains(key) && compound.get(key) is NbtCompound
+        return compound.contains(key) && compound.get(key) is CompoundTag
         //#endif
     }
 
-    fun getStringTagList(list: NbtCompound, key: String): NbtList {
+    fun getStringTagList(list: CompoundTag, key: String): ListTag {
         //#if MC < 1.21
         //$$ return list.getList(key, TAG_STRING)
         //#else
-        val nbtList = list.getList(key).getOrNull() ?: NbtList()
+        val nbtList = list.getList(key).getOrNull() ?: ListTag()
         return getList(nbtList, TAG_STRING)
         //#endif
     }
 
-    fun getCompoundTagList(list: NbtCompound, key: String): NbtList {
+    fun getCompoundTagList(list: CompoundTag, key: String): ListTag {
         //#if MC < 1.21
         //$$ return list.getList(key, TAG_COMPOUND)
         //#else
-        val nbtList = list.getList(key).getOrNull() ?: NbtList()
+        val nbtList = list.getList(key).getOrNull() ?: ListTag()
         return getList(nbtList, TAG_COMPOUND)
         //#endif
     }
 
     //#if MC > 1.21
-    private fun getList(list: NbtList, type: Int): NbtList {
+    private fun getList(list: ListTag, type: Int): ListTag {
         for (nbtElement in list) {
             when (type) {
-                TAG_STRING -> if (nbtElement !is NbtString) return NbtList()
-                TAG_COMPOUND -> if (nbtElement !is NbtCompound) return NbtList()
-                TAG_INT -> if (nbtElement !is NbtInt) return NbtList()
-                TAG_DOUBLE -> if (nbtElement !is NbtDouble) return NbtList()
-                TAG_LONG -> if (nbtElement !is NbtLong) return NbtList()
-                TAG_BYTE -> if (nbtElement !is NbtByte) return NbtList()
-                TAG_FLOAT -> if (nbtElement !is NbtFloat) return NbtList()
+                TAG_STRING -> if (nbtElement !is StringTag) return ListTag()
+                TAG_COMPOUND -> if (nbtElement !is CompoundTag) return ListTag()
+                TAG_INT -> if (nbtElement !is IntTag) return ListTag()
+                TAG_DOUBLE -> if (nbtElement !is DoubleTag) return ListTag()
+                TAG_LONG -> if (nbtElement !is LongTag) return ListTag()
+                TAG_BYTE -> if (nbtElement !is ByteTag) return ListTag()
+                TAG_FLOAT -> if (nbtElement !is FloatTag) return ListTag()
             }
         }
         return list
@@ -84,46 +84,46 @@ object NbtCompat {
 
 //#if MC > 1.21
 
-fun NbtCompound.getStringOrDefault(key: String): String {
+fun CompoundTag.getStringOrDefault(key: String): String {
     return this.getString(key).getOrNull() ?: ""
 }
 
-fun NbtCompound.getIntOrDefault(key: String?): Int {
+fun CompoundTag.getIntOrDefault(key: String?): Int {
     return this.getInt(key).getOrNull() ?: 0
 }
 
-fun NbtCompound.getLongOrDefault(key: String): Long {
+fun CompoundTag.getLongOrDefault(key: String): Long {
     return this.getLong(key).getOrNull()  ?: 0
 }
 
-fun NbtCompound.getFloatOrDefault(key: String): Float {
+fun CompoundTag.getFloatOrDefault(key: String): Float {
     return this.getFloat(key).getOrNull() ?: 0f
 }
 
-fun NbtCompound.getDoubleOrDefault(key: String): Double {
+fun CompoundTag.getDoubleOrDefault(key: String): Double {
     return this.getDouble(key).getOrNull() ?: 0.0
 }
 
-fun NbtCompound.getBooleanOrDefault(key: String): Boolean {
+fun CompoundTag.getBooleanOrDefault(key: String): Boolean {
     return this.getBoolean(key).getOrNull()  ?: false
 }
 
-fun NbtCompound.getByteOrDefault(key: String): Byte? {
+fun CompoundTag.getByteOrDefault(key: String): Byte? {
     return this.getByte(key).getOrNull()
 }
 
-fun NbtCompound.getCompoundOrDefault(key: String): NbtCompound {
+fun CompoundTag.getCompoundOrDefault(key: String): CompoundTag {
     if (this.getCompound(key).isEmpty) {
-        return NbtCompound()
+        return CompoundTag()
     }
     return this.getCompound(key).get()
 }
 
-fun NbtList.getStringOrDefault(index: Int): String {
+fun ListTag.getStringOrDefault(index: Int): String {
     return this.getString(index).getOrNull() ?: ""
 }
 
-fun NbtList.getCompoundOrDefault(index: Int): NbtCompound {
-    return this.getCompound(index).getOrNull() ?: NbtCompound()
+fun ListTag.getCompoundOrDefault(index: Int): CompoundTag {
+    return this.getCompound(index).getOrNull() ?: CompoundTag()
 }
 //#endif

@@ -35,8 +35,8 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.screen.GenericContainerScreenHandler
-import net.minecraft.item.ItemStack
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.seconds
 
@@ -66,7 +66,7 @@ object CFStrayWarning {
         } ?: false
 
     private fun isSpecial(stack: ItemStack) =
-        clickMeGoldenRabbitPattern.matches(stack.name.formattedTextCompatLeadingWhiteLessResets()) || stack.getSkullTexture() in specialRabbitTextures
+        clickMeGoldenRabbitPattern.matches(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) || stack.getSkullTexture() in specialRabbitTextures
 
     private fun shouldWarnAboutStray(item: ItemStack) = when (config.rabbitWarning.rabbitWarningLevel) {
         StrayTypeEntry.SPECIAL -> isSpecial(item)
@@ -76,7 +76,7 @@ object CFStrayWarning {
         StrayTypeEntry.RARE_P -> isRarityOrHigher(item, LorenzRarity.RARE)
         StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(item, LorenzRarity.UNCOMMON)
 
-        StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.name.formattedTextCompatLeadingWhiteLessResets()) || isSpecial(item)
+        StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) || isSpecial(item)
 
         StrayTypeEntry.NONE -> false
     }
@@ -84,8 +84,8 @@ object CFStrayWarning {
     private fun handleRabbitWarnings(item: ItemStack) {
         if (caughtRabbitPattern.matches(item.getSingleLineLore())) return
 
-        val clickMeMatches = clickMeRabbitPattern.matches(item.name.formattedTextCompatLeadingWhiteLessResets())
-        val goldenClickMeMatches = clickMeGoldenRabbitPattern.matches(item.name.formattedTextCompatLeadingWhiteLessResets())
+        val clickMeMatches = clickMeRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        val goldenClickMeMatches = clickMeGoldenRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
         if (!clickMeMatches && !goldenClickMeMatches || !shouldWarnAboutStray(item)) return
 
         val isSpecial = goldenClickMeMatches || item.getSkullTexture() in specialRabbitTextures
@@ -101,14 +101,14 @@ object CFStrayWarning {
         else event.strayHighlight()
     }
 
-    private fun GuiContainerEvent.getEventChest(): GenericContainerScreenHandler? =
-        container as? GenericContainerScreenHandler
+    private fun GuiContainerEvent.getEventChest(): ChestMenu? =
+        container as? ChestMenu
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
         val eventChest = getEventChest() ?: return
         eventChest.getUpperItems().keys.forEach { it.highlight(chromaColorAlt) }
         eventChest.slots.filter {
-            it.id != it.index
+            it.index != it.containerSlot
         }.forEach {
             it.highlight(chromaColorAlt2)
         }
@@ -117,7 +117,7 @@ object CFStrayWarning {
     private fun GuiContainerEvent.BackgroundDrawnEvent.strayHighlight() {
         val eventChest = getEventChest() ?: return
         eventChest.getUpperItems().keys.filter {
-            it.id in activeStraySlots
+            it.index in activeStraySlots
         }.forEach {
             it.highlight(warningConfig.inventoryHighlightColor)
         }
@@ -144,7 +144,7 @@ object CFStrayWarning {
                 StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(stack, LorenzRarity.UNCOMMON)
 
                 StrayTypeEntry.ALL -> {
-                    clickMeRabbitPattern.matches(it.value.name.formattedTextCompatLeadingWhiteLessResets()) || isSpecial(stack)
+                    clickMeRabbitPattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets()) || isSpecial(stack)
                 }
 
                 StrayTypeEntry.NONE -> false

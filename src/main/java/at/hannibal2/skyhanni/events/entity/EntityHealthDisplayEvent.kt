@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.events.entity
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 
-class EntityHealthDisplayEvent(var text: Text) : SkyHanniEvent()
+class EntityHealthDisplayEvent(var text: Component) : SkyHanniEvent()

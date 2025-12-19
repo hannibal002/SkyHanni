@@ -5,42 +5,42 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.compat.createWitherSkeleton
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import net.minecraft.client.renderer.entity.RenderLivingBase
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.boss.WitherEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.mob.BlazeEntity
-import net.minecraft.entity.mob.CaveSpiderEntity
-import net.minecraft.entity.mob.CreeperEntity
-import net.minecraft.entity.mob.EndermanEntity
-import net.minecraft.entity.mob.EndermiteEntity
-import net.minecraft.entity.mob.GhastEntity
-import net.minecraft.entity.mob.GiantEntity
-import net.minecraft.entity.mob.GuardianEntity
-import net.minecraft.entity.passive.IronGolemEntity
-import net.minecraft.entity.mob.MagmaCubeEntity
-import net.minecraft.entity.mob.ZombifiedPiglinEntity
-import net.minecraft.entity.mob.SilverfishEntity
-import net.minecraft.entity.mob.AbstractSkeletonEntity
-import net.minecraft.entity.mob.SlimeEntity
-import net.minecraft.entity.passive.SnowGolemEntity
-import net.minecraft.entity.mob.SpiderEntity
-import net.minecraft.entity.mob.WitchEntity
-import net.minecraft.entity.mob.ZombieEntity
-import net.minecraft.entity.passive.BatEntity
-import net.minecraft.entity.passive.ChickenEntity
-import net.minecraft.entity.passive.AbstractCowEntity
-import net.minecraft.entity.passive.HorseEntity
-import net.minecraft.entity.passive.MooshroomEntity
-import net.minecraft.entity.passive.OcelotEntity
-import net.minecraft.entity.passive.PigEntity
-import net.minecraft.entity.passive.RabbitEntity
-import net.minecraft.entity.passive.SheepEntity
-import net.minecraft.entity.passive.SquidEntity
-import net.minecraft.entity.passive.VillagerEntity
-import net.minecraft.entity.passive.WolfEntity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.boss.wither.WitherBoss
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Blaze
+import net.minecraft.world.entity.monster.CaveSpider
+import net.minecraft.world.entity.monster.Creeper
+import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.Endermite
+import net.minecraft.world.entity.monster.Ghast
+import net.minecraft.world.entity.monster.Giant
+import net.minecraft.world.entity.monster.Guardian
+import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.ZombifiedPiglin
+import net.minecraft.world.entity.monster.Silverfish
+import net.minecraft.world.entity.monster.AbstractSkeleton
+import net.minecraft.world.entity.monster.Slime
+import net.minecraft.world.entity.animal.SnowGolem
+import net.minecraft.world.entity.monster.Spider
+import net.minecraft.world.entity.monster.Witch
+import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.entity.ambient.Bat
+import net.minecraft.world.entity.animal.Chicken
+import net.minecraft.world.entity.animal.AbstractCow
+import net.minecraft.world.entity.animal.horse.Horse
+import net.minecraft.world.entity.animal.MushroomCow
+import net.minecraft.world.entity.animal.Ocelot
+import net.minecraft.world.entity.animal.Pig
+import net.minecraft.world.entity.animal.Rabbit
+import net.minecraft.world.entity.animal.sheep.Sheep
+import net.minecraft.world.entity.animal.Squid
+import net.minecraft.world.entity.npc.Villager
+import net.minecraft.world.entity.animal.wolf.Wolf
 import org.lwjgl.opengl.GL11
 
 /**
@@ -102,39 +102,39 @@ object HolographicEntities {
         }
     }
 
-    val zombie = HolographicBase(ZombieEntity(null))
-    val chicken = HolographicBase(ChickenEntity(null))
-    val slime = HolographicBase(SlimeEntity(null))
-    val wolf = HolographicBase(WolfEntity(null))
-    val skeleton = HolographicBase(AbstractSkeletonEntity(null))
-    val creeper = HolographicBase(CreeperEntity(null))
-    val ocelot = HolographicBase(OcelotEntity(null))
-    val blaze = HolographicBase(BlazeEntity(null))
-    val rabbit = HolographicBase(RabbitEntity(null))
-    val sheep = HolographicBase(SheepEntity(null))
-    val horse = HolographicBase(HorseEntity(null))
-    val eisengolem = HolographicBase(IronGolemEntity(null))
-    val silverfish = HolographicBase(SilverfishEntity(null))
-    val witch = HolographicBase(WitchEntity(null))
-    val endermite = HolographicBase(EndermiteEntity(null))
-    val snowman = HolographicBase(SnowGolemEntity(null))
+    val zombie = HolographicBase(Zombie(null))
+    val chicken = HolographicBase(Chicken(null))
+    val slime = HolographicBase(Slime(null))
+    val wolf = HolographicBase(Wolf(null))
+    val skeleton = HolographicBase(AbstractSkeleton(null))
+    val creeper = HolographicBase(Creeper(null))
+    val ocelot = HolographicBase(Ocelot(null))
+    val blaze = HolographicBase(Blaze(null))
+    val rabbit = HolographicBase(Rabbit(null))
+    val sheep = HolographicBase(Sheep(null))
+    val horse = HolographicBase(Horse(null))
+    val eisengolem = HolographicBase(IronGolem(null))
+    val silverfish = HolographicBase(Silverfish(null))
+    val witch = HolographicBase(Witch(null))
+    val endermite = HolographicBase(Endermite(null))
+    val snowman = HolographicBase(SnowGolem(null))
     val villager = HolographicBase(Villager(null))
-    val guardian = HolographicBase(GuardianEntity(null))
+    val guardian = HolographicBase(Guardian(null))
     val armorStand = HolographicBase(ArmorStand(null))
-    val squid = HolographicBase(SquidEntity(null))
-    val bat = HolographicBase(BatEntity(null))
-    val spider = HolographicBase(SpiderEntity(null))
-    val caveSpider = HolographicBase(CaveSpiderEntity(null))
-    val pigman = HolographicBase(ZombifiedPiglinEntity(null))
-    val ghast = HolographicBase(GhastEntity(null))
-    val magmaCube = HolographicBase(MagmaCubeEntity(null))
-    val wither = HolographicBase(WitherEntity(null))
-    val enderman = HolographicBase(EndermanEntity(null))
-    val mooshroom = HolographicBase(MooshroomEntity(null))
+    val squid = HolographicBase(Squid(null))
+    val bat = HolographicBase(Bat(null))
+    val spider = HolographicBase(Spider(null))
+    val caveSpider = HolographicBase(CaveSpider(null))
+    val pigman = HolographicBase(ZombifiedPiglin(null))
+    val ghast = HolographicBase(Ghast(null))
+    val magmaCube = HolographicBase(MagmaCube(null))
+    val wither = HolographicBase(WitherBoss(null))
+    val enderman = HolographicBase(EnderMan(null))
+    val mooshroom = HolographicBase(MushroomCow(null))
     val witherSkeleton = HolographicBase(createWitherSkeleton(null))
-    val cow = HolographicBase(AbstractCowEntity(null))
-    val pig = HolographicBase(PigEntity(null))
-    val giant = HolographicBase(GiantEntity(null))
+    val cow = HolographicBase(AbstractCow(null))
+    val pig = HolographicBase(Pig(null))
+    val giant = HolographicBase(Giant(null))
 
     private fun interpolateRotation(last: Float, next: Float, progress: Float): Float {
         var direction: Float = next - last
@@ -154,7 +154,7 @@ object HolographicEntities {
         holographicEntity: HolographicEntity<T>,
         holographicness: Float = 0.3f,
     ) {
-        val renderManager = MinecraftClient.getInstance().entityRenderDispatcher
+        val renderManager = Minecraft.getInstance().entityRenderDispatcher
         val entity = holographicEntity.entity
 
         val renderer = renderManager.getRenderer<LivingEntity>(entity)

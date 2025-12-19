@@ -52,7 +52,7 @@ object PowerStoneGuideFeatures {
         if (!inInventory) return
 
         event.container.slots
-            .filter { missing.containsKey(it.id) }
+            .filter { missing.containsKey(it.index) }
             .forEach { it.highlight(LorenzColor.RED) }
     }
 
@@ -71,7 +71,7 @@ object PowerStoneGuideFeatures {
         event.slot ?: return
         if (!inInventory) return
 
-        val internalName = missing[event.slot.id] ?: return
+        val internalName = missing[event.slot.index] ?: return
         val totalPrice = internalName.getPrice() * 9
         event.toolTip.add(5, "9x from Bazaar: §6${totalPrice.shortFormat()}")
     }

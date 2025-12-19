@@ -28,8 +28,8 @@ object BetterWikiFromMenus {
 
         if (chestName.isEmpty()) return
 
-        val itemClickedStack = event.slot?.stack ?: return
-        val itemClickedName = itemClickedStack.name.formattedTextCompatLeadingWhiteLessResets()
+        val itemClickedStack = event.slot?.item ?: return
+        val itemClickedName = itemClickedStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
 
         val isWiki = event.slotId == 11 && itemClickedName.contains("Wiki Command")
         val isWikithis = event.slotId == 15 && itemClickedName.contains("Wikithis Command")

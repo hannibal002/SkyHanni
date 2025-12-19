@@ -57,7 +57,7 @@ object ReplaceHoppityWithContributor {
         val last = lore.lastOrNull() ?: return
         if (!last.endsWith(" RABBIT")) return
 
-        val realName = itemStack.name.formattedTextCompatLeadingWhiteLessResets()
+        val realName = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val cleanName = realName.removeColor()
         val fakeName = replaceMap[cleanName] ?: return
 

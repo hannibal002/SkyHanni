@@ -29,9 +29,9 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderabl
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.screen.GenericContainerScreenHandler
-import net.minecraft.item.ItemStack
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.min
@@ -57,18 +57,18 @@ object DungeonSpiritLeapOverlay {
 
         val gui = event.gui
         // TODO find a way to make InventoryDetector usable here.
-        if (gui !is GenericContainerScreen || !inventory.isInside()) return
+        if (gui !is ContainerScreen || !inventory.isInside()) return
         containerWidth = gui.width
         containerHeight = gui.height
         scaleFactor = min(containerWidth, containerHeight).toDouble() / max(containerWidth, containerHeight).toDouble()
 
-        val chest = gui.container as GenericContainerScreenHandler
+        val chest = gui.container as ChestMenu
         playerList = buildList {
             for ((slot, stack) in chest.getUpperItems()) {
                 val lore = stack.getLore()
                 if (lore.isNotEmpty()) {
-                    val playerInfo = DungeonApi.getPlayerInfo(stack.name.formattedTextCompatLeadingWhiteLessResets().cleanPlayerName())
-                    add(PlayerStackInfo(playerInfo, stack, slot.id))
+                    val playerInfo = DungeonApi.getPlayerInfo(stack.hoverName.formattedTextCompatLeadingWhiteLessResets().cleanPlayerName())
+                    add(PlayerStackInfo(playerInfo, stack, slot.index))
                 }
             }
         }.sortedBy { it.playerInfo?.dungeonClass?.ordinal }

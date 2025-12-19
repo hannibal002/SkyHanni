@@ -78,7 +78,7 @@ object SkyBlockXPApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!UtilsPatterns.skyblockMenuGuiPattern.matches(event.inventoryName)) return
 
-        val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.name.formattedTextCompatLeadingWhiteLessResets()) } ?: return
+        val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return
 
         var level: Int? = null
         var xp: Int? = null

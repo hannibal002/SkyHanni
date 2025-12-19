@@ -77,7 +77,7 @@ object TeleportPadInventoryNumber {
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!inTeleportPad) return
 
-        padNumberPattern.matchMatcher(event.stack.name.formattedTextCompatLeadingWhiteLessResets().lowercase()) {
+        padNumberPattern.matchMatcher(event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets().lowercase()) {
             numbers[group("number")]?.let {
                 event.stackTip = "$it"
             }

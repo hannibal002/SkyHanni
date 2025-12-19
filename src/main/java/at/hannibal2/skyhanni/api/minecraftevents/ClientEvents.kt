@@ -15,14 +15,14 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.hud.ChatHudLine
-import net.minecraft.client.gui.hud.MessageIndicator
-import net.minecraft.resource.ResourceManager
-import net.minecraft.resource.ResourceReloader
-import net.minecraft.resource.ResourceType
-import net.minecraft.text.Text
-import net.minecraft.util.Identifier
+import net.minecraft.client.Minecraft
+import net.minecraft.client.GuiMessage
+import net.minecraft.client.GuiMessageTag
+import net.minecraft.server.packs.resources.ResourceManager
+import net.minecraft.server.packs.resources.PreparableReloadListener
+import net.minecraft.server.packs.PackType
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
@@ -59,14 +59,14 @@ object ClientEvents {
             },
         )
 
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             object : IdentifiableResourceReloadListener {
 
-                override fun getFabricId(): Identifier = Identifier.of("skyhanni", "resources")
+                override fun getFabricId(): ResourceLocation = ResourceLocation.fromNamespaceAndPath("skyhanni", "resources")
 
                 //#if MC < 1.21.9
                 override fun reload(
-                    synchronizer: ResourceReloader.Synchronizer,
+                    synchronizer: PreparableReloadListener.PreparationBarrier,
                     manager: ResourceManager,
                     prepareExecutor: Executor,
                     applyExecutor: Executor,
@@ -75,7 +75,7 @@ object ClientEvents {
                     return CompletableFuture.runAsync(
                         { ResourcePackReloadEvent(manager).post() },
                         applyExecutor,
-                    ).thenCompose(synchronizer::whenPrepared)
+                    ).thenCompose(synchronizer::wait)
                 }
                 //#else
                 //$$ override fun reload(
@@ -98,10 +98,10 @@ object ClientEvents {
 
     }
 
-    private var lastMessage: Text? = null
-    private var lastResult: Text? = null
+    private var lastMessage: Component? = null
+    private var lastResult: Component? = null
 
-    private fun onAllow(message: Text, actionBar: Boolean): Boolean {
+    private fun onAllow(message: Component, actionBar: Boolean): Boolean {
         lastMessage = message
         if (actionBar) {
             // we never cancel the action bar
@@ -113,16 +113,16 @@ object ClientEvents {
 
         if (cancel) {
             // the message doesn't get logged if we cancel it, so we do that ourselves
-            val inGameHud = MinecraftClient.getInstance().inGameHud
-            val chatHudLine = ChatHudLine(inGameHud.ticks, message, null, MessageIndicator.system())
-            inGameHud.chatHud.logChatMessage(chatHudLine)
+            val inGameHud = Minecraft.getInstance().gui
+            val chatHudLine = GuiMessage(inGameHud.guiTicks, message, null, GuiMessageTag.system())
+            inGameHud.chat.logChatMessage(chatHudLine)
         }
 
         // if we cancel then we don't allow the message
         return !cancel
     }
 
-    private fun onModify(message: Text, actionBar: Boolean): Text {
+    private fun onModify(message: Component, actionBar: Boolean): Component {
         // we check if the message is the same as the one from allow
         // if someone else modifies the message it won't be the same but what can you do about that
         if (lastMessage == message && !actionBar) {

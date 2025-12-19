@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
-import net.minecraft.util.math.Box
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 
 class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent, val lineWidth: Int, val depth: Boolean) {
@@ -17,16 +17,16 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
 
         val layer = SkyHanniRenderLayers.getLines(lineWidth.toDouble(), !depth)
         val buf = event.vertexConsumers.getBuffer(layer)
-        val matrix = event.matrices.peek()
+        val matrix = event.matrices.last()
 
         for (line in queuedLines) {
-            buf.vertex(matrix.positionMatrix, line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
-                .normal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
-                .color(line.color.red, line.color.green, line.color.blue, line.color.alpha)
+            buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
+                .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
+                .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
 
-            buf.vertex(matrix.positionMatrix, line.p2.x.toFloat(), line.p2.y.toFloat(), line.p2.z.toFloat())
-                .normal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
-                .color(line.color.red, line.color.green, line.color.blue, line.color.alpha)
+            buf.addVertex(matrix.pose(), line.p2.x.toFloat(), line.p2.y.toFloat(), line.p2.z.toFloat())
+                .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
+                .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
         }
 
         queuedLines.clear()
@@ -77,7 +77,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         }
     }
 
-    fun drawEdges(axisAlignedBB: Box, color: Color) {
+    fun drawEdges(axisAlignedBB: AABB, color: Color) {
         // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
         for ((p1, p2) in axisAlignedBB.calculateEdges()) {
             draw3DLine(p1, p2, color)
@@ -125,7 +125,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
             depth: Boolean,
             crossinline draws: LineDrawer.() -> Unit,
         ) {
-            event.matrices.push()
+            event.matrices.pushPose()
 
             val inverseView = WorldRenderUtils.getViewerPos().negated()
             event.matrices.translate(inverseView.x, inverseView.y, inverseView.z)
@@ -134,7 +134,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
             draws.invoke(lineDrawer)
             lineDrawer.drawQueuedLines()
 
-            event.matrices.pop()
+            event.matrices.popPose()
         }
     }
 }

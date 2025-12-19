@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.network.OtherClientPlayerEntity
+import net.minecraft.client.player.RemotePlayer
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -158,7 +158,7 @@ object Year400Features {
         if (!config.teamFinder) return
         val entity = event.clickedEntity
         if (colorInHand == null) return
-        if (entity !is OtherClientPlayerEntity) return
+        if (entity !is RemotePlayer) return
         if (entity.isNpc()) return
 
         val mob = entity.mob ?: return

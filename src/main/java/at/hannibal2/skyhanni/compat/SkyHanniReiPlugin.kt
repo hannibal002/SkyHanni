@@ -6,12 +6,12 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi
 import me.shedaniel.math.Rectangle
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin
 import me.shedaniel.rei.api.client.registry.screen.ExclusionZones
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
 
 class SkyHanniReiPlugin : REIClientPlugin {
 
     override fun registerExclusionZones(zones: ExclusionZones) {
-        zones.register(GenericContainerScreen::class.java) { screen ->
+        zones.register(ContainerScreen::class.java) { screen ->
             if (WardrobeApi.inCustomWardrobe) {
                 if (CustomWardrobe.renderableTopCorner == Pair(0, 0)) {
                     listOf(screen.fullRectangle())
@@ -24,11 +24,11 @@ class SkyHanniReiPlugin : REIClientPlugin {
         }
     }
 
-    private fun GenericContainerScreen.fullRectangle(): Rectangle {
+    private fun ContainerScreen.fullRectangle(): Rectangle {
         return Rectangle(0, 0, this.width, this.height)
     }
 
-    private fun GenericContainerScreen.customWardrobeExclusionRect(): Rectangle {
+    private fun ContainerScreen.customWardrobeExclusionRect(): Rectangle {
         val showReiItems = SkyHanniMod.feature.inventory.customWardrobe.showReiItems
         if (!showReiItems) {
             return fullRectangle()

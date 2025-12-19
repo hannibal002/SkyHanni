@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 // TODO Remove all removeColor calls in this class. Deal with the color code in regex.
 // TODO also fix up this all being coded very poorly and having the same patterns in multiple places
@@ -193,7 +193,7 @@ object DungeonFinderFeatures {
     private fun selectFloorStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
-            val name = stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
             map[slot] = if (anyFloorPattern.matches(name)) {
                 "A"
             } else if (entranceFloorPattern.matches(name)) {
@@ -209,7 +209,7 @@ object DungeonFinderFeatures {
     private fun partyFinderStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
-            val name = stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
             if (!checkIfPartyPattern.matches(name)) continue
             val lore = stack.getLore()
             val floor = lore.find { floorPattern.matches(it.removeColor()) } ?: continue
@@ -234,7 +234,7 @@ object DungeonFinderFeatures {
 
         if (!config.floorAsStackSize) return
         for ((slot, stack) in inventoryItems) {
-            val name = stack.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
             if (!floorTypePattern.matches(name)) continue
             val floorNum = floorNumberPattern.matchMatcher(name) {
                 group("floorNum").romanToDecimalIfNecessary()
@@ -259,7 +259,7 @@ object DungeonFinderFeatures {
         @Suppress("LoopWithTooManyJumpStatements")
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
-            if (!checkIfPartyPattern.matches(stack.name.formattedTextCompatLeadingWhiteLessResets())) continue
+            if (!checkIfPartyPattern.matches(stack.hoverName.formattedTextCompatLeadingWhiteLessResets())) continue
             if (config.markIneligibleGroups && ineligiblePattern.anyMatches(lore)) {
                 map[slot] = LorenzColor.DARK_RED
                 continue
@@ -351,7 +351,7 @@ object DungeonFinderFeatures {
         val featureActive = config.let { it.coloredClassLevel || it.showMissingClasses }
         if (!featureActive) return
 
-        val toolTip = toolTipMap[event.slot.id]
+        val toolTip = toolTipMap[event.slot.index]
         if (toolTip.isNullOrEmpty()) return
         // TODO @Thunderblade73 fix that to "event.toolTip = toolTip"
         val oldToolTip = event.toolTip
@@ -369,8 +369,8 @@ object DungeonFinderFeatures {
         if (!isEnabled()) return
         if (!config.floorAsStackSize) return
         val slot = event.slot
-        if (slot.id != slot.index) return
-        event.stackTip = (floorStackSize[slot.index]?.takeIf { it.isNotEmpty() } ?: return)
+        if (slot.index != slot.containerSlot) return
+        event.stackTip = (floorStackSize[slot.containerSlot]?.takeIf { it.isNotEmpty() } ?: return)
     }
 
     @HandleEvent
@@ -378,7 +378,7 @@ object DungeonFinderFeatures {
         if (!isEnabled()) return
         if (!inInventory) return
 
-        event.container.slots.associateWith { highlightParty[it.id] }.forEach { (slot, color) ->
+        event.container.slots.associateWith { highlightParty[it.index] }.forEach { (slot, color) ->
             color?.let { slot.highlight(it) }
         }
     }

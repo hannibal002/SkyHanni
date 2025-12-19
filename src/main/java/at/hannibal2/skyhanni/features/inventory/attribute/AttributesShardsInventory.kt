@@ -20,7 +20,7 @@ object AttributesShardsInventory {
 
         val internalName = event.stack.getInternalNameOrNull() ?: return
         if (!AttributeShardsData.isAttributeShard(internalName)) return
-        AttributeShardsData.attributeShardNamePattern.matchMatcher(event.stack.name.formattedTextCompatLeadingWhiteLessResets()) {
+        AttributeShardsData.attributeShardNamePattern.matchMatcher(event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             val tier = groupOrNull("tier")?.romanToDecimal() ?: 0
             val color = when (tier) {
                 0 -> "§c"

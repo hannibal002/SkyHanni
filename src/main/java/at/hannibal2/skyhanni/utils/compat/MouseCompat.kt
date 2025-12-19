@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.DelayedRun
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 
 object MouseCompat {
     var deltaMouseY = 0.0
@@ -11,7 +11,7 @@ object MouseCompat {
     var lastEventButton = -1
 
     private val mouse by lazy {
-        MinecraftClient.getInstance().mouse
+        Minecraft.getInstance().mouseHandler
     }
 
     fun isButtonDown(button: Int): Boolean {
@@ -25,11 +25,11 @@ object MouseCompat {
     }
 
     fun getX(): Int {
-        return mouse.x.toInt()
+        return mouse.xpos().toInt()
     }
 
     fun getY(): Int {
-        return mouse.y.toInt()
+        return mouse.ypos().toInt()
     }
 
     // I have no clue what the difference between getx and geteventx is on 1.8.9

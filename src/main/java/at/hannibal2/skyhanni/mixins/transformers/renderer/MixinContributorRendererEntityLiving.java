@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.mixins.transformers.renderer;
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
 import at.hannibal2.skyhanni.utils.FakePlayer;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerModelPart;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelPart;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,17 +28,17 @@ public class MixinContributorRendererEntityLiving<T extends LivingEntity> {
 
     @Redirect(
         method = "rotateCorpse",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isPartVisible(Lnet/minecraft/entity/player/PlayerModelPart;)Z"))
-    private boolean alwaysMarkAsHavingCape(PlayerEntity instance, PlayerModelPart enumPlayerModelParts) {
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isModelPartShown(Lnet/minecraft/world/entity/player/PlayerModelPart;)Z"))
+    private boolean alwaysMarkAsHavingCape(Player instance, PlayerModelPart enumPlayerModelParts) {
         // Always returning true here ensures maximal compatibility with other mods. This will no longer block other mods from implementing this same mixin.
         return true;
     }
 
-    @Inject(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Formatting;getTextWithoutFormattingCodes(Ljava/lang/String;)Ljava/lang/String;", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Lnet/minecraft/ChatFormatting;getTextWithoutFormattingCodes(Ljava/lang/String;)Ljava/lang/String;", shift = At.Shift.AFTER), cancellable = true)
     private void rotateThePlayer(T bat, float p_77043_2_, float p_77043_3_, float partialTicks, CallbackInfo ci) {
         if (bat instanceof FakePlayer) ci.cancel();
-        if (bat instanceof PlayerEntity) {
-            RendererLivingEntityHook.rotatePlayer((PlayerEntity) bat);
+        if (bat instanceof Player) {
+            RendererLivingEntityHook.rotatePlayer((Player) bat);
         }
     }
 }

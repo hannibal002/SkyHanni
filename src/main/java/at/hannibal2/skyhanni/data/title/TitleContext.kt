@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import org.lwjgl.opengl.GL11
@@ -131,7 +131,7 @@ open class TitleContext(
     }
 
     fun tryRenderInventoryTitle() {
-        val gui = MinecraftClient.getInstance().currentScreen as? SkyHanniGuiContainer ?: return
+        val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return
 
         val stringRenderable = with(Renderable) {
             vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {

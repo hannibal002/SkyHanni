@@ -18,8 +18,8 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.projectile.FishingBobberEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.FishingHook
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -78,9 +78,9 @@ object LegionBobbinOverlay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
         if (!isEnabled()) return
-        val bobbers = EntityUtils.getEntitiesNextToPlayer<FishingBobberEntity>(BOBBERS_DISTANCE).size
-        val players = EntityUtils.getEntitiesNextToPlayer<PlayerEntity>(LEGION_DISTANCE).count {
-            !it.isMainPlayer && it.isRealPlayer()
+        val bobbers = EntityUtils.getEntitiesNextToPlayer<FishingHook>(BOBBERS_DISTANCE).size
+        val players = EntityUtils.getEntitiesNextToPlayer<Player>(LEGION_DISTANCE).count {
+            !it.isLocalPlayer && it.isRealPlayer()
         }
         nearbyBobbers = modifyValue(nearbyBobbers, bobbers.coerceAtMost(BOBBERS_LIMIT))
         nearbyPlayers = modifyValue(nearbyPlayers, players.coerceAtMost(LEGION_LIMIT))

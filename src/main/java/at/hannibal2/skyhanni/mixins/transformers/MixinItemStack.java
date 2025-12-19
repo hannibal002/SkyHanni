@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.mixins.transformers;
 //#if MC < 1.21
 //$$ import at.hannibal2.skyhanni.data.ToolTipData;
 //#endif
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,9 +24,9 @@ public class MixinItemStack {
     //$$     ToolTipData.onHover(new DrawContext(), stack, list);
     //$$ }
     //#else
-    @Inject(method = "appendComponentTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/tooltip/TooltipAppender;appendTooltip(Lnet/minecraft/item/Item$TooltipContext;Ljava/util/function/Consumer;Lnet/minecraft/item/tooltip/TooltipType;Lnet/minecraft/component/ComponentsAccess;)V"), cancellable = true)
-    public <T extends net.minecraft.item.tooltip.TooltipAppender> void blockVanillaEnchants(net.minecraft.component.ComponentType<T> componentType, net.minecraft.item.Item.TooltipContext context, net.minecraft.component.type.TooltipDisplayComponent displayComponent, java.util.function.Consumer<net.minecraft.text.Text> textConsumer, net.minecraft.item.tooltip.TooltipType type, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
-        if (at.hannibal2.skyhanni.utils.SkyBlockUtils.INSTANCE.getInSkyBlock() && at.hannibal2.skyhanni.SkyHanniMod.feature.getInventory().getEnchantParsing().getHideVanillaEnchants().get() && componentType == net.minecraft.component.DataComponentTypes.ENCHANTMENTS) {
+    @Inject(method = "addToTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/component/TooltipProvider;addToTooltip(Lnet/minecraft/world/item/Item$TooltipContext;Ljava/util/function/Consumer;Lnet/minecraft/world/item/TooltipFlag;Lnet/minecraft/core/component/DataComponentGetter;)V"), cancellable = true)
+    public <T extends net.minecraft.world.item.component.TooltipProvider> void blockVanillaEnchants(net.minecraft.core.component.DataComponentType<T> componentType, net.minecraft.world.item.Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay displayComponent, java.util.function.Consumer<net.minecraft.network.chat.Component> textConsumer, net.minecraft.world.item.TooltipFlag type, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+        if (at.hannibal2.skyhanni.utils.SkyBlockUtils.INSTANCE.getInSkyBlock() && at.hannibal2.skyhanni.SkyHanniMod.feature.getInventory().getEnchantParsing().getHideVanillaEnchants().get() && componentType == net.minecraft.core.component.DataComponents.ENCHANTMENTS) {
             ci.cancel();
         }
     }

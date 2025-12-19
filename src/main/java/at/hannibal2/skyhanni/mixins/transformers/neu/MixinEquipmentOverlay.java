@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers.neu;
 
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue;
 import io.github.moulberry.notenoughupdates.overlays.EquipmentOverlay;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +15,7 @@ import java.util.List;
 @Mixin(value = EquipmentOverlay.class, remap = false)
 public class MixinEquipmentOverlay {
 
-    @Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getTooltip(Lnet/minecraft/entity/player/PlayerEntity;Z)Ljava/util/List;"))
+    @Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getTooltip(Lnet/minecraft/world/entity/player/Player;Z)Ljava/util/List;"))
     public void drawSlot(ItemStack stack, int x, int y, int mouseX, int mouseY, List<String> tooltip, CallbackInfo ci) {
         EstimatedItemValue.INSTANCE.onNeuDrawEquipment(stack);
     }

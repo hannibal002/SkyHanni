@@ -5,23 +5,23 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.entity.decoration.DisplayEntity
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.entity.Display
 
 @SkyHanniModule
 object ClearTreeLogs {
 
     private val treeBlocks = buildList<BlockState> {
-        add(Blocks.STRIPPED_SPRUCE_WOOD.defaultState)
-        add(Blocks.MANGROVE_WOOD.defaultState)
-        add(Blocks.MANGROVE_LEAVES.defaultState)
-        add(Blocks.AZALEA_LEAVES.defaultState)
+        add(Blocks.STRIPPED_SPRUCE_WOOD.defaultBlockState())
+        add(Blocks.MANGROVE_WOOD.defaultBlockState())
+        add(Blocks.MANGROVE_LEAVES.defaultBlockState())
+        add(Blocks.AZALEA_LEAVES.defaultBlockState())
 
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onRender(event: CheckRenderEntityEvent<DisplayEntity.BlockDisplayEntity>) {
+    fun onRender(event: CheckRenderEntityEvent<Display.BlockDisplay>) {
         if (!SkyHanniMod.feature.foraging.trees.cleanView) return
         val block = event.entity.blockState
         if (block in treeBlocks) event.cancel()

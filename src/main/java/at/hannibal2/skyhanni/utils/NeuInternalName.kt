@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.item.Items
+import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.minutes
 
 class NeuInternalName private constructor(private val internalName: String) {

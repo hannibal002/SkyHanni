@@ -12,12 +12,12 @@ import at.hannibal2.skyhanni.data.MiningApi.inSpidersDen
 import at.hannibal2.skyhanni.data.MiningApi.inTunnels
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
-import net.minecraft.block.Block
-import net.minecraft.block.StainedGlassBlock
-import net.minecraft.block.StainedGlassPaneBlock
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.util.DyeColor
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.StainedGlassBlock
+import net.minecraft.world.level.block.StainedGlassPaneBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.DyeColor
 import kotlin.math.ceil
 import kotlin.math.round
 //#if MC < 1.16

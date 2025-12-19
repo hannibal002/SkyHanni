@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable
-import net.minecraft.item.ItemStack
-import net.minecraft.util.math.Direction.Axis
-import net.minecraft.util.math.Vec3d
+import net.minecraft.world.item.ItemStack
+import net.minecraft.core.Direction.Axis
+import net.minecraft.world.phys.Vec3
 import kotlin.math.sin
 import kotlin.time.Duration
 
@@ -103,8 +103,8 @@ class AnimatedItemStackRenderable private constructor(
     override val height = baseItemHeight + fullBounceHeight
     override val stack: ItemStack get() = frameDefs[frameIndex].stack
 
-    var currentRotation: Vec3d = Vec3d(0.0, 0.0, 0.0)
-    private fun generateNextRotation(deltaTime: Double): Vec3d = Vec3d(
+    var currentRotation: Vec3 = Vec3(0.0, 0.0, 0.0)
+    private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(
         currentRotation.x + when (rotation.axis) {
             Axis.X -> rotation.rotationSpeed * deltaTime
             else -> 0.0

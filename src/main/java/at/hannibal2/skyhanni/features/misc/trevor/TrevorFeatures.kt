@@ -39,9 +39,9 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.MinecraftClient
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.client.Minecraft
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -295,7 +295,7 @@ object TrevorFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onKeyPress(event: KeyPressEvent) {
-        if (MinecraftClient.getInstance().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         if (NeuItems.neuHasFocus()) return
 
         if (event.keyCode != config.keyBind) return
@@ -318,7 +318,7 @@ object TrevorFeatures {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStandEntity>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!inTrapperDen || !config.cooldown) return
         if (event.entity.name.formattedTextCompatLessResets() == "§e§lCLICK") event.cancel()
     }

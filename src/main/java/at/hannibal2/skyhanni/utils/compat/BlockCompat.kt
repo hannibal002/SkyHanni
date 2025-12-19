@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.LorenzVec
-import net.minecraft.block.Block
-import net.minecraft.state.property.EnumProperty
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.item.ItemStack
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.properties.EnumProperty
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.ItemStack
 //#if MC < 1.21
 //$$ import net.minecraft.block.properties.IProperty
 //#endif

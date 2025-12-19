@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.hit.HitResult
+import net.minecraft.network.protocol.game.ServerboundInteractPacket
+import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.HitResult
 
 //#if MC > 1.21
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.hit.EntityHitResult
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.EntityHitResult
 //#endif
 
 object MinecraftInputHook {
@@ -28,7 +28,7 @@ object MinecraftInputHook {
             }
 
             HitResult.Type.BLOCK -> {
-                val position = blockHitResult.pos.toLorenzVec()
+                val position = blockHitResult.location.toLorenzVec()
                 BlockClickEvent(
                     ClickType.RIGHT_CLICK,
                     position,
@@ -41,7 +41,7 @@ object MinecraftInputHook {
             HitResult.Type.ENTITY -> {
                 EntityClickEvent(
                     ClickType.RIGHT_CLICK,
-                    PlayerInteractEntityC2SPacket.InteractType.INTERACT_AT,
+                    ServerboundInteractPacket.ActionType.INTERACT_AT,
                     //#if MC < 1.21
                     //$$ blockHitResult.entityHit,
                     //#else
@@ -88,7 +88,7 @@ object MinecraftInputHook {
             HitResult.Type.ENTITY -> {
                 EntityClickEvent(
                     ClickType.LEFT_CLICK,
-                    PlayerInteractEntityC2SPacket.InteractType.ATTACK,
+                    ServerboundInteractPacket.ActionType.ATTACK,
                     //#if MC < 1.21
                     //$$ blockHitResult.entityHit,
                     //#else

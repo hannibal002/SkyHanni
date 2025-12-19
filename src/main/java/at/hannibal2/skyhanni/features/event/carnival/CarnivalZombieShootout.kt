@@ -31,18 +31,18 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.entity.mob.ZombieEntity
-import net.minecraft.block.Blocks
-import net.minecraft.item.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 //#if MC > 1.21
-import net.minecraft.state.property.Properties
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 //#endif
 
 @SkyHanniModule
@@ -51,7 +51,7 @@ object CarnivalZombieShootout {
     private val config get() = SkyHanniMod.feature.event.carnival.zombieShootout
 
     private data class ShootoutLamp(var pos: LorenzVec, var time: SimpleTimeMark)
-    private data class ShootoutZombie(val entity: ZombieEntity, val type: ZombieType)
+    private data class ShootoutZombie(val entity: Zombie, val type: ZombieType)
 
     private var content = Renderable.empty()
     private var drawZombies = listOf<ShootoutZombie>()
@@ -105,11 +105,11 @@ object CarnivalZombieShootout {
 
             if (timer > 0.seconds) {
                 val entity = EntityUtils.getEntityByID(zombie.entity.id) ?: continue
-                val isSmall = (entity as? ZombieEntity)?.isBaby ?: false
+                val isSmall = (entity as? Zombie)?.isBaby ?: false
 
                 val skips = lifetime / 3
                 val prefix = determinePrefix(timer, lifetime, lifetime - skips, lifetime - skips * 2)
-                val height = if (isSmall) entity.height / 2 else entity.height
+                val height = if (isSmall) entity.bbHeight / 2 else entity.bbHeight
 
                 drawDynamicText(
                     entity.getLorenzVec().add(-0.5, height + 0.5, -0.5),
@@ -133,18 +133,18 @@ object CarnivalZombieShootout {
 
         for ((zombie, type) in drawZombies) {
             val entity = EntityUtils.getEntityByID(zombie.id) ?: continue
-            val isSmall = (entity as? ZombieEntity)?.isBaby ?: false
+            val isSmall = (entity as? Zombie)?.isBaby ?: false
 
             val boundingBox = entity.boundingBox.let {
                 if (PlatformUtils.IS_LEGACY && isSmall) {
-                    it.expand(0.0, -0.4, 0.0).offset(0.0, -0.4, 0.0)
+                    it.inflate(0.0, -0.4, 0.0).move(0.0, -0.4, 0.0)
                 } else {
                     it
                 }
             }
 
             drawHitbox(
-                boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
+                boundingBox.inflate(0.1, 0.05, 0.0).move(0.0, 0.05, 0.0),
                 type.color,
                 lineWidth = 3,
                 depth = false,
@@ -186,8 +186,8 @@ object CarnivalZombieShootout {
         val blockOld = event.old
         val blockNew = event.new
         if(blockOld == "redstone_lamp" && blockNew == "redstone_lamp") {
-            val old = event.oldState.get(Properties.LIT)
-            val new = event.newState.get(Properties.LIT)
+            val old = event.oldState.getValue(BlockStateProperties.LIT)
+            val new = event.newState.getValue(BlockStateProperties.LIT)
             lamp = when {
                 !old && new -> ShootoutLamp(event.location, SimpleTimeMark.now())
                 old && !new -> null
@@ -257,7 +257,7 @@ object CarnivalZombieShootout {
     }
 
     private fun getZombies() =
-        EntityUtils.getEntitiesNextToPlayer<ZombieEntity>(50.0).mapNotNull { zombie ->
+        EntityUtils.getEntitiesNextToPlayer<Zombie>(50.0).mapNotNull { zombie ->
             if (zombie.findHealthReal() <= 0) return@mapNotNull null
             val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
             val type = toType(helmet) ?: run {
@@ -265,12 +265,12 @@ object CarnivalZombieShootout {
                     "Could not identify Zombie Shootout type",
                     "zombie type for zombie entity helmet is null",
                     "helmet" to helmet,
-                    "helmet.displayName" to helmet.name.formattedTextCompatLeadingWhiteLessResets(),
+                    "helmet.displayName" to helmet.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "helmet.item" to helmet.item,
                     //#if MC < 1.21
                     //$$ "helmet.unlocalizedName" to helmet.unlocalizedName,
                     //#else
-                    "helmet.unlocalizedName" to helmet.item.translationKey,
+                    "helmet.unlocalizedName" to helmet.item.descriptionId,
                     //#endif
                 )
                 return@mapNotNull null

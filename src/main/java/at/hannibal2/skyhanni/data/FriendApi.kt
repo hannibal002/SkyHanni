@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import java.util.UUID
 
 @SkyHanniModule
@@ -173,7 +173,7 @@ object FriendApi {
         saveConfig()
     }
 
-    private fun readName(chatComponent: Text): String? {
+    private fun readName(chatComponent: Component): String? {
         val hoverEventSiblings = chatComponent.hover?.siblings ?: return null
         for (component in hoverEventSiblings) {
             val rawName = component.unformattedTextCompat()

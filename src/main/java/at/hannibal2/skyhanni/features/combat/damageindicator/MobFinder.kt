@@ -18,25 +18,25 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.network.OtherClientPlayerEntity
-import net.minecraft.entity.Entity
-import net.minecraft.entity.boss.dragon.EnderDragonEntity
-import net.minecraft.entity.boss.WitherEntity
-import net.minecraft.entity.mob.BlazeEntity
-import net.minecraft.entity.mob.EndermanEntity
-import net.minecraft.entity.mob.GhastEntity
-import net.minecraft.entity.mob.GiantEntity
-import net.minecraft.entity.mob.GuardianEntity
-import net.minecraft.entity.passive.IronGolemEntity
-import net.minecraft.entity.mob.MagmaCubeEntity
-import net.minecraft.entity.mob.ZombifiedPiglinEntity
-import net.minecraft.entity.mob.SilverfishEntity
-import net.minecraft.entity.mob.AbstractSkeletonEntity
-import net.minecraft.entity.mob.SpiderEntity
-import net.minecraft.entity.mob.ZombieEntity
-import net.minecraft.entity.passive.BatEntity
-import net.minecraft.entity.passive.HorseEntity
-import net.minecraft.entity.passive.WolfEntity
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon
+import net.minecraft.world.entity.boss.wither.WitherBoss
+import net.minecraft.world.entity.monster.Blaze
+import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.Ghast
+import net.minecraft.world.entity.monster.Giant
+import net.minecraft.world.entity.monster.Guardian
+import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.ZombifiedPiglin
+import net.minecraft.world.entity.monster.Silverfish
+import net.minecraft.world.entity.monster.AbstractSkeleton
+import net.minecraft.world.entity.monster.Spider
+import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.entity.ambient.Bat
+import net.minecraft.world.entity.animal.horse.Horse
+import net.minecraft.world.entity.animal.wolf.Wolf
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -53,23 +53,23 @@ class MobFinder {
     // F2
     private var floor2summons1 = false
     private var floor2summons1SpawnTime = SimpleTimeMark.farPast()
-    private val floor2summonsDiedOnce = mutableListOf<OtherClientPlayerEntity>()
+    private val floor2summonsDiedOnce = mutableListOf<RemotePlayer>()
     private var floor2secondPhase = false
     private var floor2secondPhaseSpawnTime = SimpleTimeMark.farPast()
 
     // F3
     private var floor3GuardianShield = false
     private var floor3GuardianShieldSpawnTime = SimpleTimeMark.farPast()
-    private val guardians = mutableListOf<GuardianEntity>()
+    private val guardians = mutableListOf<Guardian>()
     private var floor3Professor = false
     private var floor3ProfessorSpawnTime = SimpleTimeMark.farPast()
     private var floor3ProfessorGuardianPrepare = false
     private var floor3ProfessorGuardianPrepareSpawnTime = SimpleTimeMark.farPast()
     private var floor3ProfessorGuardian = false
-    private var floor3ProfessorGuardianEntity: GuardianEntity? = null
+    private var floor3ProfessorGuardianEntity: Guardian? = null
 
     // F5
-    private var floor5lividEntity: OtherClientPlayerEntity? = null
+    private var floor5lividEntity: RemotePlayer? = null
     private var floor5lividEntitySpawnTime = SimpleTimeMark.farPast()
     private val correctLividPattern = "§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!".toPattern()
 
@@ -95,20 +95,20 @@ class MobFinder {
                      * EntityPigZombie will never be reached because EntityPigZombie extends EntityZombie.
                      * Please take this into consideration if you are to modify this.
                      */
-                    is OtherClientPlayerEntity -> tryAddEntityOtherPlayerMP(mob)
-                    is IronGolemEntity -> tryAddEntityIronGolem(mob)
-                    is ZombifiedPiglinEntity -> tryAddEntityPigZombie(mob)
-                    is MagmaCubeEntity -> tryAddEntityMagmaCube(mob)
-                    is EndermanEntity -> tryAddEntityEnderman(mob)
-                    is AbstractSkeletonEntity -> tryAddEntitySkeleton(mob)
-                    is GuardianEntity -> tryAddEntityGuardian(mob)
-                    is ZombieEntity -> tryAddEntityZombie(mob)
-                    is WitherEntity -> tryAddEntityWither(mob)
-                    is EnderDragonEntity -> tryAddEntityDragon(mob)
-                    is SpiderEntity -> tryAddEntitySpider(mob)
-                    is HorseEntity -> tryAddEntityHorse(mob)
-                    is BlazeEntity -> tryAddEntityBlaze(mob)
-                    is WolfEntity -> tryAddEntityWolf(mob)
+                    is RemotePlayer -> tryAddEntityOtherPlayerMP(mob)
+                    is IronGolem -> tryAddEntityIronGolem(mob)
+                    is ZombifiedPiglin -> tryAddEntityPigZombie(mob)
+                    is MagmaCube -> tryAddEntityMagmaCube(mob)
+                    is EnderMan -> tryAddEntityEnderman(mob)
+                    is AbstractSkeleton -> tryAddEntitySkeleton(mob)
+                    is Guardian -> tryAddEntityGuardian(mob)
+                    is Zombie -> tryAddEntityZombie(mob)
+                    is WitherBoss -> tryAddEntityWither(mob)
+                    is EnderDragon -> tryAddEntityDragon(mob)
+                    is Spider -> tryAddEntitySpider(mob)
+                    is Horse -> tryAddEntityHorse(mob)
+                    is Blaze -> tryAddEntityBlaze(mob)
+                    is Wolf -> tryAddEntityWolf(mob)
                     else -> null
                 }
             }
@@ -117,7 +117,7 @@ class MobFinder {
 
     private fun tryAddGarden(mob: Mob): EntityResult? {
         val entity = mob.baseEntity
-        if (entity is SilverfishEntity || entity is BatEntity) {
+        if (entity is Silverfish || entity is Bat) {
             return tryAddGardenPest(mob)
         }
 
@@ -154,7 +154,7 @@ class MobFinder {
 
     private fun tryAddDungeonF2(mob: Mob): EntityResult? {
         val entity = mob.baseEntity
-        if (entity.name.formattedTextCompatLessResets() == "Summon " && entity is OtherClientPlayerEntity) {
+        if (entity.name.formattedTextCompatLessResets() == "Summon " && entity is RemotePlayer) {
             if (floor2summons1 && !floor2summonsDiedOnce.contains(entity)) {
                 if (entity.findHealthReal().toInt() != 0) {
                     return EntityResult(floor2summons1SpawnTime, bossType = BossType.DUNGEON_F2_SUMMON)
@@ -166,7 +166,7 @@ class MobFinder {
             }
         }
 
-        if (floor2secondPhase && entity is OtherClientPlayerEntity) {
+        if (floor2secondPhase && entity is RemotePlayer) {
             // TODO only show scarf after (all/at least x) summons are dead?
             if (entity.name.formattedTextCompatLessResets() == "Scarf ") {
                 return EntityResult(
@@ -181,7 +181,7 @@ class MobFinder {
 
     private fun tryAddDungeonF3(mob: Mob): EntityResult? {
         val entity = mob.baseEntity
-        if (entity is GuardianEntity && floor3GuardianShield) {
+        if (entity is Guardian && floor3GuardianShield) {
             if (guardians.size == 4) {
                 calcGuardiansTotalHealth()
             } else {
@@ -207,14 +207,14 @@ class MobFinder {
             )
         }
 
-        if (entity is GuardianEntity && floor3ProfessorGuardian && entity == floor3ProfessorGuardianEntity) {
+        if (entity is Guardian && floor3ProfessorGuardian && entity == floor3ProfessorGuardianEntity) {
             return EntityResult(finalDungeonBoss = true, bossType = BossType.DUNGEON_F3_PROFESSOR_2)
         }
         return null
     }
 
     private fun tryAddDungeonF4(mob: Mob): EntityResult? {
-        if (mob.baseEntity is GhastEntity) {
+        if (mob.baseEntity is Ghast) {
             return EntityResult(
                 bossType = BossType.DUNGEON_F4_THORN,
                 ignoreBlocks = true,
@@ -237,8 +237,8 @@ class MobFinder {
 
     private fun tryAddDungeonF6(mob: Mob): EntityResult? {
         val entity = mob.baseEntity
-        if (entity !is GiantEntity || entity.isInvisible) return null
-        if (floor6Giants && entity.pos.y > 68) {
+        if (entity !is Giant || entity.isInvisible) return null
+        if (floor6Giants && entity.position().y > 68) {
             val (extraDelay, bossType) = checkExtraF6GiantsDelay(entity)
             return EntityResult(
                 floor6GiantsSpawnTime + extraDelay + 5.seconds,
@@ -445,7 +445,7 @@ class MobFinder {
         EntityResult(bossType = BossType.THUNDER)
     } else null
 
-    private fun checkExtraF6GiantsDelay(entity: GiantEntity): Pair<Duration, BossType> {
+    private fun checkExtraF6GiantsDelay(entity: Giant): Pair<Duration, BossType> {
         val uuid = entity.uuid
 
         floor6GiantsSeparateDelay[uuid]?.let {
@@ -585,7 +585,7 @@ class MobFinder {
     }
 
     fun handleNewEntity(entity: Entity) {
-        if (DungeonApi.inDungeon() && floor3ProfessorGuardian && entity is GuardianEntity && floor3ProfessorGuardianEntity == null) {
+        if (DungeonApi.inDungeon() && floor3ProfessorGuardian && entity is Guardian && floor3ProfessorGuardianEntity == null) {
             floor3ProfessorGuardianEntity = entity
             floor3ProfessorGuardianPrepare = false
         }
@@ -597,7 +597,7 @@ class MobFinder {
     private fun findGuardians() {
         guardians.clear()
 
-        for (entity in EntityUtils.getEntities<GuardianEntity>()) {
+        for (entity in EntityUtils.getEntities<Guardian>()) {
             // F3
             if (entity.hasMaxHealth(1_000_000, true) || entity.hasMaxHealth(1_200_000, true)) {
                 guardians.add(entity)

@@ -52,8 +52,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.screen.GenericContainerScreenHandler
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.inventory.ChestMenu
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -139,8 +139,8 @@ object DailyQuestHelper {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
-        if (event.gui !is GenericContainerScreen) return
-        val chest = event.container as GenericContainerScreenHandler
+        if (event.gui !is ContainerScreen) return
+        val chest = event.container as ChestMenu
         val chestName = InventoryUtils.openInventoryName()
 
         if (chestName == "Challenges") {
@@ -149,7 +149,7 @@ object DailyQuestHelper {
             if (dojoQuest.state != QuestState.ACCEPTED) return
 
             for ((slot, stack) in chest.getUpperItems()) {
-                if (stack.name.formattedTextCompatLeadingWhiteLessResets().contains(dojoQuest.dojoName)) {
+                if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets().contains(dojoQuest.dojoName)) {
                     slot.highlight(LorenzColor.AQUA)
                 }
             }
@@ -199,7 +199,7 @@ object DailyQuestHelper {
 
         val itemName = fetchQuest.itemName
 
-        val count = InventoryUtils.countItemsInLowerInventory { it.name.formattedTextCompatLeadingWhiteLessResets().removeColor() == itemName }
+        val count = InventoryUtils.countItemsInLowerInventory { it.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == itemName }
         updateProcessQuest(fetchQuest, count)
     }
 
@@ -307,7 +307,7 @@ object DailyQuestHelper {
         val item = quest.displayItem.getItemStack()
 
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
-            val name = item.name.formattedTextCompatLeadingWhiteLessResets()
+            val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
             if (category == QuestCategory.FISHING) {
                 name.removeWordsAtEnd(1)
             } else name

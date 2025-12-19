@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.util.Identifier
+import net.minecraft.resources.ResourceLocation
 import java.awt.Color
 import kotlin.math.max
 //#if MC > 1.21
@@ -57,7 +57,7 @@ object ShaderRenderUtils {
 
         //#if MC > 1.21
         //#if MC < 1.21.6
-        this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
+        this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.pose().last().pose())
         //#endif
         //#endif
         //#if MC > 1.21.6
@@ -89,7 +89,7 @@ object ShaderRenderUtils {
         filter: Int,
         radius: Int = 10,
         smoothness: Float = 1f,
-        texture: Identifier,
+        texture: ResourceLocation,
         alpha: Float = 1f,
     ) {
         // if radius is 0 then just draw a normal textured rect

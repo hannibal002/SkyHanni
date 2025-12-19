@@ -16,15 +16,15 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.font.TextRenderer
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Font
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.client.render.DiffuseLighting
-import net.minecraft.client.render.Tessellator
-import net.minecraft.client.render.VertexFormats
-import net.minecraft.item.ItemStack
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.Vec3d
+import com.mojang.blaze3d.platform.Lighting
+import com.mojang.blaze3d.vertex.Tesselator
+import com.mojang.blaze3d.vertex.DefaultVertexFormat
+import net.minecraft.world.item.ItemStack
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.phys.Vec3
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
@@ -37,7 +37,7 @@ import kotlin.math.min
 //#else
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import com.mojang.blaze3d.systems.RenderSystem
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import org.joml.Matrix4f
 //#endif
 //#if MC > 1.21.6
@@ -60,21 +60,21 @@ import org.joml.Matrix4f
 @Suppress("UnusedParameter")
 object GuiRenderUtils {
 
-    private val fr: TextRenderer get() = MinecraftClient.getInstance().textRenderer
+    private val fr: Font get() = Minecraft.getInstance().font
 
     private fun drawStringCentered(str: String, x: Float, y: Float, shadow: Boolean, color: Int) {
-        val strLen = fr.getWidth(str)
+        val strLen = fr.width(str)
         val x2 = x - strLen / 2f
-        val y2 = y - fr.fontHeight / 2f
-        DrawContextUtils.drawContext.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
+        val y2 = y - fr.lineHeight / 2f
+        DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
     //#if MC > 1.21
-    private fun drawStringCentered(str: Text, x: Float, y: Float, shadow: Boolean, color: Int) {
-        val strLen = fr.getWidth(str)
+    private fun drawStringCentered(str: Component, x: Float, y: Float, shadow: Boolean, color: Int) {
+        val strLen = fr.width(str)
         val x2 = x - strLen / 2f
-        val y2 = y - fr.fontHeight / 2f
-        DrawContextUtils.drawContext.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
+        val y2 = y - fr.lineHeight / 2f
+        DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
     //#endif
 
@@ -83,36 +83,36 @@ object GuiRenderUtils {
     }
 
     //#if MC > 1.21
-    fun drawStringCentered(str: Text, x: Int, y: Int) {
+    fun drawStringCentered(str: Component, x: Int, y: Int) {
         drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
     }
     //#endif
 
     fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
         DrawContextUtils.pushMatrix()
-        val strLength = fr.getWidth(text)
+        val strLength = fr.width(text)
         val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
         DrawContextUtils.translate(x, y, 0f)
         DrawContextUtils.scale(factor, factor, 1f)
-        drawString(text, -strLength / 2, -fr.fontHeight / 2, color, shadow)
+        drawString(text, -strLength / 2, -fr.lineHeight / 2, color, shadow)
         DrawContextUtils.popMatrix()
     }
 
     fun drawString(str: String, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
-        DrawContextUtils.drawContext.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
+        DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
-        DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
+        DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
     }
 
     //#if MC > 1.21
-    fun drawString(str: Text, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
-        DrawContextUtils.drawContext.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
+    fun drawString(str: Component, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
+        DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
-    fun drawString(str: Text, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
-        DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
+    fun drawString(str: Component, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
+        DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
     }
     //#endif
 
@@ -123,16 +123,16 @@ object GuiRenderUtils {
     fun drawStrings(strings: List<String>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         var newY = y
         for (string in strings) {
-            DrawContextUtils.drawContext.drawText(fr, string, x, newY, color, shadow)
+            DrawContextUtils.drawContext.drawString(fr, string, x, newY, color, shadow)
             newY += 9
         }
     }
 
     //#if MC > 1.21
-    fun drawTexts(strings: List<Text>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
+    fun drawTexts(strings: List<Component>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         var newY = y
         for (string in strings) {
-            DrawContextUtils.drawContext.drawText(fr, string, x, newY, color, shadow)
+            DrawContextUtils.drawContext.drawString(fr, string, x, newY, color, shadow)
             newY += 9
         }
     }
@@ -239,7 +239,7 @@ object GuiRenderUtils {
         //#endif
     }
 
-    fun drawTexturedRect(x: Float, y: Float, texture: Identifier, alpha: Float = 1f) {
+    fun drawTexturedRect(x: Float, y: Float, texture: ResourceLocation, alpha: Float = 1f) {
         drawTexturedRect(
             x,
             y,
@@ -260,7 +260,7 @@ object GuiRenderUtils {
         uMax: Float = 1f,
         vMin: Float = 0f,
         vMax: Float = 1f,
-        texture: Identifier,
+        texture: ResourceLocation,
         alpha: Float = 1f,
         filter: Int = GL11.GL_NEAREST,
     ) {
@@ -289,7 +289,7 @@ object GuiRenderUtils {
         uMax: Float = 1f,
         vMin: Float = 0f,
         vMax: Float = 1f,
-        texture: Identifier,
+        texture: ResourceLocation,
         alpha: Float = 1f,
         filter: Int = GL11.GL_NEAREST,
     ) {
@@ -319,7 +319,7 @@ object GuiRenderUtils {
         //$$ RenderSystem.disableBlend()
         //$$ RenderSystem.color(1f, 1f, 1f, 1f)
         //#else
-        DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
+        DrawContextUtils.drawContext.blit(RenderCompat.getMinecraftGuiTextured(), texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
         //#endif
     }
 
@@ -415,7 +415,7 @@ object GuiRenderUtils {
         y: Float,
         scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
         rescaleSkulls: Boolean = true,
-        rotationDegrees: Vec3d? = null,
+        rotationDegrees: Vec3? = null,
     ) {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
@@ -482,7 +482,7 @@ object GuiRenderUtils {
                 //#if MC < 1.21
                 //$$ RenderSystem.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
                 //#else
-                savedMV = DrawContextUtils.drawContext.matrices.peek().getPositionMatrix()
+                savedMV = DrawContextUtils.drawContext.pose().last().pose()
                 //#endif
             }
             DrawContextUtils.multMatrix(savedMV)
@@ -495,7 +495,7 @@ object GuiRenderUtils {
             //#endif
 
             //#if MC < 1.21.6
-            DiffuseLighting.enableGuiDepthLighting()
+            Lighting.setupFor3DItems()
             //#else
             //$$ MinecraftClient.getInstance().gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
             //#endif
@@ -509,7 +509,7 @@ object GuiRenderUtils {
             //#if MC < 1.21
             //$$ DiffuseLighting.disable()
             //#else
-            DiffuseLighting.disableGuiDepthLighting()
+            Lighting.setupForFlatItems()
             //#endif
 
             //#if MC < 1.21

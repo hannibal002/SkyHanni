@@ -38,7 +38,7 @@ import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -271,10 +271,10 @@ object CFStrayTracker {
     fun onSecondPassed() {
         if (!isEnabled()) return
         InventoryUtils.getItemsInOpenChest().filter {
-            claimedStraysSlots.contains(it.index)
+            claimedStraysSlots.contains(it.containerSlot)
         }.forEach {
-            if (!strayCaughtPattern.matches(it.stack.name.formattedTextCompatLeadingWhiteLessResets())) {
-                claimedStraysSlots.removeAt(claimedStraysSlots.indexOf(it.index))
+            if (!strayCaughtPattern.matches(it.item.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+                claimedStraysSlots.removeAt(claimedStraysSlots.indexOf(it.containerSlot))
             }
         }
     }

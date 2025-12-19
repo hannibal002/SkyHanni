@@ -72,14 +72,14 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.network.OtherClientPlayerEntity
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.client.gui.screen.ingame.SignEditScreen
-import net.minecraft.client.gui.screen.ingame.InventoryScreen
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.item.ItemStack
+import net.minecraft.client.Minecraft
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.item.ItemStack
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
@@ -230,7 +230,7 @@ object GardenVisitorFeatures {
                     tips = internalName.createBuyTip(),
                     onLeftClick = {
                         if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickable
-                        if (MinecraftClient.getInstance().currentScreen is SignEditScreen) {
+                        if (Minecraft.getInstance().screen is SignEditScreen) {
                             SignUtils.setTextIntoSign("$amount")
                         } else {
                             internalName.buy(amount)
@@ -295,7 +295,7 @@ object GardenVisitorFeatures {
                 Renderable.optionalLink(
                     "§aCraftable!",
                     {
-                        if (MinecraftClient.getInstance().currentScreen is SignEditScreen) {
+                        if (Minecraft.getInstance().screen is SignEditScreen) {
                             SignUtils.setTextIntoSign("$leftToCraft")
                         } else {
                             HypixelCommands.viewRecipe(internalName)
@@ -401,7 +401,7 @@ object GardenVisitorFeatures {
     }
 
     fun onTooltip(visitor: VisitorApi.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
-        if (itemStack.name.formattedTextCompatLeadingWhiteLessResets() != "§aAccept Offer") return
+        if (itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aAccept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)
@@ -578,7 +578,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    private fun doesVisitorEntityExist(name: String) = EntityUtils.getEntitiesInBoundingBox<OtherClientPlayerEntity>(GardenApi.barnArea).any {
+    private fun doesVisitorEntityExist(name: String) = EntityUtils.getEntitiesInBoundingBox<RemotePlayer>(GardenApi.barnArea).any {
         it.name.formattedTextCompatLessResets().trim().equals(name, true)
     }
 
@@ -636,10 +636,10 @@ object GardenVisitorFeatures {
         }
     }
 
-    private fun findEntity(nameTag: ArmorStandEntity, visitor: VisitorApi.Visitor) {
+    private fun findEntity(nameTag: ArmorStand, visitor: VisitorApi.Visitor) {
         val nameTagVec = nameTag.getLorenzVec()
         EntityUtils.getEntitiesNearby<LivingEntity>(nameTagVec, 5.0) { entity ->
-            entity !is ArmorStandEntity && entity !is ClientPlayerEntity && entity.distanceToIgnoreY(nameTagVec) < 0.5
+            entity !is ArmorStand && entity !is LocalPlayer && entity.distanceToIgnoreY(nameTagVec) < 0.5
         }.forEach {
             visitor.entityId = it.id
             visitor.nameTagEntityId = nameTag.id
@@ -676,7 +676,7 @@ object GardenVisitorFeatures {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.shoppingList.enabled) return
-        val currentScreen = MinecraftClient.getInstance().currentScreen
+        val currentScreen = Minecraft.getInstance().screen
         if (currentScreen is SignEditScreen) return
 
         renderDisplay()
@@ -685,7 +685,7 @@ object GardenVisitorFeatures {
     private fun shouldShowShoppingList(): Boolean {
         if (VisitorApi.inInventory) return true
         if (BazaarApi.inBazaarInventory) return true
-        val currentScreen = MinecraftClient.getInstance().currentScreen ?: return true
+        val currentScreen = Minecraft.getInstance().screen ?: return true
         val isInOwnInventory = currentScreen is InventoryScreen
         if (isInOwnInventory) return true
         if (currentScreen is SignEditScreen && (currentScreen.isBazaarSign() || currentScreen.isSupercraftAmountSetSign())) return true

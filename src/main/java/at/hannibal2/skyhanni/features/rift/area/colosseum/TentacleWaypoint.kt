@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.utils.compat.DamageSourceCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.mob.SlimeEntity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.monster.Slime
 import java.awt.Color
 import kotlin.math.ceil
 
@@ -31,23 +31,23 @@ object TentacleWaypoint {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityHealthUpdate(event: MobEvent.Spawn.Special) {
         if (!isEnabled()) return
-        val entity = event.mob.baseEntity as? SlimeEntity ?: return
+        val entity = event.mob.baseEntity as? Slime ?: return
         if (event.mob.name != "Bacte Tentacle") return
         // Only get the tentacle on the ground
-        if (ceil(entity.pos.y).toInt() != TENTACLE_FLOOR_Y) return
+        if (ceil(entity.position().y).toInt() != TENTACLE_FLOOR_Y) return
         if (entity.size !in VALID_SLIME_SIZES) return
         if (entity in tentacleHits) return
 
-        tentacleHits += (event.mob.baseEntity as SlimeEntity) to 0
+        tentacleHits += (event.mob.baseEntity as Slime) to 0
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityDamage(event: MobEvent.Hurt.Special) {
         if (!isEnabled()) return
-        val entity = event.mob.baseEntity as? SlimeEntity ?: return
+        val entity = event.mob.baseEntity as? Slime ?: return
 
         // Fixes Wall Damage counting as tentacle damage
-        if (event.source.name != DamageSourceCompat.generic.name) return
+        if (event.source.msgId != DamageSourceCompat.generic.msgId) return
 
         tentacleHits[entity]?.let { tentacleHits[entity] = it + 1 }
     }

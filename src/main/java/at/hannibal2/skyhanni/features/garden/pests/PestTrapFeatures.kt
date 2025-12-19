@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.sound.SoundInstance
+import net.minecraft.client.resources.sounds.SoundInstance
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object ScreenData {
@@ -11,7 +11,7 @@ object ScreenData {
 
     @HandleEvent
     fun onTick() {
-        val isOpen = MinecraftClient.getInstance().currentScreen != null
+        val isOpen = Minecraft.getInstance().screen != null
         if (wasOpen == isOpen) return
         wasOpen = isOpen
         if (!wasOpen) {

@@ -7,26 +7,26 @@ import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import net.minecraft.client.network.OtherClientPlayerEntity
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.boss.WitherEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.ItemEntity
-import net.minecraft.entity.decoration.ItemFrameEntity
-import net.minecraft.entity.ExperienceOrbEntity
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.boss.wither.WitherBoss
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.entity.decoration.ItemFrame
+import net.minecraft.world.entity.ExperienceOrb
 
 @SkyHanniModule
 object DataWatcherApi {
 
     private val ignoredEntities = setOf(
-        ArmorStandEntity::class.java,
-        ExperienceOrbEntity::class.java,
+        ArmorStand::class.java,
+        ExperienceOrb::class.java,
         ItemEntity::class.java,
-        ItemFrameEntity::class.java,
-        OtherClientPlayerEntity::class.java,
-        ClientPlayerEntity::class.java,
+        ItemFrame::class.java,
+        RemotePlayer::class.java,
+        LocalPlayer::class.java,
     )
 
     private const val DATA_VALUE_CUSTOM_NAME = 2
@@ -38,7 +38,7 @@ object DataWatcherApi {
             //#if MC < 1.21
             //$$ if (updatedEntry.dataValueId == DATA_VALUE_CUSTOM_NAME) {
                 //#else
-                if (updatedEntry.data == Entity.CUSTOM_NAME) {
+                if (updatedEntry.accessor == Entity.DATA_CUSTOM_NAME) {
                 //#endif
                 EntityCustomNameUpdateEvent(event.entity, event.entity.customName.formattedTextCompatLessResets()).post()
             }
@@ -47,14 +47,14 @@ object DataWatcherApi {
             //$$ if (updatedEntry.dataValueId == DATA_VALUE_HEALTH) {
             //$$     val health = (updatedEntry.`object` as? Float)?.toInt() ?: continue
                 //#else
-                if (updatedEntry.data == LivingEntity.HEALTH) {
-                val health = (updatedEntry.get() as? Float)?.toInt() ?: continue
+                if (updatedEntry.accessor == LivingEntity.DATA_HEALTH_ID) {
+                val health = (updatedEntry.value as? Float)?.toInt() ?: continue
                 //#endif
 
                 val entity = EntityUtils.getEntityByID(event.entity.id) ?: continue
                 if (entity.javaClass in ignoredEntities) continue
 
-                if (event.entity is WitherEntity && health == 300 && event.entity.id < 0) continue
+                if (event.entity is WitherBoss && health == 300 && event.entity.id < 0) continue
                 if (event.entity is LivingEntity) {
                     EntityHealthUpdateEvent(event.entity, health.derpy()).post()
                 }

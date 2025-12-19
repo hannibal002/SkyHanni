@@ -1,34 +1,34 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.LorenzColor
-import net.minecraft.client.MinecraftClient
-import net.minecraft.text.ClickEvent
-import net.minecraft.text.HoverEvent
-import net.minecraft.text.Style
-import net.minecraft.text.Text
-import net.minecraft.util.Identifier
+import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.ClickEvent
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.Style
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
 //#if MC < 1.16
 //$$ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 //$$ import net.minecraft.util.ChatComponentText
 //#endif
 //#if MC > 1.16
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.util.Formatting
-import net.minecraft.text.MutableText
-import net.minecraft.text.TextColor
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.chat.TextColor
 import kotlin.time.Duration.Companion.minutes
 //#endif
 //#if MC > 1.21
-import net.minecraft.text.PlainTextContent
-import net.minecraft.client.gui.hud.MessageIndicator
-import net.minecraft.network.message.MessageSignatureData
+import net.minecraft.network.chat.contents.PlainTextContents
+import net.minecraft.client.GuiMessageTag
+import net.minecraft.network.chat.MessageSignature
 import java.net.URI
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
-import net.minecraft.text.TranslatableTextContent
+import net.minecraft.network.chat.contents.TranslatableContents
 //#endif
 //#if MC > 1.16
-private val unformattedTextCache = TimeLimitedCache<Text, String>(3.minutes)
+private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
 private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
 
 private enum class FormattedTextSettings(noExtraResets: Boolean, leadingWhite: Boolean) {
@@ -49,10 +49,10 @@ private enum class FormattedTextSettings(noExtraResets: Boolean, leadingWhite: B
     }
 }
 
-private data class TextCacheKey(val settings: FormattedTextSettings, val component: Text)
+private data class TextCacheKey(val settings: FormattedTextSettings, val component: Component)
 //#endif
 
-fun Text.unformattedTextForChatCompat(): String {
+fun Component.unformattedTextForChatCompat(): String {
 //#if MC < 1.16
 //$$     return this.unformattedTextForChat
 //#elseif MC < 1.21
@@ -63,15 +63,15 @@ fun Text.unformattedTextForChatCompat(): String {
     }
 }
 
-private fun Text.computeUnformattedTextCompat(): String {
-    if (this.content is TranslatableTextContent) {
+private fun Component.computeUnformattedTextCompat(): String {
+    if (this.contents is TranslatableContents) {
         return this.string
     }
-    return (this.content as? PlainTextContent)?.string().orEmpty()
+    return (this.contents as? PlainTextContents)?.text().orEmpty()
 //#endif
 }
 
-fun Text.unformattedTextCompat(): String =
+fun Component.unformattedTextCompat(): String =
 //#if MC < 1.16
 //$$     this.unformattedText
 //#else
@@ -79,14 +79,14 @@ iterator().map { it.unformattedTextForChatCompat() }.joinToString(separator = ""
 //#endif
 
 // has to be a separate function for pattern mappings
-fun Text?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
-fun Text?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
-fun Text?.formattedTextCompatLeadingWhiteLessResets(): String =
+fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
+fun Component?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
+fun Component?.formattedTextCompatLeadingWhiteLessResets(): String =
     this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
 
 @JvmOverloads
 @Suppress("unused")
-fun Text?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
+fun Component?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
 //#if MC < 1.16
 //$$     return this?.formattedText.orEmpty()
 //$$ }
@@ -98,7 +98,7 @@ fun Text?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Bool
     }
 }
 
-private fun Text?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
+private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
     this ?: return ""
     val sb = StringBuilder(50)
     var wasFormatted  = false
@@ -112,7 +112,7 @@ private fun Text?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhit
         if (!noExtraResets) {
             sb.append("§r")
             wasFormatted  = true
-        } else if (component == Text.empty()){
+        } else if (component == Component.empty()){
             sb.append("§r")
             wasFormatted  = true
         }
@@ -120,8 +120,8 @@ private fun Text?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhit
     return sb.removeSuffix("§r").removePrefix("§r").toString()
 }
 
-private val textColorLUT = Formatting.entries
-    .mapNotNull { formatting -> formatting.colorValue?.let { it to formatting } }
+private val textColorLUT = ChatFormatting.entries
+    .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
     .toMap()
 
 fun Style.chatStyle() = buildString {
@@ -133,92 +133,92 @@ fun Style.chatStyle() = buildString {
     if (isObfuscated) append("§k")
 }
 
-fun TextColor.toChatFormatting(): Formatting? {
-    return textColorLUT[this.rgb]
+fun TextColor.toChatFormatting(): ChatFormatting? {
+    return textColorLUT[this.value]
 }
 
-fun Text.iterator(): Sequence<Text> {
+fun Component.iterator(): Sequence<Component> {
     return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() } // TODO: in theory we want to properly inherit styles here
 }
 //#endif
 
 //#if MC > 1.21
-fun MutableText.withColor(formatting: Formatting): Text {
-    return this.styled { it.withColor(formatting) }
+fun MutableComponent.withColor(formatting: ChatFormatting): Component {
+    return this.withStyle { it.withColor(formatting) }
 }
 //#endif
 
-fun createResourceLocation(domain: String, path: String): Identifier {
+fun createResourceLocation(domain: String, path: String): ResourceLocation {
     //#if MC < 1.21
     //$$ val textureLocation = Identifier(domain, path)
     //#else
-    val textureLocation = Identifier.of(domain, path)
+    val textureLocation = ResourceLocation.fromNamespaceAndPath(domain, path)
     //#endif
     return textureLocation
 }
 
-fun createResourceLocation(path: String): Identifier {
+fun createResourceLocation(path: String): ResourceLocation {
     //#if MC < 1.21
     //$$ val textureLocation = Identifier(path)
     //#else
-    val textureLocation = Identifier.of(path)
+    val textureLocation = ResourceLocation.parse(path)
     //#endif
     return textureLocation
 }
 
-var Text.hover: Text?
+var Component.hover: Component?
     //#if MC < 1.16
     //$$ get() = this.chatStyle.chatHoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) it.value else null }
     //#else
-    get() = this.style.hoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) (it as HoverEvent.ShowText).value else null }
+    get() = this.style.hoverEvent?.let { if (it.action() == HoverEvent.Action.SHOW_TEXT) (it as HoverEvent.ShowText).value else null }
     //#endif
     set(value) {
         //#if MC < 1.16
         //$$ this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
         //#else
-        value?.let { value -> (this as MutableText).styled { it.withHoverEvent(HoverEvent.ShowText(value)) } }
+        value?.let { value -> (this as MutableComponent).withStyle { it.withHoverEvent(HoverEvent.ShowText(value)) } }
         //#endif
     }
 
-var Text.command: String?
+var Component.command: String?
     //#if MC < 1.21
     //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) it.value else null }
     //#else
-    get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) (it as ClickEvent.RunCommand).command else null }
+    get() = this.style.clickEvent?.let { if (it.action() == ClickEvent.Action.RUN_COMMAND) (it as ClickEvent.RunCommand).command else null }
     //#endif
     set(value) {
         //#if MC < 1.16
         //$$ this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) }
         //#else
-        (this as MutableText).styled { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
+        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
         //#endif
     }
 
-var Text.suggest: String?
+var Component.suggest: String?
     //#if MC < 1.21
     //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) it.value else null }
     //#else
-    get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) (it as ClickEvent.SuggestCommand).command else null }
+    get() = this.style.clickEvent?.let { if (it.action() == ClickEvent.Action.SUGGEST_COMMAND) (it as ClickEvent.SuggestCommand).command else null }
     //#endif
     set(value) {
         //#if MC < 1.16
         //$$ this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) }
         //#else
-        (this as MutableText).styled { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
+        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
         //#endif
     }
 
-var Text.url: String?
+var Component.url: String?
     //#if MC < 1.21
     //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) it.value else null }
     //#else
-    get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) (it as ClickEvent.OpenUrl).uri.toString() else null }
+    get() = this.style.clickEvent?.let { if (it.action() == ClickEvent.Action.OPEN_URL) (it as ClickEvent.OpenUrl).uri.toString() else null }
     //#endif
     set(value) {
         //#if MC < 1.16
         //$$ this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
         //#else
-        (this as MutableText).styled { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
+        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
         //#endif
     }
 
@@ -234,11 +234,11 @@ fun Style.setHoverShowText(text: String): Style {
     //#if MC < 1.21
     //$$ return this.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, text.asComponent()))
     //#else
-    return this.withHoverEvent(HoverEvent.ShowText(Text.of(text)))
+    return this.withHoverEvent(HoverEvent.ShowText(Component.nullToEmpty(text)))
     //#endif
 }
 
-fun Style.setHoverShowText(text: Text): Style {
+fun Style.setHoverShowText(text: Component): Style {
     //#if MC < 1.21
     //$$ return this.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, text))
     //#else
@@ -246,43 +246,43 @@ fun Style.setHoverShowText(text: Text): Style {
     //#endif
 }
 
-fun Text.appendString(text: String): Text =
+fun Component.appendString(text: String): Component =
     //#if MC < 1.16
     //$$ this.appendText(text)
 //#else
-(this as MutableText).append(text)
+(this as MutableComponent).append(text)
 //#endif
 
-fun Text.appendComponent(component: Text): Text =
+fun Component.appendComponent(component: Component): Component =
     //#if MC < 1.16
     //$$ this.appendSibling(component)
 //#else
-(this as MutableText).append(component)
+(this as MutableComponent).append(component)
 //#endif
 
-fun addChatMessageToChat(message: Text) {
+fun addChatMessageToChat(message: Component) {
     //#if FORGE
     //$$ Minecraft.getInstance().player.addChatMessage(message)
     //#else
-    MinecraftClient.getInstance().player?.sendMessage(message, false)
+    Minecraft.getInstance().player?.displayClientMessage(message, false)
     //#endif
 }
 
-fun addDeletableMessageToChat(component: Text, id: Int) {
+fun addDeletableMessageToChat(component: Component, id: Int) {
     //#if MC < 1.16
     //$$ Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(component, id)
     //#else
-    MinecraftClient.getInstance().execute {
-       MinecraftClient.getInstance().inGameHud.chatHud.removeMessage(idToMessageSignature(id))
-       MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, idToMessageSignature(id), MessageIndicator.system())
+    Minecraft.getInstance().execute {
+       Minecraft.getInstance().gui.chat.deleteMessage(idToMessageSignature(id))
+       Minecraft.getInstance().gui.chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
     }
     //#endif
 }
 
 //#if MC > 1.21
-val map = mutableMapOf<Int, MessageSignatureData>()
+val map = mutableMapOf<Int, MessageSignature>()
 
-fun idToMessageSignature(id: Int): MessageSignatureData {
+fun idToMessageSignature(id: Int): MessageSignature {
     val newId = abs(id % (255*128))
     if (map.contains(newId)) return map[newId]!!
     val bytes = ByteArray(256)
@@ -292,7 +292,7 @@ fun idToMessageSignature(id: Int): MessageSignatureData {
         bytes[i] = 127
     }
     bytes[div] = mod.toByte()
-    return MessageSignatureData(bytes)
+    return MessageSignature(bytes)
 }
 //#endif
 
@@ -307,7 +307,7 @@ fun ClickEvent.value(): String {
     //#if MC < 1.21
     //$$ return this.value
     //#else
-    return when (this.action) {
+    return when (this.action()) {
         ClickEvent.Action.OPEN_URL -> (this as ClickEvent.OpenUrl).uri.toString()
         ClickEvent.Action.RUN_COMMAND -> (this as ClickEvent.RunCommand).command
         ClickEvent.Action.SUGGEST_COMMAND -> (this as ClickEvent.SuggestCommand).command
@@ -322,15 +322,15 @@ fun ClickEvent.value(): String {
 
 }
 
-fun HoverEvent.value(): Text {
+fun HoverEvent.value(): Component {
     //#if MC < 1.21
     //$$ return this.contents
     //#else
-    return when (this.action) {
+    return when (this.action()) {
         HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
-        HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.name
-        HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Text.empty()
-        else -> Text.empty()
+        HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.hoverName
+        HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
+        else -> Component.empty()
     }
     //#endif
 }
@@ -341,7 +341,7 @@ fun HoverEvent.value(): Text {
 //$$     return HoverEvent(action, component)
 //$$ }
 //#else
-fun createHoverEvent(action: HoverEvent.Action?, component: MutableText): HoverEvent? {
+fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): HoverEvent? {
     if (action == null) return null
     when (action) {
         HoverEvent.Action.SHOW_TEXT -> return HoverEvent.ShowText(component)
@@ -351,34 +351,34 @@ fun createHoverEvent(action: HoverEvent.Action?, component: MutableText): HoverE
 }
 //#endif
 
-fun Text.changeColor(color: LorenzColor): Text =
+fun Component.changeColor(color: LorenzColor): Component =
     //#if MC < 1.21
     //$$ this.shallowCopy().setStyle(this.style.withColor(color.toChatFormatting()))
 //#else
-this.copy().formatted(color.toChatFormatting())
+this.copy().withStyle(color.toChatFormatting())
 //#endif
 
-fun Text.convertToJsonString(): String {
+fun Component.convertToJsonString(): String {
     //#if MC < 1.21
     //$$ return Text.Serializer.componentToJson(this)
     //#elseif MC < 1.21.6
-    return Text.Serializer(net.minecraft.registry.DynamicRegistryManager.EMPTY).serialize(this, null, null).toString()
+    return Component.SerializerAdapter(net.minecraft.core.RegistryAccess.EMPTY).serialize(this, null, null).toString()
     //#else
     //$$ return net.minecraft.text.TextCodecs.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
     //#endif
 }
 
 //#if MC > 1.21
-fun Text.append(newText: Text): Text {
-    return (this as MutableText).append(newText)
+fun Component.append(newText: Component): Component {
+    return (this as MutableComponent).append(newText)
 }
 
 val formattingPattern = Regex("§.(?:§.)?")
 
-fun Text.append(newText: String): Text {
-    val mutableText = this as MutableText
+fun Component.append(newText: String): Component {
+    val mutableText = this as MutableComponent
     if (mutableText.string.matches(formattingPattern)) {
-        return Text.of(mutableText.string + newText)
+        return Component.nullToEmpty(mutableText.string + newText)
     }
     return mutableText.append(newText)
 }

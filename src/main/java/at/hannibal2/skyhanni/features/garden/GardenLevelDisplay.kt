@@ -134,7 +134,7 @@ object GardenLevelDisplay {
             "SkyBlock Menu" -> event.inventoryItems[10] ?: return
             else -> return
         }
-        gardenItemNamePattern.matchMatcher(item.name.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+        gardenItemNamePattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
             val level = groupOrNull("currentLevel")
             if (level != null) useRomanNumerals = level.isRoman()
         } ?: return
@@ -163,7 +163,7 @@ object GardenLevelDisplay {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onToolTip(event: ToolTipEvent) {
         if (!config.overflow.get()) return
-        val slotIndex = event.slot.index
+        val slotIndex = event.slot.containerSlot
         val name = InventoryUtils.openInventoryName()
         if (!((name == "Desk" && slotIndex == 4) || (name == "SkyBlock Menu" && slotIndex == 10))) return
 

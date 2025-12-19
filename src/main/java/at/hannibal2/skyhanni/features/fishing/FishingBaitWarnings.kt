@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.entity.ItemEntity
+import net.minecraft.world.entity.item.ItemEntity
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -26,7 +26,7 @@ object FishingBaitWarnings {
     private data class Bait(
         private val entity: ItemEntity,
         val bobberDistance: Double,
-        val name: String = entity.stack.name.formattedTextCompatLeadingWhiteLessResets(),
+        val name: String = entity.item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
     )
 
     private var lastBait: String? = null
@@ -54,7 +54,7 @@ object FishingBaitWarnings {
         val bobberDistance = event.entity.distanceTo(FishingApi.bobber?.getLorenzVec() ?: return)
         if (bobberDistance > 2) return
         DelayedRun.runNextTick {
-            if (event.entity.stack.isBait()) {
+            if (event.entity.item.isBait()) {
                 baitEntities += Bait(event.entity, bobberDistance)
             }
         }

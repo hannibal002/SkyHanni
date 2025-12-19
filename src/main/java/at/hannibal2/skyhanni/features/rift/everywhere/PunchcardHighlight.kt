@@ -34,8 +34,8 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.network.AbstractClientPlayerEntity
-import net.minecraft.entity.LivingEntity
+import net.minecraft.client.player.AbstractClientPlayer
+import net.minecraft.world.entity.LivingEntity
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -170,7 +170,7 @@ object PunchcardHighlight {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPunch(event: EntityClickEvent) {
         val entity = event.clickedEntity
-        if (entity !is AbstractClientPlayerEntity) return
+        if (entity !is AbstractClientPlayer) return
         if (entity.isNpc()) return
         val name = entity.name.formattedTextCompatLessResets()
         if (name in playerList || name in playerQueue) return

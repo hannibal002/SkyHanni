@@ -6,11 +6,11 @@ import com.mojang.blaze3d.textures.AddressMode
 import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.TextureFormat
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.OutlineVertexConsumerProvider
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumer
-import net.minecraft.client.render.VertexConsumerProvider
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.OutlineBufferSource
+import net.minecraft.client.renderer.RenderType
+import com.mojang.blaze3d.vertex.VertexConsumer
+import net.minecraft.client.renderer.MultiBufferSource
 //#if MC > 1.21.6
 //$$ import com.mojang.blaze3d.textures.GpuTextureView
 //#endif
@@ -19,18 +19,18 @@ import net.minecraft.client.render.VertexConsumerProvider
 // This implementation has been modified from the original SkyBlocker code to work across multiple versions.
 
 //#if MC < 1.21.9
-class SkyHanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immediate) : OutlineVertexConsumerProvider(parent) {
+class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSource) : OutlineBufferSource(parent) {
     //#else
     //$$ class SkyHanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immediate) : OutlineVertexConsumerProvider() {
     //#endif
 
-    override fun draw() {
+    override fun endOutlineBatch() {
         beginRendering()
-        super.draw()
+        super.endOutlineBatch()
         finishRendering()
     }
 
-    override fun getBuffer(renderLayer: RenderLayer): VertexConsumer {
+    override fun getBuffer(renderLayer: RenderType): VertexConsumer {
         beginRendering()
         val returnVal = super.getBuffer(renderLayer)
         finishRendering()
@@ -40,7 +40,7 @@ class SkyHanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immed
     companion object {
 
         @JvmStatic
-        val vertexConsumers by lazy { SkyHanniOutlineVertexConsumerProvider(MinecraftClient.getInstance().bufferBuilders.entityVertexConsumers) }
+        val vertexConsumers by lazy { SkyHanniOutlineVertexConsumerProvider(Minecraft.getInstance().renderBuffers().bufferSource()) }
 
         private var customDepthAttachment: GpuTexture? = null
 
@@ -76,15 +76,15 @@ class SkyHanniOutlineVertexConsumerProvider(parent: VertexConsumerProvider.Immed
 
         @JvmStatic
         fun checkIfDepthAttachmentNeedsUpdating() {
-            val window = MinecraftClient.getInstance().window
-            if (customDepthAttachment == null || window.framebufferWidth != lastWidth || window.framebufferHeight != lastHeight) {
-                lastWidth = window.framebufferWidth
-                lastHeight = window.framebufferHeight
+            val window = Minecraft.getInstance().window
+            if (customDepthAttachment == null || window.width != lastWidth || window.height != lastHeight) {
+                lastWidth = window.width
+                lastHeight = window.height
                 updateDepthAttachment()
             }
             try {
                 RenderSystem.getDevice().createCommandEncoder().copyTextureToTexture(
-                    MinecraftClient.getInstance().framebuffer.depthAttachment,
+                    Minecraft.getInstance().mainRenderTarget.depthTexture,
                     customDepthAttachment!!,
                     0, 0, 0, 0, 0, lastWidth, lastHeight,
                 )

@@ -21,7 +21,7 @@ object GardenNextPlotPrice {
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return
 
-        if (!event.itemStack.name.formattedTextCompatLeadingWhiteLessResets().startsWith("§ePlot")) return
+        if (!event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().startsWith("§ePlot")) return
 
         var next = false
         val list = event.toolTip

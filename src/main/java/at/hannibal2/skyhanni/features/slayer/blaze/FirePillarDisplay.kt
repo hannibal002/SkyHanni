@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object FirePillarDisplay {
@@ -30,7 +30,7 @@ object FirePillarDisplay {
     private var entityId: Int = 0
 
     @HandleEvent
-    fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStandEntity>) {
+    fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         if (!isEnabled()) return
         val seconds = entityNamePattern.matchGroup(event.newName ?: return, "seconds") ?: return
         entityId = event.entity.id
@@ -38,7 +38,7 @@ object FirePillarDisplay {
     }
 
     @HandleEvent
-    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStandEntity>) {
+    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
         if (event.entity.id == entityId) display = ""
     }
 

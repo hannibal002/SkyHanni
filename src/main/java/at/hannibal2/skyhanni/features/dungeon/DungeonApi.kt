@@ -35,8 +35,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.block.Blocks
-import net.minecraft.item.ItemStack
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.ItemStack
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
@@ -311,7 +311,7 @@ object DungeonApi {
         inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
-            if (item.name.formattedTextCompatLeadingWhiteLessResets() == "§aGo Back") {
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aGo Back") {
                 item.getLore().getOrNull(0)?.let { firstLine ->
                     if (firstLine == "§7To Boss Collections") {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")

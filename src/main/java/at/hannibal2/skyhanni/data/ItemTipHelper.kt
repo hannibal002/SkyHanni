@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 
 @SkyHanniModule
@@ -41,13 +41,13 @@ object ItemTipHelper {
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
         if (GlobalRender.renderDisabled) return
 
-        val gui = MinecraftClient.getInstance().currentScreen
-        if (gui !is GenericContainerScreen) return
+        val gui = Minecraft.getInstance().screen
+        if (gui !is ContainerScreen) return
         val inventoryName = InventoryUtils.openInventoryName()
 
         val guiLeft = (gui as AccessorHandledScreen).guiLeft
         val guiTop = (gui as AccessorHandledScreen).guiTop
-        val fontRenderer = MinecraftClient.getInstance().textRenderer
+        val fontRenderer = Minecraft.getInstance().font
 
         ModernGlStateManager.disableLighting()
         ModernGlStateManager.disableDepthTest()
@@ -55,7 +55,7 @@ object ItemTipHelper {
         DrawContextUtils.pushMatrix()
         DrawContextUtils.translate(0f, 0f, 300f)
         for (slot in gui.container.slots) {
-            val stack = slot.stack.orNull() ?: continue
+            val stack = slot.item.orNull() ?: continue
 
             val itemTipEvent = RenderInventoryItemTipEvent(inventoryName, slot, stack)
             itemTipEvent.post()
@@ -66,7 +66,7 @@ object ItemTipHelper {
             val yDisplayPosition = slot.y
 
             val x = guiLeft + xDisplayPosition + 17 + itemTipEvent.offsetX - if (itemTipEvent.alignLeft) {
-                fontRenderer.getWidth(stackTip)
+                fontRenderer.width(stackTip)
             } else 0
             val y = guiTop + yDisplayPosition + 9 + itemTipEvent.offsetY
 

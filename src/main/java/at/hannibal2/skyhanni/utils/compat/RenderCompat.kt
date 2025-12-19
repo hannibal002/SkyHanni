@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.utils.compat
 import com.mojang.blaze3d.systems.GpuDevice
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
-import net.minecraft.client.gl.Framebuffer
+import com.mojang.blaze3d.pipeline.RenderTarget
 import java.util.OptionalDouble
 import java.util.OptionalInt
 //#if MC < 1.21.6
-import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.renderer.RenderType
 //#else
 //$$ import com.mojang.blaze3d.pipeline.RenderPipeline
 //$$ import net.minecraft.client.gl.RenderPipelines
@@ -16,7 +16,7 @@ import net.minecraft.client.render.RenderLayer
 object RenderCompat {
 
     //#if MC < 1.21.6
-    fun getMinecraftGuiTextured() = RenderLayer::getGuiTextured
+    fun getMinecraftGuiTextured() = RenderType::guiTextured
     //#else
     //$$ fun getMinecraftGuiTextured(): RenderPipeline = RenderPipelines.GUI_TEXTURED
     //#endif
@@ -42,21 +42,21 @@ object RenderCompat {
         //#endif
     }
 
-    private fun Framebuffer.findColorAttachment() =
+    private fun RenderTarget.findColorAttachment() =
         //#if MC < 1.21.6
-        this.colorAttachment
+        this.colorTexture
     //#else
     //$$ this.colorAttachmentView
     //#endif
 
-    private fun Framebuffer.findDepthAttachment() =
+    private fun RenderTarget.findDepthAttachment() =
         //#if MC < 1.21.6
-        if (this.useDepthAttachment) this.depthAttachment else null
+        if (this.useDepth) this.depthTexture else null
     //#else
     //$$ if (this.useDepthAttachment) this.depthAttachmentView else null
     //#endif
 
-    fun GpuDevice.createRenderPass(name: String, framebuffer: Framebuffer): RenderPass {
+    fun GpuDevice.createRenderPass(name: String, framebuffer: RenderTarget): RenderPass {
         return this.createCommandEncoder().createRenderPass(
             //#if MC > 1.21.6
             //$$ { name },

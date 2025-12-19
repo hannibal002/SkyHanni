@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -44,7 +44,7 @@ object PestParticleWaypoint {
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !PestApi.hasVacuumInHand()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
-        if (MinecraftCompat.localPlayer.isSneaking) return
+        if (MinecraftCompat.localPlayer.isShiftKeyDown) return
         reset()
         lastPestTrackerUse = SimpleTimeMark.now()
     }

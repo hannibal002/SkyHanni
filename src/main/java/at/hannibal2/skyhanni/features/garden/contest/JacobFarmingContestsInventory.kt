@@ -27,9 +27,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.screen.GenericContainerScreenHandler
-import net.minecraft.screen.slot.Slot
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.inventory.Slot
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -69,8 +69,8 @@ object JacobFarmingContestsInventory {
         for ((slot, item) in event.inventoryItems) {
             if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
 
-            foundEvents.add(item.name.formattedTextCompatLeadingWhiteLessResets())
-            val time = FarmingContestApi.getSBTimeFor(item.name.formattedTextCompatLeadingWhiteLessResets()) ?: continue
+            foundEvents.add(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
+            val time = FarmingContestApi.getSBTimeFor(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) ?: continue
             FarmingContestApi.addContest(time, item)
             if (config.realTime) {
                 readRealTime(time, slot)
@@ -92,7 +92,7 @@ object JacobFarmingContestsInventory {
         if (!config.openOnElite.isKeyHeld()) return
 
         val slot = event.slot ?: return
-        val itemName = slot.stack?.name.formattedTextCompatLeadingWhiteLessResets() ?: return
+        val itemName = slot.item?.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: return
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {
@@ -145,7 +145,7 @@ object JacobFarmingContestsInventory {
         slot: Slot,
     ) {
         GardenNextJacobContest.monthPattern.matchMatcher(chestName) {
-            if (!slot.stack.getLore().any { it.contains("§eJacob's Farming Contest") }) return
+            if (!slot.item.getLore().any { it.contains("§eJacob's Farming Contest") }) return
 
             val day = GardenNextJacobContest.dayPattern.matchMatcher(itemName) { group("day") } ?: return
             val year = group("year")
@@ -170,8 +170,8 @@ object JacobFarmingContestsInventory {
         // hide green border for a tick
         if (hideEverything) return
 
-        if (event.gui !is GenericContainerScreen) return
-        val chest = event.container as GenericContainerScreenHandler
+        if (event.gui !is ContainerScreen) return
+        val chest = event.container as ChestMenu
 
         for ((slot, stack) in chest.getUpperItems()) {
             if (stack.getLore().any { it == "§eClick to claim reward!" }) {
@@ -185,7 +185,7 @@ object JacobFarmingContestsInventory {
         event.slot ?: return
         if (!FarmingContestApi.inInventory) return
 
-        val slot = event.slot.id
+        val slot = event.slot.index
         if (config.realTime) {
             realTime[slot]?.let {
                 val toolTip = event.toolTip

@@ -40,7 +40,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -260,7 +260,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         blockedReason = "TREE_GIFT"
     }
 
-    private fun Text.getHoverLootPairs(): Set<Pair<NeuInternalName, Int>> = buildSet {
+    private fun Component.getHoverLootPairs(): Set<Pair<NeuInternalName, Int>> = buildSet {
         val treeType = treeType ?: return this
         lastHover = hover
         val lootLines = hover?.formattedTextCompat()?.split("\n")?.takeIfNotEmpty() ?: return this
@@ -296,7 +296,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private var lastPercentString = ""
     private var lastRewardCount = 0
     private val rareDrops = mutableListOf<String>()
-    private var lastHover: Text? = null
+    private var lastHover: Component? = null
 
     private fun sendTreeGiftStats() {
         val lastTreeType = treeType ?: return

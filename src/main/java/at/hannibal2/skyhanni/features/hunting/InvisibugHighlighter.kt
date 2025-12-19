@@ -18,9 +18,9 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.isCompletelyDefault
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.core.particles.ParticleTypes
 
 @SkyHanniModule
 object InvisibugHighlighter {
@@ -40,7 +40,7 @@ object InvisibugHighlighter {
         if (invisibugEntities.any { it.distanceTo(event.location) < DISTANCE }) return
 
         val aabb = event.location.boundingCenter(DISTANCE)
-        val nearestArmorStand = EntityUtils.getEntitiesInBoundingBox<ArmorStandEntity>(aabb).minByOrNull { it.distanceTo(event.location) } ?: return
+        val nearestArmorStand = EntityUtils.getEntitiesInBoundingBox<ArmorStand>(aabb).minByOrNull { it.distanceTo(event.location) } ?: return
 
         if (!nearestArmorStand.isCompletelyDefault()) return
 
@@ -75,7 +75,7 @@ object InvisibugHighlighter {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStandEntity>) {
+    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
         invisibugEntities.remove(event.entity)
     }
 

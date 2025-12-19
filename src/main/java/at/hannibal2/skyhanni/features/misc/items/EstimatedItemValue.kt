@@ -38,8 +38,8 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
-import net.minecraft.client.MinecraftClient
-import net.minecraft.item.ItemStack
+import net.minecraft.client.Minecraft
+import net.minecraft.world.item.ItemStack
 import org.lwjgl.glfw.GLFW
 import kotlin.math.roundToLong
 
@@ -61,7 +61,7 @@ object EstimatedItemValue {
     var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
         private set
 
-    fun isCurrentlyShowing() = currentlyShowing && MinecraftClient.getInstance().currentScreen != null
+    fun isCurrentlyShowing() = currentlyShowing && Minecraft.getInstance().screen != null
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
@@ -79,7 +79,7 @@ object EstimatedItemValue {
     }
 
     private fun isInNeuOverlay(): Boolean {
-        val inPv = MinecraftClient.getInstance().currentScreen is GuiProfileViewer
+        val inPv = Minecraft.getInstance().screen is GuiProfileViewer
         val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
 
         // Use reflection to make sure tradeMenu exists
@@ -249,7 +249,7 @@ object EstimatedItemValue {
 
     private fun ItemStack.shouldIgnoreDraw(): Boolean {
         this.getInternalNameOrNull()?.let { internalName ->
-            val name = this.name.formattedTextCompatLeadingWhiteLessResets()
+            val name = this.hoverName.formattedTextCompatLeadingWhiteLessResets()
             return (
                 this.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK ||
                     name.contains("Salesperson") ||

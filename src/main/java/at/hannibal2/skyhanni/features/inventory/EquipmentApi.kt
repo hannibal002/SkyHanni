@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 enum class EquipmentSlot(val slot: Int, vararg val categories: ItemCategory) {
@@ -94,12 +94,12 @@ object EquipmentApi {
             }
             add("Equipment:")
             storage.slots.forEach { item ->
-                val name = item?.name.formattedTextCompatLeadingWhiteLessResets()
+                val name = item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
                 add(" - $name")
             }
             add("Rift Equipment:")
             storage.riftSlots.forEach { item ->
-                val name = item?.name.formattedTextCompatLeadingWhiteLessResets()
+                val name = item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
                 add(" - $name")
             }
         }

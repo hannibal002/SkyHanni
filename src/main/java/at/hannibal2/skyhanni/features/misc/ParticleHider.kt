@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.entity.projectile.SmallFireballEntity
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.world.entity.projectile.SmallFireball
+import net.minecraft.core.particles.ParticleTypes
 
 @SkyHanniModule
 object ParticleHider {
@@ -39,7 +39,7 @@ object ParticleHider {
         if (config.hideFireballParticles &&
             (type == ParticleTypes.SMOKE || type == ParticleTypes.LARGE_SMOKE)
         ) {
-            if (EntityUtils.getEntitiesNearby<SmallFireballEntity>(event.location, 5.0).isNotEmpty()) event.cancel()
+            if (EntityUtils.getEntitiesNearby<SmallFireball>(event.location, 5.0).isNotEmpty()) event.cancel()
         }
     }
 

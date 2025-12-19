@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers.neu;
 
 import at.hannibal2.skyhanni.features.misc.NeuSoulPathFind;
 import io.github.moulberry.notenoughupdates.miscfeatures.FairySouls;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;

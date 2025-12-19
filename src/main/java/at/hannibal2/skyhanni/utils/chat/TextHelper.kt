@@ -8,17 +8,17 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendString
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
-import net.minecraft.client.MinecraftClient
-import net.minecraft.text.Style
-import net.minecraft.util.Formatting
-import net.minecraft.text.Text
+import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Style
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 import java.awt.Color
 //#if MC < 1.21
 //$$ import net.minecraft.text.Text
 //$$ import net.minecraft.text.LiteralText
 //#endif
 //#if MC > 1.16
-import net.minecraft.text.MutableText
+import net.minecraft.network.chat.MutableComponent
 //#endif
 
 object TextHelper {
@@ -35,16 +35,16 @@ object TextHelper {
     //$$ fun text(text: String, init: MutableText.() -> Unit = {}) = text.asComponent(init)
     //$$ fun String.asComponent(init: MutableText.() -> Unit = {}) = (LiteralText(this) as MutableText).also(init)
     //#else
-    fun text(text: String, init: MutableText.() -> Unit = {}) = text.asComponent(init)
-    fun String.asComponent(init: MutableText.() -> Unit = {}): MutableText = (Text.of(this) as MutableText).also(init)
+    fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
+    fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent = (Component.nullToEmpty(this) as MutableComponent).also(init)
     //#endif
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
-    fun join(vararg components: Any?, separator: Text? = null): Text {
+    fun join(vararg components: Any?, separator: Component? = null): Component {
         val result = "".asComponent()
         components.forEachIndexed { index, component ->
             when (component) {
-                is Text -> result.append(component)
+                is Component -> result.append(component)
                 is String -> result.appendString(component)
                 is List<*> -> result.append(join(*component.toTypedArray(), separator = separator))
                 null -> return@forEachIndexed
@@ -58,20 +58,20 @@ object TextHelper {
         return result
     }
 
-    fun Text.style(init: Style.() -> Unit): Text {
+    fun Component.style(init: Style.() -> Unit): Component {
         this.style.init()
         return this
     }
 
-    fun Text.prefix(prefix: String): Text = join(prefix, this)
-    fun Text.suffix(suffix: String): Text = join(this, suffix)
-    fun Text.wrap(prefix: String, suffix: String) = this.prefix(prefix).suffix(suffix)
+    fun Component.prefix(prefix: String): Component = join(prefix, this)
+    fun Component.suffix(suffix: String): Component = join(this, suffix)
+    fun Component.wrap(prefix: String, suffix: String) = this.prefix(prefix).suffix(suffix)
 
-    fun Text.width(): Int = MinecraftClient.getInstance().textRenderer.getWidth(this.formattedTextCompat())
+    fun Component.width(): Int = Minecraft.getInstance().font.width(this.formattedTextCompat())
 
-    fun Text.fitToChat(): Text {
+    fun Component.fitToChat(): Component {
         val width = this.width()
-        val maxWidth = MinecraftClient.getInstance().inGameHud.chatHud.width
+        val maxWidth = Minecraft.getInstance().gui.chat.width
         if (width < maxWidth) {
             val repeat = maxWidth / width
             val component = "".asComponent()
@@ -81,17 +81,17 @@ object TextHelper {
         return this
     }
 
-    fun Text.center(width: Int = MinecraftClient.getInstance().inGameHud.chatHud.width): Text {
+    fun Component.center(width: Int = Minecraft.getInstance().gui.chat.width): Component {
         val textWidth = this.width()
         val spaceWidth = SPACE.width()
         val padding = (width - textWidth) / 2
         return join(" ".repeat(padding / spaceWidth), this)
     }
 
-    fun Text.send(id: Int = 0) =
+    fun Component.send(id: Int = 0) =
         addDeletableMessageToChat(this, id)
 
-    fun List<Text>.send(id: Int = 0) {
+    fun List<Component>.send(id: Int = 0) {
         val parent = "".asComponent()
         forEach {
             parent.siblings.add(it)
@@ -101,20 +101,20 @@ object TextHelper {
         parent.send(id)
     }
 
-    fun Text.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
+    fun Component.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
         val token = ChatClickActionManager.createAction(onClick, expiresAt, oneTime)
         this.command = "/shaction $token"
     }
 
-    fun Text.onHover(tip: String) {
+    fun Component.onHover(tip: String) {
         this.hover = tip.asComponent()
     }
 
-    fun Text.onHover(tips: List<String>) {
+    fun Component.onHover(tips: List<String>) {
         this.hover = tips.joinToString("\n").asComponent()
     }
 
-    fun createDivider(dividerColor: Formatting = Formatting.BLUE) = HYPHEN.fitToChat().style {
+    fun createDivider(dividerColor: ChatFormatting = ChatFormatting.BLUE) = HYPHEN.fitToChat().style {
         withStrikethrough(true)
         withColor(dividerColor)
     }
@@ -138,10 +138,10 @@ object TextHelper {
         emptyMessage: String,
         currentPage: Int = 1,
         maxPerPage: Int = 15,
-        dividerColor: Formatting = Formatting.BLUE,
-        formatter: (T) -> Text,
+        dividerColor: ChatFormatting = ChatFormatting.BLUE,
+        formatter: (T) -> Component,
     ) {
-        val text = mutableListOf<Text>()
+        val text = mutableListOf<Component>()
 
         val totalPages = (list.size + maxPerPage - 1) / maxPerPage
         val page = if (totalPages == 0) 0 else currentPage
@@ -189,9 +189,9 @@ object TextHelper {
         multiline(text).send(chatLineId)
     }
 
-    fun createGradientText(start: Color, end: Color, string: String): Text {
+    fun createGradientText(start: Color, end: Color, string: String): Component {
         val length = string.length.toDouble()
-        var text = Text.of("")
+        var text = Component.nullToEmpty("")
         for ((index, char) in string.withIndex()) {
             val color = ColorUtils.blendRGB(start, end, index / length).rgb
             text = text.append(ExtendedChatColor(color).asText().append(char.toString()))

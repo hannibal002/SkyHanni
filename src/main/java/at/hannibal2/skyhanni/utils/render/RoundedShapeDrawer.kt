@@ -11,9 +11,9 @@ import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.BufferBuilder
-import net.minecraft.util.Identifier
+import net.minecraft.client.Minecraft
+import com.mojang.blaze3d.vertex.BufferBuilder
+import net.minecraft.resources.ResourceLocation
 //#if MC > 1.21.6
 //$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniCircleUniform
 //$$ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleUniform
@@ -82,7 +82,7 @@ object RoundedShapeDrawer {
             val buffer = getBuffer(pipeline)
             floatPairs.forEachIndexed { i, (x, y) ->
                 //#if MC < 1.21.9
-                buffer.vertex(matrices, x, y, 0f).apply {
+                buffer.addVertex(matrices, x, y, 0f).apply {
                     //#else
                     //$$ buffer.vertex(matrices, x, y).apply {
                     //#endif
@@ -121,7 +121,7 @@ object RoundedShapeDrawer {
             //$$ prePassOp.invoke()
             //#endif
 
-            draw(pipeline, buffer.end()) { pass ->
+            draw(pipeline, buffer.buildOrThrow()) { pass ->
                 //#if MC > 1.21.6
                 //$$ RenderSystem.bindDefaultUniforms(pass)
                 //$$ pass.setUniform("DynamicTransforms", dynamicTransforms)
@@ -140,12 +140,12 @@ object RoundedShapeDrawer {
         RoundedRectangleShader.performVQuadAndUniforms(
             SkyHanniRenderPipeline.ROUNDED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
-            postVertexOps = listOf { color(color) },
+            postVertexOps = listOf { setColor(color) },
         )
 
-    fun drawRoundedTexturedRect(left: Int, top: Int, right: Int, bottom: Int, texture: Identifier) {
+    fun drawRoundedTexturedRect(left: Int, top: Int, right: Int, bottom: Int, texture: ResourceLocation) {
         //#if MC < 1.21.6
-        val glTex = MinecraftClient.getInstance().textureManager.getTexture(texture).glTexture
+        val glTex = Minecraft.getInstance().textureManager.getTexture(texture).texture
         //#else
         //$$ val glTex = MinecraftClient.getInstance().textureManager.getTexture(texture).glTextureView
         //#endif
@@ -155,10 +155,10 @@ object RoundedShapeDrawer {
             SkyHanniRenderPipeline.ROUNDED_TEXTURED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
-                { texture(0f, 0f) },
-                { texture(0f, 1f) },
-                { texture(1f, 1f) },
-                { texture(1f, 0f) },
+                { setUv(0f, 0f) },
+                { setUv(0f, 1f) },
+                { setUv(1f, 1f) },
+                { setUv(1f, 0f) },
             ),
         ) {
             bindSampler("textureSampler", glTex)
@@ -171,10 +171,10 @@ object RoundedShapeDrawer {
             SkyHanniRenderPipeline.ROUNDED_RECT_OUTLINE(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
-                { color(topColor) },
-                { color(bottomColor) },
-                { color(bottomColor) },
-                { color(topColor) },
+                { setColor(topColor) },
+                { setColor(bottomColor) },
+                { setColor(bottomColor) },
+                { setColor(topColor) },
             ),
             //#if MC > 1.21.6
             //$$ { roundedOutlineBufferSlice = roundedOutlineUniform.writeWith(
@@ -196,10 +196,10 @@ object RoundedShapeDrawer {
             SkyHanniRenderPipeline.ROUNDED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
-                { color(topColor) },
-                { color(bottomColor) },
-                { color(bottomColor) },
-                { color(topColor) },
+                { setColor(topColor) },
+                { setColor(bottomColor) },
+                { setColor(bottomColor) },
+                { setColor(topColor) },
             ),
         )
 
@@ -207,7 +207,7 @@ object RoundedShapeDrawer {
         CircleShader.performVQuadAndUniforms(
             SkyHanniRenderPipeline.CIRCLE(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
-            postVertexOps = listOf { color(color) },
+            postVertexOps = listOf { setColor(color) },
             //#if MC > 1.21.6
             //$$ { circleBufferSlice = circleUniform.writeWith(
             //$$     CircleShader.angle1, CircleShader.angle2
@@ -227,8 +227,8 @@ object RoundedShapeDrawer {
             SkyHanniRenderPipeline.RADIAL_GRADIENT_CIRCLE(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf(
-                { color(startColor.toColor().rgb) },
-                { color(endColor.toColor().rgb) },
+                { setColor(startColor.toColor().rgb) },
+                { setColor(endColor.toColor().rgb) },
             ),
             //#if MC > 1.21.6
             //$$ { radialGradientCircleBufferSlice = radialGradientCircleUniform.writeWith(

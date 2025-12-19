@@ -22,9 +22,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.mob.SlimeEntity
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.monster.Slime
 import java.awt.Color
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -134,6 +134,6 @@ object SeaCreatureFeatures {
 
     @JvmStatic
     fun isRareSeaCreatureBody(entity: Entity): Boolean {
-        return entity is SlimeEntity && isRareSeaCreature(entity)
+        return entity is Slime && isRareSeaCreature(entity)
     }
 }

@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CFDataLoader {
@@ -322,7 +322,7 @@ object CFDataLoader {
     private fun processChocolateItem(item: ItemStack) {
         val profileStorage = profileStorage ?: return
 
-        CFApi.chocolateAmountPattern.matchMatcher(item.name.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+        CFApi.chocolateAmountPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
             profileStorage.currentChocolate = group("amount").formatLong()
         }
         for (line in item.getLore()) {
@@ -338,7 +338,7 @@ object CFDataLoader {
     private fun processPrestigeItem(list: MutableList<CFUpgrade>, item: ItemStack) {
         val profileStorage = profileStorage ?: return
 
-        prestigeLevelPattern.matchMatcher(item.name.formattedTextCompatLeadingWhiteLessResets()) {
+        prestigeLevelPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             CFApi.currentPrestige = group("prestige").romanToDecimal()
         }
         var prestigeCost: Long? = null
@@ -469,7 +469,7 @@ object CFDataLoader {
 
         if (slotIndex !in CFApi.otherUpgradeSlots && slotIndex !in CFApi.rabbitSlots) return
 
-        val itemName = item.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
+        val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
         val lore = item.getLore()
         val upgradeCost = CFApi.getChocolateBuyCost(lore)
         val averageChocolate = ChocolateAmount.averageChocPerSecond().roundTo(2)

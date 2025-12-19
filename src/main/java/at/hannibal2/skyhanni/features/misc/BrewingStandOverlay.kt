@@ -15,9 +15,9 @@ object BrewingStandOverlay {
         if (event.inventoryName != "Brewing Stand") return
 
         val stack = event.stack
-        val name = stack.name.formattedTextCompatLeadingWhiteLessResets()
+        val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
 
-        val slotNumber = event.slot.id
+        val slotNumber = event.slot.index
         when (slotNumber) {
             13, // Ingredient input
             21, // Progress

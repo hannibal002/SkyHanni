@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -46,7 +46,7 @@ object NotificationManager {
         val topY = (GuiScreenUtils.scaledWindowHeight * 0.75 - notification.height / 2).toInt()
 
         GuiRenderUtils.drawFloatingRectDark(midX - notification.width / 2, topY, notification.width, notification.height)
-        val closeTextWidth = MinecraftClient.getInstance().textRenderer.getWidth(CLOSE_TEXT)
+        val closeTextWidth = Minecraft.getInstance().font.width(CLOSE_TEXT)
 
         GuiRenderUtils.drawString(CLOSE_TEXT, midX + notification.width / 2 - 3 - closeTextWidth, topY + 4)
 
@@ -103,7 +103,7 @@ data class SkyHanniNotification(
 
     var endTime = SimpleTimeMark.farFuture()
 
-    val width by lazy { (message.maxOfOrNull { MinecraftClient.getInstance().textRenderer.getWidth(it) } ?: 0) + 8 }
+    val width by lazy { (message.maxOfOrNull { Minecraft.getInstance().font.width(it) } ?: 0) + 8 }
     val height = message.size * 10 + 18
 
     fun setEndTime() {

@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.features.chroma
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import net.minecraft.client.font.BakedGlyph.DrawnGlyph
-import net.minecraft.text.Style
-import net.minecraft.text.TextColor
+import net.minecraft.client.gui.font.glyphs.BakedGlyph.GlyphInstance
+import net.minecraft.network.chat.Style
+import net.minecraft.network.chat.TextColor
 
 var renderingChat: Boolean = false
 private val textColor = TextColor(0xFFFFFF, "chroma")
 private val textColorOffWhite = TextColor(0xFFFFFE, "chroma")
 var glyphIsChroma = false
 
-fun checkIfGlyphIsChroma(drawnGlyph: DrawnGlyph) {
+fun checkIfGlyphIsChroma(drawnGlyph: GlyphInstance) {
     if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return
     val colorName = drawnGlyph.style.color?.name
 
@@ -58,5 +58,5 @@ fun isNotActuallyEqualBecauseOfChroma(
 
 // the get name inside of text colour does a string format and is very bad for performance
 private fun TextColor.getTextColorName(): String? {
-    return if (name != null) name else rgb.toString()
+    return if (name != null) name else value.toString()
 }

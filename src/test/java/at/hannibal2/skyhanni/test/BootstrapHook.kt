@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import net.minecraft.block.Block
+import net.minecraft.world.level.block.Block
 import net.minecraft.block.BlockFire
 import net.minecraft.init.Bootstrap
-import net.minecraft.item.Item
+import net.minecraft.world.item.Item
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.Extension
 import org.junit.jupiter.api.extension.ExtensionContext

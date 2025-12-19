@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.Screen
 //#if MC > 1.21
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 //#endif
 //#if MC > 1.21.8
 //$$ import net.minecraft.client.gui.Click
@@ -15,13 +15,13 @@ import net.minecraft.client.gui.DrawContext
 @Suppress("UnusedParameter")
 abstract class SkyHanniBaseScreen : Screen(
     //#if MC > 1.20
-    net.minecraft.text.Text.empty()
+    net.minecraft.network.chat.Component.empty()
     //#elseif MC > 1.16
     //$$ net.minecraft.text.LiteralText.EMPTY
     //#endif
 ) {
 
-    val mc: MinecraftClient = MinecraftClient.getInstance()
+    val mc: Minecraft = Minecraft.getInstance()
 
     //#if MC < 1.21
     //$$ final override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -29,21 +29,21 @@ abstract class SkyHanniBaseScreen : Screen(
     //$$     postDrawScreen(DrawContext(), mouseX, mouseY, partialTicks)
     //$$ }
     //#else
-    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
        super.render(context, mouseX, mouseY, delta)
        postDrawScreen(context, mouseX, mouseY, delta)
     }
 
-    override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, deltaTicks: Float) {
+    override fun renderBackground(context: GuiGraphics, mouseX: Int, mouseY: Int, deltaTicks: Float) {
         try {
-            this.renderDarkening(context)
+            this.renderMenuBackground(context)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while rendering background", "screen" to this)
         }
     }
     //#endif
 
-    private fun postDrawScreen(context: DrawContext, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    private fun postDrawScreen(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
         DrawContextUtils.setContext(context)
         try {
             onDrawScreen(mouseX, mouseY, partialTicks)
@@ -214,8 +214,8 @@ abstract class SkyHanniBaseScreen : Screen(
     //$$     postGuiClosed()
     //$$ }
     //#else
-    override fun close() {
-        super.close()
+    override fun onClose() {
+        super.onClose()
         postGuiClosed()
     }
     //#endif
@@ -256,7 +256,7 @@ abstract class SkyHanniBaseScreen : Screen(
         //#if MC < 1.21
         //$$ drawDefaultBackground()
         //#else
-        renderDarkening(DrawContextUtils.drawContext)
+        renderMenuBackground(DrawContextUtils.drawContext)
         //#endif
     }
 }

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
 
 @SkyHanniModule
 object FixDoubleClicks {
@@ -35,7 +35,7 @@ object FixDoubleClicks {
      */
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onPacketSent(event: PacketSentEvent) {
-        if (event.packet !is PlayerInteractBlockC2SPacket) return
+        if (event.packet !is ServerboundUseItemOnPacket) return
         if (!SkyHanniMod.feature.misc.fixDoubleClicks) return
 
         val itemInHand = InventoryUtils.getItemInHand() ?: return

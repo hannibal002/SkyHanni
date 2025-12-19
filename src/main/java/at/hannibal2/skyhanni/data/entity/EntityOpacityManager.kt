@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.entity.LivingEntity
+import net.minecraft.world.entity.LivingEntity
 import org.lwjgl.opengl.GL11
 
 @SkyHanniModule

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.events.minecraft.packet
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
-import net.minecraft.network.packet.Packet
+import net.minecraft.network.protocol.Packet
 
 class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
 
@@ -23,7 +23,7 @@ class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
         //#if MC < 1.21
         //$$ private fun isNetworkHandlerClass(className: String) = className == "net.minecraft.client.network.NetHandlerPlayClient"
         //#else
-        private val networkClassName = net.minecraft.client.network.ClientPlayNetworkHandler::class.java.name
+        private val networkClassName = net.minecraft.client.multiplayer.ClientPacketListener::class.java.name
         private fun isNetworkHandlerClass(className: String) = className == networkClassName
         //#endif
 

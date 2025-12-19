@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 
 object MobFactories {
     fun slayer(
         baseEntity: LivingEntity,
-        armorStand: ArmorStandEntity,
+        armorStand: ArmorStand,
         extraEntityList: List<LivingEntity>,
     ): Mob? =
         MobFilter.slayerNameFilter.matchMatcher(armorStand.cleanName()) {
@@ -29,7 +29,7 @@ object MobFactories {
 
     fun boss(
         baseEntity: LivingEntity,
-        armorStand: ArmorStandEntity,
+        armorStand: ArmorStand,
         extraEntityList: List<LivingEntity> = emptyList(),
         overriddenName: String? = null,
     ): Mob? =
@@ -47,7 +47,7 @@ object MobFactories {
 
     fun dungeon(
         baseEntity: LivingEntity,
-        armorStand: ArmorStandEntity,
+        armorStand: ArmorStand,
         extraEntityList: List<LivingEntity> = emptyList(),
     ): Mob? =
         MobFilter.dungeonNameFilter.matchMatcher(armorStand.cleanName()) {
@@ -68,7 +68,7 @@ object MobFactories {
 
     fun basic(
         baseEntity: LivingEntity,
-        armorStand: ArmorStandEntity,
+        armorStand: ArmorStand,
         extraEntityList: List<LivingEntity>? = null,
     ): Mob? =
         MobFilter.mobNameFilter.findMatcher(armorStand.cleanName()) {
@@ -91,7 +91,7 @@ object MobFactories {
 
     fun summon(
         baseEntity: LivingEntity,
-        armorStand: ArmorStandEntity,
+        armorStand: ArmorStand,
         extraEntityList: List<LivingEntity>,
     ): Mob? =
         MobFilter.summonFilter.matchMatcher(armorStand.cleanName()) {
@@ -105,7 +105,7 @@ object MobFactories {
             )
         }
 
-    fun displayNpc(baseEntity: LivingEntity, armorStand: ArmorStandEntity, clickArmorStand: ArmorStandEntity): Mob =
+    fun displayNpc(baseEntity: LivingEntity, armorStand: ArmorStand, clickArmorStand: ArmorStand): Mob =
         Mob(
             baseEntity = baseEntity,
             mobType = Mob.Type.DISPLAY_NPC,
@@ -118,11 +118,11 @@ object MobFactories {
     fun projectile(baseEntity: LivingEntity, name: String): Mob =
         Mob(baseEntity = baseEntity, mobType = Mob.Type.PROJECTILE, name = name)
 
-    fun special(baseEntity: LivingEntity, name: String, armorStand: ArmorStandEntity? = null) =
+    fun special(baseEntity: LivingEntity, name: String, armorStand: ArmorStand? = null) =
         Mob(baseEntity = baseEntity, mobType = Mob.Type.SPECIAL, armorStand = armorStand, name = name)
 
     private fun String.removeCorruptedSuffix(case: Boolean) = if (case) this.dropLast(1) else this
-    fun dojo(baseEntity: LivingEntity, armorStand: ArmorStandEntity): Mob? =
+    fun dojo(baseEntity: LivingEntity, armorStand: ArmorStand): Mob? =
         MobFilter.dojoFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,

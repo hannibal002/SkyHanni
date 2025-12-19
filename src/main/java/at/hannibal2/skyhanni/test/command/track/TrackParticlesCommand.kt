@@ -20,15 +20,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 //$$ import net.minecraft.particle.ParticleTypes
 //#else
 import at.hannibal2.skyhanni.utils.ParticleUtils
-import net.minecraft.registry.Registries
-import net.minecraft.util.Identifier
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.ResourceLocation
 //#endif
 
 @SkyHanniModule
 //#if MC < 1.21
 //$$ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, ParticleTypes>(
 //#else
-object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, Identifier>(
+object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, ResourceLocation>(
 //#endif
     commonName = "particle",
 ) {
@@ -51,7 +51,7 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, Identifier>(
     //#if MC < 1.21
     //$$ override fun ReceiveParticleEvent.getTypeIdentifier(): ParticleTypes = type
     //#else
-    override fun ReceiveParticleEvent.getTypeIdentifier(): Identifier = Registries.PARTICLE_TYPE.getId(type)
+    override fun ReceiveParticleEvent.getTypeIdentifier(): ResourceLocation = BuiltInRegistries.PARTICLE_TYPE.getKey(type)
        ?: throw IllegalStateException("Particle type $type is not registered in the registry")
     //#endif
 

@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
 
 class BrigadierCommand(
     root: BaseBrigadierBuilder,

@@ -1,17 +1,17 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.DeltaTracker;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(MinecraftClient.class)
+@Mixin(Minecraft.class)
 public interface AccessorMinecraft {
 
-    @Accessor("renderTickCounter")
+    @Accessor("deltaTracker")
     //#if MC < 1.21
     //$$ RenderTickCounter getTimer();
     //#else
-    RenderTickCounter.Dynamic getTimer();
+    DeltaTracker.Timer getTimer();
     //#endif
 }

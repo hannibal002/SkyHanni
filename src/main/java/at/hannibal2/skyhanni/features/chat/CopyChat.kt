@@ -14,9 +14,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.hud.ChatHudLine
-import net.minecraft.util.math.MathHelper
+import net.minecraft.client.Minecraft
+import net.minecraft.client.GuiMessage
+import net.minecraft.util.Mth
 //#if MC < 1.21
 //$$ import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 //#else
@@ -53,7 +53,7 @@ object CopyChat {
                 //#if MC < 1.21
                 //$$ ModifyVisualWords.modifyText(formatted)?.removeColor()
                     //#else
-                    OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.asOrderedText())).removeColor()
+                    OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.visualOrderText)).removeColor()
                     //#endif
                     ?: formatted
                 ) to "modified message"
@@ -67,9 +67,9 @@ object CopyChat {
         ChatUtils.chat("Copied $infoMessage to clipboard!")
     }
 
-    private fun getChatLine(mouseX: Int, mouseY: Int): ChatHudLine? {
-        val mc = MinecraftClient.getInstance() ?: return null
-        val chatGui = mc.inGameHud.chatHud ?: return null
+    private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
+        val mc = Minecraft.getInstance() ?: return null
+        val chatGui = mc.gui.chat ?: return null
         //#if MC < 1.21
         //$$ val access = chatGui as AccessorMixinGuiNewChat
         //$$ val chatScale = chatGui.chatScale
@@ -91,19 +91,19 @@ object CopyChat {
         //$$ }
         //$$ return null
         //#else
-        val chatLineY = chatGui.toChatLineY(mouseY.toDouble())
-        val chatLineX = chatGui.toChatLineX(mouseX.toDouble())
-        val lineIndex = (chatGui.scrolledLines + chatLineY).toInt()
+        val chatLineY = chatGui.screenToChatY(mouseY.toDouble())
+        val chatLineX = chatGui.screenToChatX(mouseX.toDouble())
+        val lineIndex = (chatGui.chatScrollbarPos + chatLineY).toInt()
 
-        if (chatLineX < -4.0 || chatLineX > MathHelper.floor(chatGui.width.toDouble() / chatGui.chatScale).toDouble()) return null
+        if (chatLineX < -4.0 || chatLineX > Mth.floor(chatGui.width.toDouble() / chatGui.scale).toDouble()) return null
 
         if (lineIndex < 0) return null
-        val visibleLines = chatGui.visibleMessages
+        val visibleLines = chatGui.trimmedMessages
         if (lineIndex > visibleLines.size) return null
         val visibleLine = visibleLines[lineIndex]
 
-        val matchingLines = chatGui.messages.filter {
-            it.creationTick == visibleLine.addedTime && it.content.formattedTextCompat().isNotBlank()
+        val matchingLines = chatGui.allMessages.filter {
+            it.addedTime() == visibleLine.addedTime && it.content.formattedTextCompat().isNotBlank()
         }
 
         return when {

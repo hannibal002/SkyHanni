@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.blockhighlight.SkyHanniBlockHighlighter
 import at.hannibal2.skyhanni.utils.blockhighlight.TimedHighlightBlock
-import net.minecraft.block.Blocks
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 

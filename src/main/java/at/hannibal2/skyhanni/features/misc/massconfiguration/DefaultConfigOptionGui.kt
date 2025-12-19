@@ -60,7 +60,7 @@ class DefaultConfigOptionGui(
         GuiRenderUtils.drawStringCenteredScaledMaxWidth(
             guiTitle,
             0F,
-            mc.textRenderer.fontHeight.toFloat(),
+            mc.font.lineHeight.toFloat(),
             false,
             xSize / 2 - padding,
             -1,
@@ -70,12 +70,12 @@ class DefaultConfigOptionGui(
         DrawContextUtils.pushMatrix()
         DrawContextUtils.translate(
             (width - xSize) / 2F + padding,
-            (height + ySize) / 2F - mc.textRenderer.fontHeight * 2,
+            (height + ySize) / 2F - mc.font.lineHeight * 2,
             0F,
         )
         var i = 0
         fun button(title: String, tooltip: List<String>, func: () -> Unit) {
-            val width = mc.textRenderer.getWidth(title)
+            val width = mc.font.width(title)
             var overMouse = false
             if (originalMouseX - ((this.width - xSize) / 2 + padding) in i..(i + width) &&
                 originalMouseY - (height + ySize) / 2 in -barSize..0

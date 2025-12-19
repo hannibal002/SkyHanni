@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.events.render.gui.GuiActionPerformedEvent
 import at.hannibal2.skyhanni.events.render.gui.InitializeGuiEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.client.gui.widget.Widget
-import net.minecraft.client.gui.screen.GameMenuScreen
+import net.minecraft.client.gui.layouts.LayoutElement
+import net.minecraft.client.gui.screens.PauseScreen
 //#if MC > 1.21
-import net.minecraft.client.gui.widget.ButtonWidget
-import net.minecraft.text.Text
+import net.minecraft.client.gui.components.Button
+import net.minecraft.network.chat.Component
 //#endif
 
 @SkyHanniModule
@@ -36,7 +36,7 @@ object ButtonOnPause {
     fun onInitializeGuiPost(event: InitializeGuiEvent) {
         if (!SkyBlockUtils.onHypixel) return
 
-        if (config.configButtonOnPause && event.gui is GameMenuScreen) {
+        if (config.configButtonOnPause && event.gui is PauseScreen) {
             val x = event.gui.width - 105
             val x2 = x + 100
             var y = event.gui.height - 22
@@ -55,9 +55,9 @@ object ButtonOnPause {
             //#if MC < 1.21
             //$$ event.buttonList.add(Widget(buttonId, x, 0.coerceAtLeast(y), 100, 20, "SkyHanni"))
             //#else
-            ButtonWidget.builder(Text.of("Skyhanni")) {
+            Button.builder(Component.nullToEmpty("Skyhanni")) {
                 ConfigGuiManager.openConfigGui()
-            }.dimensions(x, 0.coerceAtLeast(y), 100, 20).build()
+            }.bounds(x, 0.coerceAtLeast(y), 100, 20).build()
             //#endif
         }
     }

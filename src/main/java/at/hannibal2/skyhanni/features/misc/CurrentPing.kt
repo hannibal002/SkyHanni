@@ -19,7 +19,7 @@ import kotlin.time.Duration.Companion.milliseconds
 //$$ import net.hypixel.modapi.packet.impl.serverbound.ServerboundPingPacket
 //$$ import kotlin.time.Duration.Companion.seconds
 //#else
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 //#endif
 
 @SkyHanniModule
@@ -65,8 +65,8 @@ object CurrentPing {
     //$$
     //#else
     val previousPings: List<Long>
-        get() = MinecraftClient.getInstance().debugHud.pingLog.let {
-            List(it.length) { i -> it[i] }
+        get() = Minecraft.getInstance().debugOverlay.pingLogger.let {
+            List(it.size()) { i -> it[i] }
         }
     //#endif
 

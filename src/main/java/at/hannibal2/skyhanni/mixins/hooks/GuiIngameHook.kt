@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.data.ScoreboardData
-import net.minecraft.client.font.TextRenderer
+import net.minecraft.client.gui.Font
 
 //#if MC > 1.21
-import net.minecraft.text.Text
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.network.chat.Component
+import net.minecraft.client.gui.GuiGraphics
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //#endif
 
@@ -13,12 +13,12 @@ object GuiIngameHook {
 
     @JvmStatic
     fun drawString(
-        renderer: TextRenderer,
+        renderer: Font,
         //#if MC < 1.21
         //$$ text: String,
         //#else
-        drawContext: DrawContext,
-        text: Text,
+        drawContext: GuiGraphics,
+        text: Component,
         //#endif
         x: Int,
         y: Int,
@@ -31,7 +31,7 @@ object GuiIngameHook {
         //#if MC < 1.21
         //$$ renderer.drawString(it, x, y, color)
         //#else
-        drawContext.drawText(renderer, it, x, y, color, false)
+        drawContext.drawString(renderer, it, x, y, color, false)
         //#endif
     } ?: 0
 

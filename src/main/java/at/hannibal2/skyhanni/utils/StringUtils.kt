@@ -12,12 +12,12 @@ import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.value
-import net.minecraft.client.MinecraftClient
-import net.minecraft.text.ClickEvent
-import net.minecraft.text.HoverEvent
-import net.minecraft.text.Style
-import net.minecraft.util.Formatting
-import net.minecraft.text.Text
+import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.ClickEvent
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.Style
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 import java.util.Base64
 import java.util.Locale
 import java.util.NavigableMap
@@ -28,8 +28,8 @@ import java.util.regex.Pattern
 //#if FORGE
 //$$ import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //#else
-import net.minecraft.client.util.ChatMessages
-import net.minecraft.text.TextColor
+import net.minecraft.client.gui.components.ComponentRenderUtils
+import net.minecraft.network.chat.TextColor
 import at.hannibal2.skyhanni.utils.compat.toChatFormatting
 //#endif
 
@@ -216,7 +216,7 @@ object StringUtils {
 
     //#if MC > 1.21
     private fun splitText(text: String, width: Int): List<String> {
-        val lines = ChatMessages.breakRenderedChatMessageLines(Text.literal(text), width, MinecraftClient.getInstance().textRenderer)
+        val lines = ComponentRenderUtils.wrapComponents(Component.literal(text), width, Minecraft.getInstance().font)
         val strings: MutableList<String> = ArrayList(lines.size)
         for (line in lines) {
             var newLine = ""
@@ -300,7 +300,7 @@ object StringUtils {
     }
 
     fun String.capAtMinecraftLength(limit: Int) = capAtLength(limit) {
-        MinecraftClient.getInstance().textRenderer.getWidth(it.toString())
+        Minecraft.getInstance().font.width(it.toString())
     }
 
     private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
@@ -356,20 +356,20 @@ object StringUtils {
     fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
 
     fun replaceIfNeeded(
-        original: Text,
+        original: Component,
         newText: String,
-    ): Text? {
+    ): Component? {
         return replaceIfNeeded(original, newText.asComponent())
     }
 
-    private val colorMap = Formatting.entries.associateBy { it.toString()[1] }
-    fun enumChatFormattingByCode(char: Char): Formatting? {
+    private val colorMap = ChatFormatting.entries.associateBy { it.toString()[1] }
+    fun enumChatFormattingByCode(char: Char): ChatFormatting? {
         return colorMap[char]
     }
 
-    fun doLookTheSame(left: Text, right: Text): Boolean {
-        class ChatIterator(var component: Text) {
-            var queue = mutableListOf<Text>()
+    fun doLookTheSame(left: Component, right: Component): Boolean {
+        class ChatIterator(var component: Component) {
+            var queue = mutableListOf<Component>()
             var idx = 0
             var colorOverride = defaultStyleConstructor
             fun next(): Pair<Char, Style>? {
@@ -384,23 +384,23 @@ object StringUtils {
                         val formattingChar = component.unformattedTextForChatCompat()[idx++]
                         val formatting = enumChatFormattingByCode(formattingChar) ?: continue
                         when (formatting) {
-                            Formatting.OBFUSCATED -> {
+                            ChatFormatting.OBFUSCATED -> {
                                 colorOverride.withObfuscated(true)
                             }
 
-                            Formatting.BOLD -> {
+                            ChatFormatting.BOLD -> {
                                 colorOverride.withBold(true)
                             }
 
-                            Formatting.STRIKETHROUGH -> {
+                            ChatFormatting.STRIKETHROUGH -> {
                                 colorOverride.withStrikethrough(true)
                             }
 
-                            Formatting.UNDERLINE -> {
-                                colorOverride.withUnderline(true)
+                            ChatFormatting.UNDERLINE -> {
+                                colorOverride.withUnderlined(true)
                             }
 
-                            Formatting.ITALIC -> {
+                            ChatFormatting.ITALIC -> {
                                 colorOverride.withItalic(true)
                             }
 
@@ -409,7 +409,7 @@ object StringUtils {
                             }
                         }
                     } else {
-                        return Pair(char, colorOverride.withParent(component.style))
+                        return Pair(char, colorOverride.applyTo(component.style))
                     }
                 }
             }
@@ -425,7 +425,7 @@ object StringUtils {
         }
     }
 
-    fun <T : Text> replaceIfNeeded(
+    fun <T : Component> replaceIfNeeded(
         original: T,
         newText: T,
     ): T? {
@@ -433,7 +433,7 @@ object StringUtils {
         return newText
     }
 
-    private fun addComponent(foundCommands: MutableList<Text>, message: Text) {
+    private fun addComponent(foundCommands: MutableList<Component>, message: Component) {
         val clickEvent = message.command
         if (clickEvent != null) {
             if (foundCommands.size == 1 && foundCommands[0].command == clickEvent) {
@@ -468,7 +468,7 @@ object StringUtils {
         replaceComponent(newComponent, transformationReason.orEmpty())
     }
 
-    private fun Text.findAllEvents(
+    private fun Component.findAllEvents(
         clickEvents: MutableList<ClickEvent>,
         hoverEvents: MutableList<HoverEvent>,
     ) {
@@ -477,11 +477,11 @@ object StringUtils {
         val clickEvent = style.clickEvent
         val hoverEvent = style.hoverEvent
 
-        if (clickEvent?.action != null && clickEvents.none { it.value() == clickEvent.value() }) {
+        if (clickEvent?.action() != null && clickEvents.none { it.value() == clickEvent.value() }) {
             clickEvents.add(clickEvent)
         }
 
-        if (hoverEvent?.action != null && hoverEvents.none {
+        if (hoverEvent?.action() != null && hoverEvents.none {
                 it.value() == hoverEvent.value()
             }
         ) {
@@ -515,18 +515,18 @@ object StringUtils {
         return message
     }
 
-    fun String.applyFormattingFrom(original: ComponentSpan): Text {
+    fun String.applyFormattingFrom(original: ComponentSpan): Component {
         return asComponent { style = original.sampleStyleAtStart() }
     }
 
-    fun String.applyFormattingFrom(original: Text): Text {
+    fun String.applyFormattingFrom(original: Component): Component {
         return asComponent { style = original.style }
     }
 
-    fun Text.contains(string: String): Boolean = formattedTextCompat().contains(string)
+    fun Component.contains(string: String): Boolean = formattedTextCompat().contains(string)
 
     fun String.width(): Int {
-        return MinecraftClient.getInstance().textRenderer.getWidth(this)
+        return Minecraft.getInstance().font.width(this)
     }
 
     private val vowels = "aeiouAEIOU".toSet()

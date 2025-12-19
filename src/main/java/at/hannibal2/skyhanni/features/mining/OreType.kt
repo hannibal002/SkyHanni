@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import net.minecraft.block.BlockState
+import net.minecraft.world.level.block.state.BlockState
 
 enum class OreType(
     val oreName: String,

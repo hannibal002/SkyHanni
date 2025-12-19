@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import net.minecraft.entity.mob.EndermanEntity
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.core.particles.ParticleTypes
 
 @SkyHanniModule
 object EndermanSlayerHideParticles {
@@ -26,7 +26,7 @@ object EndermanSlayerHideParticles {
             else -> return
         }
 
-        if (EntityUtils.getEntitiesInBoundingBox<EndermanEntity>(event.location.boundingCenter(3.0)).isNotEmpty()) {
+        if (EntityUtils.getEntitiesInBoundingBox<EnderMan>(event.location.boundingCenter(3.0)).isNotEmpty()) {
             event.cancel()
         }
     }

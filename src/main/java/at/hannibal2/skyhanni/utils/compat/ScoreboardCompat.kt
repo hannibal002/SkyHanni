@@ -1,19 +1,19 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import net.minecraft.scoreboard.ScoreboardScore
-import net.minecraft.scoreboard.ScoreboardObjective
-import net.minecraft.scoreboard.Scoreboard
+import net.minecraft.world.scores.Score
+import net.minecraft.world.scores.Objective
+import net.minecraft.world.scores.Scoreboard
 //#if MC > 1.21
-import net.minecraft.scoreboard.ScoreboardDisplaySlot
-import net.minecraft.text.Text
-import net.minecraft.scoreboard.ScoreboardEntry
+import net.minecraft.world.scores.DisplaySlot
+import net.minecraft.network.chat.Component
+import net.minecraft.world.scores.PlayerScoreEntry
 //#endif
 
-fun Scoreboard.getSidebarObjective(): ScoreboardObjective? {
+fun Scoreboard.getSidebarObjective(): Objective? {
     //#if MC < 1.21
     //$$ return this.getObjectiveForSlot(1)
     //#else
-    return this.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR)
+    return this.getDisplayObjective(DisplaySlot.SIDEBAR)
     //#endif
 }
 
@@ -25,19 +25,19 @@ fun Scoreboard.getSidebarObjective(): ScoreboardObjective? {
 //$$     }
 //$$ }
 //#else
-fun Collection<ScoreboardEntry>.getPlayerNames(scoreboard: Scoreboard): List<Text> {
+fun Collection<PlayerScoreEntry>.getPlayerNames(scoreboard: Scoreboard): List<Component> {
     return this.sortedBy { it.value }
         .map {
-            val team = scoreboard.getScoreHolderTeam(it.owner)
-            Text.empty().also { main ->
-                team?.prefix?.apply {
+            val team = scoreboard.getPlayersTeam(it.owner)
+            Component.empty().also { main ->
+                team?.playerPrefix?.apply {
                     if (siblings.isNotEmpty()) siblings.forEach { sibling -> main.append(sibling) }
                     else main.append(this)
                 }
                 // the soccer ball is because it is like that on 1.8
                 // this could be changed later but for now i think this is fine
                 main.append("⚽")
-                team?.suffix?.apply {
+                team?.playerSuffix?.apply {
                     if (siblings.isNotEmpty()) siblings.forEach { sibling -> main.append(sibling) }
                     else main.append(this)
                 }

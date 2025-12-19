@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.world.entity.player.Player
 import java.awt.Color
 //#if MC > 1.21.5
 //$$ import org.joml.Matrix3x2f
@@ -18,7 +18,7 @@ import java.awt.Color
 //#endif
 
 fun Renderable.Companion.fakePlayer(
-    player: PlayerEntity,
+    player: Player,
     followMouse: Boolean = false,
     eyesX: Float = 0f,
     eyesY: Float = 0f,
@@ -58,7 +58,7 @@ fun Renderable.Companion.fakePlayer(
         //$$     player,
         //$$ )
         //#elseif MC < 1.21.7
-        InventoryScreen.drawEntity(
+        InventoryScreen.renderEntityInInventoryFollowsMouse(
             DrawContextUtils.drawContext,
             padding,
             padding,

@@ -44,8 +44,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.block.Blocks
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -233,7 +233,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent<ClientPlayerEntity>) {
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
         if (event.distance > 10 && event.isLocalPlayer) {
             update()

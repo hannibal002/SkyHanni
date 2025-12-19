@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.SignEditScreen
-import net.minecraft.client.option.KeyBinding
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import net.minecraft.client.KeyMapping
 import org.lwjgl.glfw.GLFW
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
@@ -25,18 +25,18 @@ import kotlin.time.Duration.Companion.seconds
 object GardenCustomKeybinds {
 
     private val config get() = GardenApi.config.keyBind
-    private val mcSettings get() = MinecraftClient.getInstance().options
+    private val mcSettings get() = Minecraft.getInstance().options
 
-    private var map: Map<KeyBinding, Int> = emptyMap()
+    private var map: Map<KeyMapping, Int> = emptyMap()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
     private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
     private var isDuplicate = false
 
     @JvmStatic
-    fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
+    fun isKeyDown(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
         val override = map[keyBinding] ?: run {
-            if (map.containsValue(keyBinding.boundKey.getCode())) {
+            if (map.containsValue(keyBinding.key.value)) {
                 cir.returnValue = false
             }
             return
@@ -46,10 +46,10 @@ object GardenCustomKeybinds {
     }
 
     @JvmStatic
-    fun isKeyPressed(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
+    fun isKeyPressed(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
         val override = map[keyBinding] ?: run {
-            if (map.containsValue(keyBinding.boundKey.getCode())) {
+            if (map.containsValue(keyBinding.key.value)) {
                 cir.returnValue = false
             }
             return
@@ -60,7 +60,7 @@ object GardenCustomKeybinds {
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        val screen = MinecraftClient.getInstance().currentScreen ?: return
+        val screen = Minecraft.getInstance().screen ?: return
         if (screen !is SignEditScreen) return
         lastWindowOpenTime = SimpleTimeMark.now()
     }
@@ -90,23 +90,23 @@ object GardenCustomKeybinds {
         with(config) {
             with(mcSettings) {
                 map = buildMap {
-                    fun add(keyBinding: KeyBinding, property: Property<Int>) {
+                    fun add(keyBinding: KeyMapping, property: Property<Int>) {
                         put(keyBinding, property.get())
                     }
-                    add(attackKey, attack)
-                    add(useKey, useItem)
-                    add(leftKey, left)
-                    add(rightKey, right)
-                    add(forwardKey, forward)
-                    add(backKey, back)
-                    add(jumpKey, jump)
-                    add(sneakKey, sneak)
+                    add(keyAttack, attack)
+                    add(keyUse, useItem)
+                    add(keyLeft, left)
+                    add(keyRight, right)
+                    add(keyUp, forward)
+                    add(keyDown, back)
+                    add(keyJump, jump)
+                    add(keyShift, sneak)
                 }
             }
         }
         calculateDuplicates()
         lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
-        KeyBinding.unpressAll()
+        KeyMapping.releaseAll()
     }
 
     private fun calculateDuplicates() {
@@ -120,7 +120,7 @@ object GardenCustomKeybinds {
     private fun isActive(): Boolean =
         isEnabled() && GardenApi.toolInHand != null && !isDuplicate && !hasGuiOpen() && lastWindowOpenTime.passedSince() > 300.milliseconds
 
-    private fun hasGuiOpen() = MinecraftClient.getInstance().currentScreen != null
+    private fun hasGuiOpen() = Minecraft.getInstance().screen != null
 
     @JvmStatic
     fun disableAll() {

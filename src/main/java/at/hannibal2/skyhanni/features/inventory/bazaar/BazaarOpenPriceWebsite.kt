@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.entity.player.PlayerInventory
-import net.minecraft.item.Items
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -35,7 +35,7 @@ object BazaarOpenPriceWebsite {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         BazaarApi.currentlyOpenedProduct ?: return
-        if (event.inventory is PlayerInventory) return
+        if (event.inventory is Inventory) return
 
         if (event.slot == 22) {
             event.replace(item)

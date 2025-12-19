@@ -91,7 +91,7 @@ object HotxFeatures {
             else -> return
         }
         handler.data.firstOrNull {
-            event.stack.name.formattedTextCompatLeadingWhiteLessResets() == it.item?.name.formattedTextCompatLeadingWhiteLessResets()
+            event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == it.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
         }?.let {
             event.stackTip = if (it.activeLevel == 0 || it.activeLevel == it.maxLevel) "" else "§e${it.activeLevel}"
             it.activeLevel.toString()
@@ -104,7 +104,7 @@ object HotxFeatures {
             HotfData.inInventory && configHotf.tokenStackSize -> HotfData
             else -> return
         }
-        if (event.stack.name.formattedTextCompatLeadingWhiteLessResets() != handler.heartItem?.stack?.name.formattedTextCompatLeadingWhiteLessResets()) return
+        if (event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets() != handler.heartItem?.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()) return
         event.stackTip = handler.availableTokens.takeIf { it != 0 }?.let { "§b$it" }.orEmpty()
     }
 

@@ -24,9 +24,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.player.PlayerInventory
-import net.minecraft.block.Blocks
-import net.minecraft.item.ItemStack
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -136,7 +136,7 @@ object MinionUpgradeHelper {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.minionConfigHelper) return
-        if (event.inventory !is PlayerInventory && event.slot == 51) {
+        if (event.inventory !is Inventory && event.slot == 51) {
             displayItem?.let { event.replace(it) }
         }
     }

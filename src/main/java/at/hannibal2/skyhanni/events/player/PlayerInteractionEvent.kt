@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.events.player
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 
 class PlayerInteractionEvent(val action: ClickAction, val pos: BlockPos?, val face: Direction?) : SkyHanniEvent()
 

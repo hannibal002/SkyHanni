@@ -17,24 +17,24 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object ThunderSparksHighlight {
 
     private val config get() = SkyHanniMod.feature.fishing.thunderSpark
     private val THUNDER_SPARK_TEXTURE by lazy { SkullTextureHolder.getTexture("THUNDER_SPARK") }
-    private val sparks = mutableSetOf<ArmorStandEntity>()
+    private val sparks = mutableSetOf<ArmorStand>()
 
     @HandleEvent
-    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStandEntity>) {
+    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
         if (entity.getWornSkullTexture() == THUNDER_SPARK_TEXTURE) sparks.add(entity)
     }
 
     @HandleEvent
-    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStandEntity>) {
+    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
         sparks.remove(event.entity)
     }
 

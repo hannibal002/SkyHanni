@@ -13,13 +13,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
+import net.minecraft.network.protocol.game.ClientboundSoundPacket
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
 import kotlin.time.Duration.Companion.seconds
 //#if MC < 1.21
 //$$ import net.minecraft.network.packet.s2c.play.ConfirmScreenActionS2CPacket
 //#else
-import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket
+import net.minecraft.network.protocol.common.ClientboundPingPacket
 //#endif
 
 @SkyHanniModule
@@ -28,12 +28,12 @@ object MinecraftData {
     @HandleEvent(receiveCancelled = true)
     fun onPacket(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
-            is PlaySoundS2CPacket -> {
+            is ClientboundSoundPacket -> {
                 if (PlaySoundEvent(
                         //#if MC < 1.21
                         //$$ packet.soundName,
                         //#else
-                        packet.sound.value().id.toString().removePrefix("minecraft:"),
+                        packet.sound.value().location().toString().removePrefix("minecraft:"),
                         //#endif
                         LorenzVec(packet.x, packet.y, packet.z), packet.pitch, packet.volume,
                     ).post()
@@ -42,18 +42,18 @@ object MinecraftData {
                 }
             }
 
-            is ParticleS2CPacket -> {
+            is ClientboundLevelParticlesPacket -> {
                 if (ReceiveParticleEvent(
                         //#if MC < 1.21
                         //$$ packet.particleType,
                         //#else
-                        packet.parameters.type,
+                        packet.particle.type,
                         //#endif
                         LorenzVec(packet.x, packet.y, packet.z),
                         packet.count,
-                        packet.speed,
-                        LorenzVec(packet.offsetX, packet.offsetY, packet.offsetZ),
-                        packet.shouldForceSpawn(),
+                        packet.maxSpeed,
+                        LorenzVec(packet.xDist, packet.yDist, packet.zDist),
+                        packet.isOverrideLimiter,
                         //#if MC < 1.21
                         //$$ packet.particleArgs,
                         //#endif
@@ -67,9 +67,9 @@ object MinecraftData {
             //$$ is ConfirmScreenActionS2CPacket -> {
             //$$     if (packet.actionId > 0) return
                 //#else
-                is CommonPingS2CPacket -> {
-                if (lastPingParameter == packet.parameter) return
-                lastPingParameter = packet.parameter
+                is ClientboundPingPacket -> {
+                if (lastPingParameter == packet.id) return
+                lastPingParameter = packet.id
                 //#endif
 
                 totalServerTicks++

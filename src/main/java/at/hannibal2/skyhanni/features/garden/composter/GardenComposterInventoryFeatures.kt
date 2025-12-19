@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.screen.GenericContainerScreenHandler
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.inventory.ChestMenu
 
 @SkyHanniModule
 object GardenComposterInventoryFeatures {
@@ -77,8 +77,8 @@ object GardenComposterInventoryFeatures {
         if (!config.highlightUpgrade) return
 
         if (InventoryUtils.openInventoryName() == "Composter Upgrades") {
-            if (event.gui !is GenericContainerScreen) return
-            val chest = event.container as GenericContainerScreenHandler
+            if (event.gui !is ContainerScreen) return
+            val chest = event.container as ChestMenu
 
             for ((slot, stack) in chest.getUpperItems()) {
                 if (stack.getLore().any { it == "§eClick to upgrade!" }) {

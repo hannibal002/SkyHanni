@@ -37,7 +37,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.util.Objects
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -248,11 +248,11 @@ object ItemPickupLog {
             ItemCategory.PET -> true
             else -> false
         }
-        return if (compact) getInternalName().repoItemName else name.formattedTextCompatLeadingWhiteLessResets()
+        return if (compact) getInternalName().repoItemName else hoverName.formattedTextCompatLeadingWhiteLessResets()
     }
 
     private fun ItemStack.hash(): Int {
-        var displayName = this.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
+        var displayName = this.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
         shopPattern.matchMatcher(displayName) {
             displayName = group("itemName")
         }

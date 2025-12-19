@@ -104,7 +104,7 @@ class SkyblockGuideHighlightFeature private constructor(
             if (activeObject == null) return
 
             event.container.slots
-                .filter { missing.contains(it.id) }
+                .filter { missing.contains(it.index) }
                 .forEach { it.highlight(LorenzColor.RED) }
         }
 
@@ -113,7 +113,7 @@ class SkyblockGuideHighlightFeature private constructor(
             if (!isEnabled()) return
             event.slot ?: return
             val current = activeObject ?: return
-            if (!missing.contains(event.slot.id)) return
+            if (!missing.contains(event.slot.index)) return
             current.onTooltip.invoke(event)
         }
 
@@ -129,7 +129,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
             for ((slot, item) in event.inventoryItems) {
                 if (slot == 4) continue // Overview Item
-                val loreAndName = listOf(item.name.formattedTextCompatLeadingWhiteLessResets()) + item.getLore()
+                val loreAndName = listOf(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) + item.getLore()
                 if (!current.conditionPattern.anyMatches(loreAndName)) continue
                 missing.add(slot)
             }

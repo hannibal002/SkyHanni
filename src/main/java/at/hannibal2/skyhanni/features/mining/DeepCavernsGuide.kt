@@ -24,8 +24,8 @@ import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.inventory.SimpleInventory
-import net.minecraft.item.Items
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object DeepCavernsGuide {
@@ -111,7 +111,7 @@ object DeepCavernsGuide {
         showStartIcon = true
 
         event.inventoryItems[31]?.let {
-            if (it.name.formattedTextCompatLeadingWhiteLessResets() != "§aObsidian Sanctuary") {
+            if (it.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aObsidian Sanctuary") {
                 start()
             }
         }
@@ -146,7 +146,7 @@ object DeepCavernsGuide {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (show) return
-        if (event.inventory is SimpleInventory && showStartIcon && event.slot == 49) {
+        if (event.inventory is SimpleContainer && showStartIcon && event.slot == 49) {
             event.replace(startIcon)
         }
     }

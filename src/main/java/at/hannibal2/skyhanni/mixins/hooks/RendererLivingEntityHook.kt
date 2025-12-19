@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 
 object RendererLivingEntityHook {
     private val config get() = SkyHanniMod.feature.dev
@@ -43,15 +43,15 @@ object RendererLivingEntityHook {
      * Check if the player should spin and rotate them if the option is on.
      */
     @JvmStatic
-    fun rotatePlayer(player: PlayerEntity): Float? {
+    fun rotatePlayer(player: Player): Float? {
         if (!SkyBlockUtils.inSkyBlock) return null
         if (!config.rotateContributors && !TimeUtils.isAprilFoolsDay) return null
         val name = player.name.formattedTextCompatLessResets() ?: return null
         if (!ContributorManager.shouldSpin(name)) return null
-        val rotation = ((player.age % 90) * 4).toFloat()
+        val rotation = ((player.tickCount % 90) * 4).toFloat()
         //#if MC < 1.21
         //$$ RenderSystem.rotate(rotation, 0f, 1f, 0f)
         //#endif
-        return player.yaw + rotation
+        return player.yRot + rotation
     }
 }

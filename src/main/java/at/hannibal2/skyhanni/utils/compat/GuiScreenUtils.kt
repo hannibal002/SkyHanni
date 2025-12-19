@@ -1,20 +1,20 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 //#if MC < 1.16
 //$$ import net.minecraft.client.gui.ScaledResolution
 //#endif
 
 object GuiScreenUtils {
 
-    private val mc get() = MinecraftClient.getInstance()
+    private val mc get() = Minecraft.getInstance()
 
     val scaledWindowHeight: Int
         get() =
 //#if MC < 1.16
 //$$             ScaledResolution(mc).scaledHeight
 //#else
-           mc.window.scaledHeight.toInt()
+           mc.window.guiScaledHeight.toInt()
 //#endif
 
     val scaledWindowWidth: Int
@@ -22,7 +22,7 @@ object GuiScreenUtils {
 //#if MC < 1.16
 //$$             ScaledResolution(mc).scaledWidth
 //#else
-           mc.window.scaledWidth.toInt()
+           mc.window.guiScaledWidth.toInt()
 //#endif
 
     val displayWidth: Int
@@ -30,7 +30,7 @@ object GuiScreenUtils {
 //#if MC < 1.16
 //$$             mc.displayWidth
 //#else
-           mc.window.framebufferWidth.toInt()
+           mc.window.width.toInt()
 //#endif
 
     val displayHeight: Int
@@ -38,7 +38,7 @@ object GuiScreenUtils {
 //#if MC < 1.16
 //$$             mc.displayHeight
 //#else
-           mc.window.framebufferHeight.toInt()
+           mc.window.height.toInt()
 //#endif
 
     val scaleFactor: Int
@@ -46,7 +46,7 @@ object GuiScreenUtils {
 //#if MC < 1.16
 //$$             ScaledResolution(mc).scaleFactor
 //#else
-           mc.window.scaleFactor.toInt()
+           mc.window.guiScale.toInt()
 //#endif
 
     private val globalMouseX get() = MouseCompat.getX()
@@ -55,7 +55,7 @@ object GuiScreenUtils {
     val mouseX: Int get() {
         var x = globalMouseX * scaledWindowWidth / displayWidth
         //#if MC > 1.21
-        if (mc.window.framebufferWidth > mc.window.width) x *= 2
+        if (mc.window.width > mc.window.screenWidth) x *= 2
         //#endif
         return x
     }
@@ -68,7 +68,7 @@ object GuiScreenUtils {
 //#if MC < 1.21
 //$$             return height - y - 1
 //#else
-           if (mc.window.framebufferHeight > mc.window.height) y *= 2
+           if (mc.window.height > mc.window.screenHeight) y *= 2
            return y
 //#endif
         }

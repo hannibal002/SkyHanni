@@ -17,18 +17,18 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import com.google.gson.JsonObject
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.item.Items
-import net.minecraft.screen.GenericContainerScreenHandler
-import net.minecraft.inventory.Inventory
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.item.Items
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.Container
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.nbt.CompoundTag
 import java.util.regex.Matcher
 //#if MC > 1.21
-import net.minecraft.component.ComponentMap
+import net.minecraft.core.component.DataComponentMap
 //#endif
 
 // Code taken from NotEnoughUpdates
@@ -38,7 +38,7 @@ class ItemResolutionQuery {
     //$$ private var compound: NbtCompound? = null
     //$$
     //#else
-    private var compound: ComponentMap? = null
+    private var compound: DataComponentMap? = null
     //#endif
     private var itemType: Item? = null
     private var knownInternalName: String? = null
@@ -177,7 +177,7 @@ class ItemResolutionQuery {
     }
 
     fun withCurrentGuiContext(): ItemResolutionQuery {
-        this.guiContext = MinecraftClient.getInstance().currentScreen
+        this.guiContext = Minecraft.getInstance().screen
         return this
     }
 
@@ -226,14 +226,14 @@ class ItemResolutionQuery {
 
     private fun resolveRuneName(): String? {
         val runes = getExtraAttributes().getCompoundOrDefault("runes")
-        val runeName = runes.keys.singleOrNull()
+        val runeName = runes.keySet().singleOrNull()
         if (runeName.isNullOrEmpty()) return null
         return runeName.uppercase() + "_RUNE;" + runes.getIntOrDefault(runeName)
     }
 
     private fun resolveEnchantedBookNameFromNBT(): String? {
         val enchantments = getExtraAttributes().getCompoundOrDefault("enchantments")
-        val enchantName = enchantments.keys.singleOrNull()
+        val enchantName = enchantments.keySet().singleOrNull()
         if (enchantName.isNullOrEmpty()) return null
         return enchantName.uppercase() + ";" + enchantments.getIntOrDefault(enchantName)
     }
@@ -278,7 +278,7 @@ class ItemResolutionQuery {
 
     private fun resolveAttributeShardName(): String? {
         val attributes = getExtraAttributes().getCompoundOrDefault("attributes")
-        val attributeName = attributes.keys.singleOrNull()
+        val attributeName = attributes.keySet().singleOrNull()
         if (attributeName.isNullOrEmpty()) return null
         return "ATTRIBUTE_SHARD_" + attributeName.uppercase() + ";" + attributes.getIntOrDefault(attributeName)
     }
@@ -308,10 +308,10 @@ class ItemResolutionQuery {
     }
 
     private fun resolveContextualName(): String? {
-        val chest = guiContext as? GenericContainerScreen ?: return null
-        val inventorySlots = chest.container as GenericContainerScreenHandler
+        val chest = guiContext as? ContainerScreen ?: return null
+        val inventorySlots = chest.container as ChestMenu
         val guiName = InventoryUtils.openInventoryName()
-        val isOnBazaar: Boolean = isBazaar(inventorySlots.inventory)
+        val isOnBazaar: Boolean = isBazaar(inventorySlots.container)
         var displayName: String = ItemUtils.getDisplayName(compound) ?: return null
         displayName = displayName.removePrefix("§6§lSELL ").removePrefix("§a§lBUY ")
         if (itemType === Items.ENCHANTED_BOOK && isOnBazaar && compound != null) {
@@ -351,20 +351,20 @@ class ItemResolutionQuery {
         return null
     }
 
-    private fun isBazaar(chest: Inventory): Boolean {
+    private fun isBazaar(chest: Container): Boolean {
         if (InventoryUtils.openInventoryName().startsWith("Bazaar ➜ ")) {
             return true
         }
-        val bazaarSlot = chest.size() - 5
+        val bazaarSlot = chest.containerSize - 5
         if (bazaarSlot < 0) return false
-        val stackInSlot = chest.getStack(bazaarSlot) ?: return false
+        val stackInSlot = chest.getItem(bazaarSlot) ?: return false
         if (stackInSlot.count == 0) return false
 
         val lore: List<String> = stackInSlot.getLore()
         return lore.contains("§7To Bazaar")
     }
 
-    private fun getExtraAttributes(): NbtCompound = compound?.extraAttributes ?: NbtCompound()
+    private fun getExtraAttributes(): CompoundTag = compound?.extraAttributes ?: CompoundTag()
 
     private fun resolveFromSkyblock(): String? {
         val internalName = getExtraAttributes().getStringOrDefault("id")

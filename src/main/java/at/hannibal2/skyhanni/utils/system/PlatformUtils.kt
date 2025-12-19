@@ -35,7 +35,7 @@ object PlatformUtils {
     //#if MC < 1.21
     //$$ val MC_VERSION: String = VersionConstants.MC_VERSION
     //#else
-    val MC_VERSION: String = net.minecraft.SharedConstants.getGameVersion().name
+    val MC_VERSION: String = net.minecraft.SharedConstants.getCurrentVersion().name
     //#endif
     val IS_LEGACY: Boolean = VersionConstants.MC_VERSION == "1.8.9"
 

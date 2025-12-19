@@ -61,7 +61,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object ItemDisplayOverlayFeatures {
@@ -229,7 +229,7 @@ object ItemDisplayOverlayFeatures {
         if (COLLECTION_LEVEL.isSelected() && InventoryUtils.openInventoryName().endsWith(" Collections")) {
             if (lore.any { it.contains("Click to view!") }) {
                 if (CollectionApi.isCollectionTier0(lore)) return "0"
-                val name = item.name.formattedTextCompatLeadingWhiteLessResets()
+                val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
                 if (name.startsWith("§e")) {
                     val text = name.split(" ").last()
                     return "" + text.romanToDecimalIfNecessary()
@@ -263,7 +263,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
-            dungeonPotionPattern.matchMatcher(item.name.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+            dungeonPotionPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
                 return when (val level = group("level").romanToDecimal()) {
                     in 1..2 -> "§f$level"
                     in 3..4 -> "§a$level"

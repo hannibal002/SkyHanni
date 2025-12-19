@@ -34,12 +34,12 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableScrollT
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.GameMenuScreen
-import net.minecraft.client.gui.screen.ingame.SignEditScreen
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.PauseScreen
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.item.ItemStack
-import net.minecraft.util.Identifier
+import net.minecraft.world.item.ItemStack
+import net.minecraft.resources.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
@@ -307,14 +307,14 @@ interface Renderable {
         }
 
         internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
-            val guiScreen = MinecraftClient.getInstance().currentScreen.takeIf { it != null } ?: return false
+            val guiScreen = Minecraft.getInstance().screen.takeIf { it != null } ?: return false
 
             // Never support grayed out inventories
             if (RenderData.outsideInventory) return false
 
             if (bypassChecks) return true
 
-            val inMenu = MinecraftClient.getInstance().currentScreen !is GameMenuScreen
+            val inMenu = Minecraft.getInstance().screen !is PauseScreen
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (guiScreen !is SignEditScreen && guiScreen !is GuideGui<*>) {
                 ToolTipData.lastSlot == null
@@ -489,9 +489,9 @@ interface Renderable {
 
             val searchWidth: Int
                 get() {
-                    val fontRenderer = MinecraftClient.getInstance().textRenderer
+                    val fontRenderer = Minecraft.getInstance().font
                     val string = searchPrefix + textInput.editTextWithAlwaysCarriage()
-                    return (fontRenderer.getWidth(string) * scale).toInt() + 1
+                    return (fontRenderer.width(string) * scale).toInt() + 1
                 }
 
             init {
@@ -625,10 +625,10 @@ interface Renderable {
                     //$$ )
                     //#else
                     if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                        DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
+                        DrawContextUtils.drawContext.blitSprite(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
                             mouseOffsetX, mouseOffsetY, width, height)
                     } else {
-                        DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                        DrawContextUtils.drawContext.blit(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
                             mouseOffsetX, mouseOffsetY, 0f, 0f, width, height, 182, 5, 256, 256, -1)
                     }
                     //#endif
@@ -644,10 +644,10 @@ interface Renderable {
                         //$$ )
                         //#else
                         if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                            DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
+                            DrawContextUtils.drawContext.blitSprite(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
                                 width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
                         } else {
-                            DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
+                            DrawContextUtils.drawContext.blit(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
                                 mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
                         }
                         //#endif
@@ -661,10 +661,10 @@ interface Renderable {
                         //$$ )
                         //#else
                         if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                            DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
+                            DrawContextUtils.drawContext.blitSprite(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
                                 width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
                         } else {
-                            DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                            DrawContextUtils.drawContext.blit(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
                                 mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
                         }
                         //#endif
@@ -1147,7 +1147,7 @@ interface Renderable {
 
         fun drawInsideImage(
             input: Renderable,
-            texture: Identifier,
+            texture: ResourceLocation,
             alpha: Int = 255,
             padding: Int = 2,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
@@ -1181,7 +1181,7 @@ interface Renderable {
 
         fun drawInsideFixedSizedImage(
             input: Renderable,
-            texture: Identifier,
+            texture: ResourceLocation,
             width: Int = input.width,
             height: Int = input.height,
             alpha: Int = 255,

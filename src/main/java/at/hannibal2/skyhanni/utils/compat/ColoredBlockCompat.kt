@@ -2,15 +2,15 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import net.minecraft.block.StainedGlassBlock
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.util.DyeColor
-import net.minecraft.item.ItemStack
+import net.minecraft.world.level.block.StainedGlassBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.DyeColor
+import net.minecraft.world.item.ItemStack
 //#if MC < 1.21
 //$$ import net.minecraft.block.BlockCarpet
 //#else
-import net.minecraft.block.Block
+import net.minecraft.world.level.block.Block
 //#endif
 
 /**
@@ -221,7 +221,7 @@ enum class ColoredBlockCompat(
         //$$ val wool = Blocks.wool.defaultState
         //$$ return wool.withProperty(BlockCarpet.COLOR, getDyeColor())
         //#else
-        return this.woolBlock.defaultState
+        return this.woolBlock.defaultBlockState()
         //#endif
     }
 
@@ -230,11 +230,11 @@ enum class ColoredBlockCompat(
         //$$ val newState = state ?: Blocks.stained_glass.defaultState
         //$$ return newState.withProperty(BlockCarpet.COLOR, getDyeColor())
         //#else
-        if (state == null) return this.glassBlock.defaultState
+        if (state == null) return this.glassBlock.defaultBlockState()
         if (state.isStainedGlassPane()) {
-            return this.glassPaneBlock.getStateWithProperties(state)
+            return this.glassPaneBlock.withPropertiesOf(state)
         }
-        return this.glassBlock.getStateWithProperties(state)
+        return this.glassBlock.withPropertiesOf(state)
         //#endif
     }
 
@@ -248,7 +248,7 @@ enum class ColoredBlockCompat(
 
     fun getDyeColor(): DyeColor {
         for (entry in DyeColor.entries) {
-            if (entry.index == this.metaColor) return entry
+            if (entry.id == this.metaColor) return entry
         }
         return DyeColor.WHITE
     }

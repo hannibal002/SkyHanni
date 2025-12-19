@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -80,7 +80,7 @@ object RiftBloodEffigies {
         "Effigies: (?<hearts>(?:(?:§[7c])?⧯)*)",
     )
 
-    private fun getIndex(entity: ArmorStandEntity): Int? =
+    private fun getIndex(entity: ArmorStand): Int? =
         locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) }?.let { locations.indexOf(it) }
 
     @HandleEvent
@@ -147,7 +147,7 @@ object RiftBloodEffigies {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        eLoop@for (entity in EntityUtils.getEntitiesNearby<ArmorStandEntity>(LocationUtils.playerLocation(), 15.0)) {
+        eLoop@for (entity in EntityUtils.getEntitiesNearby<ArmorStand>(LocationUtils.playerLocation(), 15.0)) {
             effigiesTimerPattern.matchMatcher(entity.name.formattedTextCompatLessResets()) {
                 val index = getIndex(entity) ?: continue@eLoop
                 val time = TimeUtils.getDuration(group("time"))

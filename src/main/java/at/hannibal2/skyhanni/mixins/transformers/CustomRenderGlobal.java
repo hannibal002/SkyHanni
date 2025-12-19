@@ -1,17 +1,17 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gl.PostEffectProcessor;
+import net.minecraft.client.renderer.LevelRenderer;
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import net.minecraft.client.renderer.PostChain;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(WorldRenderer.class)
+@Mixin(LevelRenderer.class)
 public interface CustomRenderGlobal {
-    @Accessor("entityOutlineFramebuffer")
-    Framebuffer getEntityOutlineFramebuffer_skyhanni();
+    @Accessor("entityOutlineTarget")
+    RenderTarget getEntityOutlineFramebuffer_skyhanni();
 
     @Accessor("entityOutlineShader")
-    PostEffectProcessor getEntityOutlineShader_skyhanni();
+    PostChain getEntityOutlineShader_skyhanni();
 
 }

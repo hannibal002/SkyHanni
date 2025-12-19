@@ -20,10 +20,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object HighlightVisitorsOutsideOfGarden {
@@ -47,7 +47,7 @@ object HighlightVisitorsOutsideOfGarden {
     }
 
     private fun getSkinOrTypeFor(entity: Entity): String {
-        if (entity is PlayerEntity) {
+        if (entity is Player) {
             return entity.getSkinTexture() ?: "no skin"
         }
         return entity.javaClass.simpleName
@@ -58,7 +58,7 @@ object HighlightVisitorsOutsideOfGarden {
         val possibleJsons = visitorJson[island] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)
         return possibleJsons.any {
-            (it.position == null || it.position.distance(entity.blockPos.toLorenzVec()) < 1) &&
+            (it.position == null || it.position.distance(entity.blockPosition().toLorenzVec()) < 1) &&
                 it.skinOrType == skinOrType
         }
     }
@@ -70,7 +70,7 @@ object HighlightVisitorsOutsideOfGarden {
         if (!config.highlightVisitors) return
         val color = LorenzColor.DARK_RED.toColor().addAlpha(50)
         EntityUtils.getEntities<LivingEntity>()
-            .filter { it !is ArmorStandEntity && isVisitor(it) }
+            .filter { it !is ArmorStand && isVisitor(it) }
             .forEach {
                 RenderLivingEntityHelper.setEntityColor(it, color) { config.highlightVisitors }
             }
@@ -89,9 +89,9 @@ object HighlightVisitorsOutsideOfGarden {
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {
         if (!shouldBlock) return
-        if (MinecraftCompat.localPlayer.isSneaking) return
+        if (MinecraftCompat.localPlayer.isShiftKeyDown) return
         val entity = event.clickedEntity
-        if (isVisitor(entity) || (entity is ArmorStandEntity && isVisitorNearby(entity.getLorenzVec()))) {
+        if (isVisitor(entity) || (entity is ArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             ChatUtils.chatAndOpenConfig(
                 "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
                 VisitorApi.config::blockInteracting,

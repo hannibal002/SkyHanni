@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonSyntaxException
-import net.minecraft.resource.ResourceManager
-import net.minecraft.util.Identifier
+import net.minecraft.server.packs.resources.ResourceManager
+import net.minecraft.resources.ResourceLocation
 import java.io.IOException
 
 //#if MC > 1.21
@@ -16,13 +16,13 @@ import kotlin.jvm.optionals.getOrNull
 class ResourcePackReloadEvent(
     val resourceManager: ResourceManager,
 ) : SkyHanniEvent() {
-    inline fun <reified T : Any> getJsonResource(location: Identifier): T? {
+    inline fun <reified T : Any> getJsonResource(location: ResourceLocation): T? {
         return try {
             val packOverridesStream = resourceManager.getResource(location)
                 //#if MC > 1.21
                 .getOrNull()
                 //#endif
-                ?.inputStream ?: return null
+                ?.open() ?: return null
 
             ConfigManager.gson.fromJson<T>(packOverridesStream.reader())
         } catch (exception: JsonSyntaxException) {

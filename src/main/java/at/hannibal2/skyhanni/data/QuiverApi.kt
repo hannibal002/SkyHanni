@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.BowItem
+import net.minecraft.world.item.BowItem
 import java.util.regex.Matcher
 
 @SkyHanniModule

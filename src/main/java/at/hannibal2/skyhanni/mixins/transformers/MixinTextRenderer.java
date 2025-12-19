@@ -2,19 +2,19 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.client.gui.Font;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.network.chat.FormattedText;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin(TextRenderer.class)
+@Mixin(Font.class)
 public class MixinTextRenderer {
 
     @ModifyVariable(
         //#if MC < 1.21.7
-        method = "drawInternal(Lnet/minecraft/text/OrderedText;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;IIZ)I",
+        method = "drawInternal(Lnet/minecraft/util/FormattedCharSequence;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;IIZ)I",
         //#else
         //$$ method = "prepare(Lnet/minecraft/text/OrderedText;FFIZI)Lnet/minecraft/client/font/TextRenderer$GlyphDrawable;",
         //#endif
@@ -22,9 +22,9 @@ public class MixinTextRenderer {
         at = @At("HEAD"),
         argsOnly = true
     )
-    private OrderedText modifyOrderedText(OrderedText value) {
+    private FormattedCharSequence modifyOrderedText(FormattedCharSequence value) {
 
-        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
+        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(
             value
         );
 
@@ -34,7 +34,7 @@ public class MixinTextRenderer {
 
     @ModifyVariable(
         //#if MC < 1.21.7
-        method = "drawInternal(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;IIZ)I",
+        method = "drawInternal(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;IIZ)I",
         //#else
         //$$ method = "prepare(Ljava/lang/String;FFIZI)Lnet/minecraft/client/font/TextRenderer$GlyphDrawable;",
         //#endif
@@ -44,7 +44,7 @@ public class MixinTextRenderer {
     )
     private String modifyString(String value) {
 
-        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
+        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(
             OrderedTextUtils.legacyTextToOrderedText(value)
         );
 
@@ -53,14 +53,14 @@ public class MixinTextRenderer {
     }
 
     @ModifyVariable(
-        method = "getWidth(Lnet/minecraft/text/OrderedText;)I",
+        method = "width(Lnet/minecraft/util/FormattedCharSequence;)I",
         index = 1,
         at = @At("HEAD"),
         argsOnly = true
     )
-    private OrderedText modifyWidth(OrderedText value) {
+    private FormattedCharSequence modifyWidth(FormattedCharSequence value) {
 
-        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
+        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(
             value
         );
 
@@ -69,14 +69,14 @@ public class MixinTextRenderer {
     }
 
     @ModifyVariable(
-        method = "getWidth(Ljava/lang/String;)I",
+        method = "width(Ljava/lang/String;)I",
         index = 1,
         at = @At("HEAD"),
         argsOnly = true
     )
     private String modifyWidth(String value) {
 
-        OrderedText replaced = ModifyVisualWords.INSTANCE.transformText(
+        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(
             OrderedTextUtils.legacyTextToOrderedText(value)
         );
 
@@ -85,14 +85,14 @@ public class MixinTextRenderer {
     }
 
     @ModifyVariable(
-        method = "getWidth(Lnet/minecraft/text/StringVisitable;)I",
+        method = "width(Lnet/minecraft/network/chat/FormattedText;)I",
         index = 1,
         at = @At("HEAD"),
         argsOnly = true
     )
-    private StringVisitable modifyWidth(StringVisitable value) {
+    private FormattedText modifyWidth(FormattedText value) {
 
-        StringVisitable replaced = ModifyVisualWords.INSTANCE.transformStringVisitable(
+        FormattedText replaced = ModifyVisualWords.INSTANCE.transformStringVisitable(
             value
         );
 

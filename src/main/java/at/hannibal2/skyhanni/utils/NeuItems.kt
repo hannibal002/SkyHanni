@@ -30,9 +30,9 @@ import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
-import net.minecraft.block.Blocks
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 import java.util.NavigableMap
 import java.util.TreeMap
 import kotlin.time.Duration.Companion.minutes
@@ -104,7 +104,7 @@ object NeuItems {
                 ChatUtils.debug("skipped `$this`from readAllNeuItems")
                 return@forEach
             }
-            val cleanName = stack.name.formattedTextCompatLeadingWhiteLessResets()?.lowercase()?.removePrefix(neuPetLevelRegex)?.takeIf {
+            val cleanName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()?.lowercase()?.removePrefix(neuPetLevelRegex)?.takeIf {
                 it.isNotEmpty()
             } ?: return@forEach
 

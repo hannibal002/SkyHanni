@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.nio.FloatBuffer
 //#if MC > 1.21
 import com.mojang.blaze3d.systems.RenderSystem
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 //#endif
@@ -23,7 +23,7 @@ object DrawContextUtils {
     // GL11.GL_CURRENT_COLOR
     const val GL_CURRENT_COLOR = 2816
 
-    private var _drawContext: DrawContext? = null
+    private var _drawContext: GuiGraphics? = null
 
     /**
      * This is used to track the depth of the render context stack.
@@ -33,7 +33,7 @@ object DrawContextUtils {
      */
     private var renderDepth = 0
 
-    val drawContext: DrawContext
+    val drawContext: GuiGraphics
         get() = _drawContext ?: run {
             ErrorManager.crashInDevEnv("drawContext is null")
             //#if MC < 1.21
@@ -44,9 +44,9 @@ object DrawContextUtils {
             //#endif
         }
 
-    fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.drawItem(item, x, y)
+    fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.renderItem(item, x, y)
 
-    fun setContext(context: DrawContext) {
+    fun setContext(context: GuiGraphics) {
         renderDepth++
         if (_drawContext != null) {
             return
@@ -67,7 +67,7 @@ object DrawContextUtils {
 
     fun translate(x: Double, y: Double, z: Double) {
         //#if MC < 1.21.6
-        drawContext.matrices.translate(x, y, z)
+        drawContext.pose().translate(x, y, z)
         //#else
         //$$ drawContext.matrices.translate(x.toFloat(), y.toFloat())
         //#endif
@@ -75,7 +75,7 @@ object DrawContextUtils {
 
     fun translate(x: Float, y: Float, z: Float) {
         //#if MC < 1.21.6
-        drawContext.matrices.translate(x, y, z)
+        drawContext.pose().translate(x, y, z)
         //#else
         //$$ drawContext.matrices.translate(x, y)
         //#endif
@@ -86,7 +86,7 @@ object DrawContextUtils {
         //#if MC < 1.21
         //$$ RenderSystem.rotate(angle, xf, yf, zf)
         //#elseif MC < 1.21.6
-        drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, xf, yf, zf))
+        drawContext.pose().mulPose(Quaternionf().rotationAxis(angle, xf, yf, zf))
         //#endif
     }
 
@@ -100,13 +100,13 @@ object DrawContextUtils {
 
     //#if MC > 1.21
     //#if MC < 1.21.6
-    fun multMatrix(matrix: Matrix4f) = drawContext.matrices.multiplyPositionMatrix(matrix)
+    fun multMatrix(matrix: Matrix4f) = drawContext.pose().mulPose(matrix)
     //#endif
     //#endif
 
     fun scale(x: Float, y: Float, z: Float) {
         //#if MC < 1.21.6
-        drawContext.matrices.scale(x, y, z)
+        drawContext.pose().scale(x, y, z)
         //#else
         //$$ drawContext.matrices.scale(x, y)
         //#endif
@@ -115,7 +115,7 @@ object DrawContextUtils {
     @Deprecated("Use pushPop instead")
     fun pushMatrix() {
         //#if MC < 1.21.6
-        drawContext.matrices.push()
+        drawContext.pose().pushPose()
         //#else
         //$$ drawContext.matrices.pushMatrix()
         //#endif
@@ -124,7 +124,7 @@ object DrawContextUtils {
     @Deprecated("Use pushPop instead")
     fun popMatrix() {
         //#if MC < 1.21.6
-        drawContext.matrices.pop()
+        drawContext.pose().popPose()
         //#else
         //$$ drawContext.matrices.popMatrix()
         //#endif
@@ -162,7 +162,7 @@ object DrawContextUtils {
 
     fun loadIdentity() {
         //#if MC < 1.21.6
-        drawContext.matrices.loadIdentity()
+        drawContext.pose().setIdentity()
         //#else
         //$$ drawContext.matrices.identity()
         //#endif

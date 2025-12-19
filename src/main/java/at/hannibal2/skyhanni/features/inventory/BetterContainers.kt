@@ -20,14 +20,14 @@ import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.client.texture.NativeImage
-import net.minecraft.client.texture.NativeImageBackedTexture
-import net.minecraft.item.ItemStack
-import net.minecraft.screen.GenericContainerScreenHandler
-import net.minecraft.screen.slot.Slot
-import net.minecraft.util.Identifier
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import com.mojang.blaze3d.platform.NativeImage
+import net.minecraft.client.renderer.texture.DynamicTexture
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.inventory.Slot
+import net.minecraft.resources.ResourceLocation
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.BufferedReader
@@ -47,14 +47,14 @@ object BetterContainers {
 
     private val config get() = SkyHanniMod.feature.inventory.improvedSBMenus
 
-    private val x: Identifier = Identifier.of("skyhanni", "dynamic_54")
+    private val x: ResourceLocation = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54")
 
-    private val toggleOff = Identifier.of("skyhanni", "dynamic_54/toggle_off.png")
-    private val toggleOn = Identifier.of("skyhanni", "dynamic_54/toggle_on.png")
-    private val dynamic54Base = Identifier.of("skyhanni", "dynamic_54/style1/dynamic_54.png")
-    private val dynamic54Slot = Identifier.of("skyhanni", "dynamic_54/style1/dynamic_54_slot_ctm.png")
-    private val dynamic54Button = Identifier.of("skyhanni", "dynamic_54/style1/dynamic_54_button_ctm.png")
-    private val customDynamicChest = Identifier.of("skyhanni", "dynamic_chest_inventory.png")
+    private val toggleOff = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_off.png")
+    private val toggleOn = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_on.png")
+    private val dynamic54Base = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54.png")
+    private val dynamic54Slot = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54_slot_ctm.png")
+    private val dynamic54Button = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54_button_ctm.png")
+    private val customDynamicChest = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_chest_inventory.png")
 
     private val disallowedInventoryPattern by patternGroup.pattern(
         "disallowed",
@@ -74,7 +74,7 @@ object BetterContainers {
 
     private var loaded = false
     private var gpuNative: NativeImage? = null
-    private var gpuTex: NativeImageBackedTexture? = null
+    private var gpuTex: DynamicTexture? = null
     private var lastClickedSlot = 0
     private var clickedSlot = 0
     private var clickedSlotAt: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -92,8 +92,8 @@ object BetterContainers {
 
     @JvmStatic
     fun slotCanBeHighlighted(slot: Slot): Boolean {
-        return if (!isOverriding) slot.canBeHighlighted()
-        else !isBlankStack(slot.stack)
+        return if (!isOverriding) slot.isHighlightable
+        else !isBlankStack(slot.item)
     }
 
     fun reset() {
@@ -109,8 +109,8 @@ object BetterContainers {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isOverriding) return
         val slot = event.slot ?: return
-        val isBlankStack = isBlankStack(slot.stack)
-        val isButtonStack = isButtonStack(slot.stack)
+        val isBlankStack = isBlankStack(slot.item)
+        val isButtonStack = isButtonStack(slot.item)
         if (!(isBlankStack || isButtonStack)) return
         clickSlot(event.slotId)
         if (isBlankStack) event.makePickblock()
@@ -120,43 +120,43 @@ object BetterContainers {
     fun onSlotPre(event: GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre) {
         if (!isOverriding) return
         val slot = event.slot
-        val shouldRender = shouldRenderStack(slot.stack)
+        val shouldRender = shouldRenderStack(slot.item)
         if (!shouldRender) event.cancel()
     }
 
     @HandleEvent
     fun onGuiContainerPreDraw(event: GuiContainerEvent.PreDraw) {
-        if (event.gui !is GenericContainerScreen) return reset()
+        if (event.gui !is ContainerScreen) return reset()
         chestOpen = SkyBlockUtils.inSkyBlock && config.enabled
         if (!chestOpen) return
 
-        val inventory = (event.container as GenericContainerScreenHandler).inventory
+        val inventory = (event.container as ChestMenu).container
         lastInvHashcode = inventory.hashCode()
-        hasItem = (0 until inventory.size()).any { slotIndex ->
-            val stack = inventory.getStack(slotIndex)
+        hasItem = (0 until inventory.containerSize).any { slotIndex ->
+            val stack = inventory.getItem(slotIndex)
             stack != null
         }
-        hasNullPane = (0 until inventory.size()).any { slotIndex ->
-            val stack = inventory.getStack(slotIndex)
+        hasNullPane = (0 until inventory.containerSize).any { slotIndex ->
+            val stack = inventory.getItem(slotIndex)
             isBlankStack(stack)
         }
     }
 
     // <editor-fold desc="Resource Reading">
-    private fun readImageResources(id: Identifier, altId: Identifier): BufferedImage? =
+    private fun readImageResources(id: ResourceLocation, altId: ResourceLocation): BufferedImage? =
         readImageResource(id) ?: readImageResource(altId)
 
-    private fun readImageResource(id: Identifier): BufferedImage? = runCatching {
-        val mcResource = MinecraftClient.getInstance().resourceManager.getResource(id).get()
-        ImageIO.read(mcResource.inputStream)
+    private fun readImageResource(id: ResourceLocation): BufferedImage? = runCatching {
+        val mcResource = Minecraft.getInstance().resourceManager.getResource(id).get()
+        ImageIO.read(mcResource.open())
     }.onFailure {
         ErrorManager.logErrorWithData(it, "Could not read image resource: ${id.path}")
         null
     }.getOrNull()
 
-    private fun readJsonResource(id: Identifier): BufferedReader? = runCatching {
-        val mcResource =  MinecraftClient.getInstance().resourceManager.getResource(id).get()
-        val streamReader = InputStreamReader(mcResource.inputStream, StandardCharsets.UTF_8)
+    private fun readJsonResource(id: ResourceLocation): BufferedReader? = runCatching {
+        val mcResource =  Minecraft.getInstance().resourceManager.getResource(id).get()
+        val streamReader = InputStreamReader(mcResource.open(), StandardCharsets.UTF_8)
         BufferedReader(streamReader)
     }.getOrNull()
     // </editor-fold>
@@ -224,11 +224,11 @@ object BetterContainers {
         return hasText && stack.isDye()
     }
 
-    fun getTextureIdentifier(original: Identifier): Identifier {
+    fun getTextureIdentifier(original: ResourceLocation): ResourceLocation {
         if (!chestOpen) return original
-        val inv = (MinecraftClient.getInstance().currentScreen as? GenericContainerScreen)?.container
+        val inv = (Minecraft.getInstance().screen as? ContainerScreen)?.container
             ?: return original
-        if (inv !is GenericContainerScreenHandler) return original
+        if (inv !is ChestMenu) return original
         val invHash = inv.hashCode()
         if (gpuTex == null || lastClickedSlot != getClickedSlot() || lastInvHashcode != invHash) {
             lastInvHashcode = invHash
@@ -244,11 +244,11 @@ object BetterContainers {
         val native = NativeImage(NativeImage.Format.RGBA, bImg.width, bImg.height, false)
         for (y in 0 until bImg.height) {
             for (x in 0 until bImg.width) {
-                native.setColorArgb(x, y, bImg.getRGB(x, y))
+                native.setPixel(x, y, bImg.getRGB(x, y))
             }
         }
-        val backed = NativeImageBackedTexture(::toString, native)
-        MinecraftClient.getInstance().textureManager.registerTexture(customDynamicChest, backed)
+        val backed = DynamicTexture(::toString, native)
+        Minecraft.getInstance().textureManager.register(customDynamicChest, backed)
         gpuTex = backed
         gpuNative = native
     }
@@ -258,13 +258,13 @@ object BetterContainers {
         val backed = gpuTex ?: return uploadDynamicTexture(bImg)
         for (y in 0 until bImg.height) {
             for (x in 0 until bImg.width) {
-                native.setColorArgb(x, y, bImg.getRGB(x, y))
+                native.setPixel(x, y, bImg.getRGB(x, y))
             }
         }
         backed.upload()
     }
 
-    private fun generateModernTex(handler: GenericContainerScreenHandler) {
+    private fun generateModernTex(handler: ChestMenu) {
         if (!hasItem || !hasNullPane) {
             gpuTex = null
             return
@@ -277,7 +277,7 @@ object BetterContainers {
             lastSlots = inventorySlots
         }
 
-        val handlerInventory = handler.inventory
+        val handlerInventory = handler.container
         val bufferedImageBase = bufferedImageBase ?: return
         val horizontalTexMult = bufferedImageBase.width / 256
         val verticalTexMult = bufferedImageBase.height / 256
@@ -291,7 +291,7 @@ object BetterContainers {
         g.drawImage(bufferedImageBase, 0, 0, null)
         g.dispose()
 
-        val size = handlerInventory.size()
+        val size = handlerInventory.containerSize
         val isSlot = Array(9) { BooleanArray(size / 9) }
         val isButton = Array(9) { BooleanArray(size / 9) }
 
@@ -301,7 +301,7 @@ object BetterContainers {
         val isSuperpairs = unformattedLower.startsWith("Superpairs") && !containsStakes
 
         for (index in 0..<size) {
-            val stack: ItemStack = handlerInventory.getStack(index) ?: continue
+            val stack: ItemStack = handlerInventory.getItem(index) ?: continue
             // Column and row index
             val cI = index % 9
             val rI = index / 9
@@ -321,7 +321,7 @@ object BetterContainers {
 
         try {
             for (index in 0..<size) {
-                val stack: ItemStack = handlerInventory.getStack(index) ?: continue
+                val stack: ItemStack = handlerInventory.getItem(index) ?: continue
                 val xi = index % 9
                 val yi = index / 9
 

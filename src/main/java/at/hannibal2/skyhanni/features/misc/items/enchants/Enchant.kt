@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {

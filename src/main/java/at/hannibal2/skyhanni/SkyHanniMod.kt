@@ -45,8 +45,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.Screen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -93,12 +93,12 @@ object SkyHanniMod {
             //#if MC < 1.21
             //$$ MinecraftCompat.localPlayer.closeScreen()
             //#else
-            MinecraftCompat.localPlayer.closeHandledScreen()
+            MinecraftCompat.localPlayer.closeContainer()
             //#endif
             OtherInventoryData.close(title)
         }
         shouldCloseScreen = true
-        MinecraftClient.getInstance().setScreen(screenToOpen)
+        Minecraft.getInstance().setScreen(screenToOpen)
         screenTicks = 0
         this.screenToOpen = null
     }

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -59,7 +59,7 @@ object GardenWarpCommands {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onKeyDown(event: KeyDownEvent) {
-        if (MinecraftClient.getInstance().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         if (NeuItems.neuHasFocus()) return
 
         when (event.keyCode) {

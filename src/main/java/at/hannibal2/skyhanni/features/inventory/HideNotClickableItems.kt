@@ -49,10 +49,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.screen.GenericContainerScreenHandler
-import net.minecraft.item.ItemStack
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -121,8 +121,8 @@ object HideNotClickableItems {
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (bypassActive()) return
-        if (event.gui !is GenericContainerScreen) return
-        val chest = event.container as GenericContainerScreenHandler
+        if (event.gui !is ContainerScreen) return
+        val chest = event.container as ChestMenu
         val chestName = InventoryUtils.openInventoryName()
 
         for ((slot, stack) in chest.getLowerItems()) {
@@ -139,12 +139,12 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (bypassActive()) return
 
-        val guiChest = MinecraftClient.getInstance().currentScreen
-        if (guiChest !is GenericContainerScreen) return
+        val guiChest = Minecraft.getInstance().screen
+        if (guiChest !is ContainerScreen) return
         val chestName = InventoryUtils.openInventoryName()
 
         val stack = event.itemStack
-        if (InventoryUtils.getItemsInOpenChest().map { it.stack }.contains(stack)) return
+        if (InventoryUtils.getItemsInOpenChest().map { it.item }.contains(stack)) return
         if (!ItemUtils.getItemsInInventory().contains(stack)) return
 
         if (hide(chestName, stack)) {
@@ -169,13 +169,13 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (!config.itemsBlockClicks) return
         if (bypassActive()) return
-        if (event.gui !is GenericContainerScreen) return
+        if (event.gui !is ContainerScreen) return
         val chestName = InventoryUtils.openInventoryName()
 
         val slot = event.slot ?: return
 
-        if (slot.id == slot.index) return
-        val stack = slot.stack.orNull() ?: return
+        if (slot.index == slot.containerSlot) return
+        val stack = slot.item.orNull() ?: return
 
         if (hide(chestName, stack)) {
             event.cancel()
@@ -509,7 +509,7 @@ object HideNotClickableItems {
         }
 
         if (!config.protectRarelySoldItems) return false
-        if (stack.isVanilla() && !stack.hasEnchantments()) return false
+        if (stack.isVanilla() && !stack.isEnchanted) return false
         if (SkyBlockUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) return false
         if (hideNpcSellFilter.match(name)) return false
 

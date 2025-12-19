@@ -25,14 +25,14 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.inventory.SimpleInventory
-import net.minecraft.block.Blocks
-import net.minecraft.item.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -77,7 +77,7 @@ object UserLuckBreakdown {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.userLuck) return
-        if (event.inventory !is SimpleInventory) return
+        if (event.inventory !is SimpleContainer) return
         if (!inMiscStats) return
 
         if (event.slot == replaceSlot && !inCustomBreakdown) {
@@ -124,7 +124,7 @@ object UserLuckBreakdown {
             inMiscStats = false
             return
         }
-        val inventoryName = event.inventoryItems[4]?.name.formattedTextCompatLeadingWhiteLessResets().orEmpty()
+        val inventoryName = event.inventoryItems[4]?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty()
         if (inventoryName != "§dMiscellaneous Stats") return
         inMiscStats = true
         replaceSlot = findValidSlot(event.inventoryItemsWithNull)
@@ -174,7 +174,7 @@ object UserLuckBreakdown {
 
     private fun equipmentMenuTooltip(event: ToolTipTextEvent) {
         event.slot ?: return
-        if (event.slot.index != 25) return
+        if (event.slot.containerSlot != 25) return
         val luckEvent = getOrPostLuckEvent()
         val totalLuck = luckEvent.getTotalLuck()
         if (totalLuck == 0f && !showAllStats) return
@@ -189,10 +189,10 @@ object UserLuckBreakdown {
     private fun statsBreakdownLoreTooltip(event: ToolTipTextEvent) {
         event.slot ?: return
         if (!inMiscStats) return
-        if (inCustomBreakdown && event.slot.index == 48) {
-            event.toolTip[1] = Text.of("§7To Your Stats Breakdown")
+        if (inCustomBreakdown && event.slot.containerSlot == 48) {
+            event.toolTip[1] = Component.nullToEmpty("§7To Your Stats Breakdown")
         }
-        if (event.slot.index != 4 || inCustomBreakdown) return
+        if (event.slot.containerSlot != 4 || inCustomBreakdown) return
         val luckEvent = getOrPostLuckEvent()
         val totalLuck = luckEvent.getTotalLuck()
         if (totalLuck == 0f && !showAllStats) return
@@ -203,7 +203,7 @@ object UserLuckBreakdown {
 
     private fun skyblockMenuTooltip(event: ToolTipTextEvent) {
         event.slot ?: return
-        if (event.slot.index != 13) return
+        if (event.slot.containerSlot != 13) return
         val luckEvent = getOrPostLuckEvent()
         val lastIndex = event.toolTip.indexOfLast { it.string.removeColor() == " and more..." }
         if (lastIndex == -1) return

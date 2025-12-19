@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.mixins.transformers.gui;
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.data.model.TextInput;
 import at.hannibal2.skyhanni.mixins.hooks.GuiScreenHookKt;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,10 +20,10 @@ public class MixinGuiScreen {
 
     @Inject(method = "renderToolTip", at = @At("TAIL"))
     public void renderToolTip(ItemStack stack, int x, int y, CallbackInfo ci) {
-        GuiScreenHookKt.renderToolTip(new DrawContext(), stack);
+        GuiScreenHookKt.renderToolTip(new GuiGraphics(), stack);
     }
 
-    @Inject(method = "renderToolTip", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getRarity()Lnet/minecraft/item/EnumRarity;", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    @Inject(method = "renderToolTip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getRarity()Lnet/minecraft/item/EnumRarity;", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     public void getTooltip(ItemStack stack, int x, int y, CallbackInfo ci, List<String> list) {
         ToolTipData.getTooltip(stack, list);
         if (list.isEmpty()) {
@@ -36,7 +36,7 @@ public class MixinGuiScreen {
         TextInput.Companion.onGuiInput(ci);
     }
 
-    @Redirect(method = "handleComponentClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;isShiftKeyDown()Z"))
+    @Redirect(method = "handleComponentClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isShiftKeyDown()Z"))
     public boolean handleComponentClick() {
         return false;
     }

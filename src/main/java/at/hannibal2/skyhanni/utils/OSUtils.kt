@@ -11,7 +11,7 @@ import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import kotlin.time.Duration
 //#if MC > 1.21
-import net.minecraft.util.Util
+import net.minecraft.Util
 //#endif
 
 object OSUtils {
@@ -76,7 +76,7 @@ object OSUtils {
         //$$     )
         //$$ }
         //#else
-        Util.getOperatingSystem().open(url)
+        Util.getPlatform().openUri(url)
         //#endif
     }
 

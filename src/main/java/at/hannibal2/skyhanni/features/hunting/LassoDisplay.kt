@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.entity.mob.MobEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object LassoDisplay {
@@ -49,11 +49,11 @@ object LassoDisplay {
             //$$ if (entity !is MobEntity) continue
             //$$ val leashEntity = entity.leashedToEntity ?: continue
             //#else
-            if (entity !is net.minecraft.entity.Leashable) continue
+            if (entity !is net.minecraft.world.entity.Leashable) continue
             val leashEntity = entity.leashHolder ?: continue
             //#endif
             if (!leashEntity.isLocalPlayer) continue
-            val entitiesNearby = EntityUtils.getEntitiesNearby<ArmorStandEntity>(entity.blockPos.toLorenzVec().up(2), 2.0)
+            val entitiesNearby = EntityUtils.getEntitiesNearby<ArmorStand>(entity.blockPosition().toLorenzVec().up(2), 2.0)
             for (armorStandEntity in entitiesNearby) {
                 val name = armorStandEntity.displayName.formattedTextCompat()
                 if (name.contains("§l§m")) {

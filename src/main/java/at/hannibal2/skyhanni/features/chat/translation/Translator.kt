@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import com.google.gson.JsonArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.minecraft.text.ClickEvent
+import net.minecraft.network.chat.ClickEvent
 import java.net.URLDecoder
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.milliseconds
@@ -42,7 +42,7 @@ object Translator {
         if (message.getPlayerNameFromChatMessage() == null) return
 
         val editedComponent = event.chatComponent.transformIf({ siblings.isNotEmpty() }) { siblings.last() }
-        if (editedComponent.style?.clickEvent?.action == ClickEvent.Action.OPEN_URL) return
+        if (editedComponent.style?.clickEvent?.action() == ClickEvent.Action.OPEN_URL) return
 
         val text = messageContentRegex.find(message)!!.groupValues[1].removeColor()
         editedComponent.style.setClickRunCommand("/shtranslate $text").setHoverShowText("§bClick to translate!")

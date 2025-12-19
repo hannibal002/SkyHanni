@@ -55,13 +55,13 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
-import net.minecraft.item.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtList
-import net.minecraft.nbt.NbtString
-import net.minecraft.text.Text
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.StringTag
+import net.minecraft.network.chat.Component
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
@@ -69,16 +69,16 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.21
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.LoreComponent
-import net.minecraft.component.type.NbtComponent
-import net.minecraft.component.ComponentMap
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.ItemLore
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.core.component.DataComponentMap
 import com.mojang.authlib.GameProfile
 import java.util.UUID
 import com.mojang.authlib.properties.Property
-import net.minecraft.component.type.ItemEnchantmentsComponent
-import net.minecraft.component.type.ProfileComponent
-import net.minecraft.registry.Registries
+import net.minecraft.world.item.enchantment.ItemEnchantments
+import net.minecraft.world.item.component.ResolvableProfile
+import net.minecraft.core.registries.BuiltInRegistries
 //#endif
 //#if MC > 1.21.8
 //$$ import com.google.common.collect.ImmutableMultimap
@@ -152,7 +152,7 @@ object ItemUtils {
 
     private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
-    fun ItemStack.cleanName() = name.formattedTextCompatLeadingWhiteLessResets().removeColor()
+    fun ItemStack.cleanName() = hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
@@ -164,7 +164,7 @@ object ItemUtils {
         if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
             return data.lastLore
         }
-        val lore = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
+        val lore = this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
         data.lastLore = lore
         data.lastLoreFetchTime = SimpleTimeMark.now()
         return lore
@@ -179,20 +179,20 @@ object ItemUtils {
     //$$     return this.getCompound("display").getStringList("Lore")
     //$$ }
     //#else
-    fun ComponentMap?.getLore(): List<String> {
+    fun DataComponentMap?.getLore(): List<String> {
         this ?: return emptyList()
-        return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
+        return this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
     }
     //#endif
 
-    fun NbtCompound?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
+    fun CompoundTag?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
         this ?: return emptyList()
         val tagList = mutableListOf<String>()
-        for (s in this.keys) {
+        for (s in this.keySet()) {
             if (s == "Lore" && !includeLore) continue
             val tag = this.get(s)
 
-            if (tag !is NbtCompound) {
+            if (tag !is CompoundTag) {
                 tagList.add("$initSeparator$s: $tag")
             } else {
                 val element = this.getCompoundOrDefault(s)
@@ -211,9 +211,9 @@ object ItemUtils {
     //$$     return name
     //$$ }
     //#else
-    fun getDisplayName(compound: ComponentMap?): String? {
+    fun getDisplayName(compound: DataComponentMap?): String? {
         compound ?: return null
-        val name = compound.get(DataComponentTypes.CUSTOM_NAME)?.formattedTextCompatLeadingWhiteLessResets()
+        val name = compound.get(DataComponents.CUSTOM_NAME)?.formattedTextCompatLeadingWhiteLessResets()
         if (name.isNullOrEmpty()) return null
         return name
     }
@@ -231,26 +231,26 @@ object ItemUtils {
         //$$ tagCompound.put("display", display)
         //$$ this.tagCompound = tagCompound
         //#else
-        this.set(DataComponentTypes.LORE, LoreComponent(lore.map { Text.of(it) }))
+        this.set(DataComponents.LORE, ItemLore(lore.map { Component.nullToEmpty(it) }))
         //#endif
         return this
     }
 
-    var ItemStack.extraAttributes: NbtCompound
-        get() = this.getExtraAttributes() ?: NbtCompound()
+    var ItemStack.extraAttributes: CompoundTag
+        get() = this.getExtraAttributes() ?: CompoundTag()
         set(value) {
             //#if MC < 1.21
             //$$ val tag = this.tag ?: NbtCompound().also { tagCompound = it }
             //$$ tag.put("ExtraAttributes", value)
             //#else
-            set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(value))
+            set(DataComponents.CUSTOM_DATA, CustomData.of(value))
             //#endif
         }
 
     //#if MC < 1.21
     //$$ val NbtCompound.extraAttributes: NbtCompound get() = this.getCompound("ExtraAttributes")
     //#else
-    val ComponentMap.extraAttributes: NbtCompound get() = this.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt() ?: NbtCompound()
+    val DataComponentMap.extraAttributes: CompoundTag get() = this.get(DataComponents.CUSTOM_DATA)?.copyTag() ?: CompoundTag()
     //#endif
 
     fun ItemStack.overrideId(id: String): ItemStack {
@@ -272,9 +272,9 @@ object ItemUtils {
         val list: LinkedList<ItemStack> = LinkedList()
         val player = MinecraftCompat.localPlayer
 
-        for (slot in player.currentScreenHandler.slots) {
-            if (slot.hasStack()) {
-                list.add(slot.stack)
+        for (slot in player.containerMenu.slots) {
+            if (slot.hasItem()) {
+                list.add(slot.item)
             }
         }
 
@@ -299,7 +299,7 @@ object ItemUtils {
     }
 
     private fun ItemStack.grabInternalNameOrNull(): NeuInternalName? {
-        if (name.formattedTextCompatLeadingWhiteLessResets() == "§fWisp's Ice-Flavored Water I Splash Potion") {
+        if (hoverName.formattedTextCompatLeadingWhiteLessResets() == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
         }
         // This is to prevent an error message whenever coins are traded.
@@ -317,7 +317,7 @@ object ItemUtils {
         //#if MC < 1.21
         //$$ hasEnchantments()
     //#else
-    hasGlint()
+    hasFoil()
     //#endif
 
     // Checks for Hypixel enchantments in the attributes
@@ -328,7 +328,7 @@ object ItemUtils {
         //#if MC < 1.21
         //$$ addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
         //#else
-        set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true)
+        set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
         //#endif
     }
 
@@ -339,7 +339,7 @@ object ItemUtils {
         //$$ tempTag.remove("StoredEnchantments")
         //$$ tagCompound = tempTag
         //#else
-        this.set(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT)
+        this.set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY)
         //#endif
     }
 
@@ -350,7 +350,7 @@ object ItemUtils {
         //$$ if (!compound.contains("SkullOwner")) return null
         //$$ return compound.getCompound("SkullOwner").getSkullTexture()
         //#elseif MC < 1.21.9
-        return this.get(DataComponentTypes.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
+        return this.get(DataComponents.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
         //#else
         //$$ return this.get(DataComponentTypes.PROFILE)?.gameProfile?.properties?.get("textures")?.firstOrNull()?.value
         //#endif
@@ -370,7 +370,7 @@ object ItemUtils {
         //$$ if (!nbt.contains("SkullOwner")) return null
         //$$ return nbt.getCompound("SkullOwner").getString("Id")
         //#elseif MC < 1.21.9
-        return this.get(DataComponentTypes.PROFILE)?.id?.get().toString()
+        return this.get(DataComponents.PROFILE)?.id?.get().toString()
         //#else
         //$$ return this.get(DataComponentTypes.PROFILE)?.gameProfile?.id.toString()
         //#endif
@@ -408,7 +408,7 @@ object ItemUtils {
         //#if MC < 1.21.9
         val profile = GameProfile(UUID.fromString(uuid), "Throwpo")
         profile.properties.put("textures", Property("textures", value))
-        stack.set(DataComponentTypes.PROFILE, ProfileComponent(profile))
+        stack.set(DataComponents.PROFILE, ResolvableProfile(profile))
         //#else
         //$$ val builder = ImmutableMultimap.builder<String, Property>()
         //$$ builder.put("textures", Property("textures", value))
@@ -443,13 +443,13 @@ object ItemUtils {
         val stack = ItemStack(item, amount)
         stack.setCustomItemName(displayName)
         stack.setLore(lore)
-        var tooltipDisplay = net.minecraft.component.type.TooltipDisplayComponent.DEFAULT.with(DataComponentTypes.DAMAGE, true)
-        tooltipDisplay = tooltipDisplay.with(DataComponentTypes.ATTRIBUTE_MODIFIERS, true)
-        tooltipDisplay = tooltipDisplay.with(DataComponentTypes.UNBREAKABLE, true)
+        var tooltipDisplay = net.minecraft.world.item.component.TooltipDisplay.DEFAULT.withHidden(DataComponents.DAMAGE, true)
+        tooltipDisplay = tooltipDisplay.withHidden(DataComponents.ATTRIBUTE_MODIFIERS, true)
+        tooltipDisplay = tooltipDisplay.withHidden(DataComponents.UNBREAKABLE, true)
         if (displayName.isBlank() && lore.isEmpty()) {
-            tooltipDisplay = net.minecraft.component.type.TooltipDisplayComponent(true, tooltipDisplay.hiddenComponents)
+            tooltipDisplay = net.minecraft.world.item.component.TooltipDisplay(true, tooltipDisplay.hiddenComponents)
         }
-        stack.set(DataComponentTypes.TOOLTIP_DISPLAY, tooltipDisplay)
+        stack.set(DataComponents.TOOLTIP_DISPLAY, tooltipDisplay)
         return stack
         //#endif
     }
@@ -492,15 +492,15 @@ object ItemUtils {
                 group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
 
-            val itemCategory = getItemCategory(category, name.formattedTextCompatLeadingWhiteLessResets(), cleanName)
+            val itemCategory = getItemCategory(category, hoverName.formattedTextCompatLeadingWhiteLessResets(), cleanName)
             val itemRarity = LorenzRarity.getByName(rarity)
 
             if (itemCategory == null) {
                 ErrorManager.logErrorStateWithData(
-                    "Could not read category for item ${this.name.formattedTextCompatLeadingWhiteLessResets()}",
+                    "Could not read category for item ${this.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                     "Failed to read category from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to name.formattedTextCompatLeadingWhiteLessResets(),
+                    "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
                     "lore" to getLore(),
@@ -513,7 +513,7 @@ object ItemUtils {
                     "Could not read rarity for item name().formattedTextCompatLeadingWhiteLessResets()",
                     "Failed to read rarity from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to name.formattedTextCompatLeadingWhiteLessResets(),
+                    "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to rarity,
                     "lore" to getLore(),
@@ -638,7 +638,7 @@ object ItemUtils {
     private fun getPetRarity(pet: ItemStack): LorenzRarity? {
         val rarityId = pet.getInternalName().asString().split(";").last().toInt()
         val rarity = LorenzRarity.getById(rarityId)
-        val name = pet.name.formattedTextCompatLeadingWhiteLessResets()
+        val name = pet.hoverName.formattedTextCompatLeadingWhiteLessResets()
         if (rarity == null) {
             ErrorManager.logErrorStateWithData(
                 "Could not read rarity for pet $name",
@@ -753,7 +753,7 @@ object ItemUtils {
             addMissingRepoItem(name, "Could not find item name for $name")
             return "§c$name"
         }
-        val name = itemStack.name.formattedTextCompatLeadingWhiteLessResets()
+        val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
@@ -887,7 +887,7 @@ object ItemUtils {
         }
     }
 
-    private fun MutableList<Text>.formatTestItem(internalName: NeuInternalName, price: Double) {
+    private fun MutableList<Component>.formatTestItem(internalName: NeuInternalName, price: Double) {
         val priceColor = if (price > 0) "§6" else "§7"
         val name = internalName.repoItemName
         val priceFormat = "$priceColor${price.shortFormat()}"
@@ -957,7 +957,7 @@ object ItemUtils {
         NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
     }
 
-    fun NbtCompound.getStringList(key: String): List<String> {
+    fun CompoundTag.getStringList(key: String): List<String> {
         if (!NbtCompat.containsList(this, key)) return emptyList()
 
         return NbtCompat.getStringTagList(this, key).let { loreList ->
@@ -965,12 +965,12 @@ object ItemUtils {
         }
     }
 
-    fun NbtCompound.getCompoundList(key: String): List<NbtCompound> =
+    fun CompoundTag.getCompoundList(key: String): List<CompoundTag> =
         NbtCompat.getCompoundTagList(this, key).let { loreList ->
             List(loreList.size) { loreList.getCompoundOrDefault(it) }
         }
 
-    fun NbtCompound.containsCompound(key: String): Boolean {
+    fun CompoundTag.containsCompound(key: String): Boolean {
         return NbtCompat.containsCompound(this, key)
     }
 
@@ -1021,8 +1021,8 @@ object ItemUtils {
 
     //#if MC > 1.21
     fun ItemStack.getItemModel(): Item? {
-        val identifier = this.get(DataComponentTypes.ITEM_MODEL)
-        val itemModel = Registries.ITEM.get(identifier)
+        val identifier = this.get(DataComponents.ITEM_MODEL)
+        val itemModel = BuiltInRegistries.ITEM.getValue(identifier)
         return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
     }
     //#endif

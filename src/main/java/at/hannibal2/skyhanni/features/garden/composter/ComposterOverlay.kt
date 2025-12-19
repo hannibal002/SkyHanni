@@ -142,7 +142,7 @@ object ComposterOverlay {
     fun onToolTip(event: ToolTipEvent) {
         if (!composterUpgradesInventory.isInside()) return
         for (upgrade in ComposterUpgrade.entries) {
-            val name = event.itemStack.name.formattedTextCompatLeadingWhiteLessResets()
+            val name = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
             if (name.contains(upgrade.displayName)) {
                 maxLevel = ComposterUpgrade.regex.matchMatcher(name) {
                     group("level")?.romanToDecimalIfNecessary() ?: 0

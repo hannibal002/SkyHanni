@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.events.fishing
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import net.minecraft.entity.projectile.FishingBobberEntity
+import net.minecraft.world.entity.projectile.FishingHook
 
-class FishingBobberCastEvent(val bobber: FishingBobberEntity) : SkyHanniEvent()
+class FishingBobberCastEvent(val bobber: FishingHook) : SkyHanniEvent()

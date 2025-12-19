@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.mixins.hooks.GenericContainerScreenHook;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,24 +14,24 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 //$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#endif
 
-@Mixin(GenericContainerScreen.class)
+@Mixin(ContainerScreen.class)
 abstract class MixinGenericContainerScreen {
     @Unique
     private final GenericContainerScreenHook skyhanni$hook = new GenericContainerScreenHook();
 
     @ModifyArg(
-        method = "drawBackground",
+        method = "renderBg",
         at = @At(
             value = "INVOKE",
             //#if MC < 1.21.6
-            target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIII)V"
+            target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"
             //#else
             //$$ target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIFFIIII)V"
             //#endif
         ),
         index = 1
     )
-    private Identifier getCustomTexture(Identifier sprite) {
+    private ResourceLocation getCustomTexture(ResourceLocation sprite) {
         return skyhanni$hook.getTexture(sprite);
     }
 

@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.text.Text
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
 //$$ import net.minecraft.text.Text
@@ -24,8 +24,8 @@ import kotlin.time.Duration.Companion.milliseconds
 object EntityData {
 
     private val maxHealthMap = mutableMapOf<Int, Int>()
-    private val nametagCache = TimeLimitedCache<Entity, Text>(50.milliseconds)
-    private val healthDisplayCache = TimeLimitedCache<Text, Text>(50.milliseconds)
+    private val nametagCache = TimeLimitedCache<Entity, Component>(50.milliseconds)
+    private val healthDisplayCache = TimeLimitedCache<Component, Component>(50.milliseconds)
     private val lastVisibilityCheck = TimeLimitedCache<Int, Boolean>(200.milliseconds)
 
     // TODO replace with packet detection
@@ -54,7 +54,7 @@ object EntityData {
     }
 
     @JvmStatic
-    fun getDisplayName(entity: Entity, oldValue: Text): Text {
+    fun getDisplayName(entity: Entity, oldValue: Component): Component {
         return postRenderNametag(entity, oldValue)
     }
 
@@ -63,14 +63,14 @@ object EntityData {
         EntityLeaveWorldEvent(entity).post()
     }
 
-    private fun postRenderNametag(entity: Entity, chatComponent: Text) = nametagCache.getOrPut(entity) {
+    private fun postRenderNametag(entity: Entity, chatComponent: Component) = nametagCache.getOrPut(entity) {
         val event = EntityDisplayNameEvent(entity, chatComponent)
         event.post()
         event.chatComponent
     }
 
     @JvmStatic
-    fun getHealthDisplay(text: Text) = healthDisplayCache.getOrPut(text) {
+    fun getHealthDisplay(text: Component) = healthDisplayCache.getOrPut(text) {
         val event = EntityHealthDisplayEvent(text)
         event.post()
         event.text

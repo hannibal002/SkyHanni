@@ -166,7 +166,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     ITEM(
         {
             InventoryUtils.getItemInHand()?.let {
-                String.format(java.util.Locale.US, "Holding ${it.name.formattedTextCompatLeadingWhiteLessResets().removeColor()}")
+                String.format(java.util.Locale.US, "Holding ${it.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()}")
             } ?: "No item in hand"
         },
     ),
@@ -272,7 +272,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         {
             // Logic for getting the currently held stacking enchant is from Skytils
             val itemInHand = InventoryUtils.getItemInHand()
-            val itemName = itemInHand?.name.formattedTextCompatLeadingWhiteLessResets()?.removeColor().orEmpty()
+            val itemName = itemInHand?.hoverName.formattedTextCompatLeadingWhiteLessResets()?.removeColor().orEmpty()
 
             fun getProgressPercent(amount: Int, levels: List<Int>): String {
                 var percent = "MAXED"

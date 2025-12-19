@@ -11,11 +11,11 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
-import net.minecraft.entity.ItemEntity
-import net.minecraft.item.Items
+import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.16
-import net.minecraft.item.SpawnEggItem
+import net.minecraft.world.item.SpawnEggItem
 //#endif
 
 @SkyHanniModule
@@ -29,7 +29,7 @@ object SlayerItemsOnGround {
     fun onTick() {
         if (!isEnabled()) return
         for (entityItem in EntityUtils.getEntitiesNextToPlayer<ItemEntity>(15.0)) {
-            val itemStack = entityItem.stack
+            val itemStack = entityItem.item
             //#if MC < 1.16
             //$$ if (itemStack.item == Items.spawn_egg) continue
             //#else

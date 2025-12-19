@@ -11,14 +11,14 @@ import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object FishingHookDisplay {
 
     private val config get() = SkyHanniMod.feature.fishing.fishingHookDisplay
-    private var armorStand: ArmorStandEntity? = null
-    private val potentialArmorStands = mutableListOf<ArmorStandEntity>()
+    private var armorStand: ArmorStand? = null
+    private val potentialArmorStands = mutableListOf<ArmorStand>()
     private val pattern = "§e§l(\\d+(\\.\\d+)?)".toPattern()
 
     @HandleEvent
@@ -49,13 +49,13 @@ object FishingHookDisplay {
     }
 
     @HandleEvent
-    fun onJoinWorld(event: EntityEnterWorldEvent<ArmorStandEntity>) {
+    fun onJoinWorld(event: EntityEnterWorldEvent<ArmorStand>) {
         if (!isEnabled()) return
         potentialArmorStands.add(event.entity)
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStandEntity>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!isEnabled()) return
         if (!config.hideArmorStand) return
 
@@ -84,7 +84,7 @@ object FishingHookDisplay {
         event.transform(72, "fishing.fishingHookDisplay.position", Position::migrate)
     }
 
-    private fun ArmorStandEntity.hasCorrectName(): Boolean {
+    private fun ArmorStand.hasCorrectName(): Boolean {
         if (name.formattedTextCompatLessResets() == "§c§l!!!") {
             return true
         }

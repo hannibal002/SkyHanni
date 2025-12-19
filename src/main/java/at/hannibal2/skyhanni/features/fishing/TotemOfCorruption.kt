@@ -27,8 +27,8 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.core.particles.ParticleTypes
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -121,8 +121,8 @@ object TotemOfCorruption {
         totems = emptyList()
     }
 
-    private fun getTimeRemaining(totem: ArmorStandEntity): Duration? =
-        EntityUtils.getEntitiesNearby<ArmorStandEntity>(totem.getLorenzVec(), 2.0)
+    private fun getTimeRemaining(totem: ArmorStand): Duration? =
+        EntityUtils.getEntitiesNearby<ArmorStand>(totem.getLorenzVec(), 2.0)
             .firstNotNullOfOrNull { entity ->
                 timeRemainingPattern.matchMatcher(entity.name.formattedTextCompatLessResets()) {
                     val minutes = group("min")?.toIntOrNull() ?: 0
@@ -131,8 +131,8 @@ object TotemOfCorruption {
                 }
             }
 
-    private fun getOwner(totem: ArmorStandEntity): String? =
-        EntityUtils.getEntitiesNearby<ArmorStandEntity>(totem.getLorenzVec(), 2.0)
+    private fun getOwner(totem: ArmorStand): String? =
+        EntityUtils.getEntitiesNearby<ArmorStand>(totem.getLorenzVec(), 2.0)
             .firstNotNullOfOrNull { entity ->
                 ownerPattern.matchMatcher(entity.name.formattedTextCompatLessResets()) {
                     group("owner")
@@ -150,7 +150,7 @@ object TotemOfCorruption {
         .filter { it.distance < config.distanceThreshold }
         .maxByOrNull { it.timeRemaining }
 
-    private fun getTotems(): List<Totem> = EntityUtils.getEntitiesNextToPlayer<ArmorStandEntity>(100.0)
+    private fun getTotems(): List<Totem> = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(100.0)
         .filter { totemNamePattern.matches(it.name.formattedTextCompatLessResets()) }.toList()
         .mapNotNull { totem ->
             val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null

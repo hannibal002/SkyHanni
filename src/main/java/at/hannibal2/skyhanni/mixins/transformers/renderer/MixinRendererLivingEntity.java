@@ -4,16 +4,16 @@ import at.hannibal2.skyhanni.data.entity.EntityOpacityManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
 import at.hannibal2.skyhanni.utils.StringUtils;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.feature.FeatureRendererContext;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.client.render.entity.state.LivingEntityRenderState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,19 +25,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LivingEntityRenderer.class)
 public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>>
     extends EntityRenderer<T, S>
-    implements FeatureRendererContext<S, M> {
+    implements RenderLayerParent<S, M> {
 
     @Shadow
-    public abstract Identifier getTexture(LivingEntityRenderState par1);
+    public abstract ResourceLocation getTextureLocation(LivingEntityRenderState par1);
 
-    protected MixinRendererLivingEntity(EntityRendererFactory.Context dontCare) {
+    protected MixinRendererLivingEntity(EntityRendererProvider.Context dontCare) {
         super(dontCare);
     }
 
     //#if MC < 1.21.9
-    @Inject(method = "shouldFlipUpsideDown", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isEntityUpsideDown", at = @At("HEAD"), cancellable = true)
     private static void shouldFlipUpsideDown(LivingEntity entity, CallbackInfoReturnable<Boolean> cir) {
-        if (entity instanceof PlayerEntity || entity.hasCustomName()) {
+        if (entity instanceof Player || entity.hasCustomName()) {
             if (RendererLivingEntityHook.shouldBeUpsideDown(StringUtils.INSTANCE.removeColor(entity.getName().getString(), false))) {
                 cir.setReturnValue(true);
             }
@@ -45,18 +45,18 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
     }
     //#endif
 
-    @Inject(method = "updateRenderState(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;F)V", at = @At(value = "TAIL"))
+    @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At(value = "TAIL"))
     public void updateRenderState(LivingEntity livingEntity, LivingEntityRenderState livingEntityRenderState, float f, CallbackInfo ci) {
-        if (livingEntity instanceof PlayerEntity playerEntity) {
+        if (livingEntity instanceof Player playerEntity) {
             Float yaw = RendererLivingEntityHook.rotatePlayer(playerEntity);
             if (yaw != null) {
-                livingEntityRenderState.bodyYaw = yaw;
+                livingEntityRenderState.bodyRot = yaw;
             }
         }
     }
 
     //#if MC < 1.21.9
-    @ModifyArg(method = "render(Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;III)V"), index = 4)
+    @ModifyArg(method = "render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V"), index = 4)
     //#else
     //$$ @ModifyArg(method = "render(Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/client/render/state/CameraRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/RenderLayer;IIILnet/minecraft/client/texture/Sprite;ILnet/minecraft/client/render/command/ModelCommandRenderer$CrumblingOverlayCommand;)V"), index = 6)
     //#endif
@@ -74,11 +74,11 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
         return argb;
     }
 
-    @Inject(method = "getRenderLayer", at = @At("HEAD"), cancellable = true)
-    public void getRenderState(LivingEntityRenderState state, boolean showBody, boolean translucent, boolean showOutline, CallbackInfoReturnable<RenderLayer> cir) {
+    @Inject(method = "getRenderType", at = @At("HEAD"), cancellable = true)
+    public void getRenderState(LivingEntityRenderState state, boolean showBody, boolean translucent, boolean showOutline, CallbackInfoReturnable<RenderType> cir) {
         if (showBody && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             if (EntityOpacityManager.getEntityOpacity(livingEntity) == null) return;
-            cir.setReturnValue(RenderLayer.getItemEntityTranslucentCull(this.getTexture(state)));
+            cir.setReturnValue(RenderType.itemEntityTranslucentCull(this.getTextureLocation(state)));
         }
     }
 

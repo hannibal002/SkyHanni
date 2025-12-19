@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 
 @SkyHanniModule
 object RiftMotesOrb {

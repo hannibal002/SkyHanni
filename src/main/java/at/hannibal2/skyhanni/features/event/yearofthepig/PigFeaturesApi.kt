@@ -31,8 +31,8 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.passive.PigEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.animal.Pig
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -145,8 +145,8 @@ object PigFeaturesApi {
 
     private val ORB_SKULL by lazy { SkullTextureHolder.getTexture("SHINY_PIG_ORB") }
 
-    private fun tryFindOrb(location: LorenzVec): ArmorStandEntity? {
-        val nearbyStands = EntityUtils.getEntitiesNearby<ArmorStandEntity>(location, 5.0).toList()
+    private fun tryFindOrb(location: LorenzVec): ArmorStand? {
+        val nearbyStands = EntityUtils.getEntitiesNearby<ArmorStand>(location, 5.0).toList()
         val sortedStands = nearbyStands.sortedBy { it.distanceTo(location) }
         return sortedStands.firstOrNull { stand ->
             stand.wearingSkullTexture(ORB_SKULL)
@@ -182,10 +182,10 @@ object PigFeaturesApi {
         if (InventoryUtils.getItemInHand()?.getInternalNameOrNull() != SHINY_ORB_ITEM) return
 
         val entity = event.clickedEntity
-        if (entity is PigEntity && entity.mob?.name == "SHINY PIG") entity.handlePigClick()
+        if (entity is Pig && entity.mob?.name == "SHINY PIG") entity.handlePigClick()
     }
 
-    private fun PigEntity.handlePigClick() {
+    private fun Pig.handlePigClick() {
         val pigStartingLocation = this.getLorenzVec()
         DelayedRun.runDelayed(1.seconds) {
             if (dataSetList.any { it.pigEntityId == this.id }) return@runDelayed

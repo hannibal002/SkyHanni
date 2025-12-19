@@ -22,8 +22,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
-import net.minecraft.block.Blocks
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.core.particles.ParticleTypes
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -56,7 +56,7 @@ object RiftWiltedBerberisHelper {
 
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
-        if (MinecraftCompat.localPlayer.isOnGround) {
+        if (MinecraftCompat.localPlayer.onGround()) {
             isOnFarmland = LocationUtils.getBlockBelowPlayer().getBlockAt() == Blocks.FARMLAND
         }
     }

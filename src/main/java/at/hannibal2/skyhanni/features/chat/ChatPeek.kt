@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.SignEditScreen
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import org.lwjgl.glfw.GLFW
 
 object ChatPeek {
@@ -20,7 +20,7 @@ object ChatPeek {
 
         if (!MinecraftCompat.localPlayerExists) return false
         if (key <= GLFW.GLFW_KEY_UNKNOWN) return false
-        if (MinecraftClient.getInstance().currentScreen is SignEditScreen) return false
+        if (Minecraft.getInstance().screen is SignEditScreen) return false
         if (ConfigUtils.configScreenCurrentlyOpen) return false
 
         if (NeuItems.neuHasFocus()) return false

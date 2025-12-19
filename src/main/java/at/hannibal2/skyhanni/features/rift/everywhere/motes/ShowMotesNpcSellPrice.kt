@@ -102,7 +102,7 @@ object ShowMotesNpcSellPrice {
     private fun processItems() {
         val inventoryName = InventoryUtils.openInventoryName()
         if (!inventoryName.contains("Rift Storage")) return
-        val stacks = InventoryUtils.getItemsInOpenChest().map { it.index to it.stack }
+        val stacks = InventoryUtils.getItemsInOpenChest().map { it.containerSlot to it.item }
         itemMap.clear()
         for ((index, stack) in stacks) {
             val itemValue = stack.motesNpcPrice() ?: continue
@@ -144,7 +144,7 @@ object ShowMotesNpcSellPrice {
                 addString("  §7- ")
                 addItemStack(stack)
                 val tips = buildList {
-                    add("§6Item: ${stack.name.formattedTextCompatLeadingWhiteLessResets()}")
+                    add("§6Item: ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}")
                     add("§6Value per: §d$valuePer Motes")
                     add("§6Total in chest: §d${(value / valuePer).toInt()}")
                     add("")
@@ -152,7 +152,7 @@ object ShowMotesNpcSellPrice {
                 }
                 add(
                     Renderable.hoverTips(
-                        "§6${stack.name.formattedTextCompatLeadingWhiteLessResets()}: §b$price",
+                        "§6${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}: §b$price",
                         tips,
                         highlightsOnHoverSlots = index,
                         stack = stack,

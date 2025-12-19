@@ -14,9 +14,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.editItemInfo
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import net.minecraft.inventory.SimpleInventory
-import net.minecraft.item.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object GardenPlotIcon {
@@ -51,7 +51,7 @@ object GardenPlotIcon {
         for ((index, internalName) in plotList) {
             val old = originalStack[index]!!
             val new = internalName.getItemStack()
-            cachedStack[index] = new.editItemInfo(old.name.formattedTextCompatLeadingWhiteLessResets(), true, old.getLore())
+            cachedStack[index] = new.editItemInfo(old.hoverName.formattedTextCompatLeadingWhiteLessResets(), true, old.getLore())
         }
     }
 
@@ -71,7 +71,7 @@ object GardenPlotIcon {
             return
         }
 
-        if (event.inventory is SimpleInventory) {
+        if (event.inventory is SimpleContainer) {
             if (event.slot == 53) {
                 event.replace(editStack)
             }
@@ -107,7 +107,7 @@ object GardenPlotIcon {
         if (editMode != 0) {
             if (event.slotId in 54..89) {
                 event.cancel()
-                copyStack = event.slot?.stack?.copy()?.also {
+                copyStack = event.slot?.item?.copy()?.also {
                     it.count = 1
                 } ?: return
                 // TODO different format, not bold or show not in chat at all.
@@ -134,7 +134,7 @@ object GardenPlotIcon {
         if (!isEnabled()) return
         val plotList = plotList ?: return
         val list = event.toolTip
-        val index = event.slot?.id ?: return
+        val index = event.slot?.index ?: return
         if (index == 53) {
             list.clear()
             list.add("§6Edit Mode")
@@ -150,7 +150,7 @@ object GardenPlotIcon {
             val stack = originalStack[index] ?: return
             val lore = stack.getLore()
             list.clear()
-            list.add(0, stack.name.formattedTextCompatLeadingWhiteLessResets())
+            list.add(0, stack.hoverName.formattedTextCompatLeadingWhiteLessResets())
             for (i in lore.indices) {
                 list.add(i + 1, stack.getLore()[i])
             }

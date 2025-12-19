@@ -44,12 +44,12 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.network.OtherClientPlayerEntity
-import net.minecraft.client.network.ClientPlayerEntity
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.client.player.LocalPlayer
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.core.particles.ParticleTypes
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -67,11 +67,11 @@ object VampireSlayerFeatures {
 
     private val entityList = mutableListOf<LivingEntity>()
     private val taggedEntityList = mutableListOf<Int>()
-    private var standList = mapOf<ArmorStandEntity, OtherClientPlayerEntity>()
+    private var standList = mapOf<ArmorStand, RemotePlayer>()
 
     // Nicked support
     private val username
-        get() = EntityUtils.getEntities<ClientPlayerEntity>().firstOrNull()?.name.formattedTextCompatLessResets() ?: error("own player is null")
+        get() = EntityUtils.getEntities<LocalPlayer>().firstOrNull()?.name.formattedTextCompatLessResets() ?: error("own player is null")
 
     private val BLOOD_ICHOR_TEXTURE by lazy { SkullTextureHolder.getTexture("BLOOD_ICHOR") }
     private val KILLER_SPRING_TEXTURE by lazy { SkullTextureHolder.getTexture("KILLER_SPRING") }
@@ -85,15 +85,15 @@ object VampireSlayerFeatures {
         if (!event.isMod(5)) return
         val start = LocationUtils.playerLocation()
         if (configOwnBoss.highlight || configOtherBoss.highlight || configCoopBoss.highlight) {
-            for (player in EntityUtils.getEntities<OtherClientPlayerEntity>()) {
-                val distance = start.distance(player.blockPos.toLorenzVec())
+            for (player in EntityUtils.getEntities<RemotePlayer>()) {
+                val distance = start.distance(player.blockPosition().toLorenzVec())
                 if (distance <= 15)
                     player.process()
             }
         }
         if (configBloodIchor.highlight || configKillerSpring.highlight) {
-            for (stand in EntityUtils.getEntities<ArmorStandEntity>()) {
-                val vec = stand.blockPos.toLorenzVec()
+            for (stand in EntityUtils.getEntities<ArmorStand>()) {
+                val vec = stand.blockPosition().toLorenzVec()
                 val distance = start.distance(vec)
                 val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
                 if (!isIchor && !stand.hasSkullTexture(KILLER_SPRING_TEXTURE)) continue
@@ -114,7 +114,7 @@ object VampireSlayerFeatures {
         entityList.editCopy { removeIf { it.deceased } }
     }
 
-    private fun List<String>.spawnedByCoop(stand: ArmorStandEntity): Boolean = any {
+    private fun List<String>.spawnedByCoop(stand: ArmorStand): Boolean = any {
         var contain = false
         if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(stand.name.formattedTextCompatLessResets())) {
             val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
@@ -124,7 +124,7 @@ object VampireSlayerFeatures {
         contain
     }
 
-    private fun OtherClientPlayerEntity.process() {
+    private fun RemotePlayer.process() {
         if (name.formattedTextCompatLessResets() != "Bloodfiend ") return
 
         if (configOwnBoss.twinClawsTitle || configOtherBoss.twinClawsTitle || configCoopBoss.twinClawsTitle) {
@@ -192,7 +192,7 @@ object VampireSlayerFeatures {
         }
     }
 
-    private fun OtherClientPlayerEntity.isHighlighted(): Boolean {
+    private fun RemotePlayer.isHighlighted(): Boolean {
         return entityList.contains(this) || taggedEntityList.contains(id)
     }
 
@@ -200,7 +200,7 @@ object VampireSlayerFeatures {
     fun onEntityClick(event: EntityClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
-        if (event.clickedEntity !is OtherClientPlayerEntity) return
+        if (event.clickedEntity !is RemotePlayer) return
         if (!event.clickedEntity.isNpc()) return
         val coopList = configCoopBoss.coopMembers.split(",").toList()
         val regexA = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex()
@@ -235,7 +235,7 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent
-    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<OtherClientPlayerEntity>) {
+    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<RemotePlayer>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {
@@ -244,7 +244,7 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent
-    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<OtherClientPlayerEntity>) {
+    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<RemotePlayer>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {
@@ -257,7 +257,7 @@ object VampireSlayerFeatures {
         if (!isEnabled()) return
 
         if (config.drawLine) {
-            for (it in EntityUtils.getEntities<OtherClientPlayerEntity>()) {
+            for (it in EntityUtils.getEntities<RemotePlayer>()) {
                 if (!it.isHighlighted()) continue
                 if (!it.canBeSeen(15)) continue
                 val vec = event.exactLocation(it)
@@ -270,8 +270,8 @@ object VampireSlayerFeatures {
             }
         }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
-        for (stand in EntityUtils.getAllEntities().filterIsInstance<ArmorStandEntity>()) {
-            val vec = stand.blockPos.toLorenzVec()
+        for (stand in EntityUtils.getAllEntities().filterIsInstance<ArmorStand>()) {
+            val vec = stand.blockPosition().toLorenzVec()
             val distance = vec.distanceToPlayer()
             val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
             val isSpring = stand.hasSkullTexture(KILLER_SPRING_TEXTURE)
@@ -287,12 +287,12 @@ object VampireSlayerFeatures {
                     (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toColor()
                 val text = if (isIchor) "§4Ichor" else "§4Spring"
                 event.drawColor(
-                    stand.blockPos.toLorenzVec().up(2.0),
+                    stand.blockPosition().toLorenzVec().up(2.0),
                     LorenzColor.DARK_RED.toChromaColor(),
                     alpha = 1f,
                 )
                 event.drawDynamicText(
-                    stand.blockPos.toLorenzVec().add(0.5, 2.5, 0.5),
+                    stand.blockPosition().toLorenzVec().add(0.5, 2.5, 0.5),
                     text,
                     1.5,
                     seeThroughBlocks = false,
@@ -333,9 +333,9 @@ object VampireSlayerFeatures {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
-        for (boss in EntityUtils.getEntitiesNearby<OtherClientPlayerEntity>(loc, 3.0)) {
+        for (boss in EntityUtils.getEntitiesNearby<RemotePlayer>(loc, 3.0)) {
             if (!boss.isHighlighted() || event.type != ParticleTypes.ENCHANT) continue
-            for (ichor in EntityUtils.getEntitiesNearby<ArmorStandEntity>(event.location, 3.0)) {
+            for (ichor in EntityUtils.getEntitiesNearby<ArmorStand>(event.location, 3.0)) {
                 if (ichor.hasSkullTexture(KILLER_SPRING_TEXTURE) || ichor.hasSkullTexture(BLOOD_ICHOR_TEXTURE)) {
                     standList = standList.editCopy { this[ichor] = boss }
                 }

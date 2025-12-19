@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.MinecraftClient
-import net.minecraft.item.ItemStack
+import net.minecraft.client.Minecraft
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -164,7 +164,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     private fun getDaggerFromStack(stack: ItemStack?): Dagger? {
-        val itemName = stack?.name.formattedTextCompatLeadingWhiteLessResets().orEmpty()
+        val itemName = stack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty()
         for (dagger in Dagger.entries) {
             if (dagger.daggerNames.any { itemName.contains(it) }) {
                 return dagger
@@ -243,7 +243,7 @@ object BlazeSlayerDaggerHelper {
         if (!isEnabled()) return
 
         if (textTop == "") return
-        val currentScreen = MinecraftClient.getInstance().currentScreen
+        val currentScreen = Minecraft.getInstance().screen
         if (currentScreen != null && currentScreen !is GuiPositionEditor) return
 
         config.positionTop.renderString(textTop, posLabel = "Blaze Slayer Dagger Top")

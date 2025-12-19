@@ -25,7 +25,7 @@ object HighlightCurrentPet {
         if (!config.enabled || !inInventory) return
         val highlightSlot = highlightSlot ?: return
         val slotToHighlight = InventoryUtils.getItemsInOpenChest().firstOrNull {
-            it.id == highlightSlot
+            it.index == highlightSlot
         } ?: return
         slotToHighlight.highlight(config.color)
     }

@@ -84,7 +84,7 @@ object AbiphoneFeatures {
     private fun readPickupUuid(event: SkyHanniChatEvent) {
         val siblings = event.chatComponent.siblings.takeIf { it.size >= 3 } ?: return
         val clickEvent = siblings[2]?.style?.clickEvent ?: return
-        if (clickEvent.action.name.lowercase() != "run_command" || !clickEvent.value().lowercase().startsWith("/cb")) return
+        if (clickEvent.action().name.lowercase() != "run_command" || !clickEvent.value().lowercase().startsWith("/cb")) return
         acceptUUID = clickEvent.value().lowercase().replace("/cb ", "").takeIf { it.isValidUuid() }
         if (acceptUUID != null) DelayedRun.runDelayed(20.seconds) { acceptUUID = null }
     }

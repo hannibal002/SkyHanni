@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 //#if MC > 1.21
-import net.minecraft.particle.ParticleType
-import net.minecraft.registry.Registries
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.core.registries.BuiltInRegistries
 //#endif
 
 class ReceiveParticleEvent(
@@ -39,7 +39,7 @@ class ReceiveParticleEvent(
     //$$ }
 //#else
 override fun toString(): String {
-         return "ReceiveParticleEvent(type='${Registries.PARTICLE_TYPE.getId(type)}', location=${location.roundTo(1)}, count=$count, speed=$speed, offset=${
+         return "ReceiveParticleEvent(type='${BuiltInRegistries.PARTICLE_TYPE.getKey(type)}', location=${location.roundTo(1)}, count=$count, speed=$speed, offset=${
              offset.roundTo(
                  1
              )

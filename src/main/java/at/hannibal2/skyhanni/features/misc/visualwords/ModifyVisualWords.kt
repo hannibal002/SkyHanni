@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils.requiredStyleChangeString
-import net.minecraft.client.MinecraftClient
-import net.minecraft.text.OrderedText
-import net.minecraft.text.StringVisitable
-import net.minecraft.text.Style
-import net.minecraft.text.TextVisitFactory
+import net.minecraft.client.Minecraft
+import net.minecraft.util.FormattedCharSequence
+import net.minecraft.network.chat.FormattedText
+import net.minecraft.network.chat.Style
+import net.minecraft.util.StringDecomposer
 import java.util.Optional
 import kotlin.time.Duration.Companion.minutes
 
@@ -16,8 +16,8 @@ import kotlin.time.Duration.Companion.minutes
 object ModifyVisualWords {
     private val config get() = SkyHanniMod.feature.gui.modifyWords
 
-    val textCache = TimeAndSizeLimitedCache<OrderedText, OrderedText>(131072, 5.minutes)
-    val stringVisitableCache = TimeAndSizeLimitedCache<StringVisitable, StringVisitable>(65565, 5.minutes)
+    val textCache = TimeAndSizeLimitedCache<FormattedCharSequence, FormattedCharSequence>(131072, 5.minutes)
+    val stringVisitableCache = TimeAndSizeLimitedCache<FormattedText, FormattedText>(65565, 5.minutes)
 
     // Replacements the user added manually via /shwords
     var userModifiedWords = mutableListOf<VisualWordText>()
@@ -31,12 +31,12 @@ object ModifyVisualWords {
         textCache.clear()
         stringVisitableCache.clear()
         SkyHanniMod.visualWordsData.modifiedWords = userModifiedWords.map { visualWordText -> visualWordText.toVisualWord() }.toMutableList()
-        MinecraftClient.getInstance().inGameHud?.chatHud?.refresh()
+        Minecraft.getInstance().gui?.chat?.refreshTrimmedMessages()
     }
 
     var changeWords = true
 
-    fun transformText(orderedText: OrderedText?): OrderedText? {
+    fun transformText(orderedText: FormattedCharSequence?): FormattedCharSequence? {
         if (orderedText == null) return null
 
         if (!config.enabled) return null
@@ -65,14 +65,14 @@ object ModifyVisualWords {
 
             if (replace) characters = doReplacements(characters)
 
-            val outputTexts = mutableListOf<OrderedText>()
+            val outputTexts = mutableListOf<FormattedCharSequence>()
             var lastStyle: Style? = null
             val textStringBuilder = StringBuilder()
 
             for (character in characters) {
                 if (character.style != lastStyle) {
                     if (textStringBuilder.isNotEmpty())
-                        outputTexts.add(OrderedText.styledForwardsVisitedString(textStringBuilder.toString(), lastStyle))
+                        outputTexts.add(FormattedCharSequence.forward(textStringBuilder.toString(), lastStyle))
 
                     lastStyle = character.style
 
@@ -82,14 +82,14 @@ object ModifyVisualWords {
             }
 
             if (textStringBuilder.isNotEmpty()) {
-                outputTexts.add(OrderedText.styledForwardsVisitedString(textStringBuilder.toString(), lastStyle))
+                outputTexts.add(FormattedCharSequence.forward(textStringBuilder.toString(), lastStyle))
             }
 
-            OrderedText.concat(outputTexts)
+            FormattedCharSequence.composite(outputTexts)
         }
     }
 
-    fun transformStringVisitable(stringVisitable: StringVisitable?) : StringVisitable? {
+    fun transformStringVisitable(stringVisitable: FormattedText?) : FormattedText? {
         if (stringVisitable == null) return null
 
         if (!config.enabled) return null
@@ -114,7 +114,7 @@ object ModifyVisualWords {
 
             characters = doReplacements(characters)
 
-            val outputParts = mutableListOf<StringVisitable>()
+            val outputParts = mutableListOf<FormattedText>()
 
             var lastStyle = Style.EMPTY
             val stringBuilder = StringBuilder()
@@ -122,7 +122,7 @@ object ModifyVisualWords {
             for (character in characters) {
                 if (lastStyle != character.style) {
 
-                    outputParts.add(StringVisitable.styled(stringBuilder.toString(), lastStyle))
+                    outputParts.add(FormattedText.of(stringBuilder.toString(), lastStyle))
                     lastStyle = character.style
                     stringBuilder.clear()
                 }
@@ -131,10 +131,10 @@ object ModifyVisualWords {
             }
 
             if (stringBuilder.isNotEmpty()) {
-                outputParts.add(StringVisitable.styled(stringBuilder.toString(), lastStyle))
+                outputParts.add(FormattedText.of(stringBuilder.toString(), lastStyle))
             }
 
-            StringVisitable.concat(outputParts)
+            FormattedText.composite(outputParts)
         }
     }
 
@@ -204,7 +204,7 @@ data class StyledCharacter(
     val first: Boolean = false
 ) {
 
-    fun withParentStyle(parentStyle: Style) = StyledCharacter(codePoint, style.withParent(parentStyle), first)
+    fun withParentStyle(parentStyle: Style) = StyledCharacter(codePoint, style.applyTo(parentStyle), first)
 }
 
 data class VisualWordText(
@@ -248,7 +248,7 @@ private fun List<StyledCharacter>.toLegacyString(): String {
 private fun String.toStyledCharacterList(style: Style = Style.EMPTY, hasFirst: Boolean = true): List<StyledCharacter> {
     val newList = mutableListOf<StyledCharacter>()
 
-    TextVisitFactory.visitFormatted(this, style) {  index: Int, style: Style, codePoint: Int ->
+    StringDecomposer.iterateFormatted(this, style) {  index: Int, style: Style, codePoint: Int ->
         newList.add(StyledCharacter(codePoint, style, index == 0 && hasFirst))
         true
     }

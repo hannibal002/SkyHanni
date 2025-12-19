@@ -41,9 +41,9 @@ import at.hannibal2.skyhanni.utils.renderables.fakePlayer
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
@@ -128,7 +128,7 @@ object CustomWardrobe {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!editMode) return
-        val gui = MinecraftClient.getInstance().currentScreen as? SkyHanniGuiContainer ?: return
+        val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return
         val renderable = inventoryButton ?: addReEnableButton().also { inventoryButton = it }
         val accessorGui = gui as AccessorHandledScreen
         val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
@@ -295,12 +295,12 @@ object CustomWardrobe {
         //#if MC < 1.16
         //$$ fakePlayer.inventory.armorInventory = slot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
         //#else
-        for (equipment in net.minecraft.entity.player.PlayerInventory.EQUIPMENT_SLOTS.values) {
+        for (equipment in net.minecraft.world.entity.player.Inventory.EQUIPMENT_SLOT_MAPPING.values) {
             val armorOrdinal = equipment.ordinal - 2
             if (armorOrdinal < 0 || armorOrdinal > 3) continue
             var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
             if (stack == null) stack = ItemStack.EMPTY
-            fakePlayer.inventory.equipment.put(equipment, stack)
+            fakePlayer.inventory.equipment.set(equipment, stack)
         }
         //#endif
 

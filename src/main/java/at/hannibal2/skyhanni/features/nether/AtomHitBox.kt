@@ -14,14 +14,14 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import java.awt.Color
 
 @SkyHanniModule
 object AtomHitBox {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.atomHitBox
-    private val atomsList = mutableMapOf<ArmorStandEntity, AtomType>()
+    private val atomsList = mutableMapOf<ArmorStand, AtomType>()
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -38,7 +38,7 @@ object AtomHitBox {
     fun onTick() {
         if (!config.enabled) return
 
-        for (entity in EntityUtils.getEntitiesNextToPlayer<ArmorStandEntity>(50.0)) {
+        for (entity in EntityUtils.getEntitiesNextToPlayer<ArmorStand>(50.0)) {
             val atom = entity.getWornSkullTexture()?.let(AtomType::fromTexture) ?: continue
             if (!atom.isSelected()) continue
             atomsList[entity] = atom

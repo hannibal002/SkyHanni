@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerModelPart;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelPart;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +22,7 @@ public class MixinRendererLivingEntityHookSBA<T extends LivingEntity> {
     }
 
     @Inject(method = "isWearing", at = @At("HEAD"), cancellable = true, remap = false)
-    private static void onIsWearing(PlayerEntity player, PlayerModelPart p_175148_1_, CallbackInfoReturnable<Boolean> cir) {
+    private static void onIsWearing(Player player, PlayerModelPart p_175148_1_, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(true);
     }
 

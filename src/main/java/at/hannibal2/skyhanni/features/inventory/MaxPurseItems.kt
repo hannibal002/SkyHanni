@@ -43,8 +43,8 @@ object MaxPurseItems {
 
     private fun getPrices() {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val item = slot.stack
-            val name = item.name.formattedTextCompatLeadingWhiteLessResets() ?: continue
+            val item = slot.item
+            val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: continue
             createOrderPattern.matchMatcher(name) {
                 orderPattern.firstMatcher(item.getLore()) {
                     // +0.1 because I expect people to use the gold nugget option

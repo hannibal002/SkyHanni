@@ -7,9 +7,9 @@ import com.google.gson.annotations.SerializedName
 //$$ import net.minecraft.nbt.NbtIo
 //$$ import net.minecraft.nbt.NbtCompound
 //#else
-import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
-import net.minecraft.nbt.NbtSizeTracker
+import net.minecraft.nbt.NbtAccounter
 //#endif
 import java.io.ByteArrayInputStream
 import java.util.Base64
@@ -38,11 +38,11 @@ data class NeuItemJson(
     //$$     }
     //$$ }
     //#else
-    private fun getParsedNBT(): NbtCompound {
+    private fun getParsedNBT(): CompoundTag {
         return try {
             val decodedBytes = Base64.getDecoder().decode(nbtTagString.toByteArray(Charsets.UTF_8))
             val inputStream = ByteArrayInputStream(decodedBytes)
-            NbtIo.readCompressed(inputStream, NbtSizeTracker.ofUnlimitedBytes())
+            NbtIo.readCompressed(inputStream, NbtAccounter.unlimitedHeap())
         } catch (e: Exception) {
             throw IllegalArgumentException("Failed to parse NBT tag: $nbtTagString", e)
         }

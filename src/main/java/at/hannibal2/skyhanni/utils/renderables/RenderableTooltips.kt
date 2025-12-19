@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.client.render.DiffuseLighting
-import net.minecraft.item.ItemStack
+import com.mojang.blaze3d.platform.Lighting
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object RenderableTooltips {

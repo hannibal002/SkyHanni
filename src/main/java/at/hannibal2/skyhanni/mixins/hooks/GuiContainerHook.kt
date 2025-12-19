@@ -8,24 +8,24 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NEUApi
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import net.minecraft.screen.ScreenHandler
-import net.minecraft.screen.slot.Slot
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.Slot
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 
 class GuiContainerHook(guiAny: Any) {
 
     private val gui: SkyHanniGuiContainer = guiAny as SkyHanniGuiContainer
-    private val container: ScreenHandler
+    private val container: AbstractContainerMenu
         get() =
             //#if MC < 1.16
             //$$ gui.inventorySlots
     //#else
-    gui.screenHandler
+    gui.menu
     //#endif
 
     //#if MC < 1.21
@@ -36,13 +36,13 @@ class GuiContainerHook(guiAny: Any) {
         if (CloseWindowEvent(gui, container).post()) ci.cancel()
     }
 
-    fun backgroundDrawn(context: DrawContext, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    fun backgroundDrawn(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (GlobalRender.renderDisabled) return
         GuiContainerEvent.BackgroundDrawnEvent(context, gui, container, mouseX, mouseY, partialTicks).post()
     }
 
     fun preDraw(
-        context: DrawContext,
+        context: GuiGraphics,
         mouseX: Int,
         mouseY: Int,
         partialTicks: Float,
@@ -60,12 +60,12 @@ class GuiContainerHook(guiAny: Any) {
         }
     }
 
-    fun postDraw(context: DrawContext, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    fun postDraw(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (GlobalRender.renderDisabled) return
         GuiContainerEvent.PostDraw(context, gui, container, mouseX, mouseY, partialTicks).post()
     }
 
-    fun foregroundDrawn(context: DrawContext, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    fun foregroundDrawn(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (!PlatformUtils.IS_LEGACY) {
             DrawContextUtils.setContext(context)
             DrawContextUtils.translate(0.0, 0.0, 200.0)
@@ -87,13 +87,13 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
-        val item = container.stacks?.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
+        val item = container.items?.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
         if (SlotClickEvent(gui, container, item, slot, slotId, clickedButton, ClickType.getTypeById(clickType)).post()
         ) ci.cancel()
     }
 
     fun onDrawScreenAfter(
-        context: DrawContext,
+        context: GuiGraphics,
         mouseX: Int,
         mouseY: Int,
         ci: CallbackInfo,

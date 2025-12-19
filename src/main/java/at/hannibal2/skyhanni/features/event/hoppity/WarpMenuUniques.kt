@@ -37,7 +37,7 @@ object WarpMenuUniques {
         event.slot ?: return
         if (InventoryUtils.openInventoryName() != "Fast Travel") return
 
-        val name = islandNamePattern.matchMatcher(event.slot.stack.name.formattedTextCompatLeadingWhiteLessResets()) {
+        val name = islandNamePattern.matchMatcher(event.slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             group("name")
         } ?: return
 

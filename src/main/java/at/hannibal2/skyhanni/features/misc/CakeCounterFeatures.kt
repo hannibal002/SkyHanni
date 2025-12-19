@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
@@ -96,7 +96,7 @@ object CakeCounterFeatures {
     private var lastSoulFoundBySelf = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<ArmorStandEntity>) {
+    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         val entity = event.entity
         val name = entity.name.formattedTextCompatLessResets()
         val entityId = entity.id
@@ -134,10 +134,10 @@ object CakeCounterFeatures {
         }
     }
 
-    private fun checkForSoulsStand(cakesStand: ArmorStandEntity) {
+    private fun checkForSoulsStand(cakesStand: ArmorStand) {
         if (soulsFoundEntityId != null) return // in case it was found during DelayedRun time
 
-        val nearbyArmorStands = EntityUtils.getEntitiesNearby<ArmorStandEntity>(cakesStand.blockPos.toLorenzVec(), 1.0)
+        val nearbyArmorStands = EntityUtils.getEntitiesNearby<ArmorStand>(cakesStand.blockPosition().toLorenzVec(), 1.0)
         soulsStandExists = nearbyArmorStands.any { armorStand ->
             soulsFoundPattern.matchMatcher(armorStand.name.formattedTextCompatLessResets()) {
                 soulsFoundEntityId = armorStand.id

@@ -75,9 +75,9 @@ object PageScrolling {
         if (dWheel == 0) return
         val patterns = if ((dWheel > 0) xor config.invertScroll) forwardPattern else backwardPattern
         val slot = InventoryUtils.getItemsInOpenChest().firstOrNull {
-            patterns.matches(it.stack?.name.formattedTextCompatLeadingWhiteLessResets())
+            patterns.matches(it.item?.hoverName.formattedTextCompatLeadingWhiteLessResets())
         } ?: return
-        InventoryUtils.clickSlot(slot.id)
+        InventoryUtils.clickSlot(slot.index)
 
         currentlyScrollable = false
         cooldown = 1.0.seconds.fromNow()

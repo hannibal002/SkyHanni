@@ -127,7 +127,7 @@ object RescueMissionWaypoints {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!menuPattern.matches(event.inventoryName)) return
-        val name = event.inventoryItems[22]?.name.formattedTextCompatLeadingWhiteLessResets() ?: return
+        val name = event.inventoryItems[22]?.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: return
 
         tier = questTierPattern.matchMatcher(name) {
             group("tier").toLetter()

@@ -32,9 +32,9 @@ import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.projectile.FishingBobberEntity
-import net.minecraft.item.ItemStack
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.projectile.FishingHook
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -94,7 +94,7 @@ object FishingApi {
     private var waterRods = listOf<NeuInternalName>()
     private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
-    var bobber: FishingBobberEntity? = null
+    var bobber: FishingHook? = null
         private set
     var bobberHasTouchedLiquid = false
         private set
@@ -106,9 +106,9 @@ object FishingApi {
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onJoinWorld(event: EntityEnterWorldEvent<FishingBobberEntity>) {
+    fun onJoinWorld(event: EntityEnterWorldEvent<FishingHook>) {
         if (!holdingRod) return
-        if (event.entity.playerOwner?.isMainPlayer == false) return
+        if (event.entity.playerOwner?.isLocalPlayer == false) return
 
         lastCastTime = SimpleTimeMark.now()
         bobber = event.entity
@@ -143,7 +143,7 @@ object FishingApi {
         if (bobberHasTouchedLiquid) return
         val isWater = when {
             bobber.isInLava && holdingLavaRod -> false
-            bobber.isTouchingWater && holdingWaterRod -> true
+            bobber.isInWater && holdingWaterRod -> true
             else -> return
         }
 
@@ -214,7 +214,7 @@ object FishingApi {
     fun isFishing(checkRodInHand: Boolean = true) =
         (IsFishingDetection.isFishing || (checkRodInHand && holdingRod)) && !DungeonApi.inDungeon()
 
-    fun seaCreatureCount(entity: ArmorStandEntity): Int {
+    fun seaCreatureCount(entity: ArmorStand): Int {
         if (countIsZero(entity)) return 0
 
         return when (entity.name.formattedTextCompatLessResets()) {
@@ -226,7 +226,7 @@ object FishingApi {
 
     private val frostyNpcLocation = LorenzVec(-1.5, 76.0, 92.5)
 
-    private fun countIsZero(entity: ArmorStandEntity): Boolean {
+    private fun countIsZero(entity: ArmorStand): Boolean {
         val name = entity.name.formattedTextCompatLessResets()
         // a dragon, will always be fought
         if (name == "Reindrake") return true

@@ -21,11 +21,11 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrE
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.mob.ZombieEntity
-import net.minecraft.util.math.Box
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 import java.util.UUID
 
@@ -73,7 +73,7 @@ import java.util.UUID
 class Mob(
     var baseEntity: LivingEntity,
     val mobType: Type,
-    var armorStand: ArmorStandEntity? = null,
+    var armorStand: ArmorStand? = null,
     val name: String = "",
     additionalEntities: List<LivingEntity>? = null,
     ownerName: String? = null,
@@ -103,7 +103,7 @@ class Mob(
     val hologram2 by hologram2Delegate
 
     private val extraEntitiesList = additionalEntities?.toMutableList() ?: mutableListOf()
-    private var relativeBoundingBox: Box?
+    private var relativeBoundingBox: AABB?
 
     val extraEntities: List<LivingEntity> = extraEntitiesList
 
@@ -141,7 +141,7 @@ class Mob(
 
     fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = baseEntity !is ZombieEntity && baseEntity.isInvisible && baseEntity.getAllEquipment().isNullOrEmpty()
+    fun isInvisible() = baseEntity !is Zombie && baseEntity.isInvisible && baseEntity.getAllEquipment().isNullOrEmpty()
 
     private var highlightColor: Color? = null
     private var condition: () -> Boolean = { true }
@@ -198,8 +198,8 @@ class Mob(
         }
     }
 
-    val boundingBox: Box
-        get() = relativeBoundingBox?.offset(baseEntity.pos.x, baseEntity.pos.y, baseEntity.pos.z)
+    val boundingBox: AABB
+        get() = relativeBoundingBox?.move(baseEntity.position().x, baseEntity.position().y, baseEntity.position().z)
             ?: baseEntity.boundingBox
 
     val health: Float get() = baseEntity.findHealthReal()
@@ -228,10 +228,10 @@ class Mob(
 
     private fun makeRelativeBoundingBox() = (
         baseEntity.boundingBox.union(
-            extraEntities.filter { it !is ArmorStandEntity }
+            extraEntities.filter { it !is ArmorStand }
                 .mapNotNull { it.boundingBox },
         )
-        )?.offset(-baseEntity.pos.x, -baseEntity.pos.y, -baseEntity.pos.z)
+        )?.move(-baseEntity.position().x, -baseEntity.position().y, -baseEntity.position().z)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +
@@ -272,7 +272,7 @@ class Mob(
                 baseEntity = entity
             }
 
-            armorStand?.id ?: Int.MIN_VALUE -> armorStand = entity as ArmorStandEntity
+            armorStand?.id ?: Int.MIN_VALUE -> armorStand = entity as ArmorStand
             else -> {
                 extraEntitiesList.remove(entity)
                 extraEntitiesList.add(entity)

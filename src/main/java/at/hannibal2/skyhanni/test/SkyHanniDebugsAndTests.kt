@@ -66,7 +66,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.CompoundTag
 //#if FORGE
 //$$ import net.minecraftforge.common.MinecraftForge
 //#endif
@@ -89,9 +89,9 @@ object SkyHanniDebugsAndTests {
 
     val debugLogger = LorenzLogger("debug/test")
 
-    private fun run(compound: NbtCompound, text: String) {
+    private fun run(compound: CompoundTag, text: String) {
         print("$text'$compound'")
-        for (s in compound.keys) {
+        for (s in compound.keySet()) {
             val element = compound.getCompoundOrDefault(s)
             run(element, "$text  ")
         }

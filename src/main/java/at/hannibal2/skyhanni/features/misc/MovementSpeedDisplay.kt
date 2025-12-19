@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.block.Blocks
+import net.minecraft.world.level.block.Blocks
 import kotlin.concurrent.fixedRateTimer
 
 @SkyHanniModule
@@ -42,8 +42,8 @@ object MovementSpeedDisplay {
         if (!SkyBlockUtils.onHypixel) return
 
         speed = with(MinecraftCompat.localPlayer) {
-            val oldPos = LorenzVec(lastRenderX, lastRenderY, lastRenderZ)
-            val newPos = LorenzVec(pos.x, pos.y, pos.z)
+            val oldPos = LorenzVec(xOld, yOld, zOld)
+            val newPos = LorenzVec(position().x, position().y, position().z)
 
             // Distance from previous tick, multiplied by TPS
             oldPos.distance(newPos) * 20

@@ -85,7 +85,7 @@ object HoeLevelDisplay {
         levelUpPattern.matchMatcher(event.message) {
             val heldItem = InventoryUtils.getItemInHand() ?: return
             val leveledUpTool = group("tool")
-            val heldItemName = heldItem.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val heldItemName = heldItem.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
             if (!heldItemName.contains(leveledUpTool)) return
             val overflowLevel = addOverflowHoeLevel(heldItem.getItemUuid())
             if (isEnabled() && config.overflow && overflowLevel != null) {

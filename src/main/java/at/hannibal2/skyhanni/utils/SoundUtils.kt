@@ -7,15 +7,15 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlinx.coroutines.delay
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.sound.SoundInstance
-import net.minecraft.sound.SoundCategory
-import net.minecraft.util.Identifier
+import net.minecraft.client.Minecraft
+import net.minecraft.client.resources.sounds.SoundInstance
+import net.minecraft.sounds.SoundSource
+import net.minecraft.resources.ResourceLocation
 //#if MC < 1.21
 //$$ import net.minecraft.client.audio.PositionedSound
 //#else
-import net.minecraft.client.sound.PositionedSoundInstance
-import net.minecraft.sound.SoundEvent
+import net.minecraft.client.resources.sounds.SimpleSoundInstance
+import net.minecraft.sounds.SoundEvent
 //#endif
 
 @SkyHanniModule
@@ -33,26 +33,26 @@ object SoundUtils {
             //#if MC < 1.21
             //$$ val category = SoundCategory.PLAYERS
             //#else
-            val category = this.category
+            val category = this.source
             //#endif
 
-            val oldLevel = MinecraftClient.getInstance().options.getSoundVolume(category)
+            val oldLevel = Minecraft.getInstance().options.getSoundSourceVolume(category)
             if (!config.maintainGameVolume) category.setLevel(1f)
 
             try {
-                MinecraftClient.getInstance().soundManager.play(this)
+                Minecraft.getInstance().soundManager.play(this)
             } catch (e: IllegalArgumentException) {
                 if (e.message?.startsWith("value already present:") == true) return@execute
                 ErrorManager.logErrorWithData(
                     e,
                     "Failed to play a sound",
-                    "soundLocation" to this.id,
+                    "soundLocation" to this.location,
                 )
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(
                     e,
                     "Failed to play a sound",
-                    "soundLocation" to this.id,
+                    "soundLocation" to this.location,
                 )
             } finally {
                 if (!config.maintainGameVolume) category.setLevel(oldLevel)
@@ -61,9 +61,9 @@ object SoundUtils {
     }
 
     // TODO this needs fixing on 1.21.9
-    private fun SoundCategory.setLevel(level: Float) =
+    private fun SoundSource.setLevel(level: Float) =
         //#if MC < 1.21.9
-        MinecraftClient.getInstance().soundManager.updateSoundVolume(this, level)
+        Minecraft.getInstance().soundManager.updateSourceVolume(this, level)
     //#else
     //$$ Unit
     //#endif
@@ -82,8 +82,8 @@ object SoundUtils {
         //$$ return sound
         //#else
         val newSound = at.hannibal2.skyhanni.utils.compat.SoundCompat.getModernSoundName(name)
-        val identifier = Identifier.of(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
-        return PositionedSoundInstance.master(SoundEvent.of(identifier), pitch, volume)
+        val identifier = ResourceLocation.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
+        return SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
         //#endif
     }
 

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 data class PrimitiveItemStack(val internalName: NeuInternalName, val amount: Int) {
 

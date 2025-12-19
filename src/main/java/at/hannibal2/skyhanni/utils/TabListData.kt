@@ -20,16 +20,16 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.network.PlayerListEntry
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
+import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.PlayerInfo
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import kotlin.time.Duration.Companion.seconds
 //#if MC < 1.16
 //$$ import net.minecraft.world.WorldSettings
 //#else
-import net.minecraft.world.GameMode
+import net.minecraft.world.level.GameType
 //#endif
 
 @SkyHanniModule
@@ -106,18 +106,18 @@ object TabListData {
     private val playerOrdering = Ordering.from(PlayerComparator())
 
     @Environment(EnvType.CLIENT)
-    internal class PlayerComparator : Comparator<PlayerListEntry> {
+    internal class PlayerComparator : Comparator<PlayerInfo> {
 
-        override fun compare(o1: PlayerListEntry, o2: PlayerListEntry): Int {
-            val team1 = o1.scoreboardTeam
-            val team2 = o2.scoreboardTeam
+        override fun compare(o1: PlayerInfo, o2: PlayerInfo): Int {
+            val team1 = o1.team
+            val team2 = o2.team
             return ComparisonChain.start().compareTrueFirst(
                 //#if MC < 1.16
                 //$$ o1.gameType != WorldSettings.GameType.SPECTATOR,
                 //$$ o2.gameType != WorldSettings.GameType.SPECTATOR,
                 //#else
-                o1.gameMode != GameMode.SPECTATOR,
-                o2.gameMode != GameMode.SPECTATOR,
+                o1.gameMode != GameType.SPECTATOR,
+                o2.gameMode != GameType.SPECTATOR,
                 //#endif
             )
                 .compare(
@@ -133,12 +133,12 @@ object TabListData {
         //#if MC < 1.16
         //$$ val players = playerOrdering.sortedCopy(player.sendQueue.playerInfoMap)
         //#else
-        val players = playerOrdering.sortedCopy(player.networkHandler.playerList)
+        val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
         //#endif
         val result = mutableListOf<String>()
         tabListGuard = true
         for (info in players) {
-            val name = MinecraftClient.getInstance().inGameHud.playerListHud.getPlayerName(info)
+            val name = Minecraft.getInstance().gui.tabList.getNameForDisplay(info)
             //#if MC < 1.16
             //$$ result.add(name.stripHypixelMessage())
             //#else
@@ -154,7 +154,7 @@ object TabListData {
 
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
-        if (event.packet is PlayerListS2CPacket) {
+        if (event.packet is ClientboundPlayerInfoUpdatePacket) {
             dirty = true
         }
     }
@@ -173,7 +173,7 @@ object TabListData {
             }
         }
 
-        val tabListOverlay = MinecraftClient.getInstance().inGameHud.playerListHud as AccessorGuiPlayerTabOverlay
+        val tabListOverlay = Minecraft.getInstance().gui.tabList as AccessorGuiPlayerTabOverlay
         header = tabListOverlay.header_skyhanni?.formattedTextCompat().orEmpty()
 
         val tabFooter = tabListOverlay.footer_skyhanni?.formattedTextCompat().orEmpty()

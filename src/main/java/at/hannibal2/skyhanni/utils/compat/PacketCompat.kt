@@ -1,29 +1,29 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.LorenzVec
-import net.minecraft.item.ItemStack
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
-import net.minecraft.util.math.Direction
+import net.minecraft.world.item.ItemStack
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
+import net.minecraft.core.Direction
 //#if MC > 1.16
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 //#endif
 
-fun PlayerInteractBlockC2SPacket.getFacing(): Direction =
+fun ServerboundUseItemOnPacket.getFacing(): Direction =
     //#if MC < 1.16
     //$$ EnumFacing.getFront(placedBlockDirection)
 //#else
-blockHitResult.side
+hitResult.direction
 //#endif
 
-fun PlayerInteractBlockC2SPacket.getUsedItem(): ItemStack? =
+fun ServerboundUseItemOnPacket.getUsedItem(): ItemStack? =
     //#if MC < 1.16
     //$$ stack
 //#else
-MinecraftClient.getInstance().player?.getStackInHand(hand)
+Minecraft.getInstance().player?.getItemInHand(hand)
 //#endif
 
-fun PlayerMoveC2SPacket.getLocation(): LorenzVec =
+fun ServerboundMovePlayerPacket.getLocation(): LorenzVec =
     //#if MC < 1.16
     //$$ LorenzVec(positionX, positionY, positionZ)
 //#else

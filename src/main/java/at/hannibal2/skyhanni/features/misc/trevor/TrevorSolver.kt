@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.network.OtherClientPlayerEntity
-import net.minecraft.entity.LivingEntity
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.LivingEntity
 
 object TrevorSolver {
 
@@ -55,7 +55,7 @@ object TrevorSolver {
     fun findMob() {
         val hasBlindness = MinecraftCompat.localPlayer.hasPotionEffect(EffectsCompat.BLINDNESS)
         for (entity in EntityUtils.getAllEntities()) {
-            if (entity is OtherClientPlayerEntity) continue
+            if (entity is RemotePlayer) continue
             val mob = MobData.entityToMob[entity]
             if (mob?.isAlive == false) continue
             val name = entity.name.formattedTextCompatLessResets()
@@ -80,7 +80,7 @@ object TrevorSolver {
                             TrevorFeatures.lastTitle = TitleManager.sendTitle("§2Saw ${currentMob.mobName}!")
                         }
                         mobLocation = TrapperMobArea.FOUND
-                        mobCoordinates = entity.blockPos.toLorenzVec()
+                        mobCoordinates = entity.blockPosition().toLorenzVec()
                     }
                 } else {
                     foundID = entity.id

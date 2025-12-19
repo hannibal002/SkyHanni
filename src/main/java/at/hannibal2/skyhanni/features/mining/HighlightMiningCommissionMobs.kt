@@ -15,11 +15,11 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.mob.EndermiteEntity
-import net.minecraft.entity.passive.IronGolemEntity
-import net.minecraft.entity.mob.MagmaCubeEntity
-import net.minecraft.entity.mob.SlimeEntity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.monster.Endermite
+import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.Slime
 
 @SkyHanniModule
 object HighlightMiningCommissionMobs {
@@ -40,12 +40,12 @@ object HighlightMiningCommissionMobs {
         TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name.formattedTextCompatLessResets() == "Treasuer Hunter" }), // typo is intentional
 
         // Crystal Hollows
-        AUTOMATON("Automaton Slayer", { it is IronGolemEntity && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) }),
+        AUTOMATON("Automaton Slayer", { it is IronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) }),
         TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name.formattedTextCompatLessResets() == "Team Treasurite" }),
-        YOG("Yog Slayer", { it is MagmaCubeEntity && it.hasMaxHealth(35_000) }),
-        THYST("Thyst Slayer", { it is EndermiteEntity && it.hasMaxHealth(5_000) }),
+        YOG("Yog Slayer", { it is MagmaCube && it.hasMaxHealth(35_000) }),
+        THYST("Thyst Slayer", { it is Endermite && it.hasMaxHealth(5_000) }),
         CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name.formattedTextCompatLessResets() == "Team Treasurite" }),
-        SLUDGE("Sludge Slayer", { it is SlimeEntity && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000)) }),
+        SLUDGE("Sludge Slayer", { it is Slime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000)) }),
         CH_GOBLIN_SLAYER("Goblin Slayer", { it.name.formattedTextCompatLessResets() == "Weakling " }),
 
         // new commissions

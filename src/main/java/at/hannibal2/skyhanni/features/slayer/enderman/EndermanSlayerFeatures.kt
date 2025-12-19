@@ -31,10 +31,10 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
-import net.minecraft.entity.Entity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.mob.EndermanEntity
-import net.minecraft.block.Blocks
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 // TODO replace all drawLineToEye with LineToMobHandler
@@ -43,9 +43,9 @@ object EndermanSlayerFeatures {
 
     private val config get() = SlayerApi.config.endermen
     private val beaconConfig get() = config.beacon
-    private val endermenWithBeacons = mutableListOf<EndermanEntity>()
-    private val flyingBeacons = mutableSetOf<ArmorStandEntity>()
-    private val nukekubiSkulls = mutableSetOf<ArmorStandEntity>()
+    private val endermenWithBeacons = mutableListOf<EnderMan>()
+    private val flyingBeacons = mutableSetOf<ArmorStand>()
+    private val nukekubiSkulls = mutableSetOf<ArmorStand>()
     private var sittingBeacon = mapOf<LorenzVec, SimpleTimeMark>()
     private val logger = LorenzLogger("slayer/enderman")
 
@@ -56,7 +56,7 @@ object EndermanSlayerFeatures {
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
-        if (entity is EndermanEntity && showBeacon() && hasBeaconInHand(entity) && entity.canBeSeen(
+        if (entity is EnderMan && showBeacon() && hasBeaconInHand(entity) && entity.canBeSeen(
                 viewDistance = 15.0,
                 ignoreFrustum = true
             )
@@ -65,10 +65,10 @@ object EndermanSlayerFeatures {
             logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
         }
 
-        if (entity is ArmorStandEntity) {
+        if (entity is ArmorStand) {
             if (showBeacon()) {
                 val stack = entity.getStandHelmet() ?: return
-                if (stack.name.formattedTextCompatLeadingWhiteLessResets() == "Beacon" && entity.canBeSeen(viewDistance = 15.0, ignoreFrustum = true)) {
+                if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "Beacon" && entity.canBeSeen(viewDistance = 15.0, ignoreFrustum = true)) {
                     flyingBeacons.add(entity)
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
@@ -94,7 +94,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun hasBeaconInHand(enderman: EndermanEntity) = enderman.getBlockInHand()?.block == Blocks.BEACON
+    private fun hasBeaconInHand(enderman: EnderMan) = enderman.getBlockInHand()?.block == Blocks.BEACON
 
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 

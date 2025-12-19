@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorMinecraft
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 
 /**
  * Modified from SkyblockAddons
@@ -24,7 +24,7 @@ abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, f
             //#if MC < 1.21
             //$$ var ticks = (ClientEvents.totalTicks) + (MinecraftClient.getInstance() as AccessorMinecraft).timer.renderPartialTicks
             //#else
-            var ticks = (ClientEvents.totalTicks) + (MinecraftClient.getInstance() as AccessorMinecraft).timer.getTickProgress(true)
+            var ticks = (ClientEvents.totalTicks) + (Minecraft.getInstance() as AccessorMinecraft).timer.getGameTimeDeltaPartialTick(true)
             //#endif
 
             ticks = when (ChromaManager.config.chromaDirection) {

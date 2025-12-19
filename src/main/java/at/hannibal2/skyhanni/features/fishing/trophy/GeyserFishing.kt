@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import net.minecraft.util.math.Box
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.world.phys.AABB
+import net.minecraft.core.particles.ParticleTypes
 
 @SkyHanniModule
 object GeyserFishing {
@@ -22,7 +22,7 @@ object GeyserFishing {
     private val geyserOffset = LorenzVec(0.1f, 0.6f, 0.1f)
 
     private var geyser: LorenzVec? = null
-    private var geyserBox: Box? = null
+    private var geyserBox: AABB? = null
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -33,7 +33,7 @@ object GeyserFishing {
         geyser = event.location
         val potentialGeyser = geyser ?: return
 
-        geyserBox = Box(
+        geyserBox = AABB(
             potentialGeyser.x - 2, 118.0 - 0.1, potentialGeyser.z - 2,
             potentialGeyser.x + 2, 118.0 - 0.09, potentialGeyser.z + 2,
         )

@@ -38,7 +38,7 @@ object PetExpTooltip {
 
         val itemStack = event.itemStack
         val petExperience = itemStack.getPetInfo()?.exp?.roundTo(1) ?: return
-        val name = itemStack.name.formattedTextCompatLeadingWhiteLessResets()
+        val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         try {
             val index = findIndex(event.toolTip) ?: return
             val fixedIndex = if (index > event.toolTip.size) {

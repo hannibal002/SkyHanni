@@ -34,8 +34,8 @@ import at.hannibal2.skyhanni.utils.compat.changeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
-import net.minecraft.util.Formatting
-import net.minecraft.text.Text
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 
 /**
  * Listening to the player chat events, and applying custom chat options to them.
@@ -171,10 +171,10 @@ object PlayerNameFormatter {
         guildRank: ComponentSpan? = null,
         privateIslandRank: ComponentSpan? = null,
         privateIslandGuest: ComponentSpan? = null,
-    ): Text {
+    ): Component {
         var cleanAuthor = cleanAuthor(author)
 
-        var emblemFormat: Text? = null
+        var emblemFormat: Component? = null
         emblemPattern.matchStyledMatcher(author) {
             emblemFormat = componentOrThrow("emblem")
             cleanAuthor = groupOrThrow("author").stripHypixelMessage()
@@ -194,7 +194,7 @@ object PlayerNameFormatter {
             listOf(faction, ironman, bingo)
         } ?: listOf(null, null, null)
 
-        val map = mutableMapOf<PlayerMessagesConfig.MessagePart, Text?>()
+        val map = mutableMapOf<PlayerMessagesConfig.MessagePart, Component?>()
         map[PlayerMessagesConfig.MessagePart.SKYBLOCK_LEVEL] = levelFormat
         map[PlayerMessagesConfig.MessagePart.EMBLEM] = emblemFormat
         map[PlayerMessagesConfig.MessagePart.PLAYER_NAME] = name.intoComponent()
@@ -221,7 +221,7 @@ object PlayerNameFormatter {
         return all
     }
 
-    private fun formatLevel(rawColor: String?, rawLevel: ComponentSpan?): Text? {
+    private fun formatLevel(rawColor: String?, rawLevel: ComponentSpan?): Component? {
         val color = rawColor ?: return null
         val level = rawLevel?.getText() ?: error("level is null, color is not null")
         val levelData = "$color$level"
@@ -268,7 +268,7 @@ object PlayerNameFormatter {
         config.playerRankHider ->
             removeColor.asComponent()
                 .setStyle(name.sampleStyleAtStart()?.returnThis())
-                .style { withColor(Formatting.AQUA) }
+                .style { withColor(ChatFormatting.AQUA) }
                 .intoSpan()
 
         else ->

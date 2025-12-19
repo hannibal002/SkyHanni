@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilderStorage;
-import net.minecraft.client.render.OutlineVertexConsumerProvider;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderBuffers;
+import net.minecraft.client.renderer.OutlineBufferSource;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,11 +20,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //$$ import net.minecraft.client.render.entity.state.EntityRenderState;
 //#endif
 
-@Mixin(WorldRenderer.class)
+@Mixin(LevelRenderer.class)
 public class MixinWorldRenderer {
 
     //#if MC < 1.21.9
-    @Inject(method = "getEntitiesToRender", at = @At(value = "HEAD"))
+    @Inject(method = "collectVisibleEntities", at = @At(value = "HEAD"))
     public void resetRealGlowing(CallbackInfoReturnable<Boolean> cir) {
         //#else
         //$$ @Inject(method = "fillEntityRenderStates", at = @At(value = "HEAD"))
@@ -37,8 +37,8 @@ public class MixinWorldRenderer {
     }
 
     //#if MC < 1.21.9
-    @WrapOperation(method = {"renderEntities", "getEntitiesToRender"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"))
-    public boolean shouldAlsoGlow(MinecraftClient instance, Entity entity, Operation<Boolean> original) {
+    @WrapOperation(method = {"renderEntities", "collectVisibleEntities"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;shouldEntityAppearGlowing(Lnet/minecraft/world/entity/Entity;)Z"))
+    public boolean shouldAlsoGlow(Minecraft instance, Entity entity, Operation<Boolean> original) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
         if (glowColor == null) {
             return original.call(instance, entity);
@@ -57,7 +57,7 @@ public class MixinWorldRenderer {
     //#endif
 
     //#if MC < 1.21.9
-    @WrapOperation(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getTeamColorValue()I"))
+    @WrapOperation(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getTeamColor()I"))
     public int changeGlowColour(Entity entity, Operation<Integer> original) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
         if (glowColor == null) {
@@ -68,8 +68,8 @@ public class MixinWorldRenderer {
     //#endif
 
     //#if MC < 1.21.9
-    @WrapOperation(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilderStorage;getOutlineVertexConsumers()Lnet/minecraft/client/render/OutlineVertexConsumerProvider;"))
-    private OutlineVertexConsumerProvider modifyVertexConsumerProvider(BufferBuilderStorage storage, Operation<OutlineVertexConsumerProvider> original, @Local Entity entity) {
+    @WrapOperation(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderBuffers;outlineBufferSource()Lnet/minecraft/client/renderer/OutlineBufferSource;"))
+    private OutlineBufferSource modifyVertexConsumerProvider(RenderBuffers storage, Operation<OutlineBufferSource> original, @Local Entity entity) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
         if (glowColor == null) {
             return original.call(storage);
@@ -84,10 +84,10 @@ public class MixinWorldRenderer {
         SkyHanniOutlineVertexConsumerProvider.checkIfDepthAttachmentNeedsUpdating();
     }
 
-    @Inject(method = "method_62214", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/OutlineVertexConsumerProvider;draw()V"))
+    @Inject(method = "method_62214", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"))
     private void renderSkyhanniGlow(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
-        SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().draw();
+        SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().endOutlineBatch();
     }
 
 }

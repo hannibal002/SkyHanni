@@ -24,7 +24,7 @@ object CFTooltipCompact {
         if (!CFApi.inChocolateFactory) return
 
         if (config.tooltipMove) {
-            if (event.slot.id <= 44) {
+            if (event.slot.index <= 44) {
                 lastHover = SimpleTimeMark.now()
                 tooltipToHover = event.toolTip.toList().map { partyModeReplace(it) }
                 event.cancel()
@@ -55,7 +55,7 @@ object CFTooltipCompact {
         if (!lore.any { it == "§7§eClick to uncover the meaning of life!" }) return
         if (lastClick.passedSince() >= 1.seconds && !config.compactOnClickAlways) return
         val list = mutableListOf<String>()
-        list.add(itemStack.name.formattedTextCompatLeadingWhiteLessResets())
+        list.add(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets())
         lore.getOrNull(5)?.let {
             list.add(it)
         }

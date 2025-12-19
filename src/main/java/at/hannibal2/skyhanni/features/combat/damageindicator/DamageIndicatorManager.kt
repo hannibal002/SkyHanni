@@ -57,15 +57,15 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import com.google.gson.JsonArray
-import net.minecraft.client.network.OtherClientPlayerEntity
+import net.minecraft.client.player.RemotePlayer
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.entity.mob.MobEntity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.mob.EndermanEntity
-import net.minecraft.entity.mob.MagmaCubeEntity
-import net.minecraft.entity.mob.ZombieEntity
-import net.minecraft.entity.passive.WolfEntity
+import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.entity.animal.wolf.Wolf
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration
@@ -91,8 +91,8 @@ object DamageIndicatorManager {
 
     private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds)
 
-    fun isDamageSplash(entity: ArmorStandEntity): Boolean {
-        if (entity.age > 300) return false
+    fun isDamageSplash(entity: ArmorStand): Boolean {
+        if (entity.tickCount > 300) return false
         if (!entity.hasCustomName()) return false
         if (entity.deceased) return false
         val name = entity.customName.formattedTextCompatLessResets().removeColor().replace(",", "")
@@ -504,13 +504,13 @@ object DamageIndicatorManager {
             BossType.SLAYER_ENDERMAN_2,
             BossType.SLAYER_ENDERMAN_3,
             BossType.SLAYER_ENDERMAN_4,
-            -> return checkEnderSlayer(entity as EndermanEntity, entityData, health.toInt(), maxHealth.toInt())
+            -> return checkEnderSlayer(entity as EnderMan, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.SLAYER_BLOODFIEND_1,
             BossType.SLAYER_BLOODFIEND_2,
             BossType.SLAYER_BLOODFIEND_3,
             BossType.SLAYER_BLOODFIEND_4,
-            -> return checkVampireSlayer(entity as OtherClientPlayerEntity, entityData, health.toInt(), maxHealth.toInt())
+            -> return checkVampireSlayer(entity as RemotePlayer, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.SLAYER_BLAZE_1,
             BossType.SLAYER_BLAZE_2,
@@ -522,17 +522,17 @@ object DamageIndicatorManager {
             BossType.SLAYER_BLAZE_TYPHOEUS_2,
             BossType.SLAYER_BLAZE_TYPHOEUS_3,
             BossType.SLAYER_BLAZE_TYPHOEUS_4,
-            -> return checkBlazeSlayer(entity as MobEntity, entityData, health.toInt(), maxHealth.toInt())
+            -> return checkBlazeSlayer(entity as Mob, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.NETHER_MAGMA_BOSS -> return checkMagmaCube(
-                entity as MagmaCubeEntity,
+                entity as MagmaCube,
                 entityData,
                 health.toInt(),
                 maxHealth.toInt(),
             )
 
             BossType.SLAYER_ZOMBIE_5 -> {
-                if ((entity as ZombieEntity).hasNameTagWith(3, "§fBoom!")) {
+                if ((entity as Zombie).hasNameTagWith(3, "§fBoom!")) {
                     // TODO fix
 //                    val ticksAlive = entity.ticksExisted % (20 * 5)
 //                    val remainingTicks = (5 * 20).toLong() - ticksAlive
@@ -547,7 +547,7 @@ object DamageIndicatorManager {
             BossType.SLAYER_WOLF_3,
             BossType.SLAYER_WOLF_4,
             -> {
-                if ((entity as WolfEntity).hasNameTagWith(2, "§bCalling the pups!")) {
+                if ((entity as Wolf).hasNameTagWith(2, "§bCalling the pups!")) {
                     return "Pups!"
                 }
             }
@@ -586,7 +586,7 @@ object DamageIndicatorManager {
         return ""
     }
 
-    private fun checkBlazeSlayer(entity: MobEntity, entityData: EntityData, health: Int, maxHealth: Int): String {
+    private fun checkBlazeSlayer(entity: Mob, entityData: EntityData, health: Int, maxHealth: Int): String {
         var found = false
         for (shield in HellionShield.entries) {
             entity.getNameTagWith(3, shield.name)?.let { armorStand ->
@@ -648,7 +648,7 @@ object DamageIndicatorManager {
     }
 
     private fun checkMagmaCube(
-        entity: MagmaCubeEntity,
+        entity: MagmaCube,
         entityData: EntityData,
         health: Int,
         maxHealth: Int,
@@ -718,7 +718,7 @@ object DamageIndicatorManager {
     }
 
     private fun checkEnderSlayer(
-        entity: EndermanEntity,
+        entity: EnderMan,
         entityData: EntityData,
         health: Int,
         maxHealth: Int,
@@ -802,7 +802,7 @@ object DamageIndicatorManager {
         if (config.enderSlayer.laserPhaseTimer && ridingEntity != null) {
             val totalTimeAlive = 8.2.seconds
 
-            val ticksAlive = ridingEntity.age.ticks
+            val ticksAlive = ridingEntity.tickCount.ticks
             val remainingTime = totalTimeAlive - ticksAlive
             val formatDelay = formatDelay(remainingTime)
             if (config.enderSlayer.showHealthDuringLaser || hitPhaseText != null) {
@@ -819,7 +819,7 @@ object DamageIndicatorManager {
     }
 
     private fun checkVampireSlayer(
-        entity: OtherClientPlayerEntity,
+        entity: RemotePlayer,
         entityData: EntityData,
         health: Int,
         maxHealth: Int,
@@ -833,7 +833,7 @@ object DamageIndicatorManager {
 
         if (config.maniaCircles) {
             entity.vehicle?.let {
-                val existed = it.age
+                val existed = it.tickCount
                 if (existed > 40) {
                     val end = (20 * 26) - existed
                     val time = end.toDouble() / 20
@@ -983,7 +983,7 @@ object DamageIndicatorManager {
     private val dummyDamageCache = mutableListOf<UUID>()
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStandEntity>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
 

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 
 // This has intentionally not any settings.
@@ -21,7 +21,7 @@ object AutoFocus {
         dirty = true
 
         if (PlatformUtils.isDevEnvironment) {
-            val handle: Long = MinecraftClient.getInstance().window.handle
+            val handle: Long = Minecraft.getInstance().window.window
             GLFW.glfwFocusWindow(handle)
         }
     }

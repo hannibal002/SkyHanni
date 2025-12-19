@@ -31,9 +31,9 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.entity.projectile.FishingBobberEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.world.entity.projectile.FishingHook
+import net.minecraft.world.item.ItemStack
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.seconds
 
@@ -165,7 +165,7 @@ object HoppityEggLocator {
         val dist = lastPoint.distance(pos)
         if (dist == 0.0 || dist > 3.0) return
 
-        if (EntityUtils.getEntitiesNearby<FishingBobberEntity>(pos, 0.3).any()) return
+        if (EntityUtils.getEntitiesNearby<FishingHook>(pos, 0.3).any()) return
 
         bezierFitter.addPoint(pos)
 

@@ -16,7 +16,7 @@ import io.github.notenoughupdates.moulconfig.xml.XMLUniverse
 //$$ import io.github.notenoughupdates.moulconfig.gui.GuiComponentWrapper
 //#else
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 //#endif
 
 /**
@@ -43,7 +43,7 @@ class RepoPatternGui private constructor() {
                     //#if FORGE
                     //$$ SkyHanniMod.screenToOpen = GuiComponentWrapper(context)
                     //#else
-                    SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Text.empty(), context, null)
+                    SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Component.empty(), context, null)
                     //#endif
                 }
             }

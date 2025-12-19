@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ChatScreen
-import net.minecraft.client.option.KeyBinding
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.ChatScreen
+import net.minecraft.client.KeyMapping
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.milliseconds
@@ -20,7 +20,7 @@ import kotlin.time.Duration.Companion.milliseconds
 //$$ import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 //$$ import org.lwjgl.input.Mouse
 //#else
-import net.minecraft.client.util.InputUtil
+import com.mojang.blaze3d.platform.InputConstants
 //#endif
 //#if MC > 1.21.8
 //$$ import net.minecraft.client.input.KeyInput
@@ -72,7 +72,7 @@ object KeyboardManager {
             //#if MC < 1.21
             //$$ keycode == MinecraftClient.getInstance().options.keyInventory.boundKey.getCode() || keycode == GLFW.GLFW_KEY_ESCAPE
         //#elseif MC < 1.21.9
-        MinecraftClient.getInstance().options.inventoryKey.matchesKey(keycode, keycode) || keycode == GLFW.GLFW_KEY_ESCAPE
+        Minecraft.getInstance().options.keyInventory.matches(keycode, keycode) || keycode == GLFW.GLFW_KEY_ESCAPE
         //#else
         //$$ MinecraftClient.getInstance().options.inventoryKey.matchesKey(KeyInput(keycode, keycode, 0)) || keycode == GLFW.GLFW_KEY_ESCAPE
         //#endif
@@ -190,21 +190,21 @@ object KeyboardManager {
     //$$ }
     //#endif
 
-    fun KeyBinding.isActive(): Boolean {
+    fun KeyMapping.isActive(): Boolean {
         //#if MC < 1.16
         //$$ if (!Keyboard.isCreated()) return false
         //#endif
         try {
-            if (boundKey.getCode().isKeyHeld()) return true
+            if (key.value.isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
             ErrorManager.logErrorWithData(
                 e,
                 "Error while checking if a key is pressed.",
-                "keyCode" to boundKey.getCode(),
+                "keyCode" to key.value,
             )
             return false
         }
-        return this.isPressed || this.wasPressed()
+        return this.isDown || this.consumeClick()
     }
 
     fun Int.isKeyHeld(): Boolean = when {
@@ -222,7 +222,7 @@ object KeyboardManager {
         this == -1 -> false
         this in 0..5 -> MouseCompat.isButtonDown(this)
         //#if MC < 1.21.9
-        else -> InputUtil.isKeyPressed(MinecraftClient.getInstance().window.handle, this)
+        else -> InputConstants.isKeyDown(Minecraft.getInstance().window.window, this)
         //#else
         //$$ else -> InputUtil.isKeyPressed(MinecraftClient.getInstance().window, this)
         //#endif
@@ -249,22 +249,22 @@ object KeyboardManager {
 
     fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode).text
 
-    object WasdInputMatrix : Iterable<KeyBinding> {
-        operator fun contains(keyBinding: KeyBinding) = when (keyBinding) {
+    object WasdInputMatrix : Iterable<KeyMapping> {
+        operator fun contains(keyBinding: KeyMapping) = when (keyBinding) {
             w, a, s, d, up, down -> true
             else -> false
         }
 
-        val w get() = MinecraftClient.getInstance().options.forwardKey!!
-        val a get() = MinecraftClient.getInstance().options.leftKey!!
-        val s get() = MinecraftClient.getInstance().options.backKey!!
-        val d get() = MinecraftClient.getInstance().options.rightKey!!
+        val w get() = Minecraft.getInstance().options.keyUp!!
+        val a get() = Minecraft.getInstance().options.keyLeft!!
+        val s get() = Minecraft.getInstance().options.keyDown!!
+        val d get() = Minecraft.getInstance().options.keyRight!!
 
-        val up get() = MinecraftClient.getInstance().options.jumpKey!!
-        val down get() = MinecraftClient.getInstance().options.sneakKey!!
+        val up get() = Minecraft.getInstance().options.keyJump!!
+        val down get() = Minecraft.getInstance().options.keyShift!!
 
-        override fun iterator(): Iterator<KeyBinding> =
-            object : Iterator<KeyBinding> {
+        override fun iterator(): Iterator<KeyMapping> =
+            object : Iterator<KeyMapping> {
 
                 var current = w
                 var finished = false
@@ -272,7 +272,7 @@ object KeyboardManager {
                 override fun hasNext(): Boolean =
                     !finished
 
-                override fun next(): KeyBinding {
+                override fun next(): KeyMapping {
                     if (!hasNext()) throw NoSuchElementException()
 
                     return current.also {

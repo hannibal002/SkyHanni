@@ -24,8 +24,8 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import com.google.gson.JsonObject
-import net.minecraft.client.MinecraftClient
-import net.minecraft.util.math.MathHelper
+import net.minecraft.client.Minecraft
+import net.minecraft.util.Mth
 import org.lwjgl.glfw.GLFW
 import java.io.File
 import java.io.FileInputStream
@@ -78,7 +78,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
             }
         }
 
-        fun isInGui() = MinecraftClient.getInstance().currentScreen is VisualWordGui
+        fun isInGui() = Minecraft.getInstance().screen is VisualWordGui
         var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
         var drawImport = false
 
@@ -546,7 +546,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
             pageScroll = 0
         }
 
-        pageScroll = MathHelper.clamp(pageScroll, -(modifiedWords.size * 30 - 100), 0)
+        pageScroll = Mth.clamp(pageScroll, -(modifiedWords.size * 30 - 100), 0)
         lastMouseScroll = 0
     }
 

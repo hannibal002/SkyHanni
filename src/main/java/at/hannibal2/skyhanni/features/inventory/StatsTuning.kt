@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object StatsTuning {
@@ -45,7 +45,7 @@ object StatsTuning {
     }
 
     private fun templateStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        if (stack.name.formattedTextCompatLeadingWhiteLessResets() != "§aLoad") return false
+        if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aLoad") return false
 
         var grab = false
         val list = mutableListOf<String>()
@@ -73,7 +73,7 @@ object StatsTuning {
     }
 
     private fun renderTunings(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        if (stack.name.formattedTextCompatLeadingWhiteLessResets() != "§aStats Tuning") return false
+        if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aStats Tuning") return false
         val tunings = MaxwellApi.tunings ?: return false
 
         event.stackTip = tunings
@@ -101,7 +101,7 @@ object StatsTuning {
         val chestName = InventoryUtils.openInventoryName()
         if (!config.selectedTemplate || chestName != "Stats Tuning") return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val stack = slot.stack
+            val stack = slot.item
             val lore = stack.getLore()
 
             if (lore.any { it == "§aCurrently selected!" }) {

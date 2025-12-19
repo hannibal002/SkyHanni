@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object DnaAnalyzerSolver {
@@ -37,7 +37,7 @@ object DnaAnalyzerSolver {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled() || !config.hideTooltips) return
-        if (event.slot?.index !in 9..44) return
+        if (event.slot?.containerSlot !in 9..44) return
         event.cancel()
     }
 
@@ -237,7 +237,7 @@ object DnaAnalyzerSolver {
 
         companion object {
             fun ItemStack.toColor(): Colors {
-                val name = this.name.formattedTextCompatLeadingWhiteLessResets()
+                val name = this.hoverName.formattedTextCompatLeadingWhiteLessResets()
                 if (name.startsWith("§cDNA")) {
                     return RED
                 } else if (name.startsWith("§eDNA")) {

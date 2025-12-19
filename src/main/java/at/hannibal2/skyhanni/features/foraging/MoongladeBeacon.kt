@@ -39,12 +39,12 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.registry.Registries
-import net.minecraft.screen.slot.Slot
-import net.minecraft.util.Identifier
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.inventory.Slot
+import net.minecraft.resources.ResourceLocation
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -83,14 +83,14 @@ object MoongladeBeacon {
 
         override fun toString() = displayName
 
-        private val identifier = Identifier.of("minecraft", name.lowercase() + "_stained_glass_pane")
-        val item by lazy { itemOverride ?: Registries.ITEM.get(identifier) }
+        private val identifier = ResourceLocation.fromNamespaceAndPath("minecraft", name.lowercase() + "_stained_glass_pane")
+        val item by lazy { itemOverride ?: BuiltInRegistries.ITEM.getValue(identifier) }
 
         companion object {
             private val itemToColorMap = entries.associateBy { it.item }
             fun Item.getColorOrNull(): BeaconColor? = itemToColorMap[this]
             fun Slot.getLoreColorOrNull(): BeaconColor? {
-                val stack = this.stack ?: return null
+                val stack = this.item ?: return null
                 return ModernPatterns.beaconCurrentColorPattern.firstMatcher(stack.getLore()) {
                     val colorName = group("color") ?: return@firstMatcher null
                     entries.find { it.displayName.equals(colorName, ignoreCase = true) }
@@ -124,7 +124,7 @@ object MoongladeBeacon {
             }
 
             fun Slot.getBeaconSpeedOrNull(): BeaconSpeed? {
-                val stack = this.stack ?: return null
+                val stack = this.item ?: return null
                 return ModernPatterns.beaconCurrentSpeedPattern.firstMatcher(stack.getLore()) {
                     val guiSpeed = group("speed")?.formatIntOrNull() ?: return@firstMatcher null
                     entries.find { it.guiSpeed == guiSpeed }
@@ -150,7 +150,7 @@ object MoongladeBeacon {
         companion object {
             fun getByPitch(pitch: Float): BeaconPitch? = entries.find { it.pitch == pitch }
             fun Slot.getBeaconPitchOrNull(): BeaconPitch? {
-                val stack = this.stack ?: return null
+                val stack = this.item ?: return null
                 return ModernPatterns.beaconCurrentPitchPattern.firstMatcher(stack.getLore()) {
                     entries.find { it.displayName.equals(group("pitch"), ignoreCase = true) }
                 }
@@ -261,7 +261,7 @@ object MoongladeBeacon {
     private fun GuiContainerEvent.SlotClickEvent.blockOverClick(): Boolean {
         if (!config.preventOverClicking) return false
         if (KeyboardManager.isControlKeyDown()) return false
-        val slotIndex = this.slot?.index ?: return false
+        val slotIndex = this.slot?.containerSlot ?: return false
         val neededClickOffset = normalTuning.getOffsetBySlot(slotIndex)
             ?: enchantedTuning.getOffsetBySlot(slotIndex)?.takeUnless { !upgradingStrength }
             ?: return false
@@ -325,16 +325,16 @@ object MoongladeBeacon {
     fun onInventoryUpdated() {
         if (!solverEnabled()) return
 
-        for (slot in InventoryUtils.getItemsInOpenChest().filter { it.hasStack() && it.stack.isNotEmpty() }) {
-            val tuningData = if (slot.stack.isEnchanted()) enchantedTuning else normalTuning
+        for (slot in InventoryUtils.getItemsInOpenChest().filter { it.hasItem() && it.item.isNotEmpty() }) {
+            val tuningData = if (slot.item.isEnchanted()) enchantedTuning else normalTuning
             tuningData.readSlot(slot)
         }
         display = drawDisplay()
     }
 
     private fun Slot.performColorApplicableSet(block: (Pair<BeaconTuneData, BeaconColor>) -> Unit): Boolean {
-        val tuningData = if (this.stack.isEnchanted()) enchantedTuning else normalTuning
-        val stackColor = this.stack?.item?.getColorOrNull() ?: return false
+        val tuningData = if (this.item.isEnchanted()) enchantedTuning else normalTuning
+        val stackColor = this.item?.item?.getColorOrNull() ?: return false
         block.invoke(tuningData to stackColor)
         return true
     }
@@ -465,24 +465,24 @@ object MoongladeBeacon {
         }
 
         private fun readSlotFromSlot(slot: Slot): Boolean {
-            val target = BeaconSlotRange.getByIndexOrNull(slot.index)?.target ?: return false
-            if (slotPair[target] == slot.index) return false
-            slotPair[target] = slot.index
-            if (target == BeaconPieceTarget.REFERENCE) updateMatchSlot(slot.index)
+            val target = BeaconSlotRange.getByIndexOrNull(slot.containerSlot)?.target ?: return false
+            if (slotPair[target] == slot.containerSlot) return false
+            slotPair[target] = slot.containerSlot
+            if (target == BeaconPieceTarget.REFERENCE) updateMatchSlot(slot.containerSlot)
             return true
         }
 
         private fun readColorFromSlot(slot: Slot): Boolean {
-            val target = BeaconSlotRange.getByIndexOrNull(slot.index)?.target ?: return false
+            val target = BeaconSlotRange.getByIndexOrNull(slot.containerSlot)?.target ?: return false
             return slot.performColorApplicableSet { (tuningData, color) ->
                 tuningData.colorPair[target] = color
             }
         }
 
-        private fun readCurrentFromSlot(slot: Slot) = slot.stack?.let { stack ->
+        private fun readCurrentFromSlot(slot: Slot) = slot.item?.let { stack ->
             if (isEnchanted && !upgradingStrength) return@let
             val ours = BeaconPieceTarget.OURS
-            when (slot.index) {
+            when (slot.containerSlot) {
                 colorSelectSlot -> colorPair[ours] = slot.getLoreColorOrNull()
                 speedSelectSlot -> {
                     slot.getBeaconSpeedOrNull().let {
@@ -508,7 +508,7 @@ object MoongladeBeacon {
         fun tryHighlightSlot(slot: Slot): Boolean {
             if (isEnchanted && !upgradingStrength) return false
 
-            if (slot.index == pitchSelectSlot) {
+            if (slot.containerSlot == pitchSelectSlot) {
                 val uiPitch = slot.getBeaconPitchOrNull() ?: return false
                 if (uiPitch == pitchPair.reference) {
                     slot.highlight(LorenzColor.GREEN.addOpacity(200))
@@ -517,14 +517,14 @@ object MoongladeBeacon {
                 return false
             }
 
-            getOffsetBySlot(slot.index).takeIf { it == 0 } ?: return false
+            getOffsetBySlot(slot.containerSlot).takeIf { it == 0 } ?: return false
             slot.highlight(LorenzColor.GREEN.addOpacity(200))
             return true
         }
 
         fun RenderInventoryItemTipEvent.tryLabelIfAble() {
             if (isEnchanted && !upgradingStrength) return
-            val offset = getOffsetBySlot(slot.index)?.takeIf { it != 0 } ?: return
+            val offset = getOffsetBySlot(slot.containerSlot)?.takeIf { it != 0 } ?: return
             stackTip = "§a$offset"
         }
 

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object TeleportPadCompactName {
@@ -30,7 +30,7 @@ object TeleportPadCompactName {
     )
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStandEntity>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStand>) {
         if (!SkyHanniMod.feature.misc.teleportPad.compactName) return
         val entity = event.entity
 
@@ -44,7 +44,7 @@ object TeleportPadCompactName {
             //#if MC < 1.21
             //$$ entity.setCustomName(group("name"))
             //#else
-            entity.setCustomName(net.minecraft.text.Text.of(group("name")))
+            entity.setCustomName(net.minecraft.network.chat.Component.nullToEmpty(group("name")))
             //#endif
         }
     }

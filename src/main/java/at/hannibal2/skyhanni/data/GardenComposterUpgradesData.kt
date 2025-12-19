@@ -15,7 +15,7 @@ object GardenComposterUpgradesData {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Composter Upgrades") return
         for (item in event.inventoryItems.values) {
-            ComposterUpgrade.regex.matchMatcher(item.name.formattedTextCompatLeadingWhiteLessResets()) {
+            ComposterUpgrade.regex.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val name = group("name")
                 val level = group("level")?.romanToDecimalIfNecessary() ?: 0
                 val composterUpgrade = ComposterUpgrade.getByName(name)!!

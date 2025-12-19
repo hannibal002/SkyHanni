@@ -14,13 +14,13 @@ import at.hannibal2.skyhanni.utils.SignUtils.isGardenSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import net.minecraft.client.gui.screen.ingame.SignEditScreen
-import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL11
@@ -46,12 +46,12 @@ object GuiEditManager {
         }
         if (isInGui()) return
 
-        val guiScreen = MinecraftClient.getInstance().currentScreen
+        val guiScreen = Minecraft.getInstance().screen
         val openGui = guiScreen?.javaClass?.name ?: "none"
         val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
         if (isInNeuPv) return
         guiScreen?.let {
-            if (it !is InventoryScreen && it !is GenericContainerScreen && it !is SignEditScreen) return
+            if (it !is InventoryScreen && it !is ContainerScreen && it !is SignEditScreen) return
             if (it is SignEditScreen && !it.isGardenSign()) return
         }
 
@@ -94,7 +94,7 @@ object GuiEditManager {
         SkyHanniMod.screenToOpen = GuiPositionEditor(
             currentPositions.values.toList(),
             2,
-            MinecraftClient.getInstance().currentScreen as? SkyHanniGuiContainer,
+            Minecraft.getInstance().screen as? SkyHanniGuiContainer,
         )
         if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
             lastHotkeyReminded = SimpleTimeMark.now()
@@ -107,7 +107,7 @@ object GuiEditManager {
     }
 
     @JvmStatic
-    fun renderLast(context: DrawContext) {
+    fun renderLast(context: GuiGraphics) {
         if (GlobalRender.renderDisabled) return
         if (!isInGui()) return
 
@@ -125,7 +125,7 @@ object GuiEditManager {
         DrawContextUtils.clearContext()
     }
 
-    fun isInGui() = MinecraftClient.getInstance().currentScreen is GuiPositionEditor
+    fun isInGui() = Minecraft.getInstance().screen is GuiPositionEditor
 
     fun Position.getDummySize(random: Boolean = false): Vector2i {
         if (random) return Vector2i(5, 5)

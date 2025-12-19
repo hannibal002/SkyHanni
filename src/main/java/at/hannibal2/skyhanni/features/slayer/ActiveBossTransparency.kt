@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
-import net.minecraft.entity.LivingEntity
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.network.protocol.game.ServerboundInteractPacket
 
 @SkyHanniModule
 object ActiveBossTransparency {
@@ -39,7 +39,7 @@ object ActiveBossTransparency {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {
-        if (event.action != PlayerInteractEntityC2SPacket.InteractType.ATTACK) return
+        if (event.action != ServerboundInteractPacket.ActionType.ATTACK) return
         val mob = event.clickedEntity.mob ?: return
 
         lastClickedMob = mob

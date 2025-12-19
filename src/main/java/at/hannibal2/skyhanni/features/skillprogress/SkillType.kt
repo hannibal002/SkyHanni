@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.utils.ItemUtils
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.item.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 
 enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
     COMBAT("Combat", Items.GOLDEN_SWORD, 60),
@@ -24,7 +24,7 @@ enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
     HUNTING("Hunting", Items.LEAD, 25),
     ;
 
-    constructor(displayName: String, block: Block, maxLevel: Int) : this(displayName, Item.fromBlock(block), maxLevel)
+    constructor(displayName: String, block: Block, maxLevel: Int) : this(displayName, Item.byBlock(block), maxLevel)
 
     val item: ItemStack by lazy { ItemUtils.createItemStack(icon, displayName) }
     val lowercaseName = displayName.lowercase()

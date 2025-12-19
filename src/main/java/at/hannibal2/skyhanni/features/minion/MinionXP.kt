@@ -22,9 +22,9 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.block.ChestBlock
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.level.block.ChestBlock
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 import java.util.EnumMap
 
 @SkyHanniModule

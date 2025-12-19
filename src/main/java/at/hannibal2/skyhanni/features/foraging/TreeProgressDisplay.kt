@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object TreeProgressDisplay {
@@ -40,7 +40,7 @@ object TreeProgressDisplay {
             display = null
             return
         }
-        for (entity in EntityUtils.getEntities<ArmorStandEntity>()) {
+        for (entity in EntityUtils.getEntities<ArmorStand>()) {
             val name = entity.displayName.formattedTextCompat()
             ModernPatterns.currentTreeProgressPattern.matchMatcher(name) {
                 if (config.compact) {

@@ -6,37 +6,37 @@ import at.hannibal2.skyhanni.utils.compat.RenderCompat.drawIndexed
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.BufferBuilder
-import net.minecraft.client.render.BuiltBuffer
-import net.minecraft.client.render.Tessellator
+import net.minecraft.client.Minecraft
+import com.mojang.blaze3d.vertex.BufferBuilder
+import com.mojang.blaze3d.vertex.MeshData
+import com.mojang.blaze3d.vertex.Tesselator
 //#if MC < 1.21.6
-import net.minecraft.client.util.math.MatrixStack
+import com.mojang.blaze3d.vertex.PoseStack
 //#else
 //$$ import org.joml.Matrix3x2f
 //#endif
 
 object RenderPipelineDrawer {
     //#if MC < 1.21.6
-    val matrices: MatrixStack.Entry get() = DrawContextUtils.drawContext.matrices.peek()
+    val matrices: PoseStack.Pose get() = DrawContextUtils.drawContext.pose().last()
     //#else
     //$$ val matrices: Matrix3x2f get() = Matrix3x2f(DrawContextUtils.drawContext.matrices)
     //#endif
     fun getBuffer(
         pipeline: RenderPipeline,
-    ): BufferBuilder = Tessellator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)
+    ): BufferBuilder = Tesselator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)
 
     /**
      * Method inspired by SkyOcean's [InventoryRenderer](https://github.com/meowdding/SkyOcean/blob/main/src/client/kotlin/me/owdding/skyocean/utils/rendering/InventoryRenderer.kt)
      */
-    fun draw(pipeline: RenderPipeline, mesh: BuiltBuffer, pass: (RenderPass) -> Unit) {
-        val vertexBuffer = pipeline.vertexFormat.uploadImmediateVertexBuffer(mesh.buffer)
+    fun draw(pipeline: RenderPipeline, mesh: MeshData, pass: (RenderPass) -> Unit) {
+        val vertexBuffer = pipeline.vertexFormat.uploadImmediateVertexBuffer(mesh.vertexBuffer())
 
-        val sequentialBuffer = RenderSystem.getSequentialBuffer(mesh.drawParameters.mode)
-        val indexBuffer = sequentialBuffer.getIndexBuffer(mesh.drawParameters.indexCount)
-        val indexType = sequentialBuffer.indexType
+        val sequentialBuffer = RenderSystem.getSequentialBuffer(mesh.drawState().mode)
+        val indexBuffer = sequentialBuffer.getBuffer(mesh.drawState().indexCount)
+        val indexType = sequentialBuffer.type()
 
-        val framebuffer = MinecraftClient.getInstance().framebuffer
+        val framebuffer = Minecraft.getInstance().mainRenderTarget
 
         RenderSystem.getDevice().createRenderPass(
             "SkyHanni Immediate Pipeline Draw",
@@ -48,7 +48,7 @@ object RenderPipelineDrawer {
             renderPass.setVertexBuffer(0, vertexBuffer)
             renderPass.setIndexBuffer(indexBuffer, indexType)
 
-            renderPass.drawIndexed(mesh.drawParameters.indexCount)
+            renderPass.drawIndexed(mesh.drawState().indexCount)
         }
 
         mesh.close()

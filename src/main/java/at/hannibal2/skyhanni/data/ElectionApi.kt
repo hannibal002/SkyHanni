@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -178,7 +178,7 @@ object ElectionApi {
         if (!calendarGuiPattern.matches(event.inventoryName)) return
 
         val stack: ItemStack = event.inventoryItems.values.firstOrNull {
-            mayorHeadPattern.matchMatcher(it.name.formattedTextCompatLeadingWhiteLessResets()) {
+            mayorHeadPattern.matchMatcher(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 group("name") == "Jerry"
             } ?: false
         } ?: return

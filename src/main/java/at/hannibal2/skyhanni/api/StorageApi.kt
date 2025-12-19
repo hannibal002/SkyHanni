@@ -26,8 +26,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
-import net.minecraft.block.ChestBlock
-import net.minecraft.item.ItemStack
+import net.minecraft.world.level.block.ChestBlock
+import net.minecraft.world.item.ItemStack
 import java.util.NavigableMap
 import java.util.TreeMap
 
@@ -115,7 +115,7 @@ object StorageApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
         if (!shouldReCheck) return
-        currentStorage?.items = InventoryUtils.getItemsInOpenChestWithNull().map { it.stack }.drop(9)
+        currentStorage?.items = InventoryUtils.getItemsInOpenChestWithNull().map { it.item }.drop(9)
         shouldReCheck = false
         shouldSave = true
     }

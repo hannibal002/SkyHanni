@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import net.minecraft.client.MinecraftClient
-import net.minecraft.util.math.Box
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.client.Minecraft
+import net.minecraft.world.phys.AABB
+import net.minecraft.core.particles.ParticleTypes
 import java.awt.Color
 
 @SkyHanniModule
@@ -22,7 +22,7 @@ object PrecisionMiningHighlight {
 
     private val config get() = SkyHanniMod.feature.mining.highlightPrecisionMiningParticles
 
-    private var lastParticle: Box? = null
+    private var lastParticle: AABB? = null
     private var lookingAtParticle: Boolean = false
     private var deleteTime: SimpleTimeMark? = null
 
@@ -30,7 +30,7 @@ object PrecisionMiningHighlight {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!(event.type == ParticleTypes.CRIT || event.type == ParticleTypes.HAPPY_VILLAGER) ||
-            !MinecraftClient.getInstance().options.attackKey.isPressed
+            !Minecraft.getInstance().options.keyAttack.isDown
         ) return
 
         val particleBoundingBox = event.location.add(-0.12, -0.12, -0.12)

@@ -26,23 +26,23 @@ import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.minecraft.block.Blocks
-import net.minecraft.item.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.StringNbtReader
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtList
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.nbt.TagParser
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
 import java.io.File
 import java.util.TreeMap
 import kotlin.math.floor
 //#if MC > 1.21
-import net.minecraft.registry.Registries
-import net.minecraft.util.Identifier
-import net.minecraft.nbt.NbtString
-import net.minecraft.text.Text
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.LoreComponent
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.nbt.StringTag
+import net.minecraft.network.chat.Component
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.ItemLore
 import at.hannibal2.skyhanni.utils.ComponentUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 //#else
@@ -165,13 +165,13 @@ object EnoughUpdatesManager {
     }
 
     fun stackToJson(stack: ItemStack): JsonObject {
-        val tag = stack.components ?: NbtCompound()
+        val tag = stack.components ?: CompoundTag()
 
         val lore = stack.getLore()
 
         val json = JsonObject()
         json.addProperty("itemid", stack.item.getIdentifierString())
-        json.addProperty("displayname", stack.name.formattedTextCompatLeadingWhiteLessResets())
+        json.addProperty("displayname", stack.hoverName.formattedTextCompatLeadingWhiteLessResets())
         //#if MC < 1.21
         //$$ json.addProperty("nbttag", tag.toString())
         //$$ json.addProperty("damage", stack.itemDamage)
@@ -436,8 +436,8 @@ object EnoughUpdatesManager {
         return replacements
     }
 
-    private fun processLore(lore: JsonArray, replacements: Map<String, String>): NbtList {
-        val loreList = NbtList()
+    private fun processLore(lore: JsonArray, replacements: Map<String, String>): ListTag {
+        val loreList = ListTag()
         for (line in lore) {
             val loreLine = line.asString
             for ((key, value) in replacements) {
@@ -446,7 +446,7 @@ object EnoughUpdatesManager {
             //#if MC < 1.21
             //$$ loreList.add(NbtString(loreLine))
             //#else
-            loreList.add(NbtString.of(loreLine))
+            loreList.add(StringTag.valueOf(loreLine))
             //#endif
         }
         return loreList

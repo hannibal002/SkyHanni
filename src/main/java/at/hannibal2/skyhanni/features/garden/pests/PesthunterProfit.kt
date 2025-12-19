@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object PesthunterProfit {
@@ -70,7 +70,7 @@ object PesthunterProfit {
     }
 
     private fun readItem(slot: Int, item: ItemStack): DisplayTableEntry? {
-        val itemName = item.name.formattedTextCompatLeadingWhiteLessResets().takeIf {
+        val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets().takeIf {
             it !in DENY_LIST_ITEMS && it.trim().isNotEmpty()
         } ?: return null
         if (slot == 49) return null

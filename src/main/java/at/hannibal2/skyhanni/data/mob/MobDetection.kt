@@ -23,17 +23,17 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.mob.CreeperEntity
-import net.minecraft.entity.passive.BatEntity
-import net.minecraft.entity.passive.VillagerEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.world.World
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Creeper
+import net.minecraft.world.entity.ambient.Bat
+import net.minecraft.world.entity.npc.Villager
+import net.minecraft.world.entity.player.Player
+import net.minecraft.network.protocol.game.ClientboundLoginPacket
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.level.Level
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 //#if MC < 1.21
@@ -74,7 +74,7 @@ object MobDetection {
     // TODO this is a unused debug function. maybe connect with a debug commmand or remove
     private fun watchdog() {
         val world = MinecraftCompat.localWorldOrNull ?: return
-        if (MobData.retries.any { it.value.entity.world != world }) {
+        if (MobData.retries.any { it.value.entity.level() != world }) {
             ChatUtils.chat("Watchdog: Retires")
         }
         if (MobData.currentMobs.any { it.watchdogCheck(world) }) {
@@ -100,10 +100,10 @@ object MobDetection {
         }
     }
 
-    private fun Mob.watchdogCheck(world: World): Boolean =
-        this.baseEntity.world != world || (
-            this.armorStand?.let { it.world != world } ?: false
-            ) || this.extraEntities.any { it.world != world }
+    private fun Mob.watchdogCheck(world: Level): Boolean =
+        this.baseEntity.level() != world || (
+            this.armorStand?.let { it.level() != world } ?: false
+            ) || this.extraEntities.any { it.level() != world }
 
     @OptIn(AllEntitiesGetter::class)
     @HandleEvent
@@ -126,7 +126,7 @@ object MobDetection {
         MobData.currentEntityLiving.clear()
         MobData.currentEntityLiving.addAll(
             EntityUtils.getEntities<LivingEntity>()
-                .filter { it !is ArmorStandEntity && it !is ClientPlayerEntity },
+                .filter { it !is ArmorStand && it !is LocalPlayer },
         )
 
         if (forceReset) {
@@ -145,7 +145,7 @@ object MobDetection {
 
     /** Splits the entity into player, displayNPC and other */
     private fun LivingEntity.getRoughType() = when {
-        this is PlayerEntity && this.isRealPlayer() -> Mob.Type.PLAYER
+        this is Player && this.isRealPlayer() -> Mob.Type.PLAYER
         this.isDisplayNpc() -> Mob.Type.DISPLAY_NPC
         this.isSkyBlockMob() && !islandException() -> Mob.Type.BASIC
         else -> null
@@ -222,14 +222,14 @@ object MobDetection {
     private fun handleMobsFromPacket() = entityFromPacket.drainForEach { (type, id) ->
         when (type) {
             EntityPacketType.SPIRIT_BAT -> {
-                val entity = EntityUtils.getEntityByID(id) as? BatEntity ?: return@drainForEach
+                val entity = EntityUtils.getEntityByID(id) as? Bat ?: return@drainForEach
                 if (MobData.entityToMob[entity] != null) return@drainForEach
                 removeRetry(entity)
                 MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).post()
             }
 
             EntityPacketType.VILLAGER -> {
-                val entity = EntityUtils.getEntityByID(id) as? VillagerEntity ?: return@drainForEach
+                val entity = EntityUtils.getEntityByID(id) as? Villager ?: return@drainForEach
                 val mob = MobData.entityToMob[entity]
                 if (mob != null && mob.mobType == Mob.Type.DISPLAY_NPC) {
                     MobEvent.DeSpawn.DisplayNpc(mob)
@@ -245,9 +245,9 @@ object MobDetection {
             }
 
             EntityPacketType.CREEPER_VAIL -> {
-                val entity = EntityUtils.getEntityByID(id) as? CreeperEntity ?: return@drainForEach
+                val entity = EntityUtils.getEntityByID(id) as? Creeper ?: return@drainForEach
                 if (MobData.entityToMob[entity] != null) return@drainForEach
-                if (!entity.isCharged) return@drainForEach
+                if (!entity.isPowered) return@drainForEach
                 removeRetry(entity)
                 MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil")).post()
             }
@@ -257,15 +257,15 @@ object MobDetection {
     @HandleEvent
     fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
         when {
-            event.entity is BatEntity && event.health == 6 -> {
+            event.entity is Bat && event.health == 6 -> {
                 entityFromPacket.add(EntityPacketType.SPIRIT_BAT to event.entity.id)
             }
 
-            event.entity is VillagerEntity && event.health != 20 -> {
+            event.entity is Villager && event.health != 20 -> {
                 entityFromPacket.add(EntityPacketType.VILLAGER to event.entity.id)
             }
 
-            event.entity is CreeperEntity && event.health == 20 -> {
+            event.entity is Creeper && event.health == 20 -> {
                 entityFromPacket.add(EntityPacketType.CREEPER_VAIL to event.entity.id)
             }
         }
@@ -363,12 +363,12 @@ object MobDetection {
     @HandleEvent
     fun onEntitySpawnPacket(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
-            is EntitySpawnS2CPacket -> addEntityUpdate(packet.entityId)
+            is ClientboundAddEntityPacket -> addEntityUpdate(packet.id)
             //#if MC < 1.21
             //$$ is MobSpawnS2CPacket -> addEntityUpdate(packet.id)
             //$$ is EntitySpawnS2CPacket -> addEntityUpdate(packet.id)
             //#endif
-            is GameJoinS2CPacket -> {
+            is ClientboundLoginPacket -> {
                 // one of the first packets that is sent when switching servers inside the BungeeCord Network
                 // (please some prove this, I just found it out via Testing)
                 shouldClear.set(true)

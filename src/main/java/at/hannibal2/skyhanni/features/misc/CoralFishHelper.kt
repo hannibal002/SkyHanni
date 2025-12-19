@@ -50,7 +50,7 @@ object CoralFishHelper {
     private val textInput = SearchTextInput()
 
     private fun checkInventoryItems() {
-        val items = InventoryUtils.getItemsInOpenChest().map { it.stack }
+        val items = InventoryUtils.getItemsInOpenChest().map { it.item }
 
         val overviewItem = items[OVERVIEW_FISH_SLOT]
         val overviewItemLore = overviewItem.getLore().map { it.removeColor() }
@@ -62,7 +62,7 @@ object CoralFishHelper {
         val neededFish = mutableListOf<String>()
 
         for (item in items) {
-            val itemName = item.name.formattedTextCompatLeadingWhiteLessResets()
+            val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
             if (!ModernPatterns.coralFishNamePattern.matches(itemName)) continue
 
             if (!item.isDye(DyeCompat.GRAY)) continue

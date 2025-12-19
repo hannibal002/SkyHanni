@@ -28,9 +28,9 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.item.ItemStack
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CFCustomReminder {
@@ -97,7 +97,7 @@ object CFCustomReminder {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !inChocolateMenu()) return
         val item = event.item ?: return
-        CFDataLoader.upgradeTierPattern.matchMatcher(item.name.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+        CFDataLoader.upgradeTierPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
             if (group("upgrade") == "Time Tower" && event.clickedButton == 1) return
         }
         val (cost, name) = getCostAndName(item) ?: return
@@ -126,7 +126,7 @@ object CFCustomReminder {
                 missing to "§6${amount.shortFormat()} Chocolate Milestone"
             }
 
-        val nextLevelName = CFApi.getNextLevelName(item) ?: item.name.formattedTextCompatLeadingWhiteLessResets()
+        val nextLevelName = CFApi.getNextLevelName(item) ?: item.hoverName.formattedTextCompatLeadingWhiteLessResets()
         return cost to nextLevelName
     }
 
@@ -143,7 +143,7 @@ object CFCustomReminder {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!configReminder.always) return
-        if (MinecraftClient.getInstance().currentScreen is GenericContainerScreen) return
+        if (Minecraft.getInstance().screen is ContainerScreen) return
         if (ReminderUtils.isBusy()) return
 
         configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")

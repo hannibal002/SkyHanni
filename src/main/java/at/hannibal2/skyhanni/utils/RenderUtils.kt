@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
-import net.minecraft.screen.slot.Slot
+import net.minecraft.world.inventory.Slot
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.nio.FloatBuffer
@@ -71,7 +71,7 @@ object RenderUtils {
             //$$ matrixBuffer.flip()
             //#elseif MC < 1.21.6
             RenderSystem.assertOnRenderThread()
-            val posMatrix = DrawContextUtils.drawContext.matrices.peek().positionMatrix
+            val posMatrix = DrawContextUtils.drawContext.pose().last().pose()
             val tmp = org.joml.Vector3f()
             posMatrix.getTranslation(tmp)
             val xTranslate = tmp.x.toInt()
@@ -183,12 +183,12 @@ object RenderUtils {
         val display = "§f$string"
         DrawContextUtils.pushMatrix()
         transform()
-        val fr = MinecraftClient.getInstance().textRenderer
+        val fr = Minecraft.getInstance().font
 
         DrawContextUtils.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
         if (centered) {
-            val strLen: Int = fr.getWidth(string)
+            val strLen: Int = fr.width(string)
             val x2 = offsetX - strLen / 2f
             GuiRenderUtils.drawString(display, x2, 0f, -1)
         } else {
@@ -197,7 +197,7 @@ object RenderUtils {
 
         DrawContextUtils.popMatrix()
 
-        return fr.getWidth(display)
+        return fr.width(display)
     }
 
     @Deprecated("Use renderRenderables instead", ReplaceWith("renderRenderables(renderables)"))
@@ -300,14 +300,14 @@ object RenderUtils {
         text: String,
         scale: Float,
     ) {
-        val fontRenderer = MinecraftClient.getInstance().textRenderer
+        val fontRenderer = Minecraft.getInstance().font
 
         ModernGlStateManager.disableLighting()
         ModernGlStateManager.disableDepthTest()
         ModernGlStateManager.disableBlend()
 
         DrawContextUtils.pushPop {
-            DrawContextUtils.translate((xPos - fontRenderer.getWidth(text)).toFloat(), yPos.toFloat(), 200f)
+            DrawContextUtils.translate((xPos - fontRenderer.width(text)).toFloat(), yPos.toFloat(), 200f)
             DrawContextUtils.scale(scale, scale, 1f)
             GuiRenderUtils.drawString(text, 0f, 0f, -1)
 

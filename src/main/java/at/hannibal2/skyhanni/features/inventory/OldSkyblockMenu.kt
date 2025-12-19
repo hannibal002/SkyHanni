@@ -18,9 +18,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
-import net.minecraft.item.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 import kotlin.reflect.KFunction
 
 /**
@@ -50,7 +50,7 @@ object OldSkyblockMenu {
         if (!isEnabled()) return
 
         val sbButton = slotMap[event.slot]?.takeIf { !it.disabled } ?: return
-        val isAlreadySbButton = event.originalItem?.name.formattedTextCompatLeadingWhiteLessResets()?.endsWith(sbButton.displayName) == true
+        val isAlreadySbButton = event.originalItem?.hoverName.formattedTextCompatLeadingWhiteLessResets()?.endsWith(sbButton.displayName) == true
         if (isAlreadySbButton) return
 
         event.replace(sbButton.item)

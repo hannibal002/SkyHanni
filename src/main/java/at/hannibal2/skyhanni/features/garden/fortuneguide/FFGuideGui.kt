@@ -16,10 +16,10 @@ import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.guide.GuideTab
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.MinecraftClient
-import net.minecraft.block.Blocks
-import net.minecraft.item.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.client.Minecraft
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.ItemStack
 
 class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
 
@@ -29,7 +29,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
     @SkyHanniModule
     companion object {
 
-        fun isInGui() = MinecraftClient.getInstance().currentScreen is FFGuideGui
+        fun isInGui() = Minecraft.getInstance().screen is FFGuideGui
 
         private fun open() {
             CaptureFarmingGear.captureFarmingGear()
@@ -38,7 +38,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
         }
 
         fun updateDisplay() {
-            with(MinecraftClient.getInstance().currentScreen) {
+            with(Minecraft.getInstance().screen) {
                 if (this !is FFGuideGui) return
                 this.refreshPage()
             }

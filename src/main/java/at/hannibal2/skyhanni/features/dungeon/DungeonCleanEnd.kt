@@ -16,10 +16,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.network.OtherClientPlayerEntity
-import net.minecraft.entity.Entity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.mob.GuardianEntity
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Guardian
 
 @SkyHanniModule
 object DungeonCleanEnd {
@@ -99,14 +99,14 @@ object DungeonCleanEnd {
 
         if (config.f3IgnoreGuardians &&
             DungeonApi.isOneOf("F3", "M3") &&
-            entity is GuardianEntity &&
+            entity is Guardian &&
             entity.id != lastBossId &&
-            MinecraftCompat.localPlayer.isSneaking
+            MinecraftCompat.localPlayer.isShiftKeyDown
         ) {
             return
         }
 
-        if (chestsSpawned && ((entity is ArmorStandEntity && !entity.hasCustomName()) || entity is OtherClientPlayerEntity)) {
+        if (chestsSpawned && ((entity is ArmorStand && !entity.hasCustomName()) || entity is RemotePlayer)) {
             return
         }
 

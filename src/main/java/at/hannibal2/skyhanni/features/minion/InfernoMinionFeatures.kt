@@ -51,10 +51,10 @@ object InfernoMinionFeatures {
         if (!inInventory) return
 
         val containsFuel =
-            NeuInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.name.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
+            NeuInternalName.fromItemNameOrNull(event.container.getSlot(19).item.hoverName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
         if (!containsFuel) return
 
-        if (event.slot?.id == 19 || event.slot?.id == 53) {
+        if (event.slot?.index == 19 || event.slot?.index == 53) {
             if (KeyboardManager.isModifierKeyDown()) return
             event.cancel()
         }
@@ -65,15 +65,15 @@ object InfernoMinionFeatures {
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
 
-        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.name.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
+        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
         if (!containsFuel) return
 
-        if (event.slot.id == 19) {
+        if (event.slot.index == 19) {
             event.toolTip.add("")
             event.toolTip.add("§c[SkyHanni] is blocking you from taking this out!")
             event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
         }
-        if (event.slot.id == 53) {
+        if (event.slot.index == 53) {
             event.toolTip.add("")
             event.toolTip.add("§c[SkyHanni] is blocking you from picking this minion up!")
             event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")

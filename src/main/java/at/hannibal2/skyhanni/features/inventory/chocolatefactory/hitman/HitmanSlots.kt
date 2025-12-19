@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object HitmanSlots {
@@ -59,7 +59,7 @@ object HitmanSlots {
     private fun handleSlotStorageUpdate(event: InventoryOpenEvent) {
         if (!config.hitmanCosts) return
         val leftToPurchase = event.inventoryItems.filterNotBorderSlots().count { (_, item) ->
-            item.name.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && item.getLore().isNotEmpty() &&
+            item.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && item.getLore().isNotEmpty() &&
                 slotCostPattern.matches(item.getSingleLineLore())
         }
         val ownedSlots = CFApi.hitmanCosts.size - leftToPurchase

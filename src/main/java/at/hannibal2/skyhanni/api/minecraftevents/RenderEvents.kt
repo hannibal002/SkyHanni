@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.render.RenderTickCounter
-import net.minecraft.util.Identifier
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.DeltaTracker
+import net.minecraft.resources.ResourceLocation
 //#if MC < 1.21.6
 import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
@@ -18,8 +18,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
 //#if MC < 1.21.9
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.client.renderer.MultiBufferSource
+import com.mojang.blaze3d.vertex.PoseStack
 //#endif
 
 @SkyHanniModule
@@ -30,9 +30,9 @@ object RenderEvents {
         // SkyHanniRenderWorldEvent
         //#if MC < 1.21.9
         WorldRenderEvents.AFTER_TRANSLUCENT.register { event ->
-            val immediateVertexConsumers = event.consumers() as? VertexConsumerProvider.Immediate ?: return@register
-            val stack = event.matrixStack() ?: MatrixStack()
-            SkyHanniRenderWorldEvent(stack, event.camera(), immediateVertexConsumers, event.tickCounter().getTickProgress(true)).post()
+            val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
+            val stack = event.matrixStack() ?: PoseStack()
+            SkyHanniRenderWorldEvent(stack, event.camera(), immediateVertexConsumers, event.tickCounter().getGameTimeDeltaPartialTick(true)).post()
         }
         //#endif
 
@@ -50,7 +50,7 @@ object RenderEvents {
 
         //#if MC < 1.21.6
         HudLayerRegistrationCallback.EVENT.register { context ->
-            context.attachLayerAfter(IdentifiedLayer.SLEEP, Identifier.of("skyhanni", "gui_render_layer"), RenderEvents::postGui)
+            context.attachLayerAfter(IdentifiedLayer.SLEEP, ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"), RenderEvents::postGui)
         }
         //#else
         //$$ HudElementRegistry.attachElementBefore(
@@ -61,47 +61,47 @@ object RenderEvents {
         //#endif
     }
 
-    private fun postGui(context: DrawContext, tick: RenderTickCounter) {
-        if (MinecraftClient.getInstance().options.hudHidden) return
+    private fun postGui(context: GuiGraphics, tick: DeltaTracker) {
+        if (Minecraft.getInstance().options.hideGui) return
         RenderData.postRenderOverlay(context)
     }
 
     // GameOverlayRenderPreEvent
     // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
-    fun postHotbarLayerEventPre(context: DrawContext): Boolean {
+    fun postHotbarLayerEventPre(context: GuiGraphics): Boolean {
         return GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
     }
 
     @JvmStatic
-    fun postExperienceBarLayerEventPre(context: DrawContext): Boolean {
+    fun postExperienceBarLayerEventPre(context: GuiGraphics): Boolean {
         return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_BAR).post()
     }
 
     @JvmStatic
-    fun postExperienceNumberLayerEventPre(context: DrawContext): Boolean {
+    fun postExperienceNumberLayerEventPre(context: GuiGraphics): Boolean {
         return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
     }
 
     @JvmStatic
-    fun postTablistLayerEventPre(context: DrawContext): Boolean {
+    fun postTablistLayerEventPre(context: GuiGraphics): Boolean {
         return GameOverlayRenderPreEvent(context, RenderLayer.PLAYER_LIST).post()
     }
 
     // GameOverlayRenderPostEvent
     // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
-    fun postHotbarLayerEventPost(context: DrawContext) {
+    fun postHotbarLayerEventPost(context: GuiGraphics) {
         GameOverlayRenderPostEvent(context, RenderLayer.HOTBAR).post()
     }
 
     @JvmStatic
-    fun postExperienceBarLayerEventPost(context: DrawContext) {
+    fun postExperienceBarLayerEventPost(context: GuiGraphics) {
         GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_BAR).post()
     }
 
     @JvmStatic
-    fun postExperienceNumberLayerEventPost(context: DrawContext) {
+    fun postExperienceNumberLayerEventPost(context: GuiGraphics) {
         GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
     }
 }

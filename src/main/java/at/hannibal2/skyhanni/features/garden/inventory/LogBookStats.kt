@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.Items
+import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object LogBookStats {
@@ -65,7 +65,7 @@ object LogBookStats {
         val list = mutableListOf<VisitorInfo>()
 
         for ((index, item) in event.inventoryItems) {
-            val visitorName = item.name.formattedTextCompatLeadingWhiteLessResets() ?: continue
+            val visitorName = item.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: continue
             var timesVisited = 0L
             var timesAccepted = 0L
             val lore = item.getLore()
@@ -123,7 +123,7 @@ object LogBookStats {
             return
         }
         for (item in event.inventoryItems.values) {
-            if (item.name.formattedTextCompatLeadingWhiteLessResets() != "§aNext Page") continue
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aNext Page") continue
             pagePattern.firstMatcher(item.getLore()) {
                 currentPage = group("page").toInt() - 1
             }

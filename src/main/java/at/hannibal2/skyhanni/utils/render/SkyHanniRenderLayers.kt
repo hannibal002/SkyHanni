@@ -3,156 +3,156 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer
 import java.util.OptionalDouble
 import java.util.concurrent.ConcurrentHashMap
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.RenderLayer.MultiPhase
-import net.minecraft.client.render.RenderLayer.MultiPhaseParameters
-import net.minecraft.client.render.RenderPhase
-import net.minecraft.util.Identifier
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.RenderType.CompositeRenderType
+import net.minecraft.client.renderer.RenderType.CompositeState
+import net.minecraft.client.renderer.RenderStateShard
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.TriState
-import net.minecraft.util.Util
+import net.minecraft.Util
 
 object SkyHanniRenderLayers {
 
-    private val linesCache = ConcurrentHashMap<Int, MultiPhase>()
-    private val linesThroughWallsCache = ConcurrentHashMap<Int, MultiPhase>()
+    private val linesCache = ConcurrentHashMap<Int, CompositeRenderType>()
+    private val linesThroughWallsCache = ConcurrentHashMap<Int, CompositeRenderType>()
 
-    private val FILLED: MultiPhase = RenderLayer.of(
+    private val FILLED: CompositeRenderType = RenderType.create(
         "skyhanni_filled",
-        RenderLayer.DEFAULT_BUFFER_SIZE,
+        RenderType.TRANSIENT_BUFFER_SIZE,
         false,
         true,
         SkyHanniRenderPipeline.FILLED(),
-        MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
+        CompositeState.builder().setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING).createCompositeState(false),
     )
 
-    private val FILLED_XRAY: MultiPhase = RenderLayer.of(
+    private val FILLED_XRAY: CompositeRenderType = RenderType.create(
         "skyhanni_filled_xray",
-        RenderLayer.DEFAULT_BUFFER_SIZE,
+        RenderType.TRANSIENT_BUFFER_SIZE,
         false,
         true,
         SkyHanniRenderPipeline.FILLED_XRAY(),
-        MultiPhaseParameters.builder().build(false),
+        CompositeState.builder().createCompositeState(false),
     )
 
-    private val TRIANGLES: MultiPhase = RenderLayer.of(
+    private val TRIANGLES: CompositeRenderType = RenderType.create(
         "skyhanni_triangles",
-        RenderLayer.DEFAULT_BUFFER_SIZE,
+        RenderType.TRANSIENT_BUFFER_SIZE,
         false,
         true,
         SkyHanniRenderPipeline.TRIANGLES(),
-        MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
+        CompositeState.builder().setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING).createCompositeState(false),
     )
 
-    private val TRIANGLES_XRAY: MultiPhase = RenderLayer.of(
+    private val TRIANGLES_XRAY: CompositeRenderType = RenderType.create(
         "skyhanni_triangles_xray",
-        RenderLayer.DEFAULT_BUFFER_SIZE,
+        RenderType.TRANSIENT_BUFFER_SIZE,
         false,
         true,
         SkyHanniRenderPipeline.TRIANGLES_XRAY(),
-        MultiPhaseParameters.builder().build(false),
+        CompositeState.builder().createCompositeState(false),
     )
 
-    private val TRIANGLE_FAN: MultiPhase = RenderLayer.of(
+    private val TRIANGLE_FAN: CompositeRenderType = RenderType.create(
         "skyhanni_triangle_fan",
-        RenderLayer.DEFAULT_BUFFER_SIZE,
+        RenderType.TRANSIENT_BUFFER_SIZE,
         false,
         true,
         SkyHanniRenderPipeline.TRIANGLE_FAN(),
-        MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
+        CompositeState.builder().setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING).createCompositeState(false),
     )
 
-    private val TRIANGLE_FAN_XRAY: MultiPhase = RenderLayer.of(
+    private val TRIANGLE_FAN_XRAY: CompositeRenderType = RenderType.create(
         "skyhanni_triangle_fan_xray",
-        RenderLayer.DEFAULT_BUFFER_SIZE,
+        RenderType.TRANSIENT_BUFFER_SIZE,
         false,
         true,
         SkyHanniRenderPipeline.TRIANGLE_FAN_XRAY(),
-        MultiPhaseParameters.builder().build(false),
+        CompositeState.builder().createCompositeState(false),
     )
 
-    private val QUADS: MultiPhase = RenderLayer.of(
+    private val QUADS: CompositeRenderType = RenderType.create(
         "skyhanni_quads",
-        RenderLayer.DEFAULT_BUFFER_SIZE,
+        RenderType.TRANSIENT_BUFFER_SIZE,
         false,
         true,
         SkyHanniRenderPipeline.QUADS(),
-        MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
+        CompositeState.builder().setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING).createCompositeState(false),
     )
 
-    private val QUADS_XRAY: MultiPhase = RenderLayer.of(
+    private val QUADS_XRAY: CompositeRenderType = RenderType.create(
         "skyhanni_quads_xray",
-        RenderLayer.DEFAULT_BUFFER_SIZE,
+        RenderType.TRANSIENT_BUFFER_SIZE,
         false,
         true,
         SkyHanniRenderPipeline.QUADS_XRAY(),
-        MultiPhaseParameters.builder().build(false),
+        CompositeState.builder().createCompositeState(false),
     )
 
-    private val CHROMA_STANDARD: MultiPhase = ChromaRenderLayer(
+    private val CHROMA_STANDARD: CompositeRenderType = ChromaRenderLayer(
         "skyhanni_standard_chroma",
-        RenderLayer.CUTOUT_BUFFER_SIZE,
+        RenderType.SMALL_BUFFER_SIZE,
         false,
         false,
         SkyHanniRenderPipeline.CHROMA_STANDARD(),
-        MultiPhaseParameters.builder().build(false),
+        CompositeState.builder().createCompositeState(false),
     )
 
-    private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderLayer> = Util.memoize { texture ->
+    private val CHROMA_TEXTURED: java.util.function.Function<ResourceLocation, RenderType> = Util.memoize { texture ->
         ChromaRenderLayer(
             "skyhanni_text_chroma",
-            RenderLayer.CUTOUT_BUFFER_SIZE,
+            RenderType.SMALL_BUFFER_SIZE,
             false,
             false,
             SkyHanniRenderPipeline.CHROMA_TEXT(),
-            MultiPhaseParameters.builder()
+            CompositeState.builder()
                 //#if MC < 1.21.6
-                .texture(RenderPhase.Texture(texture, TriState.FALSE, false))
+                .setTextureState(RenderStateShard.TextureStateShard(texture, TriState.FALSE, false))
                 //#else
                 //$$ .texture(RenderPhase.Texture(texture, false))
                 //#endif
-                .build(false),
+                .createCompositeState(false),
         )
     }
 
-    private fun createLineRenderLayer(lineWidth: Double, throughWalls: Boolean): MultiPhase {
+    private fun createLineRenderLayer(lineWidth: Double, throughWalls: Boolean): CompositeRenderType {
         val pipeLine = if (throughWalls) SkyHanniRenderPipeline.LINES_XRAY() else SkyHanniRenderPipeline.LINES()
-        return RenderLayer.of(
+        return RenderType.create(
             "skyhanni_lines_${lineWidth}${if (throughWalls) "_xray" else ""}",
-            RenderLayer.DEFAULT_BUFFER_SIZE,
+            RenderType.TRANSIENT_BUFFER_SIZE,
             false,
             true,
             pipeLine,
-            MultiPhaseParameters.builder()
-                .lineWidth(RenderPhase.LineWidth(OptionalDouble.of(lineWidth)))
-                .layering(if (throughWalls) RenderPhase.NO_LAYERING else RenderPhase.VIEW_OFFSET_Z_LAYERING)
-                .build(false),
+            CompositeState.builder()
+                .setLineState(RenderStateShard.LineStateShard(OptionalDouble.of(lineWidth)))
+                .setLayeringState(if (throughWalls) RenderStateShard.NO_LAYERING else RenderStateShard.VIEW_OFFSET_Z_LAYERING)
+                .createCompositeState(false),
         )
     }
 
-    fun getFilled(throughWalls: Boolean): MultiPhase {
+    fun getFilled(throughWalls: Boolean): CompositeRenderType {
         return if (throughWalls) FILLED_XRAY else FILLED
     }
 
-    fun getTriangles(throughWalls: Boolean): MultiPhase {
+    fun getTriangles(throughWalls: Boolean): CompositeRenderType {
         return if (throughWalls) TRIANGLES_XRAY else TRIANGLES
     }
 
-    fun getTriangleFan(throughWalls: Boolean): MultiPhase {
+    fun getTriangleFan(throughWalls: Boolean): CompositeRenderType {
         return if (throughWalls) TRIANGLE_FAN_XRAY else TRIANGLE_FAN
     }
 
-    fun getQuads(throughWalls: Boolean): MultiPhase {
+    fun getQuads(throughWalls: Boolean): CompositeRenderType {
         return if (throughWalls) QUADS_XRAY else QUADS
     }
 
-    fun getLines(lineWidth: Double, throughWalls: Boolean): MultiPhase {
+    fun getLines(lineWidth: Double, throughWalls: Boolean): CompositeRenderType {
         val cache = if (throughWalls) linesThroughWallsCache else linesCache
         return cache.computeIfAbsent(lineWidth.hashCode()) {
             createLineRenderLayer(lineWidth, throughWalls)
         }
     }
 
-    fun getChromaTexturedWithIdentifier(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
+    fun getChromaTexturedWithIdentifier(identifier: ResourceLocation) = CHROMA_TEXTURED.apply(identifier)
 
     //#if MC < 1.21.6
     fun getChromaStandard() = CHROMA_STANDARD

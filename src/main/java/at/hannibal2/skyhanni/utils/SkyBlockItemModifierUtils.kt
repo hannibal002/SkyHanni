@@ -16,17 +16,17 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.util.Identifier
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.resources.ResourceLocation
 import java.util.Locale
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 //#if MC > 1.21
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.registry.Registries
-import net.minecraft.item.Items
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 //#endif
 
@@ -139,7 +139,7 @@ object SkyBlockItemModifierUtils {
     var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
 
     fun ItemStack.getPetInfo(): PetInfo? {
-        val colorlessName = name.formattedTextCompatLeadingWhiteLessResets().removeColor()
+        val colorlessName = hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
         // Repo pets will always return null for PetInfo, don't even attempt to parse it
         if (colorlessName.contains("→") || colorlessName.contains("{LVL}")) return null
         val petInfoJson = getExtraAttributes()?.takeIf {
@@ -169,7 +169,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getDrillUpgrades() = getExtraAttributes()?.let {
         val list = mutableListOf<NeuInternalName>()
-        for (attributes in it.keys) {
+        for (attributes in it.keySet()) {
             if (attributes in drillPartTypes) {
                 val upgradeItem = it.getStringOrDefault(attributes)
                 list.add(upgradeItem.uppercase().toInternalName())
@@ -198,7 +198,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getRune(): NeuInternalName? {
         val runesMap = getExtraAttributes()?.getCompoundOrDefault("runes") ?: return null
-        val runesList = runesMap.keys.associateWith { runesMap.getIntOrDefault(it) }.toList()
+        val runesList = runesMap.keySet().associateWith { runesMap.getIntOrDefault(it) }.toList()
         if (runesList.isEmpty()) return null
         val (name, tier) = runesList.first()
         return "${name.uppercase()}_RUNE;$tier".toInternalName()
@@ -229,7 +229,7 @@ object SkyBlockItemModifierUtils {
         ?.takeIf { it.containsCompound("attributes") }
         ?.getCompoundOrDefault("attributes")
         ?.let { attr ->
-            attr.keys.map {
+            attr.keySet().map {
                 it.uppercase() to attr.getIntOrDefault(it)
             }.sortedBy { it.first }
         }
@@ -274,7 +274,7 @@ object SkyBlockItemModifierUtils {
         ?.takeIf { it.contains("enchantments") }
         ?.run {
             val enchantments = this.getCompoundOrDefault("enchantments")
-            enchantments.keys.associateWith { enchantments.getIntOrDefault(it) }
+            enchantments.keySet().associateWith { enchantments.getIntOrDefault(it) }
         }
 
     fun ItemStack.getAppliedPocketSackInASack(): Int? {
@@ -294,7 +294,7 @@ object SkyBlockItemModifierUtils {
     //#if MC < 1.21
     //$$ fun ItemStack.getMinecraftId() = Item.itemRegistry.getNameForObject(item) as Identifier
     //#else
-    fun ItemStack.getMinecraftId() = Registries.ITEM.getId(item)
+    fun ItemStack.getMinecraftId() = BuiltInRegistries.ITEM.getKey(item)
     //#endif
 
     //#if MC < 1.21
@@ -306,16 +306,16 @@ object SkyBlockItemModifierUtils {
 
     fun isVanillaItem(itemId: String): Boolean {
         if (!identifierPattern.matches(itemId)) return false
-        return Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
+        return BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(itemId)) != Items.AIR
     }
     //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()
-        for (attributes in it.keys) {
+        for (attributes in it.keySet()) {
             if (attributes != "gems") continue
             val gemstones = it.getCompoundOrDefault(attributes)
-            for (key in gemstones.keys) {
+            for (key in gemstones.keySet()) {
                 if (key.endsWith("_gem")) continue
                 if (key == "unlocked_slots") continue
                 var value = gemstones.getStringOrDefault(key)
@@ -370,12 +370,12 @@ object SkyBlockItemModifierUtils {
     //#if MC < 1.21
     //$$ fun ItemStack.getExtraAttributes(): NbtCompound? = tag?.extraAttributes
     //#else
-    fun ItemStack.getExtraAttributes(): NbtCompound? {
+    fun ItemStack.getExtraAttributes(): CompoundTag? {
        val data = cachedData
        if (data.lastExtraAttributesFetchTime.passedSince() < 0.1.seconds) {
            return data.lastExtraAttributes
        }
-       val extraAttributes = get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()
+       val extraAttributes = get(DataComponents.CUSTOM_DATA)?.copyTag()
        data.lastExtraAttributes = extraAttributes
        data.lastExtraAttributesFetchTime = SimpleTimeMark.now()
        return extraAttributes

@@ -32,8 +32,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.block.Blocks
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.minutes
@@ -269,7 +269,7 @@ object ArrowGuessBurrow {
             val shouldBeLoaded = InventoryUtils.getItemInHandAtTime(SimpleTimeMark.now() - 0.5.seconds)?.isDianaSpade
             if (shouldBeLoaded == true &&
                 !burrows.contains(guessEntry.getCurrent()) && // burrow is not found
-                guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.blockPos.toLorenzVec()) < 900 // within 30 blocks
+                guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.blockPosition().toLorenzVec()) < 900 // within 30 blocks
             ) {
                 if (guessEntry.moveToNext()) {
 

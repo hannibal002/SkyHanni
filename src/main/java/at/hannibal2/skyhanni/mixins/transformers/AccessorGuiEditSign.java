@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import net.minecraft.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
-import net.minecraft.client.gui.screen.ingame.SignEditScreen;
+import net.minecraft.client.gui.screens.inventory.SignEditScreen;
 
 //#if MC < 1.21
 //$$ @Mixin(SignEditScreen.class)

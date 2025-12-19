@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object TradeValue {
@@ -77,11 +77,11 @@ object TradeValue {
         val yourMap = mutableMapOf<Int, ItemStack>()
         // Gets total value of trade
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.index in otherList) {
-                otherMap[slot.index] = slot.stack
+            if (slot.containerSlot in otherList) {
+                otherMap[slot.containerSlot] = slot.item
             }
-            if (slot.index in yourList) {
-                yourMap[slot.index] = slot.stack
+            if (slot.containerSlot in yourList) {
+                yourMap[slot.containerSlot] = slot.item
             }
         }
         val (yourCoin, yourTotal) = calculatePrice(yourMap)

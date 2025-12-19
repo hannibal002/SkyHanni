@@ -27,8 +27,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.block.ButtonBlock
-import net.minecraft.block.Blocks
+import net.minecraft.world.level.block.ButtonBlock
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -128,7 +128,7 @@ object WoodenButtonsHelper {
         buttonLocations.values.flatten().forEach { buttonLocation ->
             val blockState = buttonLocation.getBlockStateAt()
             if (blockState.block is ButtonBlock &&
-                blockState.get(ButtonBlock.POWERED) == true &&
+                blockState.getValue(ButtonBlock.POWERED) == true &&
                 buttonLocation.canBeSeen(1..3) &&
                 lastHitButton != buttonLocation &&
                 !hitButtons.contains(buttonLocation)

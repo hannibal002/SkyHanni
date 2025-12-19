@@ -75,7 +75,7 @@ object StockOfStonkFeature {
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-        if (!itemPattern.matches(event.itemStack.name.formattedTextCompatLeadingWhiteLessResets())) return
+        if (!itemPattern.matches(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
         var stonksReward = 0
         var index = 0
         var bestValueIndex = 0

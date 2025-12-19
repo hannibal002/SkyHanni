@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object AgathaCouponProfit {
@@ -121,8 +121,8 @@ object AgathaCouponProfit {
             val internalName = item.getInternalNameOrNull() ?: return null
             internalName to item.repoItemName
         } else {
-            val internalName = NeuInternalName.fromItemNameOrNull(item.name.formattedTextCompatLeadingWhiteLessResets()) ?: return null
-            internalName to item.name.formattedTextCompatLeadingWhiteLessResets()
+            val internalName = NeuInternalName.fromItemNameOrNull(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) ?: return null
+            internalName to item.hoverName.formattedTextCompatLeadingWhiteLessResets()
         }
     }
 
@@ -142,7 +142,7 @@ object AgathaCouponProfit {
                 ErrorManager.logErrorStateWithData(
                     "Error in AnitaCoupon Profit", "Could not read item amount",
                     "rawItemName" to rawItemName,
-                    "name" to item.name.formattedTextCompatLeadingWhiteLessResets(),
+                    "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "lore" to lore,
                 )
                 continue

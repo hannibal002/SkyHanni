@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 //$$ import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket
 //$$ import net.minecraft.network.play.server.S44PacketWorldBorder
 //#else
-import net.minecraft.network.packet.s2c.play.WorldBorderInitializeS2CPacket
+import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket
 //#endif
 
 @SkyHanniModule
@@ -29,7 +29,7 @@ object DungeonShadowAssassinNotification {
         //$$ val action = packet.action
         //$$ if (action != S44PacketWorldBorder.Action.INITIALIZE) return
         //#else
-        val packet = event.packet as? WorldBorderInitializeS2CPacket ?: return
+        val packet = event.packet as? ClientboundInitializeBorderPacket ?: return
         //#endif
         val warningTime = packet.warningTime
 

@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.fo
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.StringUtils.toUnDashedUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import java.util.UUID
 
 //#if MC > 1.21
-import net.minecraft.entity.attribute.EntityAttributes
+import net.minecraft.world.entity.ai.attributes.Attributes
 //#endif
 
 object PlayerUtils {
@@ -20,7 +20,7 @@ object PlayerUtils {
         //#if MC < 1.21
         //$$ return MinecraftClient.getInstance().options.thirdPersonView == 0
         //#else
-        return MinecraftClient.getInstance().options.perspective.isFirstPerson
+        return Minecraft.getInstance().options.cameraType.isFirstPerson
         //#endif
     }
 
@@ -28,9 +28,9 @@ object PlayerUtils {
         //#if MC < 1.21
         //$$ return MinecraftClient.getInstance().options.thirdPersonView == 1
         //#else
-        val perspective = MinecraftClient.getInstance().options.perspective
+        val perspective = Minecraft.getInstance().options.cameraType
         // for some reason they make you check the other 2 bools instead of giving you a third one
-        return !perspective.isFrontView && !perspective.isFirstPerson
+        return !perspective.isMirrored && !perspective.isFirstPerson
         //#endif
     }
 
@@ -38,7 +38,7 @@ object PlayerUtils {
         //#if MC < 1.21
         //$$ return MinecraftClient.getInstance().options.thirdPersonView == 2
         //#else
-        return MinecraftClient.getInstance().options.perspective.isFrontView
+        return Minecraft.getInstance().options.cameraType.isMirrored
         //#endif
     }
 
@@ -46,7 +46,7 @@ object PlayerUtils {
         //#if MC < 1.21
         //$$ val speed = MinecraftCompat.localPlayer.capabilities.walkSpeed.toDouble()
         //#else
-        val speed = MinecraftCompat.localPlayer.getAttributeBaseValue(EntityAttributes.MOVEMENT_SPEED)
+        val speed = MinecraftCompat.localPlayer.getAttributeBaseValue(Attributes.MOVEMENT_SPEED)
         //#endif
 
         // Round to avoid floating point inaccuracies (in-game precision is at most 2 decimals anyway)
@@ -59,7 +59,7 @@ object PlayerUtils {
 
     fun getName(): String = MinecraftCompat.localPlayer.name.formattedTextCompatLessResets()
 
-    fun inAir(): Boolean = !MinecraftCompat.localPlayer.isOnGround
+    fun inAir(): Boolean = !MinecraftCompat.localPlayer.onGround()
 
-    fun isSneaking(): Boolean = MinecraftCompat.localPlayer.isSneaking
+    fun isSneaking(): Boolean = MinecraftCompat.localPlayer.isShiftKeyDown
 }

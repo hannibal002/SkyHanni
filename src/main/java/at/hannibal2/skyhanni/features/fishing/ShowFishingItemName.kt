@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
-import net.minecraft.entity.ItemEntity
+import net.minecraft.world.entity.item.ItemEntity
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -37,9 +37,9 @@ object ShowFishingItemName {
     fun onTick() {
         if (!isEnabled()) return
         for (entityItem in EntityUtils.getEntitiesNextToPlayer<ItemEntity>(15.0)) {
-            val itemStack = entityItem.stack.orNull() ?: continue
+            val itemStack = entityItem.item.orNull() ?: continue
             // On 1.8 if the itemstack is null it returns stone instead
-            if (itemStack.name.formattedTextCompatLeadingWhiteLessResets().removeColor() == "Stone") continue
+            if (itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == "Stone") continue
             var text = ""
 
             val isBait = itemStack.isBait()
@@ -48,7 +48,7 @@ object ShowFishingItemName {
             if (itemStack.getSkullTexture() in cheapCoins) {
                 text = "§6Coins"
             } else {
-                val name = itemStack.name.formattedTextCompatLeadingWhiteLessResets().transformIf({ isBait }) { "§7" + this.removeColor() }
+                val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().transformIf({ isBait }) { "§7" + this.removeColor() }
                 text += if (isBait) "§c§l- §r" else "§a§l+ §r"
 
                 val size = itemStack.count

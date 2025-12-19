@@ -31,10 +31,10 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.addLine
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.client.gui.screen.ingame.InventoryScreen
-import net.minecraft.item.ItemStack
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object ChestValue {
@@ -71,7 +71,7 @@ object ChestValue {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
-        val inInv = MinecraftClient.getInstance().currentScreen is InventoryScreen
+        val inInv = Minecraft.getInstance().screen is InventoryScreen
         inOwnInventory = inInv && config.enableInOwnInventory
         if (!inInventory) return
         update()
@@ -115,7 +115,7 @@ object ChestValue {
             if (rendered >= config.itemToShow) continue
             if (total < config.hideBelow) continue
             val textAmount = " §7x${amount.addSeparators()}:"
-            val width = MinecraftClient.getInstance().textRenderer.getWidth(textAmount)
+            val width = Minecraft.getInstance().font.width(textAmount)
             val displayName = stack.repoItemNameCompact
             val name = "${displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
@@ -184,12 +184,12 @@ object ChestValue {
         } else {
             val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
             InventoryUtils.getItemsInOpenChest().filter {
-                it.hasStack() && it.inventory != MinecraftCompat.localPlayer.inventory && (!isMinion || it.id % 9 != 1)
+                it.hasItem() && it.container != MinecraftCompat.localPlayer.inventory && (!isMinion || it.index % 9 != 1)
             }
         }
         val stacks = buildMap {
             slots.forEach {
-                put(it.index, it.stack)
+                put(it.containerSlot, it.item)
             }
         }
         chestItems = createItems(stacks)
@@ -228,7 +228,7 @@ object ChestValue {
     private fun isValidStorage(): Boolean {
         if (inOwnInventory) return true
         val name = InventoryUtils.openInventoryName().removeColor()
-        if (MinecraftClient.getInstance().currentScreen !is GenericContainerScreen) return false
+        if (Minecraft.getInstance().screen !is ContainerScreen) return false
         if (BazaarApi.inBazaarInventory) return false
         if (MinionFeatures.minionInventoryOpen) return false
         if (MinionFeatures.minionStorageInventoryOpen) return false
@@ -246,15 +246,15 @@ object ChestValue {
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
-        val mc = MinecraftClient.getInstance()
-        val spaceWidth = mc.textRenderer.getWidth(char.toString())
+        val mc = Minecraft.getInstance()
+        val spaceWidth = mc.font.width(char.toString())
 
         var currentString = this
-        var currentLength = mc.textRenderer.getWidth(currentString)
+        var currentLength = mc.font.width(currentString)
 
         while (currentLength > targetLength) {
             currentString = currentString.dropLast(1)
-            currentLength = mc.textRenderer.getWidth(currentString)
+            currentLength = mc.font.width(currentString)
         }
 
         val difference = targetLength - currentLength

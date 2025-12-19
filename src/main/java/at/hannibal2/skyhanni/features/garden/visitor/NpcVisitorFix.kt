@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -46,7 +46,7 @@ object NpcVisitorFix {
         }
     }
 
-    private fun saveStaticVisitor(name: String, entity: ArmorStandEntity) {
+    private fun saveStaticVisitor(name: String, entity: ArmorStand) {
         // clicked on the real visitor, ignoring
         if (lastVisitorOpen.passedSince() < 1.seconds) return
 
@@ -76,7 +76,7 @@ object NpcVisitorFix {
         }
     }
 
-    fun findNametag(visitorName: String): ArmorStandEntity? {
+    fun findNametag(visitorName: String): ArmorStand? {
         val nametags = findNametags(visitorName)
         if (nametags.isEmpty()) return null
 
@@ -96,8 +96,8 @@ object NpcVisitorFix {
         return nametags.firstOrNull()
     }
 
-    private fun findNametags(visitorName: String): MutableList<ArmorStandEntity> {
-        return EntityUtils.getEntitiesInBoundingBox<ArmorStandEntity>(GardenApi.barnArea) {
+    private fun findNametags(visitorName: String): MutableList<ArmorStand> {
+        return EntityUtils.getEntitiesInBoundingBox<ArmorStand>(GardenApi.barnArea) {
             it.name.formattedTextCompatLessResets().removeColor() == visitorName
         }.toMutableList()
     }

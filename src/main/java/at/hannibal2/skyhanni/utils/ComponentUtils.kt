@@ -18,13 +18,13 @@ import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import com.google.gson.JsonObject
 import com.mojang.serialization.JsonOps
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.DyedColorComponent
-import net.minecraft.component.type.NbtComponent
-import net.minecraft.component.type.ProfileComponent
-import net.minecraft.item.ItemStack
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.DyedItemColor
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.ResolvableProfile
+import net.minecraft.world.item.ItemStack
 import net.minecraft.nbt.NbtOps
-import net.minecraft.util.Identifier
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Unit
 import kotlin.jvm.optionals.getOrNull
 
@@ -36,19 +36,19 @@ object ComponentUtils {
                 .convertTo(NbtOps.INSTANCE, extraJson)
                 .asCompound()
                 .get()
-            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(extraAttributes))
+            stack.set(DataComponents.CUSTOM_DATA, CustomData.of(extraAttributes))
         }
         if (nbtInfo.enchantments?.isNotEmpty() == true) {
-            stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true)
+            stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
         }
         if (nbtInfo.unbreakable?.boolean == true) {
-            stack.set(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE)
+            stack.set(DataComponents.UNBREAKABLE, Unit.INSTANCE)
         }
-        nbtInfo.itemModel?.let { stack.set(DataComponentTypes.ITEM_MODEL, Identifier.of(it)) }
+        nbtInfo.itemModel?.let { stack.set(DataComponents.ITEM_MODEL, ResourceLocation.parse(it)) }
         if (nbtInfo.display != null) {
             val display = nbtInfo.display
             if (display.color != null) {
-                stack.set(DataComponentTypes.DYED_COLOR, DyedColorComponent(display.color))
+                stack.set(DataComponents.DYED_COLOR, DyedItemColor(display.color))
             }
             if (display.name != null) {
                 stack.setCustomItemName(display.name)
@@ -62,7 +62,7 @@ object ComponentUtils {
         if (nbtInfo.skullOwner != null) {
             val skullOwner = nbtInfo.skullOwner
             //#if MC < 1.21.9
-            stack.set(DataComponentTypes.PROFILE, ProfileComponent(skullOwner.toGameProfile()))
+            stack.set(DataComponents.PROFILE, ResolvableProfile(skullOwner.toGameProfile()))
             //#else
             //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent.ofStatic(skullOwner.toGameProfile()))
             //#endif
@@ -71,8 +71,8 @@ object ComponentUtils {
     }
 
     fun convertToNeuNbtInfoJson(stack: ItemStack): JsonObject {
-        val isUnbreakable = NbtBoolean(stack.contains(DataComponentTypes.UNBREAKABLE))
-        val profile = stack.get(DataComponentTypes.PROFILE)
+        val isUnbreakable = NbtBoolean(stack.has(DataComponents.UNBREAKABLE))
+        val profile = stack.get(DataComponents.PROFILE)
         //#if MC < 1.21.9
         val profileProperties = profile?.properties?.get("textures")?.firstOrNull()
         val uuid = profile?.id?.getOrNull() ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
@@ -90,16 +90,16 @@ object ComponentUtils {
             name = profile?.name?.getOrNull(),
         )
         val lore = stack.getLore()
-        val color = stack.get(DataComponentTypes.DYED_COLOR)?.rgb
-        val displayInfo = DisplayInfo(name = stack.name.formattedTextCompat(), lore = lore, color = color)
-        val customData = stack.get(DataComponentTypes.CUSTOM_DATA)
+        val color = stack.get(DataComponents.DYED_COLOR)?.rgb
+        val displayInfo = DisplayInfo(name = stack.hoverName.formattedTextCompat(), lore = lore, color = color)
+        val customData = stack.get(DataComponents.CUSTOM_DATA)
         val itemModel = stack.getItemModel()?.getIdentifierString()
         val extraAttributes: JsonObject? = if (customData != null) {
-            NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, customData.copyNbt()).asJsonObject
+            NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, customData.copyTag()).asJsonObject
         } else {
             null
         }
-        val enchants = if (stack.contains(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE)) listOf(JsonObject()) else null
+        val enchants = if (stack.has(DataComponents.ENCHANTMENT_GLINT_OVERRIDE)) listOf(JsonObject()) else null
 
         val nbt = NeuNbtInfoJson(
             hideFlags = 254,

@@ -18,8 +18,8 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
-import net.minecraft.block.Blocks
-import net.minecraft.util.math.Box
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
 object SulphurSkitterBox {
@@ -27,7 +27,7 @@ object SulphurSkitterBox {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.sulphurSkitterBox
     private var spongeLocations = listOf<LorenzVec>()
     private var closestSponge: LorenzVec? = null
-    private var renderBox: Box? = null
+    private var renderBox: AABB? = null
     private const val RADIUS = 4
 
     @HandleEvent

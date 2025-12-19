@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 // Todo: Merge this with SuperpairDataDisplay
 //  Store slots over there
@@ -38,7 +38,7 @@ object SuperPairsItemVisibility {
         if (!config.enabled) return
         if (!ExperimentationTableApi.inTable || ExperimentationTableApi.currentExperimentType != TaskType.SUPERPAIRS) return
         if (superpairsSlotMap.isEmpty() || event.slot !in superpairsSlotMap.keys) return
-        if (!unknownSuperpairsClickPattern.matches(event.originalItem?.name.formattedTextCompatLeadingWhiteLessResets())) return
+        if (!unknownSuperpairsClickPattern.matches(event.originalItem?.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
         val replacementItem = superpairsSlotMap[event.slot] ?: return
         event.replace(replacementItem)
     }
@@ -51,11 +51,11 @@ object SuperPairsItemVisibility {
 
     @HandleEvent
     fun GuiContainerEvent.SlotClickEvent.tryReadUncoveredItem() {
-        val slotNumber = slot?.id?.takeIf {
+        val slotNumber = slot?.index?.takeIf {
             it !in superpairsSlotMap.keys
         } ?: return
         val clickedItem = item ?: return
-        if (unknownSuperpairsClickPattern.matches(clickedItem.name.formattedTextCompatLeadingWhiteLessResets())) superpairsSlotsToRead.add(slotNumber)
+        if (unknownSuperpairsClickPattern.matches(clickedItem.hoverName.formattedTextCompatLeadingWhiteLessResets())) superpairsSlotsToRead.add(slotNumber)
         else superpairsSlotMap[slotNumber] = clickedItem
     }
 
@@ -65,7 +65,7 @@ object SuperPairsItemVisibility {
         if (superpairsSlotsToRead.isEmpty()) return
 
         inventoryItems.filter {
-            it.key in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(it.value.name.formattedTextCompatLeadingWhiteLessResets())
+            it.key in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())
         }.forEach {
             superpairsSlotMap[it.key] = it.value
             superpairsSlotsToRead.remove(it.key)

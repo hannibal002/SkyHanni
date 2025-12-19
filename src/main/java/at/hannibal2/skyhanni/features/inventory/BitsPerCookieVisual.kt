@@ -52,7 +52,7 @@ object BitsPerCookieVisual {
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (event.itemStack.getInternalNameOrNull() != boosterCookie) return
-        if (wrongCookiePattern.matches(event.itemStack.name.formattedTextCompatLeadingWhiteLessResets())) return
+        if (wrongCookiePattern.matches(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
         var timeReplaced = false
 
         val toolTip = event.toolTip

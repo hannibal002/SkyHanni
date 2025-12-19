@@ -87,7 +87,7 @@ object TrophyFishMessages {
                 //#if MC < 1.21
                 //$$ edited.style = it
                 //#else
-                edited.getWithStyle(it)
+                edited.toFlatList(it)
                 //#endif
             }
         }

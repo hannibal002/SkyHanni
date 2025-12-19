@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 enum class ItemCategory {
     SWORD,

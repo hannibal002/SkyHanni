@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.mob.SilverfishEntity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Silverfish
 
 @SkyHanniModule
 object VerminHighlighter {
@@ -29,7 +29,7 @@ object VerminHighlighter {
     private val VERMIN_SPIDER_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_SPIDER") }
 
     @HandleEvent
-    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStandEntity>) {
+    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (isEnabled()) tryAdd(event.entity)
     }
 
@@ -54,8 +54,8 @@ object VerminHighlighter {
     }
 
     private fun isVermin(entity: LivingEntity): Boolean = when (entity) {
-        is ArmorStandEntity -> entity.wearingSkullTexture(VERMIN_FLY_TEXTURE) || entity.wearingSkullTexture(VERMIN_SPIDER_TEXTURE)
-        is SilverfishEntity -> entity.baseMaxHealth == 8
+        is ArmorStand -> entity.wearingSkullTexture(VERMIN_FLY_TEXTURE) || entity.wearingSkullTexture(VERMIN_SPIDER_TEXTURE)
+        is Silverfish -> entity.baseMaxHealth == 8
 
         else -> false
     }

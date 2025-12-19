@@ -32,7 +32,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.gui.screen.ingame.SignEditScreen
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -171,7 +171,7 @@ object GardenOptimalSpeed {
     }
 
     private fun warn(optimalSpeed: Int) {
-        if (!MinecraftCompat.localPlayer.isOnGround) return
+        if (!MinecraftCompat.localPlayer.onGround()) return
         if (GardenApi.onUnfarmablePlot) return
         if (!config.warning) return
         if (!GardenApi.isCurrentlyFarming()) return

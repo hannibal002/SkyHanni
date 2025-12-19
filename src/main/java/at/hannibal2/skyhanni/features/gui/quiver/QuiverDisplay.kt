@@ -23,8 +23,8 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
-import net.minecraft.item.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object QuiverDisplay {

@@ -19,9 +19,9 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.block.BlockState
-import net.minecraft.client.MinecraftClient
-import net.minecraft.util.DyeColor
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.client.Minecraft
+import net.minecraft.world.item.DyeColor
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -46,13 +46,13 @@ object MiningCommissionsBlocksColor {
 
     private fun glass(state: BlockState, result: Boolean): BlockState {
         val newColor = if (result) color else DyeColor.GRAY
-        return ColoredBlockCompat.fromMeta(newColor.index).createGlassBlockState(state)
+        return ColoredBlockCompat.fromMeta(newColor.id).createGlassBlockState(state)
     }
 
 
     private fun block(result: Boolean): BlockState {
         val newColor = if (result) color else DyeColor.GRAY
-        return ColoredBlockCompat.fromMeta(newColor.index).createWoolBlockState()
+        return ColoredBlockCompat.fromMeta(newColor.id).createWoolBlockState()
     }
 
     private var oldSneakState = false
@@ -102,7 +102,7 @@ object MiningCommissionsBlocksColor {
 
         if (enabled) {
             if (config.sneakQuickToggle.get()) {
-                val sneaking = MinecraftCompat.localPlayer.isSneaking
+                val sneaking = MinecraftCompat.localPlayer.isShiftKeyDown
                 if (sneaking != oldSneakState) {
                     oldSneakState = sneaking
                     if (oldSneakState) {
@@ -118,7 +118,7 @@ object MiningCommissionsBlocksColor {
 
         if (reload) {
             replaceBlocksMapCache = mutableMapOf()
-            MinecraftClient.getInstance().worldRenderer.reload()
+            Minecraft.getInstance().levelRenderer.allChanged()
             dirty = false
         }
     }

@@ -32,11 +32,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.21
-import net.minecraft.server.world.ServerWorld
+import net.minecraft.server.level.ServerLevel
 //#endif
 
 @SkyHanniModule
@@ -59,12 +59,12 @@ object VisitorListener {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSendEvent(event: PacketSentEvent) {
         val packet = event.packet
-        if (packet !is PlayerInteractEntityC2SPacket) return
+        if (packet !is ServerboundInteractPacket) return
 
         //#if MC < 1.21
         //$$ val entity = packet.getEntity(MinecraftCompat.localWorld) ?: return
         //#else
-        val entity = MinecraftCompat.localWorld.getEntityById(packet.entityId) ?: return
+        val entity = MinecraftCompat.localWorld.getEntity(packet.entityId) ?: return
         //#endif
         val entityId = entity.id
 
@@ -103,13 +103,13 @@ object VisitorListener {
         if (!VisitorApi.isVisitorInfo(lore)) return
 
         val offerItem = event.inventoryItems[ACCEPT_SLOT] ?: return
-        if (offerItem.name.formattedTextCompatLeadingWhiteLessResets() != "§aAccept Offer") return
+        if (offerItem.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aAccept Offer") return
 
         VisitorApi.inInventory = true
 
         val visitorOffer = VisitorApi.VisitorOffer(offerItem)
 
-        var name = npcItem.name.formattedTextCompatLeadingWhiteLessResets()
+        var name = npcItem.hoverName.formattedTextCompatLeadingWhiteLessResets()
         if (name.length == name.removeColor().length + 4) {
             name = name.substring(2)
         }
@@ -143,7 +143,7 @@ object VisitorListener {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStandEntity>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!GardenApi.onBarnPlot) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 

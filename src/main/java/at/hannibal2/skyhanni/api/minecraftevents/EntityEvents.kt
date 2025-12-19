@@ -8,16 +8,16 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.DamageSourceCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.network.packet.s2c.play.DamageTiltS2CPacket
+import net.minecraft.network.protocol.game.ClientboundHurtAnimationPacket
 
 @SkyHanniModule
 object EntityEvents {
 
     @HandleEvent
     fun onPacketReceived(event: PacketReceivedEvent) {
-        val packet = event.packet as? DamageTiltS2CPacket ?: return
+        val packet = event.packet as? ClientboundHurtAnimationPacket ?: return
 
-        val entity = MinecraftCompat.localWorld.getEntityById(packet.id()) ?: return
+        val entity = MinecraftCompat.localWorld.getEntity(packet.id()) ?: return
         EntityHurtEvent(entity, DamageSourceCompat.generic, 0.0f).post()
 
         val skyblockMob = MobData.entityToMob[entity] ?: return

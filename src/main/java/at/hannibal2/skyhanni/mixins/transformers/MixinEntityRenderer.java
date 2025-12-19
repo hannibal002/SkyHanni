@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.text.Text;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,9 +27,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EntityRenderer.class)
 public class MixinEntityRenderer {
 
-    @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderNameTag", at = @At("HEAD"), cancellable = true)
     //#if MC < 1.21.9
-    public void onRenderLabelHead(EntityRenderState state, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+    public void onRenderLabelHead(EntityRenderState state, Component text, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
         //#else
         //$$ public void onRenderLabelHead(EntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState, CallbackInfo ci) {
         //#endif
@@ -40,9 +40,9 @@ public class MixinEntityRenderer {
         }
     }
 
-    @Inject(method = "renderLabelIfPresent", at = @At("TAIL"))
+    @Inject(method = "renderNameTag", at = @At("TAIL"))
     //#if MC < 1.21.9
-    public void onRenderLabelTail(EntityRenderState state, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+    public void onRenderLabelTail(EntityRenderState state, Component text, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
         //#else
         //$$ public void onRenderLabelTail(EntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState, CallbackInfo ci) {
         //#endif

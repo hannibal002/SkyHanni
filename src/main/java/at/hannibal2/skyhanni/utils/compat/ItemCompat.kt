@@ -1,18 +1,18 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import net.minecraft.client.MinecraftClient
-import net.minecraft.item.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.client.Minecraft
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 //#if MC > 1.16
-import net.minecraft.item.DyeItem
+import net.minecraft.world.item.DyeItem
 //#endif
 //#if MC > 1.21
-import net.minecraft.item.tooltip.TooltipType
-import net.minecraft.registry.Registries
-import net.minecraft.util.Identifier
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.text.Text
+import net.minecraft.world.item.TooltipFlag
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.core.component.DataComponents
+import net.minecraft.network.chat.Component
 //#endif
 
 fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
@@ -21,8 +21,8 @@ fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
     //#elseif MC < 1.21
     //$$ return this.getTooltip(MinecraftClient.getInstance().player) { advanced }.map { it.getFormattedTextCompat() }.toMutableList()
     //#else
-    val tooltipType = if (advanced) TooltipType.ADVANCED else TooltipType.BASIC
-    return this.getTooltip(Item.TooltipContext.DEFAULT, MinecraftClient.getInstance().player, tooltipType).map { it.formattedTextCompat() }.toMutableList()
+    val tooltipType = if (advanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
+    return this.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, tooltipType).map { it.formattedTextCompat() }.toMutableList()
     //#endif
 }
 
@@ -30,7 +30,7 @@ fun Item.getIdentifierString(): String {
     //#if MC < 1.16
     //$$ return this.registryName
     //#else
-    return Registries.ITEM.getId(this).toString()
+    return BuiltInRegistries.ITEM.getKey(this).toString()
     //#endif
 }
 
@@ -41,7 +41,7 @@ fun String.getVanillaItem(): Item? {
     //#if MC < 1.16
     //$$ return Item.getByNameOrId(this)
     //#else
-    val item = Registries.ITEM.get(Identifier.of(this))
+    val item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(this))
     if (item == Items.AIR) return null
     return item
     //#endif
@@ -51,14 +51,14 @@ fun ItemStack.setCustomItemName(name: String): ItemStack {
     //#if MC < 1.16
     //$$ this.setStackDisplayName(name)
     //#else
-    this.set(DataComponentTypes.CUSTOM_NAME, Text.of(name))
+    this.set(DataComponents.CUSTOM_NAME, Component.nullToEmpty(name))
     //#endif
     return this
 }
 
 //#if MC > 1.21
-   fun ItemStack.setCustomItemName(name: Text): ItemStack {
-    this.set(DataComponentTypes.CUSTOM_NAME, name)
+   fun ItemStack.setCustomItemName(name: Component): ItemStack {
+    this.set(DataComponents.CUSTOM_NAME, name)
     return this
 }
 //#endif

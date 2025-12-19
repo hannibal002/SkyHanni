@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object TestChatCommand {
@@ -73,7 +73,7 @@ object TestChatCommand {
         test(component, isSilentAll)
     }
 
-    private fun test(componentText: Text, isHidden: Boolean) {
+    private fun test(componentText: Component, isHidden: Boolean) {
         val message = componentText.formattedTextCompat().stripHypixelMessage()
         val event = SkyHanniChatEvent(message, componentText)
         event.post()

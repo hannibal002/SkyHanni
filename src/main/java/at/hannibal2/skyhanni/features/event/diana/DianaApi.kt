@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.network.OtherClientPlayerEntity
-import net.minecraft.item.ItemStack
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object DianaApi {
@@ -64,7 +64,7 @@ object DianaApi {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onJoinWorld(event: EntityEnterWorldEvent<OtherClientPlayerEntity>) {
+    fun onJoinWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         val entity = event.entity
         // TODO: fetch rare mobs from repo instead
         if (rareDianaMobNamePattern.matches(entity.name.formattedTextCompatLessResets().trim())) {

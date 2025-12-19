@@ -6,12 +6,12 @@ import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.fakePlayer
-import net.minecraft.item.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 import kotlin.random.Random
 //#if MC > 1.8.9
-import net.minecraft.entity.player.PlayerInventory
+import net.minecraft.world.entity.player.Inventory
 //#endif
 
 @SkyHanniModule(devOnly = true)
@@ -63,7 +63,7 @@ object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {
     )
 
     private fun createRandomArmorPiece(armorPieces: Set<Item>): ItemStack = ItemStack(armorPieces.random()).also {
-        if (Random.nextBoolean()) it.addEnchantment(
+        if (Random.nextBoolean()) it.enchant(
             EnchantmentsCompat.PROTECTION.enchantment, 1,
         )
     }
@@ -80,10 +80,10 @@ object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {
         //#if MC < 1.21.5
         //$$ fakePlayer.inventory.armor = armor.toTypedArray()
         //#else
-        for (equipment in PlayerInventory.EQUIPMENT_SLOTS.values) {
+        for (equipment in Inventory.EQUIPMENT_SLOT_MAPPING.values) {
             val armorOrdinal = equipment.ordinal - 2
             if (armorOrdinal < 0 || armorOrdinal > 3) continue
-            fakePlayer.inventory.equipment.put(equipment, armor.reversed()[armorOrdinal])
+            fakePlayer.inventory.equipment.set(equipment, armor.reversed()[armorOrdinal])
         }
         //#endif
 

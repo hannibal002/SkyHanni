@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object ActionBarData {
@@ -62,7 +62,7 @@ object ActionBarData {
     /**
      * If the action bar is modified return the new one, otherwise return null.
      */
-    fun onChatReceive(component: Text): Text? {
+    fun onChatReceive(component: Component): Component? {
         val message = debugActionBar ?: component.formattedTextCompat().stripHypixelMessage()
 
         actionBar = message

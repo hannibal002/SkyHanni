@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.font.BakedGlyph;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.text.Style;
-import net.minecraft.text.TextColor;
+import net.minecraft.client.gui.font.glyphs.BakedGlyph;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,16 +17,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$ import net.minecraft.client.font.TextDrawable;
 //#endif
 
-@Mixin(TextRenderer.Drawer.class)
+@Mixin(Font.StringRenderOutput.class)
 public class MixinTextRendererDrawer {
 
     //#if MC < 1.21.9
     //#if MC < 1.21.6
-    @Inject(method = "drawGlyphs", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/font/BakedGlyph$DrawnGlyph;glyph()Lnet/minecraft/client/font/BakedGlyph;"))
+    @Inject(method = "renderCharacters", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/gui/font/glyphs/BakedGlyph$GlyphInstance;glyph()Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;"))
     //#else
     //$$ @Inject(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer$GlyphDrawer;drawGlyph(Lnet/minecraft/client/font/BakedGlyph$DrawnGlyph;)V"))
     //#endif
-    private void checkIfGlyphIsChroma(CallbackInfo ci, @Local BakedGlyph.DrawnGlyph drawnGlyph) {
+    private void checkIfGlyphIsChroma(CallbackInfo ci, @Local BakedGlyph.GlyphInstance drawnGlyph) {
         ChromaFontManagerKt.checkIfGlyphIsChroma(drawnGlyph);
     }
     //#else
@@ -39,7 +39,7 @@ public class MixinTextRendererDrawer {
     //#endif
 
     //#if MC < 1.21.9
-    @WrapOperation(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Style;getColor()Lnet/minecraft/text/TextColor;"))
+    @WrapOperation(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Style;getColor()Lnet/minecraft/network/chat/TextColor;"))
     //#else
     //$$ @WrapOperation(method = "accept(ILnet/minecraft/text/Style;Lnet/minecraft/client/font/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Style;getColor()Lnet/minecraft/text/TextColor;"))
     //#endif
@@ -48,7 +48,7 @@ public class MixinTextRendererDrawer {
     }
 
     //#if MC < 1.21.9
-    @ModifyArg(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/BakedGlyph$DrawnGlyph;<init>(FFIILnet/minecraft/client/font/BakedGlyph;Lnet/minecraft/text/Style;FF)V"))
+    @ModifyArg(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/font/glyphs/BakedGlyph$GlyphInstance;<init>(FFIILnet/minecraft/client/gui/font/glyphs/BakedGlyph;Lnet/minecraft/network/chat/Style;FF)V"))
     //#else
     //$$ @ModifyArg(method = "accept(ILnet/minecraft/text/Style;Lnet/minecraft/client/font/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/BakedGlyph;create(FFIILnet/minecraft/text/Style;FF)Lnet/minecraft/client/font/TextDrawable;"))
     //#endif

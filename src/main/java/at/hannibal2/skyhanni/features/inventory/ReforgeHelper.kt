@@ -36,9 +36,9 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderabl
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.Items
-import net.minecraft.screen.ScreenHandler
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -83,7 +83,7 @@ object ReforgeHelper {
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && isInReforgeMenu
 
     private var itemToReforge: ItemStack? = null
-    private var inventoryContainer: ScreenHandler? = null
+    private var inventoryContainer: AbstractContainerMenu? = null
 
     private var currentReforge: ReforgeApi.Reforge? = null
     private var reforgeToSearch: ReforgeApi.Reforge? = null
@@ -112,7 +112,7 @@ object ReforgeHelper {
     private val finishedColor = LorenzColor.GREEN.addOpacity(75)
 
     private fun itemUpdate() {
-        val newItem = inventoryContainer?.getSlot(reforgeItem)?.stack
+        val newItem = inventoryContainer?.getSlot(reforgeItem)?.item
         if (newItem?.getInternalName() != itemToReforge?.getInternalName()) {
             reforgeToSearch = null
         }
@@ -126,8 +126,8 @@ object ReforgeHelper {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
-        if (event.slot?.id == reforgeButton) {
-            if (event.slot.stack?.name.formattedTextCompatLeadingWhiteLessResets() == "§eReforge Item" || event.slot.stack?.name.formattedTextCompatLeadingWhiteLessResets() == "§cError!") return
+        if (event.slot?.index == reforgeButton) {
+            if (event.slot.item?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§eReforge Item" || event.slot.item?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cError!") return
             if (handleReforgeButtonClick(event)) return
         }
 
@@ -201,7 +201,7 @@ object ReforgeHelper {
         isInReforgeMenu = true
         waitForChat.set(false)
         DelayedRun.runNextTick {
-            inventoryContainer = MinecraftCompat.localPlayer.currentScreenHandler
+            inventoryContainer = MinecraftCompat.localPlayer.containerMenu
         }
     }
 
@@ -422,12 +422,12 @@ object ReforgeHelper {
 
     private fun colorReforgeStone(color: Color, reforgeStone: String?) {
         val inventory = inventoryContainer?.slots ?: return
-        val slot = inventory.firstOrNull { it?.stack?.cleanName() == reforgeStone }
+        val slot = inventory.firstOrNull { it?.item?.cleanName() == reforgeStone }
         if (slot != null) {
             slot.highlight(color)
         } else {
-            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack?.item == Items.PLAYER_HEAD }?.highlight(color)
-            inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack?.item == Items.PLAYER_HEAD }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.item?.item == Items.PLAYER_HEAD }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.item?.item == Items.PLAYER_HEAD }?.highlight(color)
         }
     }
 

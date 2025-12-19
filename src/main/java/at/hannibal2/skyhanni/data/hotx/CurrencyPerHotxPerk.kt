@@ -19,7 +19,7 @@ abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val 
         showCurrentCurrency: Boolean,
         currencySpentDesign: CurrencySpentDesign,
     ) {
-        val itemName = event.itemStack.name.formattedTextCompatLeadingWhiteLessResets()
+        val itemName = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val perk = hotx.getPerkByNameOrNull(itemName.removeColor()) ?: return
 
         if (perk.getLevelUpCost() == null) return

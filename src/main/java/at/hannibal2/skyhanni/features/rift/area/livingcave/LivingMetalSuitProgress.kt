@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object LivingMetalSuitProgress {
@@ -52,7 +52,7 @@ object LivingMetalSuitProgress {
             addLine {
                 addString("§7- ")
                 addItemStack(stack)
-                addString("${stack.name.formattedTextCompatLeadingWhiteLessResets()}: ")
+                addString("${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}: ")
                 addString(
                     progress?.let {
                         drawProgressBar(it) + " §b${it.formatPercentage()}"

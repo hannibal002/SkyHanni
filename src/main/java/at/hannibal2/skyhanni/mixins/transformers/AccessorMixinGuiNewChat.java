@@ -1,31 +1,31 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.GuiMessage;
+import net.minecraft.client.gui.components.ChatComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.List;
 
-@Mixin(ChatHud.class)
+@Mixin(ChatComponent.class)
 public interface AccessorMixinGuiNewChat {
 
-    @Accessor("messages")
-    List<ChatHudLine> getChatLines_skyhanni();
+    @Accessor("allMessages")
+    List<GuiMessage> getChatLines_skyhanni();
 
-    @Accessor("messages")
-    void setChatLines_skyhanni(List<ChatHudLine> chatLines);
+    @Accessor("allMessages")
+    void setChatLines_skyhanni(List<GuiMessage> chatLines);
 
-    @Accessor("visibleMessages")
-    List<ChatHudLine> getDrawnChatLines_skyhanni();
+    @Accessor("trimmedMessages")
+    List<GuiMessage> getDrawnChatLines_skyhanni();
 
-    @Accessor("visibleMessages")
-    void setDrawnChatLines_skyhanni(List<ChatHudLine> drawnChatLines);
+    @Accessor("trimmedMessages")
+    void setDrawnChatLines_skyhanni(List<GuiMessage> drawnChatLines);
 
-    @Accessor("scrolledLines")
+    @Accessor("chatScrollbarPos")
     int getScrollPos_skyhanni();
 
-    @Invoker("reset")
+    @Invoker("rescaleChat")
     void refreshChat_skyhanni();
 }

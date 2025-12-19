@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
 import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
 

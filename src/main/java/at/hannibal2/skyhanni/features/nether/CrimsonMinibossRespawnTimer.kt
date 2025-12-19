@@ -26,8 +26,8 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.block.entity.BeaconBlockEntity
-import net.minecraft.util.math.Box
+import net.minecraft.world.level.block.entity.BeaconBlockEntity
+import net.minecraft.world.phys.AABB
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -114,7 +114,7 @@ object CrimsonMinibossRespawnTimer {
 
         val isBossInArea = MobData.skyblockMobs.filter {
             it.name == boss.displayName
-        }.any { boss.area.isInside(it.baseEntity.blockPos.toLorenzVec()) }
+        }.any { boss.area.isInside(it.baseEntity.blockPosition().toLorenzVec()) }
         if (isBossInArea) {
             boss.spawned = true
             boss.foundBeacon = null
@@ -124,7 +124,7 @@ object CrimsonMinibossRespawnTimer {
         boss.spawned = false
 
         val isThereBeacon = EntityUtils.getAllTileEntities().filter { it is BeaconBlockEntity }.any {
-            boss.area.isInside(it.pos.toLorenzVec())
+            boss.area.isInside(it.blockPos.toLorenzVec())
         }
         if (boss.foundBeacon == true && !isThereBeacon) {
             boss.foundBeacon = false
@@ -214,7 +214,7 @@ object CrimsonMinibossRespawnTimer {
 
     enum class MiniBoss(
         val displayName: String,
-        val area: Box,
+        val area: AABB,
         var nextSpawnTime: SimpleTimeMark? = null,
         var possibleSpawnTime: Pair<SimpleTimeMark, SimpleTimeMark>? = null,
         var foundBeacon: Boolean? = null,

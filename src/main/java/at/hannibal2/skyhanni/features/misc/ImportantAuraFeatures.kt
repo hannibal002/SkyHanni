@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.SignUtils.isPlayerElectionSign
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.fakePlayer
-import net.minecraft.client.gui.screen.ingame.SignEditScreen
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
 
 @SkyHanniModule
 object ImportantAuraFeatures {

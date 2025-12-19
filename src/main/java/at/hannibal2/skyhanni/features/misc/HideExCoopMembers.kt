@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.isPlayerName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object HideExCoopMembers {
@@ -49,7 +49,7 @@ object HideExCoopMembers {
         val hiddenMembers = storage?.hiddenCoopMembers.takeIf { !it.isNullOrEmpty() } ?: return
 
         event.toolTip = event.toolTipRemovedPrefix().handleTooltip(hiddenMembers, event.itemStack)
-        changedSlotNumber = event.slot.id
+        changedSlotNumber = event.slot.index
     }
 
     private fun List<String>.handleTooltip(storage: MutableSet<String>, item: ItemStack): MutableList<String> = this.toMutableList().apply {
@@ -97,7 +97,7 @@ object HideExCoopMembers {
         event.inventoryItems.values
             .filter { it.item == Items.PLAYER_HEAD }
             .forEach { item ->
-                addHiddenMember(item.name.formattedTextCompatLeadingWhiteLessResets().cleanPlayerName())
+                addHiddenMember(item.hoverName.formattedTextCompatLeadingWhiteLessResets().cleanPlayerName())
             }
     }
 

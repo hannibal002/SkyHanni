@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.entity.Entity
-import net.minecraft.util.math.Box
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.AABB
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -24,7 +24,7 @@ object LocationUtils {
         //#if MC < 1.21
         //$$ BlockUtils.rayTrace(a, b) == null
     //#else
-    BlockUtils.rayTrace(a, b)?.missed == true
+    BlockUtils.rayTrace(a, b)?.miss == true
     //#endif
 
     fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()
@@ -50,12 +50,12 @@ object LocationUtils {
     fun playerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val vec = player.getLorenzVec()
-        return vec.up(player.standingEyeHeight.toDouble())
+        return vec.up(player.eyeHeight.toDouble())
     }
 
-    fun Box.isInside(vec: LorenzVec) = contains(vec.toVec3())
+    fun AABB.isInside(vec: LorenzVec) = contains(vec.toVec3())
 
-    fun Box.isPlayerInside() = isInside(playerLocation())
+    fun AABB.isPlayerInside() = isInside(playerLocation())
 
     fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
@@ -70,11 +70,11 @@ object LocationUtils {
             up(offset).canBeSeen(radius)
         }
 
-    fun Box.minBox() = LorenzVec(minX, minY, minZ)
+    fun AABB.minBox() = LorenzVec(minX, minY, minZ)
 
-    fun Box.maxBox() = LorenzVec(maxX, maxY, maxZ)
+    fun AABB.maxBox() = LorenzVec(maxX, maxY, maxZ)
 
-    fun Box.rayIntersects(origin: LorenzVec, direction: LorenzVec): Boolean {
+    fun AABB.rayIntersects(origin: LorenzVec, direction: LorenzVec): Boolean {
         // Reference for Algorithm https://tavianator.com/2011/ray_box.html
         val rayDirectionInverse = direction.inverse()
         val t1 = (this.minBox() - origin) * rayDirectionInverse
@@ -85,7 +85,7 @@ object LocationUtils {
         return tMax >= tMin && tMax >= 0.0
     }
 
-    fun Box.union(aabbs: List<Box>?): Box? {
+    fun AABB.union(aabbs: List<AABB>?): AABB? {
         if (aabbs.isNullOrEmpty()) {
             return null
         }
@@ -106,28 +106,28 @@ object LocationUtils {
             if (aabb.maxZ > maxZ) maxZ = aabb.maxZ
         }
 
-        return Box(minX, minY, minZ, maxX, maxY, maxZ)
+        return AABB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
-    fun Box.getEdgeLengths() = maxBox() - minBox()
+    fun AABB.getEdgeLengths() = maxBox() - minBox()
 
-    fun Box.getBoxCenter() = getEdgeLengths() * 0.5 + minBox()
+    fun AABB.getBoxCenter() = getEdgeLengths() * 0.5 + minBox()
 
-    fun Box.getTopCenter() = getBoxCenter().up((maxY - minY) / 2)
+    fun AABB.getTopCenter() = getBoxCenter().up((maxY - minY) / 2)
 
-    fun Box.clampTo(other: Box): Box {
+    fun AABB.clampTo(other: AABB): AABB {
         val minX = max(this.minX, other.minX)
         val minY = max(this.minY, other.minY)
         val minZ = max(this.minZ, other.minZ)
         val maxX = min(this.maxX, other.maxX)
         val maxY = min(this.maxY, other.maxY)
         val maxZ = min(this.maxZ, other.maxZ)
-        return Box(minX, minY, minZ, maxX, maxY, maxZ)
+        return AABB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
     fun calculatePlayerYaw(): Float {
         val player = MinecraftCompat.localPlayer
-        var yaw = player.yaw % 360
+        var yaw = player.yRot % 360
         if (yaw < 0) yaw += 360
         if (yaw > 180) yaw -= 360
 
@@ -162,7 +162,7 @@ object LocationUtils {
         return location
     }
 
-    fun Box.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
+    fun AABB.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
         val bottomLeftFront = LorenzVec(minX, minY, minZ)
         val bottomLeftBack = LorenzVec(minX, minY, maxZ)
         val topLeftFront = LorenzVec(minX, maxY, minZ)
@@ -215,7 +215,7 @@ object LocationUtils {
         return guessPitch
     }
 
-    fun Box.getCornersAtHeight(y: Double): List<LorenzVec> {
+    fun AABB.getCornersAtHeight(y: Double): List<LorenzVec> {
         val cornerOne = LorenzVec(minX, y, minZ)
         val cornerTwo = LorenzVec(minX, y, maxZ)
         val cornerThree = LorenzVec(maxX, y, maxZ)

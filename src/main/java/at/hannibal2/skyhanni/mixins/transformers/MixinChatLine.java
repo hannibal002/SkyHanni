@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.ChatLineData;
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
-import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.Text;
+import net.minecraft.client.GuiMessage;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -11,26 +11,26 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#if MC > 1.21
-import net.minecraft.client.gui.hud.MessageIndicator;
-import net.minecraft.network.message.MessageSignatureData;
+import net.minecraft.client.GuiMessageTag;
+import net.minecraft.network.chat.MessageSignature;
 //#endif
 
-@Mixin(ChatHudLine.class)
+@Mixin(GuiMessage.class)
 public class MixinChatLine implements ChatLineData {
 
     @Unique
-    private Text skyHanni$fullComponent;
+    private Component skyHanni$fullComponent;
 
     @Unique
     @NotNull
     @Override
-    public Text getSkyHanni_fullComponent() {
+    public Component getSkyHanni_fullComponent() {
         return skyHanni$fullComponent;
     }
 
     @Unique
     @Override
-    public void setSkyHanni_fullComponent(@NotNull Text fullComponent) {
+    public void setSkyHanni_fullComponent(@NotNull Component fullComponent) {
         skyHanni$fullComponent = fullComponent;
     }
 
@@ -39,10 +39,10 @@ public class MixinChatLine implements ChatLineData {
         //#if MC < 1.21
         //$$ int updateCounterCreated, Text line, int chatLineID, CallbackInfo ci
         //#else
-        int creationTick, Text line, MessageSignatureData messageSignatureData, MessageIndicator messageIndicator, CallbackInfo ci
+        int creationTick, Component line, MessageSignature messageSignatureData, GuiMessageTag messageIndicator, CallbackInfo ci
         //#endif
     ) {
-        Text component = GuiChatHook.getCurrentComponent();
+        Component component = GuiChatHook.getCurrentComponent();
         skyHanni$fullComponent = component == null ? line : component;
     }
 

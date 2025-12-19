@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.entity.Entity
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -28,7 +28,7 @@ object ChumBucketHider {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStandEntity>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!config.enabled.get()) return
 
         val entity = event.entity
@@ -66,7 +66,7 @@ object ChumBucketHider {
         // Chum Bucket
         if (config.hideBucket.get() &&
             entity.getAllEquipment().any {
-                it != null && (it.name.formattedTextCompatLeadingWhiteLessResets() == "§fEmpty Chum Bucket" || it.name.formattedTextCompatLeadingWhiteLessResets() == "§aEmpty Chumcap Bucket")
+                it != null && (it.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§fEmpty Chum Bucket" || it.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aEmpty Chumcap Bucket")
             }
         ) {
             val entityLocation = entity.getLorenzVec()

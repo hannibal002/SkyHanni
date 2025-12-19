@@ -14,7 +14,7 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
     ) {
         val layer = SkyHanniRenderLayers.getQuads(false)
         val buf = event.vertexConsumers.getBuffer(layer)
-        event.matrices.push()
+        event.matrices.pushPose()
 
         val viewerPos = WorldRenderUtils.getViewerPos()
         val newMidPoint = middlePoint - viewerPos
@@ -23,16 +23,16 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         val lastPoint = sidePoint1 + sidePoint2 - middlePoint
         val newLastPoint = lastPoint - viewerPos
 
-        buf.vertex(newSidePoint1.x.toFloat(), newSidePoint1.y.toFloat(), newSidePoint1.z.toFloat())
-            .color(c.red, c.green, c.blue, c.alpha)
-        buf.vertex(newMidPoint.x.toFloat(), newMidPoint.y.toFloat(), newMidPoint.z.toFloat())
-            .color(c.red, c.green, c.blue, c.alpha)
-        buf.vertex(newSidePoint2.x.toFloat(), newSidePoint2.y.toFloat(), newSidePoint2.z.toFloat())
-            .color(c.red, c.green, c.blue, c.alpha)
-        buf.vertex(newLastPoint.x.toFloat(), newLastPoint.y.toFloat(), newLastPoint.z.toFloat())
-            .color(c.red, c.green, c.blue, c.alpha)
+        buf.addVertex(newSidePoint1.x.toFloat(), newSidePoint1.y.toFloat(), newSidePoint1.z.toFloat())
+            .setColor(c.red, c.green, c.blue, c.alpha)
+        buf.addVertex(newMidPoint.x.toFloat(), newMidPoint.y.toFloat(), newMidPoint.z.toFloat())
+            .setColor(c.red, c.green, c.blue, c.alpha)
+        buf.addVertex(newSidePoint2.x.toFloat(), newSidePoint2.y.toFloat(), newSidePoint2.z.toFloat())
+            .setColor(c.red, c.green, c.blue, c.alpha)
+        buf.addVertex(newLastPoint.x.toFloat(), newLastPoint.y.toFloat(), newLastPoint.z.toFloat())
+            .setColor(c.red, c.green, c.blue, c.alpha)
 
-        event.matrices.pop()
+        event.matrices.popPose()
     }
 
     companion object {

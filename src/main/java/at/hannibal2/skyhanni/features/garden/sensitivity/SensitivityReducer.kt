@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object SensitivityReducer {
@@ -60,7 +60,7 @@ object SensitivityReducer {
 
     private fun updatePlayerStatus() {
         val newInBarn = GardenApi.onUnfarmablePlot
-        val newOnGround = MinecraftCompat.localPlayer.isOnGround
+        val newOnGround = MinecraftCompat.localPlayer.onGround()
 
         if (inBarn != newInBarn) {
             inBarn = newInBarn
@@ -162,5 +162,5 @@ object SensitivityReducer {
     }
 
     private fun isHoldingTool(): Boolean = GardenApi.toolInHand != null
-    private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && MinecraftClient.getInstance().currentScreen == null
+    private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null
 }

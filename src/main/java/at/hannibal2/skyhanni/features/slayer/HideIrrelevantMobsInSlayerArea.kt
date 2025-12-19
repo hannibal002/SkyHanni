@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.entity.EntityOpacityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.entity.LivingEntity
+import net.minecraft.world.entity.LivingEntity
 
 @SkyHanniModule
 object HideIrrelevantMobsInSlayerArea {

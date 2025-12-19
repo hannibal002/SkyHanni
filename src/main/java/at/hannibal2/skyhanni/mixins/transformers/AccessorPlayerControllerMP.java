@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 
-@Mixin(ClientPlayerInteractionManager.class)
+@Mixin(MultiPlayerGameMode.class)
 public interface AccessorPlayerControllerMP {
-    @Accessor("currentBreakingPos")
+    @Accessor("destroyBlockPos")
     BlockPos skyhanni_getCurrentBlock();
 }

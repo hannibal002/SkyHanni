@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.C
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object InstanceChestProfit {
@@ -126,24 +126,24 @@ object InstanceChestProfit {
     private fun createDisplay(items: Map<Int, ItemStack>) {
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
-            if (fakeItemNamePattern.matches(it.value.name.formattedTextCompatLeadingWhiteLessResets())) return@forEach
+            if (fakeItemNamePattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())) return@forEach
             if (it.value.getInternalNameOrNull() != null) {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
             }
-            attributeShardPattern.matchMatcher(it.value.name.formattedTextCompatLeadingWhiteLessResets()) {
+            attributeShardPattern.matchMatcher(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val name = group("name")
                 val count = group("count").toInt()
                 val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.name.formattedTextCompatLeadingWhiteLessResets(), price)
+                itemsWithCost.addOrPut(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets(), price)
             }
-            essencePattern.matchMatcher(it.value.name.formattedTextCompatLeadingWhiteLessResets()) {
+            essencePattern.matchMatcher(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val name = group("name")
                 val rawCount = group("count").toInt()
                 val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
                 else rawCount.toDouble()
                 val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.name.formattedTextCompatLeadingWhiteLessResets(), price)
+                itemsWithCost.addOrPut(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets(), price)
             }
         }
 

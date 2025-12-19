@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import net.minecraft.entity.Entity
+import net.minecraft.world.entity.Entity
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule

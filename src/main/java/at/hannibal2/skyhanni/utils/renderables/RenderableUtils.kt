@@ -26,7 +26,7 @@ import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.reflect.KMutableProperty0
 //#if MC > 1.21
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 //#endif
 
 @Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
@@ -186,7 +186,7 @@ internal object RenderableUtils {
 
     //#if MC > 1.21
     fun renderString(
-        text: Text,
+        text: Component,
         scale: Double = 1.0,
         color: Color = Color.WHITE,
         inverseScale: Double = 1 / scale,

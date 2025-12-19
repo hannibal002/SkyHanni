@@ -1,71 +1,71 @@
 package at.hannibal2.skyhanni.data.mob
 
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.mob.ShulkerEntity
-import net.minecraft.entity.passive.AxolotlEntity
-import net.minecraft.entity.passive.CodEntity
-import net.minecraft.entity.passive.FrogEntity
-import net.minecraft.entity.passive.PandaEntity
-import net.minecraft.entity.passive.SalmonEntity
-import net.minecraft.entity.passive.TadpoleEntity
-import net.minecraft.entity.passive.TropicalFishEntity
-import net.minecraft.util.DyeColor
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Shulker
+import net.minecraft.world.entity.animal.axolotl.Axolotl
+import net.minecraft.world.entity.animal.Cod
+import net.minecraft.world.entity.animal.frog.Frog
+import net.minecraft.world.entity.animal.Panda
+import net.minecraft.world.entity.animal.Salmon
+import net.minecraft.world.entity.animal.frog.Tadpole
+import net.minecraft.world.entity.animal.TropicalFish
+import net.minecraft.world.item.DyeColor
 
 object ModernIslandExceptions {
 
     internal fun galatea(
         baseEntity: LivingEntity,
-        armorStand: ArmorStandEntity?,
+        armorStand: ArmorStand?,
         nextEntity: LivingEntity?,
     ): MobData.MobResult? = when {
 
-        baseEntity is TadpoleEntity && armorStand == null ->
+        baseEntity is Tadpole && armorStand == null ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Birries"),
             )
 
-        baseEntity is FrogEntity && armorStand == null ->
+        baseEntity is Frog && armorStand == null ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Mossybit"),
             )
 
-        baseEntity is PandaEntity && baseEntity.isBrown ->
+        baseEntity is Panda && baseEntity.isBrown ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Mochibear"),
             )
 
-        baseEntity is PandaEntity && baseEntity.productGene == PandaEntity.Gene.NORMAL ->
+        baseEntity is Panda && baseEntity.variant == Panda.Gene.NORMAL ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Bambuleaf"),
             )
 
-        baseEntity is AxolotlEntity ->
+        baseEntity is Axolotl ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Coralot"),
             )
 
-        baseEntity is CodEntity ->
+        baseEntity is Cod ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Cod"),
             )
 
-        baseEntity is SalmonEntity ->
+        baseEntity is Salmon ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Salmon"),
             )
 
-        baseEntity is TropicalFishEntity && baseEntity.patternColor == DyeColor.LIGHT_BLUE ->
+        baseEntity is TropicalFish && baseEntity.patternColor == DyeColor.LIGHT_BLUE ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Azure"),
             )
 
-        baseEntity is TropicalFishEntity && baseEntity.patternColor == DyeColor.GREEN ->
+        baseEntity is TropicalFish && baseEntity.patternColor == DyeColor.GREEN ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Verdant"),
             )
 
-        baseEntity is ShulkerEntity && baseEntity.color == DyeColor.GREEN ->
+        baseEntity is Shulker && baseEntity.color == DyeColor.GREEN ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BASIC, name = "Hideonleaf"),
             )

@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import net.minecraft.text.HoverEvent
-import net.minecraft.text.Text
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.Component
 
 /**
  * This event is mainly used for doing things on chat hover and reading the chat component
@@ -13,6 +13,6 @@ import net.minecraft.text.Text
  * The edited chat component in [GuiChatHook][at.hannibal2.skyhanni.mixins.hooks.GuiChatHook] does not change the actual
  * chat component, but rather makes a new one just before rendering.
  */
-class ChatHoverEvent(val component: Text) : SkyHanniEvent() {
+class ChatHoverEvent(val component: Component) : SkyHanniEvent() {
     fun getHoverEvent(): HoverEvent = component.style.hoverEvent!!
 }

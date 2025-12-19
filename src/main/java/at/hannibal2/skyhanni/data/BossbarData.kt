@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 //#else
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 //#endif
 
 @SkyHanniModule
@@ -38,7 +38,7 @@ object BossbarData {
         //$$ BossbarUpdateEvent(bossbarLine).post()
         //#else
         var multipleBossBars = false
-        for (bossBar in MinecraftClient.getInstance().inGameHud.bossBarHud.bossBars.values) {
+        for (bossBar in Minecraft.getInstance().gui.bossOverlay.events.values) {
             if (multipleBossBars) {
                 return
             }

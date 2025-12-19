@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import com.google.gson.annotations.Expose
-import net.minecraft.entity.Entity
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.EulerAngle
-import net.minecraft.util.math.Vec3d
+import net.minecraft.world.entity.Entity
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
+import net.minecraft.world.phys.AABB
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Rotations
+import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.acos
@@ -28,7 +28,7 @@ data class LorenzVec(
     val y: Double,
     val z: Double,
 ) {
-    val edges by lazy { boundingToOffset(1.0, 1.0, 1.0).expand(0.0001, 0.0001, 0.0001).calculateEdges() }
+    val edges by lazy { boundingToOffset(1.0, 1.0, 1.0).inflate(0.0001, 0.0001, 0.0001).calculateEdges() }
 
     constructor() : this(0.0, 0.0, 0.0)
 
@@ -38,7 +38,7 @@ data class LorenzVec(
 
     fun toBlockPos(): BlockPos = BlockPos(floor(x).toInt(), floor(y).toInt(), floor(z).toInt())
 
-    fun toVec3(): Vec3d = Vec3d(x, y, z)
+    fun toVec3(): Vec3 = Vec3(x, y, z)
 
     fun distanceIgnoreY(other: LorenzVec): Double = distanceSqIgnoreY(other).pow(0.5)
 
@@ -167,16 +167,16 @@ data class LorenzVec(
         return LorenzVec(x, y, z)
     }
 
-    fun boundingCenter(expand: Double): Box {
-        return Box(x - expand, y - expand, z - expand, x + expand, y + expand, z + expand)
+    fun boundingCenter(expand: Double): AABB {
+        return AABB(x - expand, y - expand, z - expand, x + expand, y + expand, z + expand)
     }
 
     fun boundingToOffset(offX: Double, offY: Double, offZ: Double) =
-        Box(x, y, z, x + offX, y + offY, z + offZ)
+        AABB(x, y, z, x + offX, y + offY, z + offZ)
 
     fun scale(scalar: Double): LorenzVec = LorenzVec(scalar * x, scalar * y, scalar * z)
 
-    fun axisAlignedTo(other: LorenzVec) = Box(x, y, z, other.x, other.y, other.z)
+    fun axisAlignedTo(other: LorenzVec) = AABB(x, y, z, other.x, other.y, other.z)
 
     fun up(offset: Number = 1): LorenzVec = copy(y = y + offset.toDouble())
 
@@ -278,20 +278,20 @@ data class LorenzVec(
 
 fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
-fun Entity.getLorenzVec(): LorenzVec = LorenzVec(pos.x, pos.y, pos.z)
-fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(lastRenderX, lastRenderY, lastRenderZ)
-fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(trackedPosition.getPos().x, trackedPosition.getPos().y, trackedPosition.getPos().z)
+fun Entity.getLorenzVec(): LorenzVec = LorenzVec(position().x, position().y, position().z)
+fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(xOld, yOld, zOld)
+fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(positionCodec.base.x, positionCodec.base.y, positionCodec.base.z)
 
-fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(velocity.x, velocity.y, velocity.z)
+fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(deltaMovement.x, deltaMovement.y, deltaMovement.z)
 
 fun Entity.getPositionLog() = PositionLog(
-    tick = age,
+    tick = tickCount,
     position = getLorenzVec(),
     prev = getPrevLorenzVec(),
     server = getServerLorenzVec(),
     motion = getMotionLorenzVec(),
-    yaw = yaw,
-    pitch = pitch,
+    yaw = yRot,
+    pitch = xRot,
 )
 
 data class PositionLog(
@@ -304,16 +304,16 @@ data class PositionLog(
     @Expose val pitch: Float,
 )
 
-fun Vec3d.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
+fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
-fun EulerAngle.toLorenzVec(): LorenzVec = LorenzVec(pitch, yaw, roll)
+fun Rotations.toLorenzVec(): LorenzVec = LorenzVec(x(), y(), z())
 
-fun ParticleS2CPacket.toLorenzVec() = LorenzVec(x, y, z)
+fun ClientboundLevelParticlesPacket.toLorenzVec() = LorenzVec(x, y, z)
 
 fun Array<Double>.toLorenzVec(): LorenzVec {
     return LorenzVec(this[0], this[1], this[2])
 }
 
-fun Box.expand(vec: LorenzVec): Box = expand(vec.x, vec.y, vec.z)
+fun AABB.expand(vec: LorenzVec): AABB = inflate(vec.x, vec.y, vec.z)
 
-fun Box.expand(amount: Double): Box = expand(amount, amount, amount)
+fun AABB.expand(amount: Double): AABB = inflate(amount, amount, amount)

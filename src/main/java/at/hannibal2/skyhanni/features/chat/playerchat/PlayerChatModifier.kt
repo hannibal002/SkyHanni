@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import at.hannibal2.skyhanni.utils.compat.value
-import net.minecraft.text.ClickEvent
-import net.minecraft.text.HoverEvent
-import net.minecraft.text.Text
+import net.minecraft.network.chat.ClickEvent
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object PlayerChatModifier {
@@ -28,22 +28,22 @@ object PlayerChatModifier {
         event.applyIfPossible("PLAYER_CHAT") { cutMessage(it) }
     }
 
-    private fun findClickableTexts(chatComponent: Text, clickEvents: MutableList<ClickEvent>) {
+    private fun findClickableTexts(chatComponent: Component, clickEvents: MutableList<ClickEvent>) {
         for (sibling in chatComponent.siblings) {
             findClickableTexts(sibling, clickEvents)
         }
         val clickEvent = chatComponent.style.clickEvent ?: return
-        clickEvent.action ?: return
+        clickEvent.action() ?: return
         if (clickEvents.any { it.value() == clickEvent.value() }) return
         clickEvents.add(clickEvent)
     }
 
-    private fun findHoverTexts(chatComponent: Text, hoverEvents: MutableList<HoverEvent>) {
+    private fun findHoverTexts(chatComponent: Component, hoverEvents: MutableList<HoverEvent>) {
         for (sibling in chatComponent.siblings) {
             findHoverTexts(sibling, hoverEvents)
         }
         val hoverEvent = chatComponent.style.hoverEvent ?: return
-        hoverEvent.action ?: return
+        hoverEvent.action() ?: return
         if (hoverEvents.any { it.value() == hoverEvent.value() }) return
         hoverEvents.add(hoverEvent)
     }

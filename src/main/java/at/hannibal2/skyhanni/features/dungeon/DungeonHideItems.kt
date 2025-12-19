@@ -19,10 +19,10 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.entity.Entity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.ItemEntity
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -30,8 +30,8 @@ object DungeonHideItems {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHider
 
-    private val hideParticles = mutableMapOf<ArmorStandEntity, SimpleTimeMark>()
-    private val movingSkeletonSkulls = mutableMapOf<ArmorStandEntity, SimpleTimeMark>()
+    private val hideParticles = mutableMapOf<ArmorStand, SimpleTimeMark>()
+    private val movingSkeletonSkulls = mutableMapOf<ArmorStand, SimpleTimeMark>()
 
     private val SOUL_WEAVER_HIDER by lazy { SkullTextureHolder.getTexture("DUNGEONS_SOUL_WEAVER") }
     private val BLESSING_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_BLESSING") }
@@ -42,14 +42,14 @@ object DungeonHideItems {
     private val DAMAGE_ORB_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_DAMAGE_ORB") }
     private val HEALER_FAIRY_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_HEALER_FAIRY") }
 
-    private fun isSkeletonSkull(entity: ArmorStandEntity): Boolean = entity.getStandHelmet()?.cleanName() == "Skeleton Skull"
+    private fun isSkeletonSkull(entity: ArmorStand): Boolean = entity.getStandHelmet()?.cleanName() == "Skeleton Skull"
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         val entity = event.entity
 
         if (entity is ItemEntity) {
-            val stack = entity.stack
+            val stack = entity.item
             if (config.hideReviveStone && stack.cleanName() == "Revive Stone") {
                 event.cancel()
             }
@@ -59,7 +59,7 @@ object DungeonHideItems {
             }
         }
 
-        if (entity !is ArmorStandEntity) return
+        if (entity !is ArmorStand) return
 
         val head = entity.getStandHelmet()
         val skullTexture = head?.getSkullTexture()
@@ -168,7 +168,7 @@ object DungeonHideItems {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onArmoStandMove(event: EntityMoveEvent<ArmorStandEntity>) {
+    fun onArmoStandMove(event: EntityMoveEvent<ArmorStand>) {
         val entity = event.entity
 
         if (isSkeletonSkull(entity)) {

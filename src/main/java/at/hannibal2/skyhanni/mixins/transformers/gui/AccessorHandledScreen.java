@@ -1,31 +1,31 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ClickType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(HandledScreen.class)
+@Mixin(AbstractContainerScreen.class)
 public interface AccessorHandledScreen {
 
-    @Accessor("x")
+    @Accessor("leftPos")
     int getGuiLeft();
 
-    @Invoker("onMouseClick")
-    void handleMouseClick_skyhanni(Slot slot, int slotId, int button, SlotActionType actionType);
+    @Invoker("slotClicked")
+    void handleMouseClick_skyhanni(Slot slot, int slotId, int button, ClickType actionType);
 
-    @Accessor("y")
+    @Accessor("topPos")
     int getGuiTop();
 
-    @Invoker("drawBackground")
-    void invokeDrawGuiContainerBackgroundLayer_skyhanni(DrawContext context, float deltaTicks, int mouseX, int mouseY);
+    @Invoker("renderBg")
+    void invokeDrawGuiContainerBackgroundLayer_skyhanni(GuiGraphics context, float deltaTicks, int mouseX, int mouseY);
 
-    @Accessor("backgroundWidth")
+    @Accessor("imageWidth")
     int getWidth();
 
-    @Accessor("backgroundHeight")
+    @Accessor("imageHeight")
     int getHeight();
 }

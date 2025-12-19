@@ -38,8 +38,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrE
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
@@ -110,7 +110,7 @@ object CroesusChestTracker {
 
         if (!inCroesusInventory || croesusEmpty) return
         for ((run, slot) in InventoryUtils.getItemsInOpenChest()
-            .mapNotNull { slot -> runSlots(slot.index, slot) }) {
+            .mapNotNull { slot -> runSlots(slot.containerSlot, slot) }) {
 
             // If one chest is null every followup chest is null. Therefore, an early return is possible
             if (run.floor == null) return
@@ -161,12 +161,12 @@ object CroesusChestTracker {
             val lore = item.getLore()
 
             if (run.floor == null || run.floor == "F0") run.floor =
-                (if (masterPattern.matches(item.name.formattedTextCompatLeadingWhiteLessResets())) "M" else "F") + (
+                (if (masterPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())) "M" else "F") + (
                     lore.firstNotNullOfOrNull {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"
                     )
-            if (run.floor == "F0" && kuudraPattern.matches(item.name.formattedTextCompatLeadingWhiteLessResets())) run.floor =
+            if (run.floor == "F0" && kuudraPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())) run.floor =
                 ("T" + KuudraApi.getKuudraRunTierNumber(lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }))
             run.openState = when {
                 keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
@@ -186,7 +186,7 @@ object CroesusChestTracker {
     private fun pageSetup(event: InventoryFullyOpenedEvent) {
         inCroesusInventory = true
         pageSwitchable = true
-        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.name.formattedTextCompatLeadingWhiteLessResets())
+        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.hoverName.formattedTextCompatLeadingWhiteLessResets())
         if (event.inventoryItems[BACK_ARROW_SLOT]?.item != Items.ARROW) {
             currentPage = 0
         }
@@ -210,13 +210,13 @@ object CroesusChestTracker {
         if (inCroesusInventory && !croesusEmpty) {
             if (event.slot == null) return
             when (event.slotId) {
-                FRONT_ARROW_SLOT -> if (pageSwitchable && event.slot.stack.isArrow()) {
+                FRONT_ARROW_SLOT -> if (pageSwitchable && event.slot.item.isArrow()) {
                     pageSwitchable = false
                     currentPage++
                 }
 
                 // People are getting Index out of range errors presumably due to negative pages.
-                BACK_ARROW_SLOT -> if (pageSwitchable && currentPage != 0 && event.slot.stack.isArrow()) {
+                BACK_ARROW_SLOT -> if (pageSwitchable && currentPage != 0 && event.slot.item.isArrow()) {
                     pageSwitchable = false
                     currentPage--
                 }
@@ -230,7 +230,7 @@ object CroesusChestTracker {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
-        if (!kismetPattern.matches(event.stack.name.formattedTextCompatLeadingWhiteLessResets())) return
+        if (!kismetPattern.matches(event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
         if (kismetUsedInChestPattern.matches(event.stack.getLore().lastOrNull())) return
         event.stackTip = "§a$kismetAmountCache"
     }
@@ -239,8 +239,8 @@ object CroesusChestTracker {
     fun onRenderInventoryItemTip(event: RenderInventoryItemTipEvent) {
         if (!config.showUsedKismets) return
         if (!inCroesusInventory) return
-        if (event.slot.index != event.slot.id) return
-        val run = croesusSlotMapToRun(event.slot.index) ?: return
+        if (event.slot.containerSlot != event.slot.index) return
+        val run = croesusSlotMapToRun(event.slot.containerSlot) ?: return
         if (!getKismetUsed(run)) return
         event.offsetY = -1
         event.offsetX = -9

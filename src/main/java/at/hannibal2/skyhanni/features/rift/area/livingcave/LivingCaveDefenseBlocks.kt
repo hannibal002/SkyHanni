@@ -21,8 +21,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
-import net.minecraft.client.network.OtherClientPlayerEntity
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.core.particles.ParticleTypes
 
 @SkyHanniModule
 object LivingCaveDefenseBlocks {
@@ -31,7 +31,7 @@ object LivingCaveDefenseBlocks {
     private var movingBlocks = mapOf<DefenseBlock, Long>()
     private var staticBlocks = emptyList<DefenseBlock>()
 
-    class DefenseBlock(val entity: OtherClientPlayerEntity, val location: LorenzVec, var hidden: Boolean = false)
+    class DefenseBlock(val entity: RemotePlayer, val location: LorenzVec, var hidden: Boolean = false)
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -62,7 +62,7 @@ object LivingCaveDefenseBlocks {
         }
 
         if (event.type == ParticleTypes.ENCHANTED_HIT) {
-            var entity: OtherClientPlayerEntity? = null
+            var entity: RemotePlayer? = null
 
             // read old entity data
             getNearestMovingDefenseBlock(location)?.let {
@@ -77,7 +77,7 @@ object LivingCaveDefenseBlocks {
             if (entity == null) {
                 // read new entity data
                 val compareLocation = event.location.add(-0.5, -1.5, -0.5)
-                entity = EntityUtils.getEntitiesNearby<OtherClientPlayerEntity>(compareLocation, 2.0)
+                entity = EntityUtils.getEntitiesNearby<RemotePlayer>(compareLocation, 2.0)
                     .filter { isCorrectMob(it.name.formattedTextCompatLessResets()) }
                     .filter { !it.isAtFullHealth() }
                     .minByOrNull { it.distanceTo(compareLocation) }

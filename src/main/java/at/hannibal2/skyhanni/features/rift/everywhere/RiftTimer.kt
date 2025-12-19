@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -146,7 +146,7 @@ object RiftTimer {
         val time = nametagPattern.matchMatcher(nametag) {
             group("time")?.toIntOrNull()
         } ?: return
-        event.text = Text.of("${time.seconds.format()} §aф")
+        event.text = Component.nullToEmpty("${time.seconds.format()} §aф")
     }
 
     fun isEnabled() = RiftApi.inRift() && config.enabled

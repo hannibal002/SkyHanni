@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.gui.screen.ingame.SignEditScreen
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
 
 @SkyHanniModule
 object GardenOptimalAngles {

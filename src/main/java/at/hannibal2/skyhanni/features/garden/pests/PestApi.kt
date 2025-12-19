@@ -43,7 +43,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
@@ -324,7 +324,7 @@ object PestApi {
 
     fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
 
-    fun isNearPestTrap() = EntityUtils.getEntitiesNextToPlayer<ArmorStandEntity>(10.0).any {
+    fun isNearPestTrap() = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(10.0).any {
         pestTrapPattern.matches(it.displayName.formattedTextCompat())
     }
 

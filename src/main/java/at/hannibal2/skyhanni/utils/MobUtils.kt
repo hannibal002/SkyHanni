@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.getInventoryItems
-import net.minecraft.client.resource.language.I18n
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.client.resources.language.I18n
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object MobUtils {
@@ -21,16 +21,16 @@ object MobUtils {
         //#if MC < 1.21
         //$$ I18n.translate("entity.ArmorStand.name")
     //#else
-    I18n.translate("entity.minecraft.armor_stand")
+    I18n.get("entity.minecraft.armor_stand")
     //#endif
 
     // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
-    fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? ArmorStandEntity
+    fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? ArmorStand
 
     fun getNextEntity(entity: Entity, offset: Int): Entity? = EntityUtils.getEntityByID(entity.id + offset)
 
     fun getArmorStandByRangeAll(entity: Entity, range: Double) =
-        EntityUtils.getEntitiesNearby<ArmorStandEntity>(entity.getLorenzVec(), range)
+        EntityUtils.getEntitiesNearby<ArmorStand>(entity.getLorenzVec(), range)
 
     fun getClosestArmorStand(entity: Entity, range: Double) =
         getArmorStandByRangeAll(entity, range).minByOrNull { it.distanceTo(entity) }
@@ -38,18 +38,18 @@ object MobUtils {
     fun getClosestArmorStandWithName(entity: Entity, range: Double, name: String) =
         getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }.minByOrNull { it.distanceTo(entity) }
 
-    fun ArmorStandEntity.isDefaultValue() = this.name.formattedTextCompatLessResets() == defaultArmorStandName
+    fun ArmorStand.isDefaultValue() = this.name.formattedTextCompatLessResets() == defaultArmorStandName
 
-    fun ArmorStandEntity?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
+    fun ArmorStand?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
 
-    fun ArmorStandEntity.hasEmptyInventory() = getInventoryItems().none { it.isNotEmpty() }
+    fun ArmorStand.hasEmptyInventory() = getInventoryItems().none { it.isNotEmpty() }
 
-    fun ArmorStandEntity.isCompletelyDefault() = isDefaultValue() && hasEmptyInventory()
+    fun ArmorStand.isCompletelyDefault() = isDefaultValue() && hasEmptyInventory()
 
     class OwnerShip(val ownerName: String) {
         val ownerPlayer = MobData.players.firstOrNull { it.name == ownerName }
         override fun equals(other: Any?): Boolean {
-            if (other is PlayerEntity) return ownerPlayer == other || ownerName == other.name.formattedTextCompatLessResets()
+            if (other is Player) return ownerPlayer == other || ownerName == other.name.formattedTextCompatLessResets()
             if (other is String) return ownerName == other
             return false
         }
@@ -79,14 +79,14 @@ object MobUtils {
 
     fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
         //#if MC < 1.21
-        //$$ val pos = entity.shouldRender(partialTicks).toLorenzVec() + offset
+        //$$ val pos = entity.setInvisible(partialTicks).toLorenzVec() + offset
         //$$ val look = entity.getLook(partialTicks).toLorenzVec().normalize()
         //#else
-        val look = entity.rotationVector.toLorenzVec().normalize()
-        val pos = entity.eyePos.toLorenzVec() + offset
+        val look = entity.lookAngle.toLorenzVec().normalize()
+        val pos = entity.eyePosition.toLorenzVec() + offset
         //#endif
         val possibleEntities = MobData.entityToMob.filterKeys {
-            it !is ArmorStandEntity &&
+            it !is ArmorStand &&
                 it.boundingBox.rayIntersects(
                     pos, look
                 )

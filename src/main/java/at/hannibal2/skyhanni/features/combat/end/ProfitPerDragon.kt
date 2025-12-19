@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.UUID
 import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
@@ -29,7 +29,7 @@ object ProfitPerDragon {
     // This can probably be optimized to not use getEntities, but it's not a big issue right now
     @OptIn(AllEntitiesGetter::class)
     private fun scanForLoot() {
-        val entities = EntityUtils.getEntities<ArmorStandEntity>()
+        val entities = EntityUtils.getEntities<ArmorStand>()
 
         scannedLootUUIDs.removeIf { uuid -> entities.none { it.uuid == uuid } }
 

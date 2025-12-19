@@ -276,11 +276,11 @@ class GuiPositionEditor(
     }
 
     //#if MC > 1.21
-    override fun close() {
+    override fun onClose() {
     if (oldScreen == null) {
-        super.close()
+        super.onClose()
     } else {
-        net.minecraft.client.MinecraftClient.getInstance().currentScreen = oldScreen
+        net.minecraft.client.Minecraft.getInstance().screen = oldScreen
     }
     }
     //#endif

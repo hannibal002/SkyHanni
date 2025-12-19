@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers.neu;
 
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils;
 import io.github.moulberry.notenoughupdates.miscgui.StorageOverlay;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +16,7 @@ public class MixinStorageOverlay {
 
     @Inject(method = "render", at = @At(value = "TAIL"))
     public void renderTail(CallbackInfo ci) {
-        DrawContextUtils.INSTANCE.setContext(new DrawContext());
+        DrawContextUtils.INSTANCE.setContext(new GuiGraphics());
         EstimatedItemValue.INSTANCE.renderInNeuStorageOverlay();
         DrawContextUtils.INSTANCE.clearContext();
     }

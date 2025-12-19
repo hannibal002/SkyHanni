@@ -5,22 +5,22 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ChatScreen
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.ChatScreen
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 
 @SkyHanniModule
 object RenderData {
 
     @JvmStatic
-    fun postRenderOverlay(context: DrawContext) {
+    fun postRenderOverlay(context: GuiGraphics) {
         if (GlobalRender.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
-        val screen = MinecraftClient.getInstance().currentScreen
+        val screen = Minecraft.getInstance().screen
 
         DrawContextUtils.setContext(context)
         DrawContextUtils.translated(z = -3) {
@@ -33,8 +33,8 @@ object RenderData {
     fun onBackgroundDraw(event: DrawBackgroundEvent) {
         if (GlobalRender.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
-        val currentScreen = MinecraftClient.getInstance().currentScreen ?: return
-        if (currentScreen !is InventoryScreen && currentScreen !is GenericContainerScreen) return
+        val currentScreen = Minecraft.getInstance().screen ?: return
+        if (currentScreen !is InventoryScreen && currentScreen !is ContainerScreen) return
 
         DrawContextUtils.pushPop {
             ModernGlStateManager.enableDepthTest()
@@ -52,7 +52,7 @@ object RenderData {
 
     var outsideInventory = false
 
-    fun renderOverlay(context: DrawContext, inventoryPresent: Boolean = false) {
+    fun renderOverlay(context: GuiGraphics, inventoryPresent: Boolean = false) {
         outsideInventory = true
         GuiRenderEvent.GuiOverlayRenderEvent(context).post()
         if (!inventoryPresent) GuiRenderEvent.GuiOnTopRenderEvent(context).post()

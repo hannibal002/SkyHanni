@@ -118,7 +118,7 @@ object TabWidgetSettings {
         if (!inInventory) return
 
         event.container.slots
-            .associateWith { highlights[it.id] }
+            .associateWith { highlights[it.index] }
             .forEach { (slot, color) ->
                 color?.let { slot.highlight(it) }
             }

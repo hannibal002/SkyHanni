@@ -12,7 +12,7 @@ import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.UnsupportedFlavorException
 import kotlin.time.Duration.Companion.milliseconds
 //#if MC > 1.21
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 //#endif
 
 object ClipboardUtils {
@@ -48,7 +48,7 @@ object ClipboardUtils {
                 //#if MC < 1.21
                 //$$ getClipboard()?.setContents(StringSelection(text), null)
                 //#elseif MC < 1.21.9
-                net.minecraft.client.util.Clipboard().setClipboard(MinecraftClient.getInstance().window.handle, text)
+                com.mojang.blaze3d.platform.ClipboardManager().setClipboard(Minecraft.getInstance().window.window, text)
                 //#else
                 //$$ net.minecraft.client.util.Clipboard().set(MinecraftClient.getInstance().window, text)
                 //#endif
@@ -84,7 +84,7 @@ object ClipboardUtils {
     //#else
     fun readFromClipboard(step: Int = 0): String? {
         var shouldRetry = false
-        val clipboard = net.minecraft.client.util.Clipboard().getClipboard(
+        val clipboard = com.mojang.blaze3d.platform.ClipboardManager().getClipboard(
     //#if MC < 1.21.9
         0,
     //#else

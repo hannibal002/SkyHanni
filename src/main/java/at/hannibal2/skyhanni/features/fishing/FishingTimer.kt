@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -165,7 +165,7 @@ object FishingTimer {
     @HandleEvent
     fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
-        if (MinecraftClient.getInstance().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         if (event.keyCode != config.manualResetTimer) return
 
         mobDespawnTime.replaceAll { _, _ ->

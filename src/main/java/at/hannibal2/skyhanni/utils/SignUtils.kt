@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.utils import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.gui.screen.ingame.SignEditScreen
-import net.minecraft.text.Text
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import net.minecraft.network.chat.Component
 
 object SignUtils {
     private var pasteLastClicked = false
@@ -16,23 +16,23 @@ object SignUtils {
     private var deleteLastClicked = false
 
     fun setTextIntoSign(text: String, line: Int = 0) {
-        val gui = MinecraftClient.getInstance().currentScreen
+        val gui = Minecraft.getInstance().screen
         if (gui !is AbstractSignEditScreen) return
         //#if MC < 1.21
         //$$ gui.signText[line] = text.asComponent()
         //#else
-        val oldRow = gui.currentRow
-        gui.currentRow = line
-        gui.setCurrentRowMessage(text)
-        gui.currentRow = oldRow
+        val oldRow = gui.line
+        gui.line = line
+        gui.setMessage(text)
+        gui.line = oldRow
         //#endif
     }
 
     private fun addTextIntoSign(addedText: String) {
-        val gui = MinecraftClient.getInstance().currentScreen
+        val gui = Minecraft.getInstance().screen
         if (gui !is AbstractSignEditScreen) return
         val lines = gui.signText
-        val index = gui.currentRow
+        val index = gui.line
         val text = lines[index].unformattedTextCompat() + addedText
         lines[index] = text.capAtMinecraftLength(91).asComponent()
     }
@@ -43,12 +43,12 @@ object SignUtils {
             SkyHanniMod.launchCoroutine("sign utils check deleting") {
                 val newLine = if (KeyboardManager.isDeleteLineDown()) ""
                 else if (KeyboardManager.isDeleteWordDown()) {
-                    val currentLine = gui.signText[gui.currentRow].unformattedTextCompat()
+                    val currentLine = gui.signText[gui.line].unformattedTextCompat()
 
                     val lastSpaceIndex = currentLine.trimEnd().lastIndexOf(' ')
                     if (lastSpaceIndex >= 0) currentLine.substring(0, lastSpaceIndex + 2) else ""
                 } else return@launchCoroutine
-                setTextIntoSign(newLine, gui.currentRow)
+                setTextIntoSign(newLine, gui.line)
             }
         }
         deleteLastClicked = deleteClicked
@@ -58,7 +58,7 @@ object SignUtils {
         val copyClicked = KeyboardManager.isCopyingKeysDown()
         if (!copyLastClicked && copyClicked && gui is AbstractSignEditScreen) {
             SkyHanniMod.launchCoroutine("sign utils copy copying") {
-                ClipboardUtils.copyToClipboard(gui.signText[gui.currentRow].unformattedTextCompat())
+                ClipboardUtils.copyToClipboard(gui.signText[gui.line].unformattedTextCompat())
             }
         }
         copyLastClicked = copyClicked
@@ -113,7 +113,7 @@ object SignUtils {
         return signText[2] == "Cast your" && signText[3] == "vote"
     }
 
-    private val AbstractSignEditScreen.signText: Array<Text>
+    private val AbstractSignEditScreen.signText: Array<Component>
         //#if MC < 1.21
         //$$ get() = this.tileSign.signText
     //#else

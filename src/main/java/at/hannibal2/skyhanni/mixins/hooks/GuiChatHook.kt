@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.mixins.hooks import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import net.minecraft.text.HoverEvent
-import net.minecraft.text.Text
-import net.minecraft.text.Style
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
 //#if MC < 1.21
 //$$ import net.minecraft.text.Text
 //#endif
@@ -11,9 +11,9 @@ import net.minecraft.text.Style
 object GuiChatHook {
 
     @JvmStatic
-    var currentComponent: Text? = null
+    var currentComponent: Component? = null
 
-    lateinit var replacement: Text
+    lateinit var replacement: Component
 
     fun replaceEntireComponent(title: String, chatStyle: Style) {
         if (!this::replacement.isInitialized) return
@@ -41,7 +41,7 @@ object GuiChatHook {
         replacement = newComponent
     }
 
-    fun getReplacementAsIChatComponent(): Text {
+    fun getReplacementAsIChatComponent(): Component {
         if (!this::replacement.isInitialized) {
             // Return an extremely basic chat component as to not error downstream
             return "Original component was not set".asComponent()

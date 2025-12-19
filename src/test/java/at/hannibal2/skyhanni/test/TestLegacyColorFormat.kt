@@ -7,30 +7,30 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 import at.hannibal2.skyhanni.utils.compat.withColor
-import net.minecraft.text.Style
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
+import net.minecraft.network.chat.Style
+import net.minecraft.network.chat.Component
+import net.minecraft.ChatFormatting
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class TestLegacyColorFormat {
 
-    private val testText1 = Text.literal("")
-        .append(Text.literal("[").withColor(Formatting.DARK_GRAY))
-        .append(Text.literal("302").withColor(Formatting.BLUE))
-        .append(Text.literal("] ").withColor(Formatting.DARK_GRAY))
-        .append(Text.literal("♫ ").withColor(Formatting.GOLD))
-        .append(Text.literal("[MVP").withColor(Formatting.AQUA))
-        .append(Text.literal("+").withColor(Formatting.LIGHT_PURPLE))
-        .append(Text.literal("] lrg89").withColor(Formatting.AQUA))
-        .append(Text.literal(": test").withColor(Formatting.WHITE))
+    private val testText1 = Component.literal("")
+        .append(Component.literal("[").withColor(ChatFormatting.DARK_GRAY))
+        .append(Component.literal("302").withColor(ChatFormatting.BLUE))
+        .append(Component.literal("] ").withColor(ChatFormatting.DARK_GRAY))
+        .append(Component.literal("♫ ").withColor(ChatFormatting.GOLD))
+        .append(Component.literal("[MVP").withColor(ChatFormatting.AQUA))
+        .append(Component.literal("+").withColor(ChatFormatting.LIGHT_PURPLE))
+        .append(Component.literal("] lrg89").withColor(ChatFormatting.AQUA))
+        .append(Component.literal(": test").withColor(ChatFormatting.WHITE))
 
-    private val testText2 = Text.literal("")
-        .append(Text.literal("Test ").withColor(Formatting.WHITE))
-        .append(Text.literal("Extra ").setStyle(Style.EMPTY.withBold(true)))
-        .append(Text.literal("Resets ").setStyle(Style.EMPTY))
-        .append(Text.literal("§r").setStyle(Style.EMPTY))
-        .append(Text.literal("Done").setStyle(Style.EMPTY.withObfuscated(true)))
+    private val testText2 = Component.literal("")
+        .append(Component.literal("Test ").withColor(ChatFormatting.WHITE))
+        .append(Component.literal("Extra ").setStyle(Style.EMPTY.withBold(true)))
+        .append(Component.literal("Resets ").setStyle(Style.EMPTY))
+        .append(Component.literal("§r").setStyle(Style.EMPTY))
+        .append(Component.literal("Done").setStyle(Style.EMPTY.withObfuscated(true)))
 
     @Test
     fun `test formatted text compat`() {

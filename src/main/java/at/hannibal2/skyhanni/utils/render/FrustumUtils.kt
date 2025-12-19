@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.Frustum
-import net.minecraft.util.math.Box
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.culling.Frustum
+import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
 object FrustumUtils {
@@ -13,10 +13,10 @@ object FrustumUtils {
     //#if MC < 1.21
     //$$ private var frustum: Frustum? = null
     //#else
-    private val frustum get() = MinecraftClient.getInstance().worldRenderer.frustum
+    private val frustum get() = Minecraft.getInstance().levelRenderer.cullingFrustum
     //#endif
 
-    fun isVisible(box: Box): Boolean =
+    fun isVisible(box: AABB): Boolean =
         //#if MC < 1.21
         //$$ frustum?.isBoundingBoxInFrustum(box) ?: false
     //#else
@@ -24,7 +24,7 @@ object FrustumUtils {
     //#endif
 
     fun isVisible(minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double) =
-        isVisible(Box(minX, minY, minZ, maxX, maxY, maxZ))
+        isVisible(AABB(minX, minY, minZ, maxX, maxY, maxZ))
 
     //#if MC < 1.21
     //$$ /**

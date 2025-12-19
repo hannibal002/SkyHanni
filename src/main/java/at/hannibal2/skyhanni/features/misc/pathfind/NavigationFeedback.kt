@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -39,7 +39,7 @@ object NavigationFeedback {
     fun setNavInactive() { navActive = false }
 
     fun sendPathFindMessage(message: String) = sendPathFindMessage(message.asComponent())
-    fun sendPathFindMessage(component: Text): Boolean {
+    fun sendPathFindMessage(component: Component): Boolean {
         navActive = true
         navLastActive = SimpleTimeMark.now()
         return when (config.feedbackMode.get()) {
@@ -50,14 +50,14 @@ object NavigationFeedback {
         }
     }
 
-    private fun sendChatFeedback(component: Text): Boolean {
+    private fun sendChatFeedback(component: Component): Boolean {
         if (lastChatMessageSent.passedSince() < config.chatUpdateInterval.duration) return false
         component.send(pathFindMessageId)
         lastChatMessageSent = SimpleTimeMark.now()
         return true
     }
 
-    private fun sendGuiFeedback(component: Text): Boolean {
+    private fun sendGuiFeedback(component: Component): Boolean {
         val guiFormattedText = component.formattedTextCompat().replace("§e[SkyHanni] ", "§e")
         guiRenderable = Renderable.clickable(
             Renderable.text(guiFormattedText),

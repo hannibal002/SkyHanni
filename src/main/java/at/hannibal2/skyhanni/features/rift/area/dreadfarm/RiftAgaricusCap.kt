@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import net.minecraft.block.Blocks
+import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object RiftAgaricusCap {

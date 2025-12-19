@@ -15,27 +15,27 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import net.minecraft.client.network.OtherClientPlayerEntity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.mob.CaveSpiderEntity
-import net.minecraft.entity.mob.SlimeEntity
-import net.minecraft.entity.mob.ZombieEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.math.Box
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.monster.CaveSpider
+import net.minecraft.world.entity.monster.Slime
+import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.phys.AABB
 
 // TODO fix looking at direction, slime size, helmet/skull of zombie
 @SkyHanniModule
 object CraftRoomHolographicMob {
 
     private val config get() = SkyHanniMod.feature.rift.area.mirrorverse.craftingRoom
-    private val craftRoomArea = Box(
+    private val craftRoomArea = AABB(
         -108.0, 58.0, -106.0,
         -117.0, 51.0, -128.0,
     )
     private val entityToHolographicEntity = mapOf(
-        ZombieEntity::class.java to HolographicEntities.zombie,
-        SlimeEntity::class.java to HolographicEntities.slime,
-        CaveSpiderEntity::class.java to HolographicEntities.caveSpider,
+        Zombie::class.java to HolographicEntities.zombie,
+        Slime::class.java to HolographicEntities.slime,
+        CaveSpider::class.java to HolographicEntities.caveSpider,
     )
 
     private var holograms = mapOf<HolographicEntities.HolographicEntity<out LivingEntity>, String?>()
@@ -48,12 +48,12 @@ object CraftRoomHolographicMob {
 
         val map = mutableMapOf<HolographicEntities.HolographicEntity<out LivingEntity>, String?>()
         for (entity in EntityUtils.getEntitiesNextToPlayer<LivingEntity>(25.0)) {
-            if (entity is PlayerEntity) continue
+            if (entity is Player) continue
             val holographicEntity = entityToHolographicEntity[entity::class.java] ?: continue
 
             val currentLocation = entity.getLorenzVec()
             if (!craftRoomArea.isInside(currentLocation)) continue
-            val previousLocation = LorenzVec(entity.lastX, entity.lastY, entity.lastZ) // used to interpolate movement
+            val previousLocation = LorenzVec(entity.xo, entity.yo, entity.zo) // used to interpolate movement
 
             // we currently don't rotate the body so head rotations looked very weird
             val instance = holographicEntity.instance(previousLocation.mirror(), 0f)
@@ -81,13 +81,13 @@ object CraftRoomHolographicMob {
             event.renderHolographicEntity(mob)
 
             string?.let {
-                event.drawString(mob.position.add(y = mob.entity.standingEyeHeight + .5), it)
+                event.drawString(mob.position.add(y = mob.entity.eyeHeight + .5), it)
             }
         }
     }
 
     @HandleEvent(receiveCancelled = true, onlyOnIsland = IslandType.THE_RIFT)
-    fun onPlayerRender(event: CheckRenderEntityEvent<OtherClientPlayerEntity>) {
+    fun onPlayerRender(event: CheckRenderEntityEvent<RemotePlayer>) {
         if (enabled && config.hidePlayers) {
             event.cancel()
         }

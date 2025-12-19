@@ -27,8 +27,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 
 @SkyHanniModule
 object CrimsonIsleReputationHelper {
@@ -148,7 +148,7 @@ object CrimsonIsleReputationHelper {
     }
 
     fun isHotkeyHeld(): Boolean {
-        val isAllowedGui = MinecraftClient.getInstance().currentScreen.let {
+        val isAllowedGui = Minecraft.getInstance().screen.let {
             it == null || it is InventoryScreen
         }
         if (!isAllowedGui) return false

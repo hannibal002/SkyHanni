@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object MinionCraftHelper {
@@ -64,7 +64,7 @@ object MinionCraftHelper {
         val mainInventory = InventoryUtils.getItemsInOwnInventory()
 
         if (event.isMod(10)) {
-            hasMinionInInventory = mainInventory.map { it.name.formattedTextCompatLeadingWhiteLessResets() }.any { isMinionName(it) }
+            hasMinionInInventory = mainInventory.map { it.hoverName.formattedTextCompatLeadingWhiteLessResets() }.any { isMinionName(it) }
         }
 
         if (event.repeatSeconds(2)) {
@@ -107,7 +107,7 @@ object MinionCraftHelper {
         val otherItems = mutableMapOf<NeuInternalName, Int>()
 
         for (item in mainInventory) {
-            val name = item.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
             val rawId = item.getInternalName()
             if (isMinionName(name)) {
                 minions[name] = rawId
@@ -118,7 +118,7 @@ object MinionCraftHelper {
         minions.values.mapTo(allMinions) { it.addOneToId() }
 
         for (item in mainInventory) {
-            val name = item.name.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
             if (item.hasHypixelEnchantments()) continue
             val rawId = item.getInternalName()
             if (!isMinionName(name)) {
@@ -269,7 +269,7 @@ object MinionCraftHelper {
         if (event.inventoryName != "Crafted Minions") return
 
         for ((_, b) in event.inventoryItems) {
-            val name = b.name.formattedTextCompatLeadingWhiteLessResets()
+            val name = b.hoverName.formattedTextCompatLeadingWhiteLessResets()
             if (!name.startsWith("§e")) continue
             val internalName = NeuInternalName.fromItemName("$name I")
                 .replace("MINION", "GENERATOR").replace(";", "_").replace("CAVE_SPIDER", "CAVESPIDER")

@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.convertToJsonString
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import net.minecraft.client.MinecraftClient
-import net.minecraft.text.Text
+import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
 
 class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyHanniBaseScreen() {
 
@@ -28,7 +28,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         actionReason ?: modifiedReason
 
     private fun reasonLength(result: ChatManager.MessageFilteringResult): Int =
-        result.getReason()?.let { fontRenderer().getWidth(it) } ?: 0
+        result.getReason()?.let { fontRenderer().width(it) } ?: 0
 
     private val historySize =
         history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
@@ -93,7 +93,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         }
     }
 
-    private fun splitLine(comp: Text): List<String> {
+    private fun splitLine(comp: Component): List<String> {
         return comp.formattedTextCompat().splitLines(w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10)).split("\n")
     }
 
@@ -114,7 +114,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         }
     }
 
-    private fun fontRenderer() = MinecraftClient.getInstance().textRenderer
+    private fun fontRenderer() = Minecraft.getInstance().font
 
     override fun onHandleMouseInput() {
         setScroll(scroll - MouseCompat.getScrollDelta())

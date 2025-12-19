@@ -29,8 +29,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.network.OtherClientPlayerEntity
+import net.minecraft.client.Minecraft
+import net.minecraft.client.player.RemotePlayer
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -78,7 +78,7 @@ object RareMobWaypointShare {
     private var lastRareMob = -1
     private var lastShareTime = SimpleTimeMark.farPast()
 
-    private val rareMobsNearby = ConcurrentHashMap<Int, OtherClientPlayerEntity>()
+    private val rareMobsNearby = ConcurrentHashMap<Int, RemotePlayer>()
 
     private val _waypoints = ConcurrentHashMap<String, SharedRareMob>()
     val waypoints: Map<String, SharedRareMob>
@@ -192,7 +192,7 @@ object RareMobWaypointShare {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (MinecraftClient.getInstance().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         if (event.keyCode == config.keyBindShare) sendRareMob()
     }
 

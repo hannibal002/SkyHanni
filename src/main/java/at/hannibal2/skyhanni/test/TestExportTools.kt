@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
+import net.minecraft.world.item.ItemStack
+import net.minecraft.nbt.CompoundTag
 import java.io.InputStreamReader
 import java.io.Reader
 

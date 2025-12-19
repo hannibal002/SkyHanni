@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 //#if MC > 1.16
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 //#endif
@@ -30,7 +30,7 @@ object PetNametag {
     )
 
     @HandleEvent
-    fun onNameTagRender(event: EntityDisplayNameEvent<ArmorStandEntity>) {
+    fun onNameTagRender(event: EntityDisplayNameEvent<ArmorStand>) {
         if (!isEnabled()) return
 
         val standName: String =

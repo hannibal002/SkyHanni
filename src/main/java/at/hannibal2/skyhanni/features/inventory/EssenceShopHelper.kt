@@ -30,8 +30,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -239,14 +239,14 @@ object EssenceShopHelper {
 
     private fun processEssenceShopHeader(event: InventoryOpenEvent) {
         val essenceHeaderStack = event.inventoryItems[4]
-        if (essenceHeaderStack == null || !essenceShopPattern.matches(essenceHeaderStack.name.formattedTextCompatLeadingWhiteLessResets())) {
+        if (essenceHeaderStack == null || !essenceShopPattern.matches(essenceHeaderStack.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
             ErrorManager.logErrorWithData(
                 NoSuchElementException(""),
                 "Could not read current Essence Count from inventory",
                 extraData = listOf(
                     "inventoryName" to event.inventoryName,
-                    "essenceHeaderStack" to essenceHeaderStack?.name.formattedTextCompatLeadingWhiteLessResets().orEmpty(),
-                    "populatedInventorySize" to event.inventoryItems.filter { it.value.name.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() }.size,
+                    "essenceHeaderStack" to essenceHeaderStack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty(),
+                    "populatedInventorySize" to event.inventoryItems.filter { it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() }.size,
                     "eventType" to event.javaClass.simpleName,
                 ).toTypedArray(),
             )

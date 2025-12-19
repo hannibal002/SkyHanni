@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import at.hannibal2.skyhanni.mixins.hooks.FontRendererHook;
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Font;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(TextRenderer.class)
+@Mixin(Font.class)
 public abstract class MixinFontRenderer {
 
     /**
@@ -37,8 +37,8 @@ public abstract class MixinFontRenderer {
      * Inject call to {@link FontRendererHook#restoreChromaState()} after 1st and 3rd fontrenderer.italicStyle = ___ call
      */
     @Inject(method = "renderStringAtPos", at = {
-        @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/client/font/TextRenderer;italicStyle:Z", ordinal = 0, shift = At.Shift.AFTER),
-        @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/client/font/TextRenderer;italicStyle:Z", ordinal = 2, shift = At.Shift.AFTER)})
+        @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/client/gui/Font;italicStyle:Z", ordinal = 0, shift = At.Shift.AFTER),
+        @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/client/gui/Font;italicStyle:Z", ordinal = 2, shift = At.Shift.AFTER)})
     public void insertRestoreChromaState(CallbackInfo ci) {
         FontRendererHook.restoreChromaState();
     }
@@ -79,7 +79,7 @@ public abstract class MixinFontRenderer {
         return ModifyVisualWords.INSTANCE.modifyText(text);
     }
 
-    @ModifyVariable(method = "getWidth(Ljava/lang/String;)I", at = @At("HEAD"), argsOnly = true)
+    @ModifyVariable(method = "width(Ljava/lang/String;)I", at = @At("HEAD"), argsOnly = true)
     private String getStringWidth(String text) {
         return ModifyVisualWords.INSTANCE.modifyText(text);
     }

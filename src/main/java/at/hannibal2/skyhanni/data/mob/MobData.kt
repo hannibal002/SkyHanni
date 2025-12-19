@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.TreeMap
 import at.hannibal2.skyhanni.data.mob.Mob.Type as MobType
 
@@ -60,12 +60,12 @@ object MobData {
             val somethingWentWrong = MobResult(Result.SomethingWentWrong, null)
             fun found(mob: Mob) = MobResult(Result.Found, mob)
 
-            fun ArmorStandEntity?.makeMobResult(mob: (ArmorStandEntity) -> Mob?) =
+            fun ArmorStand?.makeMobResult(mob: (ArmorStand) -> Mob?) =
                 this?.let { armor ->
                     mob.invoke(armor)?.let { found(it) } ?: somethingWentWrong
                 } ?: notYetFound
 
-            fun List<ArmorStandEntity?>.makeMobResult(mob: (List<ArmorStandEntity>) -> Mob?) =
+            fun List<ArmorStand?>.makeMobResult(mob: (List<ArmorStand>) -> Mob?) =
                 this.takeIfAllNotNull()?.let { armor ->
                     mob.invoke(armor)?.let { found(it) } ?: somethingWentWrong
                 } ?: notYetFound

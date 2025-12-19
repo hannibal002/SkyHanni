@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import kotlinx.coroutines.Job
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import java.util.NavigableMap
 import java.util.TreeMap
 import kotlin.time.Duration.Companion.minutes
@@ -66,7 +66,7 @@ object ChangelogViewer {
     }
 
     private fun openChangelog() {
-        if (MinecraftClient.getInstance().currentScreen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen = ChangeLogViewerScreen()
+        if (Minecraft.getInstance().screen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen = ChangeLogViewerScreen()
     }
 
     private suspend fun getChangelog() {

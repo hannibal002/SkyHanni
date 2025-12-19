@@ -7,15 +7,15 @@ import com.mojang.blaze3d.pipeline.BlendFunction
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.platform.DepthTestFunction
 import com.mojang.blaze3d.vertex.VertexFormat
-import net.minecraft.client.gl.RenderPipelines
-import net.minecraft.client.gl.UniformType
-import net.minecraft.client.render.VertexFormats
-import net.minecraft.util.Identifier
+import net.minecraft.client.renderer.RenderPipelines
+import com.mojang.blaze3d.shaders.UniformType
+import com.mojang.blaze3d.vertex.DefaultVertexFormat
+import net.minecraft.resources.ResourceLocation
 
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
-    vFormat: VertexFormat = VertexFormats.POSITION_COLOR,
-    vDrawMode: VertexFormat.DrawMode = VertexFormat.DrawMode.QUADS,
+    vFormat: VertexFormat = DefaultVertexFormat.POSITION_COLOR,
+    vDrawMode: VertexFormat.Mode = VertexFormat.Mode.QUADS,
     blend: BlendFunction? = null,
     withCull: Boolean? = false,
     vertexShaderPath: String? = null,
@@ -26,52 +26,52 @@ enum class SkyHanniRenderPipeline(
     depthTestFunction: DepthTestFunction = DepthTestFunction.LEQUAL_DEPTH_TEST,
 ) {
     LINES(
-        snippet = RenderPipelines.RENDERTYPE_LINES_SNIPPET,
-        vFormat = VertexFormats.POSITION_COLOR_NORMAL,
-        vDrawMode = VertexFormat.DrawMode.LINES,
+        snippet = RenderPipelines.LINES_SNIPPET,
+        vFormat = DefaultVertexFormat.POSITION_COLOR_NORMAL,
+        vDrawMode = VertexFormat.Mode.LINES,
     ),
     LINES_XRAY(
-        snippet = RenderPipelines.RENDERTYPE_LINES_SNIPPET,
-        vFormat = VertexFormats.POSITION_COLOR_NORMAL,
-        vDrawMode = VertexFormat.DrawMode.LINES,
+        snippet = RenderPipelines.LINES_SNIPPET,
+        vFormat = DefaultVertexFormat.POSITION_COLOR_NORMAL,
+        vDrawMode = VertexFormat.Mode.LINES,
         depthWrite = false,
         depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     FILLED(
-        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
-        vDrawMode = VertexFormat.DrawMode.TRIANGLE_STRIP,
+        snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
+        vDrawMode = VertexFormat.Mode.TRIANGLE_STRIP,
     ),
     FILLED_XRAY(
-        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
-        vDrawMode = VertexFormat.DrawMode.TRIANGLE_STRIP,
+        snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
+        vDrawMode = VertexFormat.Mode.TRIANGLE_STRIP,
         depthWrite = false,
         depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     TRIANGLES(
-        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
-        vDrawMode = VertexFormat.DrawMode.TRIANGLES,
+        snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
+        vDrawMode = VertexFormat.Mode.TRIANGLES,
     ),
     TRIANGLES_XRAY(
-        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
-        vDrawMode = VertexFormat.DrawMode.TRIANGLES,
+        snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
+        vDrawMode = VertexFormat.Mode.TRIANGLES,
         depthWrite = false,
         depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     TRIANGLE_FAN(
-        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
-        vDrawMode = VertexFormat.DrawMode.TRIANGLE_FAN,
+        snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
+        vDrawMode = VertexFormat.Mode.TRIANGLE_FAN,
     ),
     TRIANGLE_FAN_XRAY(
-        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
-        vDrawMode = VertexFormat.DrawMode.TRIANGLE_FAN,
+        snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
+        vDrawMode = VertexFormat.Mode.TRIANGLE_FAN,
         depthWrite = false,
         depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     QUADS(
-        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
+        snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
     ),
     QUADS_XRAY(
-        snippet = RenderPipelines.POSITION_COLOR_SNIPPET,
+        snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         depthWrite = false,
         depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
@@ -84,7 +84,7 @@ enum class SkyHanniRenderPipeline(
     ),
     ROUNDED_TEXTURED_RECT(
         snippet = RenderPipelines.MATRICES_SNIPPET,
-        vFormat = VertexFormats.POSITION_TEXTURE,
+        vFormat = DefaultVertexFormat.POSITION_TEX,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_texture",
         sampler = "textureSampler",
@@ -93,7 +93,7 @@ enum class SkyHanniRenderPipeline(
     ),
     ROUNDED_RECT_OUTLINE(
         snippet = RenderPipelines.MATRICES_SNIPPET,
-        vFormat = VertexFormats.POSITION_COLOR,
+        vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect_outline",
         //#if MC < 1.21.6
@@ -110,7 +110,7 @@ enum class SkyHanniRenderPipeline(
     ),
     CIRCLE(
         snippet = RenderPipelines.MATRICES_SNIPPET,
-        vFormat = VertexFormats.POSITION_COLOR,
+        vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "circle",
         //#if MC < 1.21.6
@@ -126,7 +126,7 @@ enum class SkyHanniRenderPipeline(
     ),
     RADIAL_GRADIENT_CIRCLE(
         snippet = RenderPipelines.MATRICES_SNIPPET,
-        vFormat = VertexFormats.POSITION_COLOR,
+        vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "radial_gradient_circle",
         //#if MC < 1.21.6
@@ -146,14 +146,14 @@ enum class SkyHanniRenderPipeline(
     ),
     CHROMA_STANDARD(
         snippet = RenderPipelines.MATRICES_SNIPPET,
-        vFormat = VertexFormats.POSITION_COLOR,
+        vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "standard_chroma",
         uniforms = commonChromaUniforms,
     ),
     CHROMA_TEXT(
         snippet = RenderPipelines.MATRICES_SNIPPET,
-        vFormat = VertexFormats.POSITION_TEXTURE_COLOR,
+        vFormat = DefaultVertexFormat.POSITION_TEX_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "textured_chroma",
         sampler = "Sampler0",
@@ -163,13 +163,13 @@ enum class SkyHanniRenderPipeline(
 
     private val _pipe: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
-            .withLocation(Identifier.of(SkyHanniMod.MODID, this.name.lowercase()))
+            .withLocation(ResourceLocation.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
             .withVertexFormat(vFormat, vDrawMode)
             .apply {
                 // One or the other, never both
                 blend?.let(this::withBlend) ?: withCull?.let(this::withCull)
-                vertexShaderPath?.let { withVertexShader(Identifier.of(SkyHanniMod.MODID, it)) }
-                fragmentShaderPath?.let { withFragmentShader(Identifier.of(SkyHanniMod.MODID, it)) }
+                vertexShaderPath?.let { withVertexShader(ResourceLocation.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
+                fragmentShaderPath?.let { withFragmentShader(ResourceLocation.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
                 sampler?.let(this::withSampler)
                 uniforms.forEach(this::withUniform)
                 withDepthWrite(depthWrite)

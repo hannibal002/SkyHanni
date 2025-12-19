@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CarnivalShopHelper {
@@ -237,7 +237,7 @@ object CarnivalShopHelper {
 
     private fun processTokenShopFooter(event: InventoryOpenEvent): Boolean {
         val tokenFooterStack = event.inventoryItems.getOrElse(32) { return false }
-        if (tokenFooterStack.name.formattedTextCompatLeadingWhiteLessResets() != "§eCarnival Tokens") return false
+        if (tokenFooterStack.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§eCarnival Tokens") return false
         currentTokenCountPattern.firstMatcher(tokenFooterStack.getLore()) {
             val new = groupOrNull("tokens")?.formatInt() ?: 0
             val changed = new != tokensOwned

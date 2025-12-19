@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import net.minecraft.entity.Entity
+import net.minecraft.world.entity.Entity
 
 private var savedEntity: Entity? = null
 

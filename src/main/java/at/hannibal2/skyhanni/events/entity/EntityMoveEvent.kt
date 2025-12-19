@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.events.entity
 import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
-import net.minecraft.entity.LivingEntity
+import net.minecraft.world.entity.LivingEntity
 
 class EntityMoveEvent<T : LivingEntity>(
     val entity: T,

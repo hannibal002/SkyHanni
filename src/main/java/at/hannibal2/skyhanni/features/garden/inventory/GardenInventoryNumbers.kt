@@ -53,7 +53,7 @@ object GardenInventoryNumbers {
         if (InventoryUtils.openInventoryName() == "Composter Upgrades") {
             if (!config.composterUpgrades) return
 
-            ComposterUpgrade.regex.matchMatcher(event.stack.name.formattedTextCompatLeadingWhiteLessResets()) {
+            ComposterUpgrade.regex.matchMatcher(event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val level = group("level")?.romanToDecimalIfNecessary() ?: 0
                 event.stackTip = "$level"
             }
