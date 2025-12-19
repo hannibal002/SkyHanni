@@ -6,7 +6,6 @@ import at.skyhanni.sharedvariables.versionString
 import com.google.devtools.ksp.gradle.KspTaskJvm
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
-import moe.nea.shot.Shots
 import net.fabricmc.loom.api.processor.MinecraftJarProcessor
 import net.fabricmc.loom.api.processor.ProcessorContext
 import net.fabricmc.loom.api.processor.SpecContext
@@ -161,17 +160,6 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.prTitle = project.findProperty("prTitle") as? String ?: ""
     this.prBody = project.findProperty("prBody") as? String ?: ""
 }
-
-// Disabled because it breaks mixins with the minecraft dev plugin
-// file("shots.txt")
-//     .takeIf(File::exists)
-//     ?.readText()
-//     ?.lines()
-//     ?.let(ShotParser()::parse)
-//     ?.let(::Shots)
-//     ?.let {
-//         loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
-//     }
 
 dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
@@ -492,25 +480,4 @@ tasks.withType<Detekt>().configureEach {
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
-}
-
-abstract class ShotApplicationJarProcessor @Inject constructor(private val shots: Shots) :
-    MinecraftJarProcessor<MinecraftJarProcessor.Spec>,
-    Serializable {
-
-    override fun buildSpec(context: SpecContext?): MinecraftJarProcessor.Spec? = ShotSpec(shots)
-
-    override fun processJar(source: Path, spec: MinecraftJarProcessor.Spec?, context: ProcessorContext?) {
-        val dest = source.resolveSibling(source.fileName.toString() + "-temp-shot")
-        ZipFile(source.toFile()).use { input ->
-            ZipOutputStream(dest.outputStream()).use { output ->
-                shots.processZipFile(input, output)
-            }
-        }
-        dest.moveTo(source, overwrite = true)
-    }
-
-    override fun getName(): String = "Shots"
-
-    private data class ShotSpec(val shots: Shots) : MinecraftJarProcessor.Spec, Serializable
 }
