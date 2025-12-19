@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.SignUtils.isPlayerElectionSign
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.fakePlayer
-import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
 
 @SkyHanniModule
 object ImportantAuraFeatures {
@@ -69,7 +69,7 @@ object ImportantAuraFeatures {
     fun onSignOpen(event: GuiScreenOpenEvent) {
         if (!isEnabled()) return
         if (ElectionApi.currentMayor != ElectionCandidate.AURA) return
-        val gui = event.gui as? GuiEditSign ?: return
+        val gui = event.gui as? SignEditScreen ?: return
         if (!gui.isPlayerElectionSign()) return
         DelayedRun.runNextTick {
             SignUtils.setTextIntoSign("hannibal2", 0)

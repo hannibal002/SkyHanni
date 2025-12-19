@@ -11,7 +11,7 @@ object ScreenData {
 
     @HandleEvent
     fun onTick() {
-        val isOpen = Minecraft.getMinecraft().currentScreen != null
+        val isOpen = Minecraft.getInstance().screen != null
         if (wasOpen == isOpen) return
         wasOpen = isOpen
         if (!wasOpen) {

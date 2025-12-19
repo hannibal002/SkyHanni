@@ -10,9 +10,6 @@ import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import kotlin.jvm.optionals.getOrNull
-//#if MC < 1.21
-import at.hannibal2.skyhanni.features.misc.CurrentPing
-//#endif
 
 @SkyHanniModule
 object HypixelEventApi {
@@ -23,9 +20,6 @@ object HypixelEventApi {
         modApi.subscribeToEventPacket(ClientboundLocationPacket::class.java)
         modApi.createHandler(ClientboundHelloPacket::class.java, ::onHelloPacket)
         modApi.createHandler(ClientboundLocationPacket::class.java, ::onLocationPacket)
-        //#if MC < 1.21
-        modApi.createHandler(ClientboundPingPacket::class.java, CurrentPing::onPongPacket)
-        //#endif
     }
 
     private fun onHelloPacket(packet: ClientboundHelloPacket) {

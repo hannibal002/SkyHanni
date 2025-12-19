@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 @SkyHanniModule
 object FavoritePowerStone {
@@ -28,14 +29,14 @@ object FavoritePowerStone {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
 
-        highlightedSlots.forEach { event.container.inventorySlots[it].highlight(LorenzColor.AQUA) }
+        highlightedSlots.forEach { event.container.slots[it].highlight(LorenzColor.AQUA) }
     }
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !KeyboardManager.isShiftKeyDown() || !inInventory) return
 
-        val displayName = event.item?.displayName?.removeColor()?.trim() ?: return
+        val displayName = event.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()?.removeColor()?.trim() ?: return
         val power = MaxwellApi.getPowerByNameOrNull(displayName) ?: return
 
         if (power in MaxwellApi.favoritePowers) {
@@ -61,7 +62,7 @@ object FavoritePowerStone {
         if (!isEnabled() || !inInventory) return
 
         highlightedSlots = event.inventoryItems
-            .filter { (_, item) -> item.displayName.removeColor() in MaxwellApi.favoritePowers }
+            .filter { (_, item) -> item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() in MaxwellApi.favoritePowers }
             .keys
     }
 

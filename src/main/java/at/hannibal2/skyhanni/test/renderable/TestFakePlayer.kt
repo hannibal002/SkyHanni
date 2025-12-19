@@ -1,17 +1,18 @@
 package at.hannibal2.skyhanni.test.renderable
 
+//#if MC > 1.8.9
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.fakePlayer
-import net.minecraft.init.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import kotlin.random.Random
-//#if MC > 1.8.9
-//$$ import net.minecraft.entity.player.PlayerInventory
+
 //#endif
 
 @SkyHanniModule(devOnly = true)
@@ -31,39 +32,39 @@ object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {
     }
 
     private val helmetList = setOf(
-        Items.iron_helmet,
-        Items.golden_helmet,
-        Items.diamond_helmet,
-        Items.leather_helmet,
-        Items.chainmail_helmet,
+        Items.IRON_HELMET,
+        Items.GOLDEN_HELMET,
+        Items.DIAMOND_HELMET,
+        Items.LEATHER_HELMET,
+        Items.CHAINMAIL_HELMET,
     )
 
     private val chestplateList = setOf(
-        Items.iron_chestplate,
-        Items.golden_chestplate,
-        Items.diamond_chestplate,
-        Items.leather_chestplate,
-        Items.chainmail_chestplate,
+        Items.IRON_CHESTPLATE,
+        Items.GOLDEN_CHESTPLATE,
+        Items.DIAMOND_CHESTPLATE,
+        Items.LEATHER_CHESTPLATE,
+        Items.CHAINMAIL_CHESTPLATE,
     )
 
     private val leggingsList = setOf(
-        Items.iron_leggings,
-        Items.golden_leggings,
-        Items.diamond_leggings,
-        Items.leather_leggings,
-        Items.chainmail_leggings,
+        Items.IRON_LEGGINGS,
+        Items.GOLDEN_LEGGINGS,
+        Items.DIAMOND_LEGGINGS,
+        Items.LEATHER_LEGGINGS,
+        Items.CHAINMAIL_LEGGINGS,
     )
 
     private val bootsList = setOf(
-        Items.iron_boots,
-        Items.golden_boots,
-        Items.diamond_boots,
-        Items.leather_boots,
-        Items.chainmail_boots,
+        Items.IRON_BOOTS,
+        Items.GOLDEN_BOOTS,
+        Items.DIAMOND_BOOTS,
+        Items.LEATHER_BOOTS,
+        Items.CHAINMAIL_BOOTS,
     )
 
     private fun createRandomArmorPiece(armorPieces: Set<Item>): ItemStack = ItemStack(armorPieces.random()).also {
-        if (Random.nextBoolean()) it.addEnchantment(
+        if (Random.nextBoolean()) it.enchant(
             EnchantmentsCompat.PROTECTION.enchantment, 1,
         )
     }
@@ -78,13 +79,13 @@ object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {
 
         val armor = listOf(helmet, chestplate, leggings, boots)
         //#if MC < 1.21.5
-        fakePlayer.inventory.armorInventory = armor.toTypedArray()
+        //$$ fakePlayer.inventory.armor = armor.toTypedArray()
         //#else
-        //$$ for (equipment in PlayerInventory.EQUIPMENT_SLOTS.values) {
-        //$$     val armorOrdinal = equipment.ordinal - 2
-        //$$     if (armorOrdinal < 0 || armorOrdinal > 3) continue
-        //$$     fakePlayer.inventory.equipment.put(equipment, armor.reversed()[armorOrdinal])
-        //$$ }
+        for (equipment in Inventory.EQUIPMENT_SLOT_MAPPING.values) {
+            val armorOrdinal = equipment.ordinal - 2
+            if (armorOrdinal < 0 || armorOrdinal > 3) continue
+            fakePlayer.inventory.equipment.set(equipment, armor.reversed()[armorOrdinal])
+        }
         //#endif
 
         return fakePlayer

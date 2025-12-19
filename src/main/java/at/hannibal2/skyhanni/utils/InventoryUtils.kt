@@ -15,21 +15,20 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.filterNotNullOrEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.client.resources.I18n
-import net.minecraft.entity.player.InventoryPlayer
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.inventory.IInventory
-import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import net.minecraft.client.resources.language.I18n
+import net.minecraft.world.Container
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
@@ -48,41 +47,41 @@ object InventoryUtils {
     }
 
     fun getItemsInOpenChest(): List<Slot> {
-        return getItemsInOpenChestWithNull().filter { it.stack.isNotEmpty() }
+        return getItemsInOpenChestWithNull().filter { it.item.isNotEmpty() }
     }
 
     fun getItemsInOpenChestWithNull(): List<Slot> {
-        val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList()
+        val guiChest = Minecraft.getInstance().screen as? ContainerScreen ?: return emptyList()
         return guiChest.slots()
-            .filter { it.inventory !is InventoryPlayer }
+            .filter { it.container !is Inventory }
     }
 
     fun getItemIdsInOpenChest(): Set<NeuInternalName> {
-        return getItemsInOpenChest().mapNotNull { it.stack?.getInternalNameOrNull() }.toSet()
+        return getItemsInOpenChest().mapNotNull { it.item?.getInternalNameOrNull() }.toSet()
     }
 
     // only works while not in an inventory
     fun getSlotsInOwnInventory(): List<Slot> {
-        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return emptyList()
+        val guiInventory = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return emptyList()
         return guiInventory.slots()
-            .filter { it.inventory is InventoryPlayer && it.stack.isNotEmpty() }
+            .filter { it.container is Inventory && it.item.isNotEmpty() }
     }
 
     fun openInventoryName(): String = OtherInventoryData.currentInventoryName
 
-    fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
+    fun inInventory() = Minecraft.getInstance().screen is ContainerScreen
 
-    fun inOwnInventory() = Minecraft.getMinecraft().currentScreen is GuiInventory
+    fun inOwnInventory() = Minecraft.getInstance().screen is InventoryScreen
 
     fun inAnyInventory() = inInventory() || inOwnInventory()
 
-    fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
+    fun inContainer() = Minecraft.getInstance().screen is SkyHanniGuiContainer
 
     fun getItemsInOwnInventory(): List<ItemStack> =
         getItemsInOwnInventoryWithNull()?.filterNotNullOrEmpty().orEmpty()
 
     fun getItemsInOwnInventoryWithNull(): Array<ItemStack?>? =
-        MinecraftCompat.localPlayerOrNull?.inventory?.mainInventory?.normalizeAsArray().convertEmptyToNull()
+        MinecraftCompat.localPlayerOrNull?.inventory?.nonEquipmentItems?.normalizeAsArray().convertEmptyToNull()
 
     // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
     fun getItemsInHotbar(): List<ItemStack> =
@@ -92,14 +91,14 @@ object InventoryUtils {
         countItemsInLowerInventory(predicate) > 0
 
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean): Int =
-        getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
+        getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.count }
 
     fun inStorage() = openInventoryName().let {
         (it.contains("Storage") && !it.contains("Rift Storage")) ||
             it.contains("Ender Chest") || it.contains("Backpack")
     }
 
-    fun getItemInHand(): ItemStack? = MinecraftCompat.localPlayerOrNull?.heldItem
+    fun getItemInHand(): ItemStack? = MinecraftCompat.localPlayerOrNull?.mainHandItem
 
     fun getArmor(): Array<ItemStack?> = MinecraftCompat.localPlayerOrNull?.getArmorInventory() ?: arrayOfNulls(4)
 
@@ -109,88 +108,70 @@ object InventoryUtils {
     fun getBoots(): ItemStack? = getArmor()[0]
 
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
-        if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
-        slot?.slotNumber?.let { slotNumber ->
-            clickSlot(slotNumber, container.windowId, mouseButton = 0, mode = ClickType.SHIFT)
+        if (this.clickedButton == 1 && slot?.item?.getItemCategoryOrNull() == ItemCategory.SACK) return
+        slot?.index?.let { slotNumber ->
+            clickSlot(slotNumber, container.containerId, mouseButton = 0, mode = ClickType.SHIFT)
             this.cancel()
-        }
-    }
-
-    val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
-        if (!PlatformUtils.isNeuLoaded()) {
-            return@RecalculatingValue false
-        }
-        try {
-            val config = NotEnoughUpdates.INSTANCE.config
-
-            val storageField = config.javaClass.getDeclaredField("storageGUI")
-            val storage = storageField[config]
-
-            val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
-            booleanField[storage] as Boolean
-        } catch (e: Throwable) {
-            ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is enabled.")
-            false
         }
     }
 
     fun isSlotInPlayerInventory(itemStack: ItemStack): Boolean {
         val slotUnderMouse = slotUnderCursor() ?: return false
-        return slotUnderMouse.inventory is InventoryPlayer && slotUnderMouse.stack == itemStack
+        return slotUnderMouse.container is Inventory && slotUnderMouse.item == itemStack
     }
 
     fun isItemInInventory(name: NeuInternalName) = name.getAmountInInventory() > 0
 
-    fun ContainerChest.getUpperItems(): Map<Slot, ItemStack> = buildMap {
+    fun ChestMenu.getUpperItems(): Map<Slot, ItemStack> = buildMap {
         for ((slot, stack) in getAllItems()) {
-            if (slot.slotNumber != slot.slotIndex) continue
+            if (slot.index != slot.containerSlot) continue
             this[slot] = stack
         }
     }
 
-    fun ContainerChest.getLowerItems(): Map<Slot, ItemStack> = buildMap {
+    fun ChestMenu.getLowerItems(): Map<Slot, ItemStack> = buildMap {
         for ((slot, stack) in getAllItems()) {
-            if (slot.slotNumber == slot.slotIndex) continue
+            if (slot.index == slot.containerSlot) continue
             this[slot] = stack
         }
     }
 
-    fun ContainerChest.getAllItems(): Map<Slot, ItemStack> = buildMap {
-        for (slot in inventorySlots) {
+    fun ChestMenu.getAllItems(): Map<Slot, ItemStack> = buildMap {
+        for (slot in slots) {
             if (slot == null) continue
-            val stack = slot.stack.orNull() ?: continue
+            val stack = slot.item.orNull() ?: continue
             this[slot] = stack
         }
     }
 
-    fun ContainerChest.getAllSlots(): Map<Slot, ItemStack?> = buildMap {
-        for (slot in inventorySlots) {
+    fun ChestMenu.getAllSlots(): Map<Slot, ItemStack?> = buildMap {
+        for (slot in slots) {
             if (slot == null) continue
-            this[slot] = slot.stack
+            this[slot] = slot.item
         }
     }
 
-    fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack
+    fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.item
 
     fun getItemsAtSlots(vararg slotIndexes: Int): List<ItemStack> {
         return slotIndexes.toList().mapNotNull(::getItemAtSlotIndex)
     }
 
-    fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
+    fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.containerSlot == slotIndex }
 
     fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 
     fun NeuInternalName.getAmountInInventoryAndSacks(): Int = getAmountInInventory() + getAmountInSacks()
 
-    fun Slot.isTopInventory() = inventory.isTopInventory()
+    fun Slot.isTopInventory() = container.isTopInventory()
 
-    fun IInventory.isTopInventory() = this is ContainerLocalMenu
+    fun Container.isTopInventory() = this is SimpleContainer
 
     fun closeInventory() {
-        Minecraft.getMinecraft().currentScreen = null
+        Minecraft.getInstance().screen = null
     }
 
-    fun isInNormalChest(name: String = openInventoryName()): Boolean = name in normalChestInternalNames.map { I18n.format(it) }
+    fun isInNormalChest(name: String = openInventoryName()): Boolean = name in normalChestInternalNames.map { I18n.get(it) }
 
     fun clickSlot(
         slotId: Int,
@@ -209,7 +190,7 @@ object InventoryUtils {
         InventoryCompat.mouseClickInventorySlot(slotId, mouseButton, mode.id)
     }
 
-    fun GuiContainer.slots(): List<Slot> {
+    fun SkyHanniGuiContainer.slots(): List<Slot> {
         return InventoryCompat.containerSlots(this)
     }
 }

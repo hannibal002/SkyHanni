@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.milliseconds
@@ -134,7 +135,7 @@ object GardenLevelDisplay {
             "SkyBlock Menu" -> event.inventoryItems[10] ?: return
             else -> return
         }
-        gardenItemNamePattern.matchMatcher(item.displayName.removeColor()) {
+        gardenItemNamePattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
             val level = groupOrNull("currentLevel")
             if (level != null) useRomanNumerals = level.isRoman()
         } ?: return
@@ -163,7 +164,7 @@ object GardenLevelDisplay {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onToolTip(event: ToolTipEvent) {
         if (!config.overflow.get()) return
-        val slotIndex = event.slot.slotIndex
+        val slotIndex = event.slot.containerSlot
         val name = InventoryUtils.openInventoryName()
         if (!((name == "Desk" && slotIndex == 4) || (name == "SkyBlock Menu" && slotIndex == 10))) return
 

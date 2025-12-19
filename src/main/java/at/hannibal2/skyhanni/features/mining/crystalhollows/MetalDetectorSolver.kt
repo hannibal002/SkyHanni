@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -220,7 +220,7 @@ object MetalDetectorSolver {
                 for (k in -50 until 50) {
                     val blockPosition = player.add(i, j, k).roundToBlock()
                     val nextBlockPosition = blockPosition.add(0, 13, 0)
-                    if (blockPosition.getBlockAt() == Blocks.quartz_stairs && nextBlockPosition.getBlockAt() == Blocks.barrier) {
+                    if (blockPosition.getBlockAt() == Blocks.QUARTZ_STAIRS && nextBlockPosition.getBlockAt() == Blocks.BARRIER) {
                         baseCoordinates = getBaseCoordinates(nextBlockPosition)
                         return
                     }
@@ -235,15 +235,15 @@ object MetalDetectorSolver {
         var currentPosition = blockPosition
         while (changed) {
             changed = false
-            if (currentPosition.add(1, 0, 0).getBlockAt() == Blocks.barrier) {
+            if (currentPosition.add(1, 0, 0).getBlockAt() == Blocks.BARRIER) {
                 changed = true
                 currentPosition = currentPosition.add(1, 0, 0)
             }
-            if (currentPosition.add(0, 1, 0).getBlockAt() == Blocks.barrier) {
+            if (currentPosition.add(0, 1, 0).getBlockAt() == Blocks.BARRIER) {
                 changed = true
                 currentPosition = currentPosition.add(0, 1, 0)
             }
-            if (currentPosition.add(0, 0, 1).getBlockAt() == Blocks.barrier) {
+            if (currentPosition.add(0, 0, 1).getBlockAt() == Blocks.BARRIER) {
                 changed = true
                 currentPosition = currentPosition.add(0, 0, 1)
             }

@@ -194,7 +194,7 @@ object DiscordRPCManager {
         if (SkyBlockUtils.inSkyBlock) {
             // todo discord rpc doesnt connect on 1.21
             //#if TODO
-            SkyHanniMod.launchNoScopeCoroutine("discord rpc start", timeout = INFINITE) { start() }
+            //$$ SkyHanniMod.launchNoScopeCoroutine("discord rpc start", timeout = INFINITE) { start() }
             //#endif
             started = true
         }

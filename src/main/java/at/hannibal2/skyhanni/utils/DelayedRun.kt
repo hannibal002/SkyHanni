@@ -41,11 +41,11 @@ object DelayedRun {
 
     @JvmField
     val onThread = Executor {
-        val mc = Minecraft.getMinecraft()
-        if (mc.isCallingFromMinecraftThread) {
+        val mc = Minecraft.getInstance()
+        if (mc.isSameThread) {
             it.run()
         } else {
-            mc.addScheduledTask(it)
+            mc.submit(it)
         }
     }
 }

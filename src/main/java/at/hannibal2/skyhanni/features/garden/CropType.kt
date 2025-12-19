@@ -3,14 +3,12 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
-import at.hannibal2.skyhanni.utils.compat.BlockCompat.isSunflower
-import at.hannibal2.skyhanni.utils.compat.BlockCompat.isWildRose
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.block.state.IBlockState
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
 
 enum class CropType(
     val cropName: String,
@@ -26,28 +24,28 @@ enum class CropType(
 
     WHEAT(
         "Wheat", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0,
-        { ItemStack(Items.wheat) }, "wheat", FarmingItemType.WHEAT,
+        { ItemStack(Items.WHEAT) }, "wheat", FarmingItemType.WHEAT,
     ),
     CARROT(
         "Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0,
-        { ItemStack(Items.carrot) }, "carrot", FarmingItemType.CARROT, replenish = true,
+        { ItemStack(Items.CARROT) }, "carrot", FarmingItemType.CARROT, replenish = true,
     ),
     POTATO(
         "Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0,
-        { ItemStack(Items.potato) }, "potato", FarmingItemType.POTATO, replenish = true,
+        { ItemStack(Items.POTATO) }, "potato", FarmingItemType.POTATO, replenish = true,
     ),
     NETHER_WART(
         "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
-        { ItemStack(Items.nether_wart) }, "wart", FarmingItemType.NETHER_WART, replenish = true,
+        { ItemStack(Items.NETHER_WART) }, "wart", FarmingItemType.NETHER_WART, replenish = true,
         enchantName = "warts",
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
-        { ItemStack(Blocks.pumpkin) }, "pumpkin", FarmingItemType.PUMPKIN,
+        { ItemStack(Blocks.CARVED_PUMPKIN) }, "pumpkin", FarmingItemType.PUMPKIN,
     ),
     MELON(
         "Melon Slice", "MELON_DICER", "SQUASH", 5.0,
-        { ItemStack(Items.melon) }, "melon", FarmingItemType.MELON,
+        { ItemStack(Items.MELON_SLICE) }, "melon", FarmingItemType.MELON,
     ),
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
@@ -56,15 +54,15 @@ enum class CropType(
     ),
     SUGAR_CANE(
         "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
-        { ItemStack(Items.reeds) }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane",
+        { ItemStack(Items.SUGAR_CANE) }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane",
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
-        { ItemStack(Blocks.cactus) }, "cactus", FarmingItemType.CACTUS,
+        { ItemStack(Blocks.CACTUS) }, "cactus", FarmingItemType.CACTUS,
     ),
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
-        { ItemStack(Blocks.red_mushroom_block) }, "mushroom", FarmingItemType.MUSHROOM,
+        { ItemStack(Blocks.RED_MUSHROOM_BLOCK) }, "mushroom", FarmingItemType.MUSHROOM,
         enchantName = "mushrooms",
     ),
     SUNFLOWER(
@@ -104,32 +102,26 @@ enum class CropType(
 
         fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid crop type '$name'")
 
-        fun IBlockState.getCropType(pos: LorenzVec): CropType? {
+        fun BlockState.getCropType(pos: LorenzVec): CropType? {
             return when (block) {
-                Blocks.wheat -> WHEAT
-                Blocks.carrots -> CARROT
-                Blocks.potatoes -> POTATO
-                Blocks.pumpkin -> PUMPKIN
-                Blocks.reeds -> SUGAR_CANE
-                Blocks.melon_block -> MELON
-                Blocks.cactus -> CACTUS
-                Blocks.cocoa -> COCOA_BEANS
-                Blocks.red_mushroom, Blocks.brown_mushroom -> MUSHROOM
-                Blocks.nether_wart -> NETHER_WART
-                //#if MC < 1.21
-                Blocks.double_plant -> {
-                    return if (this.isSunflower(pos)) getTimeFlower() else if (this.isWildRose(pos)) WILD_ROSE else null
-                }
-                //#else
-                //$$ Blocks.ROSE_BUSH -> WILD_ROSE
-                //$$ Blocks.SUNFLOWER -> getTimeFlower()
-                //#endif
+                Blocks.WHEAT -> WHEAT
+                Blocks.CARROTS -> CARROT
+                Blocks.POTATOES -> POTATO
+                Blocks.CARVED_PUMPKIN -> PUMPKIN
+                Blocks.SUGAR_CANE -> SUGAR_CANE
+                Blocks.MELON -> MELON
+                Blocks.CACTUS -> CACTUS
+                Blocks.COCOA -> COCOA_BEANS
+                Blocks.RED_MUSHROOM, Blocks.BROWN_MUSHROOM -> MUSHROOM
+                Blocks.NETHER_WART -> NETHER_WART
+                Blocks.ROSE_BUSH -> WILD_ROSE
+                Blocks.SUNFLOWER -> getTimeFlower()
                 else -> null
             }
         }
 
         fun getTimeFlower(): CropType {
-            val time = MinecraftCompat.localWorld.worldTime % 24000
+            val time = MinecraftCompat.localWorld.dayTime % 24000
             // pretty sure great spook will break this
             return if (time >= 12000) MOONFLOWER else SUNFLOWER
         }

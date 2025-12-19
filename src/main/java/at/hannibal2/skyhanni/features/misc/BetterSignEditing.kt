@@ -18,7 +18,7 @@ object BetterSignEditing {
         if (!SkyHanniMod.feature.misc.betterSignEditing) return
         if (!PlatformUtils.IS_LEGACY) return
 
-        val gui = Minecraft.getMinecraft().currentScreen
+        val gui = Minecraft.getInstance().screen
         SignUtils.checkPaste()
         SignUtils.checkCopying(gui)
         SignUtils.checkDeleting(gui)

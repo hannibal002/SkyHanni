@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 @SkyHanniModule
 object GardenNextPlotPrice {
@@ -21,7 +22,7 @@ object GardenNextPlotPrice {
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return
 
-        if (!event.itemStack.displayName.startsWith("§ePlot")) return
+        if (!event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().startsWith("§ePlot")) return
 
         var next = false
         val list = event.toolTip

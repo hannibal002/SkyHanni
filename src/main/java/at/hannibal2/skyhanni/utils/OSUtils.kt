@@ -3,16 +3,12 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import java.awt.Desktop
+import net.minecraft.Util
 import java.io.File
 import java.io.IOException
-import java.net.URI
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import kotlin.time.Duration
-//#if MC > 1.21
-//$$ import net.minecraft.util.Util
-//#endif
 
 object OSUtils {
 
@@ -53,31 +49,7 @@ object OSUtils {
 
     @JvmStatic
     fun openBrowser(url: String) {
-        //#if MC < 1.21
-        val desktopSupported = Desktop.isDesktopSupported()
-        val supportedActionBrowse = Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)
-        if (desktopSupported && supportedActionBrowse) {
-            try {
-                Desktop.getDesktop().browse(URI(url))
-            } catch (e: IOException) {
-                ErrorManager.logErrorWithData(
-                    e,
-                    "Error while opening website.",
-                    "url" to url,
-                )
-            }
-        } else {
-            copyToClipboard(url)
-            ErrorManager.logErrorStateWithData(
-                "Cannot open website! Copied url to clipboard instead", "Web browser is not supported",
-                "url" to url,
-                "desktopSupported" to desktopSupported,
-                "supportedActionBrowse" to supportedActionBrowse,
-            )
-        }
-        //#else
-        //$$ Util.getOperatingSystem().open(url)
-        //#endif
+        Util.getPlatform().openUri(url)
     }
 
     @JvmStatic
@@ -95,7 +67,7 @@ object OSUtils {
         ClipboardUtils.copyToClipboard(text)
     }
 
-    suspend fun readFromClipboard() = ClipboardUtils.readFromClipboard()
+    fun readFromClipboard() = ClipboardUtils.readFromClipboard()
 
     private fun File.isExpired(
         expiryDuration: Duration,

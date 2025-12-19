@@ -40,10 +40,11 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.api.ApiUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.ItemStack
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -162,7 +163,7 @@ object BazaarApi {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val item = event.item ?: return
-        val itemName = item.displayName
+        val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
         if (isBazaarOrderInventory(InventoryUtils.openInventoryName())) {
             val internalName = item.getInternalNameOrNull() ?: return
             if (itemName.contains("SELL")) {
@@ -191,16 +192,16 @@ object BazaarApi {
     private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NeuInternalName? {
         val buyInstantly = inventoryItems[10] ?: return null
 
-        if (buyInstantly.displayName != "§aBuy Instantly") return null
+        if (buyInstantly.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
 
-        return NeuInternalName.fromItemName(bazaarItem.displayName)
+        return NeuInternalName.fromItemName(bazaarItem.hoverName.formattedTextCompatLeadingWhiteLessResets())
     }
 
     private fun updateTaxRate(inventoryItems: Map<Int, ItemStack>) {
         val sellInstantly = inventoryItems[11] ?: return
 
-        if (sellInstantly.displayName != "§6Sell Instantly") return
+        if (sellInstantly.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§6Sell Instantly") return
         taxPattern.firstMatcher(sellInstantly.getLore()) {
             taxRate = group("tax").formatDouble()
         }
@@ -223,15 +224,15 @@ object BazaarApi {
         if (!SkyHanniMod.feature.inventory.bazaar.purchaseHelper) return
         if (currentSearchedItem == "") return
 
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is ContainerScreen) return
+        val chest = event.container as ChestMenu
 
         for ((slot, stack) in chest.getUpperItems()) {
-            if (chest.inventorySlots.indexOf(slot) !in 9..44) {
+            if (chest.slots.indexOf(slot) !in 9..44) {
                 continue
             }
 
-            if (stack.displayName.removeColor() == currentSearchedItem) {
+            if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == currentSearchedItem) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }
@@ -259,13 +260,13 @@ object BazaarApi {
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
-        if (items.any { it.displayName.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
+        if (items.any { it.hoverName.formattedTextCompatLeadingWhiteLessResets().equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
             return true
         }
 
         // check for Buy Instantly
         event.inventoryItems[16]?.let {
-            if (it.displayName == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
+            if (it.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
                 return true
             }
         }

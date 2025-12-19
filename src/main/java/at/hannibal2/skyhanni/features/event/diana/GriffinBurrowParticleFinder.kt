@@ -22,8 +22,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -85,9 +85,6 @@ object GriffinBurrowParticleFinder {
         val oldBurrowType = burrow.type
 
         when (type) {
-            //#if MC < 1.16
-            ParticleType.FOOTSTEP -> burrow.hasFootstep = true
-            //#endif
             ParticleType.ENCHANT -> burrow.hasEnchant = true
             ParticleType.EMPTY -> burrow.type = 0
             ParticleType.MOB -> burrow.type = 1
@@ -127,24 +124,17 @@ object GriffinBurrowParticleFinder {
     // TODO remove the roundTo calls as they are only workarounds
     private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
         EMPTY(
-            { type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
+            { type == ParticleTypes.ENCHANTED_HIT && count == 4 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
         ),
         MOB(
-            { type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
+            { type == ParticleTypes.CRIT && count == 3 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
         ),
         TREASURE(
-            { type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
+            { type == ParticleTypes.DRIPPING_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
         ),
-
-        //#if MC < 1.16
-        FOOTSTEP(
-            { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0f && offset.roundTo(2) == LorenzVec(0.05, 0.0, 0.05) },
-        ),
-
-        //#endif
         ENCHANT(
             {
-                type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && offset.roundTo(2) ==
+                type == ParticleTypes.ENCHANT && count == 5 && speed == 0.05f && offset.roundTo(2) ==
                     LorenzVec(0.5, 0.4, 0.5)
             },
         )
@@ -198,7 +188,7 @@ object GriffinBurrowParticleFinder {
         if (!config.guess) return
 
         val location = event.position
-        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
+        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.GRASS_BLOCK) return
 
         if (location == fakeBurrow) {
             fakeBurrow = null
@@ -220,11 +210,7 @@ object GriffinBurrowParticleFinder {
 
     class Burrow(
         var location: LorenzVec,
-        //#if MC < 1.16
-        var hasFootstep: Boolean = false,
-        //#else
-        //$$ var hasFootstep: Boolean = true,
-        //#endif
+        var hasFootstep: Boolean = true,
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,

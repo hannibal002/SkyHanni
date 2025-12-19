@@ -33,7 +33,7 @@ object ParkourWaypointSaver {
     fun onKeyPress(event: KeyPressEvent) {
         @Suppress("InSkyBlockEarlyReturn")
         if (!SkyBlockUtils.inSkyBlock && !config.parkourOutsideSB) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         if (NeuItems.neuHasFocus()) return
         if (SkyHanniMod.feature.dev.devTool.graph.enabled) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
@@ -43,7 +43,7 @@ object ParkourWaypointSaver {
                 if (locations.isEmpty()) {
                     loadClipboard()
                 } else {
-                    if (MinecraftCompat.localPlayer.isSneaking) {
+                    if (MinecraftCompat.localPlayer.isShiftKeyDown) {
                         locations.clear()
                     } else {
                         locations = locations.dropLast(1).toMutableList()

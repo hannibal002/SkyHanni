@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -79,12 +78,8 @@ object ItemPriceUtils {
     fun NeuInternalName.isAuctionHouseItem(): Boolean = getLowestBinOrNull() != null
 
     private fun NeuInternalName.getLowestBinOrNull(): Double? = when {
-        PlatformUtils.isNeuLoaded() -> getNeuLowestBin(this)
         else -> getShLowestBin(this)
     }.takeIf { it != -1L }?.toDouble()
-
-    private fun getNeuLowestBin(internalName: NeuInternalName) =
-        NotEnoughUpdates.INSTANCE.manager.auctionManager.getLowestBin(internalName.asString())
 
     // We can not use NEU craft cost, since we want to respect the price source choice
     // NEUItems.manager.auctionManager.getCraftCost(asString())?.craftCost

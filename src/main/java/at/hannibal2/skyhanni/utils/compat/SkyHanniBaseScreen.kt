@@ -2,48 +2,34 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
-//#if MC > 1.21
-//$$ import net.minecraft.client.gui.DrawContext
-//#endif
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.network.chat.Component
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.gui.Click
-//$$ import net.minecraft.client.input.CharInput
-//$$ import net.minecraft.client.input.KeyInput
+//$$ import net.minecraft.client.input.MouseButtonEvent
+//$$ import net.minecraft.client.input.CharacterEvent
+//$$ import net.minecraft.client.input.KeyEvent
 //#endif
 
 @Suppress("UnusedParameter")
-abstract class SkyHanniBaseScreen : GuiScreen(
-    //#if MC > 1.20
-    //$$ net.minecraft.text.Text.empty()
-    //#elseif MC > 1.16
-    //$$ net.minecraft.network.chat.TextComponent.EMPTY
-    //#endif
-) {
+abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
 
-    val mc: Minecraft = Minecraft.getMinecraft()
+    val mc: Minecraft = Minecraft.getInstance()
 
-    //#if MC < 1.21
-    final override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        super.drawScreen(mouseX, mouseY, partialTicks)
-        postDrawScreen(DrawContext(), mouseX, mouseY, partialTicks)
+    override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+        super.render(context, mouseX, mouseY, delta)
+        postDrawScreen(context, mouseX, mouseY, delta)
     }
-    //#else
-    //$$ override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-    //$$    super.render(context, mouseX, mouseY, delta)
-    //$$    postDrawScreen(context, mouseX, mouseY, delta)
-    //$$ }
-    //$$
-    //$$ override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, deltaTicks: Float) {
-    //$$     try {
-    //$$         this.renderDarkening(context)
-    //$$     } catch (e: Exception) {
-    //$$         ErrorManager.logErrorWithData(e, "Error while rendering background", "screen" to this)
-    //$$     }
-    //$$ }
-    //#endif
 
-    private fun postDrawScreen(context: DrawContext, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    override fun renderBackground(context: GuiGraphics, mouseX: Int, mouseY: Int, deltaTicks: Float) {
+        try {
+            this.renderMenuBackground(context)
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Error while rendering background", "screen" to this)
+        }
+    }
+
+    private fun postDrawScreen(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
         DrawContextUtils.setContext(context)
         try {
             onDrawScreen(mouseX, mouseY, partialTicks)
@@ -55,19 +41,14 @@ abstract class SkyHanniBaseScreen : GuiScreen(
 
     open fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {}
 
-    //#if MC < 1.21
-    final override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-        super.mouseClicked(mouseX, mouseY, mouseButton)
-        postMouseClicked(mouseX, mouseY, mouseButton)
+    //#if MC < 1.21.9
+    override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
+        postMouseClicked(mouseX.toInt(), mouseY.toInt(), mouseButton)
+        postHandleMouseInput()
+        return super.mouseClicked(mouseX, mouseY, mouseButton)
     }
-    //#elseif MC < 1.21.9
-    //$$ override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
-    //$$     postMouseClicked(mouseX.toInt(), mouseY.toInt(), mouseButton)
-    //$$     postHandleMouseInput()
-    //$$     return super.mouseClicked(mouseX, mouseY, mouseButton)
-    //$$ }
     //#else
-    //$$ override fun mouseClicked(click: Click, doubled: Boolean): Boolean {
+    //$$ override fun mouseClicked(click: MouseButtonEvent, doubled: Boolean): Boolean {
     //$$     postMouseClicked(click.x.toInt(), click.y.toInt(), click.button())
     //$$     postHandleMouseInput()
     //$$     return super.mouseClicked(click, doubled)
@@ -84,28 +65,23 @@ abstract class SkyHanniBaseScreen : GuiScreen(
 
     open fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {}
 
-    //#if MC < 1.21
-    final override fun keyTyped(typedChar: Char, keyCode: Int) {
-        super.keyTyped(typedChar, keyCode)
-        postKeyTyped(typedChar, keyCode)
+    //#if MC < 1.21.9
+    override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
+        postKeyTyped(null, keyCode)
+        return super.keyPressed(keyCode, scanCode, modifiers)
     }
-    //#elseif MC < 1.21.9
-    //$$ override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-    //$$     postKeyTyped(null, keyCode)
-    //$$     return super.keyPressed(keyCode, scanCode, modifiers)
-    //$$ }
-    //$$
-    //$$ override fun charTyped(chr: Char, modifiers: Int): Boolean {
-    //$$     postKeyTyped(chr, null)
-    //$$     return super.charTyped(chr, modifiers)
-    //$$ }
+
+    override fun charTyped(chr: Char, modifiers: Int): Boolean {
+        postKeyTyped(chr, null)
+        return super.charTyped(chr, modifiers)
+    }
     //#else
-    //$$ override fun keyPressed(input: KeyInput): Boolean {
+    //$$ override fun keyPressed(input: KeyEvent): Boolean {
     //$$     postKeyTyped(null, input.key)
     //$$     return super.keyPressed(input)
     //$$ }
     //$$
-    //$$ override fun charTyped(input: CharInput): Boolean {
+    //$$ override fun charTyped(input: CharacterEvent): Boolean {
     //$$     postKeyTyped(input.codepoint.toChar(), null)
     //$$     return super.charTyped(input)
     //$$ }
@@ -121,19 +97,14 @@ abstract class SkyHanniBaseScreen : GuiScreen(
 
     open fun onKeyTyped(typedChar: Char?, keyCode: Int?) {}
 
-    //#if MC < 1.21
-    final override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
-        super.mouseReleased(mouseX, mouseY, state)
-        postMouseReleased(mouseX, mouseY, state)
+    //#if MC < 1.21.9
+    override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
+        postMouseReleased(mouseX.toInt(), mouseY.toInt(), button)
+        postHandleMouseInput()
+        return super.mouseReleased(mouseX, mouseY, button)
     }
-    //#elseif MC < 1.21.9
-    //$$ override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
-    //$$     postMouseReleased(mouseX.toInt(), mouseY.toInt(), button)
-    //$$     postHandleMouseInput()
-    //$$     return super.mouseReleased(mouseX, mouseY, button)
-    //$$ }
     //#else
-    //$$ override fun mouseReleased(click: Click): Boolean {
+    //$$ override fun mouseReleased(click: MouseButtonEvent): Boolean {
     //$$     postMouseReleased(click.x.toInt(), click.y.toInt(), click.button())
     //$$     postHandleMouseInput()
     //$$     return super.mouseReleased(click)
@@ -150,20 +121,15 @@ abstract class SkyHanniBaseScreen : GuiScreen(
 
     open fun onMouseReleased(originalMouseX: Int, originalMouseY: Int, state: Int) {}
 
-    //#if MC < 1.21
-    final override fun mouseClickMove(mouseX: Int, mouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
-        super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick)
-        postMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick)
+    //#if MC < 1.21.9
+    override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
+        // TODO there is no timeSince last click in modern
+        postMouseClickMove(mouseX.toInt(), mouseY.toInt(), button, 0L)
+        postHandleMouseInput()
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
     }
-    //#elseif MC < 1.21.9
-    //$$ override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
-    //$$     // TODO there is no timeSince last click in modern
-    //$$     postMouseClickMove(mouseX.toInt(), mouseY.toInt(), button, 0L)
-    //$$     postHandleMouseInput()
-    //$$     return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
-    //$$ }
     //#else
-    //$$ override fun mouseDragged(click: Click, mouseX: Double, mouseY: Double): Boolean {
+    //$$ override fun mouseDragged(click: MouseButtonEvent, mouseX: Double, mouseY: Double): Boolean {
     //$$     // TODO idk if mouseX is correct or if it should be click.x
     //$$     postMouseClickMove(mouseX.toInt(), mouseY.toInt(), click.button(), 0L)
     //$$     postHandleMouseInput()
@@ -181,22 +147,15 @@ abstract class SkyHanniBaseScreen : GuiScreen(
 
     open fun onMouseClickMove(originalMouseX: Int, originalMouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {}
 
-    //#if MC < 1.21
-    final override fun handleMouseInput() {
-        super.handleMouseInput()
+    override fun mouseMoved(mouseX: Double, mouseY: Double) {
         postHandleMouseInput()
+        super.mouseMoved(mouseX, mouseY)
     }
-    //#else
-    //$$ override fun mouseMoved(mouseX: Double, mouseY: Double) {
-    //$$     postHandleMouseInput()
-    //$$     super.mouseMoved(mouseX, mouseY)
-    //$$ }
-    //$$
-    //$$ override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontalAmount: Double, verticalAmount: Double): Boolean {
-    //$$     postHandleMouseInput()
-    //$$     return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)
-    //$$ }
-    //#endif
+
+    override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontalAmount: Double, verticalAmount: Double): Boolean {
+        postHandleMouseInput()
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)
+    }
 
     private fun postHandleMouseInput() {
         try {
@@ -208,17 +167,10 @@ abstract class SkyHanniBaseScreen : GuiScreen(
 
     open fun onHandleMouseInput() {}
 
-    //#if MC < 1.21
-    final override fun onGuiClosed() {
-        super.onGuiClosed()
+    override fun onClose() {
+        super.onClose()
         postGuiClosed()
     }
-    //#else
-    //$$ override fun close() {
-    //$$     super.close()
-    //$$     postGuiClosed()
-    //$$ }
-    //#endif
 
     private fun postGuiClosed() {
         try {
@@ -230,17 +182,10 @@ abstract class SkyHanniBaseScreen : GuiScreen(
 
     open fun guiClosed() {}
 
-    //#if MC < 1.21
-    final override fun initGui() {
-        super.initGui()
+    override fun init() {
+        super.init()
         postInitGui()
     }
-    //#else
-    //$$ override fun init() {
-    //$$     super.init()
-    //$$     postInitGui()
-    //$$ }
-    //#endif
 
     private fun postInitGui() {
         try {
@@ -253,10 +198,6 @@ abstract class SkyHanniBaseScreen : GuiScreen(
     open fun onInitGui() {}
 
     fun drawDefaultBackground(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        //#if MC < 1.21
-        drawDefaultBackground()
-        //#else
-        //$$ renderDarkening(DrawContextUtils.drawContext)
-        //#endif
+        renderMenuBackground(DrawContextUtils.drawContext)
     }
 }

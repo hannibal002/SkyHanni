@@ -22,17 +22,15 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.StringUtils.removePrefix
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import io.github.moulberry.notenoughupdates.NEUOverlay
-import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
-import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
-import net.minecraft.init.Blocks
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks
 import java.util.NavigableMap
 import java.util.TreeMap
 import kotlin.time.Duration.Companion.minutes
@@ -52,7 +50,7 @@ object NeuItems {
      */
     private val neuPetLevelRegex by patternGroup.pattern(
         "pet-level",
-        "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] "
+        "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] ",
     )
 
     /** Keys are internal names as String */
@@ -69,7 +67,7 @@ object NeuItems {
 
     private val fallbackItem by lazy {
         ItemUtils.createItemStack(
-            ItemStack(Blocks.barrier).item,
+            ItemStack(Blocks.BARRIER).item,
             "§cMissing Repo Item",
             "§cYour NEU repo seems to be out of date",
         )
@@ -104,9 +102,10 @@ object NeuItems {
                 ChatUtils.debug("skipped `$this`from readAllNeuItems")
                 return@forEach
             }
-            val cleanName = stack.displayName?.lowercase()?.removePrefix(neuPetLevelRegex)?.takeIf {
-                it.isNotEmpty()
-            } ?: return@forEach
+            val cleanName =
+                stack.hoverName.formattedTextCompatLeadingWhiteLessResets()?.lowercase()?.removePrefix(neuPetLevelRegex)?.takeIf {
+                    it.isNotEmpty()
+                } ?: return@forEach
 
             if (cleanName.contains("[lvl 1➡100]")) {
                 if (PlatformUtils.isDevEnvironment) error("wrong name: '$cleanName'")
@@ -268,15 +267,6 @@ object NeuItems {
     fun getRecipes(internalName: NeuInternalName): Set<PrimitiveRecipe> = EnoughUpdatesManager.getRecipesFor(internalName)
 
     fun neuHasFocus(): Boolean {
-        //#if MC < 1.16
-        if (!PlatformUtils.isNeuLoaded()) return false
-        if (AuctionSearchOverlay.shouldReplace()) return true
-        if (BazaarSearchOverlay.shouldReplace()) return true
-        // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
-        // https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/overlays/RecipeSearchOverlay.java
-        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
-        if (NEUOverlay.searchBarHasFocus) return true
-        //#endif
         return false
     }
 

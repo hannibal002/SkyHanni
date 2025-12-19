@@ -5,26 +5,26 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiChat
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.ChatScreen
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 
 @SkyHanniModule
 object RenderData {
 
     @JvmStatic
-    fun postRenderOverlay(context: DrawContext) {
+    fun postRenderOverlay(context: GuiGraphics) {
         if (GlobalRender.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
-        val screen = Minecraft.getMinecraft().currentScreen
+        val screen = Minecraft.getInstance().screen
 
         DrawContextUtils.setContext(context)
         DrawContextUtils.translated(z = -3) {
-            renderOverlay(DrawContextUtils.drawContext, screen != null && screen !is GuiChat)
+            renderOverlay(DrawContextUtils.drawContext, screen != null && screen !is ChatScreen)
         }
         DrawContextUtils.clearContext()
     }
@@ -33,11 +33,11 @@ object RenderData {
     fun onBackgroundDraw(event: DrawBackgroundEvent) {
         if (GlobalRender.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
-        val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
-        if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
+        val currentScreen = Minecraft.getInstance().screen ?: return
+        if (currentScreen !is InventoryScreen && currentScreen !is ContainerScreen) return
 
         DrawContextUtils.pushPop {
-            GlStateManager.enableDepth()
+            ModernGlStateManager.enableDepthTest()
 
             if (GuiEditManager.isInGui()) {
                 DrawContextUtils.translated(z = -3) {
@@ -52,7 +52,7 @@ object RenderData {
 
     var outsideInventory = false
 
-    fun renderOverlay(context: DrawContext, inventoryPresent: Boolean = false) {
+    fun renderOverlay(context: GuiGraphics, inventoryPresent: Boolean = false) {
         outsideInventory = true
         GuiRenderEvent.GuiOverlayRenderEvent(context).post()
         if (!inventoryPresent) GuiRenderEvent.GuiOnTopRenderEvent(context).post()

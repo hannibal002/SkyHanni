@@ -23,8 +23,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object GardenCropMilestonesCommunityFix {
@@ -86,7 +87,7 @@ object GardenCropMilestonesCommunityFix {
         crop: CropType,
         wrongData: MutableList<String>,
     ) {
-        val rawNumber = stack.displayName.removeColor().replace(crop.cropName, "").trim()
+        val rawNumber = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().replace(crop.cropName, "").trim()
         val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()

@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -37,7 +38,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.util.Objects
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -176,9 +177,9 @@ object ItemPickupLog {
                 val hash = itemStack.hash()
                 val old = itemList[hash]
                 if (old != null) {
-                    itemList[hash] = old.copy(second = old.second + itemStack.stackSize)
+                    itemList[hash] = old.copy(second = old.second + itemStack.count)
                 } else {
-                    itemList[hash] = itemStack to itemStack.stackSize
+                    itemList[hash] = itemStack to itemStack.count
                 }
             }
         }
@@ -248,11 +249,11 @@ object ItemPickupLog {
             ItemCategory.PET -> true
             else -> false
         }
-        return if (compact) getInternalName().repoItemName else displayName
+        return if (compact) getInternalName().repoItemName else hoverName.formattedTextCompatLeadingWhiteLessResets()
     }
 
     private fun ItemStack.hash(): Int {
-        var displayName = this.displayName.removeColor()
+        var displayName = this.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
         shopPattern.matchMatcher(displayName) {
             displayName = group("itemName")
         }

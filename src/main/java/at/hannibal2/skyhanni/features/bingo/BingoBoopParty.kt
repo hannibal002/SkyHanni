@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -30,7 +31,7 @@ object BingoBoopParty {
     @HandleEvent
     fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
-        val message = event.messageComponent.textComponent.formattedText.removeResets()
+        val message = event.messageComponent.textComponent.formattedTextCompat().removeResets()
         if (!boopPattern.matches(message)) return
 
         val username = event.author.cleanPlayerName(displayName = true)

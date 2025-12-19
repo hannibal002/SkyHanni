@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -61,7 +62,7 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled()) return
 
         val index = rabbitTheFishIndex ?: return
-        InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(LorenzColor.RED)
+        InventoryUtils.getItemsInOpenChest().firstOrNull { it.containerSlot == index }?.highlight(LorenzColor.RED)
     }
 
     @HandleEvent
@@ -70,9 +71,9 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
         rabbitTheFishIndex = event.inventoryItems.filter {
-            it.value.displayName.isNotEmpty() && it.key != 22
+            it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && it.key != 22
         }.entries.firstOrNull {
-            rabbitTheFishItemPattern.matches(it.value.displayName)
+            rabbitTheFishItemPattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())
         }?.key
     }
 
@@ -81,10 +82,10 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled() || rabbitTheFishIndex == null) return
 
         // Prevent opening chocolate factory when Rabbit the Fish is present
-        val stack = event.slot?.stack ?: return
+        val stack = event.slot?.item ?: return
         if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
             event.sendPreventClosureTitle()
-        } else if (rabbitTheFishIndex == event.slot.slotIndex) {
+        } else if (rabbitTheFishIndex == event.slot.containerSlot) {
             rabbitTheFishIndex = null
         }
     }

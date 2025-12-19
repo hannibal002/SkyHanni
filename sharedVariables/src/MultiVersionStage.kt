@@ -9,7 +9,7 @@ enum class MultiVersionStage(val label: String) {
     ;
 
     fun shouldCompile(projectTarget: ProjectTarget): Boolean {
-        if (projectTarget == ProjectTarget.MAIN) return true
+        if (projectTarget == ProjectTarget.MODERN_12105) return true
         return when (this) {
             OFF -> false
             FULL -> projectTarget.isModern
@@ -17,7 +17,7 @@ enum class MultiVersionStage(val label: String) {
     }
 
     fun shouldCreateProject(projectTarget: ProjectTarget): Boolean {
-        if (projectTarget == ProjectTarget.MAIN) return true
+        if (projectTarget == ProjectTarget.MODERN_12105) return true
         return when (this) {
             OFF -> false
             FULL -> true
@@ -32,7 +32,7 @@ enum class MultiVersionStage(val label: String) {
                 file.inputStream().use(prop::load)
             }
             val multiVersion = prop["skyhanni.multi-version"]
-            activeState = MultiVersionStage.values().find { it.label == multiVersion } ?: OFF
+            activeState = MultiVersionStage.values().find { it.label == multiVersion } ?: FULL
             println("SkyHanni multi version stage loaded: $activeState")
         }
     }

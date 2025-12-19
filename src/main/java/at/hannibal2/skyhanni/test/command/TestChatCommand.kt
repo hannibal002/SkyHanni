@@ -10,7 +10,10 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import net.minecraft.util.IChatComponent
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object TestChatCommand {
@@ -53,9 +56,9 @@ object TestChatCommand {
     private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean, isSilentAll: Boolean) {
         val component = if (isComplex) try {
             //#if TODO
-            IChatComponent.Serializer.jsonToComponent(text) ?: "".asComponent()
+            //$$ IChatComponent.Serializer.jsonToComponent(text) ?: "".asComponent()
             //#else
-            //$$ "complex doesnt work on 1.21".asComponent()
+            "complex doesnt work on 1.21".asComponent()
             //#endif
         } catch (ex: Exception) {
             ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
@@ -63,18 +66,18 @@ object TestChatCommand {
         }
         else text.replace("&", "§").asComponent()
 
-        println("component unformatted: ${component.unformattedText}")
-        println("${component.unformattedTextForChat} ${component.chatStyle} ${component.siblings}")
+        println("component unformatted: ${component.unformattedTextCompat()}")
+        println("${component.unformattedTextForChatCompat()} ${component.style} ${component.siblings}")
         println(component)
 
-        val rawText = component.formattedText.stripHypixelMessage().replace("§", "&").replace("\n", "\\n")
+        val rawText = component.formattedTextCompat().stripHypixelMessage().replace("§", "&").replace("\n", "\\n")
         if (!isSilent) ChatUtils.chat("Testing message: §7$rawText", prefixColor = "§a")
 
         test(component, isSilentAll)
     }
 
-    private fun test(componentText: IChatComponent, isHidden: Boolean) {
-        val message = componentText.formattedText.stripHypixelMessage()
+    private fun test(componentText: Component, isHidden: Boolean) {
+        val message = componentText.formattedTextCompat().stripHypixelMessage()
         val event = SkyHanniChatEvent(message, componentText)
         event.post()
 
@@ -83,7 +86,7 @@ object TestChatCommand {
             return
         }
         val finalMessage = event.chatComponent
-        if (!isHidden && finalMessage.formattedText.stripHypixelMessage() != message) {
+        if (!isHidden && finalMessage.formattedTextCompat().stripHypixelMessage() != message) {
             ChatUtils.chat("§eChat modified!")
         }
         ChatUtils.chat(finalMessage)

@@ -10,14 +10,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityMob
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.network.play.server.S0CPacketSpawnPlayer
-//#if MC < 1.21
-import net.minecraft.network.play.server.S0FPacketSpawnMob
-//#endif
-import net.minecraft.network.play.server.S13PacketDestroyEntities
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Monster
+import net.minecraft.world.entity.player.Player
 
 /**
  * This feature fixes ghost entities sent by hypixel that are not properly deleted in the correct order.
@@ -50,22 +47,15 @@ object FixGhostEntities {
         if (KuudraApi.inKuudra || !PlatformUtils.IS_LEGACY) return
 
         when (val packet = event.packet) {
-            is S0CPacketSpawnPlayer -> {
-                if (packet.entityID in recentlyRemovedEntities) {
-                    hiddenEntityIds.add(packet.entityID)
+            is ClientboundAddEntityPacket -> {
+                if (packet.id in recentlyRemovedEntities) {
+                    hiddenEntityIds.add(packet.id)
                 }
-                recentlySpawnedEntities.addLast(packet.entityID)
+                recentlySpawnedEntities.addLast(packet.id)
             }
-            //#if MC < 1.21
-            is S0FPacketSpawnMob -> {
-                if (packet.entityID in recentlyRemovedEntities) {
-                    hiddenEntityIds.add(packet.entityID)
-                }
-                recentlySpawnedEntities.addLast(packet.entityID)
-            }
-            //#endif
-            is S13PacketDestroyEntities -> {
-                for (entityID in packet.entityIDs) {
+
+            is ClientboundRemoveEntitiesPacket -> {
+                for (entityID in packet.entityIds) {
                     // ignore entities that got properly spawned and then removed
                     if (entityID !in recentlySpawnedEntities) {
                         recentlyRemovedEntities.addLast(entityID)
@@ -81,16 +71,16 @@ object FixGhostEntities {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (config.hideTemporaryArmorStands && event.entity is EntityArmorStand) {
+        if (config.hideTemporaryArmorStands && event.entity is ArmorStand) {
             with(event.entity) {
-                if (ticksExisted < 10 && isDefaultValue() && getAllEquipment().all { it == null }) {
+                if (tickCount < 10 && isDefaultValue() && getAllEquipment().all { it == null }) {
                     event.cancel()
                 }
             }
         }
-        if (config.fixGhostEntities && (event.entity is EntityMob || event.entity is EntityPlayer)) {
+        if (config.fixGhostEntities && (event.entity is Monster || event.entity is Player)) {
             with(event.entity) {
-                if (hiddenEntityIds.contains(entityId)) {
+                if (hiddenEntityIds.contains(id)) {
                     event.cancel()
                 }
             }

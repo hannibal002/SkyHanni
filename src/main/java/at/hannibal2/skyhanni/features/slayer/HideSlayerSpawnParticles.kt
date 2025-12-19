@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -40,9 +40,9 @@ object HideSlayerSpawnParticles {
 
     // TODO This is literally just copied from GriffinBurrowParticleFinder, should be ParticleUtils in the future
     enum class FakeParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
-        ENCHANT({ type == EnumParticleTypes.ENCHANTMENT_TABLE }),
-        WITCH({ type == EnumParticleTypes.SPELL_WITCH }),
-        SPECIFIC({ type == EnumParticleTypes.SPELL_MOB }),
+        ENCHANT({ type == ParticleTypes.ENCHANT }),
+        WITCH({ type == ParticleTypes.WITCH }),
+        SPECIFIC({ type == ParticleTypes.ENTITY_EFFECT }),
     }
 
     @HandleEvent(onlyOnSkyblock = true)

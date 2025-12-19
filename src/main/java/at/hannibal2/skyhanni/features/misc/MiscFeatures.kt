@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.render.OverlayType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 
 /**
  *  I need these features in my dev env
@@ -47,9 +47,9 @@ object MiscFeatures {
         if (inChickenRace) return
 
         when (event.type) {
-            EnumParticleTypes.EXPLOSION_LARGE,
-            EnumParticleTypes.EXPLOSION_HUGE,
-            EnumParticleTypes.EXPLOSION_NORMAL,
+            ParticleTypes.EXPLOSION,
+            ParticleTypes.EXPLOSION_EMITTER,
+            ParticleTypes.POOF,
             -> event.cancel()
 
             else -> return

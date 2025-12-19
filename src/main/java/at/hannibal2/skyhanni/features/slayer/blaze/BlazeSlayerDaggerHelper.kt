@@ -18,10 +18,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -86,7 +89,7 @@ object BlazeSlayerDaggerHelper {
 
         val playerLocation = LocationUtils.playerLocation()
         return HellionShieldHelper.hellionShieldMobs
-            .filter { !it.key.isDead && it.key.getLorenzVec().distance(playerLocation) < 10 && it.key.health > 0 }
+            .filter { !it.key.deceased && it.key.getLorenzVec().distance(playerLocation) < 10 && it.key.findHealthReal() > 0 }
             .toSortedMap { a, b ->
                 if (a.getLorenzVec().distance(playerLocation) > b.getLorenzVec().distance(playerLocation)) 1 else 0
             }.firstNotNullOfOrNull { it.value }
@@ -164,7 +167,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     private fun getDaggerFromStack(stack: ItemStack?): Dagger? {
-        val itemName = stack?.displayName.orEmpty()
+        val itemName = stack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty()
         for (dagger in Dagger.entries) {
             if (dagger.daggerNames.any { itemName.contains(it) }) {
                 return dagger
@@ -243,7 +246,7 @@ object BlazeSlayerDaggerHelper {
         if (!isEnabled()) return
 
         if (textTop == "") return
-        val currentScreen = Minecraft.getMinecraft().currentScreen
+        val currentScreen = Minecraft.getInstance().screen
         if (currentScreen != null && currentScreen !is GuiPositionEditor) return
 
         config.positionTop.renderString(textTop, posLabel = "Blaze Slayer Dagger Top")
