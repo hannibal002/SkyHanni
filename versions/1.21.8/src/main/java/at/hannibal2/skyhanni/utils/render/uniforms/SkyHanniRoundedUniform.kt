@@ -4,7 +4,7 @@ import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
 import com.mojang.blaze3d.buffers.Std140SizeCalculator
 import java.nio.ByteBuffer
-import net.minecraft.client.gl.DynamicUniformStorage
+import net.minecraft.client.renderer.DynamicUniformStorage
 import org.joml.Matrix4fc
 
 class SkyHanniRoundedUniform : AutoCloseable {
@@ -20,13 +20,13 @@ class SkyHanniRoundedUniform : AutoCloseable {
         centerPos: FloatArray,
         modelViewMatrix: Matrix4fc,
     ): GpuBufferSlice {
-        return storage.write(
+        return storage.writeUniform(
             UniformValue(scaleFactor, radius, smoothness, halfSize, centerPos, modelViewMatrix),
         )
     }
 
     fun clear() {
-        storage.clear()
+        storage.endFrame()
     }
 
     override fun close() {
@@ -40,7 +40,7 @@ class SkyHanniRoundedUniform : AutoCloseable {
         val halfSize: FloatArray,
         val centerPos: FloatArray,
         val modelViewMatrix: Matrix4fc,
-    ) : DynamicUniformStorage.Uploadable {
+    ) : DynamicUniformStorage.DynamicUniform {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)
                 .putFloat(scaleFactor)

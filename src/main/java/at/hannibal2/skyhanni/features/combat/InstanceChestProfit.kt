@@ -33,11 +33,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object InstanceChestProfit {
@@ -322,7 +323,7 @@ object InstanceChestProfit {
     private fun createDisplay(items: Map<Int, ItemStack>) {
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
-            if (fakeItemNamePattern.matches(it.value.displayName)) return@forEach
+            if (fakeItemNamePattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())) return@forEach
             if (it.value.getInternalNameOrNull() != null) {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)

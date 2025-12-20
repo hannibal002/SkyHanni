@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class DevConfig {
 
@@ -51,20 +51,20 @@ class DevConfig {
     @ConfigOption(
         name = "Chat History Length",
         desc = "The number of messages to keep in memory for §e/shchathistory§7.\n" +
-            "§cExcessively high values may cause memory allocation issues."
+                "§cExcessively high values may cause memory allocation issues.",
     )
     @ConfigEditorSlider(minValue = 100f, maxValue = 5000f, minStep = 10f)
     var chatHistoryLength: Int = 100
 
     @Expose
     @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var showSlotNumberKey: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var showSlotNumberKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(
         name = "World Edit",
-        desc = "Use wood axe or command /shworldedit to render a box, similar like the WorldEdit plugin."
+        desc = "Use wood axe or command /shworldedit to render a box, similar like the WorldEdit plugin.",
     )
     @ConfigEditorBoolean
     var worldEdit: Boolean = false
@@ -96,7 +96,7 @@ class DevConfig {
     @ConfigOption(
         name = "Fancy Contributors",
         desc = "Marks §cSkyHanni's contributors §7fancy in the tab list. " +
-            "§eThose are the folks that coded the mod for you for free :)"
+                "§eThose are the folks that coded the mod for you for free :)",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -118,7 +118,7 @@ class DevConfig {
     @ConfigOption(
         name = "Spin Contributors",
         desc = "Make SkyHanni contributors spin around when you are looking at them. " +
-            "§eRequires 'Flip Contributors' to be enabled."
+                "§eRequires 'Flip Contributors' to be enabled.",
     )
     @ConfigEditorBoolean
     var rotateContributors: Boolean = false
@@ -142,11 +142,7 @@ class DevConfig {
     @Expose
     @ConfigOption(
         name = "Ping API",
-        //#if MC < 1.21
-        desc = "Use the Hypixel Mod API to calculate your ping.",
-        //#else
-        //$$ desc = "Make the client always send ping packets to the server as if the debug HUD was open so that we can calculate your ping.",
-        //#endif
+        desc = "Make the client always send ping packets to the server as if the debug HUD was open so that we can calculate your ping.",
     )
     @ConfigEditorBoolean
     var pingApi: Boolean = true
@@ -154,7 +150,7 @@ class DevConfig {
     @Expose
     @ConfigOption(
         name = "Damage Indicator",
-        desc = "Enable the backend of the Damage Indicator. §cOnly disable when you know what you are doing!"
+        desc = "Enable the backend of the Damage Indicator. §cOnly disable when you know what you are doing!",
     )
     @ConfigEditorBoolean
     var damageIndicatorBackend: Boolean = true
@@ -162,7 +158,7 @@ class DevConfig {
     @Expose
     @ConfigOption(
         name = "NTP Server",
-        desc = "Change the NTP-Server Address. Default is \"time.google.com\".\n§cONLY CHANGE THIS IF YOU KNOW WHAT YOU'RE DOING!"
+        desc = "Change the NTP-Server Address. Default is \"time.google.com\".\n§cONLY CHANGE THIS IF YOU KNOW WHAT YOU'RE DOING!",
     )
     @ConfigEditorText
     var ntpServer: String = "time.google.com"

@@ -6,10 +6,6 @@ import at.skyhanni.sharedvariables.versionString
 import com.google.devtools.ksp.gradle.KspTaskJvm
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
-import moe.nea.shot.Shots
-import net.fabricmc.loom.api.processor.MinecraftJarProcessor
-import net.fabricmc.loom.api.processor.ProcessorContext
-import net.fabricmc.loom.api.processor.SpecContext
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
@@ -18,12 +14,6 @@ import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
 import skyhannibuildsystem.PublishToModrinth
-import java.io.Serializable
-import java.nio.file.Path
-import java.util.zip.ZipFile
-import java.util.zip.ZipOutputStream
-import kotlin.io.path.moveTo
-import kotlin.io.path.outputStream
 
 plugins {
     idea
@@ -35,7 +25,6 @@ plugins {
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
     `maven-publish`
-    id("moe.nea.shot") version "1.0.0"
     id("io.gitlab.arturbosch.detekt")
 }
 
@@ -65,7 +54,10 @@ loom {
         }
     }
     if (target.isModern) {
-        val accessWidenerFile = file("src/main/resources/skyhanni.accesswidener")
+        val accessWidenerFile = when (target) {
+            ProjectTarget.MODERN_12105 -> rootProject.file("src/main/resources/skyhanni.accesswidener")
+            else -> file("src/main/resources/skyhanni.accesswidener")
+        }
         if (accessWidenerFile.exists()) {
             accessWidenerPath = accessWidenerFile
         }
@@ -77,11 +69,7 @@ loom {
     }
     runs {
         named("client") {
-            if (target == ProjectTarget.MAIN) {
-                isIdeConfigGenerated = true
-                appendProjectPathToConfigName.set(false)
-                this.runDir(runDirectory.relativeTo(projectDir).toString())
-            } else if (target.isModern) {
+            if (target.isModern) {
                 isIdeConfigGenerated = true
                 appendProjectPathToConfigName.set(true)
                 this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
@@ -95,13 +83,6 @@ loom {
             programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
         }
         removeIf { it.name == "server" }
-    }
-}
-
-if (target == ProjectTarget.MAIN) {
-    sourceSets.main {
-        resources.destinationDirectory.set(kotlin.destinationDirectory)
-        output.setResourcesDir(kotlin.destinationDirectory)
     }
 }
 
@@ -159,17 +140,6 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.prBody = project.findProperty("prBody") as? String ?: ""
 }
 
-// Disabled because it breaks mixins with the minecraft dev plugin
-// file("shots.txt")
-//     .takeIf(File::exists)
-//     ?.readText()
-//     ?.lines()
-//     ?.let(ShotParser()::parse)
-//     ?.let(::Shots)
-//     ?.let {
-//         loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
-//     }
-
 dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
     minecraft("com.mojang:minecraft:$versionName")
@@ -196,7 +166,7 @@ dependencies {
     ksp(libs.autoservice.ksp)
     implementation(libs.autoservice.annotations)
 
-    val mixinVersion = if (target == ProjectTarget.MAIN) "0.7.11-SNAPSHOT" else "0.8.2"
+    val mixinVersion = "0.8.2"
 
     if (!target.isFabric) {
         shadowImpl("org.spongepowered:mixin:$mixinVersion") {
@@ -212,35 +182,14 @@ dependencies {
         target.modMenuVersion?.let { modImplementation("maven.modrinth:modmenu:$it") }
     }
 
-    if (!target.isModern) {
-        implementation(kotlin("stdlib-jdk8"))
-        shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
-            exclude(group = "org.jetbrains.kotlin")
-        }
-    }
-
-    if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
-    else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     // Brigadier comes bundled with more recent versions of Minecraft
     if (target.minecraftVersion == MinecraftVersion.MC189) {
         shadowImpl("com.mojang:brigadier:1.0.18")
     }
 
-    modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
-        exclude(module = "unspecified")
-        isTransitive = false
-    }
-    // December 29, 2024, 07:30 PM EST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.6.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.6.0:all") {
-        exclude(module = "unspecified")
-        isTransitive = false
-    }
-
-    if (target == ProjectTarget.MAIN) {
-        shadowModImpl(libs.moulconfig)
-    } else if (target.isModern) {
+    if (target.isModern) {
         val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
         shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
         include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
@@ -252,12 +201,7 @@ dependencies {
     if (!target.isModern) {
         shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     }
-    implementation(libs.hotswapagentforge)
 
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
-        exclude(module = "unspecified")
-        isTransitive = false
-    }
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.mockk:mockk:1.12.5")
 
@@ -285,9 +229,7 @@ dependencies {
 
 afterEvaluate {
     loom.runs.named("client") {
-        if (target == ProjectTarget.MAIN) {
-            programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
-        } else if (target.isModern) {
+        if (target.isModern) {
             programArgs("--quickPlayMultiplayer", "hypixel.net")
         }
     }
@@ -327,7 +269,8 @@ tasks.processResources {
     } // else do NOT exclude fabric.mod.json. We use fabric.mod.json in order to show a logo in prism launcher.
 }
 
-if (target == ProjectTarget.MAIN) {
+// todo 1.21.5
+if (false) {
     tasks.register("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         dependsOn(tasks.configureLaunch)
@@ -342,7 +285,7 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
-if (target == ProjectTarget.MAIN) {
+if (false) {
     tasks.compileJava {
         dependsOn(tasks.processResources)
     }
@@ -367,8 +310,8 @@ tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
 }
 
-if (target.parent == ProjectTarget.MAIN) {
-    val mainRes = project(ProjectTarget.MAIN.projectPath).tasks.getAt("processResources")
+if (target.parent == ProjectTarget.MODERN_12105) {
+    val mainRes = project(ProjectTarget.MODERN_12105.projectPath).tasks.getAt("processResources")
     tasks.named("processResources") {
         dependsOn(mainRes)
     }
@@ -387,12 +330,6 @@ tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"
-        if (target == ProjectTarget.MAIN) {
-            this["FMLCorePluginContainsFMLMod"] = "true"
-            this["ForceLoadAsMod"] = "true"
-            this["TweakClass"] = "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker"
-            this["MixinConfigs"] = "mixins.skyhanni.json"
-        }
     }
 }
 
@@ -490,7 +427,7 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        target == ProjectTarget.MAIN && project.findProperty("skipDetekt") != "true"
+        target == ProjectTarget.MODERN_12105 && project.findProperty("skipDetekt") != "true"
     }
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
@@ -506,25 +443,4 @@ tasks.withType<Detekt>().configureEach {
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
-}
-
-abstract class ShotApplicationJarProcessor @Inject constructor(private val shots: Shots) :
-    MinecraftJarProcessor<MinecraftJarProcessor.Spec>,
-    Serializable {
-
-    override fun buildSpec(context: SpecContext?): MinecraftJarProcessor.Spec? = ShotSpec(shots)
-
-    override fun processJar(source: Path, spec: MinecraftJarProcessor.Spec?, context: ProcessorContext?) {
-        val dest = source.resolveSibling(source.fileName.toString() + "-temp-shot")
-        ZipFile(source.toFile()).use { input ->
-            ZipOutputStream(dest.outputStream()).use { output ->
-                shots.processZipFile(input, output)
-            }
-        }
-        dest.moveTo(source, overwrite = true)
-    }
-
-    override fun getName(): String = "Shots"
-
-    private data class ShotSpec(val shots: Shots) : MinecraftJarProcessor.Spec, Serializable
 }

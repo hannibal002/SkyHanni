@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object RiftOdonata {
@@ -40,11 +40,11 @@ object RiftOdonata {
     }
 
     @HandleEvent
-    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<EntityArmorStand>) {
+    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (RiftLarva.isEnabled()) tryAdd(event.entity)
     }
 
-    private fun tryAdd(stand: EntityArmorStand) {
+    private fun tryAdd(stand: ArmorStand) {
         if (!stand.wearingSkullTexture(ODONATA_SKULL_TEXTURE)) return
         RenderLivingEntityHelper.setEntityColor(stand, config.highlightColor.toColor().addAlpha(1)) {
             RiftLarva.isEnabled() && hasBottleInHand
@@ -56,7 +56,7 @@ object RiftOdonata {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.highlight.onToggle {
-            getEntities<EntityArmorStand>().forEach(::tryAdd)
+            getEntities<ArmorStand>().forEach(::tryAdd)
         }
     }
 

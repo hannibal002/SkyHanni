@@ -2,96 +2,44 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLiving
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.item.ItemStack
-import net.minecraft.world.World
-//#if MC < 1.16
-import net.minecraft.entity.monster.EntitySkeleton
-//#else
-//$$ import net.minecraft.world.entity.monster.WitherSkeleton
-//$$ import net.minecraft.world.entity.EquipmentSlot
-//$$ import net.minecraft.world.entity.EntityType
-//#endif
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Level
 
-fun EntityArmorStand.getStandHelmet(): ItemStack? =
-//#if MC < 1.16
-    this.getEquipmentInSlot(4)
-//#else
-//$$ this.getItemBySlot(EquipmentSlot.HEAD)
-//#endif
+fun ArmorStand.getStandHelmet(): ItemStack? =
+    this.getItemBySlot(EquipmentSlot.HEAD)
 
-fun EntityLiving.getEntityHelmet(): ItemStack? =
-//#if MC < 1.16
-    this.getEquipmentInSlot(4)
-//#else
-//$$ this.getItemBySlot(EquipmentSlot.HEAD)
-//#endif
+fun Mob.getEntityHelmet(): ItemStack? =
+    this.getItemBySlot(EquipmentSlot.HEAD)
 
-fun EntityLivingBase.getAllEquipment() =
-//#if MC < 1.16
-    this.inventory
-//#elseif MC < 1.21
-//$$ this.armorSlots
-//#else
-//$$ this.equipment.map.values.toTypedArray()
-//#endif
+fun LivingEntity.getAllEquipment() =
+    this.equipment.items.values.toTypedArray()
 
-fun Entity.getFirstPassenger(): Entity? =
-//#if MC < 1.16
-    this.riddenByEntity
-//#else
-//$$ this.passengers.firstOrNull()
-//#endif
+fun ArmorStand.getHandItem(): ItemStack? =
+    this.getItemBySlot(EquipmentSlot.MAINHAND)
 
-fun EntityArmorStand.getHandItem(): ItemStack? =
-//#if MC < 1.16
-    this.getEquipmentInSlot(0)
-//#else
-//$$ this.getItemBySlot(EquipmentSlot.MAINHAND)
-//#endif
+fun ArmorStand.getInventoryItems(): Array<ItemStack> =
+    arrayOf(
+        getItemBySlot(EquipmentSlot.MAINHAND),
+        getItemBySlot(EquipmentSlot.FEET),
+        getItemBySlot(EquipmentSlot.LEGS),
+        getItemBySlot(EquipmentSlot.CHEST),
+        getItemBySlot(EquipmentSlot.HEAD),
+        getItemBySlot(EquipmentSlot.OFFHAND),
+    )
 
-fun EntityArmorStand.getInventoryItems(): Array<ItemStack> =
-    //#if MC < 1.16
-    inventory
-//#else
-//$$ arrayOf(
-//$$ getEquippedStack(EquipmentSlot.MAINHAND),
-//$$ getEquippedStack(EquipmentSlot.FEET),
-//$$ getEquippedStack(EquipmentSlot.LEGS),
-//$$ getEquippedStack(EquipmentSlot.CHEST),
-//$$ getEquippedStack(EquipmentSlot.HEAD),
-//$$ getEquippedStack(EquipmentSlot.OFFHAND),
-//$$ )
-//#endif
+fun Entity.getEntityLevel(): Level =
+    this.level()
 
-fun Entity.getEntityLevel(): World =
-//#if MC < 1.16
-    this.entityWorld
-//#else
-//$$ this.level
-//#endif
+val Entity.deceased: Boolean
+    get() = this.isRemoved
 
-fun createWitherSkeleton(world: World?): EntityLivingBase =
-//#if MC < 1.16
-    EntitySkeleton(world).also { it.skeletonType = 1 }
-//#else
-//$$ WitherSkeleton(EntityType.WITHER_SKELETON, world)
-//#endif
-
-//#if MC > 1.21
-//$$ val Entity.deceased: Boolean
-//$$     get() = this.isRemoved
-//#endif
-
-fun EntityLivingBase.findHealthReal(): Float {
-    //#if MC < 1.21
+fun LivingEntity.findHealthReal(): Float {
     val entityHealth = health
-    //#else
-    //$$ val entityHealth = health
-    //#endif
     if (entityHealth == 1024f && !PlatformUtils.IS_LEGACY) {
         return baseMaxHealth.toFloat()
     }

@@ -1,26 +1,41 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.player.RemotePlayer
 import net.minecraft.client.resources.DefaultPlayerSkin
-import net.minecraft.entity.player.EnumPlayerModelParts
-import net.minecraft.scoreboard.ScorePlayerTeam
-import net.minecraft.util.ResourceLocation
+import net.minecraft.client.resources.PlayerSkin
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.player.PlayerModelPart
+import net.minecraft.world.scores.PlayerTeam
 
-class FakePlayer(val hannibal: Boolean = false) : EntityOtherPlayerMP(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
+//#if MC > 1.21.8
+//$$ import net.minecraft.core.ClientAsset
+//$$ import net.minecraft.world.entity.player.PlayerModelType
+//#endif
 
-    private val hannibalSkin = ResourceLocation("skyhanni:hannibal2.png")
+class FakePlayer(val hannibal: Boolean = false) : RemotePlayer(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
 
-    override fun getLocationSkin(): ResourceLocation? {
+    //#if MC < 1.21.9
+    private val hannibalSkin = PlayerSkin(ResourceLocation.parse("skyhanni:hannibal2.png"), null, null, null, null ,false)
+    //#else
+    //$$ private val hannibalSkin = PlayerSkin(ClientAsset.DownloadedTexture(ResourceLocation.parse("skyhanni:hannibal2.png"), ""), null, null , PlayerModelType.WIDE, false)
+    //#endif
+
+    override fun getSkin(): PlayerSkin {
         if (hannibal) return hannibalSkin
-        return MinecraftCompat.localPlayer.locationSkin
-            ?: DefaultPlayerSkin.getDefaultSkin(MinecraftCompat.localPlayer.uniqueID)
+        return MinecraftCompat.localPlayer.skin
+            ?: DefaultPlayerSkin.get(MinecraftCompat.localPlayer.uuid)
     }
 
-    override fun getTeam() = object : ScorePlayerTeam(null, null) {
-        override fun getNameTagVisibility() = EnumVisible.NEVER
+    override fun getTeam() = object : PlayerTeam(null, "") {
+        override fun getNameTagVisibility() = Visibility.NEVER
     }
 
-    override fun isWearing(part: EnumPlayerModelParts): Boolean =
-        MinecraftCompat.localPlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
+    //#if MC < 1.21.9
+    override fun isModelPartShown(part: PlayerModelPart): Boolean =
+        MinecraftCompat.localPlayer.isModelPartShown(part) && part != PlayerModelPart.CAPE
+    //#else
+    //$$ override fun isModelPartShown(part: PlayerModelPart): Boolean =
+    //$$    MinecraftCompat.localPlayer.isModelPartShown(part) && part != PlayerModelPart.CAPE
+    //#endif
 }

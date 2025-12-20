@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 @SkyHanniModule
 object BetterWikiFromMenus {
@@ -28,8 +29,8 @@ object BetterWikiFromMenus {
 
         if (chestName.isEmpty()) return
 
-        val itemClickedStack = event.slot?.stack ?: return
-        val itemClickedName = itemClickedStack.displayName
+        val itemClickedStack = event.slot?.item ?: return
+        val itemClickedName = itemClickedStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
 
         val isWiki = event.slotId == 11 && itemClickedName.contains("Wiki Command")
         val isWikithis = event.slotId == 15 && itemClickedName.contains("Wikithis Command")

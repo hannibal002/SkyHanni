@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.player.EnumPlayerModelParts
+import net.minecraft.client.gui.components.PlayerFaceRenderer
 
 @SkyHanniModule
 object TabListRenderer {
@@ -51,9 +51,9 @@ object TabListRenderer {
         if (GlobalRender.renderDisabled) return
         if (!config.enabled.get()) return
         if (!config.toggleTab) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
 
-        if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isActive()) {
+        if (Minecraft.getInstance().options.keyPlayerList.isActive()) {
             if (!isPressed) {
                 isPressed = true
                 isTabToggled = !isTabToggled
@@ -100,7 +100,7 @@ object TabListRenderer {
             totalHeight += footer.size * LINE_HEIGHT + TAB_PADDING
         }
 
-        val minecraft = Minecraft.getMinecraft()
+        val minecraft = Minecraft.getInstance()
         val screenWidth = GuiScreenUtils.scaledWindowWidth / 2
         val x = screenWidth - totalWidth / 2
         val y = 10
@@ -120,7 +120,7 @@ object TabListRenderer {
             for (line in header) {
                 GuiRenderUtils.drawString(
                     line,
-                    x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
+                    x + totalWidth / 2f - minecraft.font.width(line) / 2f,
                     headerY.toFloat(),
                     -1,
                 )
@@ -135,7 +135,7 @@ object TabListRenderer {
             for (line in footer) {
                 GuiRenderUtils.drawString(
                     line,
-                    x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
+                    x + totalWidth / 2f - minecraft.font.width(line) / 2f,
                     footerY.toFloat(),
                     -1,
                 )
@@ -178,22 +178,13 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
-                        val texture = playerInfo.locationSkin
+                        val texture = playerInfo.skin.texture()
                         //#if MC > 1.21.8
                         //$$ .id()
                         //#endif
-                        //#if MC < 1.21
-                        GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 8 / 64f, 16 / 64f, 8 / 64f, 16 / 64f, texture)
-
-                        val player = tabLine.getEntity(playerInfo)
-                        if (player != null && player.isWearing(EnumPlayerModelParts.HAT)) {
-                            GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 40 / 64f, 48 / 64f, 8 / 64f, 16 / 64f, texture)
-                        }
-                        //#else
-                        //$$ net.minecraft.client.gui.PlayerSkinDrawer.draw(
-                        //$$     DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.shouldShowHat(), false, -1
-                        //$$ )
-                        //#endif
+                        PlayerFaceRenderer.draw(
+                            DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.showHat(), false, -1,
+                        )
                     }
                     middleX += 8 + 2
                 }

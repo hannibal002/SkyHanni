@@ -3,10 +3,7 @@ package at.hannibal2.skyhanni.shader
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
-//#if MC > 1.21
-//$$ import java.nio.FloatBuffer
-//$$ import org.joml.Matrix4f
-//#endif
+import org.joml.Matrix4f
 
 abstract class RoundedShader<Self : RoundedShader<Self>>(vertex: String, fragment: String) : Shader(vertex, fragment) {
     @Suppress("UNCHECKED_CAST", "PropertyName", "VariableNaming")
@@ -20,22 +17,19 @@ abstract class RoundedShader<Self : RoundedShader<Self>>(vertex: String, fragmen
         set(value) {
             field = floatArrayOf(value[0], GuiScreenUtils.displayHeight - value[1])
         }
-    //#if MC > 1.21
-    //$$ var modelViewMatrix: Matrix4f = Matrix4f()
-    //#endif
+
+    var modelViewMatrix: Matrix4f = Matrix4f()
 
     fun applyBaseUniforms(
         hasSmoothness: Boolean = true,
-        hasHalfSize: Boolean = true
+        hasHalfSize: Boolean = true,
     ) {
         registerUniform(Uniform.UniformType.FLOAT, "scaleFactor") { scaleFactor }
         registerUniform(Uniform.UniformType.FLOAT, "radius") { radius }
         if (hasSmoothness) registerUniform(Uniform.UniformType.FLOAT, "smoothness") { smoothness }
         if (hasHalfSize) registerUniform(Uniform.UniformType.VEC2, "halfSize") { halfSize }
         registerUniform(Uniform.UniformType.VEC2, "centerPos") { centerPos }
-        //#if MC > 1.21
-        //$$ registerUniform(Uniform.UniformType.MAT4, "modelViewMatrix") { modelViewMatrix }
-        //#endif
+        registerUniform(Uniform.UniformType.MAT4, "modelViewMatrix") { modelViewMatrix }
     }
 
     override fun registerUniforms() = applyBaseUniforms()
@@ -45,7 +39,7 @@ object RoundedRectangleShader : RoundedShader<RoundedRectangleShader>("rounded_r
 object RoundedTextureShader : RoundedShader<RoundedTextureShader>("rounded_texture", "rounded_texture")
 object RoundedRectangleOutlineShader : RoundedShader<RoundedRectangleOutlineShader>(
     "rounded_rect_outline",
-    "rounded_rect_outline"
+    "rounded_rect_outline",
 ) {
     var borderThickness: Float = 5f
     var borderBlur: Float = 0.3f
@@ -56,6 +50,7 @@ object RoundedRectangleOutlineShader : RoundedShader<RoundedRectangleOutlineShad
         registerUniform(Uniform.UniformType.FLOAT, "borderBlur") { borderBlur }
     }
 }
+
 object CircleShader : RoundedShader<CircleShader>("circle", "circle") {
     var angle1: Float = 0f
     var angle2: Float = 0f
@@ -66,9 +61,10 @@ object CircleShader : RoundedShader<CircleShader>("circle", "circle") {
         registerUniform(Uniform.UniformType.FLOAT, "angle2") { angle2 }
     }
 }
+
 object RadialGradientCircleShader : RoundedShader<RadialGradientCircleShader>(
     "radial_gradient_circle",
-    "radial_gradient_circle"
+    "radial_gradient_circle",
 ) {
     var angle: Float = 0f
     var startColor: FloatArray = floatArrayOf(0f, 0f, 0f, 0f)

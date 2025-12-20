@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.api.event
 
-import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import net.minecraft.client.gui.GuiGraphics
 
 /**
  * Use @[HandleEvent]
@@ -33,6 +33,6 @@ abstract class SkyHanniEvent protected constructor() {
     }
 
     interface Rendering {
-        val context: DrawContext
+        val context: GuiGraphics
     }
 }

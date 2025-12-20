@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import net.minecraft.block.state.IBlockState
+import net.minecraft.world.level.block.state.BlockState
 
 enum class OreType(
     val oreName: String,
@@ -211,7 +211,7 @@ enum class OreType(
             AQUAMARINE, CITRINE, ONYX, PERIDOT,
         )
 
-        fun IBlockState.isOreType(oreType: OreType): Boolean {
+        fun BlockState.isOreType(oreType: OreType): Boolean {
             for (oreBlock in oreType.oreBlocks) {
                 if (oreBlock !in MiningApi.currentAreaOreBlocks) continue
                 if (oreBlock.checkBlock(this)) {

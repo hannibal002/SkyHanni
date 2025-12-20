@@ -12,9 +12,10 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -27,12 +28,12 @@ object SnakeGame {
     private var inInventory = false
 
     private val keys
-        get() = with(Minecraft.getMinecraft().gameSettings) {
+        get() = with(Minecraft.getInstance().options) {
             mapOf(
-                keyBindLeft.keyCode to 50,
-                keyBindForward.keyCode to 51,
-                keyBindRight.keyCode to 52,
-                keyBindBack.keyCode to 53,
+                keyLeft.key.value to 50,
+                keyUp.key.value to 51,
+                keyRight.key.value to 52,
+                keyDown.key.value to 53,
             )
         }
 
@@ -41,7 +42,7 @@ object SnakeGame {
         if (!isEnabled()) return
         if (!inInventory) return
 
-        val chest = event.guiContainer as? GuiChest ?: return
+        val chest = event.guiContainer as? ContainerScreen ?: return
 
         if (lastClick.passedSince() < 100.milliseconds) return
 
@@ -49,7 +50,7 @@ object SnakeGame {
             if (!key.isKeyHeld()) continue
             event.cancel()
 
-            InventoryUtils.clickSlot(slot, chest.inventorySlots.windowId, mouseButton = 2, mode = ClickType.MIDDLE)
+            InventoryUtils.clickSlot(slot, chest.container.containerId, mouseButton = 2, mode = ClickType.MIDDLE)
 
             lastClick = SimpleTimeMark.now()
             break

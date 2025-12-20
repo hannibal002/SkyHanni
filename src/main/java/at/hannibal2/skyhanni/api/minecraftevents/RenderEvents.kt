@@ -1,115 +1,109 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
-import at.hannibal2.skyhanni.data.GlobalRender
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent
-import at.hannibal2.skyhanni.events.render.OverlayType
-import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
+import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
-import at.hannibal2.skyhanni.events.render.gui.GuiActionPerformedEvent
-import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
-import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
-import at.hannibal2.skyhanni.events.render.gui.InitializeGuiEvent
-import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent
-import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.compat.DrawContext
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.WorldRenderContext
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
-import net.minecraftforge.client.event.RenderBlockOverlayEvent
-import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
+import net.minecraft.client.DeltaTracker
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.resources.ResourceLocation
+//#if MC < 1.21.6
+import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
+import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
+//#else
+//$$ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+//$$ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
+//#endif
+//#if MC < 1.21.9
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
+import net.minecraft.client.renderer.MultiBufferSource
+import com.mojang.blaze3d.vertex.PoseStack
+//#endif
 
 @SkyHanniModule
 object RenderEvents {
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (GlobalRender.renderDisabled) return
-        if (!canRender()) return
-        SkyHanniRenderWorldEvent(WorldRenderContext(), event.partialTicks).post()
-    }
+    init {
 
-    @SubscribeEvent
-    fun onGuiRender(event: DrawScreenEvent.Post) {
-        if (!canRender()) return
-        ScreenDrawnEvent(DrawContext(), event.gui).post()
-    }
-
-    @SubscribeEvent
-    fun onPostRenderTick(event: RenderTickEvent) {
-        if (!canRender()) return
-        RenderingTickEvent(DrawContext(), event.phase == TickEvent.Phase.START).post()
-    }
-
-    @SubscribeEvent
-    fun onRenderOverlayPre(event: RenderGameOverlayEvent.Pre) {
-        if (!canRender()) return
-        if (GameOverlayRenderPreEvent(DrawContext(), RenderLayer.fromForge(event.type)).post()) {
-            event.isCanceled = true
+        // SkyHanniRenderWorldEvent
+        //#if MC < 1.21.9
+        WorldRenderEvents.AFTER_TRANSLUCENT.register { event ->
+            val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
+            val stack = event.matrixStack() ?: PoseStack()
+            SkyHanniRenderWorldEvent(stack, event.camera(), immediateVertexConsumers, event.tickCounter().getGameTimeDeltaPartialTick(true)).post()
         }
-    }
+        //#endif
 
-    @SubscribeEvent
-    fun onRenderOverlayPost(event: RenderGameOverlayEvent.Post) {
-        if (!canRender()) return
-        GameOverlayRenderPostEvent(DrawContext(), RenderLayer.fromForge(event.type)).post()
-    }
+        // ScreenDrawnEvent
 
-    @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent) {
-        GuiScreenOpenEvent(event.gui).post()
-    }
+        // GuiScreenOpenEvent
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
-        val guiScreen = event.gui as? GuiContainer ?: return
-        if (GuiKeyPressEvent(guiScreen).post()) {
-            event.isCanceled = true
+        // GuiMouseInputEvent
+
+        // BlockOverlayRenderEvent
+
+        // GuiActionPerformedEvent
+
+        // InitializeGuiEvent
+
+        //#if MC < 1.21.6
+        HudLayerRegistrationCallback.EVENT.register { context ->
+            context.attachLayerAfter(IdentifiedLayer.SLEEP, ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"), RenderEvents::postGui)
         }
+        //#else
+        //$$ HudElementRegistry.attachElementBefore(
+        //$$     VanillaHudElements.SLEEP,
+        //$$     ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
+        //$$     RenderEvents::postGui
+        //$$ )
+        //#endif
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onMouseInput(event: GuiScreenEvent.MouseInputEvent.Pre) {
-        if (GuiMouseInputEvent(event.gui).post()) {
-            event.isCanceled = true
-        }
+    private fun postGui(context: GuiGraphics, tick: DeltaTracker) {
+        if (Minecraft.getInstance().options.hideGui) return
+        RenderData.postRenderOverlay(context)
     }
 
-    @SubscribeEvent
-    fun onRenderBlockOverlay(event: RenderBlockOverlayEvent) {
-        if (BlockOverlayRenderEvent(OverlayType.fromForge(event.overlayType)).post()) {
-            event.isCanceled = true
-        }
+    // GameOverlayRenderPreEvent
+    // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
+    @JvmStatic
+    fun postHotbarLayerEventPre(context: GuiGraphics): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
     }
 
-    @SubscribeEvent
-    fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
-        if (!canRender()) return
-        DrawBackgroundEvent(DrawContext()).post()
+    @JvmStatic
+    fun postExperienceBarLayerEventPre(context: GuiGraphics): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_BAR).post()
     }
 
-    @SubscribeEvent
-    fun onGuiAction(event: GuiScreenEvent.ActionPerformedEvent.Post) {
-        GuiActionPerformedEvent(event.gui, event.button).post()
+    @JvmStatic
+    fun postExperienceNumberLayerEventPre(context: GuiGraphics): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
     }
 
-    @SubscribeEvent
-    fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
-        InitializeGuiEvent(event.gui, event.buttonList).post()
+    @JvmStatic
+    fun postTablistLayerEventPre(context: GuiGraphics): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.PLAYER_LIST).post()
     }
 
-    private fun canRender(): Boolean = MinecraftCompat.localWorldExists && MinecraftCompat.localPlayerExists
+    // GameOverlayRenderPostEvent
+    // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
+    @JvmStatic
+    fun postHotbarLayerEventPost(context: GuiGraphics) {
+        GameOverlayRenderPostEvent(context, RenderLayer.HOTBAR).post()
+    }
+
+    @JvmStatic
+    fun postExperienceBarLayerEventPost(context: GuiGraphics) {
+        GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_BAR).post()
+    }
+
+    @JvmStatic
+    fun postExperienceNumberLayerEventPost(context: GuiGraphics) {
+        GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
+    }
 }
 
 enum class RenderLayer {
@@ -132,11 +126,4 @@ enum class RenderLayer {
     DEBUG,
     // Not a real forge layer but is used on modern Minecraft versions
     EXPERIENCE_NUMBER,
-    ;
-
-    companion object {
-        fun fromForge(element: RenderGameOverlayEvent.ElementType): RenderLayer {
-            return entries[element.ordinal]
-        }
-    }
 }

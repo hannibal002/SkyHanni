@@ -47,7 +47,7 @@ object GardenCropMilestoneInventory {
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (average == -1.0) return
 
-        if (event.slot.slotNumber == 2) {
+        if (event.slot.index == 2) {
             event.offsetY = -38
             event.offsetX = -50
             event.alignLeft = false

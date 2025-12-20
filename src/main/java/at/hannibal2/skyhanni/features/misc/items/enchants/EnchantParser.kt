@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.OtherModsSettings
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
@@ -25,12 +24,13 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.createHoverEvent
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.event.HoverEvent
-import net.minecraft.item.ItemStack
-import net.minecraft.util.IChatComponent
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
 
 /**
@@ -153,12 +153,12 @@ object EnchantParser {
      */
     @HandleEvent
     fun onChatHoverEvent(event: ChatHoverEvent) {
-        if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
+        if (event.getHoverEvent().action() != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled() || !this.enchants.hasEnchantData()) return
 
         currentItem = null
 
-        val lore = event.getHoverEvent().value().formattedText.split("\n").toMutableList()
+        val lore = event.getHoverEvent().value().formattedTextCompat().split("\n").toMutableList()
 
         // Check for any vanilla gray enchants at the top of the tooltip
         indexOfLastGrayEnchant = accountForAndRemoveGrayEnchants(lore, null)
@@ -204,7 +204,7 @@ object EnchantParser {
     private fun parseEnchants(
         loreList: MutableList<String>,
         enchants: Map<String, Int>,
-        chatComponent: IChatComponent?,
+        chatComponent: Component?,
     ) {
         // Check if the lore is already cached so continuous hover isn't 1 fps
         if (loreCache.isCached(loreList)) {
@@ -474,12 +474,12 @@ object EnchantParser {
         }
     }
 
-    private fun editChatComponent(chatComponent: IChatComponent, loreList: MutableList<String>) {
+    private fun editChatComponent(chatComponent: Component, loreList: MutableList<String>) {
         val text = loreList.joinToString("\n").dropLast(2)
 
         // Just set the component text to the entire lore list instead of reconstructing the entire siblings tree
         val chatComponentText = text.asComponent()
-        val hoverEvent = createHoverEvent(chatComponent.chatStyle.chatHoverEvent?.action, chatComponentText) ?: return
+        val hoverEvent = createHoverEvent(chatComponent.style.hoverEvent?.action(), chatComponentText) ?: return
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
@@ -493,7 +493,7 @@ object EnchantParser {
     private fun accountForAndRemoveGrayEnchants(loreList: MutableList<String>, item: ItemStack?): Int {
         if (item != null) {
             // If the item has no enchantmentTagList then there will be no gray enchants
-            if (!item.isEnchanted() || item.enchantmentTagList.tagCount() == 0) return -1
+            if (!item.isEnchanted || item.enchantments.size() == 0) return -1
         }
 
         var lastGrayEnchant = -1

@@ -169,7 +169,7 @@ object TimeUtils {
             } else {
                 "$datePart$timePart".trim()
             },
-        ).orEmpty()
+        )
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))

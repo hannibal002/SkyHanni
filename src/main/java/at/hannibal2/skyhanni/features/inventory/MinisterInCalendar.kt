@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.item.ItemStack
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object MinisterInCalendar {
@@ -61,7 +61,7 @@ object MinisterInCalendar {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
-        if (event.inventory !is ContainerLocalMenu || event.slot != MINISTER_SLOT) return
+        if (event.inventory !is SimpleContainer || event.slot != MINISTER_SLOT) return
         if (!ElectionApi.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
         event.replace(ministerItemStack ?: return)
     }

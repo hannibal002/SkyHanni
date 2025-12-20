@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
 import at.hannibal2.skyhanni.utils.StringUtils.removeAllNonLettersAndNumbers
 import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -53,7 +53,7 @@ object AbiphoneFeatures {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (InventoryUtils.inInventory()) return
-        if (config.abiphoneAcceptKey == Keyboard.KEY_NONE || config.abiphoneAcceptKey != event.keyCode) return
+        if (config.abiphoneAcceptKey == GLFW.GLFW_KEY_UNKNOWN || config.abiphoneAcceptKey != event.keyCode) return
         val acceptUUID = acceptUUID ?: return
         HypixelCommands.callback(acceptUUID)
         AbiphoneFeatures.acceptUUID = null
@@ -83,8 +83,8 @@ object AbiphoneFeatures {
 
     private fun readPickupUuid(event: SkyHanniChatEvent) {
         val siblings = event.chatComponent.siblings.takeIf { it.size >= 3 } ?: return
-        val clickEvent = siblings[2]?.chatStyle?.chatClickEvent ?: return
-        if (clickEvent.action.name.lowercase() != "run_command" || !clickEvent.value().lowercase().startsWith("/cb")) return
+        val clickEvent = siblings[2]?.style?.clickEvent ?: return
+        if (clickEvent.action().name.lowercase() != "run_command" || !clickEvent.value().lowercase().startsWith("/cb")) return
         acceptUUID = clickEvent.value().lowercase().replace("/cb ", "").takeIf { it.isValidUuid() }
         if (acceptUUID != null) DelayedRun.runDelayed(20.seconds) { acceptUUID = null }
     }

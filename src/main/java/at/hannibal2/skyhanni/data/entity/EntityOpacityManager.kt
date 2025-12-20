@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.EntityLivingBase
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
+import net.minecraft.world.entity.LivingEntity
 import org.lwjgl.opengl.GL11
 
 @SkyHanniModule
@@ -19,7 +19,7 @@ object EntityOpacityManager {
 
     private var shouldHide: Boolean = false
 
-    private var entities = emptyMap<EntityLivingBase, Int>()
+    private var entities = emptyMap<LivingEntity, Int>()
     private var active = false
 
     @HandleEvent(SecondPassedEvent::class)
@@ -32,8 +32,8 @@ object EntityOpacityManager {
     @HandleEvent(SkyHanniTickEvent::class, onlyOnSkyblock = true)
     fun onTick() {
         if (!active) return
-        val entities = mutableMapOf<EntityLivingBase, Int>()
-        for (entity in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(80.0)) {
+        val entities = mutableMapOf<LivingEntity, Int>()
+        for (entity in EntityUtils.getEntitiesNextToPlayer<LivingEntity>(80.0)) {
             val event = EntityOpacityEvent(entity)
             event.post()
             event.opacity?.let {
@@ -43,21 +43,19 @@ object EntityOpacityManager {
         this.entities = entities
     }
 
-    //#if MC > 1.21
-    //$$ @JvmStatic
-    //$$ fun getEntityOpacity(entity: LivingEntity): Int? {
-    //$$     if (!active) return null
-    //$$     if (!canChangeOpacity(entity)) return null
-    //$$     return (opacity(entity) * 2.55).toInt()
-    //$$ }
-    //#endif
+    @JvmStatic
+    fun getEntityOpacity(entity: LivingEntity): Int? {
+        if (!active) return null
+        if (!canChangeOpacity(entity)) return null
+        return (opacity(entity) * 2.55).toInt()
+    }
 
-    private fun canChangeOpacity(entity: EntityLivingBase) = entities.containsKeys(entity) && opacity(entity) < 100
+    private fun canChangeOpacity(entity: LivingEntity) = entities.containsKeys(entity) && opacity(entity) < 100
 
-    private fun opacity(entity: EntityLivingBase): Int = entities[entity] ?: error("can not read opacity bc not in map")
+    private fun opacity(entity: LivingEntity): Int = entities[entity] ?: error("can not read opacity bc not in map")
 
     @HandleEvent
-    fun onPreRender(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
+    fun onPreRender(event: SkyHanniRenderEntityEvent.Pre<LivingEntity>) {
         if (!active) return
         val canChangeOpacity = canChangeOpacity(event.entity)
         shouldHide = canChangeOpacity
@@ -66,22 +64,22 @@ object EntityOpacityManager {
         val opacity = opacity(event.entity)
         if (opacity <= 0) return event.cancel()
 
-        GlStateManager.enableBlend()
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-        GlStateManager.color(1f, 1f, 1f, opacity / 100f)
+        ModernGlStateManager.enableBlend()
+        ModernGlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+        ModernGlStateManager.color(1f, 1f, 1f, opacity / 100f)
     }
 
     @HandleEvent
-    fun onPostRender(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
+    fun onPostRender(event: SkyHanniRenderEntityEvent.Post<LivingEntity>) {
         if (!active) return
         if (!canChangeOpacity(event.entity)) return
 
-        GlStateManager.color(1f, 1f, 1f, 1f)
-        GlStateManager.disableBlend()
+        ModernGlStateManager.color(1f, 1f, 1f, 1f)
+        ModernGlStateManager.disableBlend()
     }
 
     @HandleEvent
-    fun onRender(event: EntityRenderLayersEvent.Pre<EntityLivingBase>) {
+    fun onRender(event: EntityRenderLayersEvent.Pre<LivingEntity>) {
         if (!active) return
         if (!canChangeOpacity(event.entity)) return
         if (!shouldHide) return

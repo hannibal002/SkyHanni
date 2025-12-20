@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.getPrevLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import net.minecraft.entity.projectile.EntityArrow
+import net.minecraft.world.entity.projectile.Arrow
 import java.util.LinkedList
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -43,9 +43,9 @@ object ArrowTrail {
         listAllArrow.removeIf { it.deathTime.isInPast() }
         listYourArrow.removeIf { it.deathTime.isInPast() }
 
-        for (arrow in EntityUtils.getEntities<EntityArrow>()) {
+        for (arrow in EntityUtils.getEntities<Arrow>()) {
             val line = Line(arrow.getPrevLorenzVec(), arrow.getLorenzVec(), deathTime)
-            if (arrow.shootingEntity.isLocalPlayer) {
+            if (arrow.owner.isLocalPlayer) {
                 listYourArrow.add(line)
             } else {
                 listAllArrow.add(line)

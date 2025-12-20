@@ -2,11 +2,9 @@ package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -60,13 +58,6 @@ class FarmingFortuneConfig {
     @ConfigOption(name = "Sound Settings", desc = "")
     @Accordion
     val sound: PestBuffWarningSoundConfig = PestBuffWarningSoundConfig()
-
-    @ConfigOption(
-        name = "Farming Fortune Guide",
-        desc = "Open a guide that breaks down your Farming Fortune.\n§eCommand: /ff"
-    )
-    @ConfigEditorButton(buttonText = "Open")
-    val open: Runnable = Runnable(FFGuideGui::onCommand)
 
     @Expose
     @ConfigLink(owner = FarmingFortuneConfig::class, field = "display")

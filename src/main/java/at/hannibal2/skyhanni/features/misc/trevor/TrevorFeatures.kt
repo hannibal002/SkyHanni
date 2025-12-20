@@ -34,14 +34,15 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -260,8 +261,8 @@ object TrevorFeatures {
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         var entityTrapper = EntityUtils.getEntityByID(TRAPPER_ID)
-        if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(BACKUP_TRAPPER_ID)
-        if (entityTrapper is EntityLivingBase && config.cooldown) {
+        if (entityTrapper !is LivingEntity) entityTrapper = EntityUtils.getEntityByID(BACKUP_TRAPPER_ID)
+        if (entityTrapper is LivingEntity && config.cooldown) {
             // Solve for the fact that Moby also has the same ID as the Trapper
             val entityMob = MobData.entityToMob[entityTrapper] ?: return
             if (entityMob.name == "Moby") return
@@ -295,7 +296,7 @@ object TrevorFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onKeyPress(event: KeyPressEvent) {
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         if (NeuItems.neuHasFocus()) return
 
         if (event.keyCode != config.keyBind) return
@@ -318,9 +319,9 @@ object TrevorFeatures {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!inTrapperDen || !config.cooldown) return
-        if (event.entity.name == "§e§lCLICK") event.cancel()
+        if (event.entity.name.formattedTextCompatLessResets() == "§e§lCLICK") event.cancel()
     }
 
     private fun resetTrapper() {

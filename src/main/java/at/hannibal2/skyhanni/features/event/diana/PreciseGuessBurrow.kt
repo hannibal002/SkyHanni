@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -34,7 +34,7 @@ object PreciseGuessBurrow {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val type = event.type
-        if (type != EnumParticleTypes.DRIP_LAVA) return
+        if (type != ParticleTypes.DRIPPING_LAVA) return
         if (event.count != 2) return
         if (event.speed != -0.5f) return
         lastLavaParticle = SimpleTimeMark.now()

@@ -33,10 +33,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.ItemStack
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.seconds
 
@@ -66,7 +67,7 @@ object CFStrayWarning {
         } ?: false
 
     private fun isSpecial(stack: ItemStack) =
-        clickMeGoldenRabbitPattern.matches(stack.displayName) || stack.getSkullTexture() in specialRabbitTextures
+        clickMeGoldenRabbitPattern.matches(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) || stack.getSkullTexture() in specialRabbitTextures
 
     private fun shouldWarnAboutStray(item: ItemStack) = when (config.rabbitWarning.rabbitWarningLevel) {
         StrayTypeEntry.SPECIAL -> isSpecial(item)
@@ -76,7 +77,7 @@ object CFStrayWarning {
         StrayTypeEntry.RARE_P -> isRarityOrHigher(item, LorenzRarity.RARE)
         StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(item, LorenzRarity.UNCOMMON)
 
-        StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.displayName) || isSpecial(item)
+        StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) || isSpecial(item)
 
         StrayTypeEntry.NONE -> false
     }
@@ -84,8 +85,8 @@ object CFStrayWarning {
     private fun handleRabbitWarnings(item: ItemStack) {
         if (caughtRabbitPattern.matches(item.getSingleLineLore())) return
 
-        val clickMeMatches = clickMeRabbitPattern.matches(item.displayName)
-        val goldenClickMeMatches = clickMeGoldenRabbitPattern.matches(item.displayName)
+        val clickMeMatches = clickMeRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        val goldenClickMeMatches = clickMeGoldenRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
         if (!clickMeMatches && !goldenClickMeMatches || !shouldWarnAboutStray(item)) return
 
         val isSpecial = goldenClickMeMatches || item.getSkullTexture() in specialRabbitTextures
@@ -101,14 +102,14 @@ object CFStrayWarning {
         else event.strayHighlight()
     }
 
-    private fun GuiContainerEvent.getEventChest(): ContainerChest? =
-        container as? ContainerChest
+    private fun GuiContainerEvent.getEventChest(): ChestMenu? =
+        container as? ChestMenu
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
         val eventChest = getEventChest() ?: return
         eventChest.getUpperItems().keys.forEach { it.highlight(chromaColorAlt) }
-        eventChest.inventorySlots.filter {
-            it.slotNumber != it.slotIndex
+        eventChest.slots.filter {
+            it.index != it.containerSlot
         }.forEach {
             it.highlight(chromaColorAlt2)
         }
@@ -117,7 +118,7 @@ object CFStrayWarning {
     private fun GuiContainerEvent.BackgroundDrawnEvent.strayHighlight() {
         val eventChest = getEventChest() ?: return
         eventChest.getUpperItems().keys.filter {
-            it.slotNumber in activeStraySlots
+            it.index in activeStraySlots
         }.forEach {
             it.highlight(warningConfig.inventoryHighlightColor)
         }
@@ -144,7 +145,7 @@ object CFStrayWarning {
                 StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(stack, LorenzRarity.UNCOMMON)
 
                 StrayTypeEntry.ALL -> {
-                    clickMeRabbitPattern.matches(it.value.displayName) || isSpecial(stack)
+                    clickMeRabbitPattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets()) || isSpecial(stack)
                 }
 
                 StrayTypeEntry.NONE -> false
@@ -171,7 +172,7 @@ object CFStrayWarning {
         val toUse = if (config.partyMode.get()) chromaColor else warningConfig.flashColor
         val color = (alpha shl 24) or (toUse.toColor().rgb and 0xFFFFFF)
         GuiRenderUtils.drawRect(0, 0, GuiScreenUtils.displayWidth, GuiScreenUtils.displayHeight, color)
-        GlStateManager.color(1F, 1F, 1F, 1F)
+        ModernGlStateManager.color(1F, 1F, 1F, 1F)
     }
 
     @HandleEvent
