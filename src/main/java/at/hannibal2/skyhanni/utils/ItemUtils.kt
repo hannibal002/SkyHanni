@@ -330,11 +330,11 @@ object ItemUtils {
     }
 
     // Overload to avoid spread operators
-    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1, damage: Int = 0): ItemStack =
-        createItemStack(item, displayName, loreArray.toList(), amount, damage)
+    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1): ItemStack =
+        createItemStack(item, displayName, loreArray.toList(), amount)
 
     // Taken from NEU
-    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
+    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1): ItemStack {
         val stack = ItemStack(item, amount)
         stack.setCustomItemName(displayName)
         stack.setLore(lore)

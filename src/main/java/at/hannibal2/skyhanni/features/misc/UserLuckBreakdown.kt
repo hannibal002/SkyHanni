@@ -238,13 +238,7 @@ object UserLuckBreakdown {
     }
 
     private fun createFillerItem(): ItemStack {
-        return ItemUtils.createItemStack(
-            fillerID,
-            " ",
-            listOf(),
-            1,
-            15,
-        )
+        return ItemUtils.createItemStack(fillerID, " ", listOf(), 1)
     }
 
     private fun createItemLore(type: String, luckInput: Float = 0f): Array<String> {
