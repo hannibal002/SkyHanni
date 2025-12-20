@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.common.IItemStack
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
+import io.github.notenoughupdates.moulconfig.platform.MoulConfigPlatform
 import io.github.notenoughupdates.moulconfig.xml.Bind
 import kotlin.time.Duration.Companion.seconds
 
@@ -154,11 +155,7 @@ class CustomTodoEditor(
     @Bind
     fun getItemStack(): IItemStack {
         val item = CustomTodosGui.parseItem(icon)
-        //#if FORGE
-        return io.github.notenoughupdates.moulconfig.forge.ForgeItemStack.of(item)
-        //#else
-        //$$ return io.github.notenoughupdates.moulconfig.platform.MoulConfigPlatform.wrap(item)
-        //#endif
+        return MoulConfigPlatform.wrap(item)
     }
 
     @Bind

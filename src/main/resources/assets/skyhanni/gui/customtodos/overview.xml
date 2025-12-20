@@ -9,7 +9,7 @@
                 </Scale>
             </Center>
             <Spacer height="5"/>
-            <ScrollPanel width="350" height="450">
+            <ScrollPanel width="350" height="200">
                 <Array data="@todos">
                     <Row>
                         <Text text="@getLabel" width="200"/>

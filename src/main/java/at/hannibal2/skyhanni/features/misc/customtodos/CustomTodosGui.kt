@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 
 // Taken and modified from Not Enough Updates https://github.com/NotEnoughUpdates/NotEnoughUpdates
 @SkyHanniModule
@@ -77,7 +77,7 @@ object CustomTodosGui {
     }
 
     fun parseItem(icon: String): ItemStack {
-        if (icon.isEmpty()) return ItemStack(Items.painting)
+        if (icon.isEmpty()) return ItemStack(Items.PAINTING)
         return NeuInternalName.fromItemName(icon).getItemStack()
     }
 
