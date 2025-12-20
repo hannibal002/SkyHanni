@@ -62,8 +62,8 @@ class CustomTodoEditor(
             showOnlyWhenReady,
             target, matchMode,
             from.readyAt,
-            from.isEnabled,
-            from.ignoreColorCodes,
+            enabled,
+            ignoreColorCodes,
             from.position,
         )
     }
