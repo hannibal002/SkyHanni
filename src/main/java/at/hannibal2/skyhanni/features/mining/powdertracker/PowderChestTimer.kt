@@ -26,12 +26,14 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.world.level.block.ChestBlock
-import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.entity.ChestBlockEntity
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -43,6 +45,7 @@ object PowderChestTimer {
     private val config get() = SkyHanniMod.feature.mining.powderChestTimer
 
     private var display: String? = null
+    private val minedBlocks = TimeLimitedSet<LorenzVec>(5.seconds)
     private val chests = TimeLimitedCache<LorenzVec, SimpleTimeMark>(61.seconds)
     private val maxDuration = 60.seconds
     private const val MAX_CHEST_DISTANCE = 15
@@ -74,22 +77,28 @@ object PowderChestTimer {
     fun onServerBlockChange(event: ServerBlockChangeEvent) {
         val location = event.location
         if (location.distanceToPlayer() > MAX_CHEST_DISTANCE) return
-        val isNewChest = event.newState.isChest()
-        val isOldChest = event.oldState.isChest()
 
-        if (isNewChest && !isOldChest) {
-            if (arePlayersNearby && lastSound.passedSince() > 200.milliseconds) return
-            chests[location] = maxDuration.fromNow()
-        } else if (isOldChest && !isNewChest) {
-            chests.remove(location)
+        when {
+            event.oldState.`is`(Blocks.STONE) && event.newState.`is`(Blocks.AIR) -> {
+                minedBlocks.add(location)
+            }
+            event.oldState.`is`(Blocks.AIR) && event.newState.`is`(Blocks.CHEST) -> {
+                if (arePlayersNearby && lastSound.passedSince() > 200.milliseconds) return
+                if (!minedBlocks.remove(location)) return
+                chests[location] = maxDuration.fromNow()
+            }
+            event.oldState.`is`(Blocks.CHEST) && !event.newState.`is`(Blocks.CHEST) -> {
+                chests.remove(location)
+            }
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
+
         val location = event.position
-        if (!location.getBlockStateAt().isChest()) return
+        if (!location.getBlockStateAt().`is`(Blocks.CHEST)) return
 
         if (HotmData.GREAT_EXPLORER.activeLevel < 20) return
 
@@ -102,8 +111,12 @@ object PowderChestTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onTick() {
-        if (isEnabled()) {
-            display = drawDisplay()
+        if (!isEnabled()) return
+
+        display = drawDisplay()
+
+        chests.keys.removeIf { pos ->
+            (MinecraftCompat.localWorld.getBlockEntity(pos.toBlockPos()) as? ChestBlockEntity)?.getOpenNess(1f) != 0f
         }
     }
 
@@ -204,8 +217,6 @@ object PowderChestTimer {
     }
 
     private fun LorenzVec.isOpened() = !chests.containsKey(this)
-
-    private fun BlockState.isChest() = block is ChestBlock
 
     private fun isEnabled() = config.enabled && (!config.onlyMaxGreatExplorer || HotmData.GREAT_EXPLORER.isMaxLevel)
 }
