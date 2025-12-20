@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import com.google.gson.annotations.Expose
-import net.minecraft.entity.Entity
-import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
-import net.minecraft.util.Rotations
-import net.minecraft.util.Vec3
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Rotations
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.acos
@@ -28,7 +28,7 @@ data class LorenzVec(
     val y: Double,
     val z: Double,
 ) {
-    val edges by lazy { boundingToOffset(1.0, 1.0, 1.0).expand(0.0001, 0.0001, 0.0001).calculateEdges() }
+    val edges by lazy { boundingToOffset(1.0, 1.0, 1.0).inflate(0.0001, 0.0001, 0.0001).calculateEdges() }
 
     constructor() : this(0.0, 0.0, 0.0)
 
@@ -167,16 +167,16 @@ data class LorenzVec(
         return LorenzVec(x, y, z)
     }
 
-    fun boundingCenter(expand: Double): AxisAlignedBB {
-        return AxisAlignedBB(x - expand, y - expand, z - expand, x + expand, y + expand, z + expand)
+    fun boundingCenter(expand: Double): AABB {
+        return AABB(x - expand, y - expand, z - expand, x + expand, y + expand, z + expand)
     }
 
     fun boundingToOffset(offX: Double, offY: Double, offZ: Double) =
-        AxisAlignedBB(x, y, z, x + offX, y + offY, z + offZ)
+        AABB(x, y, z, x + offX, y + offY, z + offZ)
 
     fun scale(scalar: Double): LorenzVec = LorenzVec(scalar * x, scalar * y, scalar * z)
 
-    fun axisAlignedTo(other: LorenzVec) = AxisAlignedBB(x, y, z, other.x, other.y, other.z)
+    fun axisAlignedTo(other: LorenzVec) = AABB(x, y, z, other.x, other.y, other.z)
 
     fun up(offset: Number = 1): LorenzVec = copy(y = y + offset.toDouble())
 
@@ -278,20 +278,20 @@ data class LorenzVec(
 
 fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
-fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
-fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
-fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(serverPosX, serverPosY, serverPosZ)
+fun Entity.getLorenzVec(): LorenzVec = LorenzVec(position().x, position().y, position().z)
+fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(xOld, yOld, zOld)
+fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(positionCodec.base.x, positionCodec.base.y, positionCodec.base.z)
 
-fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
+fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(deltaMovement.x, deltaMovement.y, deltaMovement.z)
 
 fun Entity.getPositionLog() = PositionLog(
-    tick = ticksExisted,
+    tick = tickCount,
     position = getLorenzVec(),
     prev = getPrevLorenzVec(),
     server = getServerLorenzVec(),
     motion = getMotionLorenzVec(),
-    yaw = rotationYaw,
-    pitch = rotationPitch,
+    yaw = yRot,
+    pitch = xRot,
 )
 
 data class PositionLog(
@@ -304,16 +304,16 @@ data class PositionLog(
     @Expose val pitch: Float,
 )
 
-fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
+fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
-fun Rotations.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
+fun Rotations.toLorenzVec(): LorenzVec = LorenzVec(x(), y(), z())
 
-fun S2APacketParticles.toLorenzVec() = LorenzVec(xCoordinate, yCoordinate, zCoordinate)
+fun ClientboundLevelParticlesPacket.toLorenzVec() = LorenzVec(x, y, z)
 
 fun Array<Double>.toLorenzVec(): LorenzVec {
     return LorenzVec(this[0], this[1], this[2])
 }
 
-fun AxisAlignedBB.expand(vec: LorenzVec): AxisAlignedBB = expand(vec.x, vec.y, vec.z)
+fun AABB.expand(vec: LorenzVec): AABB = inflate(vec.x, vec.y, vec.z)
 
-fun AxisAlignedBB.expand(amount: Double): AxisAlignedBB = expand(amount, amount, amount)
+fun AABB.expand(amount: Double): AABB = inflate(amount, amount, amount)

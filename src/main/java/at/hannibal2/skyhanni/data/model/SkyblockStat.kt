@@ -201,7 +201,7 @@ enum class SkyblockStat(
     companion object {
 
         val fontSizeOfLargestIcon by lazy {
-            entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.icon) } + 1
+            entries.maxOf { Minecraft.getInstance().font.width(it.icon) } + 1
         }
 
         fun getValueOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.name == string || it.hypxelId == string }

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 @SkyHanniModule
 object SeaCreatureMessageShortener {
@@ -16,7 +17,7 @@ object SeaCreatureMessageShortener {
     @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
 
-        val original = event.chatEvent.chatComponent.formattedText
+        val original = event.chatEvent.chatComponent.formattedTextCompat()
         var edited = original
 
         if (config.shortenFishingMessage) {

@@ -1,19 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addRedstoneOres
-import net.minecraft.block.Block
-import net.minecraft.block.properties.PropertyInteger
-import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
-import net.minecraft.tileentity.TileEntitySkull
-import net.minecraft.util.BlockPos
-import net.minecraft.util.MovingObjectPosition
-
-//#if MC > 1.21
-//$$ import net.minecraft.world.RaycastContext
-//#endif
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.ClipContext
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.entity.SkullBlockEntity
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.IntegerProperty
+import net.minecraft.world.phys.HitResult
 
 object BlockUtils {
 
@@ -21,32 +17,26 @@ object BlockUtils {
 
     fun LorenzVec.getBlockAt(): Block = getBlockStateAt().block
 
-    fun LorenzVec.getBlockStateAt(): IBlockState = world.getBlockState(toBlockPos())
+    fun LorenzVec.getBlockStateAt(): BlockState = world.getBlockState(toBlockPos())
 
-    //#if MC < 1.21
-    fun LorenzVec.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)
-    //#else
-    //$$ fun LorenzVec.isInLoadedChunk(): Boolean =
-    //$$ world.chunkManager.isChunkLoaded(x.toInt() shr 4, z.toInt() shr 4)
-    //#endif
+    fun LorenzVec.isInLoadedChunk(): Boolean =
+        world.chunkSource.hasChunk(x.toInt() shr 4, z.toInt() shr 4)
 
     fun getTextureFromSkull(position: LorenzVec): String? {
-        val entity = world.getTileEntity(position.toBlockPos()) as? TileEntitySkull ?: return null
+        val entity = world.getBlockEntity(position.toBlockPos()) as? SkullBlockEntity ?: return null
         return entity.getSkullTexture()
     }
 
-    fun TileEntitySkull.getSkullTexture(): String? {
-        //#if MC < 1.21
-        return this.serializeNBT().getCompoundTag("Owner").getSkullTexture()
-        //#elseif MC < 1.21.9
-        //$$ return this.owner?.id?.get()?.toString()
+    fun SkullBlockEntity.getSkullTexture(): String? {
+        //#if MC < 1.21.9
+        return this.ownerProfile?.id?.get()?.toString()
         //#else
-        //$$ return this.owner?.gameProfile?.id.toString()
+        //$$ return this.ownerProfile?.partialProfile()?.id.toString()
         //#endif
     }
 
-    fun IBlockState.isBabyCrop(): Boolean {
-        val property = (block.blockState.properties.find { it.name == "age" } as? PropertyInteger) ?: return false
+    fun BlockState.isBabyCrop(): Boolean {
+        val property = (block.stateDefinition.properties.find { it.name == "age" } as? IntegerProperty) ?: return false
         return getValue(property) == 0
     }
 
@@ -54,51 +44,45 @@ object BlockUtils {
         val target = start + direction.normalize() * distance
         val result = rayTrace(start, target)
 
-        return result?.blockPos?.toLorenzVec()
+        return result?.location?.toLorenzVec()
     }
 
-    //#if MC < 1.21
-    fun rayTrace(start: LorenzVec, end: LorenzVec): MovingObjectPosition? {
-        return world.rayTraceBlocks(start.toVec3(), end.toVec3())
+    fun rayTrace(start: LorenzVec, end: LorenzVec): net.minecraft.world.phys.BlockHitResult? {
+        return world.clip(
+            ClipContext(
+                start.toVec3(),
+                end.toVec3(),
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
+                MinecraftCompat.localPlayer,
+            ),
+        )
     }
-    //#else
-    //$$ fun rayTrace(start: LorenzVec, end: LorenzVec): net.minecraft.util.hit.BlockHitResult? {
-    //$$    return world.raycast(
-    //$$        RaycastContext(
-    //$$            start.toVec3(),
-    //$$            end.toVec3(),
-    //$$            RaycastContext.ShapeType.COLLIDER,
-    //$$            RaycastContext.FluidHandling.NONE,
-    //$$            MinecraftCompat.localPlayer,
-    //$$        ),
-    //$$    )
-    //$$ }
-    //#endif
 
     fun getTargetedBlock(): LorenzVec? {
-        val mouseOverObject = Minecraft.getMinecraft().objectMouseOver ?: return null
-        if (mouseOverObject.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return null
-        return mouseOverObject.blockPos.toLorenzVec().roundToBlock()
+        val mouseOverObject = Minecraft.getInstance().hitResult ?: return null
+        if (mouseOverObject.type != HitResult.Type.BLOCK) return null
+        return mouseOverObject.location.toLorenzVec().roundToBlock()
     }
 
     fun getTargetedBlockAtDistance(distance: Double) = rayTrace(
         LocationUtils.playerEyeLocation(),
-        MinecraftCompat.localPlayer.lookVec.toLorenzVec(),
+        MinecraftCompat.localPlayer.lookAngle.toLorenzVec(),
         distance,
     )?.roundToBlock()
 
     private fun nearbyBlocks(center: LorenzVec, distance: Int): MutableIterable<BlockPos> {
         val from = center.add(-distance, -distance, -distance).toBlockPos()
         val to = center.add(distance, distance, distance).toBlockPos()
-        return BlockPos.getAllInBox(from, to)
+        return BlockPos.betweenClosed(from, to)
     }
 
     fun nearbyBlocks(
         center: LorenzVec,
         distance: Int,
         radius: Int = distance,
-        condition: (IBlockState) -> Boolean,
-    ): Map<LorenzVec, IBlockState> = nearbyBlocks(center, distance).mapNotNull {
+        condition: (BlockState) -> Boolean,
+    ): Map<LorenzVec, BlockState> = nearbyBlocks(center, distance).mapNotNull {
         val loc = it.toLorenzVec()
         val state = loc.getBlockStateAt()
         if (condition(state) && center.distance(loc) <= radius) {
@@ -111,7 +95,7 @@ object BlockUtils {
         distance: Int,
         radius: Int = distance,
         filter: Block,
-    ): Map<LorenzVec, IBlockState> = nearbyBlocks(center, distance, radius, condition = { it.block == filter })
+    ): Map<LorenzVec, BlockState> = nearbyBlocks(center, distance, radius, condition = { it.block == filter })
 
     val redstoneOreBlocks = buildList { addRedstoneOres() }
 }

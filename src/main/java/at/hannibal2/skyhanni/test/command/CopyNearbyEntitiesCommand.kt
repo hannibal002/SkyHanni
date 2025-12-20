@@ -20,25 +20,32 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.boss.EntityWither
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.item.EntityItem
-import net.minecraft.entity.monster.EntityCreeper
-import net.minecraft.entity.monster.EntityEnderman
-import net.minecraft.entity.monster.EntityMagmaCube
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.item.ItemStack
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.Display
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.animal.Panda
+import net.minecraft.world.entity.animal.TropicalFish
+import net.minecraft.world.entity.animal.frog.Frog
+import net.minecraft.world.entity.boss.wither.WitherBoss
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.entity.monster.Creeper
+import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.Shulker
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CopyNearbyEntitiesCommand {
@@ -56,8 +63,8 @@ object CopyNearbyEntitiesCommand {
         var counter = 0
 
         val resultList = buildList {
-            for (entity in EntityUtils.getAllEntities().sortedBy { it.entityId }) {
-                val position = entity.position
+            for (entity in EntityUtils.getAllEntities().sortedBy { it.id }) {
+                val position = entity.blockPosition()
                 val vec = position.toLorenzVec()
                 val distance = start.distance(vec)
                 val mob = MobData.entityToMob[entity]
@@ -66,70 +73,66 @@ object CopyNearbyEntitiesCommand {
                 val simpleName = entity.javaClass.simpleName
                 add("entity: $simpleName")
                 val displayName = entity.displayName
-                add("name: '" + entity.name + "'")
-                if (entity is EntityArmorStand) add("cleanName: '" + entity.cleanName() + "'")
-                add("displayName: '${displayName.formattedText}'")
-                add("entityId: ${entity.entityId}")
+                add("name: '" + entity.name.formattedTextCompatLessResets() + "'")
+                if (entity is ArmorStand) add("cleanName: '" + entity.cleanName() + "'")
+                add("displayName: '${displayName.formattedTextCompat()}'")
+                add("entityId: ${entity.id}")
                 add("Type of Mob: ${getType(entity, mob)}")
-                add("uuid version: ${entity.uniqueID.version()} (${entity.uniqueID})")
+                add("uuid version: ${entity.uuid.version()} (${entity.uuid})")
                 add("location data:")
                 add("-  vec: $vec")
                 add("-  distance: $distance")
 
-                val rotationYaw = entity.rotationYaw
-                val rotationPitch = entity.rotationPitch
+                val rotationYaw = entity.yRot
+                val rotationPitch = entity.xRot
                 add("-  rotationYaw: $rotationYaw")
                 add("-  rotationPitch: $rotationPitch")
 
-                val firstPassenger = entity.getFirstPassenger()
+                val firstPassenger = entity.firstPassenger
                 add("firstPassenger: $firstPassenger")
-                val ridingEntity = entity.ridingEntity
+                val ridingEntity = entity.vehicle
                 add("ridingEntity: $ridingEntity")
 
                 if (entity.isInvisible) {
                     add("Invisible: true")
                 }
-                //#if MC > 1.21
-                //$$ if (entity.isGlowing) {
-                //$$     add("Glowing: true")
-                //$$ }
-                //#endif
+                if (entity.isCurrentlyGlowing) {
+                    add("Glowing: true")
+                }
 
-                if (entity is EntityLivingBase) {
+                if (entity is LivingEntity) {
                     add("EntityLivingBase:")
                     val baseMaxHealth = entity.baseMaxHealth
-                    val health = entity.health.toInt()
+                    val health = entity.findHealthReal().toInt()
                     add("-  baseMaxHealth: $baseMaxHealth")
                     add("-  health: $health")
                 }
 
-                if (entity is EntityPlayer) {
+                if (entity is Player) {
                     val armor = entity.getArmorInventory()
                     if (armor != null) {
                         add("armor:")
                         for ((i, itemStack) in armor.withIndex()) {
-                            val name = itemStack?.displayName ?: "null"
+                            val name = itemStack?.hoverName.formattedTextCompatLeadingWhiteLessResets()
                             add("-  at: $i: $name")
                         }
                     }
                 }
 
                 when (entity) {
-                    is EntityArmorStand -> addArmorStand(entity)
-                    is EntityEnderman -> addEnderman(entity)
-                    is EntityMagmaCube -> addMagmaCube(entity)
-                    is EntityItem -> addItem(entity)
-                    is EntityOtherPlayerMP -> addOtherPlayer(entity)
-                    is EntityCreeper -> addCreeper(entity)
-                    is EntityWither -> addWither(entity)
-                    //#if MC > 1.21
-                    //$$ is net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity -> addItemDisplayEntity(entity)
-                    //$$ is net.minecraft.entity.passive.TropicalFishEntity -> addTropicalFish(entity)
-                    //$$ is net.minecraft.entity.mob.ShulkerEntity -> addShulker(entity)
-                    //$$ is net.minecraft.entity.passive.PandaEntity -> addPanda(entity)
-                    //$$ is net.minecraft.entity.decoration.DisplayEntity.BlockDisplayEntity -> addBlockDisplayEntity(entity)
-                    //$$ is net.minecraft.entity.passive.FrogEntity -> addFrogEntity(entity)
-                    //#endif
+                    is ArmorStand -> addArmorStand(entity)
+                    is EnderMan -> addEnderman(entity)
+                    is MagmaCube -> addMagmaCube(entity)
+                    is ItemEntity -> addItem(entity)
+                    is RemotePlayer -> addOtherPlayer(entity)
+                    is Creeper -> addCreeper(entity)
+                    is WitherBoss -> addWither(entity)
+                    is Display.ItemDisplay -> addItemDisplayEntity(entity)
+                    is TropicalFish -> addTropicalFish(entity)
+                    is Shulker -> addShulker(entity)
+                    is Panda -> addPanda(entity)
+                    is Display.BlockDisplay -> addBlockDisplayEntity(entity)
+                    is Frog -> addFrogEntity(entity)
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
                     add("MobInfo: ")
@@ -150,10 +153,10 @@ object CopyNearbyEntitiesCommand {
         }
     }
 
-    private fun MutableList<String>.addArmorStand(entity: EntityArmorStand) {
+    private fun MutableList<String>.addArmorStand(entity: ArmorStand) {
         add("EntityArmorStand:")
-        val headRotation = entity.headRotation.toLorenzVec()
-        val bodyRotation = entity.bodyRotation.toLorenzVec()
+        val headRotation = entity.headPose.toLorenzVec()
+        val bodyRotation = entity.bodyPose.toLorenzVec()
         add("-  headRotation: $headRotation")
         add("-  bodyRotation: $bodyRotation")
 
@@ -165,7 +168,7 @@ object CopyNearbyEntitiesCommand {
         }
     }
 
-    private fun MutableList<String>.addEnderman(entity: EntityEnderman) {
+    private fun MutableList<String>.addEnderman(entity: EnderMan) {
         add("EntityEnderman:")
         val heldBlockState = entity.getBlockInHand()
         add("-  heldBlockState: $heldBlockState")
@@ -175,121 +178,107 @@ object CopyNearbyEntitiesCommand {
         }
     }
 
-    private fun MutableList<String>.addMagmaCube(entity: EntityMagmaCube) {
+    private fun MutableList<String>.addMagmaCube(entity: MagmaCube) {
         add("EntityMagmaCube:")
-        val squishFactor = entity.squishFactor
-        val slimeSize = entity.slimeSize
+        val squishFactor = entity.squish
+        val slimeSize = entity.size
         add("-  factor: $squishFactor")
         add("-  slimeSize: $slimeSize")
     }
 
-    private fun MutableList<String>.addItem(entity: EntityItem) {
+    private fun MutableList<String>.addItem(entity: ItemEntity) {
         add("EntityItem:")
-        val stack = entity.entityItem
-        val stackName = stack.displayName
-        val stackDisplayName = stack.displayName
+        val stack = entity.item
+        val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val stackDisplayName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val cleanName = stack.cleanName()
-        val itemEnchanted = stack.isEnchanted()
-        //#if MC < 1.16
-        val itemDamage = stack.itemDamage
-        //#endif
-        val stackSize = stack.stackSize
+        val itemEnchanted = stack.isEnchanted
+        val stackSize = stack.count
         val maxStackSize = stack.maxStackSize
         val skullTexture = stack.getSkullTexture()
         add("-  name: '$stackName'")
         add("-  stackDisplayName: '$stackDisplayName'")
         add("-  cleanName: '$cleanName'")
         add("-  itemEnchanted: '$itemEnchanted'")
-        //#if MC < 1.16
-        add("-  itemDamage: '$itemDamage'")
-        //#endif
         add("-  stackSize: '$stackSize'")
         add("-  maxStackSize: '$maxStackSize'")
         skullTexture?.let { add("-  skullTexture: '$it'") }
     }
 
-    private fun MutableList<String>.addOtherPlayer(entity: EntityOtherPlayerMP) {
+    private fun MutableList<String>.addOtherPlayer(entity: RemotePlayer) {
         add("EntityOtherPlayerMP:")
 
         val skinTexture = entity.getSkinTexture()
         add("-  skin texture: $skinTexture")
     }
 
-    private fun MutableList<String>.addCreeper(entity: EntityCreeper) {
+    private fun MutableList<String>.addCreeper(entity: Creeper) {
         add("EntityCreeper:")
-        //#if MC < 1.16
-        val creeperState = entity.creeperState
-        //#endif
-        val ignite = entity.hasIgnited()
-        val powered = entity.powered
-        //#if MC < 1.16
-        add("-  creeperState: '$creeperState'")
-        //#endif
+        val ignite = entity.isIgnited
+        val powered = entity.isPowered
         add("-  ignite: '$ignite'")
         add("-  powered: '$powered'")
     }
 
-    private fun MutableList<String>.addWither(entity: EntityWither) {
+    private fun MutableList<String>.addWither(entity: WitherBoss) {
         add("EntityWither:")
-        val invulTime = entity.invulTime
-        val isArmored = entity.isArmored
+        val invulTime = entity.invulnerableTicks
+        val isArmored = entity.isPowered
         add("-  invulTime: '$invulTime'")
         add("-  armored: '$isArmored'")
     }
 
-    //#if MC > 1.21
-    //$$ private fun MutableList<String>.addItemDisplayEntity(entity: net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity) {
-    //$$     add("EntityItemDisplay:")
-    //$$     val stack = entity.itemStack
-    //$$     val rotation = entity.rotationVector
-    //$$
-    //$$     add("-  itemStack:")
-    //$$     printItemStackData(stack)
-    //$$     add("-  rotation: $rotation")
-    //$$ }
-    //$$
-    //$$ private fun MutableList<String>.addTropicalFish(entity: net.minecraft.entity.passive.TropicalFishEntity) {
-    //$$     add("EntityTropicalFish:")
-    //$$     val variety = entity.variety
-    //$$     val patternColor = entity.patternColor
-    //$$     val baseColor = entity.baseColor
-    //$$     add("-  variety: $variety")
-    //$$     add("-  patternColor: $patternColor")
-    //$$     add("-  baseColor: $baseColor")
-    //$$ }
-    //$$
-    //$$ private fun MutableList<String>.addShulker(entity: net.minecraft.entity.mob.ShulkerEntity) {
-    //$$     add("EntityShulker:")
-    //$$     val color = entity.color
-    //$$     val attachedFace = entity.attachedFace
-    //$$     add("-  color: $color")
-    //$$     add("-  attachedFace: $attachedFace")
-    //$$ }
-    //$$
-    //$$ private fun MutableList<String>.addPanda(entity: net.minecraft.entity.passive.PandaEntity) {
-    //$$     add("EntityPanda:")
-    //$$     val mainGene = entity.mainGene
-    //$$     val hiddenGene = entity.hiddenGene
-    //$$     add("-  mainGene: $mainGene")
-    //$$     add("-  hiddenGene: $hiddenGene")
-    //$$ }
-    //$$
-    //$$ private fun MutableList<String>.addBlockDisplayEntity(entity: net.minecraft.entity.decoration.DisplayEntity.BlockDisplayEntity) {
-    //$$     add("EntityBlockDisplay:")
-    //$$     val block = entity.blockState.block
-    //$$     val rotation = entity.rotationVector
-    //$$
-    //$$     add("-  block: ${block.name.formattedTextCompat()}")
-    //$$     add("-  rotation: $rotation")
-    //$$ }
-    //$$
-    //$$ private fun MutableList<String>.addFrogEntity(entity: net.minecraft.entity.passive.FrogEntity) {
-    //$$     add("EntityFrog:")
-    //$$     val variant = entity.variant
-    //$$
-    //$$     add("-  Variant: $variant")
-    //$$ }
-    //#endif
+    private fun MutableList<String>.addItemDisplayEntity(entity: Display.ItemDisplay) {
+        add("EntityItemDisplay:")
+        val stack = entity.itemStack
+        val rotation = entity.lookAngle
+
+        add("-  itemStack:")
+        printItemStackData(stack)
+        add("-  rotation: $rotation")
+    }
+
+    private fun MutableList<String>.addTropicalFish(entity: TropicalFish) {
+        add("EntityTropicalFish:")
+        val variety = entity.pattern
+        val patternColor = entity.patternColor
+        val baseColor = entity.baseColor
+        add("-  variety: $variety")
+        add("-  patternColor: $patternColor")
+        add("-  baseColor: $baseColor")
+    }
+
+    private fun MutableList<String>.addShulker(entity: Shulker) {
+        add("EntityShulker:")
+        val color = entity.color
+        val attachedFace = entity.attachFace
+        add("-  color: $color")
+        add("-  attachedFace: $attachedFace")
+    }
+
+    private fun MutableList<String>.addPanda(entity: Panda) {
+        add("EntityPanda:")
+        val mainGene = entity.mainGene
+        val hiddenGene = entity.hiddenGene
+        add("-  mainGene: $mainGene")
+        add("-  hiddenGene: $hiddenGene")
+    }
+
+    private fun MutableList<String>.addBlockDisplayEntity(entity: Display.BlockDisplay) {
+        add("EntityBlockDisplay:")
+        val block = entity.blockState.block
+        val rotation = entity.lookAngle
+
+        add("-  block: ${block.name.formattedTextCompat()}")
+        add("-  rotation: $rotation")
+    }
+
+    private fun MutableList<String>.addFrogEntity(entity: Frog) {
+        add("EntityFrog:")
+        val variant = entity.variant
+
+        add("-  Variant: $variant")
+    }
 
     private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
         if (stack != null) {
@@ -299,7 +288,7 @@ object CopyNearbyEntitiesCommand {
                 add("-     $skullTexture")
             }
             val cleanName = stack.cleanName()
-            val stackName = stack.displayName
+            val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
             val type = stack.javaClass.name
             add("-     name: '$stackName'")
             add("-     cleanName: '$cleanName'")
@@ -308,9 +297,9 @@ object CopyNearbyEntitiesCommand {
     }
 
     private fun getType(entity: Entity, mob: Mob?) = buildString {
-        if (entity is EntityLivingBase && entity.isDisplayNpc()) append("DisplayNPC, ")
-        if (entity is EntityPlayer && entity.isNpc()) append("NPC, ")
-        if (entity is EntityPlayer && entity.isRealPlayer()) append("RealPlayer, ")
+        if (entity is LivingEntity && entity.isDisplayNpc()) append("DisplayNPC, ")
+        if (entity is Player && entity.isNpc()) append("NPC, ")
+        if (entity is Player && entity.isRealPlayer()) append("RealPlayer, ")
         if (mob?.mobType == Mob.Type.SUMMON) append("Summon, ")
         if (entity.isSkyBlockMob()) {
             append("SkyblockMob(")
@@ -358,7 +347,7 @@ object CopyNearbyEntitiesCommand {
             add("Is Starred: ${mob.hasStar}")
             add("Attribute: ${mob.attribute ?: "NONE"}")
         }
-        if (mob.boundingBox != mob.baseEntity.entityBoundingBox) {
+        if (mob.boundingBox != mob.baseEntity.boundingBox) {
             add("Bounding Box: ${mob.boundingBox}")
         }
     }
@@ -372,6 +361,6 @@ object CopyNearbyEntitiesCommand {
         }
     }
 
-    private fun EntityLivingBase.asString() =
-        this.entityId.toString() + " - " + this.javaClass.simpleName + " \"" + this.name + "\""
+    private fun LivingEntity.asString() =
+        this.id.toString() + " - " + this.javaClass.simpleName + " \"" + this.name.formattedTextCompatLessResets() + "\""
 }

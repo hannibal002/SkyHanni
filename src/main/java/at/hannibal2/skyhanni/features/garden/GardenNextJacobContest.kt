@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
@@ -53,7 +54,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -255,7 +256,7 @@ object GardenNextJacobContest {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) return@mapNotNull null
 
-            val day = dayPattern.matchMatcher(item.displayName) {
+            val day = dayPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 group("day").toInt()
             } ?: return@mapNotNull null
 
@@ -431,7 +432,7 @@ object GardenNextJacobContest {
         val cropTextNoColor = crops.joinToString(", ") {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
-        if (config.warnPopup && !Minecraft.getMinecraft().inGameHasFocus) {
+        if (config.warnPopup && !Minecraft.getInstance().isWindowActive) {
             SkyHanniMod.launchCoroutine("garden jacob contest openPopupWindow") {
                 DialogUtils.openPopupWindow(
                     title = "SkyHanni Jacob Contest Notification",

@@ -42,9 +42,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
-import org.lwjgl.input.Keyboard
+import net.minecraft.world.entity.decoration.ArmorStand
+import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -129,13 +130,13 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST: §a§lPEST TRAP #3§r
-     * REGEX-TEST: §9§lMOUSE TRAP #2§r
-     * REGEX-TEST: §9§lMOUSE TRAP #2
+     * REGEX-TEST: §9§lPEST TRAP #3§r
+     * REGEX-TEST: §5§lMOUSE TRAP #2§r
+     * REGEX-TEST: §6§lVERMIN TRAP #2
      */
     private val pestTrapPattern by patternGroup.pattern(
         "entity.pest-trap",
-        "(?:§.)+§l(?<type>PEST|MOUSE) TRAP(?: #(?<number>\\d+))?(?:§.)*",
+        "(?:§.)+§l(?<type>PEST|MOUSE|VERMIN) TRAP(?: #(?<number>\\d+))?(?:§.)*",
     )
 
     /**
@@ -324,8 +325,8 @@ object PestApi {
 
     fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
 
-    fun isNearPestTrap() = EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(10.0).any {
-        pestTrapPattern.matches(it.displayName.formattedText)
+    fun isNearPestTrap() = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(10.0).any {
+        pestTrapPattern.matches(it.displayName.formattedTextCompat())
     }
 
     private fun removePests(removedPests: Int) {
@@ -415,7 +416,7 @@ object PestApi {
             return
         }
         val disabled = with(config.pestFinder) {
-            !showDisplay && !showPlotInWorld && teleportHotkey == Keyboard.KEY_NONE
+            !showDisplay && !showPlotInWorld && teleportHotkey == GLFW.GLFW_KEY_UNKNOWN
         }
         if (disabled) {
             event.addIrrelevant("disabled in config")

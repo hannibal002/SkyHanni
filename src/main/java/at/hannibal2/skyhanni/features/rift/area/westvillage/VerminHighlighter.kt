@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntitySilverfish
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Silverfish
 
 @SkyHanniModule
 object VerminHighlighter {
@@ -29,7 +29,7 @@ object VerminHighlighter {
     private val VERMIN_SPIDER_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_SPIDER") }
 
     @HandleEvent
-    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<EntityArmorStand>) {
+    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (isEnabled()) tryAdd(event.entity)
     }
 
@@ -38,7 +38,7 @@ object VerminHighlighter {
         if (isEnabled()) tryAdd(event.entity)
     }
 
-    fun tryAdd(entity: EntityLivingBase) {
+    fun tryAdd(entity: LivingEntity) {
         if (!isVermin(entity)) return
         val color = config.color.get().toColor().addAlpha(60)
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, color) { isEnabled() }
@@ -49,13 +49,13 @@ object VerminHighlighter {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.color) {
-            EntityUtils.getEntities<EntityLivingBase>().forEach(::tryAdd)
+            EntityUtils.getEntities<LivingEntity>().forEach(::tryAdd)
         }
     }
 
-    private fun isVermin(entity: EntityLivingBase): Boolean = when (entity) {
-        is EntityArmorStand -> entity.wearingSkullTexture(VERMIN_FLY_TEXTURE) || entity.wearingSkullTexture(VERMIN_SPIDER_TEXTURE)
-        is EntitySilverfish -> entity.baseMaxHealth == 8
+    private fun isVermin(entity: LivingEntity): Boolean = when (entity) {
+        is ArmorStand -> entity.wearingSkullTexture(VERMIN_FLY_TEXTURE) || entity.wearingSkullTexture(VERMIN_SPIDER_TEXTURE)
+        is Silverfish -> entity.baseMaxHealth == 8
 
         else -> false
     }

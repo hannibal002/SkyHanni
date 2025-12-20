@@ -11,7 +11,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import net.minecraft.entity.item.EntityArmorStand
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.UUID
 import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
@@ -29,12 +30,12 @@ object ProfitPerDragon {
     // This can probably be optimized to not use getEntities, but it's not a big issue right now
     @OptIn(AllEntitiesGetter::class)
     private fun scanForLoot() {
-        val entities = EntityUtils.getEntities<EntityArmorStand>()
+        val entities = EntityUtils.getEntities<ArmorStand>()
 
-        scannedLootUUIDs.removeIf { uuid -> entities.none { it.uniqueID == uuid } }
+        scannedLootUUIDs.removeIf { uuid -> entities.none { it.uuid == uuid } }
 
         for (entity in entities) {
-            val entityName = entity.name
+            val entityName = entity.name.formattedTextCompatLessResets()
             val amount: Int = entityName.split("§8x").last().toIntOrNull() ?: 1
             val internalNameFromEntityName = NeuInternalName.fromItemNameOrNull(entityName)
 
@@ -43,13 +44,13 @@ object ProfitPerDragon {
                     ChatUtils.debug("Could not find internal name for entity name: $entityName")
                     continue
                 }
-                if (entity.uniqueID in scannedLootUUIDs) continue
+                if (entity.uuid in scannedLootUUIDs) continue
 
                 ChatUtils.debug("Adding $internalNameFromEntityName x$amount to dragon loot")
 
                 dragonLoot.addOrPut(internalNameFromEntityName, amount)
 
-                scannedLootUUIDs.add(entity.uniqueID)
+                scannedLootUUIDs.add(entity.uuid)
             }
         }
 

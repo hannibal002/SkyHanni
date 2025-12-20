@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -28,6 +29,36 @@ class ForagingTrackerConfig {
     @OnlyModern
     @FeatureToggle
     var compactGiftChats: Boolean = true
+
+
+    @Expose
+    @ConfigOption(
+        name = "Compact Gifts Bonus Drops",
+        desc = "Lets you decide what types of bonus drops should be included in Compact Gifts messages."
+    )
+    @ConfigEditorDraggableList
+    val compactGiftBonusDropsList: MutableList<TreeGiftBonusDropCategory> = mutableListOf(
+        TreeGiftBonusDropCategory.UNCOMMON_DROPS,
+        TreeGiftBonusDropCategory.ENCHANTED_BOOKS,
+        TreeGiftBonusDropCategory.MOBS,
+        TreeGiftBonusDropCategory.BOOSTERS,
+        TreeGiftBonusDropCategory.SHARDS,
+        TreeGiftBonusDropCategory.RUNES,
+        TreeGiftBonusDropCategory.MISC,
+    )
+
+    @Suppress("MaxLineLength")
+    enum class TreeGiftBonusDropCategory(private val displayName: String) {
+        UNCOMMON_DROPS("§fUncommon Tree-Specific Drops\n§7(e.g. §aStretching Sticks§7)"),
+        ENCHANTED_BOOKS("§fUltimate Enchantments\n§7(§d§lFirst Impression I §7& §d§lMissile I §7Books)"),
+        MOBS("§fHuntable Mobs\n§7(Phantoms)"),
+        BOOSTERS("§fBoosters\n§7(Sweep and Foraging Wisdom)"),
+        SHARDS("§fDirect Shard Drops\n§7(§9Hummingbirds§7 and §6Chameleons§7)"),
+        RUNES("§fRunes\n§7(§fFading White §7and §aFading Green§7)"),
+        MISC("§cTree The Fish");
+
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(name = "Only Holding Axe", desc = "Only show the tracker while holding an axe.")

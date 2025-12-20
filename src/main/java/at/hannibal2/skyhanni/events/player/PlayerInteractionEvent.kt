@@ -1,22 +1,13 @@
 package at.hannibal2.skyhanni.events.player
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import net.minecraft.util.BlockPos
-import net.minecraft.util.EnumFacing
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 
-class PlayerInteractionEvent(val action: ClickAction, val pos: BlockPos?, val face: EnumFacing?) : SkyHanniEvent()
+class PlayerInteractionEvent(val action: ClickAction, val pos: BlockPos?, val face: Direction?) : SkyHanniEvent()
 
 enum class ClickAction {
     RIGHT_CLICK_AIR,
     RIGHT_CLICK_BLOCK,
-    LEFT_CLICK_BLOCK;
-
-    companion object {
-        //#if MC < 1.21
-        fun fromForge(old: net.minecraftforge.event.entity.player.PlayerInteractEvent.Action): ClickAction {
-            return ClickAction.entries[old.ordinal]
-        }
-        //#endif
-
-    }
+    LEFT_CLICK_BLOCK,
 }

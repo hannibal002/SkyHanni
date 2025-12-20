@@ -23,9 +23,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.init.Items
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object DeepCavernsGuide {
@@ -38,7 +39,7 @@ object DeepCavernsGuide {
 
     private val startIcon by lazy {
         ItemUtils.createItemStack(
-            Items.map,
+            Items.MAP,
             "§bDeep Caverns Guide",
             "§8(From SkyHanni)",
             "",
@@ -111,7 +112,7 @@ object DeepCavernsGuide {
         showStartIcon = true
 
         event.inventoryItems[31]?.let {
-            if (it.displayName != "§aObsidian Sanctuary") {
+            if (it.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aObsidian Sanctuary") {
                 start()
             }
         }
@@ -146,7 +147,7 @@ object DeepCavernsGuide {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (show) return
-        if (event.inventory is ContainerLocalMenu && showStartIcon && event.slot == 49) {
+        if (event.inventory is SimpleContainer && showStartIcon && event.slot == 49) {
             event.replace(startIcon)
         }
     }

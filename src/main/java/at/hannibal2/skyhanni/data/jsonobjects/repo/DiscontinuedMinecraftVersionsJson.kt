@@ -9,4 +9,5 @@ data class DiscontinuedMinecraftVersionsJson(
 
 data class DiscontinuedMinecraftVersion(
     @Expose @SerializedName("extra_info") val extraInfo: List<String>? = null,
+    @Expose @SerializedName("config_info") val configInfo: List<String>? = null,
 )

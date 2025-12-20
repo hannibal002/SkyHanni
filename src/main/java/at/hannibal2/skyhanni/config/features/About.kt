@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDeprecatedDisplay
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay
 import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
 import com.google.gson.annotations.Expose
@@ -12,6 +13,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class About {
+    @ConfigOption(name = "", desc = "")
+    @ConfigVersionDeprecatedDisplay
+    @Transient
+    var deprecatedVersionWarning: Unit? = null
+
     @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are currently running")
     @ConfigVersionDisplay
     @Transient

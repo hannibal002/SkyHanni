@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
@@ -91,7 +92,7 @@ object HotxFeatures {
             else -> return
         }
         handler.data.firstOrNull {
-            event.stack.displayName == it.item?.displayName
+            event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == it.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
         }?.let {
             event.stackTip = if (it.activeLevel == 0 || it.activeLevel == it.maxLevel) "" else "§e${it.activeLevel}"
             it.activeLevel.toString()
@@ -104,7 +105,7 @@ object HotxFeatures {
             HotfData.inInventory && configHotf.tokenStackSize -> HotfData
             else -> return
         }
-        if (event.stack.displayName != handler.heartItem?.stack?.displayName) return
+        if (event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets() != handler.heartItem?.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()) return
         event.stackTip = handler.availableTokens.takeIf { it != 0 }?.let { "§b$it" }.orEmpty()
     }
 

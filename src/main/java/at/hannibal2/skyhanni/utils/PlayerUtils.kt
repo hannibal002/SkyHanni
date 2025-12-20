@@ -3,12 +3,10 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.StringUtils.toUnDashedUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.client.Minecraft
+import net.minecraft.world.entity.ai.attributes.Attributes
 import java.util.UUID
-
-//#if MC > 1.21
-//$$ import net.minecraft.entity.attribute.EntityAttributes
-//#endif
 
 object PlayerUtils {
 
@@ -17,37 +15,21 @@ object PlayerUtils {
     // 1 == f3 behind
     // 2 == selfie
     fun isFirstPersonView(): Boolean {
-        //#if MC < 1.21
-        return Minecraft.getMinecraft().gameSettings.thirdPersonView == 0
-        //#else
-        //$$ return MinecraftClient.getInstance().options.perspective.isFirstPerson
-        //#endif
+        return Minecraft.getInstance().options.cameraType.isFirstPerson
     }
 
     fun isThirdPersonView(): Boolean {
-        //#if MC < 1.21
-        return Minecraft.getMinecraft().gameSettings.thirdPersonView == 1
-        //#else
-        //$$ val perspective = MinecraftClient.getInstance().options.perspective
-        //$$ // for some reason they make you check the other 2 bools instead of giving you a third one
-        //$$ return !perspective.isFrontView && !perspective.isFirstPerson
-        //#endif
+        val perspective = Minecraft.getInstance().options.cameraType
+        // for some reason they make you check the other 2 bools instead of giving you a third one
+        return !perspective.isMirrored && !perspective.isFirstPerson
     }
 
     fun isReversedView(): Boolean {
-        //#if MC < 1.21
-        return Minecraft.getMinecraft().gameSettings.thirdPersonView == 2
-        //#else
-        //$$ return MinecraftClient.getInstance().options.perspective.isFrontView
-        //#endif
+        return Minecraft.getInstance().options.cameraType.isMirrored
     }
 
     fun getWalkSpeed(): Float {
-        //#if MC < 1.21
-        val speed = MinecraftCompat.localPlayer.capabilities.walkSpeed.toDouble()
-        //#else
-        //$$ val speed = MinecraftCompat.localPlayer.getAttributeBaseValue(EntityAttributes.MOVEMENT_SPEED)
-        //#endif
+        val speed = MinecraftCompat.localPlayer.getAttributeBaseValue(Attributes.MOVEMENT_SPEED)
 
         // Round to avoid floating point inaccuracies (in-game precision is at most 2 decimals anyway)
         return (speed * 1000).roundTo(2).toFloat()
@@ -55,11 +37,11 @@ object PlayerUtils {
 
     fun getUuid() = getRawUuid().toUnDashedUUID()
 
-    fun getRawUuid(): UUID = MinecraftCompat.localPlayer.uniqueID
+    fun getRawUuid(): UUID = MinecraftCompat.localPlayer.uuid
 
-    fun getName(): String = MinecraftCompat.localPlayer.name
+    fun getName(): String = MinecraftCompat.localPlayer.name.formattedTextCompatLessResets()
 
-    fun inAir(): Boolean = !MinecraftCompat.localPlayer.onGround
+    fun inAir(): Boolean = !MinecraftCompat.localPlayer.onGround()
 
-    fun isSneaking(): Boolean = MinecraftCompat.localPlayer.isSneaking
+    fun isSneaking(): Boolean = MinecraftCompat.localPlayer.isShiftKeyDown
 }

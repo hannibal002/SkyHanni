@@ -50,9 +50,10 @@ import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SkyblockSeasonModifier
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
-import net.minecraft.init.Items
-import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
 // todo 1.21 impl needed
@@ -188,9 +189,9 @@ object HoppityApi {
         // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
         slotIndex != 13 && slotIndex in 0..26 &&
             // Stack must not be null, and must be a skull.
-            stack.item != null && stack.item == Items.skull &&
+            stack.item != null && stack.item == Items.PLAYER_HEAD &&
             // All strays have a display name, all the time.
-            stack.displayName.isNotEmpty() && stack.displayName.isNotEmpty()
+            stack.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && stack.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty()
     }
 
     private fun Map<Int, ItemStack>.filterStrayProcessable() = filterMayBeStray(this).filter {
@@ -200,8 +201,8 @@ object HoppityApi {
 
     private fun Slot.isMiscProcessable() =
         // All misc items are skulls or panes, with a display name, and lore.
-        stack != null && stack.item != null && (stack.item == Items.skull || stack.isStainedGlassPane()) &&
-            stack.displayName.isNotEmpty() && stack.getLore().isNotEmpty()
+        item != null && item.item != null && (item.item == Items.PLAYER_HEAD || item.isStainedGlassPane()) &&
+            item.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && item.getLore().isNotEmpty()
 
     private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent, note: String? = null) {
         EggFoundEvent(
@@ -248,7 +249,7 @@ object HoppityApi {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         // Remove any processed stray slots that are no longer in the inventory.
         processedStraySlots.entries.removeIf {
-            it.key !in event.inventoryItems || event.inventoryItems[it.key]?.displayName != it.value
+            it.key !in event.inventoryItems || event.inventoryItems[it.key]?.hoverName.formattedTextCompatLeadingWhiteLessResets() != it.value
         }
 
         // Only process if we're in the Chocolate Factory.
@@ -256,7 +257,7 @@ object HoppityApi {
 
         event.inventoryItems.filterStrayProcessable().forEach { (slotNumber, itemStack) ->
             var processed = false
-            CFStrayTracker.strayCaughtPattern.matchMatcher(itemStack.displayName) {
+            CFStrayTracker.strayCaughtPattern.matchMatcher(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 processed = CFStrayTracker.handleStrayClicked(slotNumber, itemStack)
                 when (groupOrNull("name") ?: return@matchMatcher) {
                     "Fish the Rabbit" -> {
@@ -282,7 +283,7 @@ object HoppityApi {
                 hoppityDataSet.duplicate = itemStack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                 EggFoundEvent(STRAY, slotNumber).post()
             }
-            if (processed) processedStraySlots[slotNumber] = itemStack.displayName
+            if (processed) processedStraySlots[slotNumber] = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         }
     }
 
@@ -291,10 +292,10 @@ object HoppityApi {
         if (!miscProcessInvPattern.matches(InventoryUtils.openInventoryName())) return
         val slot = event.slot?.takeIf { it.isMiscProcessable() } ?: return
 
-        if (sideDishNamePattern.matches(slot.stack.displayName)) EggFoundEvent(SIDE_DISH, event.slotId).post()
+        if (sideDishNamePattern.matches(slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets())) EggFoundEvent(SIDE_DISH, event.slotId).post()
 
-        milestoneNamePattern.matchMatcher(slot.stack.displayName) {
-            val lore = slot.stack.getLore()
+        milestoneNamePattern.matchMatcher(slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+            val lore = slot.item.getLore()
             if (!claimableMilestonePattern.anyMatches(lore)) return
             if (allTimeLorePattern.anyMatches(lore)) EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, event.slotId).post()
             if (shopLorePattern.anyMatches(lore)) EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, event.slotId).post()

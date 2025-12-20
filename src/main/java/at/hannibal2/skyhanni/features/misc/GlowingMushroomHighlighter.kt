@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.blockhighlight.SkyHanniBlockHighlighter
 import at.hannibal2.skyhanni.utils.blockhighlight.TimedHighlightBlock
-import net.minecraft.init.Blocks
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.level.block.Blocks
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -20,7 +20,7 @@ object GlowingMushroomHighlighter {
 
     private val blockHighlighter = SkyHanniBlockHighlighter<TimedHighlightBlock>(
         highlightCondition = ::isEnabled,
-        blockCondition = { it.block == Blocks.red_mushroom || it.block == Blocks.brown_mushroom },
+        blockCondition = { it.block == Blocks.RED_MUSHROOM || it.block == Blocks.BROWN_MUSHROOM },
         colorProvider = { config.mushroomColor },
     )
 
@@ -31,7 +31,7 @@ object GlowingMushroomHighlighter {
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (event.type != EnumParticleTypes.SPELL_MOB) return
+        if (event.type != ParticleTypes.ENTITY_EFFECT) return
 
         val offsetX = (event.location.x % 1).roundTo(1).absoluteValue
         val offsetY = (event.location.y % 1).roundTo(1).absoluteValue

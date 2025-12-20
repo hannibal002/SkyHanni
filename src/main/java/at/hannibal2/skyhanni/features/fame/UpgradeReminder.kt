@@ -22,9 +22,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -210,7 +211,7 @@ object UpgradeReminder {
 
         companion object {
             fun fromItem(item: ItemStack): CommunityShopUpgrade? {
-                val name = item.displayName
+                val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
                 val lore = item.getLore()
                 val upgrade = CommunityShopUpgrade(name)
                 upgrade.duration = upgradeDurationPattern.firstMatcher(lore) {

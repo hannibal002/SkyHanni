@@ -36,8 +36,8 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import net.minecraft.client.player.LocalPlayer
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -102,7 +102,7 @@ object IslandAreas {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (isEnabled() && event.isLocalPlayer) {
             hasMoved = true
         }
@@ -113,7 +113,7 @@ object IslandAreas {
         if (!isEnabled()) return
         if (!isPathfinderEnabled()) return
         if (!config.pathfinder.showAlways) return
-        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
         if (isInOwnInventory) return
 
         display?.let {
@@ -125,7 +125,7 @@ object IslandAreas {
     fun onBackgroundDraw() {
         if (!isEnabled()) return
         if (!isPathfinderEnabled()) return
-        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
         if (!isInOwnInventory) return
 
         display?.let {

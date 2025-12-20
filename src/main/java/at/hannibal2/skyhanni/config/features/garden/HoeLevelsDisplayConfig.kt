@@ -27,6 +27,15 @@ class HoeLevelsDisplayConfig {
     var overflow: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Mute Hoe Sounds",
+        desc = "Mutes the sound that plays when you level up the hoe."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteHoeSounds: Boolean = true
+
+    @Expose
     @ConfigLink(owner = HoeLevelsDisplayConfig::class, field = "enabled")
     val position: Position = Position(100, 100, true)
 }

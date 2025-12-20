@@ -813,6 +813,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Optimal Angles Overlay for Squeaky Mousemat. - nikijul (https://github.com/hannibal002/SkyHanni/pull/2999)
 + Added DNA Analyser Solver. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
 + Added Hoe Level Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
++ Mute Hoe Level Up Sound. - nopo (https://github.com/hannibal002/SkyHanni/pull/4966)
 
 ### Garden Pests
 

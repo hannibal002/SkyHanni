@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.inventory.Slot
+import net.minecraft.world.inventory.Slot
 import java.util.Deque
 import java.util.LinkedList
 import kotlin.time.Duration.Companion.seconds
@@ -74,7 +74,7 @@ object GetFromSackApi {
 
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
-    fun Slot.getFromSackWhenClicked(items: List<PrimitiveItemStack>) = getFromSlotClickedSackItems(items, slotIndex)
+    fun Slot.getFromSackWhenClicked(items: List<PrimitiveItemStack>) = getFromSlotClickedSackItems(items, containerSlot)
 
     private val minimumDelay = 1.65.seconds
 
@@ -115,7 +115,7 @@ object GetFromSackApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipTextEvent) {
         event.slot ?: return
-        val list = inventoryMap[event.slot.slotIndex] ?: return
+        val list = inventoryMap[event.slot.containerSlot] ?: return
         event.toolTip.let { tip ->
             tip.add("")
             tip.add("§ePress right click to get from sack:")

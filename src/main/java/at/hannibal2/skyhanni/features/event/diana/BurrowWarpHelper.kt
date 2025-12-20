@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -43,7 +43,7 @@ object BurrowWarpHelper {
         val warp = currentWarp ?: return
 
         val text = "§bWarp to " + warp.displayName
-        val keybindSuffix = if (config.keyBindWarp != Keyboard.KEY_NONE) {
+        val keybindSuffix = if (config.keyBindWarp != GLFW.GLFW_KEY_UNKNOWN) {
             val keyName = KeyboardManager.getKeyName(config.keyBindWarp)
             " §7(§ePress $keyName§7)"
         } else ""
@@ -59,7 +59,7 @@ object BurrowWarpHelper {
         if (!config.burrowNearestWarp) return
 
         if (event.keyCode != config.keyBindWarp) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
 
         val warp = currentWarp ?: return
         if (lastWarpTime.passedSince() < 1.seconds) return
