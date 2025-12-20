@@ -19,7 +19,7 @@ plugins {
     idea
     java
     id("com.gradleup.shadow") version "8.3.4"
-    id("net.fabricmc.fabric-loom-remap")
+    id("fabric-loom")
     id("com.github.SkyHanniStudios.SkyHanni-Preprocessor")
     kotlin("jvm")
     id("com.google.devtools.ksp")

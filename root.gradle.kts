@@ -3,7 +3,8 @@ import com.replaymod.gradle.preprocess.Node
 
 plugins {
     id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "1.0.8"
-    id("net.fabricmc.fabric-loom-remap") version "1.14-SNAPSHOT" apply false
+    // loom 1.14 requires gradle 9, gradle 9 causes errors
+    id("fabric-loom") version "1.13-SNAPSHOT" apply false
     kotlin("jvm") version "2.0.0" apply false
     kotlin("plugin.power-assert") version "2.0.0" apply false
     id("com.google.devtools.ksp") version "2.0.0-1.0.24" apply false
