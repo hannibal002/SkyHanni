@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 
@@ -14,5 +15,5 @@ import net.minecraft.network.chat.HoverEvent
  * chat component, but rather makes a new one just before rendering.
  */
 class ChatHoverEvent(val component: Component) : SkyHanniEvent() {
-    fun getHoverEvent(): HoverEvent = component.style.hoverEvent!!
+    fun getHoverEvent(): HoverEvent = component.style.hoverEvent ?: ErrorManager.skyHanniError("Hover event from component is missing")
 }

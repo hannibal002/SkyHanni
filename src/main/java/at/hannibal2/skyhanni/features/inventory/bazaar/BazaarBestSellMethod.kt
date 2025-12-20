@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 

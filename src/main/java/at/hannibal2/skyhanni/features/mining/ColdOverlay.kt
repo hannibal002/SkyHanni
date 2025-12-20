@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
 
@@ -34,7 +33,6 @@ object ColdOverlay {
         if (alpha == 0f) return
 
         DrawContextUtils.pushMatrix()
-        ModernGlStateManager.pushAttrib()
 
         GL11.glDepthMask(false)
         DrawContextUtils.translate(0f, 0f, -500f)
@@ -43,7 +41,6 @@ object ColdOverlay {
         GL11.glDepthMask(true)
 
         DrawContextUtils.popMatrix()
-        ModernGlStateManager.popAttrib()
     }
 
     // TODO fix small bug with high cold and low threshold having the same opacity than high cold and a b it smaller threshold

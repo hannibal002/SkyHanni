@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.minecraft.client.renderer.MultiBufferSource
 import com.mojang.blaze3d.vertex.PoseStack
+
 //#endif
 
 @SkyHanniModule
@@ -32,7 +33,12 @@ object RenderEvents {
         WorldRenderEvents.AFTER_TRANSLUCENT.register { event ->
             val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
             val stack = event.matrixStack() ?: PoseStack()
-            SkyHanniRenderWorldEvent(stack, event.camera(), immediateVertexConsumers, event.tickCounter().getGameTimeDeltaPartialTick(true)).post()
+            SkyHanniRenderWorldEvent(
+                stack,
+                event.camera(),
+                immediateVertexConsumers,
+                event.tickCounter().getGameTimeDeltaPartialTick(true),
+            ).post()
         }
         //#endif
 
@@ -50,7 +56,11 @@ object RenderEvents {
 
         //#if MC < 1.21.6
         HudLayerRegistrationCallback.EVENT.register { context ->
-            context.attachLayerAfter(IdentifiedLayer.SLEEP, ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"), RenderEvents::postGui)
+            context.attachLayerAfter(
+                IdentifiedLayer.SLEEP,
+                ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
+                RenderEvents::postGui,
+            )
         }
         //#else
         //$$ HudElementRegistry.attachElementBefore(
@@ -124,6 +134,7 @@ enum class RenderLayer {
     CHAT,
     PLAYER_LIST,
     DEBUG,
+
     // Not a real forge layer but is used on modern Minecraft versions
     EXPERIENCE_NUMBER,
 }

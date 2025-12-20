@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import net.minecraft.world.item.ItemStack
 
@@ -69,12 +68,6 @@ object RenderableTooltips {
             x // normal
         }
 
-        ModernGlStateManager.disableRescaleNormal()
-        //#if TODO
-        //$$ RenderHelper.disableStandardItemLighting()
-        //#endif
-        ModernGlStateManager.enableDepthTest()
-
         val zLevel = 400f
         DrawContextUtils.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
 
@@ -92,12 +85,6 @@ object RenderableTooltips {
         }
 
         DrawContextUtils.translate(-tooltipX.toFloat() + 1, -tooltipY.toFloat() + 1 + yTranslateSum.toFloat(), -zLevel)
-        ModernGlStateManager.enableLighting()
-        //#if TODO
-        //$$ RenderHelper.enableStandardItemLighting()
-        //#endif
-        ModernGlStateManager.enableRescaleNormal()
-        ModernGlStateManager.disableLighting()
     }
 
     private fun drawTooltipBackground(tooltipTextWidth: Int, tooltipHeight: Int, borderColorStart: Int) {

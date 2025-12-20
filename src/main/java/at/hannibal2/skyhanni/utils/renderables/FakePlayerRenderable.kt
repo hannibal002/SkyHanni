@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.player.Player
 import java.awt.Color
@@ -35,7 +34,6 @@ fun Renderable.Companion.fakePlayer(
     override val verticalAlign = VerticalAlignment.TOP
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-        ModernGlStateManager.color(1f, 1f, 1f, 1f)
         if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
         val mouse = currentRenderPassMousePosition ?: return
         DrawContextUtils.pushMatrix()
@@ -93,7 +91,6 @@ fun Renderable.Companion.fakePlayer(
 //$$ ) {
 //$$     val n: Float = (x1 + x2).toFloat() / 2.0f
 //$$     val o: Float = (y1 + y2).toFloat() / 2.0f
-//$$     guiGraphics.enableScissor(x1, y1, x2, y2)
 //$$     val p = atan(((n - mouseX) / 40.0f).toDouble()).toFloat()
 //$$     val q = atan(((o - mouseY) / 40.0f).toDouble()).toFloat()
 //$$     val quaternionf = Quaternionf().rotateZ(3.1415927f)

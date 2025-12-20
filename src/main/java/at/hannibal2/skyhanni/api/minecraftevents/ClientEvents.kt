@@ -93,8 +93,8 @@ object ClientEvents {
             },
         )
 
-        ClientReceiveMessageEvents.ALLOW_GAME.register(::onAllow);
-        ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify);
+        ClientReceiveMessageEvents.ALLOW_GAME.register(::onAllow)
+        ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify)
 
     }
 

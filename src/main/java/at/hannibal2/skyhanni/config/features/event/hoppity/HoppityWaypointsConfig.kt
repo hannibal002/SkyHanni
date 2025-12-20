@@ -17,7 +17,7 @@ class HoppityWaypointsConfig {
     @Expose
     @ConfigOption(
         name = "Shared Waypoints",
-        desc = "Enable being able to share and receive egg waypoints in your lobby."
+        desc = "Enable being able to share and receive egg waypoints in your lobby.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -44,7 +44,7 @@ class HoppityWaypointsConfig {
     @ConfigOption(
         name = "Show All Waypoints",
         desc = "Show all possible egg waypoints for the current lobby. §e" +
-            "Only works when you don't have an Egglocator in your inventory."
+            "Only works when you don't have an Egglocator in your inventory.",
     )
     @ConfigEditorBoolean
     var showAll: Boolean = false
@@ -53,7 +53,7 @@ class HoppityWaypointsConfig {
     @ConfigOption(
         name = "Hide Duplicate Waypoints",
         desc = "Hide egg waypoints you have already found.\n" +
-            "§eOnly works when you don't have an Egglocator in your inventory."
+            "§eOnly works when you don't have an Egglocator in your inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -62,7 +62,7 @@ class HoppityWaypointsConfig {
     @Expose
     @ConfigOption(
         name = "Mark Duplicate Waypoints",
-        desc = "Marks egg location waypoints which you have already found in red."
+        desc = "Marks egg location waypoints which you have already found in red.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -76,8 +76,8 @@ class HoppityWaypointsConfig {
 
     @Expose
     @ConfigOption(
-       name = "Load from SkyBlock PV",
-       desc = "Load Hoppity Egg Location data from API when opening the SkyBlock Profile Viewer mod."
+        name = "Load from SkyBlock PV",
+        desc = "Load Hoppity Egg Location data from API when opening the SkyBlock Profile Viewer mod.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

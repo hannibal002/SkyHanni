@@ -30,7 +30,8 @@ object ModifyVisualWords {
         finalWordsList = modModifiedWords + userModifiedWords
         textCache.clear()
         stringVisitableCache.clear()
-        SkyHanniMod.visualWordsData.modifiedWords = userModifiedWords.map { visualWordText -> visualWordText.toVisualWord() }.toMutableList()
+        SkyHanniMod.visualWordsData.modifiedWords =
+            userModifiedWords.map { visualWordText -> visualWordText.toVisualWord() }.toMutableList()
         Minecraft.getInstance().gui?.chat?.refreshTrimmedMessages()
     }
 
@@ -89,7 +90,7 @@ object ModifyVisualWords {
         }
     }
 
-    fun transformStringVisitable(stringVisitable: FormattedText?) : FormattedText? {
+    fun transformStringVisitable(stringVisitable: FormattedText?): FormattedText? {
         if (stringVisitable == null) return null
 
         if (!config.enabled) return null
@@ -109,7 +110,7 @@ object ModifyVisualWords {
                     characters.addAll(string.toStyledCharacterList(style, false))
                     Optional.empty<Boolean>()
                 },
-                Style.EMPTY
+                Style.EMPTY,
             )
 
             characters = doReplacements(characters)
@@ -190,7 +191,8 @@ object ModifyVisualWords {
         return workingCharacters
     }
 
-    private fun stylesAreOverlapping(testStyle: Style, testedStyle: Style) = (testStyle.color == testedStyle.color || testStyle.color == null) &&
+    private fun stylesAreOverlapping(testStyle: Style, testedStyle: Style) =
+        (testStyle.color == testedStyle.color || testStyle.color == null) &&
             !(testStyle.isBold && !testedStyle.isBold) &&
             !(testStyle.isItalic && !testedStyle.isItalic) &&
             !(testStyle.isObfuscated && !testedStyle.isObfuscated) &&
@@ -201,7 +203,7 @@ object ModifyVisualWords {
 data class StyledCharacter(
     val codePoint: Int,
     val style: Style,
-    val first: Boolean = false
+    val first: Boolean = false,
 ) {
 
     fun withParentStyle(parentStyle: Style) = StyledCharacter(codePoint, style.applyTo(parentStyle), first)
@@ -211,14 +213,14 @@ data class VisualWordText(
     val from: List<StyledCharacter>,
     val to: List<StyledCharacter>,
     val enabled: Boolean,
-    val caseSensitive: Boolean
+    val caseSensitive: Boolean,
 ) {
 
     fun toVisualWord() = VisualWord(
         from.toLegacyString().replace("§", "&&"),
         to.toLegacyString().replace("§", "&&"),
         enabled,
-        caseSensitive
+        caseSensitive,
     )
 
     companion object {
@@ -227,7 +229,7 @@ data class VisualWordText(
             visualWord.phrase.replace("&&", "§").toStyledCharacterList(),
             visualWord.replacement.replace("&&", "§").toStyledCharacterList(),
             visualWord.enabled,
-            visualWord.isCaseSensitive()
+            visualWord.isCaseSensitive(),
         )
     }
 }
@@ -248,7 +250,7 @@ private fun List<StyledCharacter>.toLegacyString(): String {
 private fun String.toStyledCharacterList(style: Style = Style.EMPTY, hasFirst: Boolean = true): List<StyledCharacter> {
     val newList = mutableListOf<StyledCharacter>()
 
-    StringDecomposer.iterateFormatted(this, style) {  index: Int, style: Style, codePoint: Int ->
+    StringDecomposer.iterateFormatted(this, style) { index: Int, style: Style, codePoint: Int ->
         newList.add(StyledCharacter(codePoint, style, index == 0 && hasFirst))
         true
     }

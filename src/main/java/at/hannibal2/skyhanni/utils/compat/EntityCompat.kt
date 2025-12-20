@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
