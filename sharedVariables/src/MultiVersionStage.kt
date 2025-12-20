@@ -12,7 +12,7 @@ enum class MultiVersionStage(val label: String) {
         if (projectTarget == ProjectTarget.MODERN_12105) return true
         return when (this) {
             OFF -> false
-            FULL -> projectTarget.isModern
+            FULL -> true
         }
     }
 
