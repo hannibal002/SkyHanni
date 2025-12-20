@@ -58,7 +58,6 @@ import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import com.google.gson.JsonArray
 import net.minecraft.client.player.RemotePlayer
@@ -152,9 +151,6 @@ object DamageIndicatorManager {
                 event.drawDynamicText(highlight.location, highlight.text, 1.5, seeThroughBlocks = false)
             }
         }
-
-        ModernGlStateManager.disableDepthTest()
-        ModernGlStateManager.disableCull()
 
         val sizeHealth: Double
         val sizeNameAbove: Double
@@ -312,8 +308,6 @@ object DamageIndicatorManager {
                 }
             }
         }
-        ModernGlStateManager.enableDepthTest()
-        ModernGlStateManager.enableCull()
     }
 
     private fun EntityData.shouldShowNameAndHealth() = config.enabled && bossType.bossTypeToggle in config.bossesToShow

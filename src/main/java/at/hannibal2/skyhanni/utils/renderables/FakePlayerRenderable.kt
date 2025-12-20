@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.player.Player
 import java.awt.Color
@@ -35,7 +34,6 @@ fun Renderable.Companion.fakePlayer(
     override val verticalAlign = VerticalAlignment.TOP
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-        ModernGlStateManager.color(1f, 1f, 1f, 1f)
         if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
         val mouse = currentRenderPassMousePosition ?: return
         DrawContextUtils.pushMatrix()
