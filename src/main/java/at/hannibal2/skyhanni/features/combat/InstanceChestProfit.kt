@@ -205,7 +205,7 @@ object InstanceChestProfit {
 
         if (inCroesusRunMenu) {
             event.inventoryItems.forEach { (slot, item) ->
-                val chestType = CroesusChestType.getByStackName(item.displayName)
+                val chestType = CroesusChestType.getByStackName(item.hoverName.string)
                 if (chestType != null) parseCroesusChest(item, chestType, slot)
             }
             createCroesusDisplay()
@@ -218,7 +218,7 @@ object InstanceChestProfit {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         val slot = slotToHighlight?.first
         if (inCroesusRunMenu && slot != null && config.croesusHighlight) {
-            event.container.inventorySlots[slot].highlight(LorenzColor.GREEN)
+            event.container.slots[slot].highlight(LorenzColor.GREEN)
         }
     }
 
@@ -328,7 +328,7 @@ object InstanceChestProfit {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
             }
-            val name = it.value.displayName
+            val name = it.value.displayName.string
             if (attributeShardPattern.matches(name)) {
                 val price = getAttribute(name)
                 itemsWithCost.addOrPut(name, price)
