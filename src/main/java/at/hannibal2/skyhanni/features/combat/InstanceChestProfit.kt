@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -205,7 +206,7 @@ object InstanceChestProfit {
 
         if (inCroesusRunMenu) {
             event.inventoryItems.forEach { (slot, item) ->
-                val chestType = CroesusChestType.getByStackName(item.hoverName.string)
+                val chestType = CroesusChestType.getByStackName(item.hoverName.formattedTextCompat())
                 if (chestType != null) parseCroesusChest(item, chestType, slot)
             }
             createCroesusDisplay()
@@ -328,7 +329,7 @@ object InstanceChestProfit {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
             }
-            val name = it.value.displayName.string
+            val name = it.value.hoverName.formattedTextCompatLeadingWhiteLessResets()
             if (attributeShardPattern.matches(name)) {
                 val price = getAttribute(name)
                 itemsWithCost.addOrPut(name, price)
