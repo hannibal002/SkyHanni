@@ -148,7 +148,6 @@ object ItemPriceUtils {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (PlatformUtils.isNeuLoaded()) return
         if (ApiUtils.isMoulberryLowestBinDisabled()) return
         if (lastLowestBinRefresh.passedSince() < 2.minutes) return
         lastLowestBinRefresh = SimpleTimeMark.now()

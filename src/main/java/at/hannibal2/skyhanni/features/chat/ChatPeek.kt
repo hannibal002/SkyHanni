@@ -23,7 +23,6 @@ object ChatPeek {
         if (Minecraft.getInstance().screen is SignEditScreen) return false
         if (ConfigUtils.configScreenCurrentlyOpen) return false
 
-        if (NeuItems.neuHasFocus()) return false
         if (GuiEditManager.isInGui() || FFGuideGui.isInGui() || VisualWordGui.isInGui()) return false
 
         return key.isKeyHeld()

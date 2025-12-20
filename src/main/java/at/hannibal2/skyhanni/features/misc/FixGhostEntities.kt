@@ -44,7 +44,7 @@ object FixGhostEntities {
 
         // Disabled on modern versions as the detection is not fully correct leading to incorrect hiding of entities
         // TODO fix this
-        if (KuudraApi.inKuudra || !PlatformUtils.IS_LEGACY) return
+        if (KuudraApi.inKuudra || true) return
 
         when (val packet = event.packet) {
             is ClientboundAddEntityPacket -> {

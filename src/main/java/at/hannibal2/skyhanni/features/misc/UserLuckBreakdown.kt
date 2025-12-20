@@ -384,7 +384,6 @@ object UserLuckBreakdown {
 
     @HandleEvent
     fun modernLuck(event: UserLuckCalculateEvent) {
-        if (PlatformUtils.IS_LEGACY) return
         event.addLuck(5f)
         val stack = ItemUtils.createItemStack(
             Items.TRIDENT,

@@ -34,8 +34,7 @@ object FrozenTreasureHighlighter {
         return IslandType.WINTER.isCurrent() && WinterApi.inGlacialCave() && config.enabled
     }
 
-    // Why does modern versions make this not the same :(
-    private val yOffset = if (PlatformUtils.IS_LEGACY) 1 else 2
+    private const val yOffset = 2
 
     @HandleEvent(onlyOnIsland = IslandType.WINTER)
     fun onTick() {

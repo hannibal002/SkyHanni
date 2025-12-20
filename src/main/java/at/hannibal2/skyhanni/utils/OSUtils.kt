@@ -55,11 +55,8 @@ object OSUtils {
     @JvmStatic
     @Suppress("MaxLineLength")
     fun openSoundsListInBrowser() {
-        val url = if (PlatformUtils.IS_LEGACY) {
-            "https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments"
-        } else {
-            "https://misode.github.io/sounds/"
-        }
+        val url = "https://misode.github.io/sounds/"
+
         openBrowser(url)
     }
 

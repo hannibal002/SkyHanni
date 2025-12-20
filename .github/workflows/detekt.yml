@@ -31,7 +31,10 @@ jobs:
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
-
+            -   name: Disable preprocessor
+                run: |
+                    mkdir -p .gradle
+                    echo skyhanni.multi-version=off > .gradle/private.properties
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt
                 uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta

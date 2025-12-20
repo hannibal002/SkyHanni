@@ -77,26 +77,6 @@ object EstimatedItemValue {
         stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
 
-    fun onNeuDrawEquipment(stack: ItemStack) {
-        renderedItems++
-        updateItem(stack)
-    }
-
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltip(event: ItemHoverEvent) {
-        if (!config.enabled) return
-        if (!PlatformUtils.isNeuLoaded()) return
-
-        if (renderedItems == 0) {
-            updateItem(event.itemStack)
-        }
-
-        // render the estimated item value over NEU PV
-        tryRendering()
-
-        renderedItems++
-    }
-
     /**
      * Workaround for NEU Profile Viewer bug where the ItemTooltipEvent gets called for two items when hovering
      * over the border between two items.

@@ -324,7 +324,7 @@ object GuiRenderUtils {
     //$$ private val itemRenderStateButCool by lazy { ItemStackRenderState() }
     //#endif
 
-    private val SKULL_SCALE = if (PlatformUtils.IS_LEGACY) (4f / 3f) else (5f / 4f)
+    private val SKULL_SCALE = (5f / 4f)
 
     @Suppress("unused")
     fun ItemStack.renderOnScreen(

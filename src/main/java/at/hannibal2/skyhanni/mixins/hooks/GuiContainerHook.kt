@@ -54,15 +54,12 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun foregroundDrawn(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        if (!PlatformUtils.IS_LEGACY) {
-            DrawContextUtils.setContext(context)
-            DrawContextUtils.translate(0.0, 0.0, 200.0)
-        }
+        DrawContextUtils.setContext(context)
+        DrawContextUtils.translate(0.0, 0.0, 200.0)
+
         GuiContainerEvent.ForegroundDrawnEvent(context, gui, container, mouseX, mouseY, partialTicks).post()
-        if (!PlatformUtils.IS_LEGACY) {
-            DrawContextUtils.translate(0.0, 0.0, -200.0)
-            DrawContextUtils.clearContext()
-        }
+        DrawContextUtils.translate(0.0, 0.0, -200.0)
+        DrawContextUtils.clearContext()
     }
 
     fun onDrawSlot(slot: Slot, ci: CallbackInfo) {

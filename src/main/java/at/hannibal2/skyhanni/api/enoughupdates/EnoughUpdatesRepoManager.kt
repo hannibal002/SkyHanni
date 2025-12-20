@@ -16,17 +16,12 @@ object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>(
     override val commonShortNameCased = "NEU"
     override val configDirectory = EnoughUpdatesManager.configDirectory
     override val config get(): NeuRepositoryConfig = SkyHanniMod.feature.dev.neuRepo
-    override val backupRepoResourcePath: String get() = when (PlatformUtils.isNeuLoaded()) {
-        true -> "assets/notenoughupdates/repo.zip"
-        else -> "assets/skyhanni/neu-repo.zip"
-    }
+    override val backupRepoResourcePath: String = "assets/skyhanni/neu-repo.zip"
+
 
     override val reloadCommand: String = "neureloadrepo"
     override val statusCommand: String = "neurepostatus"
     override val updateCommand: String = "neuresetrepo"
-
-    override val shouldRegisterReloadCommand: Boolean = !PlatformUtils.isNeuLoaded()
-    override val shouldRegisterUpdateCommand: Boolean = !PlatformUtils.isNeuLoaded()
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)

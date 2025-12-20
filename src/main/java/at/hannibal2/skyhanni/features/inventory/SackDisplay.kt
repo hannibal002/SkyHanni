@@ -116,7 +116,7 @@ object SackDisplay {
                             }
                         },
                         highlightsOnHoverSlots = listOf(slot),
-                    ) { !NeuItems.neuHasFocus() }
+                    )
                     add(nameText)
 
 
@@ -286,7 +286,7 @@ object SackDisplay {
                                 BazaarApi.searchForBazaarItem(name.removeColor().dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),
-                        ) { !NeuItems.neuHasFocus() },
+                        ),
                     )
                     when (SackApi.gemstoneStackFilter) {
                         GemstoneQuality.ROUGH -> addAlignedNumber(gem.rough.addSeparators())

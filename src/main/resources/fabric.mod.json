@@ -39,6 +39,12 @@
         ],
         "skyblockapi:imc/pv-profile": [
             "at.hannibal2.skyhanni.api.SkyBlockAPIEventWrappers::onPvLoad"
+        ],
+        "fabric-client-gametest": [
+            {
+                "adapter": "kotlin",
+                "value": "at.hannibal2.skyhanni.test.RepoPatternDumpTest"
+            }
         ]
     },
     "depends": {

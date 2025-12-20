@@ -62,7 +62,6 @@ object WikiManager {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeybind(event: GuiKeyPressEvent) {
-        if (NeuItems.neuHasFocus()) return
         val stack = stackUnderCursor() ?: return
 
         if (!config.wikiKeybind.isKeyHeld()) return

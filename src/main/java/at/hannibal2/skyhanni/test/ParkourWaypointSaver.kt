@@ -34,7 +34,6 @@ object ParkourWaypointSaver {
         @Suppress("InSkyBlockEarlyReturn")
         if (!SkyBlockUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (Minecraft.getInstance().screen != null) return
-        if (NeuItems.neuHasFocus()) return
         if (SkyHanniMod.feature.dev.devTool.graph.enabled) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 

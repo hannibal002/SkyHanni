@@ -13,7 +13,7 @@ class TabCompletionEvent(
 
     fun addSuggestion(suggestion: String) {
         if (!suggestion.startsWith(lastWord, ignoreCase = true)) return
-        val adjustedSuggestion = if (PlatformUtils.IS_LEGACY) suggestion else suggestion.removePrefix("/")
+        val adjustedSuggestion = suggestion.removePrefix("/")
         additionalSuggestions.add(adjustedSuggestion)
     }
 

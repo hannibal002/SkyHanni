@@ -48,11 +48,9 @@ object BazaarBestSellMethod {
         display = updateDisplay(event.openedProduct)
 
         // on 1.21 NeuInternalName.getAmountInInventory() does not include the item currently clicked at
-        if (!PlatformUtils.IS_LEGACY) {
-            DelayedRun.runDelayed(300.milliseconds) {
-                if (display.isEmpty()) {
-                    display = updateDisplay(event.openedProduct)
-                }
+        DelayedRun.runDelayed(300.milliseconds) {
+            if (display.isEmpty()) {
+                display = updateDisplay(event.openedProduct)
             }
         }
     }

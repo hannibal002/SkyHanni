@@ -224,7 +224,6 @@ object PestFinder {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onKeyPress(event: KeyPressEvent) {
         if (Minecraft.getInstance().screen != null) return
-        if (NeuItems.neuHasFocus()) return
 
         if (event.keyCode != config.teleportHotkey) return
         if (lastKeyPress.passedSince() < 2.seconds) return

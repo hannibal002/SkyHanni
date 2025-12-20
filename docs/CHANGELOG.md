@@ -1,5 +1,15 @@
 # SkyHanni - Change Log
 
+## Version 7.0.0
+
+### Technical Details
+
++ Remapped the project to mojang mappings. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4978)
+
+### Removed Features
+
++ Removed 1.8.9 support. - nopo (https://github.com/hannibal002/SkyHanni/pull/4978)
+
 ## Version 6.0.0
 
 ### New Features

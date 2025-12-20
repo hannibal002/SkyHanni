@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
-import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
@@ -82,11 +81,6 @@ class MiscConfig {
     @Accordion
     @Expose
     val quickModMenuSwitch: QuickModMenuSwitchConfig = QuickModMenuSwitchConfig()
-
-    @Expose
-    @ConfigOption(name = "Glowing Dropped Items", desc = "")
-    @Accordion
-    val glowingDroppedItems: GlowingDroppedItemsConfig = GlowingDroppedItemsConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Party Members", desc = "")
@@ -236,16 +230,6 @@ class MiscConfig {
     var xpInInventory: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Red Scoreboard Numbers",
-        desc = "Hide the red scoreboard numbers on the right side of the screen.",
-    )
-    @OnlyLegacy
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var hideScoreboardNumbers: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Hide Piggy", desc = "Replace 'Piggy' with 'Purse' in the Scoreboard.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -277,16 +261,6 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideFireOverlay: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Better Sign Editing",
-        desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.",
-    )
-    @ConfigEditorBoolean
-    @OnlyLegacy
-    @FeatureToggle
-    var betterSignEditing: Boolean = true
 
     @Expose
     @ConfigOption(name = "Movement Speed", desc = "Show the player movement speed in blocks per second.")
@@ -418,16 +392,6 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var maintainGameVolume: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "NEU Soul Path Find",
-        desc = "When showing §e/neusouls on§7, show a pathfind to the faily souls missing and a percentage of souls done in chat.",
-    )
-    @ConfigEditorBoolean
-    @OnlyLegacy
-    @FeatureToggle
-    var neuSoulsPathFind: Boolean = true
 
     @Expose
     @ConfigOption(
