@@ -19,26 +19,6 @@ object BlockCompat {
         return ItemStack(Blocks.POLISHED_DIORITE)
     }
 
-    fun createBlueOrchid(): ItemStack {
-        return ItemStack(Blocks.BLUE_ORCHID)
-    }
-
-    fun createSunFlower(): ItemStack {
-        return ItemStack(Blocks.SUNFLOWER)
-    }
-
-    fun createWildRose(): ItemStack {
-        return ItemStack(Blocks.ROSE_BUSH)
-    }
-
-    fun BlockState.isSunflower(pos: LorenzVec): Boolean {
-        return this.block == Blocks.SUNFLOWER
-    }
-
-    fun BlockState.isWildRose(pos: LorenzVec): Boolean {
-        return this.block == Blocks.ROSE_BUSH
-    }
-
     fun getAllLeaves(): List<Block> = buildList { addLeaves() }
 }
 

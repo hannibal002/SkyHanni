@@ -21,6 +21,7 @@ import java.util.NavigableMap
 import java.util.TreeMap
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
+
 //#if FORGE
 //$$ import net.minecraft.launchwrapper.Launch
 //$$ import net.minecraftforge.fml.common.FMLCommonHandler
@@ -62,10 +63,10 @@ object RepoPatternManager {
     private var wasPreInitialized = false
 
     private val insideTest =
-        //#if FORGE
-        //$$ Launch.blackboard == null
-    //#else
-    false
+    //#if FORGE
+    //$$ Launch.blackboard == null
+        //#else
+        false
     //#endif
 
     var inTestDuplicateUsage = true

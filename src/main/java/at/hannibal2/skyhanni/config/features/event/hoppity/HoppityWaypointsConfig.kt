@@ -44,7 +44,7 @@ class HoppityWaypointsConfig {
     @ConfigOption(
         name = "Show All Waypoints",
         desc = "Show all possible egg waypoints for the current lobby. §e" +
-                "Only works when you don't have an Egglocator in your inventory.",
+            "Only works when you don't have an Egglocator in your inventory.",
     )
     @ConfigEditorBoolean
     var showAll: Boolean = false
@@ -53,7 +53,7 @@ class HoppityWaypointsConfig {
     @ConfigOption(
         name = "Hide Duplicate Waypoints",
         desc = "Hide egg waypoints you have already found.\n" +
-                "§eOnly works when you don't have an Egglocator in your inventory.",
+            "§eOnly works when you don't have an Egglocator in your inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

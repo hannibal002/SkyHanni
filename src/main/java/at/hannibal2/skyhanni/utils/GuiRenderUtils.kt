@@ -323,7 +323,7 @@ object GuiRenderUtils {
     //$$ private val itemRenderStateButCool by lazy { ItemStackRenderState() }
     //#endif
 
-    private val SKULL_SCALE = (5f / 4f)
+    private const val SKULL_SCALE = (5f / 4f)
 
     @Suppress("unused")
     fun ItemStack.renderOnScreen(
