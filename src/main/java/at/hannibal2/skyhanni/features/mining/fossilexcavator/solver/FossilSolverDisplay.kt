@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -95,7 +96,7 @@ object FossilSolverDisplay {
     fun onTick() {
         if (!isEnabled()) return
         val slots = InventoryUtils.getItemsInOpenChest()
-        val itemNames = slots.map { it.stack.displayName.removeColor() }
+        val itemNames = slots.map { it.item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() }
         if (itemNames != inventoryItemNames) {
             inventoryItemNames = itemNames
             if (inExcavatorMenu) return
@@ -110,9 +111,9 @@ object FossilSolverDisplay {
 
         var foundChargesRemaining = false
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val stack = slot.stack
-            val slotIndex = slot.slotIndex
-            val stackName = stack.displayName.removeColor()
+            val stack = slot.item
+            val slotIndex = slot.containerSlot
+            val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
             val isDirt = stackName == "Dirt"
             val isFossil = stackName == "Fossil"
             when {
@@ -153,7 +154,7 @@ object FossilSolverDisplay {
         event.makePickblock()
 
         val slot = event.slot ?: return
-        if (slot.slotIndex == slotToClick) {
+        if (slot.containerSlot == slotToClick) {
             slotToClick = null
             correctPercentage = null
         }
@@ -166,7 +167,7 @@ object FossilSolverDisplay {
         if (slotToClick == null) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.slotIndex == slotToClick) {
+            if (slot.containerSlot == slotToClick) {
                 slot.highlight(LorenzColor.GREEN.toColor().addAlpha(90))
             }
         }
@@ -176,7 +177,7 @@ object FossilSolverDisplay {
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.showPercentage) return
-        if (slotToClick != event.slot.slotNumber) return
+        if (slotToClick != event.slot.index) return
         if (inExcavatorMenu) return
         val correctPercentage = correctPercentage ?: return
 

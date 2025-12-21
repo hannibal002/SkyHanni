@@ -60,16 +60,14 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.nbt.NBTTagCompound
-//#if FORGE
-import net.minecraftforge.common.MinecraftForge
-//#endif
+import net.minecraft.nbt.CompoundTag
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -89,10 +87,10 @@ object SkyHanniDebugsAndTests {
 
     val debugLogger = LorenzLogger("debug/test")
 
-    private fun run(compound: NBTTagCompound, text: String) {
+    private fun run(compound: CompoundTag, text: String) {
         print("$text'$compound'")
-        for (s in compound.keySet) {
-            val element = compound.getCompoundTag(s)
+        for (s in compound.keySet()) {
+            val element = compound.getCompoundOrDefault(s)
             run(element, "$text  ")
         }
     }
@@ -213,14 +211,14 @@ object SkyHanniDebugsAndTests {
         var errors = 0
 
         displayList = buildList {
-            for (item in GardenVisitorColorNames.visitorItems) {
+            for (item in GardenVisitorColorNames.visitorMap) {
                 val name = item.key
 
                 addLine {
                     val coloredName = GardenVisitorColorNames.getColoredName(name)
                     addString("$coloredName§7 (")
 
-                    for (itemName in item.value) {
+                    for (itemName in item.value.needItems) {
                         try {
                             val internalName = NeuInternalName.fromItemName(itemName)
                             addItemStack(internalName.getItemStack())
@@ -229,7 +227,7 @@ object SkyHanniDebugsAndTests {
                             errors++
                         }
                     }
-                    if (item.value.isEmpty()) {
+                    if (item.value.needItems.isEmpty()) {
                         addString("Any")
                     }
                     addString("§7) ")
@@ -256,18 +254,12 @@ object SkyHanniDebugsAndTests {
         for (original in modules.toMutableList()) {
             val javaClass = original.javaClass
             val simpleName = javaClass.simpleName
-            //#if FORGE
-            MinecraftForge.EVENT_BUS.unregister(original)
-            //#endif
             SkyHanniEvents.unregister(original)
             println("Unregistered listener $simpleName")
 
             if (simpleName !in blockedFeatures) {
                 modules.remove(original)
                 modules.add(original)
-                //#if FORGE
-                MinecraftForge.EVENT_BUS.register(original)
-                //#endif
                 SkyHanniEvents.register(original)
                 println("Registered listener $simpleName")
             } else {
@@ -285,16 +277,13 @@ object SkyHanniDebugsAndTests {
                 for (original in modules.toMutableList()) {
                     val javaClass = original.javaClass
                     val simpleName = javaClass.simpleName
-                    //#if FORGE
-                    MinecraftForge.EVENT_BUS.unregister(original)
-                    //#endif
                     SkyHanniEvents.unregister(original)
                     println("Unregistered listener $simpleName")
                 }
                 ChatUtils.clickableChat(
                     "Stopped ${modules.size} listener classes. " +
                         "If you want to re-enable them, run /shreloadlisteners or click this message.",
-                    onClick = { reloadListeners() },
+                    onClick = ::reloadListeners,
                 )
             },
         )
@@ -309,7 +298,7 @@ object SkyHanniDebugsAndTests {
         }
         lastManualContestDataUpdate = SimpleTimeMark.now()
 
-        GardenNextJacobContest.resetContestData()
+        GardenNextJacobContest.resetContestData(true)
     }
 
     private fun copyLocation(args: Array<String>) {

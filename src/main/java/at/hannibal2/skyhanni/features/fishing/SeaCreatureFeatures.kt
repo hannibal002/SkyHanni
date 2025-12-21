@@ -22,9 +22,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.monster.EntitySlime
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.monster.Slime
 import java.awt.Color
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -57,13 +58,13 @@ object SeaCreatureFeatures {
         val mob = event.mob
         if (mob !in rareSeaCreatures) return
         val entity = mob.baseEntity
-        val shouldNotify = entity.entityId !in entityIds
-        entityIds.addIfAbsent(entity.entityId)
+        val shouldNotify = entity.id !in entityIds
+        entityIds.addIfAbsent(entity.id)
         val creature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
         if (!creature.rare) return
 
         if (lastRareCatch.passedSince() < 1.seconds) return
-        if (mob.name == "Water Hydra" && entity.health == (entity.baseMaxHealth.toFloat() / 2)) return
+        if (mob.name == "Water Hydra" && entity.findHealthReal() == (entity.baseMaxHealth.toFloat() / 2)) return
         if (config.alertOtherCatches && shouldNotify) {
             val text = if (config.creatureName) "${creature.displayName} NEARBY!"
             else "${creature.rarity.chatColorCode}RARE SEA CREATURE!"
@@ -118,7 +119,7 @@ object SeaCreatureFeatures {
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && !DungeonApi.inDungeon() && !KuudraApi.inKuudra
 
     private val getEntityOutlineColor: (entity: Entity) -> Color? = { entity ->
-        (entity as? EntityLivingBase)?.mob?.let { mob ->
+        (entity as? LivingEntity)?.mob?.let { mob ->
             if (mob in rareSeaCreatures && entity.distanceToPlayer() < 30) {
                 LorenzColor.GREEN.toColor()
             } else null
@@ -127,13 +128,13 @@ object SeaCreatureFeatures {
 
     @JvmStatic
     fun isRareSeaCreature(entity: Entity): Boolean {
-        return (entity as? EntityLivingBase)?.mob?.let { mob ->
+        return (entity as? LivingEntity)?.mob?.let { mob ->
             mob in rareSeaCreatures
         } ?: false
     }
 
     @JvmStatic
     fun isRareSeaCreatureBody(entity: Entity): Boolean {
-        return entity is EntitySlime && isRareSeaCreature(entity)
+        return entity is Slime && isRareSeaCreature(entity)
     }
 }

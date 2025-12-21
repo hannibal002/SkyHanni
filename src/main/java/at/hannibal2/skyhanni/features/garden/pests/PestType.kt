@@ -107,6 +107,30 @@ enum class PestType(
         "PEST_SLUG_MONSTER".toInternalName(),
         CropType.MUSHROOM,
     ),
+    PRAYING_MANTIS(
+        "Praying Mantis",
+        BossType.GARDEN_PEST_PRAYING_MANTIS,
+        SprayType.JELLY,
+        VinylType.PRAY_FOR_ME,
+        "PEST_PRAYING_MANTIS_MONSTER".toInternalName(),
+        CropType.WILD_ROSE,
+    ),
+    FIREFLY(
+        "Firefly",
+        BossType.GARDEN_PEST_FIREFLY,
+        SprayType.JELLY,
+        VinylType.FIREFLY_IN_THE_HOLE,
+        "PEST_FIREFLY_MONSTER".toInternalName(),
+        CropType.MOONFLOWER,
+    ),
+    DRAGONFLY(
+        "Dragonfly",
+        BossType.GARDEN_PEST_DRAGONFLY,
+        SprayType.JELLY,
+        VinylType.IMAGINE_DRAGONFLIES,
+        "PEST_DRAGONFLY_MONSTER".toInternalName(),
+        CropType.SUNFLOWER,
+    ),
     // TODO replace with null
     // For use in the Pest Profit Tracker, in cases where an item cannot have an identified PestType
     // Display name intentionally omitted to aid in filtering out this entry.
@@ -209,12 +233,31 @@ enum class PestType(
             "SLUG;3" to SLUG,
             "SLUG;4" to SLUG,
 
+            // Dragonfly deterministic drops
+            "ENCHANTED_SUNFLOWER" to DRAGONFLY,
+            "COMPACTED_SUNFLOWER" to DRAGONFLY,
+            "VERMIN_VAPORIZER_GARDEN_CHIP" to DRAGONFLY,
+            "VINYL_IMAGINE_DRAGONFLIES" to DRAGONFLY,
+
+            // Praying Mantis deterministic drops
+            "ENCHANTED_WILD_ROSE" to PRAYING_MANTIS,
+            "COMPACTED_WILD_ROSE" to PRAYING_MANTIS,
+            "MANTID_CLAW" to PRAYING_MANTIS,
+            "VINYL_PRAY_FOR_ME" to PRAYING_MANTIS,
+
+            // Firefly deterministic drops
+            "ENCHANTED_MOONFLOWER" to FIREFLY,
+            "COMPACTED_MOONFLOWER" to FIREFLY,
+            "FIRE_IN_A_BOTTLE" to FIREFLY,
+            "VINYL_FIREFLY" to FIREFLY,
+
             // Spray drops only send chat message from mice
             "COMPOST" to FIELD_MOUSE,
             "HONEY_JAR" to FIELD_MOUSE,
             "DUNG" to FIELD_MOUSE,
             "PLANT_MATTER" to FIELD_MOUSE,
             "CHEESE_FUEL" to FIELD_MOUSE,
+            "JELLY" to FIELD_MOUSE,
 
             // Indeterministic drops
             "DYE_DUNG" to UNKNOWN,

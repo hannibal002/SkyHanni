@@ -31,9 +31,9 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.entity.projectile.EntityFishHook
-import net.minecraft.item.ItemStack
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.entity.projectile.FishingHook
+import net.minecraft.world.item.ItemStack
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.seconds
 
@@ -165,7 +165,7 @@ object HoppityEggLocator {
         val dist = lastPoint.distance(pos)
         if (dist == 0.0 || dist > 3.0) return
 
-        if (EntityUtils.getEntitiesNearby<EntityFishHook>(pos, 0.3).any()) return
+        if (EntityUtils.getEntitiesNearby<FishingHook>(pos, 0.3).any()) return
 
         bezierFitter.addPoint(pos)
 
@@ -213,7 +213,7 @@ object HoppityEggLocator {
         it.distance(location) < 5.0
     }
 
-    private fun ReceiveParticleEvent.isVillagerParticle() = type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0f && count == 1
+    private fun ReceiveParticleEvent.isVillagerParticle() = type == ParticleTypes.HAPPY_VILLAGER && speed == 0f && count == 1
 
     fun isEnabled() =
         SkyBlockUtils.inSkyBlock && config.waypoints.enabled && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) &&

@@ -57,7 +57,7 @@ object CrystalNucleusTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Crystal Nucleus Tracker",
-        { Data() },
+        ::Data,
         { it.mining.crystalNucleusTracker },
     ) { drawDisplay(it) }
 
@@ -199,7 +199,7 @@ object CrystalNucleusTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() },
+            condition = ::isEnabled,
             onRender = {
                 tracker.renderDisplay(config.position)
             },

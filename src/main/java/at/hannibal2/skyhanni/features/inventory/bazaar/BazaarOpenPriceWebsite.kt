@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.entity.player.InventoryPlayer
-import net.minecraft.init.Items
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -21,7 +21,7 @@ object BazaarOpenPriceWebsite {
 
     private val item by lazy {
         ItemUtils.createItemStack(
-            Items.paper,
+            Items.PAPER,
             "§bPrice History",
             "§8(From SkyHanni)",
             "",
@@ -35,7 +35,7 @@ object BazaarOpenPriceWebsite {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         BazaarApi.currentlyOpenedProduct ?: return
-        if (event.inventory is InventoryPlayer) return
+        if (event.inventory is Inventory) return
 
         if (event.slot == 22) {
             event.replace(item)

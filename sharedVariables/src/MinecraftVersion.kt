@@ -13,8 +13,6 @@ enum class MinecraftVersion(
     val versionNameOverride: String? = null,
     val moulconfigMinecraftVersionOverride: String? = null,
 ) {
-    MC189("1.8.9", 8),
-    MC11605("1.16.5", 8),
     MC12105("1.21.5", 21),
     MC12108("1.21.8", 21, moulconfigMinecraftVersionOverride = "1.21.7"),
     MC12110("1.21.10", 21),
@@ -23,7 +21,7 @@ enum class MinecraftVersion(
     val javaLanguageVersion = JavaLanguageVersion.of(javaVersion)
 
     val formattedJavaLanguageVersion: String
-        get() = if (javaVersion <= 8) "1.$javaVersion" else javaVersion.toString()
+        get() = javaVersion.toString()
 
     val versionNumber = run {
         val parts = versionName.split('.').mapTo(mutableListOf()) { it.toInt() }

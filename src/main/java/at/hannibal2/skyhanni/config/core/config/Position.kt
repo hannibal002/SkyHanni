@@ -75,7 +75,9 @@ class Position @JvmOverloads constructor(
     var linkField: Field? = null
         private set
 
+    @Transient
     var clicked: Boolean = false
+    @Transient
     var internalName: String? = null
         private set
 

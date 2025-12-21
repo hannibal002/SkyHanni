@@ -24,9 +24,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.player.InventoryPlayer
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -99,7 +99,7 @@ object MinionUpgradeHelper {
 
     private fun createDisplayItem(internalName: NeuInternalName): ItemStack {
         val lore = createLore(internalName)
-        return ItemStack(Blocks.diamond_block).setLore(lore).setCustomItemName("§bGet Required Items")
+        return ItemStack(Blocks.DIAMOND_BLOCK).setLore(lore).setCustomItemName("§bGet Required Items")
     }
 
     private fun createLore(internalName: NeuInternalName): List<String> {
@@ -136,7 +136,7 @@ object MinionUpgradeHelper {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.minionConfigHelper) return
-        if (event.inventory !is InventoryPlayer && event.slot == 51) {
+        if (event.inventory !is Inventory && event.slot == 51) {
             displayItem?.let { event.replace(it) }
         }
     }

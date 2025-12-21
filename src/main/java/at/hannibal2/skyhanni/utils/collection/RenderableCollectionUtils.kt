@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.util.Collections
 
 // TODO move the type specific into the companion objects, the rest goes back into the RenderableUtils

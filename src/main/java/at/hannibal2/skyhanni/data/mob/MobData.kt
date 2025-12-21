@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.TreeMap
 import at.hannibal2.skyhanni.data.mob.Mob.Type as MobType
 
@@ -26,12 +26,12 @@ object MobData {
     val special = MobSet()
     val currentMobs = MobSet()
 
-    val entityToMob = mutableMapOf<EntityLivingBase, Mob>()
+    val entityToMob = mutableMapOf<LivingEntity, Mob>()
 
     internal val notSeenMobs = MobSet()
 
-    internal val currentEntityLiving = mutableSetOf<EntityLivingBase>()
-    internal val previousEntityLiving = mutableSetOf<EntityLivingBase>()
+    internal val currentEntityLiving = mutableSetOf<LivingEntity>()
+    internal val previousEntityLiving = mutableSetOf<LivingEntity>()
 
     internal val retries = TreeMap<Int, RetryEntityInstancing>()
 
@@ -60,12 +60,12 @@ object MobData {
             val somethingWentWrong = MobResult(Result.SomethingWentWrong, null)
             fun found(mob: Mob) = MobResult(Result.Found, mob)
 
-            fun EntityArmorStand?.makeMobResult(mob: (EntityArmorStand) -> Mob?) =
+            fun ArmorStand?.makeMobResult(mob: (ArmorStand) -> Mob?) =
                 this?.let { armor ->
                     mob.invoke(armor)?.let { found(it) } ?: somethingWentWrong
                 } ?: notYetFound
 
-            fun List<EntityArmorStand?>.makeMobResult(mob: (List<EntityArmorStand>) -> Mob?) =
+            fun List<ArmorStand?>.makeMobResult(mob: (List<ArmorStand>) -> Mob?) =
                 this.takeIfAllNotNull()?.let { armor ->
                     mob.invoke(armor)?.let { found(it) } ?: somethingWentWrong
                 } ?: notYetFound
@@ -73,13 +73,13 @@ object MobData {
     }
 
     internal class RetryEntityInstancing(
-        var entity: EntityLivingBase,
+        var entity: LivingEntity,
         var times: Int,
         val roughType: MobType,
     ) {
-        override fun hashCode() = entity.entityId
+        override fun hashCode() = entity.id
         override fun equals(other: Any?) = (other as? RetryEntityInstancing).hashCode() == this.hashCode()
-        fun toKeyValuePair() = entity.entityId to this
+        fun toKeyValuePair() = entity.id to this
 
         fun outsideRange() =
             entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > when (roughType) {

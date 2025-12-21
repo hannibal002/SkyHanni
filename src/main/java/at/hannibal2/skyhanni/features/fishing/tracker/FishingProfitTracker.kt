@@ -62,7 +62,7 @@ object FishingProfitTracker {
     private var lastCatchTime = SimpleTimeMark.farPast()
     private val tracker = SkyHanniItemTracker(
         "Fishing Profit Tracker",
-        { Data() },
+        ::Data,
         { it.fishing.fishingProfitTracker },
     ) { drawDisplay(it) }
 

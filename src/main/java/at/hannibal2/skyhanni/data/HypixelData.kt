@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
@@ -496,23 +497,19 @@ object HypixelData {
 
     private fun checkHypixel() {
         if (!hasScoreboardUpdated) return
-        val mc = Minecraft.getMinecraft()
-        val player = MinecraftCompat.localPlayerOrNull ?: return
+        val mc = Minecraft.getInstance()
+        MinecraftCompat.localPlayerOrNull ?: return
 
         var hypixel = false
 
-        //#if MC < 1.21
-        val clientBrand = player.clientBrand
-        //#else
-        //$$ val clientBrand = mc.networkHandler?.brand
-        //#endif
+        val clientBrand = mc.connection?.serverBrand()
         clientBrand?.let {
             if (it.contains("hypixel", ignoreCase = true)) {
                 hypixel = true
             }
         }
 
-        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP.orEmpty()) {
+        serverNameConnectionPattern.matchMatcher(mc.currentServer?.ip.orEmpty()) {
             hypixel = true
             if (group("prefix") == "alpha.") {
                 hypixelAlpha = true
@@ -612,7 +609,7 @@ object HypixelData {
         val world = MinecraftCompat.localWorldOrNull ?: return null
 
         val objective = world.scoreboard.getSidebarObjective() ?: return null
-        val displayName = objective.displayName
+        val displayName = objective.displayName.formattedTextCompat()
         return displayName
     }
 

@@ -1,178 +1,115 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-//#if MC > 1.16
-//$$ import net.minecraft.world.item.DyeItem
-//#endif
-//#if MC > 1.21
-//$$ import net.minecraft.item.tooltip.TooltipType
-//$$ import net.minecraft.registry.Registries
-//$$ import net.minecraft.util.Identifier
-//$$ import net.minecraft.component.DataComponentTypes
-//$$ import net.minecraft.text.Text
-//#endif
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.TooltipFlag
 
 fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
-    //#if MC < 1.16
-    return this.getTooltip(Minecraft.getMinecraft().thePlayer, advanced)
-    //#elseif MC < 1.21
-    //$$ return this.getTooltipLines(Minecraft.getInstance().player) { advanced }.map { it.getFormattedTextCompat() }.toMutableList()
-    //#else
-    //$$ val tooltipType = if (advanced) TooltipType.ADVANCED else TooltipType.BASIC
-    //$$ return this.getTooltip(Item.TooltipContext.DEFAULT, MinecraftClient.getInstance().player, tooltipType).map { it.formattedTextCompat() }.toMutableList()
-    //#endif
+    val tooltipType = if (advanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
+    return this.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, tooltipType).map { it.formattedTextCompat() }
+        .toMutableList()
 }
 
 fun Item.getIdentifierString(): String {
-    //#if MC < 1.16
-    return this.registryName
-    //#else
-    //$$ return Registries.ITEM.getId(this).toString()
-    //#endif
+    return BuiltInRegistries.ITEM.getKey(this).toString()
 }
 
 /*
  * On Modern it will return Items.AIR if it cant find it instead of null
  */
 fun String.getVanillaItem(): Item? {
-    //#if MC < 1.16
-    return Item.getByNameOrId(this)
-    //#else
-    //$$ val item = Registries.ITEM.get(Identifier.of(this))
-    //$$ if (item == Items.AIR) return null
-    //$$ return item
-    //#endif
+    val item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(this))
+    if (item == Items.AIR) return null
+    return item
 }
 
 fun ItemStack.setCustomItemName(name: String): ItemStack {
-    //#if MC < 1.16
-    this.setStackDisplayName(name)
-    //#else
-    //$$ this.set(DataComponentTypes.CUSTOM_NAME, Text.of(name))
-    //#endif
+    this.set(DataComponents.CUSTOM_NAME, Component.nullToEmpty(name))
     return this
 }
 
-//#if MC > 1.21
-//$$    fun ItemStack.setCustomItemName(name: Text): ItemStack {
-//$$     this.set(DataComponentTypes.CUSTOM_NAME, name)
-//$$     return this
-//$$ }
-//#endif
+fun ItemStack.setCustomItemName(name: Component): ItemStack {
+    this.set(DataComponents.CUSTOM_NAME, name)
+    return this
+}
 
 enum class DyeCompat(
     private val dyeColor: Int,
-    //#if MC > 1.16
-    //$$ private val stackType: Item
-    //#endif
+    private val stackType: Item,
 ) {
     WHITE(
         15,
-        //#if MC > 1.16
-        //$$ Items.BONE_MEAL
-        //#endif
+        Items.BONE_MEAL,
     ),
     ORANGE(
         14,
-        //#if MC > 1.16
-        //$$ Items.ORANGE_DYE
-        //#endif
+        Items.ORANGE_DYE,
     ),
     MAGENTA(
         13,
-        //#if MC > 1.16
-        //$$ Items.MAGENTA_DYE
-        //#endif
+        Items.MAGENTA_DYE,
     ),
     LIGHT_BLUE(
         12,
-        //#if MC > 1.16
-        //$$ Items.LIGHT_BLUE_DYE
-        //#endif
+        Items.LIGHT_BLUE_DYE,
     ),
     YELLOW(
         11,
-        //#if MC > 1.16
-        //$$ Items.YELLOW_DYE
-        //#endif
+        Items.YELLOW_DYE,
     ),
     LIME(
         10,
-        //#if MC > 1.16
-        //$$ Items.LIME_DYE
-        //#endif
+        Items.LIME_DYE,
     ),
     PINK(
         9,
-        //#if MC > 1.16
-        //$$ Items.PINK_DYE
-        //#endif
+        Items.PINK_DYE,
     ),
     GRAY(
         8,
-        //#if MC > 1.16
-        //$$ Items.GRAY_DYE
-        //#endif
+        Items.GRAY_DYE,
     ),
     LIGHT_GRAY(
         7,
-        //#if MC > 1.16
-        //$$ Items.LIGHT_GRAY_DYE
-        //#endif
+        Items.LIGHT_GRAY_DYE,
     ),
     CYAN(
         6,
-        //#if MC > 1.16
-        //$$ Items.CYAN_DYE
-        //#endif
+        Items.CYAN_DYE,
     ),
     PURPLE(
         5,
-        //#if MC > 1.16
-        //$$ Items.PURPLE_DYE
-        //#endif
+        Items.PURPLE_DYE,
     ),
     BLUE(
         4,
-        //#if MC > 1.16
-        //$$ Items.LAPIS_LAZULI
-        //#endif
+        Items.LAPIS_LAZULI,
     ),
     BROWN(
         3,
-        //#if MC > 1.16
-        //$$ Items.COCOA_BEANS
-        //#endif
+        Items.COCOA_BEANS,
     ),
     GREEN(
         2,
-        //#if MC > 1.16
-        //$$ Items.GREEN_DYE
-        //#endif
+        Items.GREEN_DYE,
     ),
     RED(
         1,
-        //#if MC > 1.16
-        //$$ Items.RED_DYE
-        //#endif
+        Items.RED_DYE,
     ),
     BLACK(
         0,
-        //#if MC > 1.16
-        //$$ Items.BLACK_DYE
-        //#endif
+        Items.BLACK_DYE,
     )
     ;
 
-    fun createStack(size: Int = 1): ItemStack =
-        //#if MC < 1.16
-        ItemStack(Items.dye, size, dyeColor)
-    //#else
-    //$$ ItemStack(stackType, size)
-    //#endif
+    fun createStack(size: Int = 1) = ItemStack(stackType, size)
 
     companion object {
 
@@ -184,28 +121,16 @@ enum class DyeCompat(
          */
         fun ItemStack.isDye(metadata: Int = -1): Boolean {
             if (metadata == -1) {
-                //#if MC < 1.16
-                return this.item == Items.dye
-                //#else
-                //$$ return entries.firstOrNull { this.item == item } != null
-                //#endif
+                return entries.any { this.item == item }
             }
 
-            //#if MC < 1.16
-            return this.item == Items.dye && this.metadata == metadata
-            //#else
-            //$$ return this.item == fromDyeColor(metadata).stackType
-            //#endif
+            return this.item == fromDyeColor(metadata).stackType
         }
 
         private fun fromDyeColor(dyeColor: Int): DyeCompat = entries.firstOrNull { it.dyeColor == dyeColor } ?: GRAY
 
         fun toDamage(stack: ItemStack): Int {
-            //#if MC < 1.21
-            return entries.firstOrNull { it.dyeColor == stack.metadata }?.dyeColor ?: 0
-            //#else
-            //$$ return entries.firstOrNull { it.stackType == stack.item }?.dyeColor ?: 0
-            //#endif
+            return entries.firstOrNull { it.stackType == stack.item }?.dyeColor ?: 0
         }
 
         fun createDyeStack(dyeColor: Int, size: Int = 1): ItemStack =

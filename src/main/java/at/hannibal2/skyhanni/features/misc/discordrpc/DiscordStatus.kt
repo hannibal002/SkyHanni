@@ -29,6 +29,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
+import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -166,7 +169,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     ITEM(
         {
             InventoryUtils.getItemInHand()?.let {
-                String.format(java.util.Locale.US, "Holding ${it.displayName.removeColor()}")
+                String.format(java.util.Locale.US, "Holding ${it.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()}")
             } ?: "No item in hand"
         },
     ),
@@ -272,7 +275,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         {
             // Logic for getting the currently held stacking enchant is from Skytils
             val itemInHand = InventoryUtils.getItemInHand()
-            val itemName = itemInHand?.displayName?.removeColor().orEmpty()
+            val itemName = itemInHand?.hoverName.formattedTextCompatLeadingWhiteLessResets()?.removeColor().orEmpty()
 
             fun getProgressPercent(amount: Int, levels: List<Int>): String {
                 var percent = "MAXED"
@@ -293,17 +296,17 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             val extraAttributes = itemInHand?.extraAttributes
             var stackingReturn = AutoStatus.STACKING.placeholderText
             if (extraAttributes != null) {
-                val enchantments = extraAttributes.getCompoundTag("enchantments")
+                val enchantments = extraAttributes.getCompoundOrDefault("enchantments")
                 var stackingEnchant = ""
                 for (enchant in EstimatedItemValue.stackingEnchants) {
-                    if (extraAttributes.hasKey(enchant.value.statName)) {
+                    if (extraAttributes.contains(enchant.value.statName)) {
                         stackingEnchant = enchant.key
                         break
                     }
                 }
                 val levels = EstimatedItemValue.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
-                val level = enchantments.getInteger(stackingEnchant)
-                val amount = extraAttributes.getInteger(EstimatedItemValue.stackingEnchants[stackingEnchant]?.statName)
+                val level = enchantments.getIntOrDefault(stackingEnchant)
+                val amount = extraAttributes.getIntOrDefault(EstimatedItemValue.stackingEnchants[stackingEnchant]?.statName)
                 val stackingPercent = getProgressPercent(amount, levels)
 
                 stackingReturn =

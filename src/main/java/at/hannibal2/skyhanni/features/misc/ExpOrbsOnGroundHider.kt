@@ -4,13 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.entity.item.EntityXPOrb
+import net.minecraft.world.entity.ExperienceOrb
 
 @SkyHanniModule
 object ExpOrbsOnGroundHider {
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityXPOrb>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ExperienceOrb>) {
         if (!SkyHanniMod.feature.misc.hideExpBottles) return
         event.cancel()
     }
