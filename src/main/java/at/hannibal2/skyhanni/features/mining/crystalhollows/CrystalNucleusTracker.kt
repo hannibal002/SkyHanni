@@ -11,7 +11,9 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.BAL_SHARD_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.EPIC_BAL_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JUNGLE_KEY_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.LEGENDARY_BAL_ITEM
@@ -55,15 +57,13 @@ object CrystalNucleusTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Crystal Nucleus Tracker",
-        { Data() },
+        ::Data,
         { it.mining.crystalNucleusTracker },
     ) { drawDisplay(it) }
 
-    class Data : ItemTrackerData() {
-        override fun resetItems() {
-            runsCompleted = 0L
-        }
-
+    data class Data(
+        @Expose var runsCompleted: Long = 0L
+    ) : ItemTrackerData() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / runsCompleted
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -76,12 +76,9 @@ object CrystalNucleusTracker {
         // No direct coin drops from nuc runs
         override fun getCoinName(item: TrackedItem) = ""
         override fun getCoinDescription(item: TrackedItem) = mutableListOf<String>()
-
-        @Expose
-        var runsCompleted = 0L
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onChat(event: SkyHanniChatEvent) {
         balObtainedPattern.matchMatcher(event.message) {
             if (!group("player").equals(PlayerUtils.getName(), ignoreCase = true)) return@matchMatcher
@@ -92,8 +89,17 @@ object CrystalNucleusTracker {
                 else -> return@matchMatcher
             }
             tracker.modify {
-                it.addItem(item, amount = 1, false)
+                it.addItem(item, amount = 1, command = false)
             }
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
+    fun onShardGain(event: ShardGainEvent) {
+        if (event.shardInternalName != BAL_SHARD_ITEM) return
+
+        tracker.modify {
+            it.addItem(BAL_SHARD_ITEM, event.amount, command = false)
         }
     }
 
@@ -171,7 +177,8 @@ object CrystalNucleusTracker {
                 ).toSearchable(),
             )
 
-            add(tracker.addTotalProfit(profit, data.runsCompleted, "run"))
+            val duration = data.getTotalUptime()
+            addAll(tracker.addTotalProfit(profit, data.runsCompleted, "run", duration, "Runs"))
         } else {
             addSearchString("§7Do a run to start tracking!")
         }
@@ -192,7 +199,7 @@ object CrystalNucleusTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() },
+            condition = ::isEnabled,
             onRender = {
                 tracker.renderDisplay(config.position)
             },

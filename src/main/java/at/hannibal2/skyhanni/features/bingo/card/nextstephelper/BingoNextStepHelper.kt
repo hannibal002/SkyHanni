@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -195,7 +196,7 @@ object BingoNextStepHelper {
             if (step is ItemsStep) {
                 var totalCount = 0L
                 for ((itemName, multiplier) in step.variants) {
-                    val count = InventoryUtils.countItemsInLowerInventory { it.displayName.removeColor() == itemName }
+                    val count = InventoryUtils.countItemsInLowerInventory { it.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == itemName }
                     totalCount += count * multiplier
                 }
                 if (step.amountHaving != totalCount) {

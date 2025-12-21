@@ -7,9 +7,6 @@ import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
-//#if MC < 1.21
-import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -23,11 +20,12 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
 import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
+import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ChatLine
-import net.minecraft.util.IChatComponent
+import net.minecraft.network.chat.Component
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.reflect.KProperty0
@@ -101,7 +99,7 @@ object ChatUtils {
         }
     }
 
-    private val messagesThatAreOnlySentOnce = mutableListOf<String>()
+    private val messagesThatAreOnlySentOnce = mutableSetOf<String>()
 
     private fun internalChat(
         message: String,
@@ -110,23 +108,15 @@ object ChatUtils {
         messageId: Int? = null,
     ): Boolean {
         val text = message.asComponent()
-        if (onlySendOnce) {
-            if (message in messagesThatAreOnlySentOnce) {
-                return false
-            }
-            messagesThatAreOnlySentOnce.add(message)
-        }
-
+        if (onlySendOnce && !messagesThatAreOnlySentOnce.add(message)) return false
         return if (replaceSameMessage || messageId != null) {
-            text.send(messageId ?: getUniqueMessageIdForString(message))
+            text.send(messageId ?: message.getUniqueMessageIdForString())
             chat(text, false)
-        } else {
-            chat(text)
-        }
+        } else chat(text)
     }
 
-    fun chat(message: IChatComponent, send: Boolean = true): Boolean {
-        val formattedMessage = message.formattedText
+    fun chat(message: Component, send: Boolean = true): Boolean {
+        val formattedMessage = message.formattedTextCompat()
         log.log(formattedMessage)
 
         if (!MinecraftCompat.localPlayerExists) {
@@ -168,18 +158,15 @@ object ChatUtils {
             this.hover = hover.asComponent()
         }
 
-        if (replaceSameMessage) {
-            text.send(getUniqueMessageIdForString(rawText))
-        } else {
-            chat(text)
-        }
+        if (replaceSameMessage) text.send(rawText.getUniqueMessageIdForString())
+        else chat(text)
     }
 
     /**
      * Sends the message in chat.
      * Show the lines when on hover.
      * Offer option to click on the chat message to copy the lines to clipboard.
-     * Sseful for quick debug infos
+     * Useful for quick debug infos
      */
     fun clickToClipboard(message: String, lines: List<String>) {
         val text = lines.joinToString("\n") { "§7$it" }
@@ -193,10 +180,8 @@ object ChatUtils {
     }
 
     private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
-
-    // TODO kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
-    private fun getUniqueMessageIdForString(string: String): Int {
-        return uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    private fun String.getUniqueMessageIdForString() = uniqueMessageIdStorage.getOrPut(this) {
+        getUniqueMessageId()
     }
 
     private var lastUniqueMessageId = 123242
@@ -257,11 +242,9 @@ object ChatUtils {
             this.url = url
             this.hover = "$prefixColor$hover".asComponent()
         }
-        if (replaceSameMessage) {
-            text.send(getUniqueMessageIdForString(message))
-        } else {
-            chat(text)
-        }
+
+        if (replaceSameMessage) text.send(message.getUniqueMessageIdForString())
+        else chat(text)
 
         if (autoOpen) OSUtils.openBrowser(url)
     }
@@ -275,7 +258,7 @@ object ChatUtils {
      * @see CHAT_PREFIX
      */
     fun multiComponentMessage(
-        components: List<IChatComponent>,
+        components: List<Component>,
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {
@@ -283,39 +266,25 @@ object ChatUtils {
         chat(TextHelper.join(components).prefix(msgPrefix))
     }
 
-    private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
+    private val chatGui get() = Minecraft.getInstance().gui.chat
 
-    //#if MC < 1.21
-    var chatLines: MutableList<ChatLine>
-        get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
+    var chatLines: MutableList<GuiMessage>
+        get() = chatGui.allMessages
         set(value) {
-            (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni = value
+            chatGui.allMessages = value
         }
 
-    var drawnChatLines: MutableList<ChatLine>
-        get() = (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni
+    var drawnChatLines: MutableList<GuiMessage.Line>
+        get() = chatGui.trimmedMessages
         set(value) {
-            (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
+            chatGui.trimmedMessages = value
         }
-    //#else
-    //$$ var chatLines: MutableList<ChatHudLine>
-    //$$     get() = chatGui.messages
-    //$$     set(value) {
-    //$$         chatGui.messages = value
-    //$$     }
-    //$$
-    //$$ var drawnChatLines: MutableList<ChatHudLine.Visible>
-    //$$     get() = chatGui.visibleMessages
-    //$$     set(value) {
-    //$$         chatGui.visibleMessages = value
-    //$$     }
-    //#endif
 
     /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
     fun editFirstMessage(
-        component: (IChatComponent) -> IChatComponent,
+        component: (Component) -> Component,
         reason: String,
-        predicate: (ChatLine) -> Boolean,
+        predicate: (GuiMessage) -> Boolean,
     ) {
         chatLines.editChatLine(component, predicate, reason)
         refreshChat()
@@ -327,7 +296,7 @@ object ChatUtils {
     fun deleteMessage(
         reason: String,
         amount: Int = 1,
-        predicate: (ChatLine) -> Boolean,
+        predicate: (GuiMessage) -> Boolean,
     ) {
         chatLines.deleteChatLine(amount, reason, predicate)
         refreshChat()
@@ -335,7 +304,7 @@ object ChatUtils {
 
     private fun refreshChat() {
         DelayedRun.onThread.execute {
-            chatGui.refreshChat()
+            chatGui.rescaleChat()
         }
     }
 
@@ -374,7 +343,7 @@ object ChatUtils {
     @HandleEvent
     fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
-            MinecraftCompat.localPlayer.sendChatMessage(sendQueue.poll() ?: return)
+            MinecraftCompat.localPlayer.connection.sendChat(sendQueue.poll() ?: return)
             lastMessageSent = SimpleTimeMark.now()
         }
     }
@@ -382,7 +351,7 @@ object ChatUtils {
     fun sendMessageToServer(message: String) {
         if (canSendInstantly()) {
             MinecraftCompat.localPlayerOrNull?.let {
-                it.sendChatMessage(message)
+                it.connection.sendChat(message)
                 lastMessageSent = SimpleTimeMark.now()
                 return
             }
@@ -436,22 +405,14 @@ object ChatUtils {
         )
     }
 
-    var ChatLine.fullComponent: IChatComponent
+    var GuiMessage.fullComponent: Component
         get() = (this as ChatLineData).skyHanni_fullComponent
         set(value) {
             (this as ChatLineData).skyHanni_fullComponent = value
         }
 
-    //#if MC < 1.16
-    val ChatLine.chatMessage get() = chatComponent.formattedText.stripHypixelMessage()
-    fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
-    //#elseif MC < 1.21
-    //$$ val GuiMessage<Component>.chatMessage get() = message.formattedTextCompat().stripHypixelMessage()
-    //$$ fun GuiMessage<Component>.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime).ticks
-    //#else
-    //$$ val ChatHudLine.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
-    //$$ fun ChatHudLine.passedSinceSent() = (MinecraftClient.getInstance().inGameHud.ticks - creationTick).ticks
-    //#endif
+    val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
+    fun GuiMessage.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime()).ticks
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)

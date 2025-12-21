@@ -18,7 +18,7 @@ class ColorfulItemTooltips {
 
     @Expose
     @ConfigOption(
-        name = "Add stat icons",
+        name = "Add Stat Icons",
         desc = "Adds in the stat icons after the stat number.",
     )
     @ConfigEditorBoolean
@@ -26,7 +26,7 @@ class ColorfulItemTooltips {
 
     @Expose
     @ConfigOption(
-        name = "Replace percentages",
+        name = "Replace Percentages",
         desc = "Replaces the percentage sign with the stat icon if the stat ends with a percentage.\n" +
             "§eRequires add stat icons to be enabled.",
     )
@@ -35,7 +35,7 @@ class ColorfulItemTooltips {
 
     @Expose
     @ConfigOption(
-        name = "Replace rift seconds",
+        name = "Replace Rift Seconds",
         desc = "Replaces the 's' after the rift time stat.\n" +
             "§eRequires add stat icons to be enabled.",
     )

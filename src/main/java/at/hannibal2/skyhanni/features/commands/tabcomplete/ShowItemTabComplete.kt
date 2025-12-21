@@ -10,6 +10,7 @@ object ShowItemTabComplete {
 
     private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
 
+    // TODO repo
     private val showItemCommands = setOf(
         "show",
         "showitem",

@@ -13,18 +13,20 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonMobManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.Entity
-import net.minecraft.entity.boss.EntityDragon
-import net.minecraft.entity.boss.EntityWither
-import net.minecraft.entity.monster.EntityGhast
-import net.minecraft.entity.monster.EntityIronGolem
-import net.minecraft.entity.monster.EntityMagmaCube
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon
+import net.minecraft.world.entity.boss.wither.WitherBoss
+import net.minecraft.world.entity.monster.Ghast
+import net.minecraft.world.entity.monster.MagmaCube
 
 @SkyHanniModule
 object HideFarEntities {
@@ -33,6 +35,8 @@ object HideFarEntities {
     private var ignored = emptySet<Int>()
     private var neverHide = emptySet<Int>()
 
+    // TODO: use entity events
+    @OptIn(AllEntitiesGetter::class)
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (GlobalRender.renderDisabled) return
@@ -45,7 +49,7 @@ object HideFarEntities {
         val minDistance = config.minDistance.coerceAtLeast(3)
 
         ignored = EntityUtils.getAllEntities()
-            .map { it.entityId to it.distanceToPlayer() }
+            .map { it.id to it.distanceToPlayer() }
             .filter { it.second > minDistance && it.first !in neverHide }
             .sortedBy { it.second }.drop(maxAmount)
             .map { it.first }.toSet()
@@ -66,45 +70,47 @@ object HideFarEntities {
      * dungeon mini bosses: sa, frozen adventurer
      * 1b hp mob in dungeon
      */
+    // TODO: use entity events
+    @OptIn(AllEntitiesGetter::class)
     private fun updateNeverHide() {
         val list = mutableSetOf<Entity>()
         val allEntities = EntityUtils.getAllEntities()
 
         if (DungeonApi.inDungeon()) {
             list += allEntities.filter { it.mob?.name == "Mort" }
-            list += allEntities.filter { it is EntityWither || it is EntityDragon }
+            list += allEntities.filter { it is WitherBoss || it is EnderDragon }
             list += DungeonMobManager.starredVisibleMobs.map { it.baseEntity }
             // other party members
-            list += allEntities.filter { it is EntityOtherPlayerMP && !it.isNpc() }
+            list += allEntities.filter { it is RemotePlayer && !it.isNpc() }
         }
         if (KuudraApi.inKuudra) {
             list += allEntities.filter { it.mob?.name == "Elle" }
             // other party members
-            list += allEntities.filter { it is EntityOtherPlayerMP && !it.isNpc() }
+            list += allEntities.filter { it is RemotePlayer && !it.isNpc() }
         }
         if (IslandType.WINTER.isCurrent()) {
-            list += allEntities.filter { it is EntityMagmaCube }
+            list += allEntities.filter { it is MagmaCube }
         }
         if (IslandType.DWARVEN_MINES.isCurrent()) {
             // powder ghast & golem defender (from goblin raid event)
-            list += allEntities.filter { it is EntityGhast || it is EntityIronGolem }
+            list += allEntities.filter { it is Ghast || it is IronGolem }
         }
 
         // Always show boss bar
-        list += allEntities.filter { it is EntityWither && it.entityId < 0 }
+        list += allEntities.filter { it is WitherBoss && it.id < 0 }
 
-        list += allEntities.filter { it is EntityOtherPlayerMP && it.name in PartyApi.partyMembers }
+        list += allEntities.filter { it is RemotePlayer && it.name.formattedTextCompatLessResets() in PartyApi.partyMembers }
         list += DamageIndicatorManager.getAllMobs()
         list += AreaMiniBossFeatures.currentMobs.map { it.baseEntity }
 
-        neverHide = list.map { it.entityId }.toSet()
+        neverHide = list.map { it.id }.toSet()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!isEnabled()) return
         val entity = event.entity
-        if (entity.entityId in ignored) {
+        if (entity.id in ignored) {
             event.cancel()
         }
     }

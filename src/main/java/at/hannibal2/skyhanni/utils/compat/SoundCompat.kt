@@ -56,6 +56,7 @@ object SoundCompat {
         "random.orb" to "entity.experience_orb.pickup",
         "random.successful_hit" to "entity.arrow.hit_player",
         "random.wood_click" to "block.lever.click",
+        "portal.travel" to "block.portal.travel",
     )
 
     fun getModernSoundName(soundName: String): String {

@@ -22,7 +22,7 @@ class RepositoryConfig : AbstractRepoConfig<RepositoryConfig.RepositoryLocation>
 
     @ConfigOption(name = "Update Repo Now", desc = "Update your repository to the latest version")
     @ConfigEditorButton(buttonText = "Update")
-    override val updateRepo: Runnable = Runnable(SkyHanniRepoManager::updateRepo)
+    override val updateRepo: Runnable = Runnable { SkyHanniRepoManager.updateRepo("config button") }
 
     @Expose
     @ConfigOption(name = "Repository Location", desc = "")

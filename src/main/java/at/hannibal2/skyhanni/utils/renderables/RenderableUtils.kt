@@ -21,13 +21,11 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.ScrollTable.Compa
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.network.chat.Component
 import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.reflect.KMutableProperty0
-//#if MC > 1.21
-//$$ import net.minecraft.text.Text
-//#endif
 
 @Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
@@ -184,20 +182,18 @@ internal object RenderableUtils {
         DrawContextUtils.translate(-1.0, -1.0, 0.0)
     }
 
-    //#if MC > 1.21
-    //$$ fun renderString(
-    //$$     text: Text,
-    //$$     scale: Double = 1.0,
-    //$$     color: Color = Color.WHITE,
-    //$$     inverseScale: Double = 1 / scale,
-    //$$ ) {
-    //$$     DrawContextUtils.translate(1.0, 1.0, 0.0)
-    //$$     DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
-    //$$     GuiRenderUtils.drawString(text, 0f, 0f, color.rgb)
-    //$$     DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
-    //$$     DrawContextUtils.translate(-1.0, -1.0, 0.0)
-    //$$ }
-    //#endif
+    fun renderString(
+        text: Component,
+        scale: Double = 1.0,
+        color: Color = Color.WHITE,
+        inverseScale: Double = 1 / scale,
+    ) {
+        DrawContextUtils.translate(1.0, 1.0, 0.0)
+        DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
+        GuiRenderUtils.drawString(text, 0f, 0f, color.rgb)
+        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
+        DrawContextUtils.translate(-1.0, -1.0, 0.0)
+    }
 
     inline fun <T> MutableList<Searchable>.addNullableButton(
         label: String,
@@ -425,7 +421,7 @@ internal object RenderableUtils {
         data: List<DisplayTableEntry>,
         itemScale: Double = NeuItems.ITEM_FONT_SIZE,
     ): MutableList<List<Renderable>> {
-        val sorted = data.sortedByDescending { it.sort }
+        val sorted = data.sortedByDescending { it.sort.toDouble() }
         val outerList = mutableListOf<List<Renderable>>()
         for (entry in sorted) {
             val item = entry.item.getItemStackOrNull()?.let {

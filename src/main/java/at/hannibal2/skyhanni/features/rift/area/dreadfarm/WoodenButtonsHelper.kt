@@ -26,8 +26,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.block.BlockButtonWood
-import net.minecraft.init.Blocks
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.ButtonBlock
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -104,11 +104,7 @@ object WoodenButtonsHelper {
         if (!checkButtons()) return
 
         val location = event.position
-        //#if MC < 1.16
-        val oakButtonBlock = Blocks.wooden_button
-        //#else
-        //$$ val oakButtonBlock = Blocks.OAK_BUTTON
-        //#endif
+        val oakButtonBlock = Blocks.OAK_BUTTON
         if (location.getBlockAt() == oakButtonBlock && !hitButtons.contains(location)) {
             lastHitButton = event.position
         }
@@ -126,8 +122,8 @@ object WoodenButtonsHelper {
         if (lastBlowgunFire.passedSince() > 2.5.seconds) return
         buttonLocations.values.flatten().forEach { buttonLocation ->
             val blockState = buttonLocation.getBlockStateAt()
-            if (blockState.block is BlockButtonWood &&
-                blockState.getValue(BlockButtonWood.POWERED) == true &&
+            if (blockState.block is ButtonBlock &&
+                blockState.getValue(ButtonBlock.POWERED) == true &&
                 buttonLocation.canBeSeen(1..3) &&
                 lastHitButton != buttonLocation &&
                 !hitButtons.contains(buttonLocation)

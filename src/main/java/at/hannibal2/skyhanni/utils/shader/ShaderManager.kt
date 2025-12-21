@@ -68,11 +68,7 @@ object ShaderManager {
 
         val source = StringBuilder()
 
-        //#if MC < 1.21
-        val inputStream = Minecraft.getMinecraft().resourceManager.getResource(resourceLocation).inputStream
-        //#else
-        //$$ val inputStream = MinecraftClient.getInstance().resourceManager.getResource(resourceLocation).get().inputStream
-        //#endif
+        val inputStream = Minecraft.getInstance().resourceManager.getResource(resourceLocation).get().open()
         BufferedReader(InputStreamReader(inputStream)).forEachLine {
             source.append(it).append("\n")
         }

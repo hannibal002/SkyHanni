@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class HighlightClickedBlocksConfig : Resettable() {
+class HighlightClickedBlocksConfig : Resettable {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Highlight levers, chests, and wither essence when clicked in Dungeons.")
     @ConfigEditorBoolean

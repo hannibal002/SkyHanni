@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -63,6 +64,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -72,12 +75,13 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.item.ItemStack
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.item.ItemStack
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
@@ -135,7 +139,7 @@ object GardenVisitorFeatures {
         display = emptyList()
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
         val offerItem = visitor.offer?.offerItem ?: return
@@ -227,8 +231,8 @@ object GardenVisitorFeatures {
                     "$name §ex${amount.addSeparators()}",
                     tips = internalName.createBuyTip(),
                     onLeftClick = {
-                        if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickable
-                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                        if (!GardenApi.inGarden()) return@clickable
+                        if (Minecraft.getInstance().screen is SignEditScreen) {
                             SignUtils.setTextIntoSign("$amount")
                         } else {
                             internalName.buy(amount)
@@ -293,13 +297,13 @@ object GardenVisitorFeatures {
                 Renderable.optionalLink(
                     "§aCraftable!",
                     {
-                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                        if (Minecraft.getInstance().screen is SignEditScreen) {
                             SignUtils.setTextIntoSign("$leftToCraft")
                         } else {
                             HypixelCommands.viewRecipe(internalName)
                         }
                     },
-                ) { GardenApi.inGarden() && !NeuItems.neuHasFocus() },
+                ) { GardenApi.inGarden() },
             )
             list.addString("§7)")
         }
@@ -321,23 +325,28 @@ object GardenVisitorFeatures {
         }
     }
 
-    private fun MutableList<Renderable>.drawVisitor(visitor: String) {
-        val displayName = GardenVisitorColorNames.getColoredName(visitor)
+    private fun MutableList<Renderable>.drawVisitor(visitorName: String) {
+        val displayName = GardenVisitorColorNames.getColoredName(visitorName)
 
         val list = mutableListOf<Renderable>()
         list.addString(" §7- $displayName")
 
         if (config.shoppingList.itemPreview) {
-            val items = GardenVisitorColorNames.visitorItems[visitor.removeColor()]
+            val visitor = GardenVisitorColorNames.visitorMap[visitorName.removeColor()]
+            val items = visitor?.needItems
             if (items == null) {
-                val text = "Visitor '$visitor' has no items in repo!"
+                val text = "Visitor '$visitorName§7' has no items in repo!"
                 logger.log(text)
                 ChatUtils.debug(text)
                 list.addString(" §7(§c?§7)")
                 return
             }
             if (items.isEmpty()) {
-                list.addString(" §7(§fAny§7)")
+                if (visitor.unknownRewards == true) {
+                    list.addString(" §7(§fUnknown§7)")
+                } else {
+                    list.addString(" §7(§fAny§7)")
+                }
             } else {
                 for (item in items) {
                     list.addItemStack(NeuInternalName.fromItemName(item).getItemStack())
@@ -394,7 +403,7 @@ object GardenVisitorFeatures {
     }
 
     fun onTooltip(visitor: VisitorApi.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
-        if (itemStack.displayName != "§aAccept Offer") return
+        if (itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aAccept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)
@@ -480,7 +489,7 @@ object GardenVisitorFeatures {
                 readingShoppingList = false
             }
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
-            val internalName = NeuInternalName.fromItemNameOrNull(itemName)?.replace("◆_", "") ?: continue
+            val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())?.replace("◆_", "") ?: continue
 
             // Ignoring custom NEU items like copper
             if (internalName.startsWith("SKYBLOCK_")) continue
@@ -543,7 +552,7 @@ object GardenVisitorFeatures {
             ChatUtils.chat("$displayName §eis visiting your garden!")
         }
 
-        if (name.removeColor().contains("Jerry")) {
+        if (name.removeColor() == "Jerry") {
             logger.log("Jerry!")
             ItemBlink.setBlink(LEGENDARY_JERRY.getItemStackOrNull(), 5_000)
         }
@@ -571,8 +580,8 @@ object GardenVisitorFeatures {
         }
     }
 
-    private fun doesVisitorEntityExist(name: String) = EntityUtils.getEntities<EntityOtherPlayerMP>().any {
-        it.name.trim().equals(name, true)
+    private fun doesVisitorEntityExist(name: String) = EntityUtils.getEntitiesInBoundingBox<RemotePlayer>(GardenApi.barnArea).any {
+        it.name.formattedTextCompatLessResets().trim().equals(name, true)
     }
 
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
@@ -612,7 +621,7 @@ object GardenVisitorFeatures {
             }
 
             if ((config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH) &&
-                entity is EntityLivingBase
+                entity is LivingEntity
             ) {
                 val color = visitor.status.color
                 if (color != null) {
@@ -629,13 +638,13 @@ object GardenVisitorFeatures {
         }
     }
 
-    private fun findEntity(nameTag: EntityArmorStand, visitor: VisitorApi.Visitor) {
-        for (entity in EntityUtils.getAllEntities()) {
-            if (entity is EntityArmorStand) continue
-            if (entity.getLorenzVec().distanceIgnoreY(nameTag.getLorenzVec()) != 0.0) continue
-
-            visitor.entityId = entity.entityId
-            visitor.nameTagEntityId = nameTag.entityId
+    private fun findEntity(nameTag: ArmorStand, visitor: VisitorApi.Visitor) {
+        val nameTagVec = nameTag.getLorenzVec()
+        EntityUtils.getEntitiesNearby<LivingEntity>(nameTagVec, 5.0) { entity ->
+            entity !is ArmorStand && entity !is LocalPlayer && entity.distanceToIgnoreY(nameTagVec) < 0.5
+        }.forEach {
+            visitor.entityId = it.id
+            visitor.nameTagEntityId = nameTag.id
         }
     }
 
@@ -661,7 +670,7 @@ object GardenVisitorFeatures {
     fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!config.shoppingList.enabled) return
         val gui = event.gui
-        if (gui !is GuiEditSign) return
+        if (gui !is SignEditScreen) return
 
         renderDisplay()
     }
@@ -669,8 +678,8 @@ object GardenVisitorFeatures {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.shoppingList.enabled) return
-        val currentScreen = Minecraft.getMinecraft().currentScreen
-        if (currentScreen is GuiEditSign) return
+        val currentScreen = Minecraft.getInstance().screen
+        if (currentScreen is SignEditScreen) return
 
         renderDisplay()
     }
@@ -678,10 +687,10 @@ object GardenVisitorFeatures {
     private fun shouldShowShoppingList(): Boolean {
         if (VisitorApi.inInventory) return true
         if (BazaarApi.inBazaarInventory) return true
-        val currentScreen = Minecraft.getMinecraft().currentScreen ?: return true
-        val isInOwnInventory = currentScreen is GuiInventory
+        val currentScreen = Minecraft.getInstance().screen ?: return true
+        val isInOwnInventory = currentScreen is InventoryScreen
         if (isInOwnInventory) return true
-        if (currentScreen is GuiEditSign && (currentScreen.isBazaarSign() || currentScreen.isSupercraftAmountSetSign())) return true
+        if (currentScreen is SignEditScreen && (currentScreen.isBazaarSign() || currentScreen.isSupercraftAmountSetSign())) return true
 
         return false
     }

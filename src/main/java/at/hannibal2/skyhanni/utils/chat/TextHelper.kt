@@ -7,19 +7,14 @@ import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendString
 import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
+import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
-import net.minecraft.util.ChatStyle
-import net.minecraft.util.EnumChatFormatting
-import net.minecraft.util.IChatComponent
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.chat.Style
 import java.awt.Color
-//#if MC < 1.21
-import at.hannibal2.skyhanni.utils.compat.Text
-import net.minecraft.util.ChatComponentText
-//#endif
-//#if MC > 1.16
-//$$ import net.minecraft.network.chat.MutableComponent
-//#endif
 
 object TextHelper {
 
@@ -28,70 +23,63 @@ object TextHelper {
     val SPACE = " ".asComponent()
     val EMPTY = "".asComponent()
 
-    //#if MC < 1.16
-    fun text(text: String, init: IChatComponent.() -> Unit = {}) = text.asComponent(init)
-    fun String.asComponent(init: IChatComponent.() -> Unit = {}) = ChatComponentText(this).also(init)
-    //#elseif MC < 1.21
-    //$$ fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
-    //$$ fun String.asComponent(init: MutableComponent.() -> Unit = {}) = (TextComponent(this) as MutableComponent).also(init)
-    //#else
-    //$$ fun text(text: String, init: MutableText.() -> Unit = {}) = text.asComponent(init)
-    //$$ fun String.asComponent(init: MutableText.() -> Unit = {}): MutableText = (Text.of(this) as MutableText).also(init)
-    //#endif
+    fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
+    fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent =
+        (Component.nullToEmpty(this) as MutableComponent).also(init)
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
-    fun join(vararg components: Any?, separator: IChatComponent? = null): IChatComponent {
+    fun join(vararg components: Any?, separator: Component? = null): Component {
         val result = "".asComponent()
         components.forEachIndexed { index, component ->
             when (component) {
-                is IChatComponent -> result.appendSibling(component)
+                is Component -> result.append(component)
                 is String -> result.appendString(component)
-                is List<*> -> result.appendSibling(join(*component.toTypedArray(), separator = separator))
+                is List<*> -> result.append(join(*component.toTypedArray(), separator = separator))
                 null -> return@forEachIndexed
                 else -> error("Unsupported type: ${component::class.simpleName}")
             }
 
             if (index < components.size - 1 && separator != null) {
-                result.appendSibling(separator)
+                result.append(separator)
             }
         }
         return result
     }
 
-    fun IChatComponent.style(init: ChatStyle.() -> Unit): IChatComponent {
-        this.chatStyle.init()
+    fun Component.style(init: Style.() -> Unit): Component {
+        this.style.init()
         return this
     }
 
-    fun IChatComponent.prefix(prefix: String): IChatComponent = join(prefix, this)
-    fun IChatComponent.suffix(suffix: String): IChatComponent = join(this, suffix)
-    fun IChatComponent.wrap(prefix: String, suffix: String) = this.prefix(prefix).suffix(suffix)
+    fun Component.prefix(prefix: String): Component = join(prefix, this)
+    fun Component.suffix(suffix: String): Component = join(this, suffix)
+    fun Component.wrap(prefix: String, suffix: String) = this.prefix(prefix).suffix(suffix)
 
-    fun IChatComponent.width(): Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this.formattedText)
+    fun Component.width(): Int = Minecraft.getInstance().font.width(this.formattedTextCompat())
 
-    fun IChatComponent.fitToChat(): IChatComponent {
+    fun Component.fitToChat(): Component {
         val width = this.width()
-        val maxWidth = Minecraft.getMinecraft().ingameGUI.chatGUI.chatWidth
+        val maxWidth = Minecraft.getInstance().gui.chat.width
         if (width < maxWidth) {
             val repeat = maxWidth / width
             val component = "".asComponent()
-            repeat(repeat) { component.appendSibling(this) }
+            repeat(repeat) { component.append(this) }
             return component
         }
         return this
     }
 
-    fun IChatComponent.center(width: Int = Minecraft.getMinecraft().ingameGUI.chatGUI.chatWidth): IChatComponent {
+    fun Component.center(width: Int = Minecraft.getInstance().gui.chat.width): Component {
         val textWidth = this.width()
         val spaceWidth = SPACE.width()
         val padding = (width - textWidth) / 2
         return join(" ".repeat(padding / spaceWidth), this)
     }
 
-    fun IChatComponent.send(id: Int = 0) =
+    fun Component.send(id: Int = 0) =
         addDeletableMessageToChat(this, id)
 
-    fun List<IChatComponent>.send(id: Int = 0) {
+    fun List<Component>.send(id: Int = 0) {
         val parent = "".asComponent()
         forEach {
             parent.siblings.add(it)
@@ -101,22 +89,22 @@ object TextHelper {
         parent.send(id)
     }
 
-    fun IChatComponent.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
+    fun Component.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
         val token = ChatClickActionManager.createAction(onClick, expiresAt, oneTime)
         this.command = "/shaction $token"
     }
 
-    fun IChatComponent.onHover(tip: String) {
+    fun Component.onHover(tip: String) {
         this.hover = tip.asComponent()
     }
 
-    fun IChatComponent.onHover(tips: List<String>) {
+    fun Component.onHover(tips: List<String>) {
         this.hover = tips.joinToString("\n").asComponent()
     }
 
-    fun createDivider(dividerColor: EnumChatFormatting = EnumChatFormatting.BLUE) = HYPHEN.fitToChat().style {
-        setStrikethrough(true)
-        color = dividerColor
+    fun createDivider(dividerColor: ChatFormatting = ChatFormatting.BLUE) = HYPHEN.fitToChat().style {
+        withStrikethrough(true)
+        withColor(dividerColor)
     }
 
     /**
@@ -138,10 +126,10 @@ object TextHelper {
         emptyMessage: String,
         currentPage: Int = 1,
         maxPerPage: Int = 15,
-        dividerColor: EnumChatFormatting = EnumChatFormatting.BLUE,
-        formatter: (T) -> IChatComponent,
+        dividerColor: ChatFormatting = ChatFormatting.BLUE,
+        formatter: (T) -> Component,
     ) {
-        val text = mutableListOf<IChatComponent>()
+        val text = mutableListOf<Component>()
 
         val totalPages = (list.size + maxPerPage - 1) / maxPerPage
         val page = if (totalPages == 0) 0 else currentPage
@@ -189,9 +177,9 @@ object TextHelper {
         multiline(text).send(chatLineId)
     }
 
-    fun createGradientText(start: Color, end: Color, string: String): Text {
+    fun createGradientText(start: Color, end: Color, string: String): Component {
         val length = string.length.toDouble()
-        var text = Text.of("")
+        var text = Component.nullToEmpty("")
         for ((index, char) in string.withIndex()) {
             val color = ColorUtils.blendRGB(start, end, index / length).rgb
             text = text.append(ExtendedChatColor(color).asText().append(char.toString()))

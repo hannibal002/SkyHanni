@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.utils.shader
 
+import org.joml.Matrix4f
 import java.util.Objects
-//#if MC > 1.21
-//$$ import org.joml.Matrix4f
-//#endif
 
 /**
  * Class to handle shader uniform types
@@ -29,9 +27,7 @@ class Uniform<T>(
             val VEC4: UniformType<FloatArray> = UniformType()
             val BOOL: UniformType<Boolean> = UniformType()
             val INT: UniformType<Int> = UniformType()
-            //#if MC > 1.21
-            //$$ val MAT4: UniformType<Matrix4f> = UniformType()
-            //#endif
+            val MAT4: UniformType<Matrix4f> = UniformType()
         }
     }
 
@@ -61,12 +57,10 @@ class Uniform<T>(
                     ShaderHelper.glUniform4f(uniformID, values[0], values[1], values[2], values[3])
                 }
 
-                //#if MC > 1.21
-                //$$ UniformType.MAT4 -> {
-                //$$     val matrix = newUniformValue as Matrix4f
-                //$$     ShaderHelper.glUniformMatrix4f(uniformID, false, matrix)
-                //$$ }
-                //#endif
+                UniformType.MAT4 -> {
+                    val matrix = newUniformValue as Matrix4f
+                    ShaderHelper.glUniformMatrix4f(uniformID, false, matrix)
+                }
 
                 UniformType.BOOL -> ShaderHelper.glUniform1f(uniformID, if (newUniformValue as Boolean) 1f else 0f)
                 UniformType.INT -> ShaderHelper.glUniform1i(uniformID, (newUniformValue as Int))

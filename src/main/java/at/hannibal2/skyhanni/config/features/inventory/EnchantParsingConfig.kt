@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -32,12 +35,15 @@ class EnchantParsingConfig {
         override fun toString() = displayName
     }
 
-    @Expose
     @ConfigOption(
-        name = "Perfect Enchantment Color",
-        desc = "The color an enchantment will be at max level. " +
-            "§eIf SkyHanni chroma is disabled this will default to §6Gold."
+        name = "§cChroma Warning",
+        desc = "Chroma requires a separate setting.\n§eIf SkyHanni chroma is disabled Chroma will default to §6Gold.",
     )
+    @ConfigEditorButton(buttonText = "Go")
+    val chromaRunnable = Runnable { SkyHanniMod.feature.gui.chroma::enabled.jumpToEditor() }
+
+    @Expose
+    @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level.")
     @ConfigEditorDropdown
     val perfectEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.CHROMA)
 

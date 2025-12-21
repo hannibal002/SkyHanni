@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.item.EnumDyeColor
-import net.minecraft.util.EnumChatFormatting
+import net.minecraft.ChatFormatting
+import net.minecraft.world.item.DyeColor
 import java.awt.Color
 
 enum class LorenzColor(val chatColorCode: Char, private val color: Color, private val coloredLabel: String) {
@@ -65,50 +65,50 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
         return color.toChromaColor(alpha, chromaSpeedMillis)
     }
 
-    fun toDyeColor(): EnumDyeColor = when (this) {
-        WHITE -> EnumDyeColor.WHITE
-        GOLD -> EnumDyeColor.ORANGE
-        AQUA -> EnumDyeColor.MAGENTA
-        BLUE -> EnumDyeColor.LIGHT_BLUE
-        YELLOW -> EnumDyeColor.YELLOW
-        GREEN -> EnumDyeColor.LIME
-        LIGHT_PURPLE -> EnumDyeColor.PINK
-        DARK_GRAY -> EnumDyeColor.GRAY
-        GRAY -> EnumDyeColor.SILVER
-        DARK_AQUA -> EnumDyeColor.CYAN
-        DARK_PURPLE -> EnumDyeColor.PURPLE
-        DARK_BLUE -> EnumDyeColor.BLUE
+    fun toDyeColor(): DyeColor = when (this) {
+        WHITE -> DyeColor.WHITE
+        GOLD -> DyeColor.ORANGE
+        AQUA -> DyeColor.MAGENTA
+        BLUE -> DyeColor.LIGHT_BLUE
+        YELLOW -> DyeColor.YELLOW
+        GREEN -> DyeColor.LIME
+        LIGHT_PURPLE -> DyeColor.PINK
+        DARK_GRAY -> DyeColor.GRAY
+        GRAY -> DyeColor.LIGHT_GRAY
+        DARK_AQUA -> DyeColor.CYAN
+        DARK_PURPLE -> DyeColor.PURPLE
+        DARK_BLUE -> DyeColor.BLUE
 //         GOLD -> EnumDyeColor.BROWN
-        DARK_GREEN -> EnumDyeColor.GREEN
-        DARK_RED -> EnumDyeColor.RED
-        BLACK -> EnumDyeColor.BLACK
-        RED -> EnumDyeColor.RED
+        DARK_GREEN -> DyeColor.GREEN
+        DARK_RED -> DyeColor.RED
+        BLACK -> DyeColor.BLACK
+        RED -> DyeColor.RED
 
-        CHROMA -> EnumDyeColor.WHITE
+        CHROMA -> DyeColor.WHITE
     }
 
-    fun toChatFormatting(): EnumChatFormatting =
-        EnumChatFormatting.entries.firstOrNull { it.toString() == getChatColor() } ?: EnumChatFormatting.WHITE
+    fun toChatFormatting(): ChatFormatting =
+        ChatFormatting.entries.firstOrNull { it.toString() == getChatColor() } ?: ChatFormatting.WHITE
 
     companion object {
 
-        fun EnumDyeColor.toLorenzColor() = when (this) {
-            EnumDyeColor.WHITE -> WHITE
-            EnumDyeColor.MAGENTA -> LIGHT_PURPLE
-            EnumDyeColor.PINK -> LIGHT_PURPLE
-            EnumDyeColor.RED -> RED
-            EnumDyeColor.SILVER -> GRAY
-            EnumDyeColor.GRAY -> GRAY
-            EnumDyeColor.GREEN -> DARK_GREEN
-            EnumDyeColor.LIME -> GREEN
-            EnumDyeColor.BLUE -> BLUE
-            EnumDyeColor.PURPLE -> DARK_PURPLE
-            EnumDyeColor.YELLOW -> YELLOW
-            EnumDyeColor.ORANGE -> GOLD
-            EnumDyeColor.LIGHT_BLUE -> BLUE
-            EnumDyeColor.CYAN -> DARK_AQUA
-            EnumDyeColor.BROWN -> GOLD
-            EnumDyeColor.BLACK -> BLACK
+        fun DyeColor.toLorenzColor() = when (this) {
+            DyeColor.WHITE -> WHITE
+            DyeColor.MAGENTA -> LIGHT_PURPLE
+            DyeColor.PINK -> LIGHT_PURPLE
+            DyeColor.RED -> RED
+            DyeColor.LIGHT_GRAY -> GRAY
+            DyeColor.GRAY -> GRAY
+            DyeColor.GREEN -> DARK_GREEN
+            DyeColor.LIME -> GREEN
+            DyeColor.BLUE -> BLUE
+            DyeColor.PURPLE -> DARK_PURPLE
+            DyeColor.YELLOW -> YELLOW
+            DyeColor.ORANGE -> GOLD
+            DyeColor.LIGHT_BLUE -> BLUE
+            DyeColor.CYAN -> DARK_AQUA
+            DyeColor.BROWN -> GOLD
+            DyeColor.BLACK -> BLACK
         }
 
         fun Char.toLorenzColor(): LorenzColor? = entries.firstOrNull { it.chatColorCode == this } ?: run {

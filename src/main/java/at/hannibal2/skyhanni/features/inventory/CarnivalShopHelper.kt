@@ -19,16 +19,17 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object CarnivalShopHelper {
 
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
-    private inline val NAME_TAG_ITEM get() = Items.name_tag
+    private inline val NAME_TAG_ITEM get() = Items.NAME_TAG
 
     /**
      * All upgrades will appear in slots 11 -> 15
@@ -237,7 +238,7 @@ object CarnivalShopHelper {
 
     private fun processTokenShopFooter(event: InventoryOpenEvent): Boolean {
         val tokenFooterStack = event.inventoryItems.getOrElse(32) { return false }
-        if (tokenFooterStack.displayName != "§eCarnival Tokens") return false
+        if (tokenFooterStack.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§eCarnival Tokens") return false
         currentTokenCountPattern.firstMatcher(tokenFooterStack.getLore()) {
             val new = groupOrNull("tokens")?.formatInt() ?: 0
             val changed = new != tokensOwned

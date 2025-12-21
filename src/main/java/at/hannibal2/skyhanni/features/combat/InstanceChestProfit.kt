@@ -22,14 +22,16 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object InstanceChestProfit {
@@ -37,10 +39,11 @@ object InstanceChestProfit {
 
     /**
      * REGEX-TEST: §6Kraken Shard §8x1
+     * REGEX-TEST: §6Apex Dragon Shard §8x1
      */
     private val attributeShardPattern by patternGroup.pattern(
         "attributeshard",
-        "§.(?<name>\\w+ Shard) §.x(?<count>\\d+)",
+        "§.(?<name>.+ Shard) §.x(?<count>\\d+)",
     )
 
     /**
@@ -74,10 +77,19 @@ object InstanceChestProfit {
     /**
      * REGEX-TEST: §6Infernal Kuudra Key
      * REGEX-TEST: §5Burning Kuudra Key
+     * REGEX-TEST: §9Kuudra Key
      */
     private val kuudraChestKey by patternGroup.pattern(
         "kuudrachestkey",
-        "§.\\w+ Kuudra Key",
+        "§.(?:\\w+ )?Kuudra Key",
+    )
+
+    /**
+     * REGEX-TEST: §aReroll Shard
+     */
+    private val fakeItemNamePattern by patternGroup.pattern(
+        "fakeitemname",
+        "§aReroll Shard",
     )
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
@@ -115,23 +127,24 @@ object InstanceChestProfit {
     private fun createDisplay(items: Map<Int, ItemStack>) {
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
+            if (fakeItemNamePattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())) return@forEach
             if (it.value.getInternalNameOrNull() != null) {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
             }
-            attributeShardPattern.matchMatcher(it.value.displayName) {
+            attributeShardPattern.matchMatcher(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val name = group("name")
                 val count = group("count").toInt()
                 val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.displayName, price)
+                itemsWithCost.addOrPut(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets(), price)
             }
-            essencePattern.matchMatcher(it.value.displayName) {
+            essencePattern.matchMatcher(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val name = group("name")
                 val rawCount = group("count").toInt()
                 val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
                 else rawCount.toDouble()
                 val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.displayName, price)
+                itemsWithCost.addOrPut(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets(), price)
             }
         }
 

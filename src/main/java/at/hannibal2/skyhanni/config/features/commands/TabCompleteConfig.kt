@@ -15,6 +15,7 @@ class TabCompleteConfig {
     @Expose
     @ConfigOption(name = "Island Players", desc = "Tab-complete other players on the same island.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var islandPlayers: Boolean = true
 
     @Expose

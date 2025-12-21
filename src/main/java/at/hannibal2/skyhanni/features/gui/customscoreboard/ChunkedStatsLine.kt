@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSowdust
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementBank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementBits
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementCold
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardEl
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementNorthStars
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementPurse
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSowdust
 
 private val hideEmptyLines get() = informationFilteringConfig.hideEmptyLines
 
@@ -51,7 +53,7 @@ enum class ChunkedStatsLine(
         configLine = "§6Bank",
     ),
     BITS(
-        displayPair = { getBitsLine() },
+        displayPair = ::getBitsLine,
         showWhen = { !(hideEmptyLines && getBits() == "0" && getBitsAvailable() == "0") && ScoreboardElementBits.showWhen() },
         showIsland = { ScoreboardElementBits.showIsland() },
         configLine = "§bBits",
@@ -61,6 +63,12 @@ enum class ChunkedStatsLine(
         showWhen = { !(hideEmptyLines && getCopper() == "0") && ScoreboardElementCopper.showWhen() },
         showIsland = { ScoreboardElementCopper.showIsland() },
         configLine = "§cCopper",
+    ),
+    SOWDUST(
+        displayPair = { "§2${getSowdust()}" },
+        showWhen = { !(hideEmptyLines && getSowdust() == "0") && ScoreboardElementSowdust.showWhen() },
+        showIsland = { ScoreboardElementSowdust.showIsland() },
+        configLine = "§2Sowdust",
     ),
     GEMS(
         displayPair = { "§a${getGems()}" },

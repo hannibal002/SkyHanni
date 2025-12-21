@@ -126,18 +126,16 @@ object GiftProfitTracker {
     ).map { it.toPattern() }
     // </editor-fold>
 
-    private val tracker = SkyHanniItemTracker("Gift Tracker", { Data() }, { it.giftProfitTracker }) {
+    private val tracker = SkyHanniItemTracker("Gift Tracker", ::Data, { it.giftProfitTracker }) {
         drawDisplay(it)
     }
 
-    class Data : ItemTrackerData() {
-        override fun resetItems() {
-            giftsUsed.clear()
-            rarityRewardTypesGained.clear()
-            northStarsGained = 0
-            skillXpGained.clear()
-        }
-
+    data class Data(
+        @Expose var giftsUsed: MutableMap<GiftType, Long> = mutableMapOf(),
+        @Expose var rarityRewardTypesGained: MutableMap<GiftRewardRarityType, Long> = mutableMapOf(),
+        @Expose var northStarsGained: Long = 0,
+        @Expose var skillXpGained: MutableMap<SkillType, Long> = mutableMapOf(),
+    ) : ItemTrackerData() {
         override fun getDescription(timesGained: Long): List<String> {
             val totalRewards = rarityRewardTypesGained.sumAllValues().toLong().takeIf { it > 0 } ?: 1
             val percentage = timesGained.toDouble() / totalRewards
@@ -157,18 +155,6 @@ object GiftProfitTracker {
                 "§7You got §6$giftCoinsFormat coins §7that way.",
             )
         }
-
-        @Expose
-        var giftsUsed: MutableMap<GiftType, Long> = mutableMapOf()
-
-        @Expose
-        var rarityRewardTypesGained: MutableMap<GiftRewardRarityType, Long> = mutableMapOf()
-
-        @Expose
-        var northStarsGained: Long = 0
-
-        @Expose
-        var skillXpGained: MutableMap<SkillType, Long> = mutableMapOf()
     }
 
     enum class GiftType(
@@ -369,7 +355,8 @@ object GiftProfitTracker {
             )
         }
 
-        add(tracker.addTotalProfit(profit, totalRewards, "gift"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, totalRewards, "gift", duration, "Gifts"))
         tracker.addPriceFromButton(this)
     }
 
