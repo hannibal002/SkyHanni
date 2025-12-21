@@ -27,11 +27,11 @@ object ClipboardUtils {
     fun readFromClipboard(step: Int = 0): String? {
         var shouldRetry = false
         val clipboard = com.mojang.blaze3d.platform.ClipboardManager().getClipboard(
-    //#if MC < 1.21.9
-        0,
-    //#else
-    //$$     Minecraft.getInstance().window,
-    //#endif
+            //#if MC < 1.21.9
+            0,
+            //#else
+            //$$     Minecraft.getInstance().window,
+            //#endif
         ) { _, _ ->
             shouldRetry = true
         }

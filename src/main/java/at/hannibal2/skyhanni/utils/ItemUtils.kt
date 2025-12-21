@@ -159,7 +159,7 @@ object ItemUtils {
         if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
             return data.lastLore
         }
-        val lore = this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
+        val lore = this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
         data.lastLore = lore
         data.lastLoreFetchTime = SimpleTimeMark.now()
         return lore
@@ -169,7 +169,7 @@ object ItemUtils {
 
     fun DataComponentMap?.getLore(): List<String> {
         this ?: return emptyList()
-        return this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
+        return this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
     }
 
     fun CompoundTag?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
@@ -330,11 +330,11 @@ object ItemUtils {
     }
 
     // Overload to avoid spread operators
-    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1, damage: Int = 0): ItemStack =
-        createItemStack(item, displayName, loreArray.toList(), amount, damage)
+    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1): ItemStack =
+        createItemStack(item, displayName, loreArray.toList(), amount)
 
     // Taken from NEU
-    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
+    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1): ItemStack {
         val stack = ItemStack(item, amount)
         stack.setCustomItemName(displayName)
         stack.setLore(lore)

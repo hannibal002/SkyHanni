@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager
 import java.io.File
 
 @Suppress("UnstableApiUsage")
-object RepoPatternDumpTest: FabricClientGameTest {
+object RepoPatternDumpTest : FabricClientGameTest {
 
     private val logger = LogManager.getLogger("SkyHanni")
 

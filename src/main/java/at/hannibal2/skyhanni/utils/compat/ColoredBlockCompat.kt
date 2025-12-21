@@ -61,8 +61,7 @@ enum class ColoredBlockCompat(
         Blocks.YELLOW_STAINED_GLASS_PANE,
         Blocks.YELLOW_WOOL,
         Blocks.YELLOW_TERRACOTTA,
-
-        ),
+    ),
     LIME(
         5,
         LorenzColor.GREEN,

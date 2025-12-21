@@ -61,7 +61,7 @@ object BetterContainers {
      */
     private val disallowedInventoryPattern by patternGroup.pattern(
         "disallowed",
-        "(?i)navigate the maze.*"
+        "(?i)navigate the maze.*",
     )
     val disallowedInventory = InventoryDetector(disallowedInventoryPattern)
 
@@ -158,7 +158,7 @@ object BetterContainers {
     }.getOrNull()
 
     private fun readJsonResource(id: ResourceLocation): BufferedReader? = runCatching {
-        val mcResource =  Minecraft.getInstance().resourceManager.getResource(id).get()
+        val mcResource = Minecraft.getInstance().resourceManager.getResource(id).get()
         val streamReader = InputStreamReader(mcResource.open(), StandardCharsets.UTF_8)
         BufferedReader(streamReader)
     }.getOrNull()
@@ -288,7 +288,7 @@ object BetterContainers {
         val bufferedImageNew = BufferedImage(
             bufferedImageBase.width,
             bufferedImageBase.height,
-            BufferedImage.TYPE_INT_ARGB
+            BufferedImage.TYPE_INT_ARGB,
         )
         val g = bufferedImageNew.createGraphics()
         g.drawImage(bufferedImageBase, 0, 0, null)
@@ -365,7 +365,7 @@ object BetterContainers {
 
                 val ctmData = CTMUtils.CTMData(
                     up, right, down, left,
-                    upLeft, upRight, downRight, downLeft
+                    upLeft, upRight, downRight, downLeft,
                 )
                 val ctmIndex: Int = CTMUtils.getCTMIndex(ctmData)
 
@@ -376,7 +376,7 @@ object BetterContainers {
                     18 * verticalTexMult,
                     null,
                     0,
-                    18 * verticalTexMult
+                    18 * verticalTexMult,
                 )
                 bufferedImageNew.setRGB(
                     x,
@@ -385,7 +385,7 @@ object BetterContainers {
                     18 * verticalTexMult,
                     rgbArray,
                     0,
-                    18 * verticalTexMult
+                    18 * verticalTexMult,
                 )
             }
 
@@ -403,7 +403,7 @@ object BetterContainers {
                 "chestOpen" to chestOpen,
                 "hasItem" to hasItem,
                 "hasNullPane" to hasNullPane,
-                "openInventoryName" to InventoryUtils.openInventoryName()
+                "openInventoryName" to InventoryUtils.openInventoryName(),
             )
         }
     }

@@ -1,19 +1,16 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
+import at.hannibal2.skyhanni.utils.XmlUtils
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
-import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.xml.Bind
-import io.github.notenoughupdates.moulconfig.xml.XMLUniverse
-import net.minecraft.network.chat.Component
 
 /**
  * Gui for analyzing [RepoPattern]s
@@ -34,9 +31,7 @@ class RepoPatternGui private constructor() {
                 category = CommandCategory.DEVELOPER_TEST
                 simpleCallback {
                     val location = MyResourceLocation("skyhanni", "gui/regexes.xml")
-                    val universe = XMLUniverse.getDefaultUniverse()
-                    val context = GuiContext(universe.load(RepoPatternGui(), location))
-                    SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Component.empty(), context, null)
+                    XmlUtils.openXmlScreen(RepoPatternGui(), location)
                 }
             }
         }

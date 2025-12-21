@@ -136,7 +136,7 @@ fun createResourceLocation(path: String): ResourceLocation {
 var Component.hover: Component?
     get() = this.style.hoverEvent?.let { if (it.action() == HoverEvent.Action.SHOW_TEXT) (it as HoverEvent.ShowText).value else null }
     set(value) {
-        value?.let { value -> (this as MutableComponent).withStyle { it.withHoverEvent(HoverEvent.ShowText(value)) } }
+        value?.let { new -> (this as MutableComponent).withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
     }
 
 var Component.command: String?

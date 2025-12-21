@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import net.minecraft.world.entity.LivingEntity
-import org.lwjgl.opengl.GL11
 
 @SkyHanniModule
 object EntityOpacityManager {
@@ -63,19 +61,6 @@ object EntityOpacityManager {
 
         val opacity = opacity(event.entity)
         if (opacity <= 0) return event.cancel()
-
-        ModernGlStateManager.enableBlend()
-        ModernGlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-        ModernGlStateManager.color(1f, 1f, 1f, opacity / 100f)
-    }
-
-    @HandleEvent
-    fun onPostRender(event: SkyHanniRenderEntityEvent.Post<LivingEntity>) {
-        if (!active) return
-        if (!canChangeOpacity(event.entity)) return
-
-        ModernGlStateManager.color(1f, 1f, 1f, 1f)
-        ModernGlStateManager.disableBlend()
     }
 
     @HandleEvent

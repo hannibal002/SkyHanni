@@ -5,11 +5,9 @@ enum class ProjectTarget(
     val minecraftVersion: MinecraftVersion,
     val mappingDependency: String,
     val mappingStyle: MappingStyle,
-    val forgeDep: String? = null,
     val fabricLoaderVersion: String? = null,
     val fabricApiVersion: String? = null,
     val modMenuVersion: String? = null,
-    val isModern: Boolean = false,
     val modrinthInfo: ModrinthInfo? = null,
     linkTo: String?,
 ) {
@@ -21,7 +19,6 @@ enum class ProjectTarget(
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.16.13",
         fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.126.0+1.21.5",
         modMenuVersion = "14.0.0-rc.2",
-        isModern = true,
         modrinthInfo = ModrinthInfo.FABRIC_1_21_5,
         linkTo = "MODERN_12108",
     ),
@@ -33,7 +30,6 @@ enum class ProjectTarget(
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.17.3",
         fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.134.0+1.21.8",
         modMenuVersion = "15.0.0-beta.3",
-        isModern = true,
         modrinthInfo = ModrinthInfo.FABRIC_1_21_8,
         linkTo = "MODERN_12110",
     ),
@@ -45,7 +41,6 @@ enum class ProjectTarget(
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.17.3",
         fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.135.0+1.21.10",
         modMenuVersion = "16.0.0-rc.1",
-        isModern = true,
         modrinthInfo = ModrinthInfo.FABRIC_1_21_10,
         linkTo = null,
     ),
@@ -62,8 +57,6 @@ enum class ProjectTarget(
     val parent by lazy {
         values().find { it.linkTo == this }
     }
-    val isForge get() = forgeDep != null
-    val isFabric get() = forgeDep == null
 
     val projectPath get() = ":$projectName"
 

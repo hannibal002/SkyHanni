@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.ChatScreen
@@ -37,8 +36,6 @@ object RenderData {
         if (currentScreen !is InventoryScreen && currentScreen !is ContainerScreen) return
 
         DrawContextUtils.pushPop {
-            ModernGlStateManager.enableDepthTest()
-
             if (GuiEditManager.isInGui()) {
                 DrawContextUtils.translated(z = -3) {
                     renderOverlay(DrawContextUtils.drawContext, true)
