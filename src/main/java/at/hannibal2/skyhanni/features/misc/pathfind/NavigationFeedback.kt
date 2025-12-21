@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.misc.PathfindConfig
+import at.hannibal2.skyhanni.config.features.misc.navigation.PathfindConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object NavigationFeedback {
 
-    private val config get() = SkyHanniMod.feature.misc.pathfinding
+    private val config get() = SkyHanniMod.feature.misc.navigation.pathfinding
     private val pathFindMessageId = ChatUtils.getUniqueMessageId()
     private var guiRenderable: Renderable? = null
     private var lastChatMessageSent = SimpleTimeMark.farPast()
