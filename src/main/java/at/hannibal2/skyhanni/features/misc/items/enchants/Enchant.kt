@@ -13,9 +13,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
+import at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {
@@ -128,7 +129,7 @@ open class Enchant : Comparable<Enchant> {
             val nbtKey = nbtNum ?: return ""
             val levels = stackLevel ?: return ""
             val label = statLabel?.splitCamelCase()?.replaceFirstChar { it.uppercase() }?.replace("Xp", "XP") ?: return ""
-            val progress = item.extraAttributes.getDouble(nbtKey).roundTo(0).toInt()
+            val progress = item.extraAttributes.getDoubleOrDefault(nbtKey).roundTo(0).toInt()
             if (progress == 0) return ""
             val nextLevel = levels.higher(progress)
             val tail = nextLevel?.shortFormat()?.insert(0, "/ ") ?: "(Maxed)"

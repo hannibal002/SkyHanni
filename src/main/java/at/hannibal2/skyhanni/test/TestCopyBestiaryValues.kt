@@ -14,10 +14,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object TestCopyBestiaryValues {
@@ -68,7 +69,7 @@ object TestCopyBestiaryValues {
     }
 
     private fun copy(titleItem: ItemStack, inventoryItems: Map<Int, ItemStack>) {
-        val titleName = titleItem.displayName.removeWordsAtEnd(1)
+        val titleName = titleItem.hoverName.formattedTextCompatLeadingWhiteLessResets().removeWordsAtEnd(1)
 
         val obj = BestiaryObject()
         obj.name = titleName
@@ -88,7 +89,7 @@ object TestCopyBestiaryValues {
         val mobs = mutableListOf<String>()
         for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
-            bestiaryTypePattern.matchMatcher(stack.displayName.removeColor()) {
+            bestiaryTypePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
                 val lvl = group("lvl").toInt()
                 var text = group("text").lowercase().replace(" ", "_")
 

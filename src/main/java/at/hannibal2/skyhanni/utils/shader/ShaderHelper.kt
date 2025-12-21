@@ -1,19 +1,14 @@
 package at.hannibal2.skyhanni.utils.shader
 
 import at.hannibal2.skyhanni.utils.ChatUtils
+import org.joml.Matrix4f
 import org.lwjgl.opengl.ARBFragmentShader
 import org.lwjgl.opengl.ARBShaderObjects
 import org.lwjgl.opengl.ARBVertexShader
+import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20
-//#if MC < 1.21
-import org.lwjgl.opengl.ContextCapabilities
-import org.lwjgl.opengl.GLContext
-//#else
-//$$ import org.lwjgl.opengl.GL
-//$$ import org.lwjgl.opengl.GLCapabilities
-//$$ import org.joml.Matrix4f
-//#endif
+import org.lwjgl.opengl.GLCapabilities
 
 /**
  * Class to check shaders support, OpenGL capabilities, and shader helper functions
@@ -34,11 +29,7 @@ object ShaderHelper {
     var GL_FRAGMENT_SHADER: Int
 
     init {
-        //#if MC < 1.21
-        val capabilities: ContextCapabilities = GLContext.getCapabilities()
-        //#else
-        //$$ val capabilities: GLCapabilities = GL.getCapabilities()
-        //#endif
+        val capabilities: GLCapabilities = GL.getCapabilities()
 
         // Check OpenGL 2.0 Capabilities
         val openGL20supported = capabilities.OpenGL20
@@ -86,14 +77,14 @@ object ShaderHelper {
     fun glGetProgramInfoLog(program: Int, maxLength: Int): String {
         return if (USING_ARB_SHADERS) ARBShaderObjects.glGetInfoLogARB(
             program,
-            maxLength
+            maxLength,
         ) else GL20.glGetProgramInfoLog(program, maxLength)
     }
 
     fun glGetProgramInt(program: Int, pName: Int): Int {
         return if (USING_ARB_SHADERS) ARBShaderObjects.glGetObjectParameteriARB(
             program,
-            pName
+            pName,
         ) else GL20.glGetProgrami(program, pName)
     }
 
@@ -104,7 +95,7 @@ object ShaderHelper {
     fun glAttachShader(program: Int, shaderIn: Int) {
         if (USING_ARB_SHADERS) ARBShaderObjects.glAttachObjectARB(program, shaderIn) else GL20.glAttachShader(
             program,
-            shaderIn
+            shaderIn,
         )
     }
 
@@ -115,7 +106,7 @@ object ShaderHelper {
     fun glShaderSource(shader: Int, source: CharSequence) {
         if (USING_ARB_SHADERS) ARBShaderObjects.glShaderSourceARB(shader, source) else GL20.glShaderSource(
             shader,
-            source
+            source,
         )
     }
 
@@ -126,14 +117,14 @@ object ShaderHelper {
     fun glGetShaderInt(shader: Int, pName: Int): Int {
         return if (USING_ARB_SHADERS) ARBShaderObjects.glGetObjectParameteriARB(
             shader,
-            pName
+            pName,
         ) else GL20.glGetShaderi(shader, pName)
     }
 
     fun glGetShaderInfoLog(shader: Int, maxLength: Int): String {
         return if (USING_ARB_SHADERS) ARBShaderObjects.glGetInfoLogARB(
             shader,
-            maxLength
+            maxLength,
         ) else GL20.glGetShaderInfoLog(shader, maxLength)
     }
 
@@ -153,7 +144,7 @@ object ShaderHelper {
         if (USING_ARB_SHADERS) ARBShaderObjects.glUniform2fARB(location, v0, v1) else GL20.glUniform2f(
             location,
             v0,
-            v1
+            v1,
         )
     }
 
@@ -162,7 +153,7 @@ object ShaderHelper {
             location,
             v0,
             v1,
-            v2
+            v2,
         )
     }
 
@@ -172,23 +163,21 @@ object ShaderHelper {
             v0,
             v1,
             v2,
-            v3
+            v3,
         )
     }
 
-    //#if MC > 1.21
-    //$$ fun glUniformMatrix4f(location: Int, transpose: Boolean, matrix: Matrix4f) {
-    //$$    val matrixArray = FloatArray(16)
-    //$$    matrix.get(matrixArray)
-    //$$    if (USING_ARB_SHADERS) ARBShaderObjects.glUniformMatrix4fvARB(location, transpose, matrixArray)
-    //$$    else GL20.glUniformMatrix4fv(location, transpose, matrixArray)
-    //$$ }
-    //#endif
+    fun glUniformMatrix4f(location: Int, transpose: Boolean, matrix: Matrix4f) {
+        val matrixArray = FloatArray(16)
+        matrix.get(matrixArray)
+        if (USING_ARB_SHADERS) ARBShaderObjects.glUniformMatrix4fvARB(location, transpose, matrixArray)
+        else GL20.glUniformMatrix4fv(location, transpose, matrixArray)
+    }
 
     fun glGetUniformLocation(program: Int, name: CharSequence): Int {
         return if (USING_ARB_SHADERS) ARBShaderObjects.glGetUniformLocationARB(
             program,
-            name
+            name,
         ) else GL20.glGetUniformLocation(program, name)
     }
 

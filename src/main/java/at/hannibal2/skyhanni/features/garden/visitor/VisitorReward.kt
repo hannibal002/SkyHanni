@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig
+import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 
 private typealias StatsEntry = DropsStatisticsConfig.DropsStatisticsTextEntry
 
@@ -13,7 +13,7 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     GREEN_BANDANA("GREEN_BANDANA", "§9Green Bandana"),
     DEDICATION("DEDICATION;4", "§9Dedication IV"),
     MUSIC_RUNE("MUSIC_RUNE;1", "§9Music Rune"),
-    SPACE_HELMET("DCTR_SPACE_HELM", "§cSpace Helmet",),
+    SPACE_HELMET("DCTR_SPACE_HELM", "§cSpace Helmet"),
     CULTIVATING("CULTIVATING;1", "§9Cultivating I"),
     REPLENISH("REPLENISH;1", "§9Replenish I"),
     DELICATE("DELICATE;5", "§9Delicate V"),
@@ -21,10 +21,12 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     JUNGLE_KEY("JUNGLE_KEY", "§5Jungle Key"),
     FRUIT_BOWL("FRUIT_BOWL", "§9Fruit Bowl"),
     HARVEST_HARBINGER("POTION_HARVEST_HARBINGER;5", "§9Harvest Harbinger V"),
+    HYPERCHARGE_CHIP("HYPERCHARGE_GARDEN_CHIP", "§9Hypercharge Chip"),
+    QUICKDRAW_CHIP("QUICKDRAW_GARDEN_CHIP", "§9Quickdraw Chip"),
     ;
 
     private val internalName = rawInternalName.toInternalName()
-    val itemStack by lazy { internalName.getItemStack() }
+    val itemStack by AutoUpdatingItemStack(internalName)
     // TODO use this instead of hard coded item names once moulconfig no longer calls toString before the neu repo gets loaded
 //     val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.asString() }
 

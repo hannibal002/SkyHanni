@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class TooltipTweaksConfig {
     @Expose
@@ -23,8 +23,8 @@ class TooltipTweaksConfig {
         name = "Breakdown Hotkey",
         desc = "When the keybind is pressed, show a breakdown of all fortune sources on a tool."
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
-    var fortuneTooltipKeybind: Int = Keyboard.KEY_LSHIFT
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_LEFT_SHIFT)
+    var fortuneTooltipKeybind: Int = GLFW.GLFW_KEY_LEFT_SHIFT
 
     @Expose
     @ConfigOption(

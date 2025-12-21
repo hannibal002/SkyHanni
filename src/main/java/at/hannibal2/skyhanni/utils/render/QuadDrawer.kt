@@ -2,16 +2,9 @@ package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.pos
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.Tessellator
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import org.lwjgl.opengl.GL11
 import java.awt.Color
 
-class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
-
-    val worldRenderer = tessellator.worldRenderer
+class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent) {
 
     inline fun draw(
         middlePoint: LorenzVec,
@@ -19,13 +12,27 @@ class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator
         sidePoint2: LorenzVec,
         c: Color,
     ) {
-        GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f)
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(sidePoint1).endVertex()
-        worldRenderer.pos(middlePoint).endVertex()
-        worldRenderer.pos(sidePoint2).endVertex()
-        worldRenderer.pos(sidePoint1 + sidePoint2 - middlePoint).endVertex()
-        tessellator.draw()
+        val layer = SkyHanniRenderLayers.getQuads(false)
+        val buf = event.vertexConsumers.getBuffer(layer)
+        event.matrices.pushPose()
+
+        val viewerPos = WorldRenderUtils.getViewerPos()
+        val newMidPoint = middlePoint - viewerPos
+        val newSidePoint1 = sidePoint1 - viewerPos
+        val newSidePoint2 = sidePoint2 - viewerPos
+        val lastPoint = sidePoint1 + sidePoint2 - middlePoint
+        val newLastPoint = lastPoint - viewerPos
+
+        buf.addVertex(newSidePoint1.x.toFloat(), newSidePoint1.y.toFloat(), newSidePoint1.z.toFloat())
+            .setColor(c.red, c.green, c.blue, c.alpha)
+        buf.addVertex(newMidPoint.x.toFloat(), newMidPoint.y.toFloat(), newMidPoint.z.toFloat())
+            .setColor(c.red, c.green, c.blue, c.alpha)
+        buf.addVertex(newSidePoint2.x.toFloat(), newSidePoint2.y.toFloat(), newSidePoint2.z.toFloat())
+            .setColor(c.red, c.green, c.blue, c.alpha)
+        buf.addVertex(newLastPoint.x.toFloat(), newLastPoint.y.toFloat(), newLastPoint.z.toFloat())
+            .setColor(c.red, c.green, c.blue, c.alpha)
+
+        event.matrices.popPose()
     }
 
     companion object {
@@ -33,22 +40,7 @@ class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator
             event: SkyHanniRenderWorldEvent,
             crossinline quads: QuadDrawer.() -> Unit,
         ) {
-            GlStateManager.enableBlend()
-            GlStateManager.disableLighting()
-            GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-            GlStateManager.disableTexture2D()
-            GlStateManager.disableCull()
-
-            GlStateManager.pushMatrix()
-            WorldRenderUtils.translate(WorldRenderUtils.getViewerPos(event.partialTicks).negated())
-
-            quads.invoke(QuadDrawer(Tessellator.getInstance()))
-
-            GlStateManager.popMatrix()
-
-            GlStateManager.enableTexture2D()
-            GlStateManager.enableCull()
-            GlStateManager.disableBlend()
+            quads.invoke(QuadDrawer(event))
         }
     }
 }

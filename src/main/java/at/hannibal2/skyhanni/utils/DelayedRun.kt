@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.Executor
 import kotlin.time.Duration
 
+// TODO add names for runs
 object DelayedRun {
 
     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
@@ -40,11 +41,11 @@ object DelayedRun {
 
     @JvmField
     val onThread = Executor {
-        val mc = Minecraft.getMinecraft()
-        if (mc.isCallingFromMinecraftThread) {
+        val mc = Minecraft.getInstance()
+        if (mc.isSameThread) {
             it.run()
         } else {
-            mc.addScheduledTask(it)
+            mc.submit(it)
         }
     }
 }

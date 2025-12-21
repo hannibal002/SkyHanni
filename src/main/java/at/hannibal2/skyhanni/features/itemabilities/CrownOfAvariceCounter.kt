@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.itemability.CrownOfAvariceConfig.CrownOfAvariceLines
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -57,7 +58,7 @@ object CrownOfAvariceCounter {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { isEnabled() && isWearingCrown },
-            onRender = { renderDisplay() },
+            onRender = ::renderDisplay,
         )
     }
 
@@ -105,6 +106,9 @@ object CrownOfAvariceCounter {
 
         update()
     }
+
+    fun isAvariceConsuming(): Boolean =
+        isWearingCrown && (totalCoins ?: 0) < MAX_AVARICE_COINS
 
     @HandleEvent(IslandChangeEvent::class)
     fun onIslandChange() {
@@ -200,7 +204,7 @@ object CrownOfAvariceCounter {
     }
 
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable && Perk.MYTHOLOGICAL_RITUAL.isActive
 
     private fun reset() {
         coinsEarned = 0L

@@ -6,7 +6,13 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
+import at.hannibal2.skyhanni.data.NotificationManager
+import at.hannibal2.skyhanni.data.SkyHanniNotification
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DiscontinuedMinecraftVersion
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DiscontinuedMinecraftVersionsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -14,6 +20,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
@@ -23,6 +30,7 @@ import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
+import kotlin.time.Duration
 
 @SkyHanniModule
 object UpdateManager {
@@ -65,6 +73,9 @@ object UpdateManager {
         processor.registerConfigEditor(ConfigVersionDisplay::class.java) { option, _ ->
             GuiOptionEditorUpdateCheck(option)
         }
+        processor.registerConfigEditor(ConfigVersionDeprecatedDisplay::class.java) { option, _ ->
+            GuiOptionEditorDeprecatedVersion(option)
+        }
     }
 
     private val config get() = SkyHanniMod.feature.about
@@ -79,8 +90,13 @@ object UpdateManager {
     fun checkUpdate(forceDownload: Boolean = false, forcedUpdateStream: UpdateStream = config.updateStream.get()) {
         var updateStream = forcedUpdateStream
         if (updateState != UpdateState.NONE) {
-            logger.log("Trying to perform update check while another update is already in progress")
-            return
+            if (updateState == UpdateState.AVAILABLE && forceDownload) {
+                updateState = UpdateState.NONE
+                logger.log("Resetting update state to force download")
+            } else {
+                logger.log("Trying to perform update check while another update is already in progress")
+                return
+            }
         }
         logger.log("Starting update check")
         val currentStream = config.updateStream.get()
@@ -216,5 +232,39 @@ object UpdateManager {
                 updateCommand("current")
             }
         }
+    }
+
+    var discontinuedVersions: Map<String, DiscontinuedMinecraftVersion> = mapOf()
+        private set
+    private var hasWarned = false
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val constant = event.getConstant<DiscontinuedMinecraftVersionsJson>("DiscontinuedMinecraftVersions")
+        constant.versions?.let {
+            discontinuedVersions = it
+        }
+    }
+
+    @HandleEvent(HypixelJoinEvent::class)
+    fun onHypixelJoin() {
+        if (hasWarned) return
+
+        if (PlatformUtils.MC_VERSION in discontinuedVersions) {
+            val extraInfo = discontinuedVersions[PlatformUtils.MC_VERSION]?.extraInfo ?: return
+
+            val notification = SkyHanniNotification(
+                listOf(
+                    "§cSkyHanni is no longer receiving updates for Minecraft §e${PlatformUtils.MC_VERSION}§c.",
+                    "§cPlaying on a discontinued version is not recommended and may lead to issues.",
+                    "§cPlease update to a newer Minecraft version.",
+                ) + extraInfo,
+                Duration.INFINITE,
+            )
+
+            NotificationManager.queueNotification(notification)
+        }
+
+        hasWarned = true
     }
 }

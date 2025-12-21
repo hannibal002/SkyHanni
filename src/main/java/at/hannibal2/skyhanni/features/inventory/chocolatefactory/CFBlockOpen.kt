@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -70,7 +71,7 @@ object CFBlockOpen {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        val slotDisplayName = event.slot?.stack?.displayName ?: return
+        val slotDisplayName = event.slot?.item?.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: return
         if (!openCfItemPattern.matches(slotDisplayName)) return
         if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
 

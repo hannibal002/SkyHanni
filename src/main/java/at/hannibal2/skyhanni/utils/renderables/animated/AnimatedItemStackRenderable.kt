@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable
-import net.minecraft.item.ItemStack
-import net.minecraft.util.EnumFacing.Axis
-import net.minecraft.util.Vec3
+import net.minecraft.core.Direction.Axis
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
 import kotlin.math.sin
 import kotlin.time.Duration
 
@@ -107,15 +107,15 @@ class AnimatedItemStackRenderable private constructor(
 
     private var currentRotation: Vec3 = initialRotation
     private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(
-        currentRotation.xCoord + when (rotationDefinition.axis) {
+        currentRotation.x + when (rotationDefinition.axis) {
             Axis.X -> rotationDefinition.rotationSpeed * deltaTime
             else -> 0.0
         },
-        currentRotation.yCoord + when (rotationDefinition.axis) {
+        currentRotation.y + when (rotationDefinition.axis) {
             Axis.Y -> rotationDefinition.rotationSpeed * deltaTime
             else -> 0.0
         },
-        currentRotation.zCoord + when (rotationDefinition.axis) {
+        currentRotation.z + when (rotationDefinition.axis) {
             Axis.Z -> rotationDefinition.rotationSpeed * deltaTime
             else -> 0.0
         },

@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -23,19 +23,18 @@ object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val bezierFitter = ParticlePathBezierFitter(3)
-    private var newBurrow = true
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onIslandChange() {
         bezierFitter.reset()
-        newBurrow = true
+        GriffinBurrowHelper.newBurrow = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val type = event.type
-        if (type != EnumParticleTypes.DRIP_LAVA) return
+        if (type != ParticleTypes.DRIPPING_LAVA) return
         if (event.count != 2) return
         if (event.speed != -0.5f) return
         lastLavaParticle = SimpleTimeMark.now()
@@ -53,8 +52,12 @@ object PreciseGuessBurrow {
 
         val guessPosition = guessBurrowLocation() ?: return
 
-        BurrowGuessEvent(guessPosition.down(0.5).roundToBlock(), precise = bezierFitter.count() > 5, new = newBurrow).post()
-        newBurrow = false
+        BurrowGuessEvent(
+            guessPosition.down(0.5).roundToBlock(),
+            precise = bezierFitter.count() > 5,
+            new = GriffinBurrowHelper.newBurrow
+        ).post()
+        GriffinBurrowHelper.newBurrow = false
     }
 
     private fun guessBurrowLocation(): LorenzVec? = bezierFitter.solve()
@@ -74,7 +77,6 @@ object PreciseGuessBurrow {
         }
         bezierFitter.reset()
         lastDianaSpade = SimpleTimeMark.now()
-        newBurrow = true
     }
 
     @HandleEvent

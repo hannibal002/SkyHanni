@@ -3,49 +3,42 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.CropPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.guide.GuideTab
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
 
 class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
 
     override val sizeX = 360
-    override val sizeY = 225
+    override val sizeY = 255
 
     @SkyHanniModule
     companion object {
 
-        @JvmStatic
-        fun onCommand() {
-            if (!SkyBlockUtils.inSkyBlock) {
-                ChatUtils.userError("Join SkyBlock to open the fortune guide!")
-            } else {
-                open()
-            }
-        }
+        fun isInGui() = Minecraft.getInstance().screen is FFGuideGui
 
-        fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGui
-
-        fun open() {
+        private fun open() {
             CaptureFarmingGear.captureFarmingGear()
             CaptureFarmingGear.removeInvalidItems()
             SkyHanniMod.screenToOpen = FFGuideGui()
         }
 
         fun updateDisplay() {
-            with(Minecraft.getMinecraft().currentScreen) {
+            with(Minecraft.getInstance().screen) {
                 if (this !is FFGuideGui) return
                 this.refreshPage()
             }
@@ -55,7 +48,29 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
         fun onCommandRegistration(event: CommandRegistrationEvent) {
             event.registerBrigadier("ff") {
                 description = "Opens the Farming Fortune Guide"
-                callback { onCommand() }
+                literalCallback("old") {
+                    if (!SkyBlockUtils.inSkyBlock) {
+                        ChatUtils.userError("Join SkyBlock to open the fortune guide!")
+                    } else {
+                        ChatUtils.chat("The old ff guide is NOT updated, it will be missing many upgrades")
+                        open()
+                    }
+
+                }
+                simpleCallback {
+                    if (!SkyBlockUtils.inSkyBlock) {
+                        ChatUtils.userError("Join SkyBlock to open the fortune guide!")
+                    } else {
+                        val name = PlayerUtils.getName()
+                        var profile = HypixelData.profileName
+                        if (profile.isNotEmpty()) profile += "/"
+                        ChatUtils.clickableLinkChat(
+                            "§cSkyHannis /ff display is no longer being developed! " +
+                                "§6Click §bhere §6to see your updated fortune progress and cheapest upgrades on elitebot.dev instead!",
+                            "https://elitebot.dev/@$name/${profile}fortune?utm_source=SkyHanni#fortune"
+                        )
+                    }
+                }
             }
         }
     }
@@ -75,11 +90,11 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
             FortuneGuidePage.UPGRADES to UpgradePage({ currentCrop }, sizeX, sizeY - 2),
         )
         verticalTabs = listOf(
-            vTab(ItemStack(Items.gold_ingot), Renderable.text("§eBreakdown")) {
+            vTab(ItemStack(Items.GOLD_INGOT), Renderable.text("§eBreakdown")) {
                 currentPage = if (currentCrop == null) FortuneGuidePage.OVERVIEW else FortuneGuidePage.CROP
             },
             vTab(
-                ItemStack(Items.map),
+                ItemStack(Items.MAP),
                 Renderable.text("§eUpgrades"),
             ) {
                 currentPage = FortuneGuidePage.UPGRADES
@@ -87,7 +102,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
         )
         horizontalTabs = buildList {
             add(
-                hTab(ItemStack(Blocks.grass), Renderable.text("§eOverview")) {
+                hTab(ItemStack(Blocks.GRASS_BLOCK), Renderable.text("§eOverview")) {
                     currentCrop = null
 
                     it.pageSwitchHorizontal()

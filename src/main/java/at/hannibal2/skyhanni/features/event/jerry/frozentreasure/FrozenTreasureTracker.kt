@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterApi
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -39,7 +38,7 @@ object FrozenTreasureTracker {
     private var icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
-    private val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker }) {
+    private val tracker = SkyHanniTracker("Frozen Treasure Tracker", ::Data, { it.frozenTreasureTracker }) {
         formatDisplay(drawDisplay(it))
     }
 
@@ -47,23 +46,11 @@ object FrozenTreasureTracker {
         FrozenTreasure.entries.forEach { it.chatPattern }
     }
 
-    class Data : TrackerData() {
-
-        override fun reset() {
-            treasureCount.clear()
-            treasuresMined = 0
-            compactProcs = 0
-        }
-
-        @Expose
-        var treasuresMined = 0
-
-        @Expose
-        var compactProcs = 0
-
-        @Expose
-        var treasureCount: MutableMap<FrozenTreasure, Int> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var treasuresMined: Long = 0,
+        @Expose var compactProcs: Long = 0,
+        @Expose var treasureCount: MutableMap<FrozenTreasure, Int> = mutableMapOf(),
+    ) : TrackerData()
 
     @HandleEvent
     fun onWorldChange() {
@@ -74,7 +61,7 @@ object FrozenTreasureTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.WINTER)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         val difference = estimatedIce - lastEstimatedIce
         lastEstimatedIce = estimatedIce
 
@@ -132,7 +119,7 @@ object FrozenTreasureTracker {
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList<Searchable> {
+    private fun drawDisplay(data: Data) = buildList {
         calculateIce(data)
         addSearchString("§e§lFrozen Treasure Tracker")
         addSearchString("§6${formatNumber(data.treasuresMined)} Treasures Mined")

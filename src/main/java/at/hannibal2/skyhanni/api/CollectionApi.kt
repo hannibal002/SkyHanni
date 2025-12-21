@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -115,7 +116,7 @@ object CollectionApi {
 
         if (inventoryName.endsWith("s") && inventoryName != "Boss Collections") {
             for ((_, stack) in event.inventoryItems) {
-                val name = stack.displayName.removeColor()
+                val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
                 if ("Collections" in name) continue
 
                 val lore = stack.getLore()

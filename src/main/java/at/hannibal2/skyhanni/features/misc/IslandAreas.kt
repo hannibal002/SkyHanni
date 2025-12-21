@@ -33,9 +33,11 @@ import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import net.minecraft.client.player.LocalPlayer
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -46,6 +48,8 @@ object IslandAreas {
     private var paths = mapOf<GraphNode, Graph>()
     var display: Renderable? = null
     private var targetNode: GraphNode? = null
+    private var nodeSaveJob: Job? = null
+    private val nodeSaveMutex = Mutex()
 
     var currentArea = ""
         private set
@@ -60,7 +64,12 @@ object IslandAreas {
         updateArea("no_area", onlyInternal = true)
     }
 
-    fun nodeMoved() = SkyHanniMod.launchNoScopeCoroutine(::updateNodes)
+    fun nodeMoved() {
+        if (nodeSaveJob?.isActive == true) return
+        nodeSaveJob = SkyHanniMod.launchCoroutineWithMutex("§island area node moved", nodeSaveMutex) {
+            updateNodes()
+        }
+    }
 
     private fun updateNodes() {
         if (!isEnabled()) return
@@ -93,7 +102,7 @@ object IslandAreas {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (isEnabled() && event.isLocalPlayer) {
             hasMoved = true
         }
@@ -104,7 +113,7 @@ object IslandAreas {
         if (!isEnabled()) return
         if (!isPathfinderEnabled()) return
         if (!config.pathfinder.showAlways) return
-        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
         if (isInOwnInventory) return
 
         display?.let {
@@ -116,7 +125,7 @@ object IslandAreas {
     fun onBackgroundDraw() {
         if (!isEnabled()) return
         if (!isPathfinderEnabled()) return
-        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
         if (!isInOwnInventory) return
 
         display?.let {
@@ -306,7 +315,7 @@ object IslandAreas {
                 update()
             },
             allowRerouting = true,
-            condition = { isPathfinderEnabled() },
+            condition = ::isPathfinderEnabled,
         )
         update()
     }

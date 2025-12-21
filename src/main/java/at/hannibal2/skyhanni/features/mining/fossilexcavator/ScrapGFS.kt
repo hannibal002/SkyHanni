@@ -29,8 +29,8 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.system.LazyVar
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.Vec3
+import net.minecraft.core.Direction.Axis
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -42,7 +42,7 @@ object ScrapGFS {
     private val scrapProvider = NeuItemStackProvider(FossilExcavatorApi.scrapItem)
     private val scrapFrames = listOf(ItemStackAnimationFrame(scrapProvider, ticks = 0))
     private val scrapRotationDefinition = ItemStackRotationDefinition(
-        axis = EnumFacing.Axis.Y,
+        axis = Axis.Y,
         rotationSpeed = 50.0,
     )
     private val validRange = 1..2048
@@ -62,7 +62,7 @@ object ScrapGFS {
 
     private fun getSusScrapCurrentlyInInventory() = InventoryUtils.getItemsInOwnInventory().filter {
         it.getInternalNameOrNull() == FossilExcavatorApi.scrapItem
-    }.sumOf { it.stackSize }
+    }.sumOf { it.count }
 
     @HandleEvent
     fun onConfigLoad() {

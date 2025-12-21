@@ -46,8 +46,8 @@ object HighlightBonzoMasks {
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.depletedBonzosMasks) return
-        for (slot in event.container.inventorySlots) {
-            val internalName = slot.stack?.getInternalName() ?: continue
+        for (slot in event.container.slots) {
+            val internalName = slot.item?.getInternalName() ?: continue
             val maskType = MaskType.getByInternalName(internalName) ?: continue
             val readyAt = maskTimers[maskType] ?: continue
 

@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -56,16 +58,20 @@ object SunGeckoHelper {
      * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
      * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
      * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
+     * WRAPPED-REGEX-TEST: "                           §r§c§lACTIVE MODIFIERS!"
      */
     private val sunGeckoActiveModifiers by patternGroup.pattern(
         "modifiers",
-        "§f {27}§r§c§lACTIVE MODIFIERS!",
+        "(?:§.)* {27}§r§c§lACTIVE MODIFIERS!",
+
     )
 
     private val sunGeckoChatLine by patternGroup.pattern(
         "chatline",
         "§6§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
     )
+
+    private val COMBO_MANIA_TALISMAN = "COMBO_MANIA_TALISMAN".toInternalName()
 
     private var healthLeft = 250
     private var totalHealth = 250
@@ -111,7 +117,10 @@ object SunGeckoHelper {
 
         // this is just a total guess but it looks right enough
         // i think its inconsistent because of how often the action bar updates
-        var expiryTime = 5.seconds + 200.milliseconds
+        var expiryTime = 4.seconds + 700.milliseconds
+        if (InventoryUtils.isItemInInventory(COMBO_MANIA_TALISMAN)) {
+            expiryTime += 500.milliseconds
+        }
         if (modifiers.contains(Modifiers.COLLECTIVE)) {
             expiryTime += (modifiers.size * 200).milliseconds
         }
@@ -152,7 +161,7 @@ object SunGeckoHelper {
             if (currentBoss == null) {
                 currentBoss = mob
             } else {
-                if (currentBoss?.baseEntity?.isEntityAlive == false ||
+                if (currentBoss?.baseEntity?.isAlive == false ||
                     (currentBoss?.health?.toInt() ?: 0) < 20
                 ) {
                     currentBoss = mob
@@ -167,7 +176,7 @@ object SunGeckoHelper {
 
         updateDisplay()
 
-        if (currentBoss?.baseEntity?.isEntityAlive == false) {
+        if (currentBoss?.baseEntity?.isAlive == false) {
             currentBoss = null
         }
 
