@@ -132,6 +132,7 @@ object NavigationHelper {
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shnavigate") {
             description = "Using path finder to go to locations"
+            aliases = listOf("shnav")
             legacyCallbackArgs { onCommand(it) }
         }
     }
