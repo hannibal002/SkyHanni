@@ -45,11 +45,8 @@ object QuickModMenuSwitch {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled()) return
-
-        if (event.isMod(5)) {
-            update()
-        }
+        if (!isEnabled() || !event.isMod(5)) return
+        update()
     }
 
     class Mod(val name: String, val description: List<String>, val command: String, private val guiPath: List<String>) {
@@ -147,10 +144,10 @@ object QuickModMenuSwitch {
     }
 
     private fun open(mod: Mod) {
-        lastGuiOpen = System.currentTimeMillis()
-        currentlyOpeningMod = mod.name
-        update()
         try {
+            lastGuiOpen = System.currentTimeMillis()
+            currentlyOpeningMod = mod.name
+            update()
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error trying to open the gui for mod " + mod.name)
         }
@@ -160,9 +157,9 @@ object QuickModMenuSwitch {
     fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!isEnabled()) return
 
-        DrawContextUtils.pushMatrix()
-        config.pos.renderRenderables(display, posLabel = "Quick Mod Menu Switch")
-        DrawContextUtils.popMatrix()
+        DrawContextUtils.pushPop {
+            config.pos.renderRenderables(display, posLabel = "Quick Mod Menu Switch")
+        }
     }
 
     private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled

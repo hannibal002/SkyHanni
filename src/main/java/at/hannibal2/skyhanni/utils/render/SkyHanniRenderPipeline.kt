@@ -186,7 +186,7 @@ private object SkyHanniRenderPipelineUtils {
         withHalfSize: Boolean = true,
     ): Map<String, UniformType> {
         //#if MC < 1.21.6
-         return mapOf(
+        return mapOf(
             "scaleFactor" to UniformType.FLOAT,
             "radius" to UniformType.FLOAT,
             "smoothness" to UniformType.FLOAT,

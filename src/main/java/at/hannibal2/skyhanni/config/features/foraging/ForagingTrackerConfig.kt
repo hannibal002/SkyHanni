@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.foraging
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.jsonobjects.repo.TreeGiftBonusDropsJson
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
