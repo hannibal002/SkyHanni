@@ -45,7 +45,7 @@ class MiscConfig {
     val stranded: StrandedConfig = StrandedConfig()
 
     @Expose
-    @Category(name = "Navigation", desc = "Navigation features to help you get around.")
+    @Category(name = "Navigation", desc = "Navigation features and other related settings.")
     val navigation: NavigationConfig = NavigationConfig()
 
     @ConfigOption(name = "Hide Armor", desc = "")

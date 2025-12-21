@@ -23,6 +23,8 @@ import at.hannibal2.skyhanni.utils.compat.hover
 
 @SkyHanniModule
 object NavigationHelper {
+    private val config get() = SkyHanniMod.feature.misc.navigation
+
     private val messageId = ChatUtils.getUniqueMessageId()
 
     val allowedTags = listOf(
@@ -66,7 +68,7 @@ object NavigationHelper {
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
-        if (locations.size == 1) {
+        if (config.allowInstaNavigate && locations.size == 1) {
             val (name, node) = locations.first()
             node.pathFind(label = name, allowRerouting = true, condition = { true })
             sendNavigateMessageWithContent("§7Only one location found, navigating to §r$name", goBack)
