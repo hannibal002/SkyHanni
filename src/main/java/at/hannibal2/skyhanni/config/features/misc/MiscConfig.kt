@@ -470,4 +470,15 @@ class MiscConfig {
     @FeatureToggle
     @OnlyModern
     var fixDoubleClicks: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Fix Colored Particles",
+        desc = "Fixes Hypixel not setting coloured particles properly such as Slayer Specific Spawn Particles or Motes (this *will* break all particle colouring)"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("Colour Spell Spawn Specific")
+    @OnlyModern
+    var fixColorParticles: Boolean = false
 }
