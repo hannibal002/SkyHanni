@@ -100,8 +100,6 @@ open class TextInput {
             }
         }
 
-        private var timeSinceKeyEvent = 0L
-
         private var carriage
             get() = activeInstance?.carriage
             set(value) {

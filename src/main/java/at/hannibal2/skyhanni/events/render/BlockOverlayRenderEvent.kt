@@ -7,5 +7,5 @@ class BlockOverlayRenderEvent(val overlayType: OverlayType) : CancellableSkyHann
 enum class OverlayType {
     FIRE,
     BLOCK,
-    WATER;
+    WATER,
 }

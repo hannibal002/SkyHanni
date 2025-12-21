@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.repo.AbstractRepoManager
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 
 @SkyHanniModule
 object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>() {

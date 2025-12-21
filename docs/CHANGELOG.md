@@ -2,9 +2,50 @@
 
 ## Version 7.0.0
 
+### New Features
+
+#### Chat
+
++ Added /shtodos. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4968)
+  + Works exactly the same as NEU's version, you can even import your NEU todos into skyhanni.
+
+### Improvements
+
+#### Mining
+
++ Chests from powder mining are now unhighlighted faster (as soon as you open them). - Luna (https://github.com/hannibal002/SkyHanni/pull/4989)
+
+#### Foraging
++ Compact Gifts can now be customized to only inform you of certain categories of items. - ThomasThePencil (https://github.com/hannibal002/SkyHanni/pull/4925)
++ Compact Gifts now includes Stretching Sticks and Deep Roots, as well as phantom spawns. - ThomasThePencil (https://github.com/hannibal002/SkyHanni/pull/4925)
+
+### Fixes
+
+#### Foraging
+
++ Fixed an issue that prevented Stretching Sticks from ever being tracked by the Foraging Tracker. - ThomasThePencil (https://github.com/hannibal002/SkyHanni/pull/4925)
++ Fixed Tree Gift rune drops being unable to correctly resolve their internal names. - ThomasThePencil (https://github.com/hannibal002/SkyHanni/pull/4925)
+
+#### Inventory
+
++ Fixed Custom Wardrobe not rendering players on 1.21.8+. - nopo (https://github.com/hannibal002/SkyHanni/pull/4984)
+
+#### Farming
+
++ Fixed Stereo Harmony Disc Replacer not working on 1 vinyl. - nopo (https://github.com/hannibal002/SkyHanni/pull/4983)
+
+#### Mining
+
++ Fixed structure chests sometimes being incorrectly highlighted as chests dug up from powder mining. - Luna (https://github.com/hannibal002/SkyHanni/pull/4989)
+
+#### Misc
+
++ Fixed Discord RPC. - nopo (https://github.com/hannibal002/SkyHanni/pull/4985)
+
 ### Technical Details
 
 + Remapped the project to mojang mappings. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4978)
++ Fixed some detekt issues idk. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4987)
 
 ### Removed Features
 

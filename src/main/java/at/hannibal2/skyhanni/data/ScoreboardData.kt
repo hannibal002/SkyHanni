@@ -232,9 +232,8 @@ object ScoreboardData {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shdebugscoreboard") {
-            description =
-                "Monitors the scoreboard changes: " +
-                    "Prints the raw scoreboard lines in the console after each update, with time since last update."
+            description = "Monitors the scoreboard changes: " +
+                "Prints the raw scoreboard lines in the console after each update, with time since last update."
             category = CommandCategory.DEVELOPER_DEBUG
             callback {
                 monitor = !monitor

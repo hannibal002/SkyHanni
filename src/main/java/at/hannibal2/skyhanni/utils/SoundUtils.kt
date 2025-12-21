@@ -29,7 +29,7 @@ object SoundUtils {
             val category = this.source
 
             val oldLevel = Minecraft.getInstance().options.getSoundSourceVolume(category)
-            if (!config.maintainGameVolume) category.setLevel(1f)
+            if (!config.maintainGameVolume) this.setLevel(1f)
 
             try {
                 Minecraft.getInstance().soundManager.play(this)
@@ -47,17 +47,16 @@ object SoundUtils {
                     "soundLocation" to this.location,
                 )
             } finally {
-                if (!config.maintainGameVolume) category.setLevel(oldLevel)
+                if (!config.maintainGameVolume) this.setLevel(oldLevel)
             }
         }
     }
 
-    // TODO this needs fixing on 1.21.9
-    private fun SoundSource.setLevel(level: Float) =
+    private fun SoundInstance.setLevel(level: Float) =
         //#if MC < 1.21.9
-        Minecraft.getInstance().soundManager.updateSourceVolume(this, level)
+        Minecraft.getInstance().soundManager.updateSourceVolume(this.source, level)
     //#else
-    //$$ Unit
+    //$$ Minecraft.getInstance().soundManager.setVolume(this, level)
     //#endif
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {

@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.guide.GuideGui
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -46,7 +45,6 @@ import net.minecraft.world.item.ItemStack
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
-
 //#if TODO
 //$$ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 //$$ import at.hannibal2.skyhanni.features.chroma.ChromaType
@@ -364,7 +362,6 @@ interface Renderable {
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 GuiRenderUtils.drawRect(0, height, width, 11, color.rgb)
-                ModernGlStateManager.color(1F, 1F, 1F, 1F)
                 renderable.render(mouseOffsetX, mouseOffsetY)
             }
         }
@@ -608,7 +605,6 @@ interface Renderable {
                     }
 
                     if (useChroma) {
-                        ModernGlStateManager.color(1f, 1f, 1f, 1f)
                         if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
                             DrawContextUtils.drawContext.blitSprite(
                                 SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
@@ -621,7 +617,6 @@ interface Renderable {
                             )
                         }
                     } else {
-                        ModernGlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                         if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
                             DrawContextUtils.drawContext.blitSprite(
                                 RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),

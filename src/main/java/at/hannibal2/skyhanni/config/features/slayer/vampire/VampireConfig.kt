@@ -31,11 +31,6 @@ class VampireConfig {
     var withAlpha: Int = 80
 
     @Expose
-    @ConfigOption(name = "See Through Blocks", desc = "Highlight even when behind others mobs/players.")
-    @ConfigEditorBoolean
-    var seeThrough: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Low Health", desc = "Change color when the boss is below 20% health.")
     @ConfigEditorBoolean
     @FeatureToggle

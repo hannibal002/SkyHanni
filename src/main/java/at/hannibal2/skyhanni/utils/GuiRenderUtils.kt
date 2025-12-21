@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
@@ -324,7 +323,7 @@ object GuiRenderUtils {
     //$$ private val itemRenderStateButCool by lazy { ItemStackRenderState() }
     //#endif
 
-    private val SKULL_SCALE = (5f / 4f)
+    private const val SKULL_SCALE = (5f / 4f)
 
     @Suppress("unused")
     fun ItemStack.renderOnScreen(

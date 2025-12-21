@@ -161,7 +161,7 @@ object PacketTest {
         // Others
         if (packetName == ClientboundSoundPacket::class.simpleName) return
         if (!full && packetName == ClientboundLevelParticlesPacket::class.simpleName) return
-        if(packetName == net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket::class.simpleName) return
+        if (packetName == net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket::class.simpleName) return
 
         // Entity
         if (this is ClientboundRemoveEntitiesPacket) {
@@ -176,8 +176,8 @@ object PacketTest {
             if (packetName == EntityLookMove::class.simpleName) return
             if (packetName == ClientboundRotateHeadPacket::class.simpleName) return
             if (packetName == EntityLook::class.simpleName) return
-            if(packetName == net.minecraft.network.protocol.game.ClientboundBossEventPacket::class.simpleName) return
-            if(packetName == net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket::class.simpleName) return
+            if (packetName == net.minecraft.network.protocol.game.ClientboundBossEventPacket::class.simpleName) return
+            if (packetName == net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket::class.simpleName) return
             if (packetName == ClientboundSetEntityMotionPacket::class.simpleName) return
             if (packetName == ClientboundSetEntityDataPacket::class.simpleName) return
             if (packetName == ClientboundUpdateAttributesPacket::class.simpleName) return
