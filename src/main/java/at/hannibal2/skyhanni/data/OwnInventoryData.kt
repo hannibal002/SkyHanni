@@ -121,7 +121,7 @@ object OwnInventoryData {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         ignoreItem(500.milliseconds) { true }
 
-        val itemName = event.item?.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: return
+        val itemName = event.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
         checkAHMovements(itemName)
     }
 

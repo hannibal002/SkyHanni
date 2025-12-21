@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.item.ItemStack
@@ -172,7 +171,6 @@ object CFStrayWarning {
         val toUse = if (config.partyMode.get()) chromaColor else warningConfig.flashColor
         val color = (alpha shl 24) or (toUse.toColor().rgb and 0xFFFFFF)
         GuiRenderUtils.drawRect(0, 0, GuiScreenUtils.displayWidth, GuiScreenUtils.displayHeight, color)
-        ModernGlStateManager.color(1F, 1F, 1F, 1F)
     }
 
     @HandleEvent

@@ -13,12 +13,7 @@ object FrustumUtils {
     //$$ private val frustum get() = Minecraft.getInstance().levelRenderer.capturedFrustum
     //#endif
 
-    fun isVisible(box: AABB): Boolean =
-        //#if MC < 1.21
-        //$$ frustum?.isBoundingBoxInFrustum(box) ?: false
-    //#else
-    frustum?.isVisible(box) ?: true
-    //#endif
+    fun isVisible(box: AABB): Boolean = frustum?.isVisible(box) ?: true
 
     fun isVisible(minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double) =
         isVisible(AABB(minX, minY, minZ, maxX, maxY, maxZ))

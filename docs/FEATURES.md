@@ -48,6 +48,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Current Chat Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/3491)
     + Displays a GUI element that indicates what chat you are in (e.g. Party, Guild, Coop, All).
 + Notify you in chat when a marked player joins/leaves your lobby. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2653)
++ Added /shtodos. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4968)
+  + Works exactly the same as NEU's version, you can even import your NEU todos into skyhanni.
 
 #### Chat Filter
 

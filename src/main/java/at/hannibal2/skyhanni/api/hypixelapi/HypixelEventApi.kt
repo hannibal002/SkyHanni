@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.hypixel.data.region.Environment
 import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import kotlin.jvm.optionals.getOrNull

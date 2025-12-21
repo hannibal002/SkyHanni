@@ -51,7 +51,7 @@ class DevConfig {
     @ConfigOption(
         name = "Chat History Length",
         desc = "The number of messages to keep in memory for §e/shchathistory§7.\n" +
-                "§cExcessively high values may cause memory allocation issues.",
+            "§cExcessively high values may cause memory allocation issues.",
     )
     @ConfigEditorSlider(minValue = 100f, maxValue = 5000f, minStep = 10f)
     var chatHistoryLength: Int = 100
@@ -96,7 +96,7 @@ class DevConfig {
     @ConfigOption(
         name = "Fancy Contributors",
         desc = "Marks §cSkyHanni's contributors §7fancy in the tab list. " +
-                "§eThose are the folks that coded the mod for you for free :)",
+            "§eThose are the folks that coded the mod for you for free :)",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -118,7 +118,7 @@ class DevConfig {
     @ConfigOption(
         name = "Spin Contributors",
         desc = "Make SkyHanni contributors spin around when you are looking at them. " +
-                "§eRequires 'Flip Contributors' to be enabled.",
+            "§eRequires 'Flip Contributors' to be enabled.",
     )
     @ConfigEditorBoolean
     var rotateContributors: Boolean = false

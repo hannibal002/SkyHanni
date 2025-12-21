@@ -136,15 +136,13 @@ class Mob(
     /**
      * @property isRunic does not change.
      */
-    val isRunic = !RiftApi.inRift() &&
-        armorStand?.name.formattedTextCompatLessResets()?.startsWith("§5") == true &&
-        mobType == Type.BASIC
+    val isRunic = !RiftApi.inRift() && armorStand?.name.formattedTextCompatLessResets().startsWith("§5") && mobType == Type.BASIC
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
     fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = baseEntity !is Zombie && baseEntity.isInvisible && baseEntity.getAllEquipment().isNullOrEmpty()
+    fun isInvisible() = baseEntity !is Zombie && baseEntity.isInvisible && baseEntity.getAllEquipment().isEmpty()
 
     private var highlightColor: Color? = null
     private var condition: () -> Boolean = { true }

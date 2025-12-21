@@ -206,7 +206,7 @@ class ItemResolutionQuery {
 
     private fun resolvePetName(): String? {
         val petInfo = getExtraAttributes().getStringOrDefault("petInfo")
-        if (petInfo.isNullOrEmpty()) return null
+        if (petInfo.isEmpty()) return null
         try {
             val petInfoObject = ConfigManager.gson.fromJson(petInfo, JsonObject::class.java)
             val petId = petInfoObject["type"].asString
@@ -259,9 +259,9 @@ class ItemResolutionQuery {
         val potionType = getExtraAttributes().getStringOrDefault("potion_type")
         return if (potionName.isNotEmpty()) {
             "POTION_" + potionName.uppercase() + ";" + potionLvl
-        } else if (!potion.isNullOrEmpty()) {
+        } else if (potion.isNotEmpty()) {
             "POTION_" + potion.uppercase() + ";" + potionLvl
-        } else if (!potionType.isNullOrEmpty()) {
+        } else if (potionType.isNotEmpty()) {
             "POTION_" + potionType.uppercase()
         } else {
             "WATER_BOTTLE"
@@ -366,7 +366,7 @@ class ItemResolutionQuery {
 
     private fun resolveFromSkyblock(): String? {
         val internalName = getExtraAttributes().getStringOrDefault("id")
-        if (internalName.isNullOrEmpty()) return null
+        if (internalName.isEmpty()) return null
         return internalName.uppercase().replace(":", "-")
     }
 

@@ -16,7 +16,7 @@ import net.minecraft.world.scores.PlayerTeam
 class FakePlayer(val hannibal: Boolean = false) : RemotePlayer(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
 
     //#if MC < 1.21.9
-    private val hannibalSkin = PlayerSkin(ResourceLocation.parse("skyhanni:hannibal2.png"), null, null, null, null ,false)
+    private val hannibalSkin = PlayerSkin(ResourceLocation.parse("skyhanni:hannibal2.png"), null, null, null, null, false)
     //#else
     //$$ private val hannibalSkin = PlayerSkin(ClientAsset.DownloadedTexture(ResourceLocation.parse("skyhanni:hannibal2.png"), ""), null, null , PlayerModelType.WIDE, false)
     //#endif

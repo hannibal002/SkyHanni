@@ -1,0 +1,140 @@
+<!-- Taken with permission from Not Enough Updates https://github.com/NotEnoughUpdates/NotEnoughUpdates -->
+<Root xmlns="http://notenoughupdates.org/moulconfig"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://notenoughupdates.org/moulconfig https://raw.githubusercontent.com/NotEnoughUpdates/MoulConfig/master/MoulConfig.xsd">
+    <Gui>
+        <Column>
+            <Meta afterClose="@afterClose"/>
+            <Row>
+                <Button onClick="@close">
+                    <Text text="←"/>
+                </Button>
+                <Text text="@getTitle" width="400"/>
+            </Row>
+            <Row>
+                <Text text="Enabled: " width="150"/>
+                <Switch value="@enabled"/>
+            </Row>
+            <Row>
+                <Text text="Label: " width="150"/>
+                <TextField width="300" value="@label" suggestion="Label"/>
+            </Row>
+            <Row>
+                <Text text="Icon: " width="132"/>
+                <ItemStack value="@getItemStack"/>
+                <TextField width="300" value="@icon" suggestion="Item ID"/>
+            </Row>
+            <Row>
+                <Text text="Reset after (seconds): " width="150"/>
+                <TextField width="300" value="@timer"/>
+            </Row>
+            <Row>
+                <Text text="Reset at fixed time: " width="150"/>
+                <Switch value="@isResetOffset"/>
+            </Row>
+            <Row>
+                <Text text="@getFancyTimeTimer" width="300"/>
+            </Row>
+            <Row>
+                <Button onClick="@minusDayTimer">
+                    <Text text="-Day"/>
+                </Button>
+                <Button onClick="@minusHourTimer">
+                    <Text text="-Hour"/>
+                </Button>
+                <Button onClick="@minusMinuteTimer">
+                    <Text text="-Minute"/>
+                </Button>
+                <Button onClick="@plusMinuteTimer">
+                    <Text text="+Minute"/>
+                </Button>
+                <Button onClick="@plusHourTimer">
+                    <Text text="+Hour"/>
+                </Button>
+                <Button onClick="@plusDayTimer">
+                    <Text text="+Day"/>
+                </Button>
+            </Row>
+            <Row>
+                <Text text="Show only when (seconds): " width="150"/>
+                <TextField width="300" value="@showWhen"/>
+            </Row>
+            <Row>
+                <Text text="Show only when ready: " width="150"/>
+                <Switch value="@showOnlyWhenReady"/>
+            </Row>
+            <Row>
+                <Text text="@getFancyTimeShowWhen" width="300"/>
+            </Row>
+            <Row>
+                <Button onClick="@minusDayShowWhen">
+                    <Text text="-Day"/>
+                </Button>
+                <Button onClick="@minusHourShowWhen">
+                    <Text text="-Hour"/>
+                </Button>
+                <Button onClick="@minusMinuteShowWhen">
+                    <Text text="-Minute"/>
+                </Button>
+                <Button onClick="@plusMinuteShowWhen">
+                    <Text text="+Minute"/>
+                </Button>
+                <Button onClick="@plusHourShowWhen">
+                    <Text text="+Hour"/>
+                </Button>
+                <Button onClick="@plusDayShowWhen">
+                    <Text text="+Day"/>
+                </Button>
+            </Row>
+            <Row>
+                <Text text="Trigger: " width="150"/>
+                <TextField value="@trigger" width="300" suggestion="Trigger"/>
+            </Row>
+            <Row>
+                <Text text="Ignore Color Codes: " width="150"/>
+                <Switch value="@ignoreColorCodes"/>
+            </Row>
+            <Row>
+                <Button onClick="@setChat">
+                    <Text text="@getChat"/>
+                </Button>
+                <Button onClick="@setActionbar">
+                    <Text text="@getActionbar"/>
+                </Button>
+
+                <Button onClick="@setScoreboard">
+                    <Text text="@getScoreboard"/>
+                </Button>
+
+                <Button onClick="@setTablist">
+                    <Text text="@getTablist"/>
+                </Button>
+            </Row>
+            <Row>
+                <Button onClick="@setRegex">
+                    <Text text="@getRegex"/>
+                </Button>
+                <Button onClick="@setStartsWith">
+                    <Text text="@getStartsWith"/>
+                </Button>
+                <Button onClick="@setContains">
+                    <Text text="@getContains"/>
+                </Button>
+                <Button onClick="@setEquals">
+                    <Text text="@getEquals"/>
+                </Button>
+            </Row>
+            <Row>
+                <Button onClick="@copyTemplate">
+                    <Text text="Copy Preset"/>
+                </Button>
+                <Button onClick="@markAsReady">
+                    <Text text="Mark as Ready"/>
+                </Button>
+                <Button onClick="@markAsCompleted">
+                    <Text text="Mark as Done"/>
+                </Button>
+            </Row>
+        </Column>
+    </Gui>
+</Root>

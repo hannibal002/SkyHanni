@@ -3,11 +3,11 @@ import com.replaymod.gradle.preprocess.Node
 
 plugins {
     id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "1.0.8"
-    id("gg.essential.loom") version "1.10.36" apply false
+    // loom 1.14 requires gradle 9, gradle 9 causes errors
+    id("fabric-loom") version "1.13-SNAPSHOT" apply false
     kotlin("jvm") version "2.0.0" apply false
     kotlin("plugin.power-assert") version "2.0.0" apply false
     id("com.google.devtools.ksp") version "2.0.0-1.0.24" apply false
-    id("dev.architectury.architectury-pack200") version "0.1.3"
     id("io.gitlab.arturbosch.detekt") version "1.23.7" apply false
 }
 
@@ -116,12 +116,6 @@ allprojects {
             }
         }
 
-        maven("https://maven.minecraftforge.net") {
-            metadataSources {
-                artifact() // We love missing POMs
-            }
-        }
-
         maven("https://jitpack.io") {
             // NotEnoughUpdates (compiled against), Changelog builder, Preprocessor, Discord IPC
             content {
@@ -136,9 +130,6 @@ preprocess {
     ProjectTarget.activeVersions().forEach { target ->
         nodes[target] = createNode(target.projectName, target.minecraftVersion.versionNumber, target.mappingStyle.identifier)
         val p = project(target.projectPath)
-        if (target.isForge) {
-            p.extra.set("loom.platform", "forge")
-        }
     }
 
     fun File.ifExists(modifier: String = ""): File? = if (exists()) {
