@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.Graph
@@ -324,4 +325,10 @@ object IslandAreas {
     private fun isPathfinderEnabled(): Boolean = pathfingerConfig.enabled.get()
 
     private fun isEnabled() = IslandGraphs.currentIslandGraph != null
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(1235345, "features.misc.areaNavigation.areaPathfinder", "features.misc.navigation.areaPathfinder")
+        event.move(1235345, "features.misc.areaNavigation", "features.misc.navigation.islandAreas")
+    }
 }
