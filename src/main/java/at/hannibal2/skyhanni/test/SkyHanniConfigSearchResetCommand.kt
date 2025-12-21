@@ -132,7 +132,7 @@ object SkyHanniConfigSearchResetCommand {
         }
     }
 
-    private suspend fun toggleCommand(args: Array<String>): String {
+    private fun toggleCommand(args: Array<String>): String {
         if (args.size == 1 || args.size == 3) return "§c/shconfig toggle <config name> [value 1] [value 2]"
 
         val path = args[1]

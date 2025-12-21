@@ -154,7 +154,6 @@ object BetterContainers {
         ImageIO.read(mcResource.open())
     }.onFailure {
         ErrorManager.logErrorWithData(it, "Could not read image resource: ${id.path}")
-        null
     }.getOrNull()
 
     private fun readJsonResource(id: ResourceLocation): BufferedReader? = runCatching {
@@ -177,15 +176,20 @@ object BetterContainers {
         return out
     }
 
+    private fun getBaseTextColor(
+        backgroundStyle: LegacyBetterContainers.BackgroundStyle
+    ) = readJsonResource(backgroundStyle.configId)?.use { reader ->
+        val newJson = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
+        @Suppress("AvoidBritishSpelling")
+        val textColourS = newJson.get("text-colour").asString
+        textColourS.toLong(16).toInt()
+    } ?: 4210752
+
     private fun generateBufferedImages() {
         val backgroundStyle = config.menuBackgroundStyle
         val buttonStyle = config.buttonBackgroundStyle
 
-        textColor = (readJsonResource(backgroundStyle.configId)?.use { reader ->
-            val newJson = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
-            val textColourS = newJson.get("text-colour").asString
-            textColourS.toLong(16).toInt()
-        } ?: 4210752) or 0xFF000000.toInt()
+        textColor = getBaseTextColor(backgroundStyle) or 0xFF000000.toInt()
 
         bufferedImageOn = readImageResource(toggleOn)
         bufferedImageOff = readImageResource(toggleOff)
@@ -204,25 +208,25 @@ object BetterContainers {
         clickedSlot = slot
     }
 
-    fun getClickedSlot(): Int = if (clickedSlotAt.passedSince() <= 500.milliseconds) clickedSlot else -1
+    private fun getClickedSlot(): Int = if (clickedSlotAt.passedSince() <= 500.milliseconds) clickedSlot else -1
 
-    fun isBlankStack(
+    private fun isBlankStack(
         stack: ItemStack,
     ): Boolean = stack.isStainedGlassPane(ColoredBlockCompat.BLACK)
 
-    fun isButtonStack(
+    private fun isButtonStack(
         stack: ItemStack?,
     ): Boolean {
-        val stack = stack ?: return false
-        val isGlassPane = stack.isStainedGlassPane()
-        val isUnknownInternalName = stack.getInternalNameOrNull() == null
-        val isToggle = isToggleOn(stack) || isToggleOff(stack)
+        val realStack = stack ?: return false
+        val isGlassPane = realStack.isStainedGlassPane()
+        val isUnknownInternalName = realStack.getInternalNameOrNull() == null
+        val isToggle = isToggleOn(realStack) || isToggleOff(realStack)
         return !isGlassPane && !isUnknownInternalName && !isToggle
     }
 
-    fun isToggleOn(stack: ItemStack): Boolean = isToggleCommon(stack, "disable")
-    fun isToggleOff(stack: ItemStack): Boolean = isToggleCommon(stack, "enable")
-    fun isToggleCommon(stack: ItemStack, verb: String): Boolean {
+    private fun isToggleOn(stack: ItemStack): Boolean = isToggleCommon(stack, "disable")
+    private fun isToggleOff(stack: ItemStack): Boolean = isToggleCommon(stack, "enable")
+    private fun isToggleCommon(stack: ItemStack, verb: String): Boolean {
         val hasText = stack.getLore().takeIfNotEmpty()?.last()?.endsWith("Click to $verb!") ?: false
         return hasText && stack.isDye()
     }
