@@ -25,12 +25,12 @@ object ToolTooltipTweaks {
     private val config get() = GardenApi.config.tooltipTweak
 
     /**
-     * REGEX-TEST: §7Farming Fortune: §a+88.5 §9(+8)
-     * REGEX-TEST: §7Farming Fortune: §a+73 §9(+30) §d(+8)
+     * REGEX-TEST: §7Farming Fortune: §6+88.5 §9(+8)
+     * REGEX-TEST: §7Farming Fortune: §6+73 §9(+30) §d(+8)
      */
     private val farmingFortunePattern by RepoPattern.pattern(
         "garden.tooltip.farmingfortune",
-        "§7Farming Fortune: §a",
+        "§7Farming Fortune: §6",
     )
 
     private val counterStartLine = setOf("§6Logarithmic Counter", "§6Collection Analysis")
@@ -42,12 +42,12 @@ object ToolTooltipTweaks {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
+        if (true) return
         val itemStack = event.itemStack
         val itemLore = itemStack.getLore()
         val internalName = itemStack.getInternalName()
         val crop = itemStack.getCropType()
         val toolFortune = FarmingFortuneDisplay.getToolFortune(internalName)
-        val counterFortune = FarmingFortuneDisplay.getCounterFortune(itemStack)
         val collectionFortune = FarmingFortuneDisplay.getCollectionFortune(itemStack)
         val turboCropFortune = FarmingFortuneDisplay.getTurboCropFortune(itemStack, crop)
         val dedicationFortune = FarmingFortuneDisplay.getDedicationFortune(itemStack, crop)
@@ -63,7 +63,7 @@ object ToolTooltipTweaks {
 
         val ffdFortune = itemStack.getFarmingForDummiesCount() ?: 0
         val hiddenFortune =
-            (toolFortune + counterFortune + collectionFortune + turboCropFortune + dedicationFortune + abilityFortune)
+            (toolFortune + collectionFortune + turboCropFortune + dedicationFortune + abilityFortune)
         val iterator = event.toolTip.listIterator()
 
         var removingFarmhandDescription = false
@@ -93,13 +93,13 @@ object ToolTooltipTweaks {
 
                 val fortuneLine = when (config.cropTooltipFortune) {
                     CropTooltipFortuneEntry.DEFAULT ->
-                        "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
+                        "§7Farming Fortune: §6+${displayedFortune.formatStat()}$ffdString$reforgeString"
 
                     CropTooltipFortuneEntry.SHOW ->
-                        "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
+                        "§7Farming Fortune: §6+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
 
                     else ->
-                        "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
+                        "§7Farming Fortune: §6+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
                 }
                 iterator.set(fortuneLine)
 
@@ -115,7 +115,6 @@ object ToolTooltipTweaks {
                     iterator.addStat("  §7Harvesting: §a+", harvestingFortune)
                     iterator.addStat("  §7Cultivating: §a+", cultivatingFortune)
                     iterator.addStat("  §7Farming for Dummies: §2+", ffdFortune)
-                    iterator.addStat("  §7Counter: §6+", counterFortune)
                     iterator.addStat("  §7Collection: §6+", collectionFortune)
                     iterator.addStat("  §7Dedication: §6+", dedicationFortune)
                     iterator.addStat("  §7Turbo-Crop: §6+", turboCropFortune)

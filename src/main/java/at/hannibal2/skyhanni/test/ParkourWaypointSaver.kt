@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
-import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -33,8 +32,7 @@ object ParkourWaypointSaver {
     fun onKeyPress(event: KeyPressEvent) {
         @Suppress("InSkyBlockEarlyReturn")
         if (!SkyBlockUtils.inSkyBlock && !config.parkourOutsideSB) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
-        if (NeuItems.neuHasFocus()) return
+        if (Minecraft.getInstance().screen != null) return
         if (SkyHanniMod.feature.dev.devTool.graph.enabled) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
@@ -43,7 +41,7 @@ object ParkourWaypointSaver {
                 if (locations.isEmpty()) {
                     loadClipboard()
                 } else {
-                    if (MinecraftCompat.localPlayer.isSneaking) {
+                    if (MinecraftCompat.localPlayer.isShiftKeyDown) {
                         locations.clear()
                     } else {
                         locations = locations.dropLast(1).toMutableList()
@@ -68,7 +66,7 @@ object ParkourWaypointSaver {
      */
 
     private fun loadClipboard() {
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("parkour waypoint load clipboard") {
             val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
             try {
                 locations = clipboard.split("\n").map { line ->

@@ -17,11 +17,13 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import net.minecraft.init.Blocks
-import net.minecraft.util.EnumParticleTypes
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,6 +38,16 @@ object GriffinBurrowParticleFinder {
 
     // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
     private var fakeBurrow: LorenzVec? = null
+
+    private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
+
+    /**
+     * REGEX-TEST: §eYou finished the Griffin burrow chain! §r§7(4/4)
+     */
+    private val finishedChainPattern by patternGroup.pattern(
+        "chain-finished",
+        "§eYou finished the Griffin burrow chain! §r§7\\(\\d+/\\d+\\)"
+    )
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -73,9 +85,6 @@ object GriffinBurrowParticleFinder {
         val oldBurrowType = burrow.type
 
         when (type) {
-            //#if MC < 1.16
-            ParticleType.FOOTSTEP -> burrow.hasFootstep = true
-            //#endif
             ParticleType.ENCHANT -> burrow.hasEnchant = true
             ParticleType.EMPTY -> burrow.type = 0
             ParticleType.MOB -> burrow.type = 1
@@ -115,26 +124,18 @@ object GriffinBurrowParticleFinder {
     // TODO remove the roundTo calls as they are only workarounds
     private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
         EMPTY(
-            { type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
+            { type == ParticleTypes.ENCHANTED_HIT && count == 4 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
         ),
         MOB(
-            { type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
+            { type == ParticleTypes.CRIT && count == 3 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
         ),
         TREASURE(
-            { type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
+            { type == ParticleTypes.DRIPPING_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
         ),
-        //#if MC < 1.16
-        FOOTSTEP(
-            { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0f && offset.roundTo(2) == LorenzVec(0.05, 0.0, 0.05) },
-        ),
-        //#endif
         ENCHANT(
             {
-                type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && offset.roundTo(2) == LorenzVec(
-                    0.5,
-                    0.4,
-                    0.5,
-                )
+                type == ParticleTypes.ENCHANT && count == 5 && speed == 0.05f && offset.roundTo(2) ==
+                    LorenzVec(0.5, 0.4, 0.5)
             },
         )
     }
@@ -155,7 +156,7 @@ object GriffinBurrowParticleFinder {
         if (!config.guess) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
-            message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
+            finishedChainPattern.matches(message)
         ) {
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             val burrow = lastDugParticleBurrow
@@ -187,7 +188,7 @@ object GriffinBurrowParticleFinder {
         if (!config.guess) return
 
         val location = event.position
-        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
+        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.GRASS_BLOCK) return
 
         if (location == fakeBurrow) {
             fakeBurrow = null
@@ -209,15 +210,11 @@ object GriffinBurrowParticleFinder {
 
     class Burrow(
         var location: LorenzVec,
-        //#if MC < 1.16
-        var hasFootstep: Boolean = false,
-        //#else
-        //$$ var hasFootstep: Boolean = true,
-        //#endif
+        var hasFootstep: Boolean = true,
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,
-        var burrowTimeToLive: Int = CurrentPing.averagePing.inWholeTicks + 1
+        var burrowTimeToLive: Int = CurrentPing.averagePing.inWholeTicks + 1,
     ) {
 
         fun getType(): BurrowType = when (this.type) {

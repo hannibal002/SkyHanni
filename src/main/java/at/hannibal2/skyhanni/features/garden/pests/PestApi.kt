@@ -3,11 +3,12 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
@@ -26,12 +27,12 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -41,9 +42,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
-import org.lwjgl.input.Keyboard
+import net.minecraft.world.entity.decoration.ArmorStand
+import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -70,7 +72,7 @@ object PestApi {
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
-    val patternGroup = RepoPattern.group("garden.pestsapi")
+    val patternGroup = RepoPattern.group("garden.pests-api")
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
         " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)",
@@ -81,7 +83,7 @@ object PestApi {
      * REGEX-TEST:  §7⏣ §aThe Garden
      */
     private val noPestsInScoreboardPattern by patternGroup.pattern(
-        "scoreboard.nopests",
+        "scoreboard.no-pests",
         " §7⏣ §a(?:The Garden|Plot §7- §b.+)$",
     )
 
@@ -97,7 +99,7 @@ object PestApi {
      * REGEX-TEST:  §aPlot §7- §b3
      */
     private val noPestsInPlotScoreboardPattern by patternGroup.pattern(
-        "scoreboard.plot.nopests",
+        "scoreboard.plot.no-pests",
         "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
     )
     private val pestInventoryPattern by patternGroup.pattern(
@@ -108,8 +110,8 @@ object PestApi {
     /**
      * REGEX-TEST:  Plots: §r§b4§r§f, §r§b12§r§f, §r§b13§r§f, §r§b18§r§f, §r§b20
      */
-    private val infectedPlotsTablistPattern by patternGroup.pattern(
-        "tablist.infectedplots",
+    private val infestedPlotsTabListPattern by patternGroup.pattern(
+        "tablist.infected-plots",
         "\\sPlots: (?<plots>.*)",
     )
 
@@ -119,22 +121,48 @@ object PestApi {
      * REGEX-TEST: §eYou received §a64x Enchanted Sugar §efor killing a §2Mosquito§e!
      */
     val pestDeathChatPattern by patternGroup.pattern(
-        "chat.pestdeath",
+        "chat.pest-death",
         "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §2(?<pest>.*)§e!",
     )
     val noPestsChatPattern by patternGroup.pattern(
-        "chat.nopests",
+        "chat.no-pests",
         "§cThere are not any Pests on your Garden right now! Keep farming!",
     )
 
     /**
-     * REGEX-TEST: §a§lPEST TRAP #3§r
-     * REGEX-TEST: §9§lMOUSE TRAP #2§r
-     * REGEX-TEST: §9§lMOUSE TRAP #2
+     * REGEX-TEST: §9§lPEST TRAP #3§r
+     * REGEX-TEST: §5§lMOUSE TRAP #2§r
+     * REGEX-TEST: §6§lVERMIN TRAP #2
      */
-    val pestTrapPattern by patternGroup.pattern(
-        "entity.pesttrap",
-        "(?:§.)+§l(?<type>PEST|MOUSE) TRAP(?: #(?<number>\\d+))?(?:§.)*",
+    private val pestTrapPattern by patternGroup.pattern(
+        "entity.pest-trap",
+        "(?:§.)+§l(?<type>PEST|MOUSE|VERMIN) TRAP(?: #(?<number>\\d+))?(?:§.)*",
+    )
+
+    /**
+     * REGEX-TEST: Stereo Harmony
+     */
+    private val stereoInventoryPattern by patternGroup.pattern(
+        "stereo.inventory",
+        "Stereo Harmony"
+    )
+    val stereoInventory = InventoryDetector { name -> stereoInventoryPattern.matches(name) }
+
+    /**
+     * REGEX-TEST: §7Now Playing: §aWings of Harmony §8(Moth)
+     * REGEX-TEST: §7Now Playing: §a§cNone
+     */
+    val stereoPlayingPattern by patternGroup.pattern(
+        "stereo.playing",
+        "§7Now Playing: (?:§.)*(?<vinyl>[^§]+).*"
+    )
+
+    /**
+     * REGEX-TEST: §a§lPLAYING
+     */
+    val stereoPlayingItemPattern by patternGroup.pattern(
+        "stereo.playing.item",
+        "§a§lPLAYING",
     )
 
     private var gardenJoinTime = SimpleTimeMark.farPast()
@@ -187,14 +215,12 @@ object PestApi {
                 ChatUtils.userError("Open Plot Management Menu to load plot names and pest locations!")
                 return
             }
-            if (event.unknownAmount) {
-                plot.isPestCountInaccurate = true
-            } else {
-                plot.pests += event.amountPests
-                plot.isPestCountInaccurate = false
-            }
+            plot.isPestCountInaccurate = event.amountPests?.let {
+                plot.pests += it
+                false
+            } ?: true
         }
-        if (!event.unknownAmount) scoreboardPests += event.amountPests
+        event.amountPests?.let { scoreboardPests += it }
         updatePests()
     }
 
@@ -215,24 +241,26 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (line in event.tabList) {
-            infectedPlotsTablistPattern.matchMatcher(line) {
-                val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
-                if (plotList.sorted() == getInfestedPlots().map { it.id }.sorted()) return
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.PESTS)) return
 
-                for (plot in GardenPlotApi.plots) {
-                    if (plotList.contains(plot.id)) {
-                        if (!plot.isPestCountInaccurate && plot.pests == 0) {
-                            plot.isPestCountInaccurate = true
-                        }
-                    } else {
-                        plot.pests = 0
-                        plot.isPestCountInaccurate = false
+        infestedPlotsTabListPattern.firstMatcher(event.widget.lines) {
+            val tabListPlots = group("plots").removeColor().split(", ").map { it.toInt() }.toSet()
+            val apiPlots = getInfestedPlots().map { it.id }.toSet()
+
+            if (tabListPlots == apiPlots) return
+
+            for (plot in GardenPlotApi.plots) {
+                if (plot.id in tabListPlots) {
+                    if (!plot.isPestCountInaccurate && plot.pests == 0) {
+                        plot.isPestCountInaccurate = true
                     }
+                } else {
+                    plot.pests = 0
+                    plot.isPestCountInaccurate = false
                 }
-                updatePests()
             }
+            updatePests()
         }
     }
 
@@ -297,8 +325,8 @@ object PestApi {
 
     fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
 
-    fun isNearPestTrap() = EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>().any {
-        it.distanceToPlayer() < 10 && pestTrapPattern.matches(it.displayName.formattedText)
+    fun isNearPestTrap() = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(10.0).any {
+        pestTrapPattern.matches(it.displayName.formattedTextCompat())
     }
 
     private fun removePests(removedPests: Int) {
@@ -388,7 +416,7 @@ object PestApi {
             return
         }
         val disabled = with(config.pestFinder) {
-            !showDisplay && !showPlotInWorld && teleportHotkey == Keyboard.KEY_NONE
+            !showDisplay && !showPlotInWorld && teleportHotkey == GLFW.GLFW_KEY_UNKNOWN
         }
         if (disabled) {
             event.addIrrelevant("disabled in config")

@@ -21,7 +21,6 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class MiningConfig {
     @Expose
@@ -138,13 +137,6 @@ class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var crystalHollowsNamesInCore: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Private Island Ability Block", desc = "Block the mining ability when on private island.")
-    @SearchTag("Pickaxe Pickobulus")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var privateIslandNoPickaxeAbility: Boolean = true
 
     @Expose
     @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlight golden goblins you have spawned in green.")

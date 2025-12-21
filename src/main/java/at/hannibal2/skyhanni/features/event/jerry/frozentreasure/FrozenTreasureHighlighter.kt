@@ -11,12 +11,12 @@ import at.hannibal2.skyhanni.utils.blockhighlight.SkyHanniBlockHighlighter
 import at.hannibal2.skyhanni.utils.blockhighlight.TimedHighlightBlock
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.init.Blocks
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object FrozenTreasureHighlighter {
@@ -24,8 +24,8 @@ object FrozenTreasureHighlighter {
     private val config get() = SkyHanniMod.feature.event.winter.frozenTreasureHighlighter
 
     private val blockHighlighter = SkyHanniBlockHighlighter<TimedHighlightBlock>(
-        highlightCondition = { isEnabled() },
-        blockCondition = { it.block == Blocks.ice || it.block == Blocks.packed_ice },
+        highlightCondition = ::isEnabled,
+        blockCondition = { it.block == Blocks.ICE || it.block == Blocks.PACKED_ICE },
         colorProvider = { config.treasureColor },
     )
 
@@ -33,20 +33,19 @@ object FrozenTreasureHighlighter {
         return IslandType.WINTER.isCurrent() && WinterApi.inGlacialCave() && config.enabled
     }
 
-    // Why does modern versions make this not the same :(
-    private val yOffset = if (PlatformUtils.IS_LEGACY) 1 else 2
+    private const val yOffset = 2
 
     @HandleEvent(onlyOnIsland = IslandType.WINTER)
     fun onTick() {
         if (!isEnabled()) return
 
-        for (armorStand in EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(50.0)) {
+        for (armorStand in EntityUtils.getEntitiesNextToPlayer<ArmorStand>(50.0)) {
             if (armorStand.getInventoryItems().count { it.isNotEmpty() } != 1) continue
 
             val standHelmet = armorStand.getStandHelmet().orNull() ?: continue
-            if (standHelmet.isSkull() && standHelmet.displayName.endsWith("Head")) continue
+            if (standHelmet.isSkull() && standHelmet.hoverName.formattedTextCompatLeadingWhiteLessResets().endsWith("Head")) continue
 
-            val treasureLocation = armorStand.position.toLorenzVec().up(yOffset)
+            val treasureLocation = armorStand.blockPosition().toLorenzVec().up(yOffset)
             blockHighlighter.addBlock(TimedHighlightBlock(treasureLocation))
         }
     }

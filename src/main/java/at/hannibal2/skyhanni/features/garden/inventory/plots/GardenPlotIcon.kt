@@ -4,7 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -13,9 +14,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.editItemInfo
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object GardenPlotIcon {
@@ -30,7 +32,7 @@ object GardenPlotIcon {
     private var lastClickedSlotId = -1
     private val originalStack = mutableMapOf<Int, ItemStack>()
     private val cachedStack = mutableMapOf<Int, ItemStack>()
-    private val editStack = ItemStack(Items.wooden_axe)
+    private val editStack = ItemStack(Items.WOODEN_AXE)
     private val whitelistedSlot =
         listOf(2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 20, 21, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42)
 
@@ -50,7 +52,7 @@ object GardenPlotIcon {
         for ((index, internalName) in plotList) {
             val old = originalStack[index]!!
             val new = internalName.getItemStack()
-            cachedStack[index] = new.editItemInfo(old.displayName, true, old.getLore())
+            cachedStack[index] = new.editItemInfo(old.hoverName.formattedTextCompatLeadingWhiteLessResets(), true, old.getLore())
         }
     }
 
@@ -70,7 +72,7 @@ object GardenPlotIcon {
             return
         }
 
-        if (event.inventory is ContainerLocalMenu) {
+        if (event.inventory is SimpleContainer) {
             if (event.slot == 53) {
                 event.replace(editStack)
             }
@@ -106,8 +108,8 @@ object GardenPlotIcon {
         if (editMode != 0) {
             if (event.slotId in 54..89) {
                 event.cancel()
-                copyStack = event.slot?.stack?.copy()?.also {
-                    it.stackSize = 1
+                copyStack = event.slot?.item?.copy()?.also {
+                    it.count = 1
                 } ?: return
                 // TODO different format, not bold or show not in chat at all.
                 ChatUtils.chat("§6§lClick an item in the desk menu to replace it with that item!")
@@ -129,11 +131,11 @@ object GardenPlotIcon {
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         val plotList = plotList ?: return
         val list = event.toolTip
-        val index = event.slot.slotNumber
+        val index = event.slot?.index ?: return
         if (index == 53) {
             list.clear()
             list.add("§6Edit Mode")
@@ -144,13 +146,12 @@ object GardenPlotIcon {
             list.add("${if (editMode == 2) "§6► " else ""}§9RESET§7: §bClick an item in the menu to reset it to default.")
             list.add("")
             list.add("§eClick to switch Edit Mode !")
-            list.add("")
         }
         if (plotList.contains(index)) {
             val stack = originalStack[index] ?: return
             val lore = stack.getLore()
             list.clear()
-            list.add(0, stack.displayName)
+            list.add(0, stack.hoverName.formattedTextCompatLeadingWhiteLessResets())
             for (i in lore.indices) {
                 list.add(i + 1, stack.getLore()[i])
             }

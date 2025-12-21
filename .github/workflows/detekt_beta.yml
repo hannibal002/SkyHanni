@@ -23,7 +23,7 @@ jobs:
             -   name: Check if SARIF file exists
                 id: check_sarif
                 run: |
-                    if [ -f "versions/1.8.9/build/reports/detekt/main.sarif" ]; then
+                    if [ -f "build/reports/detekt/main.sarif" ]; then
                         echo "exists=true" >> $GITHUB_OUTPUT
                     else
                         echo "exists=false" >> $GITHUB_OUTPUT
@@ -32,4 +32,4 @@ jobs:
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
                 run: |
                     chmod +x .github/scripts/process_detekt_sarif.sh
-                    ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif
+                    ./.github/scripts/process_detekt_sarif.sh build/reports/detekt/main.sarif

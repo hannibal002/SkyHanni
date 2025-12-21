@@ -24,7 +24,7 @@ object GraphParkour {
             description = "Loads the current clipboard as parkour into the graph editor."
             category = CommandCategory.DEVELOPER_TEST
             callback {
-                SkyHanniMod.launchCoroutine {
+                SkyHanniMod.launchCoroutine("shgraphloadparkour command") {
                     loadParkour()
                 }
             }
@@ -122,11 +122,11 @@ object GraphParkour {
         IslandGraphs.pathFind(
             vec, "Node error",
             LorenzColor.RED.toColor(),
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         )
     }
 
-    private suspend fun loadParkour() {
+    private fun loadParkour() {
         val locations = readListFromClipboard() ?: return
         val graph = listToGraph(locations)
         GraphEditor.enable()
@@ -134,12 +134,12 @@ object GraphParkour {
         IslandGraphs.pathFind(
             locations.first(),
             "Start of parkour",
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         )
         ChatUtils.chat("Graph Editor loaded a parkour from clipboard!")
     }
 
-    private suspend fun readListFromClipboard(): List<LorenzVec>? {
+    private fun readListFromClipboard(): List<LorenzVec>? {
         val clipboard = OSUtils.readFromClipboard() ?: return null
         return clipboard.split("\n").map { line ->
             val raw = line.replace("\"", "").replace(",", "")

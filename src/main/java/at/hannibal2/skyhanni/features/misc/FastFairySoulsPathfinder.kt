@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -32,6 +31,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -119,11 +119,11 @@ object FastFairySoulsPathfinder {
                 if (aboveNearest.position.distanceToPlayer() < 10) return aboveNearest.position
             }
 
-            ErrorManager.logErrorStateWithData(
-                "unknown fairy soul",
-                "user clicked a fairy soul while far away from known fairy souls",
-                "nearest loc" to nearest,
-                "player loc" to LocationUtils.playerLocation(),
+            IslandGraphs.reportLocation(
+                playerLocation,
+                userFacingReason = "unknown fairy soul",
+                technicalInfo = "user clicked a fairy soul while far away from known fairy souls",
+                "nearest soul" to nearest,
                 "distance" to nearest.position.distanceToPlayer().roundTo(1),
                 "inAir" to inAir,
             )

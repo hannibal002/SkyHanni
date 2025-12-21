@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.inPartialMinutes
 import kotlin.math.ceil
 import kotlin.time.Duration
@@ -36,7 +37,7 @@ object HitmanApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val storage = storage ?: return
         if (event.inventoryName != "Rabbit Hitman") return
-        val summaryItem = event.inventoryItems[4].takeIf { it?.displayName == "§cRabbit Hitman" } ?: return
+        val summaryItem = event.inventoryItems[4].takeIf { it?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cRabbit Hitman" } ?: return
         val availableEggs = CFDataLoader.hitmanAvailableEggsPattern.firstMatcher(summaryItem.getLore()) {
             group("amount").toInt()
         } ?: return

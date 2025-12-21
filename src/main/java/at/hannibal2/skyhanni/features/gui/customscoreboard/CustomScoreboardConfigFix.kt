@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.json.addElementsAfter
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
@@ -13,7 +14,9 @@ import com.google.gson.JsonPrimitive
 object CustomScoreboardConfigFix {
 
     private const val PREFIX = "gui.customScoreboard"
+    private const val SCOREBOARD_ENTRIES_KEY = "$PREFIX.scoreboardEntries"
     private const val DISPLAY_PREFIX = "$PREFIX.display"
+    private const val CHUNKED_STATS_KEY = "$DISPLAY_PREFIX.chunkedStats.chunkedStats"
     private const val DISPLAY_CONFIG_PREFIX = "$PREFIX.displayConfig"
     private const val EVENTS_CONFIG_KEY = "$DISPLAY_CONFIG_PREFIX.eventsConfig"
     private const val ALIGNMENT_KEY = "$DISPLAY_PREFIX.alignment"
@@ -102,6 +105,9 @@ object CustomScoreboardConfigFix {
         event.transform(90, EVENT_ENTRIES_KEY) { element ->
             JsonArray().apply { element.asJsonArray.toSet().forEach(::add) }
         }
+
+        event.addScoreboardEntry(111, ScoreboardConfigElement.SOWDUST, addAfter = ScoreboardConfigElement.COPPER)
+        event.addChunkedStat(111, ChunkedStatsLine.SOWDUST, addAfter = ChunkedStatsLine.COPPER)
     }
 
     private fun ConfigUpdaterMigrator.ConfigFixEvent.addEvent(version: Int, vararg keys: ScoreboardConfigEventElement) {
@@ -111,6 +117,26 @@ object CustomScoreboardConfigFix {
                     add(JsonPrimitive(key.name))
                 }
             }
+        }
+    }
+
+    private fun ConfigUpdaterMigrator.ConfigFixEvent.addScoreboardEntry(
+        version: Int,
+        vararg keys: ScoreboardConfigElement,
+        addAfter: ScoreboardConfigElement? = null,
+    ) {
+        transform(version, SCOREBOARD_ENTRIES_KEY) { element ->
+            element.addElementsAfter(keys, addAfter)
+        }
+    }
+
+    private fun ConfigUpdaterMigrator.ConfigFixEvent.addChunkedStat(
+        version: Int,
+        vararg keys: ChunkedStatsLine,
+        addAfter: ChunkedStatsLine? = null,
+    ) {
+        transform(version, CHUNKED_STATS_KEY) { element ->
+            element.addElementsAfter(keys, addAfter)
         }
     }
 

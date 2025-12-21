@@ -21,13 +21,17 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -54,6 +58,14 @@ object GardenPlotApi {
     private val barnNamePattern by patternGroup.pattern(
         "barnname",
         "§.(?<name>The Barn)",
+    )
+
+    /**
+     * REGEX-TEST: §7Greenhouse Plot
+     */
+    private val greenhousePlotPattern by patternGroup.pattern(
+        "greenhouse",
+        "§7Greenhouse Plot",
     )
 
     /**
@@ -105,8 +117,8 @@ object GardenPlotApi {
      * REGEX-TEST: Spray: §r§aHoney Jar §r§7(53s)
      */
     private val plotSprayedTablistPattern by patternGroup.pattern(
-        "tablist.spray",
-        "Spray: §r§[7a](?<spray>[\\w\\s]+)(?:§r§7\\((?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\))?",
+        "tablist.spraytime",
+        "Spray: §r§[7a](?<spray>[\\w\\s]+)(?:§r§7\\((?<time>.*)\\))?",
     )
     var plots = listOf<Plot>()
 
@@ -114,7 +126,11 @@ object GardenPlotApi {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+    fun inGreenhouse(): Boolean {
+        return currentPlot?.greenhouse ?: false
+    }
+
+    class Plot(val id: Int, var inventorySlot: Int, val box: AABB, val middle: LorenzVec)
 
     private var currentPlot: Plot? = null
 
@@ -159,6 +175,9 @@ object GardenPlotApi {
 
         @Expose
         var uncleared: Boolean,
+
+        @Expose
+        var greenhouse: Boolean,
     )
 
     data class SprayData(
@@ -178,6 +197,7 @@ object GardenPlotApi {
             isPestCountInaccurate = false,
             locked = true,
             uncleared = false,
+            greenhouse = false,
         )
     }
 
@@ -229,6 +249,12 @@ object GardenPlotApi {
             this.getData()?.locked = value
         }
 
+    var Plot.greenhouse: Boolean
+        get() = this.getData()?.greenhouse ?: false
+        set(value) {
+            this.getData()?.greenhouse = value
+        }
+
     fun Plot.markExpiredSprayAsNotified() {
         getData()?.sprayHasNotified = true
     }
@@ -252,14 +278,6 @@ object GardenPlotApi {
     private fun sendSprayMessage(plot: String, spray: String, time: String) {
         ChatUtils.chat("§r§aPlot §r§7- §r§b$plot §r§7was sprayed with §r§a$spray§r§7!§r")
         ChatUtils.chat("§r§7This will expire in §r§a$time§r§7!§r")
-    }
-
-    private fun isSprayAccurate(
-        sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType,
-    ): Boolean {
-        return sprayExpiryTime >= expectedExpireTime + 6.seconds ||
-            sprayExpiryTime <= expectedExpireTime - 1.minutes ||
-            currentSpray != newSpray
     }
 
     private fun sprayMessageEligible(
@@ -300,7 +318,7 @@ object GardenPlotApi {
                 val a = LorenzVec(minX, 0.0, minY)
                 val b = LorenzVec(maxX, 256.0, maxY)
                 val middle = a.middle(b).copy(y = 10.0)
-                val box = a.axisAlignedTo(b).expand(0.0001, 0.0, 0.0001)
+                val box = a.axisAlignedTo(b).inflate(0.0001, 0.0, 0.0001)
                 list.add(Plot(id, slot, box, middle))
                 slot++
             }
@@ -320,6 +338,7 @@ object GardenPlotApi {
             val spray = SprayType.getByNameOrNull(sprayName) ?: return
 
             plot?.setSpray(spray, 30.minutes)
+
         }
         cleanPlotChatPattern.matchMatcher(event.message) {
             val plotId = group("plot").toInt()
@@ -350,21 +369,25 @@ object GardenPlotApi {
         for (plot in plots) {
             val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
             val lore = itemStack.getLore()
-            plotNamePattern.matchMatcher(itemStack.displayName) {
+            plotNamePattern.matchMatcher(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val plotName = group("name")
                 plot.name = plotName
             }
-            barnNamePattern.matchMatcher(itemStack.displayName) {
+            barnNamePattern.matchMatcher(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 plot.name = group("name")
             }
             plot.locked = false
             plot.isBeingPasted = false
+            plot.greenhouse = false
             for (line in lore) {
                 if (line.contains("§7Cost:")) plot.locked = true
                 if (line.contains("§7Pasting in progress:")) plot.isBeingPasted = true
                 plot.uncleared = false
                 uncleanedPlotPattern.matchMatcher(line) {
                     plot.uncleared = true
+                }
+                greenhousePlotPattern.matchMatcher(line) {
+                    plot.greenhouse = true
                 }
             }
         }
@@ -377,24 +400,16 @@ object GardenPlotApi {
         if (plot.isBarn()) return
 
         plotSprayedTablistPattern.firstMatcher(event.lines.map { it.trim() }) {
-
             val sprayName = group("spray").trim()
-            val minutes = group("minutes")?.toInt() ?: 0
-            val seconds = group("seconds")?.toInt() ?: 0
-
-            val time = if (seconds == 0) (minutes + 1).minutes
-            else minutes.minutes + seconds.seconds
-
-            val timeString = when {
-                minutes != 0 && seconds != 0 -> "${minutes}m ${seconds}s"
-                minutes != 0 -> "${minutes + 1}m"
-                else -> "${seconds}s"
+            val time = groupOrNull("time")?.let { getTablistEndTime(it, plot.getData()?.sprayExpiryTime) }
+            if (time == null) {
+                plot.removeSpray()
+                return
             }
 
             val newSpray: SprayType? = SprayType.getByNameOrNull(sprayName)
 
             if (plot.currentSpray != null) {
-                val expectedExpireTime = SimpleTimeMark.now() + time
                 val data = plot.getData() ?: return
 
                 val sprayExpiryTime = data.sprayExpiryTime ?: return
@@ -404,33 +419,30 @@ object GardenPlotApi {
                     plot.removeSpray()
                     return
                 } else {
-                    if (isSprayAccurate(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
-                        if (sprayMessageEligible(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
-                            sendSprayMessage(plot.name, sprayName, timeString)
-                        }
-                        plot.setSpray(newSpray, time)
+                    if (sprayMessageEligible(sprayExpiryTime, time, currentSpray, newSpray)) {
+                        sendSprayMessage(plot.name, sprayName, time.timeUntil().format())
                     }
+                    plot.setSpray(newSpray, time.timeUntil())
                 }
             } else {
                 if (newSpray == null) return
                 if (config.newSprayNotification) {
-                    sendSprayMessage(plot.name, sprayName, timeString)
+                    sendSprayMessage(plot.name, sprayName, time.timeUntil().format())
                 }
-                plot.setSpray(newSpray, time)
+                plot.setSpray(newSpray, time.timeUntil())
             }
         }
     }
 
     @HandleEvent
     fun onPlotChange(event: PlotChangeEvent) {
-        ChatUtils.debug("Current Plot: " + event.plot?.name)
         DelayedRun.runDelayed(3.seconds) {
             TabWidget.forceUpdateWidget(TabWidget.PESTS)
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (event.isLocalPlayer) {
             DelayedRun.runDelayed(.5.seconds) {
                 checkCurrentPlot()

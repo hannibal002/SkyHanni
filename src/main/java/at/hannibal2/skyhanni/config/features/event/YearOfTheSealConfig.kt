@@ -29,6 +29,7 @@ class YearOfTheSealConfig {
     @ConfigOption(name = "Bouncy Ball Line", desc = "Shows a line for your bouncy balls thrown (Only works on normal ones, not giant).")
     @ConfigEditorBoolean
     @SearchTag("beach")
+    @FeatureToggle
     val bouncyBallLine: Property<Boolean> = Property.of(true)
 
     @Expose

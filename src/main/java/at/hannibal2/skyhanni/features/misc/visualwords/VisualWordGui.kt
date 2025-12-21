@@ -22,17 +22,17 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
-import net.minecraft.util.MathHelper
-import org.lwjgl.input.Keyboard
+import net.minecraft.util.Mth
+import org.lwjgl.glfw.GLFW
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-open class VisualWordGui : SkyhanniBaseScreen() {
+open class VisualWordGui : SkyHanniBaseScreen() {
 
     private var guiLeft = 0
     private var guiTop = 0
@@ -78,7 +78,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             }
         }
 
-        fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
+        fun isInGui() = Minecraft.getInstance().screen is VisualWordGui
         var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
         var drawImport = false
 
@@ -253,9 +253,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
             if (modifiedWords.isEmpty()) {
                 modifiedWords = ModifyVisualWords.userModifiedWords
-                //#if MC > 1.21
-                //$$ .map { it.toVisualWord() }.toMutableList()
-                //#endif
+                    .map { it.toVisualWord() }.toMutableList()
             }
 
             if (toRemove != null) {
@@ -461,7 +459,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
         if (!currentlyEditing) {
-            if (keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_S) {
+            if (keyCode == GLFW.GLFW_KEY_DOWN || keyCode == GLFW.GLFW_KEY_S) {
                 if (KeyboardManager.isModifierKeyDown()) {
                     pageScroll = -(modifiedWords.size * 30 - 100)
                 } else {
@@ -469,7 +467,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 }
                 scrollScreen()
             }
-            if (keyCode == Keyboard.KEY_UP || keyCode == Keyboard.KEY_W) {
+            if (keyCode == GLFW.GLFW_KEY_UP || keyCode == GLFW.GLFW_KEY_W) {
                 if (KeyboardManager.isModifierKeyDown()) {
                     pageScroll = 0
                 } else {
@@ -482,7 +480,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         if (currentTextBox == SelectedTextBox.NONE) return
         if (currentIndex >= modifiedWords.size || currentIndex == -1) return
 
-        if (keyCode == Keyboard.KEY_BACK) {
+        if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             if (currentText.isNotEmpty()) {
                 currentText = if (KeyboardManager.isDeleteLineDown()) ""
                 else if (KeyboardManager.isDeleteWordDown()) {
@@ -504,7 +502,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         }
 
         if (KeyboardManager.isPastingKeysDown()) {
-            SkyHanniMod.launchCoroutine {
+            SkyHanniMod.launchCoroutine("visual word pasting") {
                 val clipboard = OSUtils.readFromClipboard().orEmpty()
                 for (char in clipboard) {
                     if (currentText.length < maxTextLength && !Character.isISOControl(char)) {
@@ -546,16 +544,13 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             pageScroll = 0
         }
 
-        pageScroll = MathHelper.clamp_int(pageScroll, -(modifiedWords.size * 30 - 100), 0)
+        pageScroll = Mth.clamp(pageScroll, -(modifiedWords.size * 30 - 100), 0)
         lastMouseScroll = 0
     }
 
     private fun saveChanges() {
 
-        ModifyVisualWords.userModifiedWords = modifiedWords
-        //#if MC > 1.21
-        //$$ .map { VisualWordText.fromVisualWord(it) }.toMutableList()
-        //#endif
+        ModifyVisualWords.userModifiedWords = modifiedWords.map { VisualWordText.fromVisualWord(it) }.toMutableList()
         ModifyVisualWords.update()
 
         SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")

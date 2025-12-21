@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGems
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 // widget
@@ -17,6 +18,8 @@ object ScoreboardElementGems : ScoreboardElement() {
     }
 
     override val configLine = "Gems: §a57,873"
+
+    override val elementPatterns = listOf(ScoreboardPattern.gemsPattern)
 
     override fun showIsland() = !SkyBlockUtils.inAnyIsland(IslandType.THE_RIFT, IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 }

@@ -102,33 +102,29 @@ object SkyHanniEvents {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        //#if MC > 1.21
-        //$$ try {
-        //#endif
-        val list = handlers.values.toMutableList()
+        try {
+            val list = handlers.values.toMutableList()
 
-        for (second in seconds) {
-            if (event.repeatSeconds(second)) {
+            for (second in seconds) {
+                if (event.repeatSeconds(second)) {
 
-                for (handler in list) {
-                    val log = handler.invokeLog
-                    val current = log.invokeCount
+                    for (handler in list) {
+                        val log = handler.invokeLog
+                        val current = log.invokeCount
 
-                    val storage = log.overTimeLog[second]
-                    if (storage == null) {
-                        log.overTimeLog[second] = EventInvokeData(current, 0)
-                    } else {
-                        storage.diff = current - storage.oldValue
-                        storage.oldValue = current
+                        val storage = log.overTimeLog[second]
+                        if (storage == null) {
+                            log.overTimeLog[second] = EventInvokeData(current, 0)
+                        } else {
+                            storage.diff = current - storage.oldValue
+                            storage.oldValue = current
+                        }
                     }
                 }
             }
+        } catch (_: Exception) {
+            // ignore this error on 1.21 for now
         }
-        //#if MC > 1.21
-        //$$ } catch (_: Exception) {
-        //$$ // ignore this error on 1.21 for now
-        //$$ }
-        //#endif
     }
 
     class EventInvokeData(var oldValue: Long, var diff: Long)

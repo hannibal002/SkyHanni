@@ -27,7 +27,7 @@ object GardenPlotMenuHighlighting {
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val list = mutableListOf<PlotStatusType>()
-            val plot = GardenPlotApi.plots.find { it.inventorySlot == slot.slotIndex } ?: continue
+            val plot = GardenPlotApi.plots.find { it.inventorySlot == slot.containerSlot } ?: continue
 
             val (pestsEnabled, spraysEnabled, locksEnabled, currentEnabled, pastesEnabled) =
                 PlotStatusType.entries.map { it in config.deskPlotStatusTypes }
@@ -53,7 +53,7 @@ object GardenPlotMenuHighlighting {
             val items = InventoryUtils.getItemsInOpenChest()
             if (plot.key.inventorySlot in items.indices) {
                 val slot = items[plot.key.inventorySlot]
-                slot.stack.stackSize = handleStackSize(plot.key, plot.value)
+                slot.item.count = handleStackSize(plot.key, plot.value)
                 slot.highlight(plot.value.highlightColor)
             }
         }

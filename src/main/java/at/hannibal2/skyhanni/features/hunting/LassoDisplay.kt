@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -16,8 +17,7 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.entity.EntityLiving
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object LassoDisplay {
@@ -32,6 +32,8 @@ object LassoDisplay {
         config.lassoDisplayPosition.renderRenderable(display, posLabel = "Lasso Display")
     }
 
+    // TODO: use entity events
+    @OptIn(AllEntitiesGetter::class)
     @HandleEvent(SkyHanniTickEvent::class, onlyOnSkyblock = true)
     fun onTick() {
         if (!config.lassoDisplay) return
@@ -42,15 +44,10 @@ object LassoDisplay {
             return
         }
         for (entity in EntityUtils.getAllEntities()) {
-            //#if MC < 1.21
-            if (entity !is EntityLiving) continue
-            val leashEntity = entity.leashedToEntity ?: continue
-            //#else
-            //$$ if (entity !is net.minecraft.entity.Leashable) continue
-            //$$ val leashEntity = entity.leashHolder ?: continue
-            //#endif
+            if (entity !is net.minecraft.world.entity.Leashable) continue
+            val leashEntity = entity.leashHolder ?: continue
             if (!leashEntity.isLocalPlayer) continue
-            val entitiesNearby = EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.position.toLorenzVec().up(2), 2.0)
+            val entitiesNearby = EntityUtils.getEntitiesNearby<ArmorStand>(entity.blockPosition().toLorenzVec().up(2), 2.0)
             for (armorStandEntity in entitiesNearby) {
                 val name = armorStandEntity.displayName.formattedTextCompat()
                 if (name.contains("§l§m")) {

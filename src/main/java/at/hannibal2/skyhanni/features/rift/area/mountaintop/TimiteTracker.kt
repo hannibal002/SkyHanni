@@ -34,10 +34,6 @@ object TimiteTracker {
     private val TIMITE = "TIMITE".toInternalName()
 
     class Data : ItemTrackerData() {
-        override fun resetItems() {
-            return
-        }
-
         override fun getDescription(timesGained: Long): List<String> = emptyList()
 
         override fun getCoinName(item: TrackedItem): String = "§5Motes"
@@ -58,18 +54,23 @@ object TimiteTracker {
         val profit = tracker.drawItems(data, { true }, this)
 
         NeuItems.getRecipes(HIGHLITE).singleOrNull()?.let { highliteRecipe ->
-            var craftableAmount = 0
+            var craftableAmountByYoungite = 0
+            var craftableAmountByTimite = 0
+            var craftableAmountByObsolite = 0
 
             for (neededItem in ItemUtils.neededItems(highliteRecipe)) {
                 if (neededItem.key in validItems) {
                     data.items[neededItem.key]?.let {
-                        val amountCanCraft = it.totalAmount.toInt() / neededItem.value
-                        if (craftableAmount == 0 || amountCanCraft < craftableAmount) {
-                            craftableAmount = amountCanCraft
+                        when (neededItem.key) {
+                            "YOUNGITE".toInternalName() -> craftableAmountByYoungite = it.totalAmount.toInt() / neededItem.value
+                            TIMITE -> craftableAmountByTimite = it.totalAmount.toInt() / neededItem.value
+                            "OBSOLITE".toInternalName() -> craftableAmountByObsolite = it.totalAmount.toInt() / neededItem.value
                         }
                     }
                 }
             }
+            val craftableAmountArray = listOf(craftableAmountByYoungite, craftableAmountByTimite, craftableAmountByObsolite)
+            val craftableAmount = craftableAmountArray.min()
             val motes = HIGHLITE.motesNpcPrice()?.times(craftableAmount)?.shortFormat() ?: "0"
             if (craftableAmount > 0) {
                 addSearchString(" §7${craftableAmount.shortFormat()}x ${HIGHLITE.repoItemName} Craftable§7: §5$motes motes")
@@ -80,7 +81,7 @@ object TimiteTracker {
         addSearchString("§dTotal Profit§7: §5${profit.toInt().shortFormat()} Motes")
     }
 
-    private val tracker = SkyHanniItemTracker("Timite Tracker", { Data() }, { it.rift.timiteTracker }) {
+    private val tracker = SkyHanniItemTracker("Timite Tracker", ::Data, { it.rift.timiteTracker }) {
         drawDisplay(it)
     }
 

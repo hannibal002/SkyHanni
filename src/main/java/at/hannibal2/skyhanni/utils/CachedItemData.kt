@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
 
 data class CachedItemData(
@@ -36,7 +36,7 @@ data class CachedItemData(
 
     var lastLoreFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
 
-    var lastExtraAttributes: NBTTagCompound? = null,
+    var lastExtraAttributes: CompoundTag? = null,
 
     var lastExtraAttributesFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
 

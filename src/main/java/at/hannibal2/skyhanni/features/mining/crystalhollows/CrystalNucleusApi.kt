@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -48,6 +49,7 @@ object CrystalNucleusApi {
     private val FORTUNE_IV_BOOK_ITEM = "FORTUNE;4".toInternalName()
     val EPIC_BAL_ITEM = "BAL;3".toInternalName()
     val LEGENDARY_BAL_ITEM = "BAL;4".toInternalName()
+    val BAL_SHARD_ITEM = "ATTRIBUTE_SHARD_DEEP_TECHNIQUE;1".toInternalName()
     private val PRECURSOR_APPARATUS_ITEM = "PRECURSOR_APPARATUS".toInternalName()
     val JUNGLE_KEY_ITEM = "JUNGLE_KEY".toInternalName()
     private val ROBOT_PARTS_ITEMS = listOf(
@@ -63,7 +65,7 @@ object CrystalNucleusApi {
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
-        if (event.itemStack.displayName != "§fEnchanted Book") return
+        if (event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§fEnchanted Book") return
         when (event.itemStack.getHypixelEnchantments()?.keys?.firstOrNull() ?: return) {
             "lapidary" -> loot.addOrPut(LAPIDARY_I_BOOK_ITEM, 1)
             "fortune" -> loot.addOrPut(FORTUNE_IV_BOOK_ITEM, 1)
