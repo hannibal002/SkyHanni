@@ -46,7 +46,7 @@ jobs:
                 if: always()
                 id: check_sarif
                 run: |
-                    if [ -f "versions/1.21.5/build/reports/detekt/main.sarif" ]; then
+                    if [ -f "build/reports/detekt/main.sarif" ]; then
                         echo "exists=true" >> $GITHUB_OUTPUT
                     else
                         echo "exists=false" >> $GITHUB_OUTPUT
