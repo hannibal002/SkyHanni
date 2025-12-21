@@ -37,7 +37,9 @@ object HitmanApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val storage = storage ?: return
         if (event.inventoryName != "Rabbit Hitman") return
-        val summaryItem = event.inventoryItems[4].takeIf { it?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cRabbit Hitman" } ?: return
+        val summaryItem = event.inventoryItems[4].takeIf {
+            it?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cRabbit Hitman"
+        } ?: return
         val availableEggs = CFDataLoader.hitmanAvailableEggsPattern.firstMatcher(summaryItem.getLore()) {
             group("amount").toInt()
         } ?: return

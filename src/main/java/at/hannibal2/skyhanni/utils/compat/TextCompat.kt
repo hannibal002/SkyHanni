@@ -198,7 +198,7 @@ val map = mutableMapOf<Int, MessageSignature>()
 
 fun idToMessageSignature(id: Int): MessageSignature {
     val newId = abs(id % (255 * 128))
-    if (map.contains(newId)) return map[newId]!!
+    map[newId]?.let { return it }
     val bytes = ByteArray(256)
     val div = newId / 128
     val mod = newId % 128

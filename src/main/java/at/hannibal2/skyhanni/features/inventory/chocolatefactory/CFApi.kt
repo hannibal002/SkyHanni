@@ -218,9 +218,11 @@ object CFApi {
     }
 
     fun getNextLevelName(stack: ItemStack): String? = upgradeLorePattern.firstMatcher(stack.getLore()) {
-        val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+        val isEmployee = stack.getLore().any { it == "§8Employee" }
+        val upgradeName = if (!isEmployee) groupOrNull("upgradename")
+        else employeeNamePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             groupOrNull("employee")
-        } else groupOrNull("upgradename")
+        }
         val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")
         if (upgradeName == null || nextLevel == null) null
         else "$upgradeName $nextLevel"

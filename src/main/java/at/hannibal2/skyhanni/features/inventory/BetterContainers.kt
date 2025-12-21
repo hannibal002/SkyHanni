@@ -25,6 +25,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.Container
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
@@ -271,33 +272,12 @@ object BetterContainers {
         backed.upload()
     }
 
-    private fun generateModernTex(handler: ChestMenu) {
-        if (!hasItem || !hasNullPane) {
-            gpuTex = null
-            return
-        }
-
-        loaded = true
-        val inventorySlots = handler.slots
-        if (lastSlots !== inventorySlots) {
-            generateBufferedImages()
-            lastSlots = inventorySlots
-        }
-
-        val handlerInventory = handler.container
-        val bufferedImageBase = bufferedImageBase ?: return
-        val horizontalTexMult = bufferedImageBase.width / 256
-        val verticalTexMult = bufferedImageBase.height / 256
-
-        val bufferedImageNew = BufferedImage(
-            bufferedImageBase.width,
-            bufferedImageBase.height,
-            BufferedImage.TYPE_INT_ARGB,
-        )
-        val g = bufferedImageNew.createGraphics()
-        g.drawImage(bufferedImageBase, 0, 0, null)
-        g.dispose()
-
+    private fun processChestIndices(
+        handlerInventory: Container,
+        horizontalTexMult: Int,
+        verticalTexMult: Int,
+        bufferedImageNew: BufferedImage
+    ) {
         val size = handlerInventory.containerSize
         val isSlot = Array(9) { BooleanArray(size / 9) }
         val isButton = Array(9) { BooleanArray(size / 9) }
@@ -326,73 +306,102 @@ object BetterContainers {
             }
         }
 
-        try {
-            for (index in 0..<size) {
-                val stack: ItemStack = handlerInventory.getItem(index) ?: continue
-                val xi = index % 9
-                val yi = index / 9
+        for (index in 0..<size) {
+            val stack: ItemStack = handlerInventory.getItem(index) ?: continue
+            val xi = index % 9
+            val yi = index / 9
 
-                val isThisButton = isButton[xi][yi]
-                val isThisSlot = isSlot[xi][yi]
-                if (!isThisButton && !isThisSlot) continue
+            val isThisButton = isButton[xi][yi]
+            val isThisSlot = isSlot[xi][yi]
+            if (!isThisButton && !isThisSlot) continue
 
-                val x = 7 * horizontalTexMult + xi * 18 * horizontalTexMult
-                val y = 17 * verticalTexMult + yi * 18 * verticalTexMult
+            val x = 7 * horizontalTexMult + xi * 18 * horizontalTexMult
+            val y = 17 * verticalTexMult + yi * 18 * verticalTexMult
 
-                val on: Boolean = isToggleOn(stack)
-                val off: Boolean = isToggleOff(stack)
+            val on: Boolean = isToggleOn(stack)
+            val off: Boolean = isToggleOff(stack)
 
-                if (on || off) {
-                    for (x2 in 0..17) {
-                        for (y2 in 0..17) {
-                            val toggle: BufferedImage = (if (on) bufferedImageOn else bufferedImageOff) ?: continue
-                            val c = Color(toggle.getRGB(x2, y2), true)
-                            if (c.alpha < 10) continue
-                            bufferedImageNew.setRGB(x + x2, y + y2, c.rgb)
-                        }
+            if (on || off) {
+                for (x2 in 0..17) {
+                    for (y2 in 0..17) {
+                        val toggle: BufferedImage = (if (on) bufferedImageOn else bufferedImageOff) ?: continue
+                        val c = Color(toggle.getRGB(x2, y2), true)
+                        if (c.alpha < 10) continue
+                        bufferedImageNew.setRGB(x + x2, y + y2, c.rgb)
                     }
-                    continue
                 }
-
-                val targetArr = if (isThisButton) isButton else isSlot
-                val targetBuffer = (if (isThisButton) bufferedImageButton else bufferedImageSlot) ?: continue
-
-                val up = yi > 0 && targetArr[xi][yi - 1]
-                val right = xi < targetArr.size - 1 && targetArr[xi + 1][yi]
-                val down = yi < targetArr[xi].size - 1 && targetArr[xi][yi + 1]
-                val left = xi > 0 && targetArr[xi - 1][yi]
-
-                val upLeft = yi > 0 && xi > 0 && targetArr[xi - 1][yi - 1]
-                val upRight = yi > 0 && xi < targetArr.size - 1 && targetArr[xi + 1][yi - 1]
-                val downRight = xi < targetArr.size - 1 && yi < targetArr[xi + 1].size - 1 && targetArr[xi + 1][yi + 1]
-                val downLeft = xi > 0 && yi < targetArr[xi - 1].size - 1 && targetArr[xi - 1][yi + 1]
-
-                val ctmData = CTMUtils.CTMData(
-                    up, right, down, left,
-                    upLeft, upRight, downRight, downLeft,
-                )
-                val ctmIndex: Int = CTMUtils.getCTMIndex(ctmData)
-
-                val rgbArray = targetBuffer.getRGB(
-                    (ctmIndex % 12) * 19 * horizontalTexMult,
-                    (ctmIndex / 12) * 19 * verticalTexMult,
-                    18 * horizontalTexMult,
-                    18 * verticalTexMult,
-                    null,
-                    0,
-                    18 * verticalTexMult,
-                )
-                bufferedImageNew.setRGB(
-                    x,
-                    y,
-                    18 * horizontalTexMult,
-                    18 * verticalTexMult,
-                    rgbArray,
-                    0,
-                    18 * verticalTexMult,
-                )
+                continue
             }
 
+            val targetArr = if (isThisButton) isButton else isSlot
+            val targetBuffer = (if (isThisButton) bufferedImageButton else bufferedImageSlot) ?: continue
+
+            val up = yi > 0 && targetArr[xi][yi - 1]
+            val right = xi < targetArr.size - 1 && targetArr[xi + 1][yi]
+            val down = yi < targetArr[xi].size - 1 && targetArr[xi][yi + 1]
+            val left = xi > 0 && targetArr[xi - 1][yi]
+
+            val upLeft = yi > 0 && xi > 0 && targetArr[xi - 1][yi - 1]
+            val upRight = yi > 0 && xi < targetArr.size - 1 && targetArr[xi + 1][yi - 1]
+            val downRight = xi < targetArr.size - 1 && yi < targetArr[xi + 1].size - 1 && targetArr[xi + 1][yi + 1]
+            val downLeft = xi > 0 && yi < targetArr[xi - 1].size - 1 && targetArr[xi - 1][yi + 1]
+
+            val ctmData = CTMUtils.CTMData(
+                up, right, down, left,
+                upLeft, upRight, downRight, downLeft,
+            )
+            val ctmIndex: Int = CTMUtils.getCTMIndex(ctmData)
+
+            val rgbArray = targetBuffer.getRGB(
+                (ctmIndex % 12) * 19 * horizontalTexMult,
+                (ctmIndex / 12) * 19 * verticalTexMult,
+                18 * horizontalTexMult,
+                18 * verticalTexMult,
+                null,
+                0,
+                18 * verticalTexMult,
+            )
+            bufferedImageNew.setRGB(
+                x,
+                y,
+                18 * horizontalTexMult,
+                18 * verticalTexMult,
+                rgbArray,
+                0,
+                18 * verticalTexMult,
+            )
+        }
+    }
+
+    private fun generateModernTex(handler: ChestMenu) {
+        if (!hasItem || !hasNullPane) {
+            gpuTex = null
+            return
+        }
+
+        loaded = true
+        val inventorySlots = handler.slots
+        if (lastSlots !== inventorySlots) {
+            generateBufferedImages()
+            lastSlots = inventorySlots
+        }
+
+        val handlerInventory = handler.container
+        val bufferedImageBase = bufferedImageBase ?: return
+        val horizontalTexMult = bufferedImageBase.width / 256
+        val verticalTexMult = bufferedImageBase.height / 256
+
+        val bufferedImageNew = BufferedImage(
+            bufferedImageBase.width,
+            bufferedImageBase.height,
+            BufferedImage.TYPE_INT_ARGB,
+        )
+        val g = bufferedImageNew.createGraphics()
+        g.drawImage(bufferedImageBase, 0, 0, null)
+        g.dispose()
+
+        try {
+            processChestIndices(handlerInventory, horizontalTexMult, verticalTexMult, bufferedImageNew)
             when (gpuTex) {
                 null -> uploadDynamicTexture(bufferedImageNew)
                 else -> updateDynamicTexture(bufferedImageNew)

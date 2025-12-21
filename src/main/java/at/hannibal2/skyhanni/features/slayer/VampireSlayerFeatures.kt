@@ -72,7 +72,8 @@ object VampireSlayerFeatures {
 
     // Nicked support
     private val username
-        get() = EntityUtils.getEntities<LocalPlayer>().firstOrNull()?.name.formattedTextCompatLessResets() ?: error("own player is null")
+        get() = EntityUtils.getEntities<LocalPlayer>().firstOrNull()?.name?.formattedTextCompatLessResets()
+            ?: error("own player is null")
 
     private val BLOOD_ICHOR_TEXTURE by lazy { SkullTextureHolder.getTexture("BLOOD_ICHOR") }
     private val KILLER_SPRING_TEXTURE by lazy { SkullTextureHolder.getTexture("KILLER_SPRING") }
