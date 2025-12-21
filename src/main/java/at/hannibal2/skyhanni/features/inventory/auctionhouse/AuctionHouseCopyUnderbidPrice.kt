@@ -63,7 +63,7 @@ object AuctionHouseCopyUnderbidPrice {
             OSUtils.copyToClipboard("")
             return
         }
-        val newPrice = price * item.stackSize - 1
+        val newPrice = price * item.count - 1
         OSUtils.copyToClipboard("$newPrice")
         ChatUtils.chat("Copied ${newPrice.addSeparators()} to clipboard. (Copy Underbid Price)")
     }

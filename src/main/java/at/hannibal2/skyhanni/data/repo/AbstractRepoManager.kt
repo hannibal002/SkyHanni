@@ -83,10 +83,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         get() = GitHubUtils.RepoLocation(config.location, debugConfig.logRepoErrors)
     val repoMutex = Mutex()
 
-    open val shouldRegisterUpdateCommand: Boolean = true
-    open val shouldRegisterStatusCommand: Boolean = true
-    open val shouldRegisterReloadCommand: Boolean = true
-
     abstract val updateCommand: String
     abstract val statusCommand: String
     abstract val reloadCommand: String
@@ -110,7 +106,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     // Will be invoked by the implementation of this class
     @Suppress("HandleEventInspection")
     fun registerCommands(event: CommandRegistrationEvent) {
-        if (shouldRegisterUpdateCommand) event.registerBrigadier(updateCommand) {
+        event.registerBrigadier(updateCommand) {
             description = "Remove and re-download the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
             simpleCallback { updateRepo("/$updateCommand", forceReset = true) }
@@ -119,7 +115,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 updateRepo("/$updateCommand force", forceReset = it)
             }
         }
-        if (shouldRegisterStatusCommand) event.registerBrigadier(statusCommand) {
+        event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
             coroutineSimpleCallback {
@@ -129,7 +125,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 progress.end("done showing status")
             }
         }
-        if (shouldRegisterReloadCommand) event.registerBrigadier(reloadCommand) {
+        event.registerBrigadier(reloadCommand) {
             description = "Reloads the local $commonName repo"
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {

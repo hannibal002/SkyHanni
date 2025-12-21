@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import net.minecraft.init.Blocks
+import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object RiftAgaricusCap {
@@ -42,7 +42,7 @@ object RiftAgaricusCap {
         val currentLocation = BlockUtils.getTargetedBlock() ?: return null
 
         when (currentLocation.getBlockAt()) {
-            Blocks.brown_mushroom -> {
+            Blocks.BROWN_MUSHROOM -> {
                 return if (location != currentLocation) {
                     startTime = SimpleTimeMark.now()
                     currentLocation
@@ -54,7 +54,7 @@ object RiftAgaricusCap {
                 }
             }
 
-            Blocks.red_mushroom -> {
+            Blocks.RED_MUSHROOM -> {
                 if (location == currentLocation) {
                     startTime = SimpleTimeMark.farFuture()
                     return location

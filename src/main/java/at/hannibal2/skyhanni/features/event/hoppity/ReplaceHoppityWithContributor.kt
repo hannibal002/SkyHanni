@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CircularList
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 @SkyHanniModule
 object ReplaceHoppityWithContributor {
@@ -48,7 +49,7 @@ object ReplaceHoppityWithContributor {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ItemHoverEvent) {
+    fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (!HoppityCollectionStats.inInventory) return
 
@@ -57,7 +58,7 @@ object ReplaceHoppityWithContributor {
         val last = lore.lastOrNull() ?: return
         if (!last.endsWith(" RABBIT")) return
 
-        val realName = itemStack.displayName
+        val realName = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val cleanName = realName.removeColor()
         val fakeName = replaceMap[cleanName] ?: return
 

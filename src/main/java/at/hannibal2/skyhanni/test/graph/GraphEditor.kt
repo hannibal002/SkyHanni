@@ -45,8 +45,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import kotlinx.coroutines.runBlocking
+import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
-import net.minecraft.client.settings.KeyBinding
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
 import kotlin.math.min
@@ -160,12 +160,12 @@ object GraphEditor {
         }
 
         if (inEditMode) {
-            add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.keyCode)}")
-            add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.keyCode)}")
-            add("§ez+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.a.keyCode)}")
-            add("§ez- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.d.keyCode)}")
-            add("§ey+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.up.keyCode)}")
-            add("§ey- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.down.keyCode)}")
+            add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.key.value)}")
+            add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.key.value)}")
+            add("§ez+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.a.key.value)}")
+            add("§ez- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.d.key.value)}")
+            add("§ey+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.up.key.value)}")
+            add("§ey- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.down.key.value)}")
         }
         if (inTextMode) {
             add("§eFormat: ${textBox.finalText()}")
@@ -618,7 +618,7 @@ object GraphEditor {
     private var lastGuiTime = SimpleTimeMark.farPast()
 
     private fun isAnyGuiActive(): Boolean {
-        val gui = Minecraft.getMinecraft().currentScreen != null
+        val gui = Minecraft.getInstance().screen != null
         if (gui) {
             lastGuiTime = 3.ticks.fromNow()
         }
@@ -636,15 +636,15 @@ object GraphEditor {
         KeyboardManager.WasdInputMatrix.down.handleEditClicks(LorenzVec(0, -1, 0))
     }
 
-    private fun KeyBinding.handleEditClicks(vector: LorenzVec) {
-        if (this.keyCode.isKeyClicked()) {
+    private fun KeyMapping.handleEditClicks(vector: LorenzVec) {
+        if (this.key.value.isKeyClicked()) {
             activeNode?.let {
                 it.position += vector
             }
         }
     }
 
-    fun onMinecraftInput(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
+    fun onMinecraftInput(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
         if (!isEnabled()) return
         if (!inEditMode) return
         if (keyBinding !in KeyboardManager.WasdInputMatrix) return

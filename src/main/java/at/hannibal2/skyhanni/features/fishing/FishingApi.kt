@@ -27,14 +27,17 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.compat.addWaters
+import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
+import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.projectile.EntityFishHook
-import net.minecraft.item.ItemStack
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.projectile.FishingHook
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -94,7 +97,7 @@ object FishingApi {
     private var waterRods = listOf<NeuInternalName>()
     private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
-    var bobber: EntityFishHook? = null
+    var bobber: FishingHook? = null
         private set
     var bobberHasTouchedLiquid = false
         private set
@@ -106,9 +109,9 @@ object FishingApi {
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onJoinWorld(event: EntityEnterWorldEvent<EntityFishHook>) {
+    fun onJoinWorld(event: EntityEnterWorldEvent<FishingHook>) {
         if (!holdingRod) return
-        if (event.entity.angler?.isLocalPlayer == false) return
+        if (event.entity.playerOwner?.isLocalPlayer == false) return
 
         lastCastTime = SimpleTimeMark.now()
         bobber = event.entity
@@ -134,7 +137,7 @@ object FishingApi {
         }
 
         val bobber = bobber ?: return
-        if (bobber.isDead) {
+        if (bobber.deceased) {
             if (lastReelTime.passedSince() < 0.5.seconds && lastCatchSound.passedSince() < 0.5.seconds) FishingCatchEvent.post()
             resetBobber()
             return
@@ -172,12 +175,12 @@ object FishingApi {
     fun NeuInternalName.isWaterRod() = this in waterRods
 
     fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? {
-        val rodPartName = getExtraAttributes()?.getCompoundTag(part.tagName)?.getString("part")
+        val rodPartName = getExtraAttributes()?.getCompoundOrDefault(part.tagName)?.getStringOrDefault("part")
         if (rodPartName.isNullOrEmpty()) return null
         return rodPartName.toInternalName()
     }
 
-    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
+    fun ItemStack.isBait(): Boolean = count == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
@@ -214,10 +217,10 @@ object FishingApi {
     fun isFishing(checkRodInHand: Boolean = true) =
         (IsFishingDetection.isFishing || (checkRodInHand && holdingRod)) && !DungeonApi.inDungeon()
 
-    fun seaCreatureCount(entity: EntityArmorStand): Int {
+    fun seaCreatureCount(entity: ArmorStand): Int {
         if (countIsZero(entity)) return 0
 
-        return when (entity.name) {
+        return when (entity.name.formattedTextCompatLessResets()) {
             "Sea Emperor", "Rider of the Deep" -> 2
 
             else -> 1
@@ -226,8 +229,8 @@ object FishingApi {
 
     private val frostyNpcLocation = LorenzVec(-1.5, 76.0, 92.5)
 
-    private fun countIsZero(entity: EntityArmorStand): Boolean {
-        val name = entity.name
+    private fun countIsZero(entity: ArmorStand): Boolean {
+        val name = entity.name.formattedTextCompatLessResets()
         // a dragon, will always be fought
         if (name == "Reindrake") return true
 

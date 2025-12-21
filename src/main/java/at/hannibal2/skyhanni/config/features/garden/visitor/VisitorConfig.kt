@@ -7,7 +7,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
+import org.lwjgl.glfw.GLFW
 
 class VisitorConfig {
     @Expose
@@ -93,10 +94,11 @@ class VisitorConfig {
     @ConfigOption(
         name = "Accept Hotkey",
         desc = "Accept a visitor when you press this keybind while in the visitor GUI.\n" +
-            "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event."
+            "§eUseful for getting Ephemeral Gratitudes during the Great Spook event."
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var acceptHotkey: Int = Keyboard.KEY_NONE
+    @SearchTag("halloween")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var acceptHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
 
     @Expose

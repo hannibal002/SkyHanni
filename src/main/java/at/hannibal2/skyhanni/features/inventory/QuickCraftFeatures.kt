@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
@@ -13,9 +13,11 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.ItemStack
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.network.chat.Component
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object QuickCraftFeatures {
@@ -40,16 +42,17 @@ object QuickCraftFeatures {
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
+        event.slot ?: return
         val inventoryType = getInventoryType() ?: return
-        if (inventoryType.ignoreSlot(event.slot.slotNumber)) return
+        if (inventoryType.ignoreSlot(event.slot.index)) return
 
         if (needsQuickCraftConfirmation(event.itemStack)) {
-            event.toolTip.replaceAll {
-                it.replace(
-                    "Click to craft!",
-                    "§c${KeyboardManager.getModifierKeyName()} + Click to craft!",
-                )
+            for ((index, line) in event.toolTip.withIndex()) {
+                if (line.string.removeColor() == "Click to craft!") {
+                    event.toolTip.set(index, Component.nullToEmpty("§c${KeyboardManager.getModifierKeyName()} + Click to craft!"))
+                    break
+                }
             }
         }
     }
@@ -58,12 +61,12 @@ object QuickCraftFeatures {
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         val inventoryType = getInventoryType() ?: return
         if (KeyboardManager.isModifierKeyDown()) return
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is ContainerScreen) return
+        val chest = event.container as ChestMenu
 
         for ((slot, stack) in chest.getAllItems()) {
-            if (inventoryType.ignoreSlot(slot.slotNumber)) continue
-            if (stack.displayName == "§cQuick Crafting Slot") continue
+            if (inventoryType.ignoreSlot(slot.index)) continue
+            if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cQuick Crafting Slot") continue
             if (needsQuickCraftConfirmation(stack)) {
                 slot.highlight(LorenzColor.DARK_GRAY.addOpacity(180))
             }
@@ -73,16 +76,16 @@ object QuickCraftFeatures {
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val inventoryType = getInventoryType() ?: return
-        if (inventoryType.ignoreSlot(event.slot?.slotNumber)) return
+        if (inventoryType.ignoreSlot(event.slot?.index)) return
 
-        val clickedItem = event.slot?.stack ?: return
+        val clickedItem = event.slot?.item ?: return
         if (!KeyboardManager.isModifierKeyDown() && needsQuickCraftConfirmation(clickedItem)) {
             event.cancel()
         }
     }
 
     private fun needsQuickCraftConfirmation(item: ItemStack): Boolean {
-        return !quickCraftableItems.contains(item.displayName.removeColor())
+        return !quickCraftableItems.contains(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor())
     }
 
     private fun getInventoryType(): InventoryType? {

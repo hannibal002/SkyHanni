@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirst
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -40,7 +41,7 @@ object AnitaExtraFarmingFortune {
 
         if (InventoryUtils.openInventoryName() != "Anita") return
 
-        if (!event.itemStack.displayName.contains("Extra Farming Fortune")) return
+        if (!event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().contains("Extra Farming Fortune")) return
 
         val anitaUpgrade = GardenApi.storage?.fortune?.anitaUpgrade ?: return
 

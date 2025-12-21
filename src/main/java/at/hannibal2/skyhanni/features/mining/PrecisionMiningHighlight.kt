@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import net.minecraft.client.Minecraft
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 
 @SkyHanniModule
@@ -22,15 +22,15 @@ object PrecisionMiningHighlight {
 
     private val config get() = SkyHanniMod.feature.mining.highlightPrecisionMiningParticles
 
-    private var lastParticle: AxisAlignedBB? = null
+    private var lastParticle: AABB? = null
     private var lookingAtParticle: Boolean = false
     private var deleteTime: SimpleTimeMark? = null
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (!(event.type == EnumParticleTypes.CRIT || event.type == EnumParticleTypes.VILLAGER_HAPPY) ||
-            !Minecraft.getMinecraft().gameSettings.keyBindAttack.isKeyDown
+        if (!(event.type == ParticleTypes.CRIT || event.type == ParticleTypes.HAPPY_VILLAGER) ||
+            !Minecraft.getInstance().options.keyAttack.isDown
         ) return
 
         val particleBoundingBox = event.location.add(-0.12, -0.12, -0.12)
@@ -39,9 +39,9 @@ object PrecisionMiningHighlight {
         val blockBoundingBox = BlockUtils.getTargetedBlock()?.let {
             it.axisAlignedTo(it.add(1.0, 1.0, 1.0))
         } ?: return
-        if (!blockBoundingBox.intersectsWith(particleBoundingBox)) return
+        if (!blockBoundingBox.intersects(particleBoundingBox)) return
 
-        lookingAtParticle = event.type == EnumParticleTypes.VILLAGER_HAPPY
+        lookingAtParticle = event.type == ParticleTypes.HAPPY_VILLAGER
         lastParticle = particleBoundingBox
         deleteTime = 5.ticks.fromNow()
     }

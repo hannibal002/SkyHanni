@@ -11,11 +11,20 @@ class HideNotClickableConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Hide items that are not clickable in the current inventory: ah, bz, accessory bag, etc.",
+        desc = "Gray out items that are not clickable in the current inventory: Auction House, Bazaar, Accessory Bag, etc.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Protect Rarely Sold Items",
+        desc = "Also gray out items that are not commonly sold to NPCs in NPC shop menus.\n" +
+            "§eRequires main toggle to be enabled!",
+    )
+    @ConfigEditorBoolean
+    var protectRarelySoldItems: Boolean = false
 
     @Expose
     @ConfigOption(name = "Block Clicks", desc = "Block the clicks on these items.")

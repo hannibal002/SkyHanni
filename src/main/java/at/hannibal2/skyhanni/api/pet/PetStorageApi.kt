@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstUniqueByOrNul
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Matcher
@@ -322,7 +323,7 @@ object PetStorageApi {
         if (inventoryName != "Your Equipment and Stats") return
         val petStorage = petStorage ?: return
         val currentPetItem = inventoryItems[EQUIP_MENU_CURRENT_PET_SLOT]?.takeIf {
-            it.displayName != "§7Empty Pet Slot"
+            it.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§7Empty Pet Slot"
         } ?: return
         val petInfo = currentPetItem.getPetInfo() ?: return
 
@@ -402,7 +403,7 @@ object PetStorageApi {
         petStorage.expSharePets.addAll(
             EXP_SHARE_SLOTS.map { expShareSlot ->
                 val slotItem = inventoryItems[expShareSlot]?.takeIf {
-                    it.displayName != "§7No pet in slot"
+                    it.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§7No pet in slot"
                 } ?: return@map null
                 slotItem.getPetInfo()?.uniqueId
             },

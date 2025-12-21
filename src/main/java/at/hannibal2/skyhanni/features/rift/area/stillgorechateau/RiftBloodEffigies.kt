@@ -21,11 +21,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -80,7 +81,7 @@ object RiftBloodEffigies {
         "Effigies: (?<hearts>(?:(?:§[7c])?⧯)*)",
     )
 
-    private fun getIndex(entity: EntityArmorStand): Int? =
+    private fun getIndex(entity: ArmorStand): Int? =
         locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) }?.let { locations.indexOf(it) }
 
     @HandleEvent
@@ -147,8 +148,8 @@ object RiftBloodEffigies {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        eLoop@for (entity in EntityUtils.getEntitiesNearby<EntityArmorStand>(LocationUtils.playerLocation(), 15.0)) {
-            effigiesTimerPattern.matchMatcher(entity.name) {
+        eLoop@for (entity in EntityUtils.getEntitiesNearby<ArmorStand>(LocationUtils.playerLocation(), 15.0)) {
+            effigiesTimerPattern.matchMatcher(entity.name.formattedTextCompatLessResets()) {
                 val index = getIndex(entity) ?: continue@eLoop
                 val time = TimeUtils.getDuration(group("time"))
                 effigies[index]?.let {
@@ -158,7 +159,7 @@ object RiftBloodEffigies {
                 continue@eLoop
             }
 
-            if (effigiesBreakPattern.matches(entity.name)) {
+            if (effigiesBreakPattern.matches(entity.name.formattedTextCompatLessResets())) {
                 val index = getIndex(entity) ?: continue
                 effigies[index]?.state = EffigyState.NOT_BROKEN
                 continue
