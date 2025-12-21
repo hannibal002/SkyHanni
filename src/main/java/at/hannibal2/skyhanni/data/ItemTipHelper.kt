@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.container
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 
@@ -50,9 +49,6 @@ object ItemTipHelper {
         val guiTop = (gui as AccessorHandledScreen).guiTop
         val fontRenderer = Minecraft.getInstance().font
 
-        ModernGlStateManager.disableLighting()
-        ModernGlStateManager.disableDepthTest()
-        ModernGlStateManager.disableBlend()
         DrawContextUtils.pushMatrix()
         DrawContextUtils.translate(0f, 0f, 300f)
         for (slot in gui.container.slots) {
@@ -74,7 +70,5 @@ object ItemTipHelper {
             GuiRenderUtils.drawString(stackTip, x, y, -1)
         }
         DrawContextUtils.popMatrix()
-        ModernGlStateManager.enableLighting()
-        ModernGlStateManager.enableDepthTest()
     }
 }

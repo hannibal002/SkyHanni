@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.world.entity.monster.Zombie
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack

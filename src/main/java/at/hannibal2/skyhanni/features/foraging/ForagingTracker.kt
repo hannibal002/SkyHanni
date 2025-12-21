@@ -4,12 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig.TreeGiftBonusDropCategory as DropCategory
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.TreeGiftBonusDropsJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.foraging.ForagingTracker.drawDisplay
@@ -192,7 +195,26 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         addItem(treeType, STRETCHING_STICKS, change, command = false)
     }
 
+    private var dropsJson: TreeGiftBonusDropsJson? = null
+    private var dropsJsonCategories: Array<Pair<DropCategory, List<NeuInternalName>>> = arrayOf()
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
+        val dropsJson = dropsJson ?: return
+        dropsJsonCategories = arrayOf(
+            Pair(DropCategory.UNCOMMON_DROPS, dropsJson.uncommonDrops),
+            Pair(DropCategory.ENCHANTED_BOOKS, dropsJson.enchantedBooks),
+            Pair(DropCategory.BOOSTERS, dropsJson.boosters),
+            Pair(DropCategory.SHARDS, dropsJson.shards),
+            Pair(DropCategory.RUNES, dropsJson.runes),
+            Pair(DropCategory.MISC, dropsJson.miscDrops)
+        )
+    }
+
     private fun SkyHanniChatEvent.tryReadLoot() {
+        val dropsJson = dropsJson ?: return
+
         ForagingTrackerLegacy.openCloseRewardPattern.matchMatcher(message) {
             openLootLoop = !openLootLoop
             if (openLootLoop) {
@@ -236,22 +258,38 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
             }
         }
 
-        if (!openBonusGiftLoop) return
-        ForagingTrackerLegacy.bonusGiftRewardPattern.matchMatcher(message) {
-            val item = group("item")
-            val itemInternalName = ForagingTrackerLegacy.enchantedBookPattern.matchMatcher(item) {
-                val book = group("book")
-                val tier = group("tier").romanToDecimal()
-                NeuInternalName.fromItemNameOrNull("$book $tier")
-            } ?: NeuInternalName.fromItemNameOrNull(item) ?: return@matchMatcher
+        ForagingTrackerLegacy.phantomSpawnPattern.matchMatcher(message) {
+            val mob = group("phantom")
 
-            // Stretching Sticks handled separately due to stack size not being given in message
-            if (itemInternalName == STRETCHING_STICKS) return@matchMatcher
+            if (dropsJson.mobs.contains(mob) && config.compactGiftBonusDropsList.contains(DropCategory.MOBS))
+                rareDrops.add("A wild §d$mob §fappeared!")
+        }
 
-            loot.addOrPut(itemInternalName, 1)
+        if (!openBonusGiftLoop)
+            return
 
-            val percentage = group("percentage").formatDoubleOrNull() ?: return@matchMatcher
-            if (percentage <= 1.0) rareDrops.add(item)
+        val item = ForagingTrackerLegacy.bonusGiftRewardPattern.matchMatcher(message) { group("item") } ?: return
+        var itemInternalName = ForagingTrackerLegacy.enchantedBookPattern.matchMatcher(item) {
+            val book = group("book")
+            val tier = group("tier").romanToDecimal()
+            NeuInternalName.fromItemNameOrNull("$book $tier")
+        } ?: NeuInternalName.fromItemNameOrNull(item) ?: return
+
+        /**
+         * this is a failsafe in the event of runes lackin' sufficient NEU repo data to automagically
+         * fetch their correct internal names, and thus translatin' their in-game names into internal
+         * names literally
+         */
+        if (itemInternalName.startsWith(("◆_")))
+            itemInternalName = itemInternalName.replace("◆_", "AXE_")
+
+        loot.addOrPut(itemInternalName, 1)
+
+        val bonusDropTypeList = config.compactGiftBonusDropsList
+        for ((category, itemList) in dropsJsonCategories)
+        {
+            if (itemList.contains(itemInternalName) && bonusDropTypeList.contains(category))
+                rareDrops.add(item)
         }
     }
 

@@ -62,7 +62,8 @@ object DungeonLividFinder {
     // This only happens when in f5/m5 bossfight, so the performance impact is minimal
     @OptIn(AllEntitiesGetter::class)
     private val lividEntities: List<RemotePlayer>
-        get() = EntityUtils.getEntities<RemotePlayer>().filterTo(mutableListOf()) { it.isNpc() && lividNamePattern.matches(it.name.formattedTextCompatLessResets()) }
+        get() = EntityUtils.getEntities<RemotePlayer>()
+            .filterTo(mutableListOf()) { it.isNpc() && lividNamePattern.matches(it.name.formattedTextCompatLessResets()) }
 
     private var color: LorenzColor? = null
     private val lividNameColor = mapOf(
