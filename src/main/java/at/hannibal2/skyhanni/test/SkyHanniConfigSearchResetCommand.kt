@@ -86,7 +86,7 @@ object SkyHanniConfigSearchResetCommand {
         }
     }
 
-    private suspend fun setCommand(args: Array<String>): String {
+    private fun setCommand(args: Array<String>): String {
         if (args.size < 3) return "§c/shconfig set <config name> <json element>"
         val term = args[1]
         var rawJson = args.drop(2).joinToString(" ")
@@ -382,7 +382,7 @@ object SkyHanniConfigSearchResetCommand {
             description = "Searches or resets config elements §c(warning, dangerous!)"
             category = CommandCategory.DEVELOPER_DEBUG
             legacyCallbackArgs {
-                SkyHanniMod.launchCoroutine {
+                SkyHanniMod.launchCoroutine("shconfig command") {
                     ChatUtils.chat(runCommand(it))
                 }
                 lastCommand = it

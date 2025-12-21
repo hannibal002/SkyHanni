@@ -10,7 +10,7 @@ class PlaySoundEvent(
     val rawSoundName: String,
     override val location: LorenzVec,
     val pitch: Float,
-    val volume: Float
+    val volume: Float,
 ) : CancellableWorldEvent() {
 
     val soundName by lazy { getSoundName(rawSoundName) }
@@ -33,11 +33,7 @@ class PlaySoundEvent(
 
     companion object {
         private fun getSoundName(rawSoundName: String): String {
-            //#if MC < 1.21
-            return rawSoundName
-            //#else
-            //$$ return at.hannibal2.skyhanni.utils.compat.SoundCompat.getLegacySoundName(rawSoundName)
-            //#endif
+            return at.hannibal2.skyhanni.utils.compat.SoundCompat.getLegacySoundName(rawSoundName)
         }
     }
 }

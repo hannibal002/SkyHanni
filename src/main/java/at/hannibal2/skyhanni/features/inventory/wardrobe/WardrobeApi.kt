@@ -18,9 +18,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -98,7 +99,7 @@ object WardrobeApi {
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
             EstimatedItemValueCalculator.getTotalPrice(stack)?.let { price ->
-                add("  §7- ${stack.displayName}: §6${price.shortFormat()}")
+                add("  §7- ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}: §6${price.shortFormat()}")
                 totalPrice += price
             }
         }
@@ -153,7 +154,7 @@ object WardrobeApi {
                 getWardrobeItem(itemsList[slot.leggingsSlot]),
                 getWardrobeItem(itemsList[slot.bootsSlot]),
             )
-            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.displayName)) {
+            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
                 currentSlot = slot.id
                 foundCurrentSlot = true
             }
@@ -196,7 +197,7 @@ object WardrobeApi {
                 } else {
                     add(slotInfo)
                     setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armorName ->
-                        slot.getData()?.armor?.get(id)?.displayName?.let { name ->
+                        slot.getData()?.armor?.get(id)?.hoverName.formattedTextCompatLeadingWhiteLessResets()?.let { name ->
                             add("   $armorName: $name")
                         }
                     }

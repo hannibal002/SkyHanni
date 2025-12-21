@@ -24,11 +24,12 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object FishyTreatProfit {
@@ -56,7 +57,7 @@ object FishyTreatProfit {
             // ignore the last line of menu items
             if (slot > 44) continue
             // background items
-            if (item.displayName == " ") continue
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets() == " ") continue
             try {
                 readItem(slot, item, table)
             } catch (e: Throwable) {
@@ -145,7 +146,7 @@ object FishyTreatProfit {
     }
 
     private fun getItemName(item: ItemStack): String {
-        val name = item.displayName
+        val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
             item.repoItemName
@@ -194,7 +195,7 @@ object FishyTreatProfit {
                     ErrorManager.logErrorStateWithData(
                         "Error in FishyTreat Profit", "Could not read item amount",
                         "rawItemName" to rawItemName,
-                        "name" to item.displayName,
+                        "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                         "lore" to lore,
                     )
                     continue

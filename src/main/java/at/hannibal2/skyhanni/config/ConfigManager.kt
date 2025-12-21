@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
@@ -27,9 +28,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybind
-//#if MC < 1.21
-import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybindL
-//#endif
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -278,6 +276,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
     STORAGE("storage", StorageData::class.java, SkyHanniMod::storageData),
     ROUTES("routes", OrderedWaypointsRoutes::class.java, SkyHanniMod::orderedWaypointsRoutesData),
+    CUSTOM_TODOS("custom_todos", CustomTodosStorage::class.java, SkyHanniMod::customTodos),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
@@ -301,25 +300,11 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
         if (default is GuiOptionEditorKeybind) {
             UpdateKeybinds.keybinds.add(extraPath)
         }
-        //#if MC < 1.21
-        if (default is GuiOptionEditorKeybindL) {
-            UpdateKeybinds.keybinds.add(extraPath)
-        }
-        //#endif
 
         EnforcedConfigValues.isBlockedFromEditing(extraPath)?.let { extraMessage ->
             return GuiOptionEditorBlocked(default, extraMessage)
         }
 
-        if (PlatformUtils.IS_LEGACY) {
-            if (field.isAnnotationPresent(OnlyModern::class.java)) {
-                return GuiOptionEditorHidden(default)
-            }
-        } else {
-            if (field.isAnnotationPresent(OnlyLegacy::class.java)) {
-                return GuiOptionEditorHidden(default)
-            }
-        }
         return default
     }
 }

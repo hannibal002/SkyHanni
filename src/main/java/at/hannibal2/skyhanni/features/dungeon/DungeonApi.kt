@@ -34,9 +34,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
@@ -311,7 +312,7 @@ object DungeonApi {
         inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
-            if (item.displayName == "§aGo Back") {
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aGo Back") {
                 item.getLore().getOrNull(0)?.let { firstLine ->
                     if (firstLine == "§7To Boss Collections") {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
@@ -416,10 +417,10 @@ object DungeonApi {
 
         val position = event.position
         val blockType: ClickedBlockType = when (position.getBlockAt()) {
-            Blocks.chest -> ClickedBlockType.CHEST
-            Blocks.trapped_chest -> ClickedBlockType.TRAPPED_CHEST
-            Blocks.lever -> ClickedBlockType.LEVER
-            Blocks.skull -> {
+            Blocks.CHEST -> ClickedBlockType.CHEST
+            Blocks.TRAPPED_CHEST -> ClickedBlockType.TRAPPED_CHEST
+            Blocks.LEVER -> ClickedBlockType.LEVER
+            Blocks.PLAYER_HEAD -> {
                 val blockTexture = BlockUtils.getTextureFromSkull(position)
                 if (blockTexture == WITHER_ESSENCE_TEXTURE) {
                     ClickedBlockType.WITHER_ESSENCE

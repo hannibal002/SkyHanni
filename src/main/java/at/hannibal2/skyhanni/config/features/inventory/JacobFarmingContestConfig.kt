@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class JacobFarmingContestConfig {
     @Expose
@@ -28,8 +28,8 @@ class JacobFarmingContestConfig {
         name = "Open On Elite",
         desc = "Open the contest on §eelitebot.dev§7 when pressing this key in Jacob's menu or the calendar."
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var openOnElite: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var openOnElite: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(

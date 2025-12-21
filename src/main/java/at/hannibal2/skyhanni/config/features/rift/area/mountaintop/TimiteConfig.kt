@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.rift.area.mountaintop
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -7,6 +8,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class TimiteConfig {
+
+    @Expose
+    @ConfigOption(name = "Enabled", desc = "Helps you with mining Timite and Obsolite.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var enabled: Boolean = true
+
     @Expose
     @ConfigOption(name = "Timite Evolution Timer", desc = "Count down the time until Timite evolves with the time gun.")
     @ConfigEditorBoolean
@@ -20,6 +28,7 @@ class TimiteConfig {
     @Expose
     @ConfigOption(name = "Timite Tracker", desc = "Tracks collected Timite ores and shows mote profit.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var tracker: Boolean = false
 
     @Expose

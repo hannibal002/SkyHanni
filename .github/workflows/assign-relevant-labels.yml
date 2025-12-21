@@ -1,7 +1,9 @@
 name: "Assign relevant labels"
+
 on:
     pull_request_target:
-        types: [ opened, edited ]
+        types: [ opened, edited, reopened, milestoned, demilestoned ]
+
 jobs:
     assign-label:
         if: github.event.pull_request.state == 'open'
@@ -14,51 +16,73 @@ jobs:
             -   name: label
                 env:
                     TITLE: ${{ github.event.pull_request.title }}
+                    HAS_MILESTONE: ${{ github.event.pull_request.milestone && 'true' || 'false' }}
+                    # labels
                     LABEL_FIX: Bug Fix
                     LABEL_BACKEND: Backend
+                    # comma-separated list of labels that require a milestone
+                    GATED_LABELS: Bug Fix
                 uses: actions/github-script@v7
                 with:
-                    github-token: ${{ secrets.GITHUB_TOKEN}}
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
                     script: |
                         const labelsToAdd = [];
                         const labelsToRemove = [];
-                        const title = process.env.TITLE.split(":")[0].toUpperCase();
+                        const title = (process.env.TITLE || '').split(':')[0].toUpperCase();
+                        const hasMilestone = process.env.HAS_MILESTONE === 'true';
+                        const gated = new Set((process.env.GATED_LABELS || '')
+                                              .split(',')
+                                              .map(s => s.trim())
+                                              .filter(Boolean));
                         
-                        if(title.includes("FIX")){
+                        // --- decide labels from title ---
+                        if (title.includes('FIX')) {
                           labelsToAdd.push(process.env.LABEL_FIX);
                         } else {
                           labelsToRemove.push(process.env.LABEL_FIX);
                         }
                         
-                        if(title.includes("BACKEND")){
+                        if (title.includes('BACKEND')) {
                           labelsToAdd.push(process.env.LABEL_BACKEND);
                         } else {
                           labelsToRemove.push(process.env.LABEL_BACKEND);
                         }
                         
+                        // --- enforce milestone gate for selected labels ---
+                        // If a gated label is about to be added but there is no milestone, move it to removal.
+                        for (let i = labelsToAdd.length - 1; i >= 0; i--) {
+                          const label = labelsToAdd[i];
+                          if (gated.has(label) && !hasMilestone) {
+                            labelsToRemove.push(label);
+                            labelsToAdd.splice(i, 1);
+                          }
+                        }
+                        
                         for (const label of labelsToAdd) {
-                          github.rest.issues.addLabels({
-                            issue_number: context.issue.number,
+                          await github.rest.issues.addLabels({
                             owner: context.repo.owner,
                             repo: context.repo.repo,
-                            labels: [label]
+                            issue_number: context.issue.number,
+                            labels: [label],
                           });
                         }
                         
-                        const {data} = await github.rest.issues.listLabelsOnIssue({
-                          issue_number: context.issue.number,
+                        const { data: current } = await github.rest.issues.listLabelsOnIssue({
                           owner: context.repo.owner,
                           repo: context.repo.repo,
+                          issue_number: context.issue.number,
                         });
                         
-                        for (const label of labelsToRemove) {
-                          const filtered = data.filter(l => l.name == label);
-                          if(filtered.length == 1){
-                            github.rest.issues.removeLabel({
-                              issue_number: context.issue.number,
+                        const hasLabel = name =>
+                          current.some(l => l.name.toLowerCase() === String(name).toLowerCase());
+                        
+                        for (const label of new Set(labelsToRemove)) {
+                          if (hasLabel(label)) {
+                            await github.rest.issues.removeLabel({
                               owner: context.repo.owner,
                               repo: context.repo.repo,
-                              name: label
-                            });
+                              issue_number: context.issue.number,
+                              name: label,
+                            }).catch(() => {});
                           }
                         }

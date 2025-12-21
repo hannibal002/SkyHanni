@@ -8,14 +8,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.util.IChatComponent
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object WatchdogHider {
 
     private var inWatchdog = false
     private var blockedLines = 0
-    private var startLineComponent: IChatComponent? = null
+    private var startLineComponent: Component? = null
 
     private const val START_LINE = "§f"
     private const val ANNOUNCEMENT_LINE = "§4[WATCHDOG ANNOUNCEMENT]"

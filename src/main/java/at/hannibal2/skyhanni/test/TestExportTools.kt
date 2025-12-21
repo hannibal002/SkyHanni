@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.test
 
+//#if TODO
+//$$ import at.hannibal2.skyhanni.utils.json.ItemStackTypeAdapterFactory
+//$$ import at.hannibal2.skyhanni.utils.json.NBTTypeAdapter
+//#endif
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -12,15 +16,10 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
-//#if TODO
-import at.hannibal2.skyhanni.utils.json.ItemStackTypeAdapterFactory
-import at.hannibal2.skyhanni.utils.json.NBTTypeAdapter
-//#endif
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.world.item.ItemStack
 import java.io.InputStreamReader
 import java.io.Reader
 
@@ -32,8 +31,8 @@ object TestExportTools {
     val gson = GsonBuilder()
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
         //#if TODO
-        .registerTypeAdapter(NBTTagCompound::class.java, NBTTypeAdapter)
-        .registerTypeAdapterFactory(ItemStackTypeAdapterFactory)
+        //$$ .registerTypeAdapter(NBTTagCompound::class.java, NBTTypeAdapter)
+        //$$ .registerTypeAdapterFactory(ItemStackTypeAdapterFactory)
         //#endif
         .create()
 

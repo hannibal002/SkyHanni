@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -34,15 +35,13 @@ object ForagingTrackerLegacy {
         }
     }
 
-    class BucketData : BucketedItemTrackerData<TreeType>(TreeType::class) {
-        override fun resetItems() {
-            treesCut = enumMapOf()
-            wholeTreesCut = enumMapOf()
-            hotfExperience = enumMapOf()
-            foragingExperience = enumMapOf()
-            forestWhispers = enumMapOf()
-        }
-
+    data class BucketData(
+        @Expose var treesCut: MutableMap<TreeType, Long> = enumMapOf(),
+        @Expose var wholeTreesCut: MutableMap<TreeType, Double> = enumMapOf(),
+        @Expose var hotfExperience: MutableMap<TreeType, Long> = enumMapOf(),
+        @Expose var foragingExperience: MutableMap<TreeType, Long> = enumMapOf(),
+        @Expose var forestWhispers: MutableMap<TreeType, Long> = enumMapOf(),
+    ) : BucketedItemTrackerData<TreeType>(TreeType::class) {
         override fun getDescription(bucket: TreeType?, timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
                 selectedBucket?.let {
@@ -57,33 +56,21 @@ object ForagingTrackerLegacy {
             )
         }
 
-        override fun getCoinName(bucket: TreeType?, item: TrackedItem) = "<no coins>"
-        override fun getCoinDescription(bucket: TreeType?, item: TrackedItem): List<String> = listOf("<no coins>")
-
-        override fun TreeType.isBucketSelectable() = true
-
-        override fun bucketName(): String {
-            return "tree"
+        override fun getCoinName(bucket: TreeType?, item: TrackedItem) = "§6Coins"
+        override fun getCoinDescription(bucket: TreeType?, item: TrackedItem): List<String> {
+            val mobKillCoinsFormat = item.totalAmount.shortFormat()
+            return listOf(
+                "§7Cutting trees gives you coins.",
+                "§7You got §6$mobKillCoinsFormat coins §7that way.",
+            )
         }
+        override fun TreeType.isBucketSelectable() = true
+        override fun bucketName(): String = "tree"
 
-        @Expose
-        var treesCut: MutableMap<TreeType, Long> = enumMapOf()
         fun getTreeCount(): Long = selectedBucket?.let { treesCut[it] } ?: treesCut.values.sum()
-
-        @Expose
-        var wholeTreesCut: MutableMap<TreeType, Double> = enumMapOf()
         fun getWholeTreeCount(): Double = selectedBucket?.let { wholeTreesCut[it] } ?: wholeTreesCut.values.sum()
-
-        @Expose
-        var hotfExperience: MutableMap<TreeType, Long> = enumMapOf()
         fun getHotfExperience(): Long = selectedBucket?.let { hotfExperience[it] } ?: hotfExperience.values.sum()
-
-        @Expose
-        var foragingExperience: MutableMap<TreeType, Long> = enumMapOf()
         fun getForagingExperience(): Long = selectedBucket?.let { foragingExperience[it] } ?: foragingExperience.values.sum()
-
-        @Expose
-        var forestWhispers: MutableMap<TreeType, Long> = enumMapOf()
         fun getForestWhispers(): Long = selectedBucket?.let { forestWhispers[it] } ?: forestWhispers.values.sum()
     }
 
@@ -126,33 +113,20 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST: §2Forest Essence §8x4
-     * REGEX-TEST: §2Forest Essence §8x6
-     * REGEX-TEST: §2Forest Essence §8x12
-     * REGEX-TEST: §2Forest Essence §8x16
-     * REGEX-TEST: §2Forest Whispers §8x40
-     * REGEX-TEST: §2Forest Whispers §8x60
-     * REGEX-TEST: §2Forest Whispers §8x100
-     * REGEX-TEST: §2Forest Whispers §8x160
-     * REGEX-TEST: §3Foraging Experience §8x1,000
-     * REGEX-TEST: §3Foraging Experience §8x2,000
-     * REGEX-TEST: §3Foraging Experience §8x2,500
-     * REGEX-TEST: §3Foraging Experience §8x5,000
-     * REGEX-TEST: §3Foraging Experience §8x8,000
+     * REGEX-TEST: §2Forest Essence§r§8 x4
+     * REGEX-TEST: §2Forest Essence§r§8 x12
+     * REGEX-TEST: §2Forest Whispers §r§8x40
+     * REGEX-TEST: §2Forest Whispers §r§8x100
+     * REGEX-TEST: §3Foraging Experience §r§8x1,000
      * REGEX-TEST: §aHOTF Experience §8x10
-     * REGEX-TEST: §aHOTF Experience §8x30
-     * REGEX-TEST: §aHOTF Experience §8x50
-     * REGEX-TEST: §aHOTF Experience §8x80
-     * REGEX-TEST: §aTender Wood §8x0-2
-     * REGEX-TEST: §aTender Wood §8x0-3
-     * REGEX-TEST: §aTender Wood §8x0-5
-     * REGEX-TEST: §aTender Wood §8x0-9
+     * REGEX-TEST: §aTender Wood §r§8x0-2
      * REGEX-TEST: §aVinesap §8x0-3
      * REGEX-TEST: §6Signal Enhancer §8(§a0.4%§8)
      */
+    @Suppress("MaxLineLength")
     val hoverRewardPattern by patternGroup.pattern(
         "hover-reward",
-        "(?:§.)*(?<item>.*) (?:§.)*§8x?(?:(?<amount>[\\d,-]+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))"
+        "(?:§.)*(?<item>[^§\\s](?:[^§]*[^§\\s])?)(?:§.)*\\s*(?:§.)*§8\\s*x?(?:(?:0-)?(?<amount>[\\d,]+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))"
     )
 
     /**
@@ -185,7 +159,17 @@ object ForagingTrackerLegacy {
      */
     val enchantedBookPattern by patternGroup.pattern(
         "bonus-gift.enchanted-book",
-        "(?:§.)+Enchanted Book \\((?:§.)+(?<book>.*) (?<tier>[IVCLX])(?:§.)+\\)"
+        " *(?:§.)+Enchanted Book \\((?:§.)+(?<book>.*) (?<tier>[IVCLX])(?:§.)+\\)"
+    )
+
+    /**
+     * REGEX-TEST: §r§7A §r§dPhanpyre §r§7fell from the Tree!
+     * REGEX-TEST: §r§7A §r§dPhanflare §r§7fell from the Tree!
+     * REGEX-TEST: §r§7A §r§dDreadwing §r§7fell from the Tree!
+     */
+    val phantomSpawnPattern by patternGroup.pattern(
+        "bonus-gift.phantoms",
+        " *(?:§.)+A (?:§.)+(?<phantom>.*) (?:§.)+fell from the Tree!"
     )
 
     /**

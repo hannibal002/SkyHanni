@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -51,7 +52,7 @@ object GardenCropUpgrades {
         if (event.inventoryName != "Crop Upgrades") return
 
         for (item in event.inventoryItems.values) {
-            val crop = CropType.getByNameOrNull(item.displayName.removeColor()) ?: continue
+            val crop = CropType.getByNameOrNull(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) ?: continue
             tierPattern.firstMatcher(item.getLore()) {
                 val level = group("level").formatInt()
                 crop.setUpgradeLevel(level)

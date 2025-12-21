@@ -1,20 +1,18 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.isGreedy
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.toSuggestionProvider
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.StringUtils.hasWhitespace
 import at.hannibal2.skyhanni.utils.StringUtils.splitLastWhitespace
-import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.CommandNode
-//#if MC < 1.21
-import net.minecraft.command.ICommand
-//#endif
 
 typealias LiteralCommandBuilder = BrigadierBuilder<LiteralArgumentBuilder<Any?>>
 typealias ArgumentCommandBuilder<T> = BrigadierBuilder<RequiredArgumentBuilder<Any?, T>>
@@ -30,10 +28,6 @@ class BaseBrigadierBuilder(override val name: String) : CommandData, BrigadierBu
         get() = description
 
     lateinit var node: CommandNode<Any?>
-
-    //#if MC < 1.21
-    override fun toCommand(dispatcher: CommandDispatcher<Any?>): ICommand = BrigadierCommand(this, dispatcher)
-    //#endif
 }
 
 open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
@@ -46,7 +40,11 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     /** Executes the code block when the command is executed. */
     fun callback(block: ArgContext.() -> Unit) {
         this.builder.executes {
-            block(ArgContext(it))
+            try {
+                block(ArgContext(it))
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(e)
+            }
             1
         }
     }
@@ -54,7 +52,21 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     /** Alternative to [callback] when no arguments are needed. */
     fun simpleCallback(block: () -> Unit) {
         this.builder.executes {
-            block()
+            try {
+                block()
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(e)
+            }
+            1
+        }
+    }
+
+    /** Alternative to [simpleCallback] when a block needs to be executed in a coroutine. */
+    fun coroutineSimpleCallback(block: suspend ArgContext.() -> Unit) {
+        this.builder.executes {
+            SkyHanniMod.launchIOCoroutine("brigadier builder coroutineSimpleCallback") {
+                block(ArgContext(it))
+            }
             1
         }
     }

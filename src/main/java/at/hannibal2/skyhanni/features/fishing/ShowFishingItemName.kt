@@ -14,16 +14,17 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
-import net.minecraft.entity.item.EntityItem
+import net.minecraft.world.entity.item.ItemEntity
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ShowFishingItemName {
 
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
-    private val itemsOnGround = TimeLimitedCache<EntityItem, String>(750.milliseconds)
+    private val itemsOnGround = TimeLimitedCache<ItemEntity, String>(750.milliseconds)
 
     // Textures taken from Skytils - moved to REPO
     private val cheapCoins by lazy {
@@ -36,10 +37,10 @@ object ShowFishingItemName {
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
-            val itemStack = entityItem.entityItem.orNull() ?: continue
+        for (entityItem in EntityUtils.getEntitiesNextToPlayer<ItemEntity>(15.0)) {
+            val itemStack = entityItem.item.orNull() ?: continue
             // On 1.8 if the itemstack is null it returns stone instead
-            if (itemStack.displayName.removeColor() == "Stone") continue
+            if (itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == "Stone") continue
             var text = ""
 
             val isBait = itemStack.isBait()
@@ -48,10 +49,10 @@ object ShowFishingItemName {
             if (itemStack.getSkullTexture() in cheapCoins) {
                 text = "§6Coins"
             } else {
-                val name = itemStack.displayName.transformIf({ isBait }) { "§7" + this.removeColor() }
+                val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().transformIf({ isBait }) { "§7" + this.removeColor() }
                 text += if (isBait) "§c§l- §r" else "§a§l+ §r"
 
-                val size = itemStack.stackSize
+                val size = itemStack.count
                 if (size != 1) text += "§7x$size §r"
                 text += name
             }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.garden.pests
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -26,4 +27,24 @@ class PestSpawnConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var showTitle: Boolean = true
+
+    enum class PestSpawnSoundMode(private val displayName: String) {
+        DEFAULT("Default"),
+        MUTED("Muted"),
+        CUSTOM("Custom"),
+        PLUMBER("Plumber"),
+        ;
+
+        override fun toString() = displayName
+    }
+
+    @Expose
+    @ConfigOption(name = "Spawn Sound", desc = "Mute or replace the default spawn sound with a custom one.")
+    @ConfigEditorDropdown
+    var soundMode: PestSpawnSoundMode = PestSpawnSoundMode.DEFAULT
+
+    @Expose
+    @ConfigOption(name = "Sound Settings", desc = "")
+    @Accordion
+    val sound: PestSpawnSoundSettings = PestSpawnSoundSettings()
 }

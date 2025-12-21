@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -35,6 +34,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -101,16 +101,16 @@ object FastFairySoulsPathfinder {
 
             val inAir = PlayerUtils.inAir()
             if (inAir) {
-                val abovePlayer = LocationUtils.playerLocation().up(10)
+                val abovePlayer = playerLocation.up(10)
                 val aboveNearest = allSouls.minBy { it.distanceSq(abovePlayer) }
-                if (aboveNearest.distanceToPlayer() < 10) return aboveNearest
+                if (aboveNearest.distance(abovePlayer) < 10) return aboveNearest
             }
 
-            ErrorManager.logErrorStateWithData(
-                "unknown fairy soul",
-                "user clicked a fairy soul while far away from known fairy souls",
-                "nearest loc" to nearest,
-                "player loc" to LocationUtils.playerLocation(),
+            IslandGraphs.reportLocation(
+                playerLocation,
+                userFacingReason = "unknown fairy soul",
+                technicalInfo = "user clicked a fairy soul while far away from known fairy souls",
+                "nearest soul" to nearest,
                 "distance" to nearest.distanceToPlayer().roundTo(1),
                 "inAir" to inAir,
             )
@@ -211,7 +211,7 @@ object FastFairySoulsPathfinder {
         if (event.inventoryName != "Fairy Souls Guide") return
 
         for (stack in event.inventoryItems.values) {
-            val island = IslandType.getByNameOrNull(stack.displayName.removeColor()) ?: continue
+            val island = IslandType.getByNameOrNull(stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) ?: continue
             val have = stack.getLore().firstOrNull()?.let {
                 loreSoulPattern.matchMatcher(it) {
                     group("have").toIntOrNull()
@@ -263,7 +263,7 @@ object FastFairySoulsPathfinder {
         calculatingStart = SimpleTimeMark.now()
         "§e[SkyHanni] Calculating Fairy Soul route §b0s".asComponent().send(calculatingMessageId)
 
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("fairy souls pathfind") {
             val route = NavigationUtils.getRoute(missingSouls, maxIterations = 300, neighborhoodSize = 50).toMutableList()
             val duration = calculatingStart.passedSince()
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()

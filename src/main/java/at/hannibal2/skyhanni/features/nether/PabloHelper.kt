@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -43,7 +44,7 @@ object PabloHelper {
             group("flower")
         } ?: return
 
-        if (InventoryUtils.countItemsInLowerInventory { it.displayName.contains(itemName) } > 0) return
+        if (InventoryUtils.countItemsInLowerInventory { it.hoverName.formattedTextCompatLeadingWhiteLessResets().contains(itemName) } > 0) return
 
         DelayedRun.runNextTick {
             GetFromSackApi.getFromChatMessageSackItems(

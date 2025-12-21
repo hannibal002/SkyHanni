@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class ArmorDropTrackerConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Track all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
+    @ConfigOption(name = "Enabled", desc = "Track all §aCropie§7, §9Squash§7, §5Fermento §7and §6Helianthus §7dropped.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
