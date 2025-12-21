@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.particles.ParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,25 +25,17 @@ object HideSlayerSpawnParticles {
         if (!SlayerApi.hasActiveQuest() || !SlayerApi.isInCorrectArea) return
         val distance = event.location.distanceToNearestDeadMob() ?: return
         if (distance >= 5) return
-
-        if (config.spawnParticleHider.get().any { it.particle.check(event) }) {
+        if (config.spawnParticleHider.get().any { it.particle == event.type }) {
             event.cancel()
         }
     }
 
-    enum class SpawnParticles(private val displayName: String, val particle: FakeParticleType) {
-        ENCHANT_TABLE("White", FakeParticleType.ENCHANT),
-        SPELL_WITCH("Purple", FakeParticleType.WITCH),
-        SPELL_MOB("Slayer Specific", FakeParticleType.SPECIFIC);
+    enum class SpawnParticles(private val displayName: String, val particle: ParticleType<*>) {
+        ENCHANT_TABLE("White", ParticleTypes.ENCHANT),
+        SPELL_WITCH("Purple", ParticleTypes.WITCH),
+        SPELL_MOB("Slayer Specific", ParticleTypes.ENTITY_EFFECT);
 
         override fun toString() = displayName
-    }
-
-    // TODO This is literally just copied from GriffinBurrowParticleFinder, should be ParticleUtils in the future
-    enum class FakeParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
-        ENCHANT({ type == ParticleTypes.ENCHANT }),
-        WITCH({ type == ParticleTypes.WITCH }),
-        SPECIFIC({ type == ParticleTypes.ENTITY_EFFECT }),
     }
 
     @HandleEvent(onlyOnSkyblock = true)
