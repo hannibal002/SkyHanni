@@ -26,6 +26,10 @@ object ColorParticleFix {
         }
         event.particleOptions = particleOptions
     }
+    /*
+    1.8 has, some, questionable, ways of working out colour for particles where it uses the offset to calculate the Colouring,
+    this is done as RBG with XYZ, so in modern since it uses ARGB we go to XZY.
+     */
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.fixColorParticles
 }
