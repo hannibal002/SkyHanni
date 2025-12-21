@@ -162,19 +162,19 @@ object IslandAreas {
 
             val coloredName = "${color.getChatColor()}$name"
 
-            var suffix = ""
-            paths[node]?.let { path ->
-                val passedAreas = path.filter { it.getAreaTag() != null }.map { it.name }.distinct().toMutableList()
-                passedAreas.remove(name)
-                passedAreas.remove(null)
-                passedAreas.remove("null")
-                passedAreas.remove(currentArea)
-                // so show areas needed to pass thorough
-                // TODO show this pass through in the /shnavigate command
-                if (passedAreas.isNotEmpty()) {
+            val suffix = ""
+//             paths[node]?.let { path ->
+//                 val passedAreas = path.filter { it.getAreaTag() != null }.map { it.name }.distinct().toMutableList()
+//                 passedAreas.remove(name)
+//                 passedAreas.remove(null)
+//                 passedAreas.remove("null")
+//                 passedAreas.remove(currentArea)
+//                 // so show areas needed to pass thorough
+//                 // TODO show this pass through in the /shnavigate command
+//                 if (passedAreas.isNotEmpty()) {
 //                     suffix = " §7${passedAreas.joinToString(", ")}"
-                }
-            }
+//                 }
+//             }
 
             val distance = difference.roundTo(0).toInt()
             val text = "$coloredName§7: §e$distance$suffix"
@@ -266,7 +266,7 @@ object IslandAreas {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!areaConfig.showInWorld) return
-        for ((node, distance) in nodes) {
+        for ((node, _) in nodes) {
             val name = node.name ?: continue
             if (name == currentArea) continue
             if (name == "no_area") continue

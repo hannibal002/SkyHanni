@@ -38,7 +38,9 @@ object NavigationFeedback {
 
     private fun isActive() = navActive || navLastActive.passedSince() < 3.seconds
 
-    fun setNavInactive() { navActive = false }
+    fun setNavInactive() {
+        navActive = false
+    }
 
     fun sendPathFindMessage(message: String) = sendPathFindMessage(message.asComponent())
     fun sendPathFindMessage(component: Component): Boolean {
@@ -64,7 +66,7 @@ object NavigationFeedback {
         guiRenderable = Renderable.clickable(
             Renderable.text(guiFormattedText),
             onLeftClick = IslandGraphs::cancelClick,
-            tips = listOf("§eClick to stop navigating!")
+            tips = listOf("§eClick to stop navigating!"),
         )
         return true
     }
