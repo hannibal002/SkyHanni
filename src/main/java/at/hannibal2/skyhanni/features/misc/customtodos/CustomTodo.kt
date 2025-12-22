@@ -62,6 +62,7 @@ data class CustomTodo(
             } else {
                 now + timer.seconds
             }
+        CustomTodos.save()
     }
 
     var readyAtOnCurrentProfile: SimpleTimeMark?

@@ -11,7 +11,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
@@ -20,6 +22,8 @@ import net.minecraft.world.item.Items
 object CustomTodosGui {
 
     private val todos get() = SkyHanniMod.customTodos.customTodos
+
+    private val config get() = SkyHanniMod.feature.misc.customTodos
 
     private fun matchString(todo: CustomTodo, text: String): Boolean {
         val cleanedText = if (todo.ignoreColorCodes) text.removeColor() else text
@@ -69,10 +73,19 @@ object CustomTodosGui {
 
     @HandleEvent
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!config.enabled) return
         if (todos.isEmpty()) return
+        val display = mutableListOf<Renderable>()
         for ((index, todo) in todos.withIndex()) {
             val renderable = todo.getRenderable() ?: continue
-            todo.position.renderRenderable(renderable, posLabel = "${todo.label} $index")
+            if (config.separateGuis) {
+                todo.position.renderRenderable(renderable, posLabel = "${todo.label} $index")
+            } else {
+                display.add(renderable)
+            }
+        }
+        if (!config.separateGuis) {
+            config.position.renderRenderables(display, posLabel = "Custom Todo Display")
         }
     }
 

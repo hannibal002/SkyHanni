@@ -385,6 +385,11 @@ class MiscConfig {
     val lastStorage: LastStorageConfig = LastStorageConfig()
 
     @Expose
+    @ConfigOption(name = "Custom Todos", desc = "")
+    @Accordion
+    val customTodos: CustomTodosConfig = CustomTodosConfig()
+
+    @Expose
     @ConfigOption(
         name = "Maintain Volume During Warnings",
         desc = "Do not change game volume levels when warning sounds are played.",
