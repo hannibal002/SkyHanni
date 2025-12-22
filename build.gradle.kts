@@ -1,4 +1,3 @@
-import at.skyhanni.sharedvariables.MinecraftVersion
 import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
@@ -361,7 +360,7 @@ publishing.publications {
 detekt {
     buildUponDefaultConfig = true // preconfigure defaults
     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
-    baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
+    baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
     source.setFrom(project.sourceSets.named("main").map { it.allSource })
 }
 
@@ -372,15 +371,28 @@ tasks.withType<Detekt>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
 
+    val isDetektMain = (this.name == "detektMain")
+    val outputFileName = if (isDetektMain) "main" else "detekt"
+    val detektDir = rootProject.layout.buildDirectory.dir("reports/detekt").get().asFile.absolutePath
     reports {
         html.required.set(true) // observe findings in your browser with structure and code snippets
+        html.outputLocation.set(file("$detektDir/$outputFileName.html"))
         xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
+        xml.outputLocation.set(file("$detektDir/$outputFileName.xml"))
         sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
+        sarif.outputLocation.set(file("$detektDir/$outputFileName.sarif"))
         md.required.set(true) // simple Markdown format
+        md.outputLocation.set(file("$detektDir/$outputFileName.md"))
+        txt.required.set(true)
+        txt.outputLocation.set(file("$detektDir/$outputFileName.txt"))
     }
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
+
+    val isMainBaseline = (this.name == "detektBaselineMain")
+    val outputFileName = if (isMainBaseline) "baseline" else "baseline-detekt"
+    baseline.set(file(rootProject.layout.projectDirectory.file("detekt/$outputFileName.xml")))
 }
