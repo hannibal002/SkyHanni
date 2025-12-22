@@ -360,7 +360,7 @@ publishing.publications {
 detekt {
     buildUponDefaultConfig = true // preconfigure defaults
     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
-    baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
+    baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline-main.xml")) // a way of suppressing issues before introducing detekt
     source.setFrom(project.sourceSets.named("main").map { it.allSource })
 }
 
@@ -391,8 +391,12 @@ tasks.withType<Detekt>().configureEach {
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
+    onlyIf {
+        // We only need one baseline for the main source set
+        target == ProjectTarget.MODERN_12105
+    }
 
     val isMainBaseline = (this.name == "detektBaselineMain")
-    val outputFileName = if (isMainBaseline) "baseline" else "baseline-detekt"
+    val outputFileName = if (isMainBaseline) "baseline-main" else "baseline"
     baseline.set(file(rootProject.layout.projectDirectory.file("detekt/$outputFileName.xml")))
 }
