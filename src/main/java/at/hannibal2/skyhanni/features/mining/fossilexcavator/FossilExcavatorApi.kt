@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -50,20 +49,19 @@ object FossilExcavatorApi {
 
     val excavatorInventory = InventoryDetector(
         checkInventoryName = { it == "Fossil Excavator" },
-        closeInventory = { inExcavatorMenu = false }
+        onCloseInventory = { inExcavatorMenu = false }
     )
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!excavatorInventory.isInside()) return
         inExcavatorMenu = event.inventoryItems.values.any {
-            it.displayName.removeColor() == "Start Excavator"
+            it.displayName.toString().removeColor() == "Start Excavator"
         }
     }
 
     @HandleEvent
     fun onWorldChange() {
-        inInventory = false
         inExcavatorMenu = false
     }
 
