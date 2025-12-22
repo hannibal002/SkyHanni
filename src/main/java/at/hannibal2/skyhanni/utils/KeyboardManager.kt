@@ -46,7 +46,7 @@ object KeyboardManager {
     //#if MC < 1.21.9
     private fun Int.matchesClosureKey() = Minecraft.getInstance().options.keyInventory.matches(this, this)
     //#else
-    //$$ private fun Int.matchesClosureKey() = Minecraft.getInstance().options.keyInventory.matches(KeyEvent(keycode, keycode, 0))
+    //$$ private fun Int.matchesClosureKey() = Minecraft.getInstance().options.keyInventory.matches(KeyEvent(this, this, 0))
     //#endif
 
     @JvmStatic
