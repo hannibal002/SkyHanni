@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -105,13 +106,10 @@ class ItemResolutionQuery {
             mayBeMangled: Boolean,
         ): String? {
             var itemName = displayName
-            val isPet = itemName.contains("[Lvl ")
             var petRarity: String? = null
-            if (isPet) {
-                petPattern.matchMatcher(itemName) {
-                    itemName = group("name")
-                    petRarity = group("rarity")
-                }
+            petPattern.matchMatcher(itemName) {
+                itemName = group("name")
+                petRarity = group("rarity")
             }
             val cleanDisplayName = itemName.removeColor()
             var bestMatch: String? = null
@@ -120,14 +118,11 @@ class ItemResolutionQuery {
                 val unCleanItemDisplayName: String = EnoughUpdatesManager.getDisplayName(internalName)
                 var cleanItemDisplayName = unCleanItemDisplayName.removeColor()
                 if (cleanItemDisplayName.isEmpty()) continue
-                if (isPet) {
+                if (petPattern.matches(itemName)) {
                     if (!cleanItemDisplayName.contains("[Lvl {LVL}] ")) continue
                     cleanItemDisplayName = cleanItemDisplayName.replace("[Lvl {LVL}] ", "")
-                    val matcher: Matcher = petPattern.matcher(unCleanItemDisplayName)
-                    if (matcher.matches()) {
-                        if (matcher.group(2) != petRarity) {
-                            continue
-                        }
+                    petPattern.matchMatcher(unCleanItemDisplayName) {
+                        if (group("rarity") != petRarity) continue
                     }
                 }
 
@@ -146,7 +141,7 @@ class ItemResolutionQuery {
         }
 
         private fun findInternalNameCandidatesForDisplayName(displayName: String): Set<String> {
-            val isPet = displayName.contains("[Lvl ")
+            val isPet = petPattern.matches(displayName)
             val cleanDisplayName = displayName.cleanString()
             val titleWordMap = EnoughUpdatesManager.titleWordMap
             val candidates = HashSet<String>()
