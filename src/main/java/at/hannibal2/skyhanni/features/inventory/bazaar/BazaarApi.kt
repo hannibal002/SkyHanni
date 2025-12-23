@@ -257,10 +257,11 @@ object BazaarApi {
     }
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
-        val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
-        if (items.any { it.hoverName.formattedTextCompatLeadingWhiteLessResets().equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
-            return true
+        val itemMatch = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }.any {
+            it.hoverName.formattedTextCompatLeadingWhiteLessResets().equalsIgnoreColor("Go Back") &&
+                it.getLore().firstOrNull() == "§7To Bazaar"
         }
+        if (itemMatch) return true
 
         // check for Buy Instantly
         event.inventoryItems[16]?.let {

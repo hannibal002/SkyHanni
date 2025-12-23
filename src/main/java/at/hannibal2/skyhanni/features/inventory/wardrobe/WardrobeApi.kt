@@ -197,7 +197,7 @@ object WardrobeApi {
                 } else {
                     add(slotInfo)
                     setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armorName ->
-                        slot.getData()?.armor?.get(id)?.hoverName.formattedTextCompatLeadingWhiteLessResets()?.let { name ->
+                        slot.getData()?.armor?.get(id)?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.let { name ->
                             add("   $armorName: $name")
                         }
                     }

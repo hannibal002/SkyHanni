@@ -799,7 +799,7 @@ object HoppityCollectionStats {
 
     private fun logRabbits(event: InventoryFullyOpenedEvent) {
         for (item in event.inventoryItems.values) {
-            val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets()?.removeColor()?.takeIfKnownRabbit() ?: continue
+            val itemName = item.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.removeColor()?.takeIfKnownRabbit() ?: continue
 
             val itemLore = item.getLore()
             saveLocationRabbit(itemName, itemLore)

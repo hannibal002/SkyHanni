@@ -16,7 +16,7 @@ object GuiIngameHook {
         x: Int,
         y: Int,
         color: Int,
-    ) = ScoreboardData.tryToReplaceScoreboardLine(text.formattedTextCompatLessResets())?.let {
+    ) = ScoreboardData.tryToReplaceScoreboardLine(text.formattedTextCompatLessResets()).let {
         drawContext.drawString(renderer, it, x, y, color, false)
     }
 

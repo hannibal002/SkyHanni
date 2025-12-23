@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.entity.EntityDeathEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.slayer.VampireSlayerFeatures.process
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
@@ -71,7 +72,8 @@ object VampireSlayerFeatures {
 
     // Nicked support
     private val username
-        get() = EntityUtils.getEntities<LocalPlayer>().firstOrNull()?.name.formattedTextCompatLessResets() ?: error("own player is null")
+        get() = EntityUtils.getEntities<LocalPlayer>().firstOrNull()?.name?.formattedTextCompatLessResets()
+            ?: error("own player is null")
 
     private val BLOOD_ICHOR_TEXTURE by lazy { SkullTextureHolder.getTexture("BLOOD_ICHOR") }
     private val KILLER_SPRING_TEXTURE by lazy { SkullTextureHolder.getTexture("KILLER_SPRING") }
@@ -124,38 +126,43 @@ object VampireSlayerFeatures {
         contain
     }
 
-    private fun RemotePlayer.process() {
-        if (name.formattedTextCompatLessResets() != "Bloodfiend ") return
+    private fun RemotePlayer.processTwinClawsTitle() {
+        val configEnabled = configOwnBoss.twinClawsTitle || configOtherBoss.twinClawsTitle || configCoopBoss.twinClawsTitle
+        if (!configEnabled) return
 
-        if (configOwnBoss.twinClawsTitle || configOtherBoss.twinClawsTitle || configCoopBoss.twinClawsTitle) {
-            for (stand in getAllNameTagsInRadiusWith("TWINCLAWS")) {
-                if (!".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex()
-                        .matches(stand.name.formattedTextCompatLessResets())
-                ) continue
-                val coopList = configCoopBoss.coopMembers.split(",").toList()
-                val containUser = getAllNameTagsInRadiusWith("Spawned by").any {
-                    it.name.formattedTextCompatLessResets().contains(username)
-                }
-                val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
-                    configCoopBoss.highlight && coopList.spawnedByCoop(it)
-                }
-                val shouldSendTitle =
-                    if (containUser && configOwnBoss.twinClawsTitle) true
-                    else if (containCoop && configCoopBoss.twinClawsTitle) true
-                    else taggedEntityList.contains(this.id) && configOtherBoss.twinClawsTitle
+        for (stand in getAllNameTagsInRadiusWith("TWINCLAWS")) {
+            if (!".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex()
+                    .matches(stand.name.formattedTextCompatLessResets())
+            ) continue
+            val coopList = configCoopBoss.coopMembers.split(",").toList()
+            val containUser = getAllNameTagsInRadiusWith("Spawned by").any {
+                it.name.formattedTextCompatLessResets().contains(username)
+            }
+            val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
+                configCoopBoss.highlight && coopList.spawnedByCoop(it)
+            }
+            val shouldSendTitle =
+                if (containUser && configOwnBoss.twinClawsTitle) true
+                else if (containCoop && configCoopBoss.twinClawsTitle) true
+                else taggedEntityList.contains(this.id) && configOtherBoss.twinClawsTitle
 
-                if (!shouldSendTitle) continue
-                DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
-                    if (nextClawSend < System.currentTimeMillis()) {
-                        TitleManager.sendTitle(
-                            "§6§lTWINCLAWS",
-                            duration = (1750 - config.twinclawsDelay).milliseconds,
-                        )
-                        nextClawSend = System.currentTimeMillis() + 5_000
-                    }
+            if (!shouldSendTitle) continue
+            DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
+                if (nextClawSend < System.currentTimeMillis()) {
+                    TitleManager.sendTitle(
+                        "§6§lTWINCLAWS",
+                        duration = (1750 - config.twinclawsDelay).milliseconds,
+                    )
+                    nextClawSend = System.currentTimeMillis() + 5_000
                 }
             }
         }
+    }
+
+    private fun RemotePlayer.process() {
+        if (name.formattedTextCompatLessResets() != "Bloodfiend ") return
+
+        processTwinClawsTitle()
         for (it in getAllNameTagsInRadiusWith("Spawned by")) {
             val coopList = configCoopBoss.coopMembers.split(",").toList()
             val containUser = it.name.formattedTextCompatLessResets().contains(username)

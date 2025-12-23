@@ -32,7 +32,7 @@ object SkyHanniConfigSearchResetCommand {
 
     private var lastCommand = emptyArray<String>()
 
-    private suspend fun runCommand(args: Array<String>): String {
+    private fun runCommand(args: Array<String>): String {
         if (args.isEmpty()) {
             return "§cThis is a powerful config-edit command, only use it if you know what you are doing!"
         }
@@ -132,7 +132,7 @@ object SkyHanniConfigSearchResetCommand {
         }
     }
 
-    private suspend fun toggleCommand(args: Array<String>): String {
+    private fun toggleCommand(args: Array<String>): String {
         if (args.size == 1 || args.size == 3) return "§c/shconfig toggle <config name> [value 1] [value 2]"
 
         val path = args[1]

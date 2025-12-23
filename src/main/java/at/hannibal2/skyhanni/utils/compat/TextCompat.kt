@@ -134,25 +134,33 @@ fun createResourceLocation(path: String): ResourceLocation {
 }
 
 var Component.hover: Component?
-    get() = this.style.hoverEvent?.let { if (it.action() == HoverEvent.Action.SHOW_TEXT) (it as HoverEvent.ShowText).value else null }
+    get() = this.style.hoverEvent?.takeIf {
+        it.action() == HoverEvent.Action.SHOW_TEXT
+    }?.let { (it as HoverEvent.ShowText).value }
     set(value) {
         value?.let { new -> (this as MutableComponent).withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
     }
 
 var Component.command: String?
-    get() = this.style.clickEvent?.let { if (it.action() == ClickEvent.Action.RUN_COMMAND) (it as ClickEvent.RunCommand).command else null }
+    get() = this.style.clickEvent?.takeIf {
+        it.action() == ClickEvent.Action.RUN_COMMAND
+    }?.let { (it as ClickEvent.RunCommand).command }
     set(value) {
         (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
     }
 
 var Component.suggest: String?
-    get() = this.style.clickEvent?.let { if (it.action() == ClickEvent.Action.SUGGEST_COMMAND) (it as ClickEvent.SuggestCommand).command else null }
+    get() = this.style.clickEvent?.takeIf {
+        it.action() == ClickEvent.Action.SUGGEST_COMMAND
+    }?.let { (it as ClickEvent.SuggestCommand).command }
     set(value) {
         (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
     }
 
 var Component.url: String?
-    get() = this.style.clickEvent?.let { if (it.action() == ClickEvent.Action.OPEN_URL) (it as ClickEvent.OpenUrl).uri.toString() else null }
+    get() = this.style.clickEvent?.takeIf {
+        it.action() == ClickEvent.Action.OPEN_URL
+    }?.let { (it as ClickEvent.OpenUrl).uri.toString() }
     set(value) {
         (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
     }
@@ -190,7 +198,7 @@ val map = mutableMapOf<Int, MessageSignature>()
 
 fun idToMessageSignature(id: Int): MessageSignature {
     val newId = abs(id % (255 * 128))
-    if (map.contains(newId)) return map[newId]!!
+    map[newId]?.let { return it }
     val bytes = ByteArray(256)
     val div = newId / 128
     val mod = newId % 128

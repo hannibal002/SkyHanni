@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.state.BlockState
 
 object BlockCompat {
     fun getAllLogs(): List<Block> {

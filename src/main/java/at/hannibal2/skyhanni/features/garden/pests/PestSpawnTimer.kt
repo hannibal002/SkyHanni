@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.HeldIt
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -79,6 +80,9 @@ object PestSpawnTimer {
     private var countdownTitleContext: TitleContext? = null
     private var lastPlayedSound: SimpleTimeMark = SimpleTimeMark.farPast()
 
+    private val customCooldownTime get(): Duration =
+        (if (Perk.PEST_ERADICATOR.isActive) config.customCooldownTimeFinnegan else config.customCooldownTime).get().seconds
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
@@ -95,7 +99,7 @@ object PestSpawnTimer {
             }
             if (time == null) return
             pestCooldownEndTime = if (config.customCooldown.get()) {
-                lastPestSpawnTime + config.customCooldownTime.get().seconds
+                lastPestSpawnTime + customCooldownTime
             } else time
 
             if (pestSpawned) {
@@ -196,7 +200,7 @@ object PestSpawnTimer {
     }
 
     private fun setCustomCooldown() {
-        if (config.customCooldown.get()) pestCooldownEndTime = lastPestSpawnTime + config.customCooldownTime.get().seconds
+        if (config.customCooldown.get()) pestCooldownEndTime = lastPestSpawnTime + customCooldownTime
     }
 
     private fun drawDisplay(): List<Renderable> {

@@ -247,7 +247,7 @@ object ExperimentsAddonsHelper {
     }
 
     private fun InventoryUpdatedEvent.readPhaseOrNull(): HelperPhase? {
-        val phaseItemName = inventoryItems[PHASE_STATUS_SLOT]?.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: return null
+        val phaseItemName = inventoryItems[PHASE_STATUS_SLOT]?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: return null
         return when {
             replicatePhaseItemPattern.matches(phaseItemName) -> HelperPhase.REPLICATE
             readPhaseItemPattern.matches(phaseItemName) -> HelperPhase.READ
@@ -256,7 +256,7 @@ object ExperimentsAddonsHelper {
     }
 
     private fun InventoryUpdatedEvent.readChronomatronRoundOrNull(): Int? {
-        val roundItemName = inventoryItems[ROUND_STATUS_SLOT]?.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: return null
+        val roundItemName = inventoryItems[ROUND_STATUS_SLOT]?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: return null
         return roundItemPattern.matchGroup(roundItemName, "round")?.formatIntOrNull()
     }
 
