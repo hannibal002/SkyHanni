@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
@@ -45,7 +46,25 @@ class ItemResolutionQuery {
     @SkyHanniModule
     companion object {
 
-        private val petPattern = ".*(\\[Lvl .*] )§(.).*".toPattern()
+        private val patternGroup = RepoPattern.group("misc.itemresolution")
+
+        /**
+         * REGEX-TEST: §r§7[Lvl 100] §r§6Scatha
+         * REGEX-TEST: §r§7[Lvl 200] §r§6Golden Dragon§5 ✦
+         */
+        private val petPattern by patternGroup.pattern(
+            "pet",
+            "(?:§.)*\\[Lvl (?<level>\\d+)] (?:§.)*§(?<rarity>.)(?<name>[^§]+)(?:(§.)* ✦)?",
+        )
+
+        /**
+         * REGEX-TEST: §aCondor
+         * REGEX-TEST: §aCondor §d§lNEW SHARD
+         */
+        private val shardPattern by patternGroup.pattern(
+            "shard",
+            "(?<name>§.[^§]+)(?: §d§lNEW SHARD)?",
+        )
 
         val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
 
@@ -89,10 +108,9 @@ class ItemResolutionQuery {
             val isPet = itemName.contains("[Lvl ")
             var petRarity: String? = null
             if (isPet) {
-                val matcher: Matcher = petPattern.matcher(itemName)
-                if (matcher.matches()) {
-                    itemName = itemName.replace(matcher.group(1), "").replace("✦", "").trim()
-                    petRarity = matcher.group(2)
+                petPattern.matchMatcher(itemName) {
+                    itemName = group("name")
+                    petRarity = group("rarity")
                 }
             }
             val cleanDisplayName = itemName.removeColor()
@@ -341,7 +359,11 @@ class ItemResolutionQuery {
             return resolveItemInHuntingBoxMenu(displayName)
         }
         if (guiName == "Confirm Fusion") {
-            return resolveItemInHuntingBoxMenu(compound.getLore().firstOrNull() ?: return null)
+            compound.getLore().firstOrNull()?.let {
+                shardPattern.matchMatcher(it) {
+                    return resolveItemInHuntingBoxMenu(group("name"))
+                }
+            }
         }
         if (guiName == "Dye Compendium") {
             return findInternalNameByDisplayName(displayName, false)
