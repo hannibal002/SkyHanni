@@ -190,6 +190,7 @@ object DungeonLividFinder {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!inLividBossRoom() || !config.enabled.get()) return
+        if (isBlind) return
 
         val entity = livid ?: return
         val lorenzColor =
