@@ -135,12 +135,13 @@ object DungeonLividFinder {
             val lividColor = entity.getLividColor() ?: run {
                 lividNamePattern.matchMatcher(entity.name.toString()) {
                     val namecolor = lividNameColor[group("name")] ?: continue
+                    val texture = entity.getSkinTexture() ?: continue
                     ErrorManager.logErrorStateWithData(
                         "Unknown Livid found",
                         "No color matches for texture",
-                        "Livid Texture & Livid Name with associated Color" to "${entity.getSkinTexture()} $namecolor ${group("name")}",
+                        "Livid Texture & Livid Name with associated Color" to "$texture $namecolor ${group("name")}",
                     )
-
+                    lividTextureToColor.add(Pair(texture, namecolor))
                     continue
                 }
             }
@@ -338,6 +339,9 @@ object DungeonLividFinder {
             add("blockColor: ${blockLocation.getBlockStateAt()}")
             add("livid: '${livid?.name.formattedTextCompatLessResets()}'")
             add("color: ${color?.name}")
+            for (livid in lividTextureToColor) {
+                add("${livid.value}: ${livid.key}")
+            }
         }
     }
 }
