@@ -1,11 +1,13 @@
-package at.hannibal2.skyhanni.features.dungeon import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.LividSolverJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
@@ -28,11 +30,13 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isWool
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
@@ -63,17 +67,31 @@ object DungeonLividFinder {
         get() = EntityUtils.getEntities<RemotePlayer>().filterTo(mutableListOf()) { it.isNpc() }
 
     private var color: LorenzColor? = null
-    @Suppress("LineTooLong")
-    private var textureToColor = mapOf(
-        "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzMyNzkxMiwKICAicHJvZmlsZUlkIiA6ICIzZmM3ZmRmOTM5NjM0YzQxOTExOTliYTNmN2NjM2ZlZCIsCiAgInByb2ZpbGVOYW1lIiA6ICJZZWxlaGEiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmEwNGM4Yzg4N2UzOThkMzMyMGQzOTUwNTdjODdiMWUwMmI3OTViMTBiYmIzOGY3ZTJhOGNmYmZjMDc4YTE2OCIKICAgIH0KICB9Cn0=" to LorenzColor.WHITE,
-        "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzQzNjUwMSwKICAicHJvZmlsZUlkIiA6ICI3ZGEyYWIzYTkzY2E0OGVlODMwNDhhZmMzYjgwZTY4ZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJHb2xkYXBmZWwiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDQ4ZTQzZjg0MmYzMTY2NTFlNTFhNTc5N2NhYTMyYmZhOWRlODFhOGMyMzg0YmQ2YzBkMWM0N2M0NDgwM2M5MSIKICAgIH0KICB9Cn0=" to LorenzColor.GRAY,
-        "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzM0ODg4MSwKICAicHJvZmlsZUlkIiA6ICIxNzhmMTJkYWMzNTQ0ZjRhYjExNzkyZDc1MDkzY2JmYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJzaWxlbnRkZXRydWN0aW9uIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdmMWFiZmQwNzE3NTExMTVmYTEwMDBjOWQ3NmQxMDk3M2ZmMzI3NzMxNDZjZDE0MDY4NjRiYWFmMzc4MTZlOWEiCiAgICB9CiAgfQp9" to LorenzColor.LIGHT_PURPLE,
-        "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzQxNTQyNSwKICAicHJvZmlsZUlkIiA6ICJmYThiNGRmYWMxZTg0Mzg5YmFkZTIzYTE0Zjk1ZTRkNyIsCiAgInByb2ZpbGVOYW1lIiA6ICJkZXZ2YXJhcmdzIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzJmMDVmYjRiZGI1NzgwNzc4ZmU0NDYxMjgzZWRkZmFiNzI3M2I5NmQ0Njc1NDdlOGJjYTdlYzEwMTM1N2U2NmYiCiAgICB9CiAgfQp9" to LorenzColor.DARK_PURPLE,
-        "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzM2ODIxMiwKICAicHJvZmlsZUlkIiA6ICJmNWQwYjFhZTQxNmU0YTE5ODEyMTRmZGQzMWU3MzA1YiIsCiAgInByb2ZpbGVOYW1lIiA6ICJDYXRjaFRoZVdhdmUxMCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS82MTA4ODU0Mzk0YzgwZmVkNDE4OTU4Mjg3ZGU1ODEyMDlmZDY5ZmZmM2U2M2NiM2M4ODFjMzRiZmE4MThjOWUiCiAgICB9CiAgfQp9" to LorenzColor.BLUE,
-        "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzI4MzQ1NiwKICAicHJvZmlsZUlkIiA6ICI5MWYwNGZlOTBmMzY0M2I1OGYyMGUzMzc1Zjg2ZDM5ZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJTdG9ybVN0b3JteSIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9hMTE2ZGJhYmQ3Njk1N2E1MDBkYjhmMzQ2NDcwZDc5NjQ3M2YyNDU1N2Y3ZjlkM2Y0ZTJhYzNmN2M4NDM5ZWEzIgogICAgfQogIH0KfQ==" to LorenzColor.RED,
-        "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzMwMjU4MSwKICAicHJvZmlsZUlkIiA6ICJiYWE1Yjg0YzA2NGM0NTBlYjU2NTU4ZDQxOWVmYTkzMSIsCiAgInByb2ZpbGVOYW1lIiA6ICJDYW1lbGxpYWFkYW1zIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzMxY2M2NDA4ZTVhMjY4ZTZjZWIyZjhiOWFmYjZlZWZkNGE5NGI3ZWI0Nzg4MzgyNmJkNmMzNTRmYzNkY2E5NzMiCiAgICB9CiAgfQp9" to LorenzColor.YELLOW,
-        "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzM5MTM5NCwKICAicHJvZmlsZUlkIiA6ICI2ZmQyNGJlNDk4ZjA0MDJlOTZhYWQ2MWUzY2VmYjZmMCIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbmdlbGFsbHhfIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzRjM2MwMjQ4OGU2M2I1ZTY3NTg0YWE5Nzc2ZDVlYTU2YmFhNjk2NWE3MzNhNjhmNzAwY2E4YjA4ODkxMWEyYjciCiAgICB9CiAgfQp9" to LorenzColor.GREEN,
-        "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzIzNjA1MiwKICAicHJvZmlsZUlkIiA6ICIyNmM1MmQzZjgxMzQ0ZjUzYmNhYzA0Mjc4ODBiZDVjNCIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbWJpZ3VvdXNCaXZhbHZlIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzliZmY0ZDY1OWQ5ODVlNTFmNDIxOTU1YWM4NzcwNGE5YjYxMjJjYjZhMTY5ZDliMDQ4Y2RkNmFiMWUxYjBiNTciCiAgICB9CiAgfQp9" to LorenzColor.DARK_GREEN
+
+//     @Suppress("LineTooLong")
+//     private var lividTextureToColor = mapOf(
+//         "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzMyNzkxMiwKICAicHJvZmlsZUlkIiA6ICIzZmM3ZmRmOTM5NjM0YzQxOTExOTliYTNmN2NjM2ZlZCIsCiAgInByb2ZpbGVOYW1lIiA6ICJZZWxlaGEiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmEwNGM4Yzg4N2UzOThkMzMyMGQzOTUwNTdjODdiMWUwMmI3OTViMTBiYmIzOGY3ZTJhOGNmYmZjMDc4YTE2OCIKICAgIH0KICB9Cn0=" to LorenzColor.WHITE,
+//         "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzQzNjUwMSwKICAicHJvZmlsZUlkIiA6ICI3ZGEyYWIzYTkzY2E0OGVlODMwNDhhZmMzYjgwZTY4ZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJHb2xkYXBmZWwiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDQ4ZTQzZjg0MmYzMTY2NTFlNTFhNTc5N2NhYTMyYmZhOWRlODFhOGMyMzg0YmQ2YzBkMWM0N2M0NDgwM2M5MSIKICAgIH0KICB9Cn0=" to LorenzColor.GRAY,
+//         "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzM0ODg4MSwKICAicHJvZmlsZUlkIiA6ICIxNzhmMTJkYWMzNTQ0ZjRhYjExNzkyZDc1MDkzY2JmYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJzaWxlbnRkZXRydWN0aW9uIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdmMWFiZmQwNzE3NTExMTVmYTEwMDBjOWQ3NmQxMDk3M2ZmMzI3NzMxNDZjZDE0MDY4NjRiYWFmMzc4MTZlOWEiCiAgICB9CiAgfQp9" to LorenzColor.LIGHT_PURPLE,
+//         "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzQxNTQyNSwKICAicHJvZmlsZUlkIiA6ICJmYThiNGRmYWMxZTg0Mzg5YmFkZTIzYTE0Zjk1ZTRkNyIsCiAgInByb2ZpbGVOYW1lIiA6ICJkZXZ2YXJhcmdzIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzJmMDVmYjRiZGI1NzgwNzc4ZmU0NDYxMjgzZWRkZmFiNzI3M2I5NmQ0Njc1NDdlOGJjYTdlYzEwMTM1N2U2NmYiCiAgICB9CiAgfQp9" to LorenzColor.DARK_PURPLE,
+//         "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzM2ODIxMiwKICAicHJvZmlsZUlkIiA6ICJmNWQwYjFhZTQxNmU0YTE5ODEyMTRmZGQzMWU3MzA1YiIsCiAgInByb2ZpbGVOYW1lIiA6ICJDYXRjaFRoZVdhdmUxMCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS82MTA4ODU0Mzk0YzgwZmVkNDE4OTU4Mjg3ZGU1ODEyMDlmZDY5ZmZmM2U2M2NiM2M4ODFjMzRiZmE4MThjOWUiCiAgICB9CiAgfQp9" to LorenzColor.BLUE,
+//         "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzI4MzQ1NiwKICAicHJvZmlsZUlkIiA6ICI5MWYwNGZlOTBmMzY0M2I1OGYyMGUzMzc1Zjg2ZDM5ZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJTdG9ybVN0b3JteSIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9hMTE2ZGJhYmQ3Njk1N2E1MDBkYjhmMzQ2NDcwZDc5NjQ3M2YyNDU1N2Y3ZjlkM2Y0ZTJhYzNmN2M4NDM5ZWEzIgogICAgfQogIH0KfQ==" to LorenzColor.RED,
+//         "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzMwMjU4MSwKICAicHJvZmlsZUlkIiA6ICJiYWE1Yjg0YzA2NGM0NTBlYjU2NTU4ZDQxOWVmYTkzMSIsCiAgInByb2ZpbGVOYW1lIiA6ICJDYW1lbGxpYWFkYW1zIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzMxY2M2NDA4ZTVhMjY4ZTZjZWIyZjhiOWFmYjZlZWZkNGE5NGI3ZWI0Nzg4MzgyNmJkNmMzNTRmYzNkY2E5NzMiCiAgICB9CiAgfQp9" to LorenzColor.YELLOW,
+//         "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzM5MTM5NCwKICAicHJvZmlsZUlkIiA6ICI2ZmQyNGJlNDk4ZjA0MDJlOTZhYWQ2MWUzY2VmYjZmMCIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbmdlbGFsbHhfIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzRjM2MwMjQ4OGU2M2I1ZTY3NTg0YWE5Nzc2ZDVlYTU2YmFhNjk2NWE3MzNhNjhmNzAwY2E4YjA4ODkxMWEyYjciCiAgICB9CiAgfQp9" to LorenzColor.GREEN,
+//         "ewogICJ0aW1lc3RhbXAiIDogMTU5ODk3NzIzNjA1MiwKICAicHJvZmlsZUlkIiA6ICIyNmM1MmQzZjgxMzQ0ZjUzYmNhYzA0Mjc4ODBiZDVjNCIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbWJpZ3VvdXNCaXZhbHZlIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzliZmY0ZDY1OWQ5ODVlNTFmNDIxOTU1YWM4NzcwNGE5YjYxMjJjYjZhMTY5ZDliMDQ4Y2RkNmFiMWUxYjBiNTciCiAgICB9CiAgfQp9" to LorenzColor.DARK_GREEN,
+//     )
+
+    private var lividTextureToColor = mutableMapOf<String, LorenzColor>()
+    private val lividNameColor = mapOf(
+        "Vendetta" to LorenzColor.WHITE,
+        "Doctor" to LorenzColor.GRAY,
+        "Crossed" to LorenzColor.LIGHT_PURPLE,
+        "Purple" to LorenzColor.DARK_PURPLE,
+        "Scream" to LorenzColor.BLUE,
+        "Hockey" to LorenzColor.RED,
+        "Arcade" to LorenzColor.YELLOW,
+        "Smile" to LorenzColor.GREEN,
+        "Frog" to LorenzColor.DARK_GREEN,
     )
 
     /**
@@ -85,6 +103,28 @@ object DungeonLividFinder {
         "^§(?<colorCode>.)﴾ §.§lLivid.*$",
     )
 
+
+    /**
+     * REGEX-TEST: Doctor Livid
+     */
+    private val lividNamePattern by RepoPattern.pattern(
+        "dungeon.f5.livid.name",
+        "^(?<type>\\w+) Livid$",
+    )
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<LividSolverJson>("misc/LividSolver")
+        val map = data.lividSkins
+        for ((color, skin) in map) {
+            if (!lividTextureToColor.containsKey(skin)) {
+                val repoColor = LorenzColor.entries.firstOrNull { it.name == color } ?: continue
+                lividTextureToColor.add(Pair(skin, repoColor))
+            }
+        }
+    }
+
+
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
         if (!config.enabled.get()) return
@@ -93,12 +133,16 @@ object DungeonLividFinder {
 
         for (entity in lividEntities) {
             val lividColor = entity.getLividColor() ?: run {
-                ErrorManager.logErrorStateWithData(
-                    "Unknown Livid found",
-                    "No color matches for texture",
-                    "Livid Texture" to entity.getSkinTexture(),
-                )
-                continue
+                lividNamePattern.matchMatcher(entity.name.toString()) {
+                    val namecolor = lividNameColor[group("name")] ?: continue
+                    ErrorManager.logErrorStateWithData(
+                        "Unknown Livid found",
+                        "No color matches for texture",
+                        "Livid Texture & Livid Name with associated Color" to "${entity.getSkinTexture()} $namecolor ${group("name")}",
+                    )
+
+                    continue
+                }
             }
             if (lividColor == color) {
                 livid = entity
@@ -184,7 +228,7 @@ object DungeonLividFinder {
 
     private fun RemotePlayer.getLividColor(): LorenzColor? {
         val texture = this.getSkinTexture() ?: return null
-        return textureToColor.getOrElse(texture) {return null}
+        return lividTextureToColor.getOrElse(texture) { return null }
     }
 
     @HandleEvent
@@ -196,7 +240,7 @@ object DungeonLividFinder {
         val lorenzColor =
             if (config.colorOverride != LividColorHighlight.DEFAULT) config.colorOverride.color as LorenzColor else color ?: return
 
-        if(!entity.canBeSeen(150, 0.5, true)) return
+        if (!entity.canBeSeen(150, 0.5, true)) return
         val location = event.exactLocation(entity)
         val boundingBox = event.exactBoundingBox(entity)
 
