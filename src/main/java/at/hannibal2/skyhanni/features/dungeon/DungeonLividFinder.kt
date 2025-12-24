@@ -114,7 +114,7 @@ object DungeonLividFinder {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<LividSolverJson>("misc/LividSolver")
+        val data = event.getConstant<LividSolverJson>("dungeons/LividSolver")
         val map = data.lividSkins
         for ((color, skin) in map) {
             if (!lividTextureToColor.containsKey(skin)) {
