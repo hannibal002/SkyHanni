@@ -48,6 +48,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getFarmingForDummiesCount() = getAttributeInt("farming_for_dummies_count")
 
+    fun ItemStack.getOverclockerCount() = getAttributeInt("levelable_overclocks")
+
     fun ItemStack.getPolarvoidBookCount() = getAttributeInt("polarvoid")
 
     fun ItemStack.getBookwormBookCount() = getAttributeInt("bookworm_books")
