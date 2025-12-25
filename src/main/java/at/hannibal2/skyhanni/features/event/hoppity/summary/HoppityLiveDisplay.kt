@@ -195,7 +195,7 @@ object HoppityLiveDisplay {
         return when {
             currentScreen is InventoryScreen -> HoppityLiveDisplayInventoryType.OWN_INVENTORY
             inChocolateFactory -> HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY
-            HoppityApi.inInventory() -> HoppityLiveDisplayInventoryType.HOPPITY
+            inventoryName == "Hoppity" -> HoppityLiveDisplayInventoryType.HOPPITY
             mealEggInventoryPattern.matches(inventoryName) -> HoppityLiveDisplayInventoryType.MEAL_EGGS
             else -> return false
         } in setting

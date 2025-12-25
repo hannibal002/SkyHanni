@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTr
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -159,10 +158,6 @@ object HoppityApi {
 
     fun isHoppityEvent() = (SkyblockSeason.SPRING.isSeason() || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
 
-    fun inInventory(): Boolean =
-        InventoryUtils.openInventoryName() == "Hoppity" &&
-            InventoryUtils.getItemsInOpenChestWithNull().getOrNull(29)?.item?.cleanName() != "Accept Offer"
-
     // First event was year 346 -> #1, 20th event was year 365, etc.
     fun getHoppityEventNumber(skyblockYear: Int): Int = (skyblockYear - 345)
 
@@ -231,7 +226,7 @@ object HoppityApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!checkNextInvOpen) return
         checkNextInvOpen = false
-        if (!inInventory()) return
+        if (event.inventoryName != "Hoppity") return
         lastHoppityCallAccept = SimpleTimeMark.now()
     }
 

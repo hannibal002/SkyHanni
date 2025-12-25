@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MilestoneJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFUpgrade
@@ -60,11 +59,12 @@ object CFApi {
     )
 
     /**
+     * REGEX-TEST: Hoppity
      * REGEX-TEST: Chocolate Factory Milestones
      */
-    private val chocolateFactoryMilestonesInventoryNamePattern by patternGroup.pattern(
-        "inventory.milestones",
-        "Chocolate Factory Milestones",
+    private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
+        "inventory.name",
+        "Hoppity|Chocolate Factory Milestones",
     )
 
     /**
@@ -139,10 +139,7 @@ object CFApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (
-            chocolateFactoryMilestonesInventoryNamePattern.matches(event.inventoryName) ||
-            HoppityApi.inInventory()
-        ) {
+        if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
             if (config.enabled) {
                 chocolateFactoryPaused = true
                 CFStats.updateDisplay()
