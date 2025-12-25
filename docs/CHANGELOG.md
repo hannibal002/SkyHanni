@@ -8,6 +8,12 @@
 
 + Added /shtodos. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4968)
   + Works exactly the same as NEU's version, you can even import your NEU todos into skyhanni.
++ Added `/shcalc` command. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
+
+#### Misc
+
++ Added Particle Colour Fixer. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4993)
+  + This makes particles have the same colours as they do on 1.8.
 
 ### Improvements
 
@@ -18,6 +24,16 @@
 #### Foraging
 + Compact Gifts can now be customized to only inform you of certain categories of items. - ThomasThePencil (https://github.com/hannibal002/SkyHanni/pull/4925)
 + Compact Gifts now includes Stretching Sticks and Deep Roots, as well as phantom spawns. - ThomasThePencil (https://github.com/hannibal002/SkyHanni/pull/4925)
+
+#### Garden
+
++ Added an option to use a different custom pest spawn cooldown time when Finnegan's Pest Eradicator perk is active. - Luna (https://github.com/hannibal002/SkyHanni/pull/5004)
++ Added Farming Exp Boost (Epic) to rare visitor rewards. - Luna (https://github.com/hannibal002/SkyHanni/pull/4999)
++ Added Overclockers to Estimated Item Value. - nopo (https://github.com/hannibal002/SkyHanni/pull/5008)
+
+#### Misc
+
++ Added option to render custom todos as one Gui. - nopo (https://github.com/hannibal002/SkyHanni/pull/5001)
 
 ### Fixes
 
@@ -38,14 +54,35 @@
 
 + Fixed structure chests sometimes being incorrectly highlighted as chests dug up from powder mining. - Luna (https://github.com/hannibal002/SkyHanni/pull/4989)
 
+#### Fishing
+
++ Fixed Pet Drop Rarity not working for fished pets. - Luna (https://github.com/hannibal002/SkyHanni/pull/4998)
+
 #### Misc
 
 + Fixed Discord RPC. - nopo (https://github.com/hannibal002/SkyHanni/pull/4985)
++ Fixed Custom Todos not saving ready time. - nopo (https://github.com/hannibal002/SkyHanni/pull/5001)
++ Fixed Math Teacher Solver not working if NEU is not installed. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
++ Fixed not being able to use calculations for /gfs amount if NEU is not installed. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
+  + Example: `/gfs enchanted melon slice 5*64`.
++ Fixed Scoreboard looking messed up on some other servers. - nopo (https://github.com/hannibal002/SkyHanni/pull/5009)
++ Fixed Setting sound levels on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/4991)
 
 ### Technical Details
 
 + Remapped the project to mojang mappings. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4978)
 + Fixed some detekt issues idk. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4987)
++ `Calculator.calculateOrNull()` no longer accepts a `null` argument. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
++ Added Modrinth launcher detection. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4513)
++ Fixed some Detekt errors. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4997)
++ Moved detekt outputs to project-root build directory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5002)
++ Moved launcher firstStack identification to repo. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4513)
++ Removed Extra Enum that was necessary for preprocessor to function with this feature. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4992)
++ Removed TestingModFeatures file. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4997)
++ Renamed `NeuCalculator` to `Calculator` and made it use Keval instead of NEU. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
++ Renamed detekt baseline to baseline-main.xml. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5002)
+  + You no longer have to do any manual steps when generating the baseline file.
+  + It will generate in the correct location as part of the gradle task.
 
 ### Removed Features
 
