@@ -73,7 +73,7 @@ public class MixinGuiIngame {
 
     @Redirect(method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/scores/Objective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)I"))
     private int drawScoreboardString(GuiGraphics drawContext, Font textRenderer, Component text, int x, int y, int color, boolean shadow) {
-        return GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color);
+        return GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color, shadow);
     }
     //#else
     //$$ @Inject(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.BEFORE), cancellable = true)
@@ -102,7 +102,7 @@ public class MixinGuiIngame {
     //$$
     //$$ @Redirect(method = "displayScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"))
     //$$ private void renderItemOverlayPost(GuiGraphics drawContext, Font textRenderer, Component text, int x, int y, int color, boolean bl) {
-    //$$     GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color);
+    //$$     GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color, bl);
     //$$ }
     //#endif
 
