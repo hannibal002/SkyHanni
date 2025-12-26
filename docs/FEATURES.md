@@ -50,6 +50,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Notify you in chat when a marked player joins/leaves your lobby. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2653)
 + Added /shtodos. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4968)
   + Works exactly the same as NEU's version, you can even import your NEU todos into skyhanni.
++ Added `/shcalc` command. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
 
 #### Chat Filter
 
@@ -1791,6 +1792,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Middle Click Fix for 1.21.x. - Luna (https://github.com/hannibal002/SkyHanni/pull/4863)
     + This fixes not being able to middle click items in inventories (e.g. to disable a full set bonus or a rune).
 + \* Few extra features not worth mentioning. - nopo (https://github.com/hannibal002/SkyHanni/pull/4902)
++ Added Particle Colour Fixer. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4993)
+  + This makes particles have the same colours as they do on 1.8.
 
 </details>
 <details open><summary>

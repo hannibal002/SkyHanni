@@ -46,7 +46,8 @@ class RewardWarningConfig {
         VisitorReward.SPACE_HELMET,
         VisitorReward.CULTIVATING,
         VisitorReward.REPLENISH,
-        VisitorReward.COPPER_DYE
+        VisitorReward.COPPER_DYE,
+        VisitorReward.FARMING_EXP_BOOST_EPIC,
     )
 
     @Expose

@@ -139,7 +139,8 @@ object SuperpairDataDisplay {
         val items = uncoveredItems.toMutableMap()
         val itemExistsInData = items.any { it.value.slotId == event.slotId && it.key == items.keys.max() }
         val clicksItem = InventoryUtils.getItemAtSlotIndex(4)
-        val hasRemainingClicks = remainingClicksPattern.matchMatcher(clicksItem?.hoverName.formattedTextCompatLeadingWhiteLessResets()?.removeColor().orEmpty()) {
+        val clicksItemName = clicksItem?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.removeColor().orEmpty()
+        val hasRemainingClicks = remainingClicksPattern.matchMatcher(clicksItemName) {
             group("clicks").toInt() > 0
         } ?: false
 

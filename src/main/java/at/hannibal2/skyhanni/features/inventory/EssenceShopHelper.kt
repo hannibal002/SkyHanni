@@ -247,7 +247,9 @@ object EssenceShopHelper {
                 extraData = listOf(
                     "inventoryName" to event.inventoryName,
                     "essenceHeaderStack" to essenceHeaderStack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty(),
-                    "populatedInventorySize" to event.inventoryItems.filter { it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() }.size,
+                    "populatedInventorySize" to event.inventoryItems.filter {
+                        it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty()
+                    }.size,
                     "eventType" to event.javaClass.simpleName,
                 ).toTypedArray(),
             )

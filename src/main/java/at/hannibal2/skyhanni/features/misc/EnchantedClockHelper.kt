@@ -109,8 +109,10 @@ object EnchantedClockHelper {
             private var entries = listOf<BoostType>()
 
             fun byUsageStringOrNull(usageString: String) = entries.firstOrNull { it.usageString == usageString }
-            fun byItemStackOrNull(stack: ItemStack) = entries.firstOrNull { it.formattedName == stack.hoverName.formattedTextCompatLeadingWhiteLessResets() }
             fun bySimpleBoostType(simple: SimpleBoostType) = entries.firstOrNull { it.name == simple.name }
+            fun byItemStackOrNull(stack: ItemStack) = entries.firstOrNull {
+                it.formattedName == stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            }
 
             fun populateFromJson(json: EnchantedClockJson) {
                 entries = json.boosts.map {

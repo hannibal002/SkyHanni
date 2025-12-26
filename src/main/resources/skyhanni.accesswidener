@@ -40,3 +40,5 @@ accessible field net/minecraft/client/gui/components/ChatComponent chatScrollbar
 accessible method net/minecraft/client/gui/components/ChatComponent screenToChatX (D)D
 accessible method net/minecraft/client/gui/components/ChatComponent screenToChatY (D)D
 accessible field net/minecraft/client/ToggleKeyMapping needsToggle Ljava/util/function/BooleanSupplier;
+accessible field net/minecraft/core/particles/ColorParticleOption color I
+mutable field net/minecraft/core/particles/ColorParticleOption color I

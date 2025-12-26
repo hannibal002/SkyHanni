@@ -50,106 +50,107 @@ import net.minecraft.world.item.ItemStack
 @SkyHanniModule
 object CopyNearbyEntitiesCommand {
 
-    // Only runs on the command, so performance impact is minimal
-    @OptIn(AllEntitiesGetter::class)
+    private var entityCounter = 0
+
     private fun command(args: Array<String>) {
         var searchRadius = 10
         if (args.size == 1) {
             searchRadius = args[0].toInt()
         }
 
-        val start = LocationUtils.playerLocation()
+        val resultList = buildCommandResult(searchRadius)
 
-        var counter = 0
-
-        val resultList = buildList {
-            for (entity in EntityUtils.getAllEntities().sortedBy { it.id }) {
-                val position = entity.blockPosition()
-                val vec = position.toLorenzVec()
-                val distance = start.distance(vec)
-                val mob = MobData.entityToMob[entity]
-                if (distance >= searchRadius) continue
-
-                val simpleName = entity.javaClass.simpleName
-                add("entity: $simpleName")
-                val displayName = entity.displayName
-                add("name: '" + entity.name.formattedTextCompatLessResets() + "'")
-                if (entity is ArmorStand) add("cleanName: '" + entity.cleanName() + "'")
-                add("displayName: '${displayName.formattedTextCompat()}'")
-                add("entityId: ${entity.id}")
-                add("Type of Mob: ${getType(entity, mob)}")
-                add("uuid version: ${entity.uuid.version()} (${entity.uuid})")
-                add("location data:")
-                add("-  vec: $vec")
-                add("-  distance: $distance")
-
-                val rotationYaw = entity.yRot
-                val rotationPitch = entity.xRot
-                add("-  rotationYaw: $rotationYaw")
-                add("-  rotationPitch: $rotationPitch")
-
-                val firstPassenger = entity.firstPassenger
-                add("firstPassenger: $firstPassenger")
-                val ridingEntity = entity.vehicle
-                add("ridingEntity: $ridingEntity")
-
-                if (entity.isInvisible) {
-                    add("Invisible: true")
-                }
-                if (entity.isCurrentlyGlowing) {
-                    add("Glowing: true")
-                }
-
-                if (entity is LivingEntity) {
-                    add("EntityLivingBase:")
-                    val baseMaxHealth = entity.baseMaxHealth
-                    val health = entity.findHealthReal().toInt()
-                    add("-  baseMaxHealth: $baseMaxHealth")
-                    add("-  health: $health")
-                }
-
-                if (entity is Player) {
-                    val armor = entity.getArmorInventory()
-                    if (armor != null) {
-                        add("armor:")
-                        for ((i, itemStack) in armor.withIndex()) {
-                            val name = itemStack?.hoverName.formattedTextCompatLeadingWhiteLessResets()
-                            add("-  at: $i: $name")
-                        }
-                    }
-                }
-
-                when (entity) {
-                    is ArmorStand -> addArmorStand(entity)
-                    is EnderMan -> addEnderman(entity)
-                    is MagmaCube -> addMagmaCube(entity)
-                    is ItemEntity -> addItem(entity)
-                    is RemotePlayer -> addOtherPlayer(entity)
-                    is Creeper -> addCreeper(entity)
-                    is WitherBoss -> addWither(entity)
-                    is Display.ItemDisplay -> addItemDisplayEntity(entity)
-                    is TropicalFish -> addTropicalFish(entity)
-                    is Shulker -> addShulker(entity)
-                    is Panda -> addPanda(entity)
-                    is Display.BlockDisplay -> addBlockDisplayEntity(entity)
-                    is Frog -> addFrogEntity(entity)
-                }
-                if (mob != null && mob.mobType != Mob.Type.PLAYER) {
-                    add("MobInfo: ")
-                    addAll(getMobInfo(mob).map { "-  $it" })
-                }
-                add("")
-                add("")
-                counter++
-            }
-        }
-
-        if (counter != 0) {
+        if (entityCounter != 0) {
             val string = resultList.joinToString("\n")
             OSUtils.copyToClipboard(string)
-            ChatUtils.chat("$counter entities copied into the clipboard!")
+            ChatUtils.chat("$entityCounter entities copied into the clipboard!")
         } else {
             ChatUtils.chat("No entities found in a search radius of $searchRadius!")
+        }
+    }
+
+    // Only runs on the command, so performance impact is minimal
+    @OptIn(AllEntitiesGetter::class)
+    private fun buildCommandResult(searchRadius: Int): List<String> = buildList {
+        val start = LocationUtils.playerLocation()
+        for (entity in EntityUtils.getAllEntities().sortedBy { it.id }) {
+            val position = entity.blockPosition()
+            val vec = position.toLorenzVec()
+            val distance = start.distance(vec)
+            val mob = MobData.entityToMob[entity]
+            if (distance >= searchRadius) continue
+
+            val simpleName = entity.javaClass.simpleName
+            add("entity: $simpleName")
+            val displayName = entity.displayName
+            add("name: '" + entity.name.formattedTextCompatLessResets() + "'")
+            if (entity is ArmorStand) add("cleanName: '" + entity.cleanName() + "'")
+            add("displayName: '${displayName.formattedTextCompat()}'")
+            add("entityId: ${entity.id}")
+            add("Type of Mob: ${getType(entity, mob)}")
+            add("uuid version: ${entity.uuid.version()} (${entity.uuid})")
+            add("location data:")
+            add("-  vec: $vec")
+            add("-  distance: $distance")
+
+            val rotationYaw = entity.yRot
+            val rotationPitch = entity.xRot
+            add("-  rotationYaw: $rotationYaw")
+            add("-  rotationPitch: $rotationPitch")
+
+            val firstPassenger = entity.firstPassenger
+            add("firstPassenger: $firstPassenger")
+            val ridingEntity = entity.vehicle
+            add("ridingEntity: $ridingEntity")
+
+            if (entity.isInvisible) {
+                add("Invisible: true")
+            }
+            if (entity.isCurrentlyGlowing) {
+                add("Glowing: true")
+            }
+
+            if (entity is LivingEntity) {
+                add("EntityLivingBase:")
+                val baseMaxHealth = entity.baseMaxHealth
+                val health = entity.findHealthReal().toInt()
+                add("-  baseMaxHealth: $baseMaxHealth")
+                add("-  health: $health")
+            }
+
+            if (entity is Player) {
+                val armor = entity.getArmorInventory()
+                if (armor != null) {
+                    add("armor:")
+                    for ((i, itemStack) in armor.withIndex()) {
+                        val name = itemStack?.hoverName.formattedTextCompatLeadingWhiteLessResets()
+                        add("-  at: $i: $name")
+                    }
+                }
+            }
+
+            when (entity) {
+                is ArmorStand -> addArmorStand(entity)
+                is EnderMan -> addEnderman(entity)
+                is MagmaCube -> addMagmaCube(entity)
+                is ItemEntity -> addItem(entity)
+                is RemotePlayer -> addOtherPlayer(entity)
+                is Creeper -> addCreeper(entity)
+                is WitherBoss -> addWither(entity)
+                is Display.ItemDisplay -> addItemDisplayEntity(entity)
+                is TropicalFish -> addTropicalFish(entity)
+                is Shulker -> addShulker(entity)
+                is Panda -> addPanda(entity)
+                is Display.BlockDisplay -> addBlockDisplayEntity(entity)
+                is Frog -> addFrogEntity(entity)
+            }
+            if (mob != null && mob.mobType != Mob.Type.PLAYER) {
+                add("MobInfo: ")
+                addAll(getMobInfo(mob).map { "-  $it" })
+            }
+            add("")
+            add("")
+            entityCounter++
         }
     }
 

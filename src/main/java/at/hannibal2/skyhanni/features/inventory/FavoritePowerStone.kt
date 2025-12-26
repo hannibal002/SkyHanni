@@ -36,7 +36,7 @@ object FavoritePowerStone {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !KeyboardManager.isShiftKeyDown() || !inInventory) return
 
-        val displayName = event.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()?.removeColor()?.trim() ?: return
+        val displayName = event.item?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.removeColor()?.trim() ?: return
         val power = MaxwellApi.getPowerByNameOrNull(displayName) ?: return
 
         if (power in MaxwellApi.favoritePowers) {

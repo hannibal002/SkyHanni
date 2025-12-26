@@ -71,7 +71,7 @@ object CFBlockOpen {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        val slotDisplayName = event.slot?.item?.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: return
+        val slotDisplayName = event.slot?.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
         if (!openCfItemPattern.matches(slotDisplayName)) return
         if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
 

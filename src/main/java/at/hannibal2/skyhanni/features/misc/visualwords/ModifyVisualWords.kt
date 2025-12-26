@@ -250,8 +250,8 @@ private fun List<StyledCharacter>.toLegacyString(): String {
 private fun String.toStyledCharacterList(style: Style = Style.EMPTY, hasFirst: Boolean = true): List<StyledCharacter> {
     val newList = mutableListOf<StyledCharacter>()
 
-    StringDecomposer.iterateFormatted(this, style) { index: Int, style: Style, codePoint: Int ->
-        newList.add(StyledCharacter(codePoint, style, index == 0 && hasFirst))
+    StringDecomposer.iterateFormatted(this, style) { index: Int, styleIter: Style, codePoint: Int ->
+        newList.add(StyledCharacter(codePoint, styleIter, index == 0 && hasFirst))
         true
     }
 

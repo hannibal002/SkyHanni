@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -22,6 +23,7 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.glfw.GLFW
 
+@Suppress("AvoidBritishSpelling")
 class MiscConfig {
     @Expose
     @Category(name = "Pets", desc = "Pets Settings")
@@ -385,6 +387,11 @@ class MiscConfig {
     val lastStorage: LastStorageConfig = LastStorageConfig()
 
     @Expose
+    @ConfigOption(name = "Custom Todos", desc = "")
+    @Accordion
+    val customTodos: CustomTodosConfig = CustomTodosConfig()
+
+    @Expose
     @ConfigOption(
         name = "Maintain Volume During Warnings",
         desc = "Do not change game volume levels when warning sounds are played.",
@@ -470,4 +477,20 @@ class MiscConfig {
     @FeatureToggle
     @OnlyModern
     var fixDoubleClicks: Boolean = true
+
+
+    @ConfigOption(name = "Color Particle Warning", desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.§f")
+    @ConfigEditorInfoText
+    @SearchTag("Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes Fix Colored Particles")
+    var notice: String = ""
+
+    @Expose
+    @ConfigOption(
+        name = "Fix Colored Particles",
+        desc = "Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("Colour Spell Spawn Specific")
+    var fixColorParticles: Boolean = false
 }

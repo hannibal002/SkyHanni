@@ -1,15 +1,20 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.events.ParticleChangeEvent;
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent;
 import at.hannibal2.skyhanni.features.misc.CurrentPing;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -27,5 +32,12 @@ public class MixinClientPlayNetworkHandler {
     public boolean shouldShowPacketSizeAndPingCharts(boolean original) {
         if (!CurrentPing.INSTANCE.isEnabled()) return original;
         return true;
+    }
+
+    @ModifyArg(method = "handleParticleEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)V"))
+    public ParticleOptions postParticleChangeEvent(ParticleOptions particleOptions, @Local(argsOnly = true) ClientboundLevelParticlesPacket packet) {
+        ParticleChangeEvent particleChangeEvent = new ParticleChangeEvent(particleOptions, packet);
+        particleChangeEvent.post();
+        return particleChangeEvent.getParticleOptions();
     }
 }
