@@ -33,6 +33,9 @@ class CustomTodoEditor(
     var showWhen: String = from.showWhen.toString()
 
     @field:Bind
+    var totalTriggers: String = from.totalTriggers.toString()
+
+    @field:Bind
     var trigger: String = from.trigger
 
     @field:Bind
@@ -65,6 +68,8 @@ class CustomTodoEditor(
             enabled,
             ignoreColorCodes,
             from.position,
+            totalTriggers.toIntOrNull() ?: 1,
+            from.triggersLeft
         )
     }
 

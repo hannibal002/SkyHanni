@@ -33,6 +33,8 @@ data class CustomTodo(
     @Expose var isEnabled: Boolean = true,
     @Expose var ignoreColorCodes: Boolean = true,
     @Expose var position: Position = Position(10, 10),
+    @Expose var totalTriggers: Int = 1,
+    @Expose var triggersLeft: MutableMap<String, Int> = mutableMapOf(),
 ) {
     enum class TriggerMatcher {
         REGEX,
@@ -55,6 +57,13 @@ data class CustomTodo(
     fun setDoneNow() {
         if (!SkyBlockUtils.inSkyBlock) return
         val now = SimpleTimeMark.now()
+        val triggersLeft = this.triggersLeftOnCurrentProfile ?: 1
+        if (triggersLeft > 1) {
+            this.triggersLeftOnCurrentProfile = triggersLeft - 1
+            return
+        } else {
+            this.triggersLeftOnCurrentProfile = this.totalTriggers
+        }
         readyAt[HypixelData.profileName] =
             if (isResetOffset) {
                 val asTimeMark = (now.toMillis() - now.toMillis() % MS_IN_A_DAY + timer * 1000L).asTimeMark()
@@ -75,6 +84,16 @@ data class CustomTodo(
             readyAt[HypixelData.profileName] = value ?: return
         }
 
+    private var triggersLeftOnCurrentProfile: Int?
+        get() {
+            if (!SkyBlockUtils.inSkyBlock) return null
+            return triggersLeft[HypixelData.profileName]
+        }
+        set(value) {
+            if (!SkyBlockUtils.inSkyBlock) return
+            triggersLeft[HypixelData.profileName] = value ?: return
+        }
+
 
     companion object {
         private const val NEU_TEMPLATE_PREFIX = "NEU:CUSTOMTODO/"
@@ -89,6 +108,7 @@ data class CustomTodo(
             }
             return maybeDecoded?.also {
                 it.readyAt.clear()
+                it.triggersLeft.clear()
             }
         }
     }
@@ -96,22 +116,40 @@ data class CustomTodo(
     fun toTemplate(): String {
         return TemplateUtil.encodeTemplate(
             TEMPLATE_PREFIX,
-            this.copy(readyAt = mutableMapOf()),
+            this.copy(readyAt = mutableMapOf(), triggersLeft = mutableMapOf()),
         )
     }
 
     fun getRenderable(): Renderable? {
         if (!this.isEnabled || !this.isValid()) return null
         val readyAt = this.readyAtOnCurrentProfile ?: return null
+        if (this.triggersLeftOnCurrentProfile == null) {
+            this.triggersLeftOnCurrentProfile = this.totalTriggers
+        }
+        val triggers = this.triggersLeftOnCurrentProfile ?: return null
         if (this.showOnlyWhenReady && readyAt.isInFuture()) return null
         if (this.showWhen != 0 && readyAt.timeUntil().inWholeSeconds > this.showWhen) return null
 
-        val timer = if (readyAt.isInPast()) "§aReady" else readyAt.timeUntil().format(maxUnits = 2)
+        var timer = readyAt.timeUntil().format(maxUnits = 2)
+        if (readyAt.isInPast()) {
+            timer = if (this.totalTriggers == 1) "§aReady"
+            else "§a$triggers Left"
+        }
         val label = this.label.replace("&&", "§")
         val textRenderable = Renderable.text("§3$label: §c$timer")
 
         if (this.icon.isEmpty()) return textRenderable
         return Renderable.horizontal(Renderable.item(CustomTodosGui.parseItem(this.icon)), textRenderable)
 
+    }
+
+    private var compiledRegex: Regex? = null
+
+    fun getRegex(): Regex? {
+        if (this.triggerMatcher != TriggerMatcher.REGEX) return null
+        if (compiledRegex != null) return compiledRegex
+        val regex = this.trigger.toRegex()
+        compiledRegex = regex
+        return regex
     }
 }
