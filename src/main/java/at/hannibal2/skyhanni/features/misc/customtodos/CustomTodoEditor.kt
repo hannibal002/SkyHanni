@@ -50,11 +50,18 @@ class CustomTodoEditor(
     @field:Bind
     var ignoreColorCodes: Boolean = from.ignoreColorCodes
 
+    @field:Bind
+    var cronEnabled: Boolean = from.cronEnabled
+
+    @field:Bind
+    var cronExpression: String = from.cronExpression
+
     var target = from.triggerTarget
     var matchMode = from.triggerMatcher
 
     fun into(): CustomTodo {
         if (from.readyAtOnCurrentProfile == null) markAsReady()
+        if (from.totalTriggers != totalTriggers.toIntOrNull()) from.triggersLeft = mutableMapOf()
         return CustomTodo(
             label,
             timer.toIntOrNull() ?: 0,
@@ -69,7 +76,9 @@ class CustomTodoEditor(
             ignoreColorCodes,
             from.position,
             totalTriggers.toIntOrNull() ?: 1,
-            from.triggersLeft
+            from.triggersLeft,
+            cronEnabled,
+            cronExpression,
         )
     }
 

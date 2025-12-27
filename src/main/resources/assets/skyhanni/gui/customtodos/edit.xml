@@ -99,6 +99,14 @@
                 <Switch value="@ignoreColorCodes"/>
             </Row>
             <Row>
+                <Text text="Cron Expression: " width="150"/>
+                <TextField value="@cronExpression" width="300" suggestion="* * * * * ?"/>
+            </Row>
+            <Row>
+                <Text text="Enable Cron (Advanced): " width="150"/>
+                <Switch value="@cronEnabled"/>
+            </Row>
+            <Row>
                 <Button onClick="@setChat">
                     <Text text="@getChat"/>
                 </Button>
@@ -128,6 +136,8 @@
                     <Text text="@getEquals"/>
                 </Button>
             </Row>
+            <Spacer height="10">
+            </Spacer>
             <Row>
                 <Button onClick="@copyTemplate">
                     <Text text="Copy Preset"/>

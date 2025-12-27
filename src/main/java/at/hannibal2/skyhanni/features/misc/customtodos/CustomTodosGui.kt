@@ -77,7 +77,12 @@ object CustomTodosGui {
         if (todos.isEmpty()) return
         val display = mutableListOf<Renderable>()
         for ((index, todo) in todos.withIndex()) {
-            val renderable = todo.getRenderable() ?: continue
+            val renderable: Renderable
+            try {
+                renderable = todo.getRenderable() ?: continue
+            } catch (e: Exception) {
+                continue
+            }
             if (config.separateGuis) {
                 todo.position.renderRenderable(renderable, posLabel = "${todo.label} $index")
             } else {

@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.annotations.Expose
+import org.apache.logging.log4j.core.util.CronExpression
+import java.util.Date
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,6 +37,8 @@ data class CustomTodo(
     @Expose var position: Position = Position(10, 10),
     @Expose var totalTriggers: Int = 1,
     @Expose var triggersLeft: MutableMap<String, Int> = mutableMapOf(),
+    @Expose var cronEnabled: Boolean = false,
+    @Expose var cronExpression: String = "",
 ) {
     enum class TriggerMatcher {
         REGEX,
@@ -50,15 +54,15 @@ data class CustomTodo(
         SIDEBAR
     }
 
-    fun isValid(): Boolean {
-        return timer >= 0 && trigger.isNotBlank()
+    private fun isValid(): Boolean {
+        return timer >= 0 && (trigger.isNotBlank() && !cronEnabled) || (cronEnabled && cronExpression.isNotBlank())
     }
 
     fun setDoneNow() {
         if (!SkyBlockUtils.inSkyBlock) return
         val now = SimpleTimeMark.now()
         val triggersLeft = this.triggersLeftOnCurrentProfile ?: 1
-        if (triggersLeft > 1) {
+        if (triggersLeft > 1 && !this.cronEnabled) {
             this.triggersLeftOnCurrentProfile = triggersLeft - 1
             return
         } else {
@@ -69,7 +73,8 @@ data class CustomTodo(
                 val asTimeMark = (now.toMillis() - now.toMillis() % MS_IN_A_DAY + timer * 1000L).asTimeMark()
                 if (asTimeMark.isInPast()) asTimeMark + 1.days else asTimeMark
             } else {
-                now + timer.seconds
+                if (this.cronEnabled) now
+                else now + timer.seconds
             }
         CustomTodos.save()
     }
@@ -127,20 +132,46 @@ data class CustomTodo(
             this.triggersLeftOnCurrentProfile = this.totalTriggers
         }
         val triggers = this.triggersLeftOnCurrentProfile ?: return null
-        if (this.showOnlyWhenReady && readyAt.isInFuture()) return null
-        if (this.showWhen != 0 && readyAt.timeUntil().inWholeSeconds > this.showWhen) return null
 
-        var timer = readyAt.timeUntil().format(maxUnits = 2)
-        if (readyAt.isInPast()) {
-            timer = if (this.totalTriggers == 1) "§aReady"
-            else "§a$triggers Left"
-        }
+        val timer = if (this.cronEnabled) getTimerCronString(readyAt) else getTimerString(readyAt, triggers)
+        timer ?: return null
         val label = this.label.replace("&&", "§")
         val textRenderable = Renderable.text("§3$label: §c$timer")
 
         if (this.icon.isEmpty()) return textRenderable
         return Renderable.horizontal(Renderable.item(CustomTodosGui.parseItem(this.icon)), textRenderable)
+    }
 
+    private fun getTimerString(readyAt: SimpleTimeMark, triggers: Int): String? {
+        var timer = readyAt.timeUntil().format(maxUnits = 2)
+        if (readyAt.isInPast()) {
+            timer = if (this.totalTriggers == 1) "§aReady"
+            else "§a$triggers Left"
+        }
+        if (this.showOnlyWhenReady) return null
+        if (this.showWhen != 0 && readyAt.timeUntil().inWholeSeconds > this.showWhen) return null
+        return timer
+    }
+
+    private fun getTimerCronString(readyAt: SimpleTimeMark): String? {
+        val date = Date(readyAt.toMillis())
+        val cron = CronExpression(this.cronExpression)
+        val timeMark = SimpleTimeMark(cron.getNextValidTimeAfter(date).time)
+        val nextTime = timeMark + this.timer.seconds
+        var timer = ""
+        if (timeMark.isInPast() && nextTime.isInFuture()) {
+            timer = "§aReady"
+        } else {
+            if (nextTime.isInPast()) {
+                this.readyAtOnCurrentProfile = SimpleTimeMark.now()
+            }
+            if (this.showOnlyWhenReady) return null
+            if (this.showWhen != 0 && timeMark.timeUntil().inWholeSeconds > this.showWhen) return null
+
+            timer = timeMark.timeUntil().format(maxUnits = 2)
+        }
+
+        return timer
     }
 
     private var compiledRegex: Regex? = null
