@@ -89,7 +89,7 @@ data class CustomTodo(
             readyAt[HypixelData.profileName] = value ?: return
         }
 
-    private var triggersLeftOnCurrentProfile: Int?
+    var triggersLeftOnCurrentProfile: Int?
         get() {
             if (!SkyBlockUtils.inSkyBlock) return null
             return triggersLeft[HypixelData.profileName]

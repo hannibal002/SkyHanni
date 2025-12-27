@@ -179,11 +179,13 @@ class CustomTodoEditor(
 
     @Bind
     fun markAsReady() {
+        from.triggersLeftOnCurrentProfile = totalTriggers.toIntOrNull() ?: 1
         from.readyAtOnCurrentProfile = SimpleTimeMark.now()
     }
 
     @Bind
     fun markAsCompleted() {
+        from.triggersLeftOnCurrentProfile = 0
         from.setDoneNow()
     }
 
