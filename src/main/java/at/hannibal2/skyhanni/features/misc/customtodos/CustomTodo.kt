@@ -126,7 +126,7 @@ data class CustomTodo(
     }
 
     fun getRenderable(): Renderable? {
-        if (!this.isEnabled || !this.isValid()) return null
+        if (!this.isValid()) return null
         val readyAt = this.readyAtOnCurrentProfile ?: return null
         if (this.triggersLeftOnCurrentProfile == null) {
             this.triggersLeftOnCurrentProfile = this.totalTriggers

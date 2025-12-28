@@ -26,6 +26,7 @@ object CustomTodosGui {
     private val config get() = SkyHanniMod.feature.misc.customTodos
 
     private fun matchString(todo: CustomTodo, text: String): Boolean {
+        if (!todo.isValid()) return false
         val cleanedText = if (todo.ignoreColorCodes) text.removeColor() else text
         return when (todo.triggerMatcher) {
             CustomTodo.TriggerMatcher.REGEX -> cleanedText.matches(todo.getRegex() ?: return false)
