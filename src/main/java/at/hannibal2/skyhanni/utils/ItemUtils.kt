@@ -150,7 +150,7 @@ object ItemUtils {
 
     private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
-    fun ItemStack.cleanName() = hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+    fun ItemStack.cleanName() = hoverName.string.removeColor()
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
@@ -266,7 +266,7 @@ object ItemUtils {
     }
 
     private fun ItemStack.grabInternalNameOrNull(): NeuInternalName? {
-        if (hoverName.formattedTextCompatLeadingWhiteLessResets() == "§fWisp's Ice-Flavored Water I Splash Potion") {
+        if (hoverName.string == "Wisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
         }
         // This is to prevent an error message whenever coins are traded.
@@ -451,7 +451,13 @@ object ItemUtils {
     }
 
     // Taken from NEU
-    fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
+    fun ItemStack.editItemInfo(displayName: String, lore: List<String>): ItemStack {
+        this.setCustomItemName(displayName)
+        this.setLore(lore)
+        return this
+    }
+
+    fun ItemStack.editItemInfo(displayName: Component, lore: List<Component>): ItemStack {
         this.setCustomItemName(displayName)
         this.setLore(lore)
         return this

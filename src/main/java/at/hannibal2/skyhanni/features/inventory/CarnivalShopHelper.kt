@@ -238,7 +238,7 @@ object CarnivalShopHelper {
 
     private fun processTokenShopFooter(event: InventoryOpenEvent): Boolean {
         val tokenFooterStack = event.inventoryItems.getOrElse(32) { return false }
-        if (tokenFooterStack.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§eCarnival Tokens") return false
+        if (tokenFooterStack.hoverName.string != "Carnival Tokens") return false
         currentTokenCountPattern.firstMatcher(tokenFooterStack.getLore()) {
             val new = groupOrNull("tokens")?.formatInt() ?: 0
             val changed = new != tokensOwned

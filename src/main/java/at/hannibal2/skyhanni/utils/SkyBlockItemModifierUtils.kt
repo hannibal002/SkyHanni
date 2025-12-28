@@ -146,7 +146,7 @@ object SkyBlockItemModifierUtils {
     var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
 
     fun ItemStack.getPetInfo(): PetInfo? {
-        val colorlessName = hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+        val colorlessName = hoverName.string.removeColor()
         // Repo pets will always return null for PetInfo, don't even attempt to parse it
         if (colorlessName.contains("→") || colorlessName.contains("{LVL}")) return null
         val petInfoJson = getExtraAttributes()?.takeIf {

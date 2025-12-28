@@ -112,7 +112,7 @@ object EnigmaSoulWaypoints {
         for (stack in event.inventoryItems.values) {
             stack.getLore().lastOrNull()?.let {
                 if (notCompletedPattern.matches(it.removeColor())) {
-                    enigmaTitlePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+                    enigmaTitlePattern.matchMatcher(stack.hoverName.string.removeColor()) {
                         inventoryUnfound.add(group("name"))
                     }
                 }
@@ -149,7 +149,7 @@ object EnigmaSoulWaypoints {
 
         if (event.slot?.item == null) return
 
-        val name = enigmaTitlePattern.matchMatcher(event.slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+        val name = enigmaTitlePattern.matchMatcher(event.slot.item.hoverName.string.removeColor()) {
             group("name")
         } ?: return
         event.makePickblock()
@@ -192,7 +192,7 @@ object EnigmaSoulWaypoints {
         val tracked = trackedSouls[area] ?: return
 
         for ((slot, stack) in chest.getAllItems()) {
-            enigmaTitlePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+            enigmaTitlePattern.matchMatcher(stack.hoverName.string.removeColor()) {
                 if (group("name") in tracked) {
                     slot.highlight(LorenzColor.DARK_PURPLE)
                 }

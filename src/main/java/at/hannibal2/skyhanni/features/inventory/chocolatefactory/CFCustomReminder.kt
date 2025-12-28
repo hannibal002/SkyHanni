@@ -98,7 +98,7 @@ object CFCustomReminder {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !inChocolateMenu()) return
         val item = event.item ?: return
-        CFDataLoader.upgradeTierPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+        CFDataLoader.upgradeTierPattern.matchMatcher(item.hoverName.string.removeColor()) {
             if (group("upgrade") == "Time Tower" && event.clickedButton == 1) return
         }
         val (cost, name) = getCostAndName(item) ?: return

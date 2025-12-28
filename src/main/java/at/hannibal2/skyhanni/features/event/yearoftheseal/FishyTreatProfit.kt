@@ -57,7 +57,7 @@ object FishyTreatProfit {
             // ignore the last line of menu items
             if (slot > 44) continue
             // background items
-            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets() == " ") continue
+            if (item.hoverName.string == " ") continue
             try {
                 readItem(slot, item, table)
             } catch (e: Throwable) {

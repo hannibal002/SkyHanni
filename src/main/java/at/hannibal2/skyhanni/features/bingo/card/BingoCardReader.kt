@@ -53,7 +53,7 @@ object BingoCardReader {
                 lore.any { it.endsWith("Community Goal") } -> GoalType.COMMUNITY
                 else -> continue
             }
-            val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = stack.hoverName.string.removeColor()
             var index = 0
             val builder = StringBuilder()
             for (s in lore) {

@@ -99,7 +99,7 @@ object HideFarEntities {
         // Always show boss bar
         list += allEntities.filter { it is WitherBoss && it.id < 0 }
 
-        list += allEntities.filter { it is RemotePlayer && it.name.formattedTextCompatLessResets() in PartyApi.partyMembers }
+        list += allEntities.filter { it is RemotePlayer && it.name.string in PartyApi.partyMembers }
         list += DamageIndicatorManager.getAllMobs()
         list += AreaMiniBossFeatures.currentMobs.map { it.baseEntity }
 

@@ -322,8 +322,8 @@ object SuperpairDataDisplay {
 
     private fun ItemStack.convertToReward() = when {
         guardianPetInternalNamePattern.matches(getInternalNameOrNull()?.asString().orEmpty()) -> hoverName.formattedTextCompatLeadingWhiteLessResets().split("] ")[1]
-        hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == "Enchanted Book" -> getLore()[2].removeColor()
-        else -> hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+        hoverName.string.removeColor() == "Enchanted Book" -> getLore()[2].removeColor()
+        else -> hoverName.string.removeColor()
     }
 
     private fun determinePrefix(index: Int, lastIndex: Int) = if (index == lastIndex) "└" else "├"

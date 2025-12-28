@@ -446,7 +446,7 @@ object ExperimentationTableApi {
     }
 
     private fun GuiContainerEvent.SlotClickEvent.tryResetQueuedEvent() {
-        if (item?.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§cDecline") return
+        if (item?.hoverName?.string != "Decline") return
         queuedCompleteEvent = null
     }
 
@@ -487,7 +487,7 @@ object ExperimentationTableApi {
             it != lastExpOverHash && it != currentExpOverHash && it != 0
         } ?: return
 
-        currentExperimentData.type = ExperimentationTaskType.fromStringOrNull(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) ?: return
+        currentExperimentData.type = ExperimentationTaskType.fromStringOrNull(item.hoverName.string.removeColor()) ?: return
         currentExperimentData.tier = expOverStakesLorePattern.firstMatcher(lore) {
             ExperimentationTier.byNameOrNull(group("stakes"))
         } ?: return

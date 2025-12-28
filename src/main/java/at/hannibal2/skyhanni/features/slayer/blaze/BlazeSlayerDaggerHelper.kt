@@ -167,7 +167,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     private fun getDaggerFromStack(stack: ItemStack?): Dagger? {
-        val itemName = stack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty()
+        val itemName = stack?.hoverName?.string.orEmpty()
         for (dagger in Dagger.entries) {
             if (dagger.daggerNames.any { itemName.contains(it) }) {
                 return dagger

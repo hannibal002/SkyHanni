@@ -117,7 +117,7 @@ object CityProjectFeatures {
             // internal name -> amount
             val materials = mutableMapOf<NeuInternalName, Int>()
             for ((_, item) in event.inventoryItems) {
-                if (item.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§eContribute this component!") continue
+                if (item.hoverName.string != "Contribute this component!") continue
                 fetchMaterials(item, materials)
             }
 
@@ -147,7 +147,7 @@ object CityProjectFeatures {
                         nextTime = endTime
                     }
                 }
-                if (item.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§eContribute this component!") continue
+                if (item.hoverName.string != "Contribute this component!") continue
                 nextTime = now
             }
             ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
