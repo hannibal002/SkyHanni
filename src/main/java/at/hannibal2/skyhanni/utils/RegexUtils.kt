@@ -53,7 +53,7 @@ object RegexUtils {
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
 
     fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { matches(it) } ?: false
-    fun Pattern.anyMatches(list: List<Component>?): Boolean = list?.any { matches(it.string) } ?: false
+    fun Pattern.anyMatchesComponent(list: List<Component>?): Boolean = list?.any { matches(it.string) } ?: false
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
 
     fun Pattern.matchGroup(text: String, groupName: String): String? = matchMatcher(text) { groupOrNull(groupName) }
