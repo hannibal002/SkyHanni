@@ -453,13 +453,13 @@ object ItemUtils {
     // Taken from NEU
     fun ItemStack.editItemInfo(displayName: String, lore: List<String>): ItemStack {
         this.setCustomItemName(displayName)
-        this.setLore(lore)
+        this.setLoreString(lore)
         return this
     }
 
     fun ItemStack.editItemInfo(displayName: Component, lore: List<Component>): ItemStack {
         this.setCustomItemName(displayName)
-        this.setLoreString(lore)
+        this.setLore(lore)
         return this
     }
 
