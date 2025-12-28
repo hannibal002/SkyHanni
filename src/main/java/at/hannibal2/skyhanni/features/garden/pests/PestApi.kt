@@ -162,7 +162,7 @@ object PestApi {
      */
     val stereoPlayingItemPattern by patternGroup.pattern(
         "stereo.playing.item",
-        "§a§lPLAYING",
+        "PLAYING",
     )
 
     private var gardenJoinTime = SimpleTimeMark.farPast()

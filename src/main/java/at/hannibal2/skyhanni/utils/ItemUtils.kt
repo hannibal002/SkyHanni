@@ -165,6 +165,11 @@ object ItemUtils {
         return lore
     }
 
+    fun ItemStack.getLoreComponent(): List<Component> {
+        val lore = this.get(DataComponents.LORE)?.lines
+        return lore ?: emptyList()
+    }
+
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
 
     fun DataComponentMap?.getLore(): List<String> {
@@ -199,6 +204,11 @@ object ItemUtils {
 
     fun ItemStack.setLore(lore: List<String>): ItemStack {
         this.set(DataComponents.LORE, ItemLore(lore.map { Component.nullToEmpty(it) }))
+        return this
+    }
+
+    fun ItemStack.setLore(lore: List<Component>): ItemStack {
+        this.set(DataComponents.LORE, ItemLore(lore))
         return this
     }
 
