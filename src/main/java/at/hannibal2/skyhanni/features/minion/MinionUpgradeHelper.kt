@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -99,7 +99,7 @@ object MinionUpgradeHelper {
 
     private fun createDisplayItem(internalName: NeuInternalName): ItemStack {
         val lore = createLore(internalName)
-        return ItemStack(Blocks.DIAMOND_BLOCK).setLore(lore).setCustomItemName("§bGet Required Items")
+        return ItemStack(Blocks.DIAMOND_BLOCK).setLoreString(lore).setCustomItemName("§bGet Required Items")
     }
 
     private fun createLore(internalName: NeuInternalName): List<String> {
