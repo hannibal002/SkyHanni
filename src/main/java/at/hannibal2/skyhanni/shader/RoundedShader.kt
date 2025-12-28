@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.shader
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import org.joml.Matrix4f
 
-abstract class RoundedShader<Self : RoundedShader<Self>>() {
+abstract class RoundedShader<Self : RoundedShader<Self>> {
     @Suppress("UNCHECKED_CAST", "PropertyName", "VariableNaming")
     val INSTANCE: Self
         get() = this as Self
