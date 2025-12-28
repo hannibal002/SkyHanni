@@ -202,7 +202,7 @@ object ItemUtils {
         return name
     }
 
-    fun ItemStack.setLore(lore: List<String>): ItemStack {
+    fun ItemStack.setLoreString(lore: List<String>): ItemStack {
         this.set(DataComponents.LORE, ItemLore(lore.map { Component.nullToEmpty(it) }))
         return this
     }
@@ -331,7 +331,7 @@ object ItemUtils {
         //$$ stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(profile))
         //#endif
         stack.setCustomItemName(displayName)
-        stack.setLore(lore.toList())
+        stack.setLoreString(lore.toList())
         return stack
     }
 
@@ -347,7 +347,7 @@ object ItemUtils {
     fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1): ItemStack {
         val stack = ItemStack(item, amount)
         stack.setCustomItemName(displayName)
-        stack.setLore(lore)
+        stack.setLoreString(lore)
         var tooltipDisplay = net.minecraft.world.item.component.TooltipDisplay.DEFAULT.withHidden(DataComponents.DAMAGE, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.ATTRIBUTE_MODIFIERS, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.UNBREAKABLE, true)
@@ -459,7 +459,7 @@ object ItemUtils {
 
     fun ItemStack.editItemInfo(displayName: Component, lore: List<Component>): ItemStack {
         this.setCustomItemName(displayName)
-        this.setLore(lore)
+        this.setLoreString(lore)
         return this
     }
 
