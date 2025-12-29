@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
@@ -204,20 +205,6 @@ object ChatManager {
         return Pair(component.takeIf { modified }, cancelled)
     }
 
-    private fun openChatHistoryGui(args: Array<String>) {
-        SkyHanniMod.screenToOpen = if (args.isEmpty()) {
-            ChatHistoryGui(getRecentMessageHistory())
-        } else {
-            val searchTerm = args.joinToString(" ")
-            val history = getRecentMessageHistoryWithSearch(searchTerm)
-            if (history.isEmpty()) {
-                ChatUtils.chat("§eNot found in chat history! ($searchTerm)")
-                return
-            }
-            ChatHistoryGui(history)
-        }
-    }
-
     // TODO: Add another predicate to stop searching after a certain amount of lines have been searched
     //  or if the lines were sent too long ago. Same thing for the deleteChatLine function.
     fun MutableList<GuiMessage>.editChatLine(
@@ -284,7 +271,17 @@ object ChatManager {
         event.registerBrigadier("shchathistory") {
             description = "Show the unfiltered chat history"
             category = CommandCategory.DEVELOPER_TEST
-            legacyCallbackArgs { openChatHistoryGui(it) }
+            argCallback("search", BrigadierArguments.greedyString()) { searchTerm ->
+                val history = getRecentMessageHistoryWithSearch(searchTerm)
+                if (history.isEmpty()) {
+                    ChatUtils.chat("§eNot found in chat history! ($searchTerm)")
+                    return@argCallback
+                }
+                SkyHanniMod.screenToOpen = ChatHistoryGui(history)
+            }
+            simpleCallback {
+                SkyHanniMod.screenToOpen = ChatHistoryGui(getRecentMessageHistory())
+            }
         }
     }
 }
