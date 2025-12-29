@@ -103,7 +103,7 @@ private val textColorLUT = ChatFormatting.entries
     .toMap()
 
 fun Style.chatStyle() = buildString {
-    color?.let { append(it.toChatFormatting()?.toString() ?: "§r") }
+    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.formatValue()}>") }
     if (isBold) append("§l")
     if (isItalic) append("§o")
     if (isUnderlined) append("§n")
