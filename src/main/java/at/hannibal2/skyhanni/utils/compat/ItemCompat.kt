@@ -10,6 +10,11 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.TooltipFlag
 
+fun ItemStack.getTooltip(advanced: Boolean): MutableList<Component> {
+    val tooltipType = if (advanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
+    return this.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, tooltipType)
+}
+
 fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
     val tooltipType = if (advanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
     return this.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, tooltipType).map { it.formattedTextCompat() }
