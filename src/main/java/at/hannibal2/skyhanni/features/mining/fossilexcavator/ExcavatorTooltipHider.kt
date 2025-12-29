@@ -34,7 +34,7 @@ object ExcavatorTooltipHider {
         }
 
         if (config.hideDirt) {
-            val isDirt = dirtPattern.matches(event.itemStack.hoverName.string)
+            val isDirt = dirtPattern.matches(event.itemStack.hoverName)
             if (isDirt) {
                 event.cancel()
             }
