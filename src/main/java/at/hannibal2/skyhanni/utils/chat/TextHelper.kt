@@ -182,7 +182,7 @@ object TextHelper {
         var text = Component.literal("")
         for ((index, char) in string.withIndex()) {
             val color = ColorUtils.blendRGB(start, end, index / length).rgb
-            text = text.append(ExtendedChatColor(color).asText().append(char.toString()))
+            text = text.append(ExtendedChatColor(color).asText(char.toString()))
         }
         return text
     }

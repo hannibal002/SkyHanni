@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import net.minecraft.network.chat.Component
 import java.awt.Color
 
 object ColorUtils {
@@ -44,8 +45,6 @@ object ColorUtils {
     )
 
     val ChromaColour.rgb get() = this.toColor().rgb
-
-    fun Color.getExtendedColorCode(hasAlpha: Boolean = false): String = ExtendedChatColor(rgb, hasAlpha).toString()
 
     /** Darkens a color by a [factor]. The lower the [factor], the darker the color. */
     fun Color.darker(factor: Double = 0.7) = Color(

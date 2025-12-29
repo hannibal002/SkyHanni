@@ -162,7 +162,7 @@ object FlowstateHelper {
         if (!config.colorfulTimer) return Component.literal("§b")
         return when (timeRemaining) {
             in 0.seconds..2.seconds -> Component.literal("§c")
-            in 2.seconds..4.seconds -> ExtendedChatColor("#ec7b36", false).asText()
+            in 2.seconds..4.seconds -> ExtendedChatColor("#ec7b36").asText()
             in 4.seconds..6.seconds -> Component.literal("§e")
             in 6.seconds..8.seconds -> Component.literal("§a")
             in 8.seconds..10.seconds -> Component.literal("§2")

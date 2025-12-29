@@ -2,15 +2,15 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object ColorHexInLore {
@@ -36,7 +36,7 @@ object ColorHexInLore {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltip(event: ToolTipEvent) {
+    fun onTooltip(event: ToolTipTextEvent) {
         // this feature wont work on 1.21 probably until we drop 1.8
         // todo actually fix now
         if (true) return
@@ -47,19 +47,15 @@ object ColorHexInLore {
             !InventoryUtils.openInventoryName().startsWith("Dye")
         ) return
 
-        event.toolTip = event.toolTip.map {
-            doubleHexPattern.matchMatcher(it) {
-                it.replaceColor(group("hexfirst")).replaceColor(group("hexsecond"))
-            } ?: hexPattern.matchMatcher(it) {
-                it.replaceColor(group("hex"))
-            } ?: it
-
-        }.toMutableList()
+        for ((index, component) in event.toolTip.withIndex()) {
+            for (sibling in component.siblings) {
+                // ill fix it in a separate pr
+                if (sibling.string.contains("#")) {} // blah blah do something
+            }
+        }
     }
 
-    private fun String.replaceColor(hexCode: String) = replace(hexCode, addColor(hexCode))
-
-    private fun addColor(hexFirst: String): String = ExtendedChatColor(hexFirst, false).toString() + hexFirst
+    private fun addColor(hexFirst: String): Component = ExtendedChatColor(hexFirst).asText(hexFirst)
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.inventory.hexAsColorInLore
 }
