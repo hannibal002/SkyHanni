@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.PauseScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import org.lwjgl.opengl.GL11
@@ -99,6 +100,7 @@ interface Renderable {
             null -> placeholder(12)
             is Renderable -> any
             is String -> text(any)
+            is Component -> text(any)
             is ItemStack -> item(any, itemScale)
             else -> null
         }

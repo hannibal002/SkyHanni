@@ -270,3 +270,19 @@ fun Component.append(newText: String): Component {
     }
     return mutableText.append(newText)
 }
+
+fun List<Any>.mapToComponents(): List<Component> {
+    val newList = mutableListOf<Component>()
+    for (entry in this) {
+        when (entry) {
+            is String -> newList.add(Component.literal(entry))
+            is Component -> newList.add(entry)
+            else -> throw IllegalArgumentException("$entry is not String or Component")
+        }
+    }
+    return newList
+}
+
+fun Component.replace(oldValue: String, newValue: String): Component {
+    return Component.literal(this.string.replace(oldValue, newValue)).withStyle(this.style)
+}

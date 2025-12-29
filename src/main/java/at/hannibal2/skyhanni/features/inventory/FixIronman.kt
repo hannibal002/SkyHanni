@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.replace
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
@@ -54,7 +55,7 @@ object FixIronman {
 
     fun fixScoreboard(component: Component): Component? {
         return if (TimeUtils.isAprilFoolsDay && component.string.contains("Ironman")) {
-            Component.literal(component.string.replace("Ironman", "Ironperson")).withStyle(component.style)
+            component.replace("Ironman", "Ironperson")
         } else null
     }
 
