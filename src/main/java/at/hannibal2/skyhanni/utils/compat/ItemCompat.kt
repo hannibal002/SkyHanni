@@ -30,7 +30,7 @@ fun String.getVanillaItem(): Item? {
 }
 
 fun ItemStack.setCustomItemName(name: String): ItemStack {
-    this.set(DataComponents.CUSTOM_NAME, Component.nullToEmpty(name))
+    this.set(DataComponents.CUSTOM_NAME, Component.literal(name))
     return this
 }
 

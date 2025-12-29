@@ -170,7 +170,7 @@ fun Style.setClickRunCommand(text: String): Style {
 }
 
 fun Style.setHoverShowText(text: String): Style {
-    return this.withHoverEvent(HoverEvent.ShowText(Component.nullToEmpty(text)))
+    return this.withHoverEvent(HoverEvent.ShowText(Component.literal(text)))
 }
 
 fun Style.setHoverShowText(text: Component): Style {
@@ -266,7 +266,7 @@ val formattingPattern = Regex("§.(?:§.)?")
 fun Component.append(newText: String): Component {
     val mutableText = this as MutableComponent
     if (mutableText.string.matches(formattingPattern)) {
-        return Component.nullToEmpty(mutableText.string + newText)
+        return Component.literal(mutableText.string + newText)
     }
     return mutableText.append(newText)
 }

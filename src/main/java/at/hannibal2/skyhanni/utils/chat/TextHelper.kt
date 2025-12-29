@@ -179,7 +179,7 @@ object TextHelper {
 
     fun createGradientText(start: Color, end: Color, string: String): Component {
         val length = string.length.toDouble()
-        var text = Component.nullToEmpty("")
+        var text = Component.literal("")
         for ((index, char) in string.withIndex()) {
             val color = ColorUtils.blendRGB(start, end, index / length).rgb
             text = text.append(ExtendedChatColor(color).asText().append(char.toString()))

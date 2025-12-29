@@ -203,7 +203,7 @@ object ItemUtils {
     }
 
     fun ItemStack.setLoreString(lore: List<String>): ItemStack {
-        this.set(DataComponents.LORE, ItemLore(lore.map { Component.nullToEmpty(it) }))
+        this.set(DataComponents.LORE, ItemLore(lore.map { Component.literal(it) }))
         return this
     }
 
