@@ -27,14 +27,13 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.createHoverEvent
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.mojang.blaze3d.systems.RenderSystem
 import java.util.TreeSet
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.HoverEvent
 import net.minecraft.world.item.ItemStack
 
 /**
@@ -135,6 +134,11 @@ object EnchantParser {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltipEvent(event: ToolTipTextEvent) {
+        // Only proceed if we are on the render thread as other mods could end up triggering
+        // the ToolTipTextEvent from different threads which breaks the parser. (i.e. REI
+        // during item searching since it needs to check tooltips for search queries)
+        if (!RenderSystem.isOnRenderThread()) return
+
         // If enchants doesn't have any enchant data then we have no data to parse enchants correctly
         if (!this.enchants.hasEnchantData()) return
 
@@ -152,16 +156,16 @@ object EnchantParser {
     @HandleEvent
     fun onChatHoverEvent(event: ChatHoverEvent) {
         return // TODO: Deal with this method once Hypixel fixes /show
-        if (event.getHoverEvent().action() != HoverEvent.Action.SHOW_TEXT) return
-        if (!isEnabled() || !this.enchants.hasEnchantData()) return
-
-        currentItem = null
-
-        val lore = event.getHoverEvent().value().formattedTextCompat().split("\n").toMutableList()
-
-        // Since we don't get given an item stack from /show, we pass an empty enchants map and
-        // use all enchants from the Enchants class instead
-        //parseEnchants(lore, mapOf(), event.component)
+//         if (event.getHoverEvent().action() != HoverEvent.Action.SHOW_TEXT) return
+//         if (!isEnabled() || !this.enchants.hasEnchantData()) return
+//
+//         currentItem = null
+//
+//         val lore = event.getHoverEvent().value().formattedTextCompat().split("\n").toMutableList()
+//
+//         // Since we don't get given an item stack from /show, we pass an empty enchants map and
+//         // use all enchants from the Enchants class instead
+//         parseEnchants(lore, mapOf(), event.component)
     }
 
     private fun warnAaronMaxEnchant() {
@@ -277,6 +281,7 @@ object EnchantParser {
                 "loreList" to loreList,
                 "format" to config.format.get(),
                 "orderedEnchants" to orderedEnchants.toString(),
+                "currentThread" to Thread.currentThread().name,
             )
         }
 
@@ -287,6 +292,7 @@ object EnchantParser {
             ErrorManager.logErrorWithData(
                 e,
                 "Error parsing enchantment info from item",
+                "item" to currentItem,
                 "loreList" to loreList,
                 "startEnchant" to startEnchant,
                 "endEnchant" to endEnchant,
