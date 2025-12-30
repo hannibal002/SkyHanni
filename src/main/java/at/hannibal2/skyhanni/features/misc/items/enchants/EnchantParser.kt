@@ -142,10 +142,6 @@ object EnchantParser {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltipEvent(event: ToolTipTextEvent) {
-        // TODO: On ToolTipTextEvent Minecraft ultimately calls a Font.renderText that uses a FormattedCharSequence which does not use
-        // TODO: StringDecomposer.iterateForward, which parses chat formatting codes (which is what is used for chroma rendering)
-        // TODO: So need a way to detect chroma in StringDecomposer.iterate
-
         // If enchants doesn't have any enchant data then we have no data to parse enchants correctly
         if (!this.enchants.hasEnchantData()) return
 

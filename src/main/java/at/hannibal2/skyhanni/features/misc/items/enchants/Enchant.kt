@@ -89,7 +89,6 @@ open class Enchant : Comparable<Enchant> {
      * a corresponding enchantment conditional, unless the exception is not specific to a certain enchant. i.e.
      * Efficiency exceptions should be within the `if (this.nbtName == "efficiency")` conditional)*
      *
-     * @param color The original coloring based on default behaviour, for when no exception is met
      * @param level The level of the enchant currently being parsed
      * @param itemStack The ItemStack of the hovered item. Can be null, e.g. when hovering over `/show` items
      */
