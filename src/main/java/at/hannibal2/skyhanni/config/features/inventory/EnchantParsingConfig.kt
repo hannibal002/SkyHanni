@@ -44,6 +44,11 @@ class EnchantParsingConfig {
     val chromaRunnable = Runnable { SkyHanniMod.feature.gui.chroma::enabled.jumpToEditor() }
 
     @Expose
+    @ConfigOption(name = "Ultimate Enchantment Color", desc = "The color the Ultimate enchantment will be. (Will always be bold)")
+    @ConfigEditorDropdown
+    val ultimateEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.LIGHT_PURPLE)
+
+    @Expose
     @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level.")
     @ConfigEditorDropdown
     val perfectEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.CHROMA)

@@ -44,8 +44,8 @@ open class Enchant : Comparable<Enchant> {
     private fun isUltimate() = this is Ultimate
     private fun isStacking() = this is Stacking
 
-    private val config by lazy { SkyHanniMod.feature.inventory.enchantParsing }
-    private val advanced by lazy { config.advancedEnchantColors }
+    val config by lazy { SkyHanniMod.feature.inventory.enchantParsing }
+    val advanced by lazy { config.advancedEnchantColors }
 
     open fun getComponent(level: Int, itemStack: ItemStack?): Component {
         return Component.literal(loreName).setStyle(getStyle(level, itemStack))
@@ -133,7 +133,14 @@ open class Enchant : Comparable<Enchant> {
 
     class Ultimate : Enchant() {
         override fun getStyle(level: Int, itemStack: ItemStack?): Style {
-            return Style.EMPTY.withColor(ChatFormatting.LIGHT_PURPLE).withBold(true)
+            return if (advanced.useAdvancedUltimateColor.get()) {
+                Style.EMPTY.withColor(advanced.advancedUltimateColor.get().getEffectiveColourRGB()).withBold(true)
+            } else {
+                if (config.ultimateEnchantColor.get() == LorenzColor.CHROMA)
+                    Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma")).withBold(true)
+                else
+                    Style.EMPTY.withColor(config.ultimateEnchantColor.get().toColor().rgb).withBold(true)
+            }
         }
     }
 
