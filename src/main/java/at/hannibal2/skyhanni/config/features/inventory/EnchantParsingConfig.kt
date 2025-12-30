@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -66,6 +67,11 @@ class EnchantParsingConfig {
     @ConfigOption(name = "Poor Enchantment Color", desc = "The color an enchantment will be at a poor level.")
     @ConfigEditorDropdown
     val poorEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.GRAY)
+
+    @Expose
+    @ConfigOption(name = "Advanced Enchantment Colors", desc = "")
+    @Accordion
+    val advancedEnchantColors: AdvancedEnchantmentColors = AdvancedEnchantmentColors()
 
     @Expose
     @ConfigOption(name = "Comma Format", desc = "Change the format of the comma after each enchant.")
