@@ -47,8 +47,8 @@ object EnchantParser {
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     // Pattern to check that the line contains ONLY enchants (and the other bits that come with a valid enchant line)
     /**
-     * REGEX-TEST: §9Champion VI §81.2M
-     * REGEX-TEST: §9Cultivating VII §83,271,717
+     * REGEX-TEST: §9Champion VI §r§81.2M
+     * REGEX-TEST: §9Cultivating VII §r§83,271,717
      * REGEX-TEST: §5§o§9Compact X
      * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
      * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
@@ -57,12 +57,12 @@ object EnchantParser {
      */
     val enchantmentExclusivePattern by patternGroup.pattern(
         "exclusive",
-        "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
+        "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?§9, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
     )
 
     /**
-     * REGEX-TEST: §9Champion VI §81.2M
-     * REGEX-TEST: §9Cultivating VII §83,271,717
+     * REGEX-TEST: §9Champion VI §r§81.2M
+     * REGEX-TEST: §9Cultivating VII §r§83,271,717
      * REGEX-TEST: §5§o§9Compact X
      * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
      * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
@@ -72,7 +72,7 @@ object EnchantParser {
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
+        "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
 
     private var currentItem: ItemStack? = null
