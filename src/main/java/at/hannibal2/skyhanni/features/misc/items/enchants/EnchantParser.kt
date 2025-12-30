@@ -23,13 +23,16 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.createHoverEvent
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.value
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import java.util.TreeSet
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.world.item.ItemStack
@@ -72,19 +75,9 @@ object EnchantParser {
         "enchants.new",
         "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
-    /**
-     * REGEX-TEST: Respiration
-     * REGEX-TEST: Efficiency V
-     * REGEX-TEST: Depth Strider II
-     * REGEX-TEST: Aqua Affinity
-     */
-    private val grayEnchantPattern by patternGroup.pattern(
-        "gray.enchants", "^(?:Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
-    )
 
     private var currentItem: ItemStack? = null
 
-    private var indexOfLastGrayEnchant = -1
     private var startEnchant = -1
     private var endEnchant = -1
 
@@ -150,9 +143,6 @@ object EnchantParser {
         // The enchants we expect to find in the lore, found from the items NBT data
         val enchants = event.itemStack.getHypixelEnchantments() ?: return
 
-        // Check for any vanilla gray enchants at the top of the tooltip
-        indexOfLastGrayEnchant = accountForAndRemoveGrayEnchants(event.toolTip, event.itemStack)
-
         parseEnchants(event.toolTip, enchants, null)
     }
 
@@ -168,9 +158,6 @@ object EnchantParser {
         currentItem = null
 
         val lore = event.getHoverEvent().value().formattedTextCompat().split("\n").toMutableList()
-
-        // Check for any vanilla gray enchants at the top of the tooltip
-        //indexOfLastGrayEnchant = accountForAndRemoveGrayEnchants(lore, null)
 
         // Since we don't get given an item stack from /show, we pass an empty enchants map and
         // use all enchants from the Enchants class instead
@@ -333,8 +320,7 @@ object EnchantParser {
         var startEnchant = -1
         var endEnchant = -1
 
-        val startIndex = if (indexOfLastGrayEnchant == -1) 0 else indexOfLastGrayEnchant + 1
-        for (i in startIndex until loreList.size) {
+        for (i in 0 until loreList.size) {
             val strippedLine = loreList[i].unformattedTextCompat()
 
             if (startEnchant == -1) {
@@ -411,12 +397,16 @@ object EnchantParser {
         val commaFormat = config.commaFormat.get()
         var component = Component.empty()
 
+        val lastElement = orderedEnchants.last
         for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
-            val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
-
             component = component.append(orderedEnchant.getComponent(currentItem))
-            if (i % maxEnchantsPerLine != maxEnchantsPerLine - 1) {
-                component = component.append(comma)
+
+            if (i % maxEnchantsPerLine != maxEnchantsPerLine - 1 && orderedEnchant != lastElement) {
+                // Add comma
+                if (commaFormat == CommaFormat.COPY_ENCHANT)
+                    component.siblings.last().append(", ")
+                else
+                    component.append(Component.literal(", ").withColor(ChatFormatting.BLUE))
             } else {
                 insertEnchants.add(component)
 
@@ -427,24 +417,28 @@ object EnchantParser {
             }
         }
 
-        finishFormatting(insertEnchants, component, commaFormat)
+        if (component != Component.empty()) insertEnchants.add(component)
     }
 
     private fun compressedFormatting(insertEnchants: MutableList<Component>) {
         val commaFormat = config.commaFormat.get()
         var component = Component.empty()
 
+        val lastElement = orderedEnchants.last
         for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
-            val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
-
             component = component.append(orderedEnchant.getComponent(currentItem))
+
             if (itemIsBook() && maxEnchantsPerLine == 1) {
                 insertEnchants.add(component)
                 insertEnchants.addAll(orderedEnchant.getLore())
                 component = Component.empty()
             } else {
-                if (i % 3 != 2) {
-                    component = component.append(comma)
+                if (i % 3 != 2 && orderedEnchant != lastElement) {
+                    // Add comma
+                    if (commaFormat == CommaFormat.COPY_ENCHANT)
+                        component.siblings.last().append(", ")
+                    else
+                        component.append(Component.literal(", ").withColor(ChatFormatting.BLUE))
                 } else {
                     insertEnchants.add(component)
                     component = Component.empty()
@@ -452,7 +446,7 @@ object EnchantParser {
             }
         }
 
-        finishFormatting(insertEnchants, component, commaFormat)
+        if (component != Component.empty()) insertEnchants.add(component)
     }
 
     private fun stackedFormatting(insertEnchants: MutableList<Component>) {
@@ -468,20 +462,6 @@ object EnchantParser {
         }
     }
 
-    private fun finishFormatting(
-        insertEnchants: MutableList<Component>,
-        component: Component,
-        commaFormat: CommaFormat,
-    ) {
-        if (component != Component.empty()) insertEnchants.add(component)
-
-        // Check if there is a trailing space (therefore also a comma) and remove the last 2 chars
-//         if (insertEnchants.last().last() == ' ') {
-//             insertEnchants[insertEnchants.lastIndex] =
-//                 insertEnchants.last().dropLast(if (commaFormat == CommaFormat.COPY_ENCHANT) 2 else 4)
-//         }
-    }
-
     private fun editChatComponent(chatComponent: Component, loreList: MutableList<Component>) {
         val text = loreList.joinToString("\n").dropLast(2)
 
@@ -490,37 +470,6 @@ object EnchantParser {
         val hoverEvent = createHoverEvent(chatComponent.style.hoverEvent?.action(), chatComponentText) ?: return
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
-    }
-
-    /**
-     * Finds where the gray enchants (vanilla) end and optionally remove them from the tooltip.
-     *
-     * Allow for a null item stack in odd situations like when other mods add them in chat components, i.e,
-     * Skytils party finder feature showing a players inventory in chat
-     */
-    private fun accountForAndRemoveGrayEnchants(loreList: MutableList<Component>, item: ItemStack?): Int {
-        if (item != null) {
-            // If the item has no enchantmentTagList then there will be no gray enchants
-            if (!item.isEnchanted || item.enchantments.size() == 0) return -1
-        }
-
-        var lastGrayEnchant = -1
-        val removeGrayEnchants = config.hideVanillaEnchants.get()
-
-        var i = 1
-        repeat(2) { // Using the fact that there should be at most 2 vanilla enchants
-            if (i + 1 >= loreList.size) return@repeat // In case the tooltip is very short (i.e, hovering over a short chat component)
-            val line = loreList[i].unformattedTextCompat()
-            if (grayEnchantPattern.matcher(line).matches()) {
-                lastGrayEnchant = i
-
-                if (removeGrayEnchants) loreList.removeAt(i) else i++
-            } else {
-                i++
-            }
-        }
-
-        return if (removeGrayEnchants) -1 else lastGrayEnchant
     }
 
     private fun itemIsBook(): Boolean {

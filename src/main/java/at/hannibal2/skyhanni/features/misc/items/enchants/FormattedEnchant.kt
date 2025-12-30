@@ -20,6 +20,6 @@ data class FormattedEnchant(
     override fun compareTo(other: FormattedEnchant) = this.enchant.compareTo(other.enchant)
 
     fun getComponent(itemStack: ItemStack?): Component {
-        return enchant.getComponent(level, itemStack).append(" ").append(if (isRoman) level.toRoman() else level.toString())
+        return enchant.getComponent(level, itemStack).append(if (isRoman) " ${level.toRoman()}" else " $level")
     }
 }
