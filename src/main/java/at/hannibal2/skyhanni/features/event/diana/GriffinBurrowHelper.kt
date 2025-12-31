@@ -78,11 +78,35 @@ object GriffinBurrowHelper {
         "§eYou (?<type>finished the Griffin burrow chain!|dug out a Griffin Burrow!) §r§7\\((?<current>\\d+)/(?<max>\\d+)\\)"
     )
 
+    /**
+     * REGEX-TEST: §c§lUh oh! §r§eYou dug out a §r§2Gaia Construct§r§e!
+     * REGEX-TEST: §c§lOi! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
+     * REGEX-TEST: §c§lOi! §r§eYou dug out §r§2Siamese Lynxes§r§e!
+     * REGEX-TEST: §c§lWoah! §r§eYou dug out a §r§2Cretan Bull§r§e!
+     * REGEX-TEST: §c§lDanger! §r§eYou dug out a §r§2Cretan Bull§r§e!
+     */
+    val genericMythologicalSpawnPattern by patternGroup.pattern(
+        "generic-spawn",
+        "§c§l(?:Oh|Uh oh|Yikes|Oi|Good Grief|Danger|Woah)! §r§eYou dug out (?:a )?(?:§[a-f0-9r])*(?<creatureType>[\\w\\s]+)§r§e!",
+    )
+
+    /**
+     * REGEX-TEST: §6§lRARE DROP! §r§eYou dug out a §r§9Mythos Fragment§r§e!
+     * REGEX-TEST: §6§lWow! §r§eYou dug out §r§6120,000 coins§r§e!
+     * REGEX-TEST: §6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!
+     * braided griffin feather may be crazy rare or smth
+     */
+    val treasureDugPattern by patternGroup.pattern(
+        "treasure-dug",
+        "§6§l(?:RARE DROP!|Wow!) §r§eYou dug out(?: a)? §r§?.+§r§e!",
+    )
+
     var targetLocation: LorenzVec? = null
 
     private val allGuessesTimers = mutableMapOf<GuessEntry, SimpleTimeMark>() // hypixel itself removes burrows after 30m
     private val allGuesses = mutableListOf<GuessEntry>()
     private val recentBlocksClicked = mutableListOf<LorenzVec>()
+    private var lastBurrowInteracted: LorenzVec? = null
 
     private var shouldFocusOnRareMob = false
 
@@ -233,17 +257,16 @@ object GriffinBurrowHelper {
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
 
-        if (allGuesses.flatMap { it.guesses }.any { event.guess.contains(it) }) return
+        if (allGuesses.flatMap { it.guesses }.any { event.guess.contains(it) }) {
+            println("already guessed")
+            return
+        }
 
         val newLocation = event.guess.getCurrent()
         val playerLocation = LocationUtils.playerLocation()
 
         if (newLocation.distance(playerLocation) < 6) return
         if (!IslandType.HUB.isInBounds(newLocation)) return
-
-        for (guessEntry in allGuesses) {
-            if (guessEntry.contains(newLocation)) return
-        }
 
         addGuess(event.guess)
 
@@ -252,11 +275,12 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
+        println("burrow detected")
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val burrowLocation = event.burrowLocation
-
         val currentEntry = allGuesses.firstOrNull { it.contains(burrowLocation) }
-        if (currentEntry == null) addGuess(GuessEntry(listOf(burrowLocation), burrowType = event.type))
+
+        if (currentEntry == null) addGuess(GuessEntry(listOf(burrowLocation), event.type))
         else {
             val correctIndex = currentEntry.guesses.indices // safe because of the .contains and null checks above
                 .first { index -> currentEntry.guesses[index] == burrowLocation }
@@ -302,21 +326,31 @@ object GriffinBurrowHelper {
             // TODO remove based on last blocks clicked
         }
 
-        if (burrowDugPattern.matches(event.message)) {
-            val matcher = burrowDugPattern.matcher(event.message)
-            if (matcher.find()) {
-                val current = matcher.group("current").toInt()
-                val max = matcher.group("max").toInt()
+        // send burrow dug event
+        val burrowDugMatcher = burrowDugPattern.matcher(event.message)
+        if (burrowDugMatcher.find()) {
+            val current = burrowDugMatcher.group("current").toInt()
+            val max = burrowDugMatcher.group("max").toInt()
 
-                val burrows = allGuesses.flatMap { it.guesses }
-                for (block in recentBlocksClicked.asReversed()) {
-                    if (burrows.contains(block)) {
-                        BurrowDugEvent(block, current, max).post()
-                        return
-                    }
+            val burrows = allGuesses.flatMap { it.guesses }
+            for (block in recentBlocksClicked.asReversed()) {
+                if (burrows.contains(block)) {
+                    lastBurrowInteracted == block
+                    BurrowDugEvent(block, current, max).post()
+                    return
                 }
-                recentBlocksClicked.clear()
+            }
+            recentBlocksClicked.clear()
 
+        } else if (genericMythologicalSpawnPattern.matches(event.message)) {
+            println("adding mob burrow from mob")
+            lastBurrowInteracted?.let {
+                addGuess(GuessEntry(listOf(it), BurrowType.MOB))
+            }
+        }else if (treasureDugPattern.matches(event.message)) {
+            println("adding start burrow from treasure")
+            lastBurrowInteracted?.let {
+                addGuess(GuessEntry(listOf(it), BurrowType.START))
             }
         }
 
@@ -465,6 +499,18 @@ object GriffinBurrowHelper {
         }
 
         if (RareMobWaypointShare.waypoints.isNotEmpty() && config.inquisitorSharing.focusInquisitor) {
+            return
+        }
+
+        if (!config.multiGuesses) {
+            val target = allGuesses.firstOrNull { it.getCurrent() == targetLocation }
+            if (target == null) return
+            val location = target.getCurrent()
+            val distance = location.distance(playerLocation)
+
+            event.drawColor(location, target.burrowType.color, distance > 10)
+            event.drawDynamicText(location.up(), target.burrowType.text, 1.5)
+
             return
         }
 

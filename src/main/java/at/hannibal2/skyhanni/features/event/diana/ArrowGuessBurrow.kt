@@ -152,11 +152,6 @@ object ArrowGuessBurrow {
     }
 
     @HandleEvent
-    fun onBurrowDetect(event: BurrowDetectEvent) {
-        GriffinBurrowHelper.removeGuess(event.burrowLocation)
-    }
-
-    @HandleEvent
     fun onBurrowDug(event: BurrowDugEvent) {
         if (event.current != event.max) {
             points.clear()
