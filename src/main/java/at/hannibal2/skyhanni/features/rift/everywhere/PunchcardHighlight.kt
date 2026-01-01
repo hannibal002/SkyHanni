@@ -173,7 +173,7 @@ object PunchcardHighlight {
         val entity = event.clickedEntity
         if (entity !is AbstractClientPlayer) return
         if (entity.isNpc()) return
-        val name = entity.name.formattedTextCompatLessResets()
+        val name = entity.name.string
         if (name in playerList || name in playerQueue) return
         playerQueue.add(name)
         listening = true

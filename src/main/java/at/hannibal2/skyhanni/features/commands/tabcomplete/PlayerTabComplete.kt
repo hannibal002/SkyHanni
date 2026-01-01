@@ -24,7 +24,7 @@ object PlayerTabComplete {
     private val partyMembersEntry = lazyEntry { PartyApi.partyMembers }
     private val guildMembersEntry = lazyEntry { GuildApi.getAllMembers() }
     private val vipVisitsEntry = lazyEntry { vipVisits }
-    private val islandPlayersEntry = lazyEntry { EntityUtils.getPlayerEntities().map { it.name.formattedTextCompatLessResets() } }
+    private val islandPlayersEntry = lazyEntry { EntityUtils.getPlayerEntities().map { it.name.string } }
 
     private val suggestions = SuggestionProvider.build {
         parent("f", "friend") {
@@ -89,7 +89,7 @@ object PlayerTabComplete {
             addAll(FriendApi.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }.map { it.name })
         }
         if (config.islandPlayers && PlayerCategory.ISLAND_PLAYERS !in categories) {
-            addAll(EntityUtils.getPlayerEntities().map { it.name.formattedTextCompatLessResets() })
+            addAll(EntityUtils.getPlayerEntities().map { it.name.string })
         }
         if (config.party && PlayerCategory.PARTY !in categories) {
             addAll(PartyApi.partyMembers)

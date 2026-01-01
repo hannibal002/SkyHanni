@@ -126,10 +126,7 @@ dependencies {
     }
 
     // Discord RPC client
-    shadowImpl("com.github.caoimhebyrne:KDiscordIPC:0.2.3") {
-        exclude("org.jetbrains.kotlin")
-        exclude("org.jetbrains.kotlinx")
-    }
+    includeImplementation("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
     compileOnly(libs.jbAnnotations)
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
@@ -144,7 +141,10 @@ dependencies {
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
-    shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
+    shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+    }
     include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
 
     @Suppress("UnstableApiUsage")
@@ -165,14 +165,19 @@ dependencies {
 
 
     // getting clock offset
-    shadowImpl("commons-net:commons-net:3.11.1")
+    includeImplementation("commons-net:commons-net:3.11.1")
 
     // Calculator
-    shadowImpl("com.notkamui.libs:keval:1.1.1")
+    includeImplementation("com.notkamui.libs:keval:1.1.1")
 
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
+}
+
+fun DependencyHandler.includeImplementation(dep: Any) {
+    include(dep)
+    modImplementation(dep)
 }
 
 afterEvaluate {
@@ -297,8 +302,6 @@ tasks.shadowJar {
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
-    relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
-    relocate("org.apache.commons.net", "at.hannibal2.skyhanni.deps.commons.net")
     relocate("net.hypixel.modapi.tweaker", "at.hannibal2.skyhanni.deps.hypixel.modapi.tweaker")
 }
 tasks.jar {

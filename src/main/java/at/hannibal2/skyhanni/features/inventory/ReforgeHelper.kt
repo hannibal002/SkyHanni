@@ -128,7 +128,7 @@ object ReforgeHelper {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.index == reforgeButton) {
-            if (event.slot.item?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§eReforge Item" || event.slot.item?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cError!") return
+            if (event.slot.item?.hoverName?.string == "Reforge Item" || event.slot.item?.hoverName?.string == "Error!") return
             if (handleReforgeButtonClick(event)) return
         }
 

@@ -258,14 +258,14 @@ object BazaarApi {
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val itemMatch = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }.any {
-            it.hoverName.formattedTextCompatLeadingWhiteLessResets().equalsIgnoreColor("Go Back") &&
+            it.hoverName.string.equalsIgnoreColor("Go Back") &&
                 it.getLore().firstOrNull() == "§7To Bazaar"
         }
         if (itemMatch) return true
 
         // check for Buy Instantly
         event.inventoryItems[16]?.let {
-            if (it.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
+            if (it.hoverName.string == "Custom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
                 return true
             }
         }

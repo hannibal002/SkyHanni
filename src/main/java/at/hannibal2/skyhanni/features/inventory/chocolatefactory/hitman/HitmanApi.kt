@@ -38,7 +38,7 @@ object HitmanApi {
         val storage = storage ?: return
         if (event.inventoryName != "Rabbit Hitman") return
         val summaryItem = event.inventoryItems[4].takeIf {
-            it?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cRabbit Hitman"
+            it?.hoverName?.string == "Rabbit Hitman"
         } ?: return
         val availableEggs = CFDataLoader.hitmanAvailableEggsPattern.firstMatcher(summaryItem.getLore()) {
             group("amount").toInt()

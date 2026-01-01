@@ -220,7 +220,7 @@ object FishingApi {
     fun seaCreatureCount(entity: ArmorStand): Int {
         if (countIsZero(entity)) return 0
 
-        return when (entity.name.formattedTextCompatLessResets()) {
+        return when (entity.name.string) {
             "Sea Emperor", "Rider of the Deep" -> 2
 
             else -> 1

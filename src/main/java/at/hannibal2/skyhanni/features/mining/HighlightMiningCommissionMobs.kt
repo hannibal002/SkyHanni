@@ -34,20 +34,20 @@ object HighlightMiningCommissionMobs {
     enum class MobType(val commissionName: String, val isMob: (LivingEntity) -> Boolean) {
 
         // Dwarven Mines
-        DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name.formattedTextCompatLessResets() == "Goblin " }),
-        STAR_PUNCHER("Star Sentry Puncher", { it.name.formattedTextCompatLessResets() == "Crystal Sentry" }),
-        ICE_WALKER("Glacite Walker Slayer", { it.name.formattedTextCompatLessResets() == "Ice Walker" }),
-        GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.formattedTextCompatLessResets().contains("Golden Goblin") }),
-        TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name.formattedTextCompatLessResets() == "Treasuer Hunter" }), // typo is intentional
+        DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name.string == "Goblin " }),
+        STAR_PUNCHER("Star Sentry Puncher", { it.name.string == "Crystal Sentry" }),
+        ICE_WALKER("Glacite Walker Slayer", { it.name.string == "Ice Walker" }),
+        GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.string.contains("Golden Goblin") }),
+        TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name.string == "Treasuer Hunter" }), // typo is intentional
 
         // Crystal Hollows
         AUTOMATON("Automaton Slayer", { it is IronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) }),
-        TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name.formattedTextCompatLessResets() == "Team Treasurite" }),
+        TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name.string == "Team Treasurite" }),
         YOG("Yog Slayer", { it is MagmaCube && it.hasMaxHealth(35_000) }),
         THYST("Thyst Slayer", { it is Endermite && it.hasMaxHealth(5_000) }),
-        CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name.formattedTextCompatLessResets() == "Team Treasurite" }),
+        CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name.string == "Team Treasurite" }),
         SLUDGE("Sludge Slayer", { it is Slime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000)) }),
-        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name.formattedTextCompatLessResets() == "Weakling " }),
+        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name.string == "Weakling " }),
 
         // new commissions
     }

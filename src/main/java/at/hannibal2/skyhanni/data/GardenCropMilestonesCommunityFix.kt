@@ -87,7 +87,7 @@ object GardenCropMilestonesCommunityFix {
         crop: CropType,
         wrongData: MutableList<String>,
     ) {
-        val rawNumber = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().replace(crop.cropName, "").trim()
+        val rawNumber = stack.hoverName.string.removeColor().replace(crop.cropName, "").trim()
         val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()
