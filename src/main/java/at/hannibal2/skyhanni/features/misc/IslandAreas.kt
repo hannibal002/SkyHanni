@@ -162,22 +162,8 @@ object IslandAreas {
 
             val coloredName = "${color.getChatColor()}$name"
 
-            val suffix = ""
-//             paths[node]?.let { path ->
-//                 val passedAreas = path.filter { it.getAreaTag() != null }.map { it.name }.distinct().toMutableList()
-//                 passedAreas.remove(name)
-//                 passedAreas.remove(null)
-//                 passedAreas.remove("null")
-//                 passedAreas.remove(currentArea)
-//                 // so show areas needed to pass thorough
-//                 // TODO show this pass through in the /shnavigate command
-//                 if (passedAreas.isNotEmpty()) {
-//                     suffix = " §7${passedAreas.joinToString(", ")}"
-//                 }
-//             }
-
             val distance = difference.roundTo(0).toInt()
-            val text = "$coloredName§7: §e$distance$suffix"
+            val text = "$coloredName§7: §e$distance"
 
             val isConfigVisible = node.getAreaTag(useConfig = true) != null
             if (!foundCurrentArea) {
