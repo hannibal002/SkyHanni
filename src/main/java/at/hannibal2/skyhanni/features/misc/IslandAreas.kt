@@ -44,6 +44,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object IslandAreas {
     private val config get() = SkyHanniMod.feature.misc.navigation
+
     // TODO all code that touches this config element should get moved into a new file "island areas features" or similar.
     private val areaListConfig get() = config.areasList
 
