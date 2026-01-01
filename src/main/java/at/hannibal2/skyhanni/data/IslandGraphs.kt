@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
+import at.hannibal2.skyhanni.features.misc.IslandAreaFeatures
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -267,7 +268,7 @@ object IslandGraphs {
         SkyHanniMod.launchCoroutine("load island graph data for $islandName") {
             try {
                 val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
-                IslandAreas.display = null
+                IslandAreaFeatures.display = null
                 DelayedRun.runNextTick {
                     setNewGraph(graph)
                 }
