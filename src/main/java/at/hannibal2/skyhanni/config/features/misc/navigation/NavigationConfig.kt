@@ -24,5 +24,5 @@ class NavigationConfig {
     @Expose
     @ConfigOption(name = "Allow Instant Navigation", desc = "Starts navigating instantly upon §e/shnavigate§r with only one match.")
     @ConfigEditorBoolean
-    val allowInstantNavigation: Boolean = true
+    var allowInstantNavigation: Boolean = true
 }
