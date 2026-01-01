@@ -43,7 +43,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object IslandAreas {
-    private val pathfingerConfig get() = SkyHanniMod.feature.misc.navigation.areaPathfinder
+    private val pathfinderConfig get() = SkyHanniMod.feature.misc.navigation.areaPathfinder
     private val areaConfig get() = SkyHanniMod.feature.misc.navigation.islandAreas
 
     private var nodes = mapOf<GraphNode, Double>()
@@ -114,12 +114,12 @@ object IslandAreas {
     fun onRenderOverlay() {
         if (!isEnabled()) return
         if (!isPathfinderEnabled()) return
-        if (!pathfingerConfig.showAlways) return
+        if (!pathfinderConfig.showAlways) return
         val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
         if (isInOwnInventory) return
 
         display?.let {
-            pathfingerConfig.position.renderRenderable(it, posLabel = "Island Areas")
+            pathfinderConfig.position.renderRenderable(it, posLabel = "Island Areas")
         }
     }
 
@@ -131,7 +131,7 @@ object IslandAreas {
         if (!isInOwnInventory) return
 
         display?.let {
-            pathfingerConfig.position.renderRenderable(it, posLabel = "Island Areas")
+            pathfinderConfig.position.renderRenderable(it, posLabel = "Island Areas")
         }
     }
 
@@ -184,7 +184,7 @@ object IslandAreas {
                 foundCurrentArea = true
 
                 val inAnArea = name != "no_area" && isConfigVisible
-                if (pathfingerConfig.includeCurrentArea.get()) {
+                if (pathfinderConfig.includeCurrentArea.get()) {
                     if (inAnArea) {
                         buildDisplay?.addSearchString("§eCurrent area: $coloredName")
                     } else {
@@ -280,7 +280,7 @@ object IslandAreas {
 
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
-        with(pathfingerConfig) {
+        with(pathfinderConfig) {
             ConditionalUtils.onToggle(color) {
                 targetNode?.let {
                     setTarget(it)
@@ -308,7 +308,7 @@ object IslandAreas {
         targetNode = node
         val tag = node.getAreaTag() ?: return
         val displayName = tag.color.getChatColor() + node.name
-        val color = pathfingerConfig.color.get().toColor()
+        val color = pathfinderConfig.color.get().toColor()
         node.pathFind(
             displayName,
             color,
@@ -322,7 +322,7 @@ object IslandAreas {
         update()
     }
 
-    private fun isPathfinderEnabled(): Boolean = pathfingerConfig.enabled.get()
+    private fun isPathfinderEnabled(): Boolean = pathfinderConfig.enabled.get()
 
     private fun isEnabled() = IslandGraphs.currentIslandGraph != null
 
