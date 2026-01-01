@@ -3,7 +3,10 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.LauncherEntry
+import at.hannibal2.skyhanni.data.jsonobjects.repo.LaunchersJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -18,6 +21,9 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComputerEnvDebug {
 
+    private var launchers: List<LauncherEntry> = listOf()
+    private var genericStacks: List<String> = listOf()
+
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         os(event)
@@ -25,6 +31,13 @@ object ComputerEnvDebug {
         ram(event)
         uptime(event)
         performanceMods(event)
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val repoJson = event.getConstant<LaunchersJson>("Launchers")
+        launchers = repoJson.launchers
+        genericStacks = repoJson.genericStacks
     }
 
     private fun launcher(event: DebugDataCollectEvent) {
@@ -35,54 +48,46 @@ object ComputerEnvDebug {
             return
         }
 
-        val (launcher, relevant) = findLauncher(firstStack)
+        val launcherBrand = runCatching {
+            System.getProperty("minecraft.launcher.brand")
+        }.getOrNull().orEmpty()
+        val (launcher, relevant) = findLauncher(firstStack, launcherBrand)
 
         launcher?.let {
-            if (relevant) {
-                event.addData(it)
-            } else {
-                event.addIrrelevant(it)
-            }
+            if (relevant) event.addData(it)
+            else event.addIrrelevant(it)
             return
         }
 
         event.addData {
             add("Unknown launcher!")
-            val launcherBrand = System.getProperty("minecraft.launcher.brand")
             add("System property of 'minecraft.launcher.brand': '$launcherBrand'")
             add("firstStack: '$firstStack'")
         }
     }
 
-    // TODO put into repo
-    private fun findLauncher(firstStack: String): Pair<String?, Boolean> {
-        if (firstStack.contains("net.fabricmc.devlaunchinjector.Main.main")) {
-            return Pair("Dev Env", false)
+    private fun findLauncher(firstStack: String, launcherBrand: String): Pair<String?, Boolean> {
+        val isGeneric = genericStacks.any { firstStack.contains(it) }
+        val matchingLaunchers = launchers.filter { launcher ->
+            val firstStackMatch = launcher.firstStacks.any { firstStack.contains(it) }
+            val brandMatch = launcher.brand.isEmpty() || launcher.brand.equals(launcherBrand, ignoreCase = true)
+            (isGeneric || firstStackMatch) && brandMatch
         }
-        if (firstStack.contains("net.minecraft.launchwrapper.Launch.main")) {
-            return Pair("Vanilla Launcher", false)
+        val fallbackPair = null to true
+        return when (matchingLaunchers.size) {
+            0 -> fallbackPair
+            1 -> matchingLaunchers.first().getIdPair()
+            else -> matchingLaunchers.firstOrNull {
+                it.brand.equals(launcherBrand, ignoreCase = true)
+            }?.getIdPair() ?: fallbackPair
         }
-        if (firstStack.contains("org.prismlauncher.EntryPoint.main")) {
-            return Pair("Prism", false)
-        }
-        if (firstStack.contains("org.multimc.EntryPoint.main")) {
-            return Pair("MultiMC", false)
-        }
-        if (firstStack.contains("net.digitalingot.vendor.") || firstStack.contains("net.digitalingot.rustextension.")) {
-            return Pair("Feather Client", true)
-        }
-        return Pair(null, true)
     }
 
-    private fun getFirstStack(): String? {
-        val firstStack = try {
-            Thread.currentThread().stackTrace.last().toString()
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(e, "Failed loading current thread stack trace info")
-            null
-        }
-        return firstStack
-    }
+    private fun getFirstStack(): String? = kotlin.runCatching {
+        Thread.currentThread().stackTrace.last().toString()
+    }.onFailure { e ->
+        ErrorManager.logErrorWithData(e, "Failed loading current thread stack trace info")
+    }.getOrNull()
 
     private fun os(event: DebugDataCollectEvent) {
         event.title("Computer Operating System")
