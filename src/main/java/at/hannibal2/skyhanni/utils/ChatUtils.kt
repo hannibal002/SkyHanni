@@ -405,6 +405,7 @@ object ChatUtils {
         )
     }
 
+    @Suppress("CAST_NEVER_SUCCEEDS")
     var GuiMessage.fullComponent: Component
         get() = (this as ChatLineData).skyHanni_fullComponent
         set(value) {

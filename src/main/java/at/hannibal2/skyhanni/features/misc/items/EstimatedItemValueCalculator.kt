@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOverclockerCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
@@ -116,6 +117,7 @@ object EstimatedItemValueCalculator {
         ::addHotPotatoBooks,
         ::addWetBook,
         ::addFarmingForDummies,
+        ::addOverclocker,
         ::addSilex,
         ::addTransmissionTuners,
         ::addManaDisintegrators,
@@ -139,6 +141,7 @@ object EstimatedItemValueCalculator {
     )
 
     private val FARMING_FOR_DUMMIES = "FARMING_FOR_DUMMIES".toInternalName()
+    private val OVERCLOCKER_3000 = "OVERCLOCKER_3000".toInternalName()
     private val ETHERWARP_CONDUIT = "ETHERWARP_CONDUIT".toInternalName()
     private val ETHERWARP_MERGER = "ETHERWARP_MERGER".toInternalName()
     private val FUMING_POTATO_BOOK = "FUMING_POTATO_BOOK".toInternalName()
@@ -383,6 +386,14 @@ object EstimatedItemValueCalculator {
 
         val price = FARMING_FOR_DUMMIES.getPrice() * count
         list.add(formatProgress("Farming for Dummies", count, max = 5, price))
+        return price
+    }
+
+    private fun addOverclocker(stack: ItemStack, list: MutableList<String>): Double {
+        val count = stack.getOverclockerCount() ?: return 0.0
+
+        val price = OVERCLOCKER_3000.getPrice() * count
+        list.add(formatProgress("Overclocker 3000", count, max = 10, price))
         return price
     }
 

@@ -34,7 +34,7 @@ object ContributorManager {
     @HandleEvent
     fun onRenderNametag(event: EntityDisplayNameEvent<Player>) {
         if (!config.contributorNametags) return
-        if (event.entity.isRealPlayer()) getSuffix(event.entity.name.formattedTextCompatLessResets())?.let {
+        if (event.entity.isRealPlayer()) getSuffix(event.entity.name.string)?.let {
             event.chatComponent.appendComponent(it.asComponent())
         }
     }

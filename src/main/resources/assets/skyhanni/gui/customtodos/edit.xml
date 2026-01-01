@@ -87,12 +87,24 @@
                 </Button>
             </Row>
             <Row>
-                <Text text="Trigger: " width="150"/>
+                <Text text="Trigger Count: " width="150"/>
+                <TextField width="300" value="@totalTriggers"/>
+            </Row>
+            <Row>
+                <Text text="Completion Trigger: " width="150"/>
                 <TextField value="@trigger" width="300" suggestion="Trigger"/>
             </Row>
             <Row>
                 <Text text="Ignore Color Codes: " width="150"/>
                 <Switch value="@ignoreColorCodes"/>
+            </Row>
+            <Row>
+                <Text text="Cron Expression: " width="150"/>
+                <TextField value="@cronExpression" width="300" suggestion="* * * * * ?"/>
+            </Row>
+            <Row>
+                <Text text="Enable Cron (Advanced): " width="150"/>
+                <Switch value="@cronEnabled"/>
             </Row>
             <Row>
                 <Button onClick="@setChat">
@@ -124,6 +136,8 @@
                     <Text text="@getEquals"/>
                 </Button>
             </Row>
+            <Spacer height="10">
+            </Spacer>
             <Row>
                 <Button onClick="@copyTemplate">
                     <Text text="Copy Preset"/>

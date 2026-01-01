@@ -201,14 +201,13 @@ object MobFilter {
         extraDisplayNpcByName.contains(name)
 
     private val listOfClickArmorStand = setOf(
-        "§e§lCLICK",
-        "§6§lSEASONAL SKINS",
-        "§e§lGATE KEEPER",
-        "§e§lBLACKSMITH",
-        "§e§lSHOP",
-        "§e§lTREASURES",
-        "§c§lQUEST",
-        "§e§lQUEST",
+        "CLICK",
+        "SEASONAL SKINS",
+        "GATE KEEPER",
+        "BLACKSMITH",
+        "SHOP",
+        "TREASURES",
+        "QUEST",
     )
 
     fun Entity.isSkyBlockMob(): Boolean = when {
@@ -232,7 +231,7 @@ object MobFilter {
 
     fun createDisplayNpc(entity: LivingEntity): Boolean {
         val clickArmorStand = MobUtils.getArmorStandByRangeAll(entity, 1.5).firstOrNull { armorStand ->
-            listOfClickArmorStand.contains(armorStand.name.formattedTextCompatLessResets())
+            listOfClickArmorStand.contains(armorStand.name.string)
         } ?: return false
         val armorStand = MobUtils.getArmorStand(clickArmorStand, -1) ?: return false
         MobEvent.Spawn.DisplayNpc(MobFactories.displayNpc(entity, armorStand, clickArmorStand)).post()
@@ -301,7 +300,7 @@ object MobFilter {
             else -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
         }
 
-        baseEntity is Giant && baseEntity.name.formattedTextCompatLessResets() == "Dinnerbone" -> MobResult.found(
+        baseEntity is Giant && baseEntity.name.string == "Dinnerbone" -> MobResult.found(
             MobFactories.projectile(
                 baseEntity,
                 "Giant Sword",
@@ -320,7 +319,7 @@ object MobFilter {
             ),
         )
 
-        baseEntity is RemotePlayer && baseEntity.name.formattedTextCompatLessResets() == "Decoy " -> MobResult.found(
+        baseEntity is RemotePlayer && baseEntity.name.string == "Decoy " -> MobResult.found(
             MobFactories.special(
                 baseEntity,
                 "Decoy",

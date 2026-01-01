@@ -83,9 +83,11 @@ class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSour
                 updateDepthAttachment()
             }
             try {
+                val gpuTexture = Minecraft.getInstance().mainRenderTarget.depthTexture ?: return
+                val depthAttachment = customDepthAttachment ?: return
                 RenderSystem.getDevice().createCommandEncoder().copyTextureToTexture(
-                    Minecraft.getInstance().mainRenderTarget.depthTexture,
-                    customDepthAttachment!!,
+                    gpuTexture,
+                    depthAttachment,
                     0, 0, 0, 0, 0, lastWidth, lastHeight,
                 )
             } catch (e: Exception) {
@@ -95,10 +97,11 @@ class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSour
 
         private fun updateDepthAttachment() {
             try {
-                if (customDepthAttachment != null) {
-                    customDepthAttachment!!.close()
+                @Suppress("SimpleRedundantLet")
+                customDepthAttachment?.let {
+                    it.close()
                     //#if MC > 1.21.6
-                    //$$ customDepthAttachmentView!!.close()
+                    //$$ customDepthAttachmentView?.close()
                     //#endif
                 }
                 val device = RenderSystem.getDevice()

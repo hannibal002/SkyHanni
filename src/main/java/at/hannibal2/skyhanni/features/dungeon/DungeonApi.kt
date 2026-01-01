@@ -312,7 +312,7 @@ object DungeonApi {
         inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
-            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aGo Back") {
+            if (item.hoverName.string == "Go Back") {
                 item.getLore().getOrNull(0)?.let { firstLine ->
                     if (firstLine == "§7To Boss Collections") {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")

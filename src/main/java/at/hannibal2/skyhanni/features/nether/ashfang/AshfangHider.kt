@@ -35,7 +35,7 @@ object AshfangHider {
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!AshfangManager.active || !config.particles) return
-        if (event.entity.getAllEquipment().any { it?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "Glowstone" }) event.cancel()
+        if (event.entity.getAllEquipment().any { it?.hoverName?.string == "Glowstone" }) event.cancel()
     }
 
     @HandleEvent

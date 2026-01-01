@@ -34,7 +34,7 @@ object RngMeterInventory {
 
         val stack = event.stack
         if (config.floorName && chestName == "Catacombs RNG Meter") {
-            if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == "RNG Meter") {
+            if (stack.hoverName.string.removeColor() == "RNG Meter") {
                 floorPattern.firstMatcher(stack.getLore()) {
                     event.stackTip = group("floor")
                 }

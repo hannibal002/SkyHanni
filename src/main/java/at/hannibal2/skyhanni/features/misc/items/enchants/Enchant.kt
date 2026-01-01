@@ -14,10 +14,16 @@ import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
 import at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault
+import at.hannibal2.skyhanni.utils.compat.withColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
+import net.minecraft.network.chat.TextColor
+import net.minecraft.world.item.ItemStack
 
 open class Enchant : Comparable<Enchant> {
 
@@ -38,29 +44,42 @@ open class Enchant : Comparable<Enchant> {
     private fun isUltimate() = this is Ultimate
     private fun isStacking() = this is Stacking
 
-    open fun getFormattedName(level: Int, itemStack: ItemStack?) = getFormat(level, itemStack) + loreName
+    val config by lazy { SkyHanniMod.feature.inventory.enchantParsing }
+    val advanced by lazy { config.advancedEnchantColors }
 
-    open fun getFormat(level: Int, itemStack: ItemStack? = null): String {
-        val config = SkyHanniMod.feature.inventory.enchantParsing
+    open fun getComponent(level: Int, itemStack: ItemStack?): Component {
+        return Component.literal(loreName).setStyle(getStyle(level, itemStack))
+    }
 
-        // TODO change color to string (support for bold)
-        var color = when {
-            level >= maxLevel -> config.perfectEnchantColor
-            level > goodLevel -> config.greatEnchantColor
-            level == goodLevel -> config.goodEnchantColor
-            else -> config.poorEnchantColor
+    open fun getStyle(level: Int, itemStack: ItemStack? = null): Style {
+        val colorProperty: Property<out Any> = when {
+            level >= maxLevel -> if (advanced.useAdvancedPerfectColor.get()) advanced.advancedPerfectColor else config.perfectEnchantColor
+            level > goodLevel -> if (advanced.useAdvancedGreatColor.get()) advanced.advancedGreatColor else config.greatEnchantColor
+            level == goodLevel -> if (advanced.useAdvancedGoodColor.get()) advanced.advancedGoodColor else config.goodEnchantColor
+            else -> if (advanced.useAdvancedPoorColor.get()) advanced.advancedPoorColor else config.poorEnchantColor
         }
 
         // Exceptions
-        color = checkExceptions(color, level, itemStack)
+        checkExceptions(level, itemStack)?.let { return it }
 
-        // TODO when chroma is disabled maybe use the neu chroma style instead of gold
-        if (color.get() == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
+        if (colorProperty.get() is LorenzColor &&
+            colorProperty.get() == LorenzColor.CHROMA && // If enchant color is chroma
+            !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) { // and chroma is disabled
+            return Style.EMPTY.withColor(ChatFormatting.GOLD).withBold(true) // return bold gold color
+        }
 
-        val chatColor = color.get().getChatColor()
-        return if ((level >= maxLevel || color == config.perfectEnchantColor) && config.boldPerfectEnchant.get()) {
-            "$chatColor§l"
-        } else chatColor
+        var style = if (colorProperty.get() is LorenzColor) {
+            if (colorProperty.get() == LorenzColor.CHROMA)
+                Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma"))
+            else
+                Style.EMPTY.withColor(TextColor.fromRgb((colorProperty.get() as LorenzColor).toColor().rgb))
+        } else {
+            Style.EMPTY.withColor((colorProperty.get() as ChromaColour).getEffectiveColourRGB())
+        }
+
+        if (level >= maxLevel && config.boldPerfectEnchant.get()) style = style.withBold(true)
+
+        return style
     }
 
     /**
@@ -70,13 +89,10 @@ open class Enchant : Comparable<Enchant> {
      * a corresponding enchantment conditional, unless the exception is not specific to a certain enchant. i.e.
      * Efficiency exceptions should be within the `if (this.nbtName == "efficiency")` conditional)*
      *
-     * @param color The original coloring based on default behaviour, for when no exception is met
      * @param level The level of the enchant currently being parsed
      * @param itemStack The ItemStack of the hovered item. Can be null, e.g. when hovering over `/show` items
      */
-    private fun checkExceptions(color: Property<LorenzColor>, level: Int, itemStack: ItemStack?): Property<LorenzColor> {
-        val config = SkyHanniMod.feature.inventory.enchantParsing
-
+    private fun checkExceptions(level: Int, itemStack: ItemStack?): Style? {
         val itemCategory = itemStack?.getItemCategoryOrNull()
         val internalName = itemStack?.getInternalNameOrNull()
         val itemName = internalName?.repoItemName?.removeColor()
@@ -87,11 +103,18 @@ open class Enchant : Comparable<Enchant> {
             if (itemName == "Stonk" ||
                 (itemCategory != null && !ItemCategory.miningTools.contains(itemCategory) && level == 5 && itemName != "Promising Shovel")
             ) {
-                return config.perfectEnchantColor
+                return if (advanced.useAdvancedPerfectColor.get()) {
+                    Style.EMPTY.withColor(advanced.advancedPerfectColor.get().getEffectiveColourRGB())
+                } else {
+                    if (config.perfectEnchantColor.get() == LorenzColor.CHROMA)
+                        Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma"))
+                    else
+                        Style.EMPTY.withColor(config.perfectEnchantColor.get().toChromaColor().getEffectiveColourRGB())
+                }
             }
         }
 
-        return color
+        return null
     }
 
     override fun toString() = "$nbtName $goodLevel $maxLevel\n"
@@ -109,7 +132,16 @@ open class Enchant : Comparable<Enchant> {
     class Normal : Enchant()
 
     class Ultimate : Enchant() {
-        override fun getFormat(level: Int, itemStack: ItemStack?) = "§d§l"
+        override fun getStyle(level: Int, itemStack: ItemStack?): Style {
+            return if (advanced.useAdvancedUltimateColor.get()) {
+                Style.EMPTY.withColor(advanced.advancedUltimateColor.get().getEffectiveColourRGB()).withBold(true)
+            } else {
+                if (config.ultimateEnchantColor.get() == LorenzColor.CHROMA)
+                    Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma")).withBold(true)
+                else
+                    Style.EMPTY.withColor(config.ultimateEnchantColor.get().toColor().rgb).withBold(true)
+            }
+        }
     }
 
     class Stacking : Enchant() {
@@ -145,6 +177,8 @@ open class Enchant : Comparable<Enchant> {
 
         // Ensures enchants not yet in repo stay as vanilla formatting
         // (instead of that stupid dark red lowercase formatting *cough* sba *cough*)
-        override fun getFormattedName(level: Int, itemStack: ItemStack?): String = "§9$loreName"
+        override fun getComponent(level: Int, itemStack: ItemStack?): Component {
+            return Component.literal(loreName).withColor(ChatFormatting.BLUE)
+        }
     }
 }

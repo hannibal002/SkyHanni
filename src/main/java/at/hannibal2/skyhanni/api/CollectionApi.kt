@@ -116,7 +116,7 @@ object CollectionApi {
 
         if (inventoryName.endsWith("s") && inventoryName != "Boss Collections") {
             for ((_, stack) in event.inventoryItems) {
-                val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+                val name = stack.hoverName.string.removeColor()
                 if ("Collections" in name) continue
 
                 val lore = stack.getLore()

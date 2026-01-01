@@ -90,10 +90,10 @@ object UniqueGiftingOpportunitiesFeatures {
     }
 
     private fun isBingo(entity: LivingEntity) =
-        !SkyBlockUtils.isBingoProfile && entity.displayName.formattedTextCompat().endsWith("Ⓑ§r")
+        !SkyBlockUtils.isBingoProfile && entity.displayName?.string.orEmpty().endsWith("Ⓑ")
 
     private fun isIronman(entity: LivingEntity) =
-        !SkyBlockUtils.noTradeMode && entity.displayName.formattedTextCompat().endsWith("♲§r")
+        !SkyBlockUtils.noTradeMode && entity.displayName?.string.orEmpty().endsWith("♲")
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {

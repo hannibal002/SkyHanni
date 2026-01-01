@@ -1,9 +1,5 @@
 package at.hannibal2.skyhanni.test
 
-//#if TODO
-//$$ import at.hannibal2.skyhanni.utils.json.ItemStackTypeAdapterFactory
-//$$ import at.hannibal2.skyhanni.utils.json.NBTTypeAdapter
-//#endif
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -22,6 +18,10 @@ import com.google.gson.JsonElement
 import net.minecraft.world.item.ItemStack
 import java.io.InputStreamReader
 import java.io.Reader
+//#if TODO
+//$$ import at.hannibal2.skyhanni.utils.json.ItemStackTypeAdapterFactory
+//$$ import at.hannibal2.skyhanni.utils.json.NBTTypeAdapter
+//#endif
 
 @SkyHanniModule
 object TestExportTools {

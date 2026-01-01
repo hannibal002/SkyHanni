@@ -19,7 +19,7 @@ object ExcavatorTooltipHider {
      */
     private val dirtPattern by RepoPattern.pattern(
         "excavator.dirt.name",
-        "§6Dirt",
+        "Dirt",
     )
 
     @HandleEvent
@@ -34,7 +34,7 @@ object ExcavatorTooltipHider {
         }
 
         if (config.hideDirt) {
-            val isDirt = dirtPattern.matches(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets())
+            val isDirt = dirtPattern.matches(event.itemStack.hoverName)
             if (isDirt) {
                 event.cancel()
             }

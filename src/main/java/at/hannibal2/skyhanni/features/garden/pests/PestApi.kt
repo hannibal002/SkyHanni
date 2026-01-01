@@ -158,11 +158,11 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST: §a§lPLAYING
+     * REGEX-TEST: PLAYING
      */
     val stereoPlayingItemPattern by patternGroup.pattern(
         "stereo.playing.item",
-        "§a§lPLAYING",
+        "PLAYING",
     )
 
     private var gardenJoinTime = SimpleTimeMark.farPast()
