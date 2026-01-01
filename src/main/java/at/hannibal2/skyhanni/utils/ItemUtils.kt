@@ -459,7 +459,7 @@ object ItemUtils {
 
     fun ItemStack.editItemInfo(displayName: Component, lore: List<Component>): ItemStack {
         this.setCustomItemName(displayName)
-        this.setLoreString(lore)
+        this.setLore(lore)
         return this
     }
 
