@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+import net.minecraft.client.Minecraft
 import net.minecraft.network.protocol.game.ClientboundContainerClosePacket
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
@@ -136,10 +137,12 @@ object OtherInventoryData {
     }
 
     private fun done(inventory: Inventory) {
-        InventoryFullyOpenedEvent(inventory).post()
-        inventory.fullyOpenedOnce = true
-        InventoryUpdatedEvent(inventory).post()
-        acceptItems = false
+        Minecraft.getInstance().execute {
+            InventoryFullyOpenedEvent(inventory).post()
+            inventory.fullyOpenedOnce = true
+            InventoryUpdatedEvent(inventory).post()
+            acceptItems = false
+        }
     }
 
     class Inventory(

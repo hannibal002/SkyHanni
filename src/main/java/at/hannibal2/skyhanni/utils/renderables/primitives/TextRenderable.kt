@@ -34,15 +34,7 @@ class StringRenderable internal constructor(
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) : Renderable {
-
-    private var widthCache = 0
-
-    override val width by lazy {
-        Minecraft.getInstance().execute {
-            widthCache = (Minecraft.getInstance().font.width(text) * scale).toInt() + 1
-        }
-        widthCache
-    }
+    override val width by lazy { (Minecraft.getInstance().font.width(text) * scale).toInt() + 1 }
     override val height = (9 * scale).toInt() + 1
 
     private val inverseScale = 1 / scale
@@ -68,14 +60,7 @@ class TextRenderable internal constructor(
         operator fun Renderable.invoke(string: String): TextRenderable = TextRenderable(Component.nullToEmpty(string))
     }
 
-    private var widthCache = 0
-
-    override val width by lazy {
-        Minecraft.getInstance().execute {
-            widthCache = (Minecraft.getInstance().font.width(text) * scale).toInt() + 1
-        }
-        widthCache
-    }
+    override val width by lazy { (Minecraft.getInstance().font.width(text) * scale).toInt() + 1 }
     override val height = (9 * scale).toInt() + 1
 
     private val inverseScale = 1 / scale
