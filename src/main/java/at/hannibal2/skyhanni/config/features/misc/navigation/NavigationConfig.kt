@@ -7,11 +7,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class NavigationConfig {
     @Expose
-    @ConfigOption(name = "Allow Instant Navigation", desc = "Starts navigating instantly upon shnavigate with only one match.")
-    @ConfigEditorBoolean
-    val allowInstantNavigation: Boolean = true
-
-    @Expose
     @ConfigOption(name = "Area Path Finder", desc = "Helps navigate to different areas on the current island.")
     @Accordion
     val areaPathfinder: AreaPathfinderConfig = AreaPathfinderConfig()
@@ -25,4 +20,9 @@ class NavigationConfig {
     @ConfigOption(name = "Pathfinding", desc = "General settings for Pathfinding/Navigating in different features.")
     @Accordion
     val pathfinding: PathfindConfig = PathfindConfig()
+
+    @Expose
+    @ConfigOption(name = "Allow Instant Navigation", desc = "Starts navigating instantly upon §e/shnavigate§r with only one match.")
+    @ConfigEditorBoolean
+    val allowInstantNavigation: Boolean = true
 }
