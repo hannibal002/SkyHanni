@@ -9,21 +9,18 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class NavigationConfig {
 
     @Expose
-    @ConfigOption(
-        name = "Areas List",
-        desc = "Helps navigate to different areas on the current island by showing all areas of this island as a list.",
-    )
+    @ConfigOption(name = "Areas List", desc = "")
     @Accordion
     val areasList: AreasListConfig = AreasListConfig()
 
     @Expose
-    @ConfigOption(name = "Show in World", desc = "Shows the area names in world.")
+    @ConfigOption(name = "Show in World", desc = "Shows neighboring area names as waypoints at their borders.")
     @ConfigEditorBoolean
     @FeatureToggle
     var showInWorld: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Title on Enter", desc = "Sends a titles on screen when entering an area.")
+    @ConfigOption(name = "Title on Enter", desc = "Sends a title on screen when entering an area.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enterTitle: Boolean = false
@@ -39,7 +36,7 @@ class NavigationConfig {
     var allowInstantNavigation: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Small Areas", desc = "Include small areas in features using island areas.")
+    @ConfigOption(name = "Small Areas", desc = "Include small areas in the areas list and world display.")
     @ConfigEditorBoolean
     var includeSmallAreas: Boolean = false
 }
