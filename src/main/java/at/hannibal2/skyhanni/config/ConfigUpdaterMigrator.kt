@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.json.asIntOrNull
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
@@ -80,6 +81,9 @@ object ConfigUpdaterMigrator {
         }
 
         fun move(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement = { it }) {
+            if (listOf(oldPath, newPath).any { it.startsWith("feature") }) {
+                ErrorManager.crashInDevEnv("Migration path should not start with 'features.'!")
+            }
             if (since <= oldVersion) {
                 logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
                 return
