@@ -248,8 +248,8 @@ object IslandAreas {
     fun onAreaChange(event: GraphAreaChangeEvent) {
         val name = event.area
         val inAnArea = name != "no_area"
-        // when this is a small area and small areas are disabled via config
-        if (!config.includeSmallAreas && name in smallAreas) return
+        // when this is a small area move and small areas are disabled via config
+        if (!config.includeSmallAreas && (name in smallAreas || event.previousArea in smallAreas)) return
 
         oldTitle?.stop()
         if (event.onlyInternal) return
@@ -278,15 +278,9 @@ object IslandAreas {
     fun onConfigLoad() {
         with(areaListConfig) {
             ConditionalUtils.onToggle(color) {
-                targetNode?.let {
-                    setTarget(it)
-                }
+                targetNode?.let { setTarget(it) }
             }
-            ConditionalUtils.onToggle(
-                color,
-                includeCurrentArea,
-                enabled,
-            ) {
+            ConditionalUtils.onToggle(color, includeCurrentArea, enabled) {
                 updateNodes()
                 update()
             }
