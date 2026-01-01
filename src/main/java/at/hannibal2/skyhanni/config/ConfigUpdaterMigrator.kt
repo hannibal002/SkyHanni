@@ -89,12 +89,16 @@ object ConfigUpdaterMigrator {
                 return
             }
             if (since > CONFIG_VERSION) {
-                error("Illegal new version $since > $CONFIG_VERSION")
+                ErrorManager.crashInDevEnv("Illegal new version $since > $CONFIG_VERSION")
             }
             if (since > oldVersion + 1) {
                 logger.log("Skipping move from $oldPath to $newPath (will be done in another pass)")
                 return
             }
+            internalMove(since, oldPath, newPath, transform)
+        }
+
+        private fun internalMove(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement) {
             val op = oldPath.split(".")
             val np = newPath.split(".")
             if (op.first().startsWith("#")) {
