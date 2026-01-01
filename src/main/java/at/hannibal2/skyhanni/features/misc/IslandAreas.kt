@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -94,9 +95,11 @@ object IslandAreas {
         }
 
         nodes = finalNodes
+        smallAreas = nodes.filter { GraphNodeTag.SMALL_AREA in it.key.tags }.mapNotNull { it.key.name }.toSet()
     }
 
     private var hasMoved = false
+    private var smallAreas = setOf<String>()
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -239,14 +242,19 @@ object IslandAreas {
         }
     }
 
+    var oldTitle: TitleContext? = null
+
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
         val name = event.area
         val inAnArea = name != "no_area"
         // when this is a small area and small areas are disabled via config
+        if (!config.includeSmallAreas && name in smallAreas) return
+
+        oldTitle?.stop()
         if (event.onlyInternal) return
         if (inAnArea && config.enterTitle) {
-            TitleManager.sendTitle("§aEntered $name!")
+            oldTitle = TitleManager.sendTitle("§aEntered $name!")
         }
     }
 
