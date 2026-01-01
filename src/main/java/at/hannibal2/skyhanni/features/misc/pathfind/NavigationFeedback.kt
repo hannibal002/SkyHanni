@@ -86,6 +86,6 @@ object NavigationFeedback {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(1235345, "features.misc.pathfinding", "features.misc.navigation.pathfinding")
+        event.move(114, "features.misc.pathfinding", "features.misc.navigation.pathfinding")
     }
 }
