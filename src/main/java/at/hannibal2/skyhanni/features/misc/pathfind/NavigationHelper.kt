@@ -68,7 +68,7 @@ object NavigationHelper {
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
-        if (config.allowInstaNavigate && locations.size == 1) {
+        if (config.allowInstantNavigation && locations.size == 1) {
             val (name, node) = locations.first()
             node.pathFind(label = name, allowRerouting = true, condition = { true })
             sendNavigateMessageWithContent("§7Only one location found, navigating to §r$name", goBack)
