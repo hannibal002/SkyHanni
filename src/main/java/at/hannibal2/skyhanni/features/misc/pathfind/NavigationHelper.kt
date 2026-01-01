@@ -72,24 +72,25 @@ object NavigationHelper {
             val (name, node) = locations.first()
             node.pathFind(label = name, allowRerouting = true, condition = { true })
             sendNavigateMessageWithContent("§7Only one location found, navigating to §r$name", goBack)
-        } else {
-            TextHelper.displayPaginatedList(
-                title,
-                locations,
-                chatLineId = messageId,
-                emptyMessage = "No locations found.",
-            ) { (name, node) ->
-                val distance = distances[node]!!.roundTo(1)
-                val component = "$name §e$distance".asComponent()
-                component.onClick {
-                    node.pathFind(label = name, allowRerouting = true, condition = { true })
-                    sendNavigateMessage(name, goBack)
-                }
-                val tag = node.tags.first { it in allowedTags }
-                val hoverText = "Name: $name\n§7Type: §r${tag.displayName}\n§7Distance: §e$distance blocks\n§eClick to start navigating!"
-                component.hover = hoverText.asComponent()
-                component
+            return
+        }
+
+        TextHelper.displayPaginatedList(
+            title,
+            locations,
+            chatLineId = messageId,
+            emptyMessage = "No locations found.",
+        ) { (name, node) ->
+            val distance = distances[node]!!.roundTo(1)
+            val component = "$name §e$distance".asComponent()
+            component.onClick {
+                node.pathFind(label = name, allowRerouting = true, condition = { true })
+                sendNavigateMessage(name, goBack)
             }
+            val tag = node.tags.first { it in allowedTags }
+            val hoverText = "Name: $name\n§7Type: §r${tag.displayName}\n§7Distance: §e$distance blocks\n§eClick to start navigating!"
+            component.hover = hoverText.asComponent()
+            component
         }
     }
 
@@ -100,9 +101,8 @@ object NavigationHelper {
         componentText.send(messageId)
     }
 
-    private fun sendNavigateMessage(name: String, goBack: () -> Unit) {
+    private fun sendNavigateMessage(name: String, goBack: () -> Unit) =
         sendNavigateMessageWithContent("§7Started navigating to §r$name§7. ", goBack)
-    }
 
     private fun calculateNames(distances: Map<GraphNode, Double>): List<Pair<String, GraphNode>> {
         val names = mutableMapOf<String, GraphNode>()
