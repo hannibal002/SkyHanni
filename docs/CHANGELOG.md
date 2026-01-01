@@ -10,6 +10,10 @@
   + Works exactly the same as NEU's version, you can even import your NEU todos into skyhanni.
 + Added `/shcalc` command. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
 
+#### Fishing
+
++ Mute Banshee screams. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/5007)
+
 #### Misc
 
 + Added Particle Colour Fixer. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4993)
@@ -31,10 +35,21 @@
 + Added Farming Exp Boost (Epic) to rare visitor rewards. - Luna (https://github.com/hannibal002/SkyHanni/pull/4999)
 + Added Overclockers to Estimated Item Value. - nopo (https://github.com/hannibal002/SkyHanni/pull/5008)
 
+#### Inventory
+
++ Enchant parsing now works in other mods such as SkyblockPv's /pv. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5021)
++ Enchants can now have custom colours. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5021)
+  + Added an 'Advanced' section to allow for custom colours for enchant tiers instead of the usual Minecraft presets.
++ You can now customise Ultimate enchant colour. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5021)
+
+
 #### Misc
 
 + Added option to render custom todos as one Gui. - nopo (https://github.com/hannibal002/SkyHanni/pull/5001)
-
++ Added multi-triggers to /shtodos. - nopo (https://github.com/hannibal002/SkyHanni/pull/5012)
++ Added support for cron expressions in /shtodos. - nopo (https://github.com/hannibal002/SkyHanni/pull/5012)
++ Improved misc performance around the mod. - nopo (https://github.com/hannibal002/SkyHanni/pull/5016)
+  + May cause issues 🙂.
 ### Fixes
 
 #### Foraging
@@ -53,6 +68,7 @@
 #### Mining
 
 + Fixed structure chests sometimes being incorrectly highlighted as chests dug up from powder mining. - Luna (https://github.com/hannibal002/SkyHanni/pull/4989)
++ Fixed Powder Chest Timer sometimes not detecting chests. - Luna (https://github.com/hannibal002/SkyHanni/pull/5013)
 
 #### Fishing
 
@@ -67,6 +83,8 @@
   + Example: `/gfs enchanted melon slice 5*64`.
 + Fixed Scoreboard looking messed up on some other servers. - nopo (https://github.com/hannibal002/SkyHanni/pull/5009)
 + Fixed Setting sound levels on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/4991)
++ Fixed performance issue with blank /shtodos. - nopo (https://github.com/hannibal002/SkyHanni/pull/5012)
++ Fixed performance issue with regex /shtodos matching. - nopo (https://github.com/hannibal002/SkyHanni/pull/5012)
 
 ### Technical Details
 
@@ -83,7 +101,11 @@
 + Renamed detekt baseline to baseline-main.xml. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5002)
   + You no longer have to do any manual steps when generating the baseline file.
   + It will generate in the correct location as part of the gradle task.
-
++ Changed Stereo Disc replacer to use Components. - nopo (https://github.com/hannibal002/SkyHanni/pull/5015)
++ Fixed bundling kotlin and other useless libs. - juna (https://github.com/hannibal002/SkyHanni/pull/5019)
++ Removed 1.8.9 shader code. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5014)
++ Removed many instances of TextCompat. - nopo (https://github.com/hannibal002/SkyHanni/pull/5016)
++ Use Components and Fabric's tooltip event for better mod compat. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5021)
 ### Removed Features
 
 + Removed 1.8.9 support. - nopo (https://github.com/hannibal002/SkyHanni/pull/4978)
