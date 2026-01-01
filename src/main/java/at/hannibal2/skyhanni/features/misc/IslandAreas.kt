@@ -316,8 +316,8 @@ object IslandAreas {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(114, "features.misc.areaNavigation", "features.misc.navigation")
-        event.move(114, "features.misc.navigation.pathfinder", "features.misc.navigation.areasList")
-        event.move(114, "features.misc.navigation.inWorld", "features.misc.navigation.showInWorld")
+        event.move(114, "misc.areaNavigation", "misc.navigation")
+        event.move(115, "misc.navigation.pathfinder", "misc.navigation.areasList")
+        event.move(115, "misc.navigation.inWorld", "misc.navigation.showInWorld")
     }
 }
