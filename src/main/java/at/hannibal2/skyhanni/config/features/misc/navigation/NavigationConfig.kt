@@ -1,20 +1,32 @@
 package at.hannibal2.skyhanni.config.features.misc.navigation
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class NavigationConfig {
-    @Expose
-    @ConfigOption(name = "Area Path Finder", desc = "Helps navigate to different areas on the current island.")
-    @Accordion
-    val areaPathfinder: AreaPathfinderConfig = AreaPathfinderConfig()
 
     @Expose
-    @ConfigOption(name = "Island Areas", desc = "Settings for Island Areas.")
+    @ConfigOption(
+        name = "Areas List",
+        desc = "Helps navigate to different areas on the current island by showing all areas of this island as a list.",
+    )
     @Accordion
-    val islandAreas: IslandAreasConfig = IslandAreasConfig()
+    val areasList: AreasListConfig = AreasListConfig()
+
+    @Expose
+    @ConfigOption(name = "Show in World", desc = "Shows the area names in world.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var showInWorld: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Title on Enter", desc = "Sends a titles on screen when entering an area.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var enterTitle: Boolean = false
 
     @Expose
     @ConfigOption(name = "Pathfinding", desc = "General settings for Pathfinding/Navigating in different features.")
@@ -25,4 +37,9 @@ class NavigationConfig {
     @ConfigOption(name = "Allow Instant Navigation", desc = "Starts navigating instantly upon §e/shnavigate§r with only one match.")
     @ConfigEditorBoolean
     var allowInstantNavigation: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Small Areas", desc = "Include small areas in features using island areas.")
+    @ConfigEditorBoolean
+    var includeSmallAreas: Boolean = false
 }

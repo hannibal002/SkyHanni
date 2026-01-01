@@ -10,11 +10,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class AreaPathfinderConfig {
+class AreasListConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "While in your inventory, show all areas of the island. Click on an area to display the path to this area."
+        desc = "While in your inventory, show all areas of the island. Click to pathfind to this area."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -36,6 +36,6 @@ class AreaPathfinderConfig {
     val color: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(85, 255, 85, 245))
 
     @Expose
-    @ConfigLink(owner = AreaPathfinderConfig::class, field = "enabled")
+    @ConfigLink(owner = AreasListConfig::class, field = "enabled")
     val position: Position = Position(-350, 100)
 }

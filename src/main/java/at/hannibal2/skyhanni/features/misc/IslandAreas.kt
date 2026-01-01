@@ -43,8 +43,9 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object IslandAreas {
-    private val pathfinderConfig get() = SkyHanniMod.feature.misc.navigation.areaPathfinder
-    private val areaConfig get() = SkyHanniMod.feature.misc.navigation.islandAreas
+    private val config get() = SkyHanniMod.feature.misc.navigation
+    // TODO all code that touches this config element should get moved into a new file "island areas features" or similar.
+    private val areaListConfig get() = config.areasList
 
     private var nodes = mapOf<GraphNode, Double>()
     private var paths = mapOf<GraphNode, Graph>()
@@ -114,12 +115,12 @@ object IslandAreas {
     fun onRenderOverlay() {
         if (!isEnabled()) return
         if (!isPathfinderEnabled()) return
-        if (!pathfinderConfig.showAlways) return
+        if (!areaListConfig.showAlways) return
         val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
         if (isInOwnInventory) return
 
         display?.let {
-            pathfinderConfig.position.renderRenderable(it, posLabel = "Island Areas")
+            areaListConfig.position.renderRenderable(it, posLabel = "Island Areas")
         }
     }
 
@@ -131,7 +132,7 @@ object IslandAreas {
         if (!isInOwnInventory) return
 
         display?.let {
-            pathfinderConfig.position.renderRenderable(it, posLabel = "Island Areas")
+            areaListConfig.position.renderRenderable(it, posLabel = "Island Areas")
         }
     }
 
@@ -170,7 +171,7 @@ object IslandAreas {
                 foundCurrentArea = true
 
                 val inAnArea = name != "no_area" && isConfigVisible
-                if (pathfinderConfig.includeCurrentArea.get()) {
+                if (areaListConfig.includeCurrentArea.get()) {
                     if (inAnArea) {
                         buildDisplay?.addSearchString("§eCurrent area: $coloredName")
                     } else {
@@ -243,7 +244,7 @@ object IslandAreas {
         val inAnArea = name != "no_area"
         // when this is a small area and small areas are disabled via config
         if (event.onlyInternal) return
-        if (inAnArea && areaConfig.enterTitle) {
+        if (inAnArea && config.enterTitle) {
             TitleManager.sendTitle("§aEntered $name!")
         }
     }
@@ -251,7 +252,7 @@ object IslandAreas {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        if (!areaConfig.showInWorld) return
+        if (!config.showInWorld) return
         for ((node, _) in nodes) {
             val name = node.name ?: continue
             if (name == currentArea) continue
@@ -266,7 +267,7 @@ object IslandAreas {
 
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
-        with(pathfinderConfig) {
+        with(areaListConfig) {
             ConditionalUtils.onToggle(color) {
                 targetNode?.let {
                     setTarget(it)
@@ -287,14 +288,14 @@ object IslandAreas {
     private val onlyLargeAreas = listOf(GraphNodeTag.AREA)
 
     fun GraphNode.getAreaTag(useConfig: Boolean = false): GraphNodeTag? = tags.firstOrNull {
-        it in (if (areaConfig.includeSmallAreas || !useConfig) allAreas else onlyLargeAreas)
+        it in (if (config.includeSmallAreas || !useConfig) allAreas else onlyLargeAreas)
     }
 
     private fun setTarget(node: GraphNode) {
         targetNode = node
         val tag = node.getAreaTag() ?: return
         val displayName = tag.color.getChatColor() + node.name
-        val color = pathfinderConfig.color.get().toColor()
+        val color = areaListConfig.color.get().toColor()
         node.pathFind(
             displayName,
             color,
@@ -308,7 +309,7 @@ object IslandAreas {
         update()
     }
 
-    private fun isPathfinderEnabled(): Boolean = pathfinderConfig.enabled.get()
+    private fun isPathfinderEnabled(): Boolean = areaListConfig.enabled.get()
 
     private fun isEnabled() = IslandGraphs.currentIslandGraph != null
 
