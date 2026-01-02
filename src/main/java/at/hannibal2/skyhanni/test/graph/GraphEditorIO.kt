@@ -64,7 +64,7 @@ object GraphEditorIO {
                 )
             },
         )
-        val translation = graph.mapIndexed { index, node -> node to nodes[index] }.toMap()
+        val translation = graph.zip(nodes).toMap()
 
         val neighbors = graph.flatMap { node ->
             node.neighbours.mapNotNull { (neighbor, _) ->
