@@ -60,14 +60,13 @@ object IslandAreaBackend {
         this.paths = paths
 
         val alreadyFoundAreas = mutableSetOf<String>()
-        val areaNodes = map.sorted().mapNotNull { (node, distance) ->
+        this.areaNodes = map.sorted().mapNotNull { (node, distance) ->
             val name = node.name?.takeIf { it !in alreadyFoundAreas } ?: return@mapNotNull null
             val tag = node.getAreaTag() ?: return@mapNotNull null
             alreadyFoundAreas += name
             AreaNode(node, name, tag, distance)
         }
 
-        this.areaNodes = areaNodes
         IslandAreaFeatures.updateNodes(areaNodes)
     }
 
