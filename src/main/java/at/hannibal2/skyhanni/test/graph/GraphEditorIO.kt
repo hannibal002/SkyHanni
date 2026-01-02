@@ -18,8 +18,9 @@ object GraphEditorIO {
 
     val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
 
-    private val nodes get() = GraphEditor.nodes
-    private val edges get() = GraphEditor.edges
+    private val state get() = GraphEditor.state
+    private val nodes get() = state.nodes
+    private val edges get() = state.edges
 
     fun compileGraph(): Graph {
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
@@ -52,9 +53,10 @@ object GraphEditorIO {
         return Graph(compiledNodes)
     }
 
-    fun import(graph: Graph) {
-        GraphEditor.clear()
-        nodes.addAll(
+    fun createStateFrom(graph: Graph): GraphEditorState {
+        val newState = GraphEditorState()
+
+        newState.nodes.addAll(
             graph.map {
                 GraphingNode(
                     it.id,
@@ -64,7 +66,7 @@ object GraphEditorIO {
                 )
             },
         )
-        val translation = graph.zip(nodes).toMap()
+        val translation = graph.zip(newState.nodes).toMap()
 
         val neighbors = graph.flatMap { node ->
             node.neighbours.mapNotNull { (neighbor, _) ->
@@ -87,10 +89,9 @@ object GraphEditorIO {
             accumulator
         }
 
-        edges.addAll(reduced.values)
-        GraphEditor.id = nodes.lastOrNull()?.id?.plus(1) ?: 0
-        GraphEditor.checkDissolve()
-        GraphEditor.selectedEdge = GraphEditor.findEdgeBetweenActiveAndClosest()
+        newState.edges.addAll(reduced.values)
+        newState.id = newState.nodes.lastOrNull()?.id?.plus(1) ?: 0
+        return newState
     }
 
     fun save() {
@@ -138,7 +139,8 @@ object GraphEditorIO {
             }
         }
         GraphEditor.enable()
-        import(graph)
+        GraphEditor.state = createStateFrom(graph)
         ChatUtils.chat("Graph Editor loaded this island!")
     }
+
 }

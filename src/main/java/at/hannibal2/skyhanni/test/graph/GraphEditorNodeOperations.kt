@@ -11,45 +11,47 @@ object GraphEditorNodeOperations {
 
     val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
 
-    private val nodes get() = GraphEditor.nodes
-    private val edges get() = GraphEditor.edges
+    private val state get() = GraphEditor.state
+    private val nodes get() = state.nodes
+    private val edges get() = state.edges
 
     fun addNode() {
-        val closestNode = GraphEditor.closestNode
-        if (closestNode != null && closestNode.distanceSqToPlayer() < 9.0 && closestNode == GraphEditor.activeNode) {
+        val closestNode = state.closestNode
+        if (closestNode != null && closestNode.distanceSqToPlayer() < 9.0 && closestNode == state.activeNode) {
             GraphEditor.feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
-            GraphEditor.nodes.remove(closestNode)
-            GraphEditor.edges.removeIf { it.isInEdge(closestNode) }
-            if (closestNode == GraphEditor.activeNode) GraphEditor.activeNode = null
-            GraphEditor.closestNode = null
+            nodes.remove(closestNode)
+            edges.removeIf { it.isInEdge(closestNode) }
+            if (closestNode == state.activeNode) state.activeNode = null
+            state.closestNode = null
             return
         }
 
-        if (GraphEditor.nodes.any { it.position == playerPosition }) {
+        if (nodes.any { it.position == playerPosition }) {
             GraphEditor.feedBackInTutorial("Can't create node, here is already another one.")
             return
         }
-        val node = GraphingNode(GraphEditor.id++, playerPosition)
-        GraphEditor.nodes.add(node)
+        val node = GraphingNode(state.id++, playerPosition)
+        nodes.add(node)
         GraphEditor.feedBackInTutorial("Added graph node.")
-        if (GraphEditor.activeNode == null) return
-        addEdge(GraphEditor.activeNode, node)
+        state.activeNode?.let {
+            addEdge(it, node)
+        }
     }
 
     fun addEdge(node1: GraphingNode?, node2: GraphingNode?, direction: EdgeDirection = EdgeDirection.BOTH): Boolean {
         if (node1 == null || node2 == null || node1 == node2) return false
         val edge = GraphingEdge(node1, node2, direction)
-        if (edge.isInEdge(GraphEditor.activeNode)) {
-            GraphEditor.checkDissolve()
-            GraphEditor.selectedEdge = GraphEditor.findEdgeBetweenActiveAndClosest()
+        if (edge.isInEdge(state.activeNode)) {
+            state.checkDissolve()
+            state.selectedEdge = GraphEditor.state.findEdgeBetweenActiveAndClosest()
         }
-        return GraphEditor.edges.add(edge)
+        return edges.add(edge)
     }
 
     fun handleDissolve() {
-        if (!GraphEditor.dissolvePossible || !config.dissolveKey.isKeyClicked()) return
+        if (!state.dissolvePossible || !config.dissolveKey.isKeyClicked()) return
 
-        val activeNode = GraphEditor.activeNode ?: return
+        val activeNode = state.activeNode ?: return
 
         GraphEditor.feedBackInTutorial("Dissolved the node, now it is gone.")
         val edgePair = edges.filter { it.isInEdge(activeNode) }
@@ -62,7 +64,7 @@ object GraphEditorNodeOperations {
         val direction = getDirection(edge1, edge2, neighbors1, activeNode, neighbors2)
         edges.removeAll(edgePair)
         nodes.remove(activeNode)
-        GraphEditor.activeNode = null
+        state.activeNode = null
         addEdge(neighbors1, neighbors2, direction)
     }
 
@@ -86,15 +88,15 @@ object GraphEditorNodeOperations {
     }
 
     fun handleConnect() {
-        if (GraphEditor.activeNode == GraphEditor.closestNode || !config.connectKey.isKeyClicked()) return
-        val edge = GraphEditor.getEdgeIndex(GraphEditor.activeNode, GraphEditor.closestNode)
+        if (state.activeNode == state.closestNode || !config.connectKey.isKeyClicked()) return
+        val edge = GraphEditor.state.getEdgeIndex(state.activeNode, state.closestNode)
         if (edge == null) {
-            addEdge(GraphEditor.activeNode, GraphEditor.closestNode)
+            addEdge(state.activeNode, state.closestNode)
             GraphEditor.feedBackInTutorial("Added new edge.")
         } else {
             edges.removeAt(edge)
-            GraphEditor.checkDissolve()
-            GraphEditor.selectedEdge = GraphEditor.findEdgeBetweenActiveAndClosest()
+            state.checkDissolve()
+            state.selectedEdge = GraphEditor.state.findEdgeBetweenActiveAndClosest()
             GraphEditor.feedBackInTutorial("Removed edge.")
         }
     }

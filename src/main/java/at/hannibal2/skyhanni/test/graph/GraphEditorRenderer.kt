@@ -26,18 +26,20 @@ object GraphEditorRenderer {
 
     val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
 
-    private val nodes get() = GraphEditor.nodes
-    private val edges get() = GraphEditor.edges
-    private val closestNode get() = GraphEditor.closestNode
-    private val inEditMode get() = GraphEditor.inEditMode
-    private val inTextMode get() = GraphEditor.inTextMode
-    private val activeNode get() = GraphEditor.activeNode
-    private val dissolvePossible get() = GraphEditor.dissolvePossible
-    private val selectedEdge get() = GraphEditor.selectedEdge
-    private val textBox get() = GraphEditor.textBox
-    private val seeThroughBlocks get() = GraphEditor.seeThroughBlocks
-    private val highlightedEdges get() = GraphEditor.highlightedEdges
-    private val highlightedNodes get() = GraphEditor.highlightedNodes
+    private val state get() = GraphEditor.state
+
+    private val nodes get() = state.nodes
+    private val edges get() = state.edges
+    private val closestNode get() = state.closestNode
+    private val inEditMode get() = state.inEditMode
+    private val inTextMode get() = state.inTextMode
+    private val activeNode get() = state.activeNode
+    private val dissolvePossible get() = state.dissolvePossible
+    private val selectedEdge get() = state.selectedEdge
+    private val textBox get() = state.textBox
+    private val seeThroughBlocks get() = state.seeThroughBlocks
+    private val highlightedEdges get() = state.highlightedEdges
+    private val highlightedNodes get() = state.highlightedNodes
 
     private val nodeColor = LorenzColor.BLUE.addOpacity(200)
     private val activeColor = LorenzColor.GREEN.addOpacity(200)

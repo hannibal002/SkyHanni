@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
-import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,63 +22,13 @@ object GraphEditor {
 
     val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
 
+    var state = GraphEditorState()
+
     fun isEnabled(): Boolean = config.enabled
 
-    var id = 0
-
-    val nodes = mutableListOf<GraphingNode>()
-    val edges = mutableListOf<GraphingEdge>()
-
-    var activeNode: GraphingNode? = null
-        set(value) {
-            field = value
-            selectedEdge = findEdgeBetweenActiveAndClosest()
-            checkDissolve()
-        }
-    var closestNode: GraphingNode? = null
-        set(value) {
-            field = value
-            selectedEdge = findEdgeBetweenActiveAndClosest()
-        }
-
-    var selectedEdge: GraphingEdge? = null
-
-    var seeThroughBlocks = true
-
-    var inEditMode = false
-    var inTextMode = false
-        set(value) {
-            field = value
-            if (value) {
-                activeNode?.name?.let {
-                    textBox.textBox = it
-                }
-
-                textBox.makeActive()
-            } else {
-                textBox.clear()
-                textBox.disable()
-            }
-        }
-
-    var inTutorialMode = false
-
-    val textBox = TextInput()
-
-    var dissolvePossible = false
-
-    private var cachedNearbyNodes = listOf<GraphingNode>()
-    private var lastCacheUpdate = SimpleTimeMark.farPast()
-
-    fun findEdgeBetweenActiveAndClosest(): GraphingEdge? = getEdgeIndex(activeNode, closestNode)?.let { edges[it] }
-
-    fun checkDissolve() {
-        if (activeNode == null) {
-            dissolvePossible = false
-            return
-        }
-        dissolvePossible = edges.count { it.isInEdge(activeNode) } == 2
-    }
+    private val nodes get() = state.nodes
+    private val inTutorialMode get() = state.inTutorialMode
+    private val inEditMode get() = state.inEditMode
 
     fun feedBackInTutorial(text: String) {
         if (inTutorialMode) {
@@ -97,11 +46,11 @@ object GraphEditor {
         if (nodes.isEmpty()) return
 
         // Update cache every second for normal movement
-        if (lastCacheUpdate.passedSince() > 1.seconds) {
+        if (state.lastCacheUpdate.passedSince() > 1.seconds) {
             updateCache()
         }
 
-        closestNode = cachedNearbyNodes.minByOrNull { it.distanceSqToPlayer() }
+        state.closestNode = state.cachedNearbyNodes.minByOrNull { it.distanceSqToPlayer() }
 
         GraphEditorNodeFinder.handleAllNodeFind()
     }
@@ -117,8 +66,8 @@ object GraphEditor {
     }
 
     private fun updateCache() {
-        cachedNearbyNodes = nodes.sortedBy { it.distanceSqToPlayer() }.take(20)
-        lastCacheUpdate = SimpleTimeMark.now()
+        state.cachedNearbyNodes = nodes.sortedBy { it.distanceSqToPlayer() }.take(20)
+        state.lastCacheUpdate = SimpleTimeMark.now()
     }
 
     private fun updateRender() {
@@ -170,25 +119,8 @@ object GraphEditor {
         cir.returnValue = false
     }
 
-    fun getEdgeIndex(node1: GraphingNode?, node2: GraphingNode?) =
-        if (node1 != null && node2 != null && node1 != node2) GraphingEdge(
-            node1,
-            node2,
-        ).let { e -> edges.indexOfFirst { it == e }.takeIf { it != -1 } }
-        else null
-
-
-    val highlightedNodes = mutableSetOf<GraphingNode>()
-    val highlightedEdges = mutableSetOf<GraphingEdge>()
-
     fun clear() {
-        id = 0
-        nodes.clear()
-        edges.clear()
-        cachedNearbyNodes = emptyList()
-        activeNode = null
-        closestNode = null
-        dissolvePossible = false
+        state = GraphEditorState()
     }
 
     fun enable() {
