@@ -6,15 +6,17 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.model.TextInput
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.KeyMapping
+import net.minecraft.client.player.LocalPlayer
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GraphEditor {
@@ -66,6 +68,9 @@ object GraphEditor {
 
     var dissolvePossible = false
 
+    private var cachedNearbyNodes = listOf<GraphingNode>()
+    private var lastCacheUpdate = SimpleTimeMark.farPast()
+
     fun findEdgeBetweenActiveAndClosest(): GraphingEdge? = getEdgeIndex(activeNode, closestNode)?.let { edges[it] }
 
     fun checkDissolve() {
@@ -90,8 +95,30 @@ object GraphEditor {
             updateRender()
         }
         if (nodes.isEmpty()) return
-        closestNode = nodes.getNearestNode()
+
+        // Update cache every second for normal movement
+        if (lastCacheUpdate.passedSince() > 1.seconds) {
+            updateCache()
+        }
+
+        closestNode = cachedNearbyNodes.minByOrNull { it.distanceSqToPlayer() }
+
         GraphEditorNodeFinder.handleAllNodeFind()
+    }
+
+    @HandleEvent
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+        if (!isEnabled()) return
+        if (!event.isLocalPlayer) return
+
+        if (event.distance > 20) {
+            updateCache()
+        }
+    }
+
+    private fun updateCache() {
+        cachedNearbyNodes = nodes.sortedBy { it.distanceSqToPlayer() }.take(20)
+        lastCacheUpdate = SimpleTimeMark.now()
     }
 
     private fun updateRender() {
@@ -158,6 +185,7 @@ object GraphEditor {
         id = 0
         nodes.clear()
         edges.clear()
+        cachedNearbyNodes = emptyList()
         activeNode = null
         closestNode = null
         dissolvePossible = false
