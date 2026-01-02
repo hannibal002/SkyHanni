@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.json.fromJson
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
@@ -23,7 +24,7 @@ value class Graph(
 
     override fun containsAll(elements: Collection<GraphNode>) = nodes.containsAll(elements)
 
-    override fun get(index: Int) = nodes.get(index)
+    override fun get(index: Int) = nodes[index]
 
     override fun isEmpty() = nodes.isEmpty()
 
@@ -51,19 +52,19 @@ value class Graph(
     constructor() : this(emptyList())
 
     companion object {
-        val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(
+        val gson: Gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(
             { out, value ->
                 out.beginObject()
-                value.forEach {
-                    out.name(it.id.toString()).beginObject()
+                for (graphNode in value) {
+                    out.name(graphNode.id.toString()).beginObject()
 
-                    out.name("Position").value(with(it.position) { "$x:$y:$z" })
+                    out.name("Position").value(with(graphNode.position) { "$x:$y:$z" })
 
-                    it.name?.let {
+                    graphNode.name?.let {
                         out.name("Name").value(it)
                     }
 
-                    it.tagNames.takeIf { list -> list.isNotEmpty() }?.let {
+                    graphNode.tagNames.takeIf { list -> list.isNotEmpty() }?.let {
                         out.name("Tags")
                         out.beginArray()
                         for (tagName in it) {
@@ -74,7 +75,7 @@ value class Graph(
 
                     out.name("Neighbours")
                     out.beginObject()
-                    for ((node, weight) in it.neighbours) {
+                    for ((node, weight) in graphNode.neighbours) {
                         val id = node.id.toString()
                         out.name(id).value(weight.roundTo(2))
                     }
@@ -165,7 +166,7 @@ value class Graph(
     fun toJson(): String = gson.toJson(this)
 }
 
-// The node object that gets parsed from/to json
+// The node object that gets parsed from/to JSON
 class GraphNode(val id: Int, override val position: LorenzVec, val name: String? = null, val tagNames: List<String> = emptyList()) :
     GraphUtils.GenericNode {
 
@@ -188,9 +189,7 @@ class GraphNode(val id: Int, override val position: LorenzVec, val name: String?
 
         other as GraphNode
 
-        if (id != other.id) return false
-
-        return true
+        return id == other.id
     }
 
     fun sameNameAndTags(other: GraphNode): Boolean = name == other.name && allowedTags == other.allowedTags
