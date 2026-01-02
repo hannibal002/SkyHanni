@@ -140,7 +140,8 @@ object IslandAreaFeatures {
         }
     }
 
-    fun reset() {
+    @HandleEvent
+    fun onWorldChange() {
         display = null
         targetNode = null
     }

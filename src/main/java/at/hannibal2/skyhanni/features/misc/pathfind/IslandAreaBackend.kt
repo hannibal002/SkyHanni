@@ -38,7 +38,6 @@ object IslandAreaBackend {
     @HandleEvent
     fun onWorldChange() {
         areaNodes = emptyList()
-        IslandAreaFeatures.reset()
         hasMoved = true
         updateArea(AreaNode.NO_AREA, onlyInternal = true)
     }
