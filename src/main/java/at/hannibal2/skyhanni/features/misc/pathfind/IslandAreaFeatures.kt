@@ -211,7 +211,7 @@ object IslandAreaFeatures {
             if (area.node == targetNode) {
                 add("§aPath Finder points to this!")
                 add("")
-                add("§eClick to disable!")
+                add("§eClick to stop navigating!")
             } else {
                 add("§eClick to find a path!")
             }
