@@ -12,13 +12,10 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
@@ -28,31 +25,20 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RaycastUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import java.awt.Color
-import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("LargeClass")
 @SkyHanniModule
 object GraphEditor {
 
@@ -63,7 +49,7 @@ object GraphEditor {
     private var id = 0
 
     val nodes = mutableListOf<GraphingNode>()
-    private val edges = mutableListOf<GraphingEdge>()
+    val edges = mutableListOf<GraphingEdge>()
 
     var activeNode: GraphingNode? = null
         set(value) {
@@ -71,18 +57,18 @@ object GraphEditor {
             selectedEdge = findEdgeBetweenActiveAndClosest()
             checkDissolve()
         }
-    private var closestNode: GraphingNode? = null
+    var closestNode: GraphingNode? = null
         set(value) {
             field = value
             selectedEdge = findEdgeBetweenActiveAndClosest()
         }
 
-    private var selectedEdge: GraphingEdge? = null
+    var selectedEdge: GraphingEdge? = null
 
-    private var seeThroughBlocks = true
+    var seeThroughBlocks = true
 
-    private var inEditMode = false
-    private var inTextMode = false
+    var inEditMode = false
+    var inTextMode = false
         set(value) {
             field = value
             if (value) {
@@ -99,16 +85,7 @@ object GraphEditor {
 
     private var inTutorialMode = false
 
-    private val textBox = TextInput()
-
-    private val nodeColor = LorenzColor.BLUE.addOpacity(200)
-    private val activeColor = LorenzColor.GREEN.addOpacity(200)
-    private val closestColor = LorenzColor.YELLOW.addOpacity(200)
-    private val dijkstraColor = LorenzColor.LIGHT_PURPLE.addOpacity(200)
-
-    private val edgeColor = LorenzColor.GOLD.addOpacity(150)
-    private val edgeDijkstraColor = LorenzColor.DARK_BLUE.addOpacity(150)
-    private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
+    val textBox = TextInput()
 
     private val nodesAlreadyFound = mutableListOf<LorenzVec>()
     private val nodesToFind: List<LorenzVec>
@@ -116,64 +93,7 @@ object GraphEditor {
     private var currentNodeToFind: LorenzVec? = null
     private var active = false
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled()) return
-        nodes.forEach { event.drawNode(it) }
-        edges.forEach { event.drawEdge(it) }
-    }
-
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
-        if (!isEnabled()) return
-        config.infoDisplay.renderRenderables(buildDisplay(), posLabel = "Graph Info")
-    }
-
-    private fun buildDisplay(): List<Renderable> = buildList {
-        add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
-        if (!inEditMode && !inTextMode) {
-            add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
-            add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
-            add("§eSelect (Look): §6${KeyboardManager.getKeyName(config.selectRaycastKey)}")
-            add("§eConnect: §6${KeyboardManager.getKeyName(config.connectKey)}")
-            add("§eTest: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
-            add("§eVision: §6${KeyboardManager.getKeyName(config.throughBlocksKey)}")
-            add("§eSave: §6${KeyboardManager.getKeyName(config.saveKey)}")
-            add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
-            add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
-            add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
-            add(" ")
-            if (activeNode != null) {
-                add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
-                if (dissolvePossible) add("§eDissolve: §6${KeyboardManager.getKeyName(config.dissolveKey)}")
-                if (selectedEdge != null) {
-                    add("§eSplit: §6${KeyboardManager.getKeyName(config.splitKey)}")
-                    add("§eCycle Direction: §6${KeyboardManager.getKeyName(config.edgeCycle)}")
-                }
-            }
-        }
-
-        if (!inTextMode) {
-            if (activeNode != null) {
-                add("§eEdit active node: §6${KeyboardManager.getKeyName(config.editKey)}")
-            }
-        }
-
-        if (inEditMode) {
-            add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.key.value)}")
-            add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.key.value)}")
-            add("§ez+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.a.key.value)}")
-            add("§ez- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.d.key.value)}")
-            add("§ey+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.up.key.value)}")
-            add("§ey- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.down.key.value)}")
-        }
-        if (inTextMode) {
-            add("§eFormat: ${textBox.finalText()}")
-            add("§eRaw:     ${textBox.editText(textColor = LorenzColor.YELLOW)}")
-        }
-    }.map { StringRenderable.from(it) }
-
-    private var dissolvePossible = false
+    var dissolvePossible = false
 
     private fun findEdgeBetweenActiveAndClosest(): GraphingEdge? = getEdgeIndex(activeNode, closestNode)?.let { edges[it] }
 
@@ -254,98 +174,6 @@ object GraphEditor {
         } else {
             ChatUtils.chat("Graph navigation over all nodes stopped.")
         }
-    }
-
-    private fun SkyHanniRenderWorldEvent.drawNode(node: GraphingNode) {
-        if (!node.rendering) return
-        this.drawWaypointFilled(
-            node.position,
-            node.getNodeColor(),
-            seeThroughBlocks = seeThroughBlocks,
-            minimumAlpha = 0.2f,
-            inverseAlphaScale = true,
-        )
-
-        val nodeName = node.name ?: return
-        val showTextAlways = seeThroughBlocks || node.distanceSqToPlayer() < 100
-        this.drawDynamicText(
-            node.position,
-            nodeName,
-            0.8,
-            seeThroughBlocks = showTextAlways,
-            smallestDistanceVew = 12.0,
-            ignoreY = true,
-            yOff = -15f,
-            maxDistance = 80,
-        )
-
-        val tags = node.tags
-        if (tags.isEmpty()) return
-        val tagText = tags.joinToString(" §f+ ") { it.displayName }
-        this.drawDynamicText(
-            node.position,
-            tagText,
-            0.8,
-            seeThroughBlocks = showTextAlways,
-            smallestDistanceVew = 12.0,
-            ignoreY = true,
-            yOff = 0f,
-            maxDistance = 80,
-        )
-    }
-
-    private fun SkyHanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {
-        if (!edge.node1.rendering && !edge.node2.rendering) return
-        val color = when {
-            selectedEdge == edge -> edgeSelectedColor
-            edge in highlightedEdges -> edgeDijkstraColor
-            else -> edgeColor
-        }
-
-        draw3DLine(
-            edge.node1.position.add(0.5, 0.5, 0.5),
-            edge.node2.position.add(0.5, 0.5, 0.5),
-            color,
-            7,
-            !seeThroughBlocks,
-        )
-        if (edge.direction != EdgeDirection.BOTH) {
-            drawDirection(edge, color)
-        }
-    }
-
-    private fun SkyHanniRenderWorldEvent.drawDirection(edge: GraphingEdge, color: Color) {
-        val lineVec = edge.node2.position - edge.node1.position
-        val center = edge.node1.position + lineVec / 2.0
-        val quad1 = edge.node1.position + lineVec / 4.0
-        val quad2 = edge.node1.position + lineVec * (3.0 / 4.0)
-
-        val pyramidSize =
-            lineVec.normalize().times(min(lineVec.length() / 10.0, 1.0)) * (if (edge.direction == EdgeDirection.ONE_TO_TWO) 1.0 else -1.0)
-
-        val lineOffsetVec = LorenzVec(0.5, 0.5, 0.5)
-
-        fun pyramidDraw(
-            pos: LorenzVec,
-        ) {
-            this.drawPyramid(
-                pos + lineOffsetVec + pyramidSize,
-                pos + lineOffsetVec,
-                pos.crossProduct(lineVec).normalize().times(pyramidSize.length() / 2.5) + pos + lineOffsetVec,
-                color,
-            )
-        }
-
-        pyramidDraw(center)
-        pyramidDraw(quad1)
-        pyramidDraw(quad2)
-    }
-
-    private fun GraphingNode.getNodeColor() = when (this) {
-        activeNode -> if (this == closestNode) ColorUtils.blendRGB(activeColor, closestColor, 0.5) else activeColor
-        closestNode -> closestColor
-        in highlightedNodes -> dijkstraColor
-        else -> nodeColor
     }
 
     @HandleEvent
@@ -759,8 +587,8 @@ object GraphEditor {
         selectedEdge = findEdgeBetweenActiveAndClosest()
     }
 
-    private val highlightedNodes = mutableSetOf<GraphingNode>()
-    private val highlightedEdges = mutableSetOf<GraphingEdge>()
+    val highlightedNodes = mutableSetOf<GraphingNode>()
+    val highlightedEdges = mutableSetOf<GraphingEdge>()
 
     private fun testDijkstra() {
 
