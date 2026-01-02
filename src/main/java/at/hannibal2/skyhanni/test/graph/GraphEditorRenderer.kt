@@ -76,7 +76,7 @@ object GraphEditorRenderer {
             add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
             add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
             add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
-            GraphEditor.addUndoRedo(this)
+            GraphEditorHistory.addDisplayLines(this)
             add(" ")
             if (activeNode != null) {
                 add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")

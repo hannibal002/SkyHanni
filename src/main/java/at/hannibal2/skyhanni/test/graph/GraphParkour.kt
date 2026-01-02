@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.graph.GraphEditor.isEnabled
-import at.hannibal2.skyhanni.test.graph.GraphEditor.saveState
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -144,7 +143,7 @@ object GraphParkour {
         val locations = readListFromClipboard() ?: return
         val graph = listToGraph(locations)
         GraphEditor.enable()
-        saveState("load parkour")
+        GraphEditorHistory.save("load parkour")
         GraphEditor.state = GraphEditorIO.createStateFrom(graph)
         IslandGraphs.pathFind(
             locations.first(),

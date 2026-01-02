@@ -19,9 +19,10 @@ object GraphEditorNodeOperations {
         val closestNode = state.closestNode
         if (closestNode != null && closestNode.distanceSqToPlayer() < 9.0 && closestNode == state.activeNode) {
             GraphEditor.feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
-            GraphEditor.saveState("added node")
+            GraphEditorHistory.save("removed node")
             nodes.remove(closestNode)
             edges.removeIf { it.isInEdge(closestNode) }
+            GraphEditor.updateCache()
             if (closestNode == state.activeNode) state.activeNode = null
             state.closestNode = null
             return
@@ -32,7 +33,7 @@ object GraphEditorNodeOperations {
             return
         }
         val node = GraphingNode(state.id++, playerPosition)
-        GraphEditor.saveState("add node")
+        GraphEditorHistory.save("added node")
         nodes.add(node)
         GraphEditor.feedBackInTutorial("Added graph node.")
         state.activeNode?.let {
@@ -65,7 +66,7 @@ object GraphEditorNodeOperations {
         val neighbors2 = edge2.getOther(activeNode)
 
         val direction = getDirection(edge1, edge2, neighbors1, activeNode, neighbors2)
-        GraphEditor.saveState("dissolved node")
+        GraphEditorHistory.save("dissolved node")
         edges.removeAll(edgePair)
         nodes.remove(activeNode)
         state.activeNode = null
@@ -95,11 +96,11 @@ object GraphEditorNodeOperations {
         if (state.activeNode == state.closestNode || !config.connectKey.isKeyClicked()) return
         val edge = GraphEditor.state.getEdgeIndex(state.activeNode, state.closestNode)
         if (edge == null) {
-            GraphEditor.saveState("added edge")
+            GraphEditorHistory.save("added edge")
             addEdge(state.activeNode, state.closestNode)
             GraphEditor.feedBackInTutorial("Added new edge.")
         } else {
-            GraphEditor.saveState("removed edge")
+            GraphEditorHistory.save("removed edge")
             edges.removeAt(edge)
             state.checkDissolve()
             state.selectedEdge = GraphEditor.state.findEdgeBetweenActiveAndClosest()

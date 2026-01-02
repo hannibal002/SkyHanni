@@ -91,7 +91,7 @@ object GraphEditorInput {
 
     private fun handleEdgeCycle(selectedEdge: GraphingEdge) {
         if (!config.edgeCycle.isKeyClicked()) return
-        GraphEditor.saveState("cycled direction")
+        GraphEditorHistory.save("cycled direction")
         selectedEdge.cycleDirection(state.activeNode)
         GraphEditor.feedBackInTutorial("Cycled Direction to: ${selectedEdge.cycleText(state.activeNode)}")
     }
@@ -101,7 +101,7 @@ object GraphEditorInput {
         GraphEditor.feedBackInTutorial("Split Edge into a Node and two edges.")
         val middle = selectedEdge.node1.position.middle(selectedEdge.node2.position).roundToBlock()
         val node = GraphingNode(state.id++, middle)
-        GraphEditor.saveState("split node")
+        GraphEditorHistory.save("split node")
         nodes.add(node)
         edges.remove(selectedEdge)
         GraphEditorNodeOperations.addEdge(selectedEdge.node1, node, selectedEdge.direction)
@@ -139,11 +139,11 @@ object GraphEditorInput {
     private fun handleUndoRedo(): Boolean {
         if (Minecraft.getInstance().screen == null) {
             if (GLFW.GLFW_KEY_Y.isKeyClicked() && KeyboardManager.isControlKeyDown()) {
-                GraphEditor.undo()
+                GraphEditorHistory.undo()
                 return true
             }
             if (GLFW.GLFW_KEY_Z.isKeyClicked() && KeyboardManager.isControlKeyDown()) {
-                GraphEditor.redo()
+                GraphEditorHistory.redo()
                 return true
             }
         }
@@ -185,7 +185,7 @@ object GraphEditorInput {
                 val newState = GraphEditorIO.createStateFrom(graph)
 
                 Minecraft.getInstance().execute {
-                    GraphEditor.saveState("load from clipboard")
+                    GraphEditorHistory.save("load from clipboard")
                     GraphEditor.state = newState
                     ChatUtils.chat("Loaded Graph from clipboard.")
                 }
@@ -210,7 +210,7 @@ object GraphEditorInput {
 
             // Check if name got changed
             if (activeNode != null && activeNode.name != newText) {
-                GraphEditor.saveState("renamed node")
+                GraphEditorHistory.save("renamed node")
                 activeNode.name = newText
             }
 
@@ -259,7 +259,7 @@ object GraphEditorInput {
             }.filterNotNull(),
         )
 
-        GraphEditor.saveState("help when is this")
+        GraphEditorHistory.save("help when is this")
         GraphEditor.state = newState
     }
 
@@ -276,7 +276,7 @@ object GraphEditorInput {
 
     private fun KeyMapping.handleEditClicks(vector: LorenzVec) {
         if (!this.key.value.isKeyClicked()) return
-        GraphEditor.saveState("moved node")
+        GraphEditorHistory.save("moved node")
         state.activeNode?.let {
             it.position += vector
         }
