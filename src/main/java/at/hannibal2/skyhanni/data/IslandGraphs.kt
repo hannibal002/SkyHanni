@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * TODO
@@ -126,6 +127,10 @@ object IslandGraphs {
 
     var closestNode: GraphNode? = null
         private set
+
+    private var cachedNearbyNodes = listOf<GraphNode>()
+    private var lastCacheUpdate = SimpleTimeMark.farPast()
+
 
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
@@ -302,6 +307,7 @@ object IslandGraphs {
     private fun reset() {
         stop()
         closestNode = null
+        cachedNearbyNodes = emptyList()
     }
 
     /**
@@ -341,7 +347,13 @@ object IslandGraphs {
         }
 
         val graph = currentIslandGraph ?: return
-        val newClosest = graph.getNearestNode()
+
+        // Update cache every second for normal movement
+        if (lastCacheUpdate.passedSince() > 1.seconds) {
+            updateClosestCache(graph)
+        }
+
+        val newClosest = cachedNearbyNodes.minByOrNull { it.distanceSqToPlayer() } ?: return
         if (closestNode == newClosest) return
         val newPath = !onCurrentPath()
 
@@ -350,6 +362,11 @@ object IslandGraphs {
         if (newPath) {
             findNewPath()
         }
+    }
+
+    private fun updateClosestCache(graph: Graph) {
+        cachedNearbyNodes = graph.sortedBy { it.distanceSqToPlayer() }.take(20)
+        lastCacheUpdate = SimpleTimeMark.now()
     }
 
     private fun onCurrentPath(): Boolean {
@@ -411,8 +428,12 @@ object IslandGraphs {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        if (currentIslandGraph != null && event.isLocalPlayer) {
-            hasMoved = true
+        val graph = currentIslandGraph
+        if (graph == null || !event.isLocalPlayer) return
+        hasMoved = true
+
+        if (event.distance > 20) {
+            updateClosestCache(graph)
         }
     }
 
