@@ -72,7 +72,7 @@ object IslandAreaFeatures {
         val name = event.area
         val inAnArea = name != "no_area"
         // when this is a small area move and small areas are disabled via config
-        if (!config.includeSmallAreas && (name in smallAreas || event.previousArea in smallAreas)) return
+        if (!config.includeSmallAreas && name in smallAreas) return
 
         oldTitle?.stop()
         if (event.onlyInternal) return
