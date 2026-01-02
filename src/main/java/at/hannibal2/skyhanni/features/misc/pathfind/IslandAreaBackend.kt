@@ -39,7 +39,7 @@ object IslandAreaBackend {
         areaNodes = emptyList()
         IslandAreaFeatures.reset()
         hasMoved = true
-        updateArea("no_area", onlyInternal = true)
+        updateArea(AreaNode.NO_AREA, onlyInternal = true)
     }
 
     fun nodeMoved() {

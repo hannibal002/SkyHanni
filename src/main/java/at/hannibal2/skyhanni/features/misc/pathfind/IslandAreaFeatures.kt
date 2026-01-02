@@ -70,7 +70,7 @@ object IslandAreaFeatures {
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
         val name = event.area
-        val inAnArea = name != "no_area"
+        val inAnArea = name != AreaNode.NO_AREA
         // when this is a small area move and small areas are disabled via config
         if (!config.includeSmallAreas && name in smallAreas) return
 

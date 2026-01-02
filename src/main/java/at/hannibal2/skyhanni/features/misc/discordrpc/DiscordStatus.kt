@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
@@ -107,7 +108,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                     else "Visiting a Garden"
                 }
 
-                else -> location.takeIf { it != "None" && it != "invalid" && it != "no_area" }
+                else -> location.takeIf { it != "None" && it != "invalid" && it != AreaNode.NO_AREA }
                     ?: lastKnownDisplayStrings[LOCATION].orEmpty()
             }
             // Only display None if we don't have a last known area

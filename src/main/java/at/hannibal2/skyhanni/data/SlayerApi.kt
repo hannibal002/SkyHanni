@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
+import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -259,7 +260,7 @@ object SlayerApi {
         -> Type.VOID
 
         "Dragon's Nest" -> if (trackerConfig.voidgloomInNest && IslandType.THE_END.isCurrent()) Type.VOID else null
-        "no_area" -> if (trackerConfig.voidgloomInNoArea && IslandType.THE_END.isCurrent()) Type.VOID else null
+        AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea && IslandType.THE_END.isCurrent()) Type.VOID else null
 
         "Stronghold",
         "The Wasteland",
