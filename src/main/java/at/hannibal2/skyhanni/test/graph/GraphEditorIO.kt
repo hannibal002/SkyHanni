@@ -23,25 +23,33 @@ object GraphEditorIO {
 
     fun compileGraph(): Graph {
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
-        val nodes = nodes.mapIndexed { index, node ->
+        val compiledNodes = nodes.mapIndexed { index, node ->
             GraphNode(
                 index,
                 node.position,
                 node.name,
-                node.tags.map {
-                    it.internalName
-                },
+                node.tags.map { it.internalName },
             )
         }
-        val neighbours = GraphEditor.nodes.map { node ->
-            edges.filter { it.isInEdge(node) && it.isValidDirectionFrom(node) }.map { edge ->
+
+        val edgesByNode = nodes.associateWith { node ->
+            edges.filter { it.isInEdge(node) && it.isValidDirectionFrom(node) }
+        }
+
+        val neighbours = nodes.map { node ->
+            val nodeEdges = edgesByNode[node] ?: emptyList()
+
+            nodeEdges.map { edge ->
                 val otherNode = if (node == edge.node1) edge.node2 else edge.node1
                 val index = indexedTable[otherNode.id] ?: error("Invalid node ID ${otherNode.id} referenced in edge")
-                nodes[index] to node.position.distance(otherNode.position)
+                compiledNodes[index] to node.position.distance(otherNode.position)
             }.sortedBy { it.second }
         }
-        nodes.forEachIndexed { index, node -> node.neighbours = neighbours[index].toMap() }
-        return Graph(nodes)
+
+        compiledNodes.forEachIndexed { index, node ->
+            node.neighbours = neighbours[index].toMap()
+        }
+        return Graph(compiledNodes)
     }
 
     fun import(graph: Graph) {
