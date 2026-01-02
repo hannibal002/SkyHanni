@@ -100,22 +100,12 @@ object IslandAreas {
 
     // updating the position (mandatory for all other features), and builds the display (optionally)
     fun update(shouldBuildDisplay: Boolean = true) {
-        var foundCurrentArea = false
-        for ((node, _) in nodes) {
-
-            val name = node.name ?: continue
-
-            val isConfigVisible = node.getAreaTag(useConfig = true) != null
-            if (!foundCurrentArea) {
-                foundCurrentArea = true
-
-                updateArea(name, onlyInternal = !isConfigVisible)
-                continue
+        nodes.keys
+            .firstOrNull { it.name != null }
+            ?.let { node ->
+                val isConfigVisible = node.getAreaTag(useConfig = true) != null
+                updateArea(node.name!!, onlyInternal = !isConfigVisible)
             }
-
-            if (name == "no_area") continue
-            if (!isConfigVisible) continue
-        }
 
         if (shouldBuildDisplay) {
             IslandAreaFeatures.redraw()

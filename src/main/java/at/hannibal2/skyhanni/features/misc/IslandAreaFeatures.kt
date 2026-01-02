@@ -148,56 +148,61 @@ object IslandAreaFeatures {
     }
 
     fun redraw() {
-        var foundCurrentArea = false
-        var foundAreas = 0
-        val buildDisplay = mutableListOf<Searchable>()
-        for ((node, difference) in nodes) {
-            val tag = node.getAreaTag() ?: continue
+        display = createDisplay()?.buildSearchBox(textInput)
+    }
 
-            val name = node.name ?: continue
-            // can not compare nodes directly. By using names, we also accept other nodes
-            val isTarget = node.name == targetNode?.name
-            val color = if (isTarget) LorenzColor.GOLD else tag.color
-
-            val coloredName = "${color.getChatColor()}$name"
-
-            val distance = difference.roundTo(0).toInt()
-            val text = "$coloredName§7: §e$distance"
-
-            val isConfigVisible = node.getAreaTag(useConfig = true) != null
-            if (!foundCurrentArea) {
-                foundCurrentArea = true
-
-                val inAnArea = name != "no_area" && isConfigVisible
-                if (areaListConfig.includeCurrentArea.get()) {
-                    if (inAnArea) {
-                        buildDisplay.addSearchString("§eCurrent area: $coloredName")
-                    } else {
-                        buildDisplay.addSearchString("§7Not in an area.")
-                    }
-                }
-
-                buildDisplay.addSearchString("§eAreas nearby:")
-                continue
-            }
-
-            if (name == "no_area") continue
-            if (!isConfigVisible) continue
-            foundAreas++
-
-            buildDisplay.add(build(text, tag, node.name, distance, node, name))
+    fun createDisplay(): List<Searchable> = buildList {
+        val validNodes = nodes.entries.filter { (node, _) ->
+            node.name != null && node.getAreaTag() != null
         }
-        if (foundAreas == 0) {
-            val islandName = SkyBlockUtils.currentIsland.displayName
-            if (foundCurrentArea) {
-                buildDisplay.addSearchString("§cThere is only one area in $islandName,")
-                buildDisplay.addSearchString("§cnothing else to navigate to!")
+
+        if (validNodes.isEmpty()) {
+            addSearchString("§cThere is no ${SkyBlockUtils.currentIsland.displayName} area data available yet!")
+            return@buildList
+
+        }
+
+        val firstEntry = validNodes.first()
+        val nearbyEntries = validNodes.drop(1)
+
+        // Current area
+        val (currentNode, _) = firstEntry
+        val currentName = currentNode.name ?: error("impossible")
+        val currentTag = currentNode.getAreaTag() ?: error("impossible")
+
+        if (areaListConfig.includeCurrentArea.get()) {
+            val isConfigVisible = currentNode.getAreaTag(useConfig = true) != null
+            val inAnArea = currentName != "no_area" && isConfigVisible
+
+            if (inAnArea) {
+                val color = currentTag.color.getChatColor()
+                addSearchString("§eCurrent area: $color$currentName")
             } else {
-                buildDisplay.addSearchString("§cThere is no $islandName area data available yet!")
+                addSearchString("§7Not in an area.")
             }
         }
-        buildDisplay.let {
-            display = it.buildSearchBox(textInput)
+        addSearchString("§eAreas nearby:")
+
+        val visibleNearby = nearbyEntries.filter { (node, _) ->
+            node.name != "no_area" && node.getAreaTag(useConfig = true) != null
+        }
+
+        visibleNearby.forEach { (node, difference) ->
+            val name = node.name ?: error("impossible")
+            val tag = node.getAreaTag() ?: error("impossible")
+
+            val isTarget = name == targetNode?.name
+            val color = if (isTarget) LorenzColor.GOLD else tag.color
+            val coloredName = "${color.getChatColor()}$name"
+            val distance = difference.roundTo(0).toInt()
+
+            add(build("$coloredName§7: §e$distance", tag, name, distance, node, name))
+        }
+
+        if (visibleNearby.isEmpty()) {
+            val islandName = SkyBlockUtils.currentIsland.displayName
+            addSearchString("§cThere is only one area in $islandName,")
+            addSearchString("§cnothing else to navigate to!")
         }
     }
 
