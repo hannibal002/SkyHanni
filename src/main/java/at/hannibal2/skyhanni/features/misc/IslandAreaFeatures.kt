@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas.getAreaTag
+import at.hannibal2.skyhanni.features.misc.navigation.AreaNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -37,11 +38,11 @@ object IslandAreaFeatures {
     var smallAreas = setOf<String>()
 
     private val areaListConfig get() = config.areasList
-    private var nodes = mapOf<GraphNode, Double>()
 
     var display: Renderable? = null
     private var targetNode: GraphNode? = null
     private val textInput = SearchTextInput()
+    private var areaNodes = listOf<AreaNode>()
 
     private fun setTarget(node: GraphNode) {
         targetNode = node
@@ -85,7 +86,7 @@ object IslandAreaFeatures {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showInWorld) return
-        for ((node, _) in nodes) {
+        for ((node, _) in areaNodes) {
             val name = node.name ?: continue
             if (name == SkyBlockUtils.graphArea) continue
             if (name == "no_area") continue
@@ -142,85 +143,63 @@ object IslandAreaFeatures {
 
     private fun isEnabled() = IslandGraphs.currentIslandGraph != null
 
-    fun updateNodes(nodes: MutableMap<GraphNode, Double>) {
-        this.nodes = nodes
-        smallAreas = nodes.filter { GraphNodeTag.SMALL_AREA in it.key.tags }.mapNotNull { it.key.name }.toSet()
+    fun updateNodes(nodes: List<AreaNode>) {
+        areaNodes = nodes
+        smallAreas = nodes
+            .filter { GraphNodeTag.SMALL_AREA in it.node.tags }
+            .map { it.name }
+            .toSet()
     }
 
     fun redraw() {
         display = createDisplay()?.buildSearchBox(textInput)
     }
 
-    fun createDisplay(): List<Searchable> = buildList {
-        val validNodes = nodes.entries.filter { (node, _) ->
-            node.name != null && node.getAreaTag() != null
-        }
 
-        if (validNodes.isEmpty()) {
+    fun createDisplay(): List<Searchable> = buildList {
+        if (areaNodes.isEmpty()) {
             addSearchString("§cThere is no ${SkyBlockUtils.currentIsland.displayName} area data available yet!")
             return@buildList
-
         }
 
-        val firstEntry = validNodes.first()
-        val nearbyEntries = validNodes.drop(1)
-
-        // Current area
-        val (currentNode, _) = firstEntry
-        val currentName = currentNode.name ?: error("impossible")
-        val currentTag = currentNode.getAreaTag() ?: error("impossible")
+        val current = areaNodes.first()
+        val nearby = areaNodes.drop(1)
 
         if (areaListConfig.includeCurrentArea.get()) {
-            val isConfigVisible = currentNode.getAreaTag(useConfig = true) != null
-            val inAnArea = currentName != "no_area" && isConfigVisible
-
-            if (inAnArea) {
-                val color = currentTag.color.getChatColor()
-                addSearchString("§eCurrent area: $color$currentName")
+            if (!current.isNoArea && current.isConfigVisible) {
+                addSearchString("§eCurrent area: ${current.tag.color.getChatColor()}${current.name}")
             } else {
                 addSearchString("§7Not in an area.")
             }
         }
+
         addSearchString("§eAreas nearby:")
 
-        val visibleNearby = nearbyEntries.filter { (node, _) ->
-            node.name != "no_area" && node.getAreaTag(useConfig = true) != null
-        }
+        val visibleNearby = nearby.filter { !it.isNoArea && it.isConfigVisible }
 
-        visibleNearby.forEach { (node, difference) ->
-            val name = node.name ?: error("impossible")
-            val tag = node.getAreaTag() ?: error("impossible")
+        for (area in visibleNearby) {
+            val isTarget = area.name == targetNode?.name
+            val color = if (isTarget) LorenzColor.GOLD else area.tag.color
+            val coloredName = "${color.getChatColor()}${area.name}"
+            val distance = area.distance.roundTo(0).toInt()
 
-            val isTarget = name == targetNode?.name
-            val color = if (isTarget) LorenzColor.GOLD else tag.color
-            val coloredName = "${color.getChatColor()}$name"
-            val distance = difference.roundTo(0).toInt()
-
-            add(build("$coloredName§7: §e$distance", tag, name, distance, node, name))
+            add(buildAreaEntry(coloredName, area, distance))
         }
 
         if (visibleNearby.isEmpty()) {
-            val islandName = SkyBlockUtils.currentIsland.displayName
-            addSearchString("§cThere is only one area in $islandName,")
+            addSearchString("§cThere is only one area in ${SkyBlockUtils.currentIsland.displayName},")
             addSearchString("§cnothing else to navigate to!")
         }
     }
 
-    private fun build(
-        text: String,
-        tag: GraphNodeTag,
-        name: String,
-        distance: Int,
-        node: GraphNode,
-        name2: String,
-    ): Searchable = Renderable.clickable(
-        text,
+    private fun buildAreaEntry(displayText: String, area: AreaNode, distance: Int): Searchable = Renderable.clickable(
+        "$displayText§7: §e$distance",
         tips = buildList {
-            add(tag.color.getChatColor() + name)
-            add("§7Type: ${tag.displayName}")
+            add("${area.tag.color.getChatColor()}${area.name}")
+            add("§7Type: ${area.tag.displayName}")
             add("§7Distance: §e$distance blocks")
             add("")
-            if (node == targetNode) {
+            if (area.node == targetNode) {
                 add("§aPath Finder points to this!")
                 add("")
                 add("§eClick to disable!")
@@ -229,13 +208,13 @@ object IslandAreaFeatures {
             }
         },
         onLeftClick = {
-            if (node == targetNode) {
+            if (area.node == targetNode) {
                 targetNode = null
                 IslandGraphs.stop()
                 update()
             } else {
-                setTarget(node)
+                setTarget(area.node)
             }
         },
-    ).toSearchable(name2)
+    ).toSearchable(area.name)
 }

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.skyhanni.features.misc.navigation.AreaNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -28,7 +29,7 @@ object IslandAreas {
 
     private val areaListConfig get() = config.areasList
 
-    var nodes = mapOf<GraphNode, Double>()
+    var areaNodes = listOf<AreaNode>()
     private var paths = mapOf<GraphNode, Graph>()
     private var nodeSaveJob: Job? = null
     private val nodeSaveMutex = Mutex()
@@ -38,7 +39,7 @@ object IslandAreas {
 
     @HandleEvent
     fun onWorldChange() {
-        nodes = emptyMap()
+        areaNodes = emptyList()
         IslandAreaFeatures.reset()
         hasMoved = true
         updateArea("no_area", onlyInternal = true)
@@ -59,18 +60,16 @@ object IslandAreas {
         val (paths, map) = GraphUtils.findFastestPaths(graph, closestNode) { it.getAreaTag() != null }
         this.paths = paths
 
-        val finalNodes = mutableMapOf<GraphNode, Double>()
-        val alreadyFoundAreas = mutableListOf<String>()
-        for ((node, distance) in map.sorted()) {
-            val areaName = node.name ?: continue
-            if (areaName in alreadyFoundAreas) continue
-            alreadyFoundAreas.add(areaName)
-
-            finalNodes[node] = distance
+        val alreadyFoundAreas = mutableSetOf<String>()
+        val areaNodes = map.sorted().mapNotNull { (node, distance) ->
+            val name = node.name?.takeIf { it !in alreadyFoundAreas } ?: return@mapNotNull null
+            val tag = node.getAreaTag() ?: return@mapNotNull null
+            alreadyFoundAreas += name
+            AreaNode(node, name, tag, distance)
         }
 
-        nodes = finalNodes
-        IslandAreaFeatures.updateNodes(finalNodes)
+        this.areaNodes = areaNodes
+        IslandAreaFeatures.updateNodes(areaNodes)
     }
 
     private var hasMoved = false
@@ -100,12 +99,9 @@ object IslandAreas {
 
     // updating the position (mandatory for all other features), and builds the display (optionally)
     fun update(shouldBuildDisplay: Boolean = true) {
-        nodes.keys
-            .firstOrNull { it.name != null }
-            ?.let { node ->
-                val isConfigVisible = node.getAreaTag(useConfig = true) != null
-                updateArea(node.name!!, onlyInternal = !isConfigVisible)
-            }
+        areaNodes.firstOrNull()?.let { area ->
+            updateArea(area.name, onlyInternal = !area.isConfigVisible)
+        }
 
         if (shouldBuildDisplay) {
             IslandAreaFeatures.redraw()
