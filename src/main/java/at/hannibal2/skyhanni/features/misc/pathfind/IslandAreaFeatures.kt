@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -32,6 +33,7 @@ import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object IslandAreaFeatures {
@@ -65,6 +67,7 @@ object IslandAreaFeatures {
     }
 
     var currentTitle: TitleContext? = null
+    private var lastTitleTime = SimpleTimeMark.farPast()
 
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
@@ -75,9 +78,11 @@ object IslandAreaFeatures {
 
         currentTitle?.stop()
         if (event.onlyInternal) return
-        if (inAnArea && config.enterTitle) {
-            currentTitle = TitleManager.sendTitle("§aEntered $name!")
-        }
+        if (!inAnArea || !config.enterTitle) return
+        if (lastTitleTime.passedSince() < 2.seconds) return
+
+        currentTitle = TitleManager.sendTitle("§aEntered $name!")
+        lastTitleTime = SimpleTimeMark.now()
     }
 
 
