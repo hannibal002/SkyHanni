@@ -56,7 +56,7 @@ object GraphNodeEditor {
         return nodesDisplay
     }
 
-    private fun updateNodeNames() {
+    fun updateNodeNames() {
         lastUpdate = SimpleTimeMark.now()
         nodesDisplay = buildList {
             val list = drawNodeNames()

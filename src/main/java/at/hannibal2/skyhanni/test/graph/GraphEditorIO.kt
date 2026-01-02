@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.graph.GraphEditor.saveState
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -139,6 +140,7 @@ object GraphEditorIO {
             }
         }
         GraphEditor.enable()
+        saveState("load island ${IslandGraphs.lastLoadedIslandType}")
         GraphEditor.state = createStateFrom(graph)
         ChatUtils.chat("Graph Editor loaded this island!")
     }

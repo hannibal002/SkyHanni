@@ -103,7 +103,7 @@ object IslandGraphs {
 
     var currentIslandGraph: Graph? = null
         private set
-    private var lastLoadedIslandType = "nothing"
+    var lastLoadedIslandType = "nothing"
     private var lastLoadedTime = SimpleTimeMark.farPast()
 
     var disabledNodesReason: String? = null

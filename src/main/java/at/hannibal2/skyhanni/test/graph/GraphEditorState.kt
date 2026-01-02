@@ -64,4 +64,47 @@ class GraphEditorState {
         }
         dissolvePossible = edges.count { it.isInEdge(active) } == 2
     }
+
+    fun copy(): GraphEditorState {
+        val newState = GraphEditorState()
+
+        newState.id = this.id
+        newState.dissolvePossible = this.dissolvePossible
+        newState.seeThroughBlocks = this.seeThroughBlocks
+        newState.inEditMode = this.inEditMode
+        newState.inTutorialMode = this.inTutorialMode
+        newState.textBox.textBox = this.textBox.textBox
+
+        val nodeMap = mutableMapOf<GraphingNode, GraphingNode>()
+
+        for (oldNode in this.nodes) {
+            val newNode = GraphingNode(
+                oldNode.id,
+                oldNode.position.copy(),
+                oldNode.name,
+                ArrayList(oldNode.tags),
+            )
+            newState.nodes.add(newNode)
+            nodeMap[oldNode] = newNode
+        }
+
+        for (oldEdge in this.edges) {
+            val n1 = nodeMap[oldEdge.node1]!!
+            val n2 = nodeMap[oldEdge.node2]!!
+            val newEdge = GraphingEdge(n1, n2, oldEdge.direction)
+            newState.edges.add(newEdge)
+        }
+
+        newState.activeNode = this.activeNode?.let { nodeMap[it] }
+        newState.closestNode = this.closestNode?.let { nodeMap[it] }
+
+        val selectedIndex = this.edges.indexOf(this.selectedEdge)
+        if (selectedIndex != -1) {
+            newState.selectedEdge = newState.edges[selectedIndex]
+        }
+
+        this.highlightedNodes.mapNotNullTo(newState.highlightedNodes) { nodeMap[it] }
+
+        return newState
+    }
 }

@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
+import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object GraphEditorInput {
@@ -36,6 +37,8 @@ object GraphEditorInput {
     private val selectedEdge get() = state.selectedEdge
 
     fun input() {
+        if (handleUndoRedo()) return
+
         if (isAnyGuiActive()) return
         if (handleExit()) return
         if (handleTextMode()) return
@@ -88,6 +91,7 @@ object GraphEditorInput {
 
     private fun handleEdgeCycle(selectedEdge: GraphingEdge) {
         if (!config.edgeCycle.isKeyClicked()) return
+        GraphEditor.saveState("cycled direction")
         selectedEdge.cycleDirection(state.activeNode)
         GraphEditor.feedBackInTutorial("Cycled Direction to: ${selectedEdge.cycleText(state.activeNode)}")
     }
@@ -97,6 +101,7 @@ object GraphEditorInput {
         GraphEditor.feedBackInTutorial("Split Edge into a Node and two edges.")
         val middle = selectedEdge.node1.position.middle(selectedEdge.node2.position).roundToBlock()
         val node = GraphingNode(state.id++, middle)
+        GraphEditor.saveState("split node")
         nodes.add(node)
         edges.remove(selectedEdge)
         GraphEditorNodeOperations.addEdge(selectedEdge.node1, node, selectedEdge.direction)
@@ -129,6 +134,20 @@ object GraphEditorInput {
             GraphEditor.feedBackInTutorial("Selected new active node.")
             closestNode
         }
+    }
+
+    private fun handleUndoRedo(): Boolean {
+        if (Minecraft.getInstance().screen == null) {
+            if (GLFW.GLFW_KEY_Y.isKeyClicked() && KeyboardManager.isControlKeyDown()) {
+                GraphEditor.undo()
+                return true
+            }
+            if (GLFW.GLFW_KEY_Z.isKeyClicked() && KeyboardManager.isControlKeyDown()) {
+                GraphEditor.redo()
+                return true
+            }
+        }
+        return false
     }
 
     private fun handleRayCast() {
@@ -166,6 +185,7 @@ object GraphEditorInput {
                 val newState = GraphEditorIO.createStateFrom(graph)
 
                 Minecraft.getInstance().execute {
+                    GraphEditor.saveState("load from clipboard")
                     GraphEditor.state = newState
                     ChatUtils.chat("Loaded Graph from clipboard.")
                 }
@@ -179,17 +199,24 @@ object GraphEditorInput {
     private fun handleTextMode(): Boolean {
         if (!state.inTextMode) return false
         textBox.handle()
-        val text = textBox.finalText()
-        state.activeNode?.name = text.ifEmpty { null }
         return true
     }
 
     private fun handleExit(): Boolean {
         if (!config.exitKey.isKeyClicked()) return false
         if (state.inTextMode) {
+            val newText = textBox.finalText().ifEmpty { null }
+            val activeNode = state.activeNode
+
+            // Check if name got changed
+            if (activeNode != null && activeNode.name != newText) {
+                GraphEditor.saveState("renamed node")
+                activeNode.name = newText
+            }
+
             state.inTextMode = false
             GraphEditor.feedBackInTutorial("Exited Text Mode.")
-            state.activeNode?.let {
+            activeNode?.let {
                 GraphEditorNodeOperations.handleNameShortcut(it.name)?.let { (tag, name) ->
                     it.tags.add(tag)
                     it.name = name
@@ -232,6 +259,7 @@ object GraphEditorInput {
             }.filterNotNull(),
         )
 
+        GraphEditor.saveState("help when is this")
         GraphEditor.state = newState
     }
 
@@ -248,6 +276,7 @@ object GraphEditorInput {
 
     private fun KeyMapping.handleEditClicks(vector: LorenzVec) {
         if (!this.key.value.isKeyClicked()) return
+        GraphEditor.saveState("moved node")
         state.activeNode?.let {
             it.position += vector
         }
