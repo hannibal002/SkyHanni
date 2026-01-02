@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.AreaNodesUpdatedEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend.getAreaTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -43,6 +44,7 @@ object IslandAreaFeatures {
     private var targetNode: GraphNode? = null
     private val textInput = SearchTextInput()
     private var areaNodes = listOf<AreaNode>()
+    private var visibleAreaNodes = listOf<AreaNode>()
 
     private fun setTarget(node: GraphNode) {
         targetNode = node
@@ -78,18 +80,27 @@ object IslandAreaFeatures {
         }
     }
 
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
+        if (!event.isMod(5)) return
+
+        if (!config.showInWorld) return
+        visibleAreaNodes = areaNodes.filter { area ->
+            !area.isInside &&
+                !area.isNoArea &&
+                area.isConfigVisible &&
+                area.node.position.canBeSeen(40.0)
+        }
+    }
+
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showInWorld) return
-        for (area in areaNodes) {
-            if (area.isInside) continue
-            if (area.isNoArea) continue
-            if (!area.isConfigVisible) continue
-
-            val position = area.node.position
-            if (!position.canBeSeen(40.0)) continue
-            event.drawDynamicText(position, area.coloredName, 1.5)
+        for (area in visibleAreaNodes) {
+            event.drawDynamicText(area.node.position, area.coloredName, 1.5)
         }
     }
 
