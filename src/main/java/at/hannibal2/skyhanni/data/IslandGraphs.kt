@@ -456,7 +456,10 @@ object IslandGraphs {
     }
 
     fun stop() {
-        currentTarget = null
+        if (currentTarget != null) {
+            NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
+            currentTarget = null
+        }
         goal = null
         fastestPath = null
         currentTargetNode = null
@@ -464,6 +467,7 @@ object IslandGraphs {
         totalDistance = 0.0
         lastDistance = 0.0
         NavigationFeedback.setNavInactive()
+
     }
 
     /**
@@ -560,7 +564,6 @@ object IslandGraphs {
     }
 
     fun cancelClick() {
-        NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
         stop()
         onManualCancel()
     }
@@ -648,7 +651,6 @@ object IslandGraphs {
             callback {
                 if (currentTarget != null) {
                     stop()
-                    NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
                 } else {
                     ChatUtils.userError("No navigation is currently active.")
                 }
