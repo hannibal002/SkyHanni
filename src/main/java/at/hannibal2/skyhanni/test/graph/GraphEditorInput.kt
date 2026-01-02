@@ -41,37 +41,9 @@ object GraphEditorInput {
 
     fun input() {
         if (isAnyGuiActive()) return
-        if (config.exitKey.isKeyClicked()) {
-            if (GraphEditor.inTextMode) {
-                GraphEditor.inTextMode = false
-                GraphEditor.feedBackInTutorial("Exited Text Mode.")
-                GraphEditor.activeNode?.let {
-                    handleNameShortcut(it.name)?.let { (tag, name) ->
-                        it.tags.add(tag)
-                        it.name = name
-                    }
-                }
-                return
-            }
-            if (GraphEditor.inEditMode) {
-                GraphEditor.inEditMode = false
-                GraphEditor.feedBackInTutorial("Exited Edit Mode.")
-                return
-            }
-            config.enabled = false
-            GraphEditor.chatAtDisable()
-        }
-        if (GraphEditor.inTextMode) {
-            textBox.handle()
-            val text = textBox.finalText()
-            activeNode?.name = text.ifEmpty { null }
-            return
-        }
-        if (activeNode != null && config.textKey.isKeyClicked()) {
-            GraphEditor.inTextMode = true
-            GraphEditor.feedBackInTutorial("Entered Text Mode.")
-            return
-        }
+        if (handleExit()) return
+        if (handleTextMode()) return
+        if (handleText()) return
         if (GraphEditor.inEditMode) {
             editModeClicks()
             GraphEditor.inEditMode = false
@@ -84,85 +56,15 @@ object GraphEditorInput {
             GraphEditorIO.save()
             return
         }
-        if (config.loadKey.isKeyClicked()) {
-            runBlocking {
-                OSUtils.readFromClipboard()?.let {
-                    try {
-                        Graph.fromJson(it)
-                    } catch (e: Exception) {
-                        ErrorManager.logErrorWithData(
-                            e,
-                            "Import of graph failed.",
-                            "json" to it,
-                            ignoreErrorCache = true,
-                        )
-                        null
-                    }
-                }?.let {
-                    GraphEditorIO.import(it)
-                    ChatUtils.chat("Loaded Graph from clip board.")
-                }
-            }
-            return
-        }
-        if (config.clearKey.isKeyClicked()) {
-            val json = GraphEditorIO.compileGraph().toJson()
-            OSUtils.copyToClipboard(json)
-            ChatUtils.chat("Copied Graph to Clipboard and cleared the graph.")
-            GraphEditor.clear()
-        }
+        if (handleLoad()) return
+        handleClear()
         if (config.placeKey.isKeyClicked()) {
             addNode()
         }
-        if (config.selectKey.isKeyClicked()) {
-            GraphEditor.activeNode = if (activeNode == closestNode) {
-                GraphEditor.feedBackInTutorial("De-selected active node.")
-                null
-            } else {
-                GraphEditor.feedBackInTutorial("Selected new active node.")
-                closestNode
-            }
-        }
-        if (config.selectRaycastKey.isKeyClicked()) {
-            val playerRay = RaycastUtils.createPlayerLookDirectionRay()
-            var minimumDistance = Double.MAX_VALUE
-            var minimumNode: GraphingNode? = null
-            for (node in nodes) {
-                val nodeCenterPosition = node.position.add(0.5, 0.5, 0.5)
-                val distance = RaycastUtils.findDistanceToRay(playerRay, nodeCenterPosition)
-                if (distance > minimumDistance) {
-                    continue
-                }
-                if (minimumDistance > 1.0) {
-                    minimumNode = node
-                    minimumDistance = distance
-                    continue
-                }
-                if (minimumNode == null || minimumNode.distanceSqToPlayer() > node.distanceSqToPlayer()) {
-                    minimumNode = node
-                    minimumDistance = distance
-                }
-            }
-            GraphEditor.activeNode = minimumNode
-        }
-        if (activeNode != closestNode && config.connectKey.isKeyClicked()) {
-            val edge = GraphEditor.getEdgeIndex(activeNode, closestNode)
-            if (edge == null) {
-                addEdge(activeNode, closestNode)
-                GraphEditor.feedBackInTutorial("Added new edge.")
-            } else {
-                edges.removeAt(edge)
-                GraphEditor.checkDissolve()
-                GraphEditor.selectedEdge = GraphEditor.findEdgeBetweenActiveAndClosest()
-                GraphEditor.feedBackInTutorial("Removed edge.")
-            }
-        }
-        if (config.throughBlocksKey.isKeyClicked()) {
-            GraphEditor.seeThroughBlocks = !GraphEditor.seeThroughBlocks
-            GraphEditor.feedBackInTutorial(
-                if (GraphEditor.seeThroughBlocks) "Graph is visible though walls." else "Graph is invisible behind walls.",
-            )
-        }
+        handleSelect()
+        handleRayCast()
+        handleConnect()
+        handleThroughtBlocks()
         if (config.dijkstraKey.isKeyClicked()) {
             GraphEditor.feedBackInTutorial("Calculated shortest route and cleared active node.")
             testDijkstra()
@@ -173,21 +75,72 @@ object GraphEditorInput {
         }
         val selectedEdge = selectedEdge
         if (selectedEdge != null) {
-            if (config.splitKey.isKeyClicked()) {
-                GraphEditor.feedBackInTutorial("Split Edge into a Node and two edges.")
-                val middle = selectedEdge.node1.position.middle(selectedEdge.node2.position).roundToBlock()
-                val node = GraphingNode(GraphEditor.id++, middle)
-                nodes.add(node)
-                edges.remove(selectedEdge)
-                addEdge(selectedEdge.node1, node, selectedEdge.direction)
-                addEdge(node, selectedEdge.node2, selectedEdge.direction)
-                GraphEditor.activeNode = node
-            }
-            if (config.edgeCycle.isKeyClicked()) {
-                selectedEdge.cycleDirection(activeNode)
-                GraphEditor.feedBackInTutorial("Cycled Direction to: ${selectedEdge.cycleText(activeNode)}")
+            handleSplit(selectedEdge)
+            handleEdgeCycle(selectedEdge)
+        }
+        handleDissolve()
+    }
+
+    private fun handleText(): Boolean {
+        if (activeNode != null && config.textKey.isKeyClicked()) {
+            GraphEditor.inTextMode = true
+            GraphEditor.feedBackInTutorial("Entered Text Mode.")
+            return true
+        }
+        return false
+    }
+
+    private fun handleEdgeCycle(selectedEdge: GraphingEdge) {
+        if (config.edgeCycle.isKeyClicked()) {
+            selectedEdge.cycleDirection(activeNode)
+            GraphEditor.feedBackInTutorial("Cycled Direction to: ${selectedEdge.cycleText(activeNode)}")
+        }
+    }
+
+    private fun handleSplit(selectedEdge: GraphingEdge) {
+        if (config.splitKey.isKeyClicked()) {
+            GraphEditor.feedBackInTutorial("Split Edge into a Node and two edges.")
+            val middle = selectedEdge.node1.position.middle(selectedEdge.node2.position).roundToBlock()
+            val node = GraphingNode(GraphEditor.id++, middle)
+            nodes.add(node)
+            edges.remove(selectedEdge)
+            addEdge(selectedEdge.node1, node, selectedEdge.direction)
+            addEdge(node, selectedEdge.node2, selectedEdge.direction)
+            GraphEditor.activeNode = node
+        }
+    }
+
+    private fun handleThroughtBlocks() {
+        if (config.throughBlocksKey.isKeyClicked()) {
+            GraphEditor.seeThroughBlocks = !GraphEditor.seeThroughBlocks
+            GraphEditor.feedBackInTutorial(
+                if (GraphEditor.seeThroughBlocks) "Graph is visible though walls." else "Graph is invisible behind walls.",
+            )
+        }
+    }
+
+    private fun handleClear() {
+        if (config.clearKey.isKeyClicked()) {
+            val json = GraphEditorIO.compileGraph().toJson()
+            OSUtils.copyToClipboard(json)
+            ChatUtils.chat("Copied Graph to Clipboard and cleared the graph.")
+            GraphEditor.clear()
+        }
+    }
+
+    private fun handleSelect() {
+        if (config.selectKey.isKeyClicked()) {
+            GraphEditor.activeNode = if (activeNode == closestNode) {
+                GraphEditor.feedBackInTutorial("De-selected active node.")
+                null
+            } else {
+                GraphEditor.feedBackInTutorial("Selected new active node.")
+                closestNode
             }
         }
+    }
+
+    private fun handleDissolve() {
         if (GraphEditor.dissolvePossible && config.dissolveKey.isKeyClicked()) {
             GraphEditor.feedBackInTutorial("Dissolved the node, now it is gone.")
             val edgePair = edges.filter { it.isInEdge(activeNode) }
@@ -214,6 +167,105 @@ object GraphEditorInput {
             GraphEditor.activeNode = null
             addEdge(neighbors1, neighbors2, direction)
         }
+    }
+
+    private fun handleConnect() {
+        if (activeNode != closestNode && config.connectKey.isKeyClicked()) {
+            val edge = GraphEditor.getEdgeIndex(activeNode, closestNode)
+            if (edge == null) {
+                addEdge(activeNode, closestNode)
+                GraphEditor.feedBackInTutorial("Added new edge.")
+            } else {
+                edges.removeAt(edge)
+                GraphEditor.checkDissolve()
+                GraphEditor.selectedEdge = GraphEditor.findEdgeBetweenActiveAndClosest()
+                GraphEditor.feedBackInTutorial("Removed edge.")
+            }
+        }
+    }
+
+    private fun handleRayCast() {
+        if (config.selectRaycastKey.isKeyClicked()) {
+            val playerRay = RaycastUtils.createPlayerLookDirectionRay()
+            var minimumDistance = Double.MAX_VALUE
+            var minimumNode: GraphingNode? = null
+            for (node in nodes) {
+                val nodeCenterPosition = node.position.add(0.5, 0.5, 0.5)
+                val distance = RaycastUtils.findDistanceToRay(playerRay, nodeCenterPosition)
+                if (distance > minimumDistance) {
+                    continue
+                }
+                if (minimumDistance > 1.0) {
+                    minimumNode = node
+                    minimumDistance = distance
+                    continue
+                }
+                if (minimumNode == null || minimumNode.distanceSqToPlayer() > node.distanceSqToPlayer()) {
+                    minimumNode = node
+                    minimumDistance = distance
+                }
+            }
+            GraphEditor.activeNode = minimumNode
+        }
+    }
+
+    private fun handleLoad(): Boolean {
+        if (config.loadKey.isKeyClicked()) {
+            runBlocking {
+                OSUtils.readFromClipboard()?.let {
+                    try {
+                        Graph.fromJson(it)
+                    } catch (e: Exception) {
+                        ErrorManager.logErrorWithData(
+                            e,
+                            "Import of graph failed.",
+                            "json" to it,
+                            ignoreErrorCache = true,
+                        )
+                        null
+                    }
+                }?.let {
+                    GraphEditorIO.import(it)
+                    ChatUtils.chat("Loaded Graph from clip board.")
+                }
+            }
+            return true
+        }
+        return false
+    }
+
+    private fun handleTextMode(): Boolean {
+        if (GraphEditor.inTextMode) {
+            textBox.handle()
+            val text = textBox.finalText()
+            activeNode?.name = text.ifEmpty { null }
+            return true
+        }
+        return false
+    }
+
+    private fun handleExit(): Boolean {
+        if (config.exitKey.isKeyClicked()) {
+            if (GraphEditor.inTextMode) {
+                GraphEditor.inTextMode = false
+                GraphEditor.feedBackInTutorial("Exited Text Mode.")
+                GraphEditor.activeNode?.let {
+                    handleNameShortcut(it.name)?.let { (tag, name) ->
+                        it.tags.add(tag)
+                        it.name = name
+                    }
+                }
+                return true
+            }
+            if (GraphEditor.inEditMode) {
+                GraphEditor.inEditMode = false
+                GraphEditor.feedBackInTutorial("Exited Edit Mode.")
+                return true
+            }
+            config.enabled = false
+            GraphEditor.chatAtDisable()
+        }
+        return false
     }
 
     private fun addNode() {
