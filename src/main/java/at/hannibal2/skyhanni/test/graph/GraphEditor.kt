@@ -86,12 +86,6 @@ object GraphEditor {
 
     val textBox = TextInput()
 
-    private val nodesAlreadyFound = mutableListOf<LorenzVec>()
-    private val nodesToFind: List<LorenzVec>
-        get() = IslandGraphs.currentIslandGraph?.map { it.position }?.filter { it !in nodesAlreadyFound }.orEmpty()
-    private var currentNodeToFind: LorenzVec? = null
-    var active = false
-
     var dissolvePossible = false
 
     fun findEdgeBetweenActiveAndClosest(): GraphingEdge? = getEdgeIndex(activeNode, closestNode)?.let { edges[it] }
@@ -119,59 +113,13 @@ object GraphEditor {
         }
         if (nodes.isEmpty()) return
         closestNode = nodes.getNearestNode()
-        handleAllNodeFind()
+        GraphEditorNodeFinder.handleAllNodeFind()
     }
 
     private fun updateRender() {
         val maxNodeDistance = config.maxNodeDistance * config.maxNodeDistance
         for (node in nodes) {
             node.rendering = node.distanceSqToPlayer() < maxNodeDistance
-        }
-    }
-
-    private fun handleAllNodeFind() {
-        if (!active) return
-
-        if (nodesToFind.isEmpty()) return
-        val closest = nodesToFind.getNearestToPlayer()
-        if (distanceSqToPlayer(closest) >= 9) return
-        nodesAlreadyFound.add(closest)
-
-        if (nodesToFind.isEmpty()) {
-            currentNodeToFind = null
-            ChatUtils.chat("Found all nodes on this island")
-            TitleManager.sendTitle("§eAll Found!")
-            active = false
-            return
-        }
-
-        calculateNewAllNodeFind()
-    }
-
-    fun calculateNewAllNodeFind(): LorenzVec {
-        val next = GraphUtils.findShortestDistancesOnCurrentIsland(nodesToFind).lastVisitedNode.position
-
-        val max = IslandGraphs.currentIslandGraph?.size ?: -1
-        val todo = nodesToFind.size
-        val done = max - todo
-        val percentage = (done.toDouble() / max.toDouble()) * 100
-        val node = GraphUtils.nearestNodeOnCurrentIsland(next)
-        node.pathFind(
-            "Progress: ${done.addSeparators()}/${max.addSeparators()} (${percentage.roundTo(2)}%)",
-            condition = { active },
-        )
-        currentNodeToFind = next
-        return next
-    }
-
-    private fun toggleFindAll() {
-        active = !active
-        if (active) {
-            nodesAlreadyFound.clear()
-            calculateNewAllNodeFind()
-            ChatUtils.chat("Graph navigation over all nodes started.")
-        } else {
-            ChatUtils.chat("Graph navigation over all nodes stopped.")
         }
     }
 
@@ -185,7 +133,7 @@ object GraphEditor {
         event.register("shgraphfindall") {
             description = "Navigate over the whole graph network"
             category = CommandCategory.DEVELOPER_TEST
-            callback { toggleFindAll() }
+            callback { GraphEditorNodeFinder.toggleFindAll() }
         }
         event.register("shgraphloadthisisland") {
             description = "Loads the current island data into the graph editor."
