@@ -32,7 +32,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 
 @SkyHanniModule
-object IslandAreaFeatures {//
+object IslandAreaFeatures {
     private val config get() = SkyHanniMod.feature.misc.navigation
     var smallAreas = setOf<String>()
 
@@ -195,7 +195,7 @@ object IslandAreaFeatures {//
         }
     }
 
-    private fun buildAreaEntry(displayText: String, area: AreaNode, distance: Int): Searchable = Renderable.Companion.clickable(
+    private fun buildAreaEntry(displayText: String, area: AreaNode, distance: Int): Searchable = Renderable.clickable(
         "$displayText§7: §e$distance",
         tips = buildList {
             add("${area.tag.color.getChatColor()}${area.name}")
