@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -29,7 +28,6 @@ object IslandAreaBackend {
     private val areaListConfig get() = config.areasList
 
     var areaNodes = listOf<AreaNode>()
-    private var paths = mapOf<GraphNode, Graph>()
     private var nodeSaveJob: Job? = null
     private val nodeSaveMutex = Mutex()
 
@@ -56,8 +54,7 @@ object IslandAreaBackend {
         val graph = IslandGraphs.currentIslandGraph ?: return
         val closestNode = IslandGraphs.closestNode ?: return
 
-        val (paths, map) = GraphUtils.findFastestPaths(graph, closestNode) { it.getAreaTag() != null }
-        this.paths = paths
+        val (_, map) = GraphUtils.findFastestPaths(graph, closestNode) { it.getAreaTag() != null }
 
         val alreadyFoundAreas = mutableSetOf<String>()
         this.areaNodes = map.sorted().mapNotNull { (node, distance) ->
@@ -95,13 +92,13 @@ object IslandAreaBackend {
         }
     }
 
-    // updating the position (mandatory for all other features), and builds the display (optionally)
+    // updating the position and asks island area features to redraw the list.
     fun update() {
         areaNodes.firstOrNull()?.let { area ->
             updateArea(area.name, onlyInternal = !area.isConfigVisible)
         }
 
-        IslandAreaFeatures.redraw()
+        IslandAreaFeatures.redrawList()
     }
 
     private fun updateArea(name: String, onlyInternal: Boolean) {

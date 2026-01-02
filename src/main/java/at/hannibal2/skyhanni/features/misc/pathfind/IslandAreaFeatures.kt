@@ -56,7 +56,7 @@ object IslandAreaFeatures {
                 update()
             },
             allowRerouting = true,
-            condition = ::isPathfinderEnabled,
+            condition = ::isAreaListEnabled,
         )
         update()
     }
@@ -100,8 +100,7 @@ object IslandAreaFeatures {
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onRenderOverlay() {
-        if (!isEnabled()) return
-        if (!isPathfinderEnabled()) return
+        if (!isAreaListEnabled()) return
         if (!areaListConfig.showAlways) return
         val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
         if (!isInOwnInventory) {
@@ -111,8 +110,7 @@ object IslandAreaFeatures {
 
     @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
     fun onBackgroundDraw() {
-        if (!isEnabled()) return
-        if (!isPathfinderEnabled()) return
+        if (!isAreaListEnabled()) return
         val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
         if (isInOwnInventory) {
             doRender()
@@ -139,9 +137,9 @@ object IslandAreaFeatures {
         targetNode = null
     }
 
-    private fun isPathfinderEnabled(): Boolean = areaListConfig.enabled.get()
+    private fun isAreaListEnabled(): Boolean = isEnabled() && areaListConfig.enabled.get()
 
-    private fun isEnabled() = IslandGraphs.currentIslandGraph != null
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && IslandGraphs.currentIslandGraph != null
 
     fun updateNodes(nodes: List<AreaNode>) {
         areaNodes = nodes
@@ -151,8 +149,8 @@ object IslandAreaFeatures {
             .toSet()
     }
 
-    fun redraw() {
-        if (!isPathfinderEnabled()) {
+    fun redrawList() {
+        if (!isAreaListEnabled()) {
             display = null
             return
         }
