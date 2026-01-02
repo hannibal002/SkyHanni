@@ -86,14 +86,13 @@ object IslandAreaFeatures {
         if (!isEnabled()) return
         if (!config.showInWorld) return
         for (area in areaNodes) {
-            if (area.name == SkyBlockUtils.graphArea) continue
+            if (area.isInside) continue
             if (area.isNoArea) continue
             if (!area.isConfigVisible) continue
 
             val position = area.node.position
             if (!position.canBeSeen(40.0)) continue
-            val name = area.tag.color.getChatColor() + area.name
-            event.drawDynamicText(position, name, 1.5)
+            event.drawDynamicText(position, area.coloredName, 1.5)
         }
     }
 
