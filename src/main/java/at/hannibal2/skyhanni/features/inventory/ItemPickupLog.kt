@@ -253,7 +253,7 @@ object ItemPickupLog {
     }
 
     private fun ItemStack.hash(): Int {
-        var displayName = this.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+        var displayName = this.hoverName.string.removeColor()
         shopPattern.matchMatcher(displayName) {
             displayName = group("itemName")
         }

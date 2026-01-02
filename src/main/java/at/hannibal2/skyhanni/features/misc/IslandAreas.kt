@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.Graph
@@ -42,7 +43,10 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object IslandAreas {
-    private val config get() = SkyHanniMod.feature.misc.areaNavigation
+    private val config get() = SkyHanniMod.feature.misc.navigation
+
+    // TODO all code that touches this config element should get moved into a new file "island areas features" or similar.
+    private val areaListConfig get() = config.areasList
 
     private var nodes = mapOf<GraphNode, Double>()
     private var paths = mapOf<GraphNode, Graph>()
@@ -112,12 +116,12 @@ object IslandAreas {
     fun onRenderOverlay() {
         if (!isEnabled()) return
         if (!isPathfinderEnabled()) return
-        if (!config.pathfinder.showAlways) return
+        if (!areaListConfig.showAlways) return
         val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
         if (isInOwnInventory) return
 
         display?.let {
-            config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")
+            areaListConfig.position.renderRenderable(it, posLabel = "Island Areas")
         }
     }
 
@@ -129,7 +133,7 @@ object IslandAreas {
         if (!isInOwnInventory) return
 
         display?.let {
-            config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")
+            areaListConfig.position.renderRenderable(it, posLabel = "Island Areas")
         }
     }
 
@@ -160,29 +164,15 @@ object IslandAreas {
 
             val coloredName = "${color.getChatColor()}$name"
 
-            var suffix = ""
-            paths[node]?.let { path ->
-                val passedAreas = path.filter { it.getAreaTag() != null }.map { it.name }.distinct().toMutableList()
-                passedAreas.remove(name)
-                passedAreas.remove(null)
-                passedAreas.remove("null")
-                passedAreas.remove(currentArea)
-                // so show areas needed to pass thorough
-                // TODO show this pass through in the /shnavigate command
-                if (passedAreas.isNotEmpty()) {
-//                     suffix = " §7${passedAreas.joinToString(", ")}"
-                }
-            }
-
             val distance = difference.roundTo(0).toInt()
-            val text = "$coloredName§7: §e$distance$suffix"
+            val text = "$coloredName§7: §e$distance"
 
             val isConfigVisible = node.getAreaTag(useConfig = true) != null
             if (!foundCurrentArea) {
                 foundCurrentArea = true
 
                 val inAnArea = name != "no_area" && isConfigVisible
-                if (config.pathfinder.includeCurrentArea.get()) {
+                if (areaListConfig.includeCurrentArea.get()) {
                     if (inAnArea) {
                         buildDisplay?.addSearchString("§eCurrent area: $coloredName")
                     } else {
@@ -263,8 +253,8 @@ object IslandAreas {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        if (!config.inWorld) return
-        for ((node, distance) in nodes) {
+        if (!config.showInWorld) return
+        for ((node, _) in nodes) {
             val name = node.name ?: continue
             if (name == currentArea) continue
             if (name == "no_area") continue
@@ -278,7 +268,7 @@ object IslandAreas {
 
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
-        with(config.pathfinder) {
+        with(areaListConfig) {
             ConditionalUtils.onToggle(color) {
                 targetNode?.let {
                     setTarget(it)
@@ -306,7 +296,7 @@ object IslandAreas {
         targetNode = node
         val tag = node.getAreaTag() ?: return
         val displayName = tag.color.getChatColor() + node.name
-        val color = config.pathfinder.color.get().toColor()
+        val color = areaListConfig.color.get().toColor()
         node.pathFind(
             displayName,
             color,
@@ -320,7 +310,14 @@ object IslandAreas {
         update()
     }
 
-    private fun isPathfinderEnabled(): Boolean = config.pathfinder.enabled.get()
+    private fun isPathfinderEnabled(): Boolean = areaListConfig.enabled.get()
 
     private fun isEnabled() = IslandGraphs.currentIslandGraph != null
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(114, "misc.areaNavigation", "misc.navigation")
+        event.move(115, "misc.navigation.pathfinder", "misc.navigation.areasList")
+        event.move(115, "misc.navigation.inWorld", "misc.navigation.showInWorld")
+    }
 }

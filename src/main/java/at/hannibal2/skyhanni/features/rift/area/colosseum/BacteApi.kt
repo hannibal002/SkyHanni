@@ -75,7 +75,7 @@ object BacteApi {
     fun onSecondPassed(event: SecondPassedEvent) {
         val bacte = bacte ?: return
 
-        val name = bacte.armorStand?.name.formattedTextCompatLessResets() ?: return
+        val name = bacte.armorStand?.name?.formattedTextCompatLessResets() ?: return
 
         namePattern.matchMatcher(name) {
             currentPhase = Phase.fromNumber(group("name").length)

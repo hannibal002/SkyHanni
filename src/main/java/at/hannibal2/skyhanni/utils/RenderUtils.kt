@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import com.mojang.blaze3d.systems.RenderSystem
@@ -88,15 +87,11 @@ object RenderUtils {
     }
 
     private fun highlight(color: Color, x: Int, y: Int) {
-        ModernGlStateManager.disableLighting()
-        ModernGlStateManager.disableDepthTest()
         DrawContextUtils.pushMatrix()
         val zLevel = 50f
         DrawContextUtils.translate(0f, 0f, 110 + zLevel)
         GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
         DrawContextUtils.popMatrix()
-        ModernGlStateManager.enableDepthTest()
-        ModernGlStateManager.enableLighting()
     }
 
     fun Slot.drawBorder(color: LorenzColor) {
@@ -116,8 +111,6 @@ object RenderUtils {
     }
 
     fun drawBorder(color: Color, x: Int, y: Int) {
-        ModernGlStateManager.disableLighting()
-        ModernGlStateManager.disableDepthTest()
         DrawContextUtils.pushMatrix()
         val zLevel = 50f
         DrawContextUtils.translate(0f, 0f, 110 + zLevel)
@@ -126,8 +119,6 @@ object RenderUtils {
         GuiRenderUtils.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
         GuiRenderUtils.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
         DrawContextUtils.popMatrix()
-        ModernGlStateManager.enableDepthTest()
-        ModernGlStateManager.enableLighting()
     }
 
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
@@ -273,10 +264,6 @@ object RenderUtils {
     ) {
         val fontRenderer = Minecraft.getInstance().font
 
-        ModernGlStateManager.disableLighting()
-        ModernGlStateManager.disableDepthTest()
-        ModernGlStateManager.disableBlend()
-
         DrawContextUtils.pushPop {
             DrawContextUtils.translate((xPos - fontRenderer.width(text)).toFloat(), yPos.toFloat(), 200f)
             DrawContextUtils.scale(scale, scale, 1f)
@@ -286,8 +273,5 @@ object RenderUtils {
 
             DrawContextUtils.scale(reverseScale, reverseScale, 1f)
         }
-
-        ModernGlStateManager.enableLighting()
-        ModernGlStateManager.enableDepthTest()
     }
 }

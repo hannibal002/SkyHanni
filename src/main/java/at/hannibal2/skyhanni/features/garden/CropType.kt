@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.world.item.ItemStack
@@ -67,15 +66,15 @@ enum class CropType(
     ),
     SUNFLOWER(
         "Sunflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { BlockCompat.createSunFlower() }, "sunflower", FarmingItemType.SUNFLOWER,
+        { ItemStack(Blocks.SUNFLOWER) }, "sunflower", FarmingItemType.SUNFLOWER,
     ),
     MOONFLOWER(
         "Moonflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { BlockCompat.createBlueOrchid() }, "moonflower", FarmingItemType.MOONFLOWER,
+        { ItemStack(Blocks.BLUE_ORCHID) }, "moonflower", FarmingItemType.MOONFLOWER,
     ),
     WILD_ROSE(
         "Wild Rose", "THEORETICAL_HOE_WILD_ROSE", "HELIANTHUS", 2.0,
-        { BlockCompat.createWildRose() }, "rose", FarmingItemType.WILD_ROSE,
+        { ItemStack(Blocks.ROSE_BUSH) }, "rose", FarmingItemType.WILD_ROSE,
     ),
     ;
 

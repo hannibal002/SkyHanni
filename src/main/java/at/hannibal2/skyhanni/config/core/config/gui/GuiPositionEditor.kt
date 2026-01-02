@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -72,7 +71,6 @@ class GuiPositionEditor(
             oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
         }
 
-        ModernGlStateManager.disableLighting()
         val hoveredPos = renderRectangles()
 
         renderLabels(hoveredPos)

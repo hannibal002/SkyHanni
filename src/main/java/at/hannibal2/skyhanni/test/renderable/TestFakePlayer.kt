@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test.renderable
 
-//#if MC > 1.8.9
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
@@ -12,8 +11,6 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.random.Random
-
-//#endif
 
 @SkyHanniModule(devOnly = true)
 object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {

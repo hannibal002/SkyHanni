@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -79,7 +78,7 @@ object CopyChat {
             matchingLines.size == 1 -> matchingLines.first()
             else -> {
                 matchingLines.firstOrNull {
-                    it.content.formattedTextCompat().stripHypixelMessage().removeColor()
+                    it.content.string.removeColor()
                         .contains(OrderedTextUtils.orderedTextToLegacyString(visibleLine.content).removeColor())
                 } ?: matchingLines.first()
             }

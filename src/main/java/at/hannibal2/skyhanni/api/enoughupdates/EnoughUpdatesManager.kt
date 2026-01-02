@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ComponentUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
@@ -237,7 +237,7 @@ object EnoughUpdatesManager {
                 loreList.add(nbtElement.asString().get())
             }
 
-            stack.setLore(loreList)
+            stack.setLoreString(loreList)
         }
 
         if (usingCache) itemStackCache[internalName] = stack

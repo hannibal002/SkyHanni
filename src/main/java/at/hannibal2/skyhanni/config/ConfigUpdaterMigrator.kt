@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.json.asIntOrNull
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
@@ -11,7 +12,7 @@ import com.google.gson.JsonPrimitive
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 113
+    const val CONFIG_VERSION = 115
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -80,17 +81,24 @@ object ConfigUpdaterMigrator {
         }
 
         fun move(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement = { it }) {
+            if (listOf(oldPath, newPath).any { it.startsWith("feature") }) {
+                ErrorManager.crashInDevEnv("Migration path should not start with 'features.'!")
+            }
             if (since <= oldVersion) {
                 logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
                 return
             }
             if (since > CONFIG_VERSION) {
-                error("Illegal new version $since > $CONFIG_VERSION")
+                ErrorManager.crashInDevEnv("Illegal new version $since > $CONFIG_VERSION")
             }
             if (since > oldVersion + 1) {
                 logger.log("Skipping move from $oldPath to $newPath (will be done in another pass)")
                 return
             }
+            internalMove(since, oldPath, newPath, transform)
+        }
+
+        private fun internalMove(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement) {
             val op = oldPath.split(".")
             val np = newPath.split(".")
             if (op.first().startsWith("#")) {

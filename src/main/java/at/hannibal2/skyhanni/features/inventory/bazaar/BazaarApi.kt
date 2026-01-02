@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -258,14 +257,15 @@ object BazaarApi {
     }
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
-        val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
-        if (items.any { it.hoverName.formattedTextCompatLeadingWhiteLessResets().equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
-            return true
+        val itemMatch = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }.any {
+            it.hoverName.string.equalsIgnoreColor("Go Back") &&
+                it.getLore().firstOrNull() == "§7To Bazaar"
         }
+        if (itemMatch) return true
 
         // check for Buy Instantly
         event.inventoryItems[16]?.let {
-            if (it.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
+            if (it.hoverName.string == "Custom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
                 return true
             }
         }

@@ -37,6 +37,8 @@ accessible field net/minecraft/world/entity/LivingEntity DATA_HEALTH_ID Lnet/min
 accessible field net/minecraft/client/gui/components/ChatComponent chatScrollbarPos I
 accessible method net/minecraft/client/gui/components/ChatComponent screenToChatX (D)D
 accessible method net/minecraft/client/gui/components/ChatComponent screenToChatY (D)D
+accessible field net/minecraft/core/particles/ColorParticleOption color I
+mutable field net/minecraft/core/particles/ColorParticleOption color I
 
 # 1.21.7 stuff
 accessible field net/minecraft/client/renderer/RenderType$CompositeRenderType renderPipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;

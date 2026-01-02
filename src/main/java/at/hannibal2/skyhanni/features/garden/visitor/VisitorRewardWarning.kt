@@ -61,8 +61,8 @@ object VisitorRewardWarning {
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason
 
-        val isRefuseSlot = stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cRefuse Offer"
-        val isAcceptSlot = stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aAccept Offer"
+        val isRefuseSlot = stack.hoverName.string == "Refuse Offer"
+        val isAcceptSlot = stack.hoverName.string == "Accept Offer"
 
         val shouldBlock = blockReason?.run { blockRefusing && isRefuseSlot || !blockRefusing && isAcceptSlot } ?: false
         if (!config.bypassKey.isKeyHeld() && shouldBlock) {
@@ -93,8 +93,8 @@ object VisitorRewardWarning {
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         if (config.bypassKey.isKeyHeld()) return
 
-        val isRefuseSlot = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cRefuse Offer"
-        val isAcceptSlot = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aAccept Offer"
+        val isRefuseSlot = event.itemStack.hoverName.string == "Refuse Offer"
+        val isAcceptSlot = event.itemStack.hoverName.string == "Accept Offer"
 
         val blockReason = visitor.blockReason ?: return
         if (blockReason.blockRefusing && !isRefuseSlot) return

@@ -126,7 +126,7 @@ object GraphParkour {
         )
     }
 
-    private suspend fun loadParkour() {
+    private fun loadParkour() {
         val locations = readListFromClipboard() ?: return
         val graph = listToGraph(locations)
         GraphEditor.enable()
@@ -139,7 +139,7 @@ object GraphParkour {
         ChatUtils.chat("Graph Editor loaded a parkour from clipboard!")
     }
 
-    private suspend fun readListFromClipboard(): List<LorenzVec>? {
+    private fun readListFromClipboard(): List<LorenzVec>? {
         val clipboard = OSUtils.readFromClipboard() ?: return null
         return clipboard.split("\n").map { line ->
             val raw = line.replace("\"", "").replace(",", "")

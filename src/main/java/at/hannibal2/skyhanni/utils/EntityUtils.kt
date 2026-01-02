@@ -71,7 +71,7 @@ object EntityUtils {
         contains: String,
         radius: Double = 3.0,
     ): List<ArmorStand> = getArmorStandsInRadius(getLorenzVec().up(3), radius).filter {
-        it.name.formattedTextCompatLessResets().contains(contains)
+        it.name.string.contains(contains)
     }
 
     @Deprecated("Use Mob Detection Instead")
@@ -162,7 +162,7 @@ object EntityUtils {
 
     @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
     fun ArmorStand.hasSkullTexture(skin: String): Boolean {
-        val inventory = this.getAllEquipment() ?: return false
+        val inventory = this.getAllEquipment()
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
@@ -228,7 +228,7 @@ object EntityUtils {
     fun LivingEntity.isRunic() = baseMaxHealth == findHealthReal().toInt().derpy() * 4 || isRunicAndCorrupt()
     fun LivingEntity.isRunicAndCorrupt() = baseMaxHealth == findHealthReal().toInt().derpy() * 3 * 4
 
-    fun Entity.cleanName() = this.name.formattedTextCompatLessResets().removeColor()
+    fun Entity.cleanName() = this.name.string.removeColor()
 
     // TODO use derpy() on every use case
     val LivingEntity.baseMaxHealth: Int

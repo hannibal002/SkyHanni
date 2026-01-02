@@ -45,6 +45,7 @@ object DelayedRun {
         if (mc.isSameThread) {
             it.run()
         } else {
+            @Suppress("IgnoredReturnValue")
             mc.submit(it)
         }
     }

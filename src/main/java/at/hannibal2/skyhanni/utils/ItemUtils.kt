@@ -150,7 +150,7 @@ object ItemUtils {
 
     private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
-    fun ItemStack.cleanName() = hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+    fun ItemStack.cleanName() = hoverName.string.removeColor()
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
@@ -159,17 +159,22 @@ object ItemUtils {
         if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
             return data.lastLore
         }
-        val lore = this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
+        val lore = this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
         data.lastLore = lore
         data.lastLoreFetchTime = SimpleTimeMark.now()
         return lore
+    }
+
+    fun ItemStack.getLoreComponent(): List<Component> {
+        val lore = this.get(DataComponents.LORE)?.lines
+        return lore ?: emptyList()
     }
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
 
     fun DataComponentMap?.getLore(): List<String> {
         this ?: return emptyList()
-        return this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() } ?: emptyList()
+        return this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
     }
 
     fun CompoundTag?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
@@ -197,8 +202,13 @@ object ItemUtils {
         return name
     }
 
-    fun ItemStack.setLore(lore: List<String>): ItemStack {
+    fun ItemStack.setLoreString(lore: List<String>): ItemStack {
         this.set(DataComponents.LORE, ItemLore(lore.map { Component.nullToEmpty(it) }))
+        return this
+    }
+
+    fun ItemStack.setLore(lore: List<Component>): ItemStack {
+        this.set(DataComponents.LORE, ItemLore(lore))
         return this
     }
 
@@ -256,7 +266,7 @@ object ItemUtils {
     }
 
     private fun ItemStack.grabInternalNameOrNull(): NeuInternalName? {
-        if (hoverName.formattedTextCompatLeadingWhiteLessResets() == "§fWisp's Ice-Flavored Water I Splash Potion") {
+        if (hoverName.string == "Wisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
         }
         // This is to prevent an error message whenever coins are traded.
@@ -321,7 +331,7 @@ object ItemUtils {
         //$$ stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(profile))
         //#endif
         stack.setCustomItemName(displayName)
-        stack.setLore(lore.toList())
+        stack.setLoreString(lore.toList())
         return stack
     }
 
@@ -330,14 +340,14 @@ object ItemUtils {
     }
 
     // Overload to avoid spread operators
-    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1, damage: Int = 0): ItemStack =
-        createItemStack(item, displayName, loreArray.toList(), amount, damage)
+    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1): ItemStack =
+        createItemStack(item, displayName, loreArray.toList(), amount)
 
     // Taken from NEU
-    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
+    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1): ItemStack {
         val stack = ItemStack(item, amount)
         stack.setCustomItemName(displayName)
-        stack.setLore(lore)
+        stack.setLoreString(lore)
         var tooltipDisplay = net.minecraft.world.item.component.TooltipDisplay.DEFAULT.withHidden(DataComponents.DAMAGE, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.ATTRIBUTE_MODIFIERS, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.UNBREAKABLE, true)
@@ -441,7 +451,13 @@ object ItemUtils {
     }
 
     // Taken from NEU
-    fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
+    fun ItemStack.editItemInfo(displayName: String, lore: List<String>): ItemStack {
+        this.setCustomItemName(displayName)
+        this.setLoreString(lore)
+        return this
+    }
+
+    fun ItemStack.editItemInfo(displayName: Component, lore: List<Component>): ItemStack {
         this.setCustomItemName(displayName)
         this.setLore(lore)
         return this

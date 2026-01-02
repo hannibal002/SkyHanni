@@ -91,9 +91,9 @@ object SlayerQuestWarning {
         val slayerType = SlayerApi.currentAreaType ?: return false
 
         // workaround for rift mob that is unrelated to slayer
-        if (entity.name.formattedTextCompatLessResets() == "Oubliette Guard") return false
+        if (entity.name.string == "Oubliette Guard") return false
         // workaround for Bladesoul in  Crimson Isle
-        if (SkyBlockUtils.scoreboardArea == "Stronghold" && entity.name.formattedTextCompatLessResets() == "Skeleton") return false
+        if (SkyBlockUtils.scoreboardArea == "Stronghold" && entity.name.string == "Skeleton") return false
 
         val isSlayer = slayerType.clazz.isInstance(entity)
         if (!isSlayer) return false

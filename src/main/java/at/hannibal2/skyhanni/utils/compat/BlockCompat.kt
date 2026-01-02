@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.state.BlockState
 
 object BlockCompat {
     fun getAllLogs(): List<Block> {
@@ -17,26 +15,6 @@ object BlockCompat {
 
     fun createSmoothDiorite(): ItemStack {
         return ItemStack(Blocks.POLISHED_DIORITE)
-    }
-
-    fun createBlueOrchid(): ItemStack {
-        return ItemStack(Blocks.BLUE_ORCHID)
-    }
-
-    fun createSunFlower(): ItemStack {
-        return ItemStack(Blocks.SUNFLOWER)
-    }
-
-    fun createWildRose(): ItemStack {
-        return ItemStack(Blocks.ROSE_BUSH)
-    }
-
-    fun BlockState.isSunflower(pos: LorenzVec): Boolean {
-        return this.block == Blocks.SUNFLOWER
-    }
-
-    fun BlockState.isWildRose(pos: LorenzVec): Boolean {
-        return this.block == Blocks.ROSE_BUSH
     }
 
     fun getAllLeaves(): List<Block> = buildList { addLeaves() }

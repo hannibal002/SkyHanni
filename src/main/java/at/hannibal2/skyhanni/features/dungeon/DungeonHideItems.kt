@@ -169,7 +169,7 @@ object DungeonHideItems {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onArmoStandMove(event: EntityMoveEvent<ArmorStand>) {
+    fun onArmorStandMove(event: EntityMoveEvent<ArmorStand>) {
         val entity = event.entity
 
         if (isSkeletonSkull(entity)) {

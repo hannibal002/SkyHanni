@@ -194,7 +194,7 @@ object DungeonFinderFeatures {
     private fun selectFloorStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
-            val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = stack.hoverName.string.removeColor()
             map[slot] = if (anyFloorPattern.matches(name)) {
                 "A"
             } else if (entranceFloorPattern.matches(name)) {
@@ -210,7 +210,7 @@ object DungeonFinderFeatures {
     private fun partyFinderStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
-            val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = stack.hoverName.string.removeColor()
             if (!checkIfPartyPattern.matches(name)) continue
             val lore = stack.getLore()
             val floor = lore.find { floorPattern.matches(it.removeColor()) } ?: continue
@@ -235,7 +235,7 @@ object DungeonFinderFeatures {
 
         if (!config.floorAsStackSize) return
         for ((slot, stack) in inventoryItems) {
-            val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = stack.hoverName.string.removeColor()
             if (!floorTypePattern.matches(name)) continue
             val floorNum = floorNumberPattern.matchMatcher(name) {
                 group("floorNum").romanToDecimalIfNecessary()

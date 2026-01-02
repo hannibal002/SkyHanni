@@ -47,7 +47,7 @@ jobs:
                 if: ${{ !cancelled() }}
                 with:
                     name: "Test Results"
-                    path: versions/1.8.9/build/reports/tests/test/
+                    path: build/reports/tests/test/
 
     preprocess:
         runs-on: ubuntu-latest

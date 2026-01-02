@@ -65,6 +65,7 @@ object ClientEvents {
                 override fun getFabricId(): ResourceLocation = ResourceLocation.fromNamespaceAndPath("skyhanni", "resources")
 
                 //#if MC < 1.21.9
+                @Suppress("ForbiddenVoid")
                 override fun reload(
                     synchronizer: PreparableReloadListener.PreparationBarrier,
                     manager: ResourceManager,
@@ -93,8 +94,8 @@ object ClientEvents {
             },
         )
 
-        ClientReceiveMessageEvents.ALLOW_GAME.register(::onAllow);
-        ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify);
+        ClientReceiveMessageEvents.ALLOW_GAME.register(::onAllow)
+        ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify)
 
     }
 

@@ -26,7 +26,7 @@ object IrisCompat {
         try {
             val irisApiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi")
             IRIS_INSTANCE = irisApiClass.getMethod("getInstance").invoke(null)
-            val irisInstanceClass = IRIS_INSTANCE!!.javaClass
+            val irisInstanceClass = IRIS_INSTANCE?.javaClass ?: return
 
             val irisProgramEnum = Class.forName("net.irisshaders.iris.api.v0.IrisProgram")
             IRIS_PROGRAM_BASIC = java.lang.Enum.valueOf(irisProgramEnum.asSubclass(Enum::class.java), "BASIC")

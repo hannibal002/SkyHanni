@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
@@ -75,7 +74,6 @@ object FlareDisplay {
                 GuiScreenUtils.displayHeight,
                 (alpha shl 24) or (config.flashColor.rgb and 0xFFFFFF),
             )
-            ModernGlStateManager.color(1F, 1F, 1F, 1F)
         }
 
         if (config.displayType == FlareConfig.DisplayType.WORLD) return

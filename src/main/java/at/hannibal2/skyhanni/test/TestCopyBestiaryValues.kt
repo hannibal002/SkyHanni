@@ -89,7 +89,7 @@ object TestCopyBestiaryValues {
         val mobs = mutableListOf<String>()
         for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
-            bestiaryTypePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+            bestiaryTypePattern.matchMatcher(stack.hoverName.string.removeColor()) {
                 val lvl = group("lvl").toInt()
                 var text = group("text").lowercase().replace(" ", "_")
 
