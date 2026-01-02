@@ -1,0 +1,139 @@
+package at.hannibal2.skyhanni.test.graph
+
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.dev.GraphConfig
+import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import kotlin.time.Duration.Companion.seconds
+
+@SkyHanniModule
+object GraphEditorIO {
+
+    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
+
+    private val nodes get() = GraphEditor.nodes
+    private val edges get() = GraphEditor.edges
+
+    fun compileGraph(): Graph {
+        val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
+        val nodes = nodes.mapIndexed { index, node ->
+            GraphNode(
+                index,
+                node.position,
+                node.name,
+                node.tags.map {
+                    it.internalName
+                },
+            )
+        }
+        val neighbours = GraphEditor.nodes.map { node ->
+            edges.filter { it.isInEdge(node) && it.isValidDirectionFrom(node) }.map { edge ->
+                val otherNode = if (node == edge.node1) edge.node2
+                else edge.node1
+                // TODO: Fix this to not use a bang bang
+                @Suppress("MapGetWithNotNullAssertionOperator")
+                nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
+            }.sortedBy { it.second }
+        }
+        nodes.forEachIndexed { index, node -> node.neighbours = neighbours[index].toMap() }
+        return Graph(nodes)
+    }
+
+    fun import(graph: Graph) {
+        GraphEditor.clear()
+        nodes.addAll(
+            graph.map {
+                GraphingNode(
+                    it.id,
+                    it.position,
+                    it.name,
+                    it.tagNames.mapNotNull { tag -> GraphNodeTag.byId(tag) }.toMutableList(),
+                )
+            },
+        )
+        val translation = graph.mapIndexed { index, node -> node to nodes[index] }.toMap()
+
+        val neighbors = graph.map { node ->
+            // TODO: Fix this to not use bang bangs
+            @Suppress("MapGetWithNotNullAssertionOperator")
+            node.neighbours.map {
+                GraphingEdge(
+                    translation[node]!!,
+                    translation[it.key]!!,
+                    EdgeDirection.ONE_TO_TWO,
+                )
+            }
+        }.flatten()
+
+        val reduced = neighbors.groupingBy { it }.reduce { _, accumulator, element ->
+            if (
+                (element.node1 == accumulator.node1 && accumulator.direction != element.direction) ||
+                (element.node1 == accumulator.node2 && accumulator.direction == element.direction)
+            ) {
+                accumulator.direction = EdgeDirection.BOTH
+            }
+            accumulator
+        }
+
+        edges.addAll(reduced.values)
+        GraphEditor.id = nodes.lastOrNull()?.id?.plus(1) ?: 0
+        GraphEditor.checkDissolve()
+        GraphEditor.selectedEdge = GraphEditor.findEdgeBetweenActiveAndClosest()
+    }
+
+    fun save() {
+        if (nodes.isEmpty()) {
+            ChatUtils.chat("Copied nothing since the graph is empty.")
+            return
+        }
+        val compileGraph = compileGraph()
+        if (config.useAsIslandArea) {
+            IslandGraphs.setNewGraph(compileGraph)
+            GraphEditorBugFinder.runTests()
+            if (GraphEditor.active) {
+                GraphEditor.calculateNewAllNodeFind()
+            }
+        }
+        val json = compileGraph.toJson()
+        OSUtils.copyToClipboard(json)
+        ChatUtils.chat("Copied Graph to Clipboard.")
+        if (config.showsStats) {
+            val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
+            ChatUtils.chat(
+                "§lStats\n" + "§eNamed Nodes: ${
+                    nodes.count { it.name != null }.addSeparators()
+                }\n" + "§eNodes: ${nodes.size.addSeparators()}\n" + "§eEdges: ${edges.size.addSeparators()}\n" + "§eLength: $length",
+            )
+        }
+    }
+
+    fun loadThisIsland() {
+        val graph = IslandGraphs.currentIslandGraph
+        if (graph == null) {
+            ChatUtils.userError("This island does not have graph data!")
+            return
+        }
+
+        IslandGraphs.disabledNodesReason?.let {
+            if (GraphEditor.bypassTempRemoveTimer.isInPast()) {
+                IslandGraphs.enableAllNodes()
+                ChatUtils.chat("Reset temp remove!")
+            } else {
+                ChatUtils.chat("§cParts of the island graph are currently temp removed: $it")
+                ChatUtils.chat("Run this command again in the next 5 seconds to remove the temp remove logic and copy the current island!")
+                GraphEditor.bypassTempRemoveTimer = 5.seconds.fromNow()
+                return
+            }
+        }
+        GraphEditor.enable()
+        import(graph)
+        ChatUtils.chat("Graph Editor loaded this island!")
+    }
+}

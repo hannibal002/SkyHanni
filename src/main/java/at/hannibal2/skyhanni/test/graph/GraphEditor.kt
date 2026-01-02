@@ -37,7 +37,6 @@ import kotlinx.coroutines.runBlocking
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GraphEditor {
@@ -46,7 +45,7 @@ object GraphEditor {
 
     fun isEnabled(): Boolean = config.enabled
 
-    private var id = 0
+    var id = 0
 
     val nodes = mutableListOf<GraphingNode>()
     val edges = mutableListOf<GraphingEdge>()
@@ -91,13 +90,13 @@ object GraphEditor {
     private val nodesToFind: List<LorenzVec>
         get() = IslandGraphs.currentIslandGraph?.map { it.position }?.filter { it !in nodesAlreadyFound }.orEmpty()
     private var currentNodeToFind: LorenzVec? = null
-    private var active = false
+    var active = false
 
     var dissolvePossible = false
 
-    private fun findEdgeBetweenActiveAndClosest(): GraphingEdge? = getEdgeIndex(activeNode, closestNode)?.let { edges[it] }
+    fun findEdgeBetweenActiveAndClosest(): GraphingEdge? = getEdgeIndex(activeNode, closestNode)?.let { edges[it] }
 
-    private fun checkDissolve() {
+    fun checkDissolve() {
         if (activeNode == null) {
             dissolvePossible = false
             return
@@ -149,7 +148,7 @@ object GraphEditor {
         calculateNewAllNodeFind()
     }
 
-    private fun calculateNewAllNodeFind(): LorenzVec {
+    fun calculateNewAllNodeFind(): LorenzVec {
         val next = GraphUtils.findShortestDistancesOnCurrentIsland(nodesToFind).lastVisitedNode.position
 
         val max = IslandGraphs.currentIslandGraph?.size ?: -1
@@ -191,34 +190,11 @@ object GraphEditor {
         event.register("shgraphloadthisisland") {
             description = "Loads the current island data into the graph editor."
             category = CommandCategory.DEVELOPER_TEST
-            callback { loadThisIsland() }
+            callback { GraphEditorIO.loadThisIsland() }
         }
     }
 
-    private var bypassTempRemoveTimer = SimpleTimeMark.farPast()
-
-    private fun loadThisIsland() {
-        val graph = IslandGraphs.currentIslandGraph
-        if (graph == null) {
-            ChatUtils.userError("This island does not have graph data!")
-            return
-        }
-
-        IslandGraphs.disabledNodesReason?.let {
-            if (bypassTempRemoveTimer.isInPast()) {
-                IslandGraphs.enableAllNodes()
-                ChatUtils.chat("Reset temp remove!")
-            } else {
-                ChatUtils.chat("§cParts of the island graph are currently temp removed: $it")
-                ChatUtils.chat("Run this command again in the next 5 seconds to remove the temp remove logic and copy the current island!")
-                bypassTempRemoveTimer = 5.seconds.fromNow()
-                return
-            }
-        }
-        enable()
-        import(graph)
-        ChatUtils.chat("Graph Editor loaded this island!")
-    }
+    var bypassTempRemoveTimer = SimpleTimeMark.farPast()
 
     private fun toggleFeature() {
         config.enabled = !config.enabled
@@ -276,7 +252,7 @@ object GraphEditor {
             return
         }
         if (config.saveKey.isKeyClicked()) {
-            save()
+            GraphEditorIO.save()
             return
         }
         if (config.loadKey.isKeyClicked()) {
@@ -294,14 +270,14 @@ object GraphEditor {
                         null
                     }
                 }?.let {
-                    import(it)
+                    GraphEditorIO.import(it)
                     ChatUtils.chat("Loaded Graph from clip board.")
                 }
             }
             return
         }
         if (config.clearKey.isKeyClicked()) {
-            val json = compileGraph().toJson()
+            val json = GraphEditorIO.compileGraph().toJson()
             OSUtils.copyToClipboard(json)
             ChatUtils.chat("Copied Graph to Clipboard and cleared the graph.")
             clear()
@@ -417,32 +393,6 @@ object GraphEditor {
         else -> null
     }
 
-    private fun save() {
-        if (nodes.isEmpty()) {
-            ChatUtils.chat("Copied nothing since the graph is empty.")
-            return
-        }
-        val compileGraph = compileGraph()
-        if (config.useAsIslandArea) {
-            IslandGraphs.setNewGraph(compileGraph)
-            GraphEditorBugFinder.runTests()
-            if (active) {
-                calculateNewAllNodeFind()
-            }
-        }
-        val json = compileGraph.toJson()
-        OSUtils.copyToClipboard(json)
-        ChatUtils.chat("Copied Graph to Clipboard.")
-        if (config.showsStats) {
-            val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
-            ChatUtils.chat(
-                "§lStats\n" + "§eNamed Nodes: ${
-                    nodes.count { it.name != null }.addSeparators()
-                }\n" + "§eNodes: ${nodes.size.addSeparators()}\n" + "§eEdges: ${edges.size.addSeparators()}\n" + "§eLength: $length",
-            )
-        }
-    }
-
     private var lastGuiTime = SimpleTimeMark.farPast()
 
     private fun isAnyGuiActive(): Boolean {
@@ -520,73 +470,6 @@ object GraphEditor {
             edges.add(edge)
         } else false
 
-    fun compileGraph(): Graph {
-        val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
-        val nodes = nodes.mapIndexed { index, node ->
-            GraphNode(
-                index,
-                node.position,
-                node.name,
-                node.tags.map {
-                    it.internalName
-                },
-            )
-        }
-        val neighbours = GraphEditor.nodes.map { node ->
-            edges.filter { it.isInEdge(node) && it.isValidDirectionFrom(node) }.map { edge ->
-                val otherNode = if (node == edge.node1) edge.node2
-                else edge.node1
-                // TODO: Fix this to not use a bang bang
-                @Suppress("MapGetWithNotNullAssertionOperator")
-                nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
-            }.sortedBy { it.second }
-        }
-        nodes.forEachIndexed { index, node -> node.neighbours = neighbours[index].toMap() }
-        return Graph(nodes)
-    }
-
-    fun import(graph: Graph) {
-        clear()
-        nodes.addAll(
-            graph.map {
-                GraphingNode(
-                    it.id,
-                    it.position,
-                    it.name,
-                    it.tagNames.mapNotNull { tag -> GraphNodeTag.byId(tag) }.toMutableList(),
-                )
-            },
-        )
-        val translation = graph.mapIndexed { index, node -> node to nodes[index] }.toMap()
-
-        val neighbors = graph.map { node ->
-            // TODO: Fix this to not use bang bangs
-            @Suppress("MapGetWithNotNullAssertionOperator")
-            node.neighbours.map {
-                GraphingEdge(
-                    translation[node]!!,
-                    translation[it.key]!!,
-                    EdgeDirection.ONE_TO_TWO,
-                )
-            }
-        }.flatten()
-
-        val reduced = neighbors.groupingBy { it }.reduce { _, accumulator, element ->
-            if (
-                (element.node1 == accumulator.node1 && accumulator.direction != element.direction) ||
-                (element.node1 == accumulator.node2 && accumulator.direction == element.direction)
-            ) {
-                accumulator.direction = EdgeDirection.BOTH
-            }
-            accumulator
-        }
-
-        edges.addAll(reduced.values)
-        id = nodes.lastOrNull()?.id?.plus(1) ?: 0
-        checkDissolve()
-        selectedEdge = findEdgeBetweenActiveAndClosest()
-    }
-
     val highlightedNodes = mutableSetOf<GraphingNode>()
     val highlightedEdges = mutableSetOf<GraphingEdge>()
 
@@ -595,8 +478,8 @@ object GraphEditor {
         val savedCurrent = closestNode ?: return
         val savedActive = activeNode ?: return
 
-        val compiled = compileGraph()
-        import(compiled)
+        val compiled = GraphEditorIO.compileGraph()
+        GraphEditorIO.import(compiled)
         highlightedEdges.clear()
         highlightedNodes.clear()
 
@@ -617,7 +500,7 @@ object GraphEditor {
         )
     }
 
-    private fun clear() {
+    fun clear() {
         id = 0
         nodes.clear()
         edges.clear()
