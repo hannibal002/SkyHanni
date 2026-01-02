@@ -39,7 +39,8 @@ object ColorHexInLore {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipEvent) {
         // this feature wont work on 1.21 probably until we drop 1.8
-        if (!PlatformUtils.IS_LEGACY) return
+        // todo actually fix now
+        if (true) return
         if (!isEnabled()) return
         val itemCategory = event.itemStack.getItemCategoryOrNull()
         if (itemCategory != ItemCategory.DYE &&

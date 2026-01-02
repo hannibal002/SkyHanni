@@ -14,10 +14,9 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import org.lwjgl.input.Keyboard
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object GuiData {
@@ -43,15 +42,15 @@ object GuiData {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onGuiKeyPress(event: GuiKeyPressEvent) {
-        val allowedKeys = with(Minecraft.getMinecraft().gameSettings) {
+        val allowedKeys = with(Minecraft.getInstance().options) {
             listOf(
-                keyBindInventory,
-                keyBindScreenshot,
-                keyBindFullscreen,
+                keyInventory,
+                keyScreenshot,
+                keyFullscreen,
             )
         }
         if (allowedKeys.any { it.isActive() }) return
-        if (Keyboard.KEY_ESCAPE.isKeyHeld()) return
+        if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) return
 
         if (CustomWardrobeKeybinds.allowKeyboardClick()) return
 
@@ -61,7 +60,7 @@ object GuiData {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runNextTick {
-            if (Minecraft.getMinecraft().currentScreen !is GuiChest) {
+            if (Minecraft.getInstance().screen !is ContainerScreen) {
                 preDrawEventCancelled = false
             }
         }
@@ -75,12 +74,5 @@ object GuiData {
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         preDrawEventCancelled = false
-    }
-
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onGuiOpen(event: GuiScreenOpenEvent) {
-        if (preDrawEventCancelled) {
-            if (PlatformUtils.isNeuLoaded()) NEUApi.setInventoryButtonsToDisabled()
-        }
     }
 }

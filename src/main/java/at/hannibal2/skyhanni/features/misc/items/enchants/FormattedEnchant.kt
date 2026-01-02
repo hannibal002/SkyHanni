@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 data class FormattedEnchant(
     private val enchant: Enchant,

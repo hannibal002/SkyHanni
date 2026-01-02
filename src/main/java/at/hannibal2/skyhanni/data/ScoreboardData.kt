@@ -17,16 +17,14 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getPlayerNames
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
-import net.minecraft.network.play.server.S3BPacketScoreboardObjective
-import net.minecraft.network.play.server.S3CPacketUpdateScore
-import net.minecraft.network.play.server.S3EPacketTeams
-import net.minecraft.scoreboard.IScoreObjectiveCriteria
-import net.minecraft.scoreboard.ScorePlayerTeam
-//#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-//#endif
+import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket
+import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
+import net.minecraft.network.protocol.game.ClientboundSetScorePacket
+import net.minecraft.world.scores.criteria.ObjectiveCriteria
 
 @SkyHanniModule
 object ScoreboardData {
@@ -37,7 +35,7 @@ object ScoreboardData {
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
     val objectiveTitle: String
         get() =
-            MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
+            MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.formattedTextCompat().orEmpty()
 
     private var dirty = false
 
@@ -80,24 +78,24 @@ object ScoreboardData {
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
-            is S3CPacketUpdateScore -> {
+            is ClientboundSetScorePacket -> {
                 if (packet.objectiveName == "update") {
                     dirty = true
                 }
             }
 
-            is S3EPacketTeams -> {
+            is ClientboundSetPlayerTeamPacket -> {
                 if (packet.name.startsWith("team_")) {
                     dirty = true
                 }
             }
 
-            is S3BPacketScoreboardObjective -> {
-                val type = packet.func_179817_d()
-                if (type != IScoreObjectiveCriteria.EnumRenderType.INTEGER) return
-                val objectiveName = packet.func_149339_c()
+            is ClientboundSetObjectivePacket -> {
+                val type = packet.renderType
+                if (type != ObjectiveCriteria.RenderType.INTEGER) return
+                val objectiveName = packet.objectiveName
                 if (objectiveName == "health") return
-                val objectiveValue = packet.func_149337_d()
+                val objectiveValue = packet.displayName.formattedTextCompat()
                 ScoreboardTitleUpdateEvent(objectiveValue, objectiveName).post()
             }
         }
@@ -152,20 +150,9 @@ object ScoreboardData {
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = MinecraftCompat.localWorldOrNull?.scoreboard ?: return emptyList()
         val objective = scoreboard.getSidebarObjective() ?: return emptyList()
-        var scores = scoreboard.getSortedScores(objective)
+        var scores = scoreboard.listPlayerScores(objective)
         val list = scores.getPlayerNames(scoreboard)
-        //#if MC < 1.21
-        scores = if (list.size > 15) {
-            list.drop(15)
-        } else {
-            list
-        }
-        return scores.map {
-            ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
-        }
-        //#else
-        //$$ return list.map { it.formattedTextCompatLessResets() }
-        //#endif
+        return list.map { it.formattedTextCompatLessResets() }
     }
 
     /**
@@ -173,7 +160,7 @@ object ScoreboardData {
      * @param text The line to check and possibly replace
      * @return The replaced line, or null if it should be hidden
      */
-    fun tryToReplaceScoreboardLine(text: String): String? {
+    fun tryToReplaceScoreboardLine(text: String): String {
         try {
             return tryToReplaceScoreboardLineHarder(text)
         } catch (t: Throwable) {
@@ -186,12 +173,7 @@ object ScoreboardData {
         }
     }
 
-    private fun tryToReplaceScoreboardLineHarder(text: String): String? {
-        //#if MC < 1.21
-        if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
-            return null
-        }
-        //#endif
+    private fun tryToReplaceScoreboardLineHarder(text: String): String {
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
             PurseApi.piggyPattern.matchMatcher(text) {
                 val coins = group("coins")
@@ -252,7 +234,7 @@ object ScoreboardData {
         event.register("shdebugscoreboard") {
             description =
                 "Monitors the scoreboard changes: " +
-                "Prints the raw scoreboard lines in the console after each update, with time since last update."
+                    "Prints the raw scoreboard lines in the console after each update, with time since last update."
             category = CommandCategory.DEVELOPER_DEBUG
             callback {
                 monitor = !monitor

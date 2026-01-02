@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(RenderSystem.class)
 public class MixinRenderSystem {
 
-    @Inject(method = "flipFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/DynamicUniforms;clear()V"))
+    @Inject(method = "flipFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DynamicUniforms;reset()V"))
     private static void clearChromaUniforms(CallbackInfo ci) {
         GuiRendererHook.INSTANCE.getChromaUniform().clear();
         RoundedShapeDrawer.INSTANCE.clearUniforms();

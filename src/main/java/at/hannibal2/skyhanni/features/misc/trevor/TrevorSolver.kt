@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -13,9 +14,10 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.EntityLivingBase
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.LivingEntity
 
 object TrevorSolver {
 
@@ -49,27 +51,27 @@ object TrevorSolver {
         averageHeight = (minHeight + maxHeight) / 2
     }
 
+    // TODO: use entity events
+    @OptIn(AllEntitiesGetter::class)
     fun findMob() {
         val hasBlindness = MinecraftCompat.localPlayer.hasPotionEffect(EffectsCompat.BLINDNESS)
         for (entity in EntityUtils.getAllEntities()) {
-            if (entity is EntityOtherPlayerMP) continue
+            if (entity is RemotePlayer) continue
             val mob = MobData.entityToMob[entity]
             if (mob?.isAlive == false) continue
-            val name = entity.name
+            val name = entity.name.formattedTextCompatLessResets()
             val isTrevor = mob?.let { it.name != name && isTrevorMob(it) } ?: false
-            val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
-            currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) || it.entityName.contains(name) }
+            val entityHealth = if (entity is LivingEntity) entity.baseMaxHealth.derpy() else 0
+            currentMob = TrevorMob.findByName(name)
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
 
-                val currentMob = currentMob ?: run {
-                    ErrorManager.skyHanniError(
-                        "Found trevor mob but current mob is null",
-                        "entity" to entity,
-                        "mobDataMob" to mob,
-                    )
-                }
+                val currentMob = currentMob ?: ErrorManager.skyHanniError(
+                    "Found trevor mob but current mob is null",
+                    "entity" to entity,
+                    "mobDataMob" to mob,
+                )
 
-                if (foundID == entity.entityId) {
+                if (foundID == entity.id) {
                     val isOasisMob = currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP
                     if (isOasisMob && mobLocation == TrapperMobArea.OASIS && !isTrevor) return
                     val canSee = entity.canBeSeen(currentMob.renderDistance) && !entity.isInvisible && !hasBlindness
@@ -79,10 +81,10 @@ object TrevorSolver {
                             TrevorFeatures.lastTitle = TitleManager.sendTitle("§2Saw ${currentMob.mobName}!")
                         }
                         mobLocation = TrapperMobArea.FOUND
-                        mobCoordinates = entity.position.toLorenzVec()
+                        mobCoordinates = entity.blockPosition().toLorenzVec()
                     }
                 } else {
-                    foundID = entity.entityId
+                    foundID = entity.id
                 }
                 return
             }

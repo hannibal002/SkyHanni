@@ -59,8 +59,7 @@ object GardenWarpCommands {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onKeyDown(event: KeyDownEvent) {
-        if (Minecraft.getMinecraft().currentScreen != null) return
-        if (NeuItems.neuHasFocus()) return
+        if (Minecraft.getInstance().screen != null) return
 
         when (event.keyCode) {
             config.homeHotkey -> {

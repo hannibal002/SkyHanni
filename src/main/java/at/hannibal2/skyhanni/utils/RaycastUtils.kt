@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.phys.AABB
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -31,7 +31,7 @@ object RaycastUtils {
     fun createPlayerLookDirectionRay(): Ray {
         return Ray(
             LocationUtils.playerEyeLocation(),
-            MinecraftCompat.localPlayer.lookVec.toLorenzVec()
+            MinecraftCompat.localPlayer.lookAngle.toLorenzVec()
         )
     }
 
@@ -78,7 +78,7 @@ object RaycastUtils {
      * The entry point may be behind the ray origin if the ray starts inside the box.
      * Returns null if the ray points away from the box or misses it entirely.
      */
-    fun intersectAABBWithRay(aabb: AxisAlignedBB, ray: Ray): Pair<LorenzVec, LorenzVec>? {
+    fun intersectAABBWithRay(aabb: AABB, ray: Ray): Pair<LorenzVec, LorenzVec>? {
         val aabbMin = LorenzVec(aabb.minX, aabb.minY, aabb.minZ).toDoubleArray()
         val aabbMax = LorenzVec(aabb.maxX, aabb.maxY, aabb.maxZ).toDoubleArray()
 

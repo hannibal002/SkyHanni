@@ -10,23 +10,16 @@ import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import com.mojang.blaze3d.systems.RenderSystem
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.inventory.Slot
-import org.lwjgl.opengl.GL11
+import net.minecraft.world.inventory.Slot
 import java.awt.Color
-import java.nio.FloatBuffer
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
-//#if MC < 1.21
-import net.minecraft.client.renderer.GLAllocation
-//#else
-//$$ import com.mojang.blaze3d.systems.RenderSystem
-//$$ import org.lwjgl.BufferUtils
-//#endif
 
 @Suppress("LargeClass", "TooManyFunctions")
 object RenderUtils {
@@ -51,32 +44,19 @@ object RenderUtils {
         override fun toString() = value
     }
 
-    //#if MC < 1.21
-    private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
-    private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
-    //#endif
-
     /**
      * Used for some debugging purposes.
      */
     val absoluteTranslation
         get() = run {
-            //#if MC < 1.21
-            matrixBuffer.clear()
-            GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, matrixBuffer)
-            val read = generateSequence(0) { it + 1 }.take(16).map { matrixBuffer.get() }.toList()
-            val xTranslate = read[12].toInt()
-            val yTranslate = read[13].toInt()
-            val zTranslate = read[14].toInt()
-            matrixBuffer.flip()
-            //#elseif MC < 1.21.6
-            //$$ RenderSystem.assertOnRenderThread()
-            //$$ val posMatrix = DrawContextUtils.drawContext.matrices.peek().positionMatrix
-            //$$ val tmp = org.joml.Vector3f()
-            //$$ posMatrix.getTranslation(tmp)
-            //$$ val xTranslate = tmp.x.toInt()
-            //$$ val yTranslate = tmp.y.toInt()
-            //$$ val zTranslate = tmp.z.toInt()
+            //#if MC < 1.21.6
+            RenderSystem.assertOnRenderThread()
+            val posMatrix = DrawContextUtils.drawContext.pose().last().pose()
+            val tmp = org.joml.Vector3f()
+            posMatrix.getTranslation(tmp)
+            val xTranslate = tmp.x.toInt()
+            val yTranslate = tmp.y.toInt()
+            val zTranslate = tmp.z.toInt()
             //#else
             //$$ val xTranslate = 0
             //$$ val yTranslate = 0
@@ -92,7 +72,7 @@ object RenderUtils {
 
     // TODO eventually removed awt.Color support, we should only use moulconfig.ChromaColour or LorenzColor
     fun Slot.highlight(color: Color) {
-        highlight(color, xDisplayPosition, yDisplayPosition)
+        highlight(color, x, y)
     }
 
     fun Slot.highlight(color: ChromaColour) {
@@ -108,20 +88,15 @@ object RenderUtils {
     }
 
     private fun highlight(color: Color, x: Int, y: Int) {
-        GlStateManager.disableLighting()
-        GlStateManager.disableDepth()
+        ModernGlStateManager.disableLighting()
+        ModernGlStateManager.disableDepthTest()
         DrawContextUtils.pushMatrix()
-        // TODO don't use z
-        //#if MC < 1.21
-        val zLevel = Minecraft.getMinecraft().renderItem.zLevel
-        //#else
-        //$$ val zLevel = 50f
-        //#endif
+        val zLevel = 50f
         DrawContextUtils.translate(0f, 0f, 110 + zLevel)
         GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
         DrawContextUtils.popMatrix()
-        GlStateManager.enableDepth()
-        GlStateManager.enableLighting()
+        ModernGlStateManager.enableDepthTest()
+        ModernGlStateManager.enableLighting()
     }
 
     fun Slot.drawBorder(color: LorenzColor) {
@@ -129,7 +104,7 @@ object RenderUtils {
     }
 
     fun Slot.drawBorder(color: Color) {
-        drawBorder(color, xDisplayPosition, yDisplayPosition)
+        drawBorder(color, x, y)
     }
 
     fun RenderGuiItemOverlayEvent.drawBorder(color: LorenzColor) {
@@ -141,22 +116,18 @@ object RenderUtils {
     }
 
     fun drawBorder(color: Color, x: Int, y: Int) {
-        GlStateManager.disableLighting()
-        GlStateManager.disableDepth()
+        ModernGlStateManager.disableLighting()
+        ModernGlStateManager.disableDepthTest()
         DrawContextUtils.pushMatrix()
-        //#if TODO
-        val zLevel = Minecraft.getMinecraft().renderItem.zLevel
-        //#else
-        //$$ val zLevel = 50f
-        //#endif
+        val zLevel = 50f
         DrawContextUtils.translate(0f, 0f, 110 + zLevel)
         GuiRenderUtils.drawRect(x, y, x + 1, y + 16, color.rgb)
         GuiRenderUtils.drawRect(x, y, x + 16, y + 1, color.rgb)
         GuiRenderUtils.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
         GuiRenderUtils.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
         DrawContextUtils.popMatrix()
-        GlStateManager.enableDepth()
-        GlStateManager.enableLighting()
+        ModernGlStateManager.enableDepthTest()
+        ModernGlStateManager.enableLighting()
     }
 
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
@@ -183,12 +154,12 @@ object RenderUtils {
         val display = "§f$string"
         DrawContextUtils.pushMatrix()
         transform()
-        val fr = Minecraft.getMinecraft().fontRendererObj
+        val fr = Minecraft.getInstance().font
 
         DrawContextUtils.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
         if (centered) {
-            val strLen: Int = fr.getStringWidth(string)
+            val strLen: Int = fr.width(string)
             val x2 = offsetX - strLen / 2f
             GuiRenderUtils.drawString(display, x2, 0f, -1)
         } else {
@@ -197,7 +168,7 @@ object RenderUtils {
 
         DrawContextUtils.popMatrix()
 
-        return fr.getStringWidth(display)
+        return fr.width(display)
     }
 
     @Deprecated("Use renderRenderables instead", ReplaceWith("renderRenderables(renderables)"))
@@ -300,14 +271,14 @@ object RenderUtils {
         text: String,
         scale: Float,
     ) {
-        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+        val fontRenderer = Minecraft.getInstance().font
 
-        GlStateManager.disableLighting()
-        GlStateManager.disableDepth()
-        GlStateManager.disableBlend()
+        ModernGlStateManager.disableLighting()
+        ModernGlStateManager.disableDepthTest()
+        ModernGlStateManager.disableBlend()
 
         DrawContextUtils.pushPop {
-            DrawContextUtils.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 200f)
+            DrawContextUtils.translate((xPos - fontRenderer.width(text)).toFloat(), yPos.toFloat(), 200f)
             DrawContextUtils.scale(scale, scale, 1f)
             GuiRenderUtils.drawString(text, 0f, 0f, -1)
 
@@ -316,16 +287,7 @@ object RenderUtils {
             DrawContextUtils.scale(reverseScale, reverseScale, 1f)
         }
 
-        GlStateManager.enableLighting()
-        GlStateManager.enableDepth()
+        ModernGlStateManager.enableLighting()
+        ModernGlStateManager.enableDepthTest()
     }
-
-    //#if MC < 1.21
-    fun getAlpha(): Float {
-        colorBuffer.clear()
-        GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colorBuffer)
-        if (colorBuffer.limit() < 4) return 1f
-        return colorBuffer.get(3)
-    }
-    //#endif
 }

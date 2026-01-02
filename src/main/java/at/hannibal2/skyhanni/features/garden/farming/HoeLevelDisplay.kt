@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.appendString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -85,16 +85,12 @@ object HoeLevelDisplay {
         levelUpPattern.matchMatcher(event.message) {
             val heldItem = InventoryUtils.getItemInHand() ?: return
             val leveledUpTool = group("tool")
-            val heldItemName = heldItem.displayName.removeColor()
+            val heldItemName = heldItem.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
             if (!heldItemName.contains(leveledUpTool)) return
             val overflowLevel = addOverflowHoeLevel(heldItem.getItemUuid())
             if (isEnabled() && config.overflow && overflowLevel != null) {
                 val currentLevel = heldItem.getHoeLevel() ?: return
-                //#if MC < 1.21
-                event.chatComponent = event.chatComponent.appendString(" §8(§3Level ${currentLevel + overflowLevel}§8)")
-                //#else
-                //$$ event.chatComponent = event.chatComponent.copy().append(" §8(§3Level ${currentLevel + overflowLevel}§8)")
-                //#endif
+                event.chatComponent = event.chatComponent.copy().append(" §8(§3Level ${currentLevel + overflowLevel}§8)")
             }
         }
     }

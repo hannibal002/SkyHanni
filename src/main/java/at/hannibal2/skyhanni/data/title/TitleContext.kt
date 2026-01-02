@@ -10,13 +10,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -81,8 +81,8 @@ open class TitleContext(
         val mainScalar = position.scale * 3.0
         val subScalar = mainScalar * 0.75f
 
-        GlStateManager.enableBlend()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+        ModernGlStateManager.enableBlend()
+        ModernGlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         DrawContextUtils.pushPop {
             val mainTextRenderable = Renderable.text(
                 getTitleText(),
@@ -131,7 +131,7 @@ open class TitleContext(
     }
 
     fun tryRenderInventoryTitle() {
-        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
+        val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return
 
         val stringRenderable = with(Renderable) {
             vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {

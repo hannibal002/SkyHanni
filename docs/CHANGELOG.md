@@ -1,5 +1,15 @@
 # SkyHanni - Change Log
 
+## Version 7.0.0
+
+### Technical Details
+
++ Remapped the project to mojang mappings. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4978)
+
+### Removed Features
+
++ Removed 1.8.9 support. - nopo (https://github.com/hannibal002/SkyHanni/pull/4978)
+
 ## Version 6.0.0
 
 ### New Features
@@ -35,6 +45,7 @@
   + Modes are Default, Muted, Custom, and Plumber.
 + Added DNA Analyser Solver. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
 + Added Hoe Level Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
++ Mute Hoe Level Up Sound. - nopo (https://github.com/hannibal002/SkyHanni/pull/4966)
 
 #### Foraging
 
@@ -73,6 +84,12 @@
   + Made it work if you abiphone Jake.
   + Blocked accidentally clicking the close puzzle button.
 + Added support for Moonflower, Sunflower, and Wild Rose in Basket of Seeds for Not Clickable Items. - Luna (https://github.com/hannibal002/SkyHanni/pull/4954)
++ Added chips to visitor drop rewards display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4960)
++ Added support for the new Mouse Trap upgrade (Vermin Trap). - Luna (https://github.com/hannibal002/SkyHanni/pull/4969)
++ Disabled Custom Garden Keybinds while on the greenhouse. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4965)
++ Disabled Saving last farmed location on the greenhouse. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4965)
++ Disabled Sensitivity Reducer while on the greenhouse. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4965)
++ Replaced /ff with a link to elitebot.dev's fortune page. - nopo (https://github.com/hannibal002/SkyHanni/pull/4970)
 
 #### Mining
 
@@ -107,6 +124,7 @@
   + Only enabled on sessions by default; uptime was not tracked before this and will be wrong on total mode.
 + Made Block Break Prticle Hider searchable by typing breaking. - Luna (https://github.com/hannibal002/SkyHanni/pull/4931)
 + Made warnings about missing tab list info less frequent and aggressive. - Luna (https://github.com/hannibal002/SkyHanni/pull/4933)
++ Improved performance of entity features. - Empa (https://github.com/hannibal002/SkyHanni/pull/4900)
 
 ### Fixes
 
@@ -152,6 +170,7 @@
 + Fixed Slayer spawn costs not being tracked during aura. - nopo (https://github.com/hannibal002/SkyHanni/pull/4905)
 + Fixed Broodmother chat messages sending twice or incorrectly. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4918)
 + Fixed Slayer Spawn Cost not Counting during Aura. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4919)
++ Fixed Fire Pillar Display disappearing sometimes wrongly. - Empa (https://github.com/hannibal002/SkyHanni/pull/4900)
 
 #### Farming
 
@@ -166,6 +185,9 @@
 + Fixed Skill error during crop fever. - nopo (https://github.com/hannibal002/SkyHanni/pull/4950)
 + Fixed vinyl error in the vacuum. - nopo (https://github.com/hannibal002/SkyHanni/pull/4949)
 + Made armor drop tracker work with the greenhouse update. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4953)
++ Fixed sowdust displaying incorrectly in chunked stats on custom scoreboard. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4963)
++ Fixed Jerry easter egg triggering on St. Jerry. - nopo (https://github.com/hannibal002/SkyHanni/pull/4975)
++ Fixed Stereo Harmony Crop Display not showing the new crops. - nopo (https://github.com/hannibal002/SkyHanni/pull/4976)
 
 #### Chocolate Factory
 
@@ -202,6 +224,8 @@
 + Fixed Hideonleaf finder navigating when typing. - nopo (https://github.com/hannibal002/SkyHanni/pull/4945)
 + Fixed some box rendering on modern. - nopo (https://github.com/hannibal002/SkyHanni/pull/4940)
 + Fixed Tablist not rendering over other elements when using toggle tab. - nopo (https://github.com/hannibal002/SkyHanni/pull/4941)
++ Fixed potential config wipe. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4961)
++ Fixed Performance issues on the garden due to fire pit warning. - nopo (https://github.com/hannibal002/SkyHanni/pull/4974)
 
 ### Technical Details
 
@@ -224,6 +248,9 @@
   + They can still be edited via `/shconfig`.
 + Added the ability to change current mayor perks via repo. - nopo (https://github.com/hannibal002/SkyHanni/pull/4936)
 + Using `@OnlyLegacy` and `@OnlyModern` together on the same config option now throws a compile-time (and runtime) error. - Luna (https://github.com/hannibal002/SkyHanni/pull/4908)
++ Added the ability to remove something from the config. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4961)
++ Made config moves actually remove the old data. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4961)
++ Added message in the config when your mc version is no longer supported. - nopo (https://github.com/hannibal002/SkyHanni/pull/4967)
 
 ### Removed Features
 

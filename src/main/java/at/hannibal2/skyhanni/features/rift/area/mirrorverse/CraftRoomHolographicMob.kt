@@ -13,32 +13,34 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.monster.EntityCaveSpider
-import net.minecraft.entity.monster.EntitySlime
-import net.minecraft.entity.monster.EntityZombie
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.monster.CaveSpider
+import net.minecraft.world.entity.monster.Slime
+import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.phys.AABB
 
 // TODO fix looking at direction, slime size, helmet/skull of zombie
 @SkyHanniModule
 object CraftRoomHolographicMob {
 
     private val config get() = SkyHanniMod.feature.rift.area.mirrorverse.craftingRoom
-    private val craftRoomArea = AxisAlignedBB(
+    private val craftRoomArea = AABB(
         -108.0, 58.0, -106.0,
         -117.0, 51.0, -128.0,
     )
     private val entityToHolographicEntity = mapOf(
-        EntityZombie::class.java to HolographicEntities.zombie,
-        EntitySlime::class.java to HolographicEntities.slime,
-        EntityCaveSpider::class.java to HolographicEntities.caveSpider,
+        Zombie::class.java to HolographicEntities.zombie,
+        Slime::class.java to HolographicEntities.slime,
+        CaveSpider::class.java to HolographicEntities.caveSpider,
     )
 
-    private var holograms = mapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
+    private var holograms = mapOf<HolographicEntities.HolographicEntity<out LivingEntity>, String?>()
     private var enabled = false
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
@@ -46,31 +48,31 @@ object CraftRoomHolographicMob {
         enabled = config.enabled && craftRoomArea.isPlayerInside()
         if (!enabled) return
 
-        val map = mutableMapOf<HolographicEntities.HolographicEntity<out EntityLivingBase>, String?>()
-        for (entity in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(25.0)) {
-            if (entity is EntityPlayer) continue
+        val map = mutableMapOf<HolographicEntities.HolographicEntity<out LivingEntity>, String?>()
+        for (entity in EntityUtils.getEntitiesNextToPlayer<LivingEntity>(25.0)) {
+            if (entity is Player) continue
             val holographicEntity = entityToHolographicEntity[entity::class.java] ?: continue
 
             val currentLocation = entity.getLorenzVec()
             if (!craftRoomArea.isInside(currentLocation)) continue
-            val previousLocation = LorenzVec(entity.lastTickPosX, entity.lastTickPosY, entity.lastTickPosZ) // used to interpolate movement
+            val previousLocation = LorenzVec(entity.xo, entity.yo, entity.zo) // used to interpolate movement
 
             // we currently don't rotate the body so head rotations looked very weird
             val instance = holographicEntity.instance(previousLocation.mirror(), 0f)
-            instance.isChild = entity.isChild
+            instance.isChild = entity.isBaby
             instance.moveTo(currentLocation.mirror(), 0f)
             map[instance] = entity.display()
         }
         holograms = map
     }
 
-    private fun EntityLivingBase.display() = buildString {
+    private fun LivingEntity.display() = buildString {
         if (config.showName) {
-            val mobName = displayName.formattedText
+            val mobName = displayName.formattedTextCompat()
             append("§a$mobName ")
         }
         if (config.showHealth) {
-            append("§c${health.roundTo(1)}♥")
+            append("§c${findHealthReal().roundTo(1)}♥")
         }
     }.trim().takeIf { it.isNotEmpty() }
 
@@ -87,7 +89,7 @@ object CraftRoomHolographicMob {
     }
 
     @HandleEvent(receiveCancelled = true, onlyOnIsland = IslandType.THE_RIFT)
-    fun onPlayerRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
+    fun onPlayerRender(event: CheckRenderEntityEvent<RemotePlayer>) {
         if (enabled && config.hidePlayers) {
             event.cancel()
         }

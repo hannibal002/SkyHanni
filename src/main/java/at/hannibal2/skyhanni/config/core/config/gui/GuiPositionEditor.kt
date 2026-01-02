@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.OtherInventoryData
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -33,12 +32,13 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import at.hannibal2.skyhanni.utils.render.ModernGlStateManager
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.client.renderer.GlStateManager
-import org.lwjgl.input.Keyboard
+import net.minecraft.client.Minecraft
+import org.lwjgl.glfw.GLFW
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
@@ -46,7 +46,7 @@ import kotlin.reflect.jvm.javaField
 class GuiPositionEditor(
     private val positions: List<Position>,
     private val border: Int,
-    private val oldScreen: GuiContainer? = null,
+    private val oldScreen: SkyHanniGuiContainer? = null,
 ) : SkyHanniBaseScreen() {
 
     private val config get() = SkyHanniMod.feature.gui
@@ -67,17 +67,12 @@ class GuiPositionEditor(
         drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
             //#if MC > 1.21.5
-            //$$ oldScreen.drawBackground(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
+            //$$ oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
             //#endif
-            //#if MC < 1.21
-            val accessor = oldScreen as AccessorGuiContainer
-            accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
-            //#else
-            //$$ oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
-            //#endif
+            oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
         }
 
-        GlStateManager.disableLighting()
+        ModernGlStateManager.disableLighting()
         val hoveredPos = renderRectangles()
 
         renderLabels(hoveredPos)
@@ -91,7 +86,7 @@ class GuiPositionEditor(
 
         // When the mouse isn't currently hovering over a gui element
         val text = if (displayPos == -1) {
-            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == Keyboard.KEY_NONE
+            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == GLFW.GLFW_KEY_UNKNOWN
 
             buildList {
                 add("§cSkyHanni Position Editor")
@@ -204,12 +199,12 @@ class GuiPositionEditor(
         val elementWidth = position.getDummySize(true).x
         val elementHeight = position.getDummySize(true).y
         when (keyCode) {
-            Keyboard.KEY_DOWN -> position.moveY(dist, elementHeight)
-            Keyboard.KEY_UP -> position.moveY(-dist, elementHeight)
-            Keyboard.KEY_LEFT -> position.moveX(-dist, elementWidth)
-            Keyboard.KEY_RIGHT -> position.moveX(dist, elementWidth)
-            Keyboard.KEY_MINUS, Keyboard.KEY_SUBTRACT -> position.scale -= .1F
-            Keyboard.KEY_EQUALS, Keyboard.KEY_ADD -> position.scale += .1F
+            GLFW.GLFW_KEY_DOWN -> position.moveY(dist, elementHeight)
+            GLFW.GLFW_KEY_UP -> position.moveY(-dist, elementHeight)
+            GLFW.GLFW_KEY_LEFT -> position.moveX(-dist, elementWidth)
+            GLFW.GLFW_KEY_RIGHT -> position.moveX(dist, elementWidth)
+            GLFW.GLFW_KEY_MINUS, GLFW.GLFW_KEY_KP_SUBTRACT -> position.scale -= .1F
+            GLFW.GLFW_KEY_EQUAL, GLFW.GLFW_KEY_KP_ADD -> position.scale += .1F
         }
     }
 
@@ -275,13 +270,11 @@ class GuiPositionEditor(
         hovered.scale += if (scroll > 0) .1F else -.1F
     }
 
-    //#if MC > 1.21
-    //$$ override fun close() {
-    //$$ if (oldScreen == null) {
-    //$$     super.close()
-    //$$ } else {
-    //$$     net.minecraft.client.MinecraftClient.getInstance().currentScreen = oldScreen
-    //$$ }
-    //$$ }
-    //#endif
+    override fun onClose() {
+        if (oldScreen == null) {
+            super.onClose()
+        } else {
+            Minecraft.getInstance().screen = oldScreen
+        }
+    }
 }

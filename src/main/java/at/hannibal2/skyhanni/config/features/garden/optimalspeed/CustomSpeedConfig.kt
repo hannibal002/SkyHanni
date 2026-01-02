@@ -90,19 +90,19 @@ class CustomSpeedConfig {
     @ConfigOption(
         name = "Sunflower & Moonflower",
         desc = "Suggested farm speed:\n" +
-            "ask google",
+            "§eYaw 45§7: §f✦ 328 speed",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 400f, minStep = 1f)
-    val sunMoonFlower: Property<Float> = Property.of(155f)
+    val sunMoonFlower: Property<Float> = Property.of(328f)
 
     @Expose
     @ConfigOption(
         name = "Wild Flower",
         desc = "Suggested farm speed:\n" +
-            "ask google",
+            "§eYaw 45§7: §f✦ 328 speed",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 400f, minStep = 1f)
-    val wildRose: Property<Float> = Property.of(155f)
+    val wildRose: Property<Float> = Property.of(328f)
 
     @Expose
     @ConfigOption(

@@ -201,7 +201,7 @@ enum class SkyblockStat(
     companion object {
 
         val fontSizeOfLargestIcon by lazy {
-            entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.icon) } + 1
+            entries.maxOf { Minecraft.getInstance().font.width(it.icon) } + 1
         }
 
         fun getValueOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.name == string || it.hypxelId == string }
@@ -278,6 +278,7 @@ enum class SkyblockStat(
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(69, "#profile.stats.TRUE_DEFENCE", "#profile.stats.TRUE_DEFENSE")
             event.move(112, "#profile.stats.NETHER_WART_FORTUNE", "#profile.stats.NETHER_STALK_FORTUNE")
+            event.remove(113, "#profile.stats.null")
         }
     }
 }

@@ -75,17 +75,10 @@ class HoppityWaypointsConfig {
     var showNearbyDuplicates: Boolean = false
 
     @Expose
-    //#if FORGE
     @ConfigOption(
-        name = "Load from NEU PV",
-        desc = "Load Hoppity Egg Location data from API when opening the NEU Profile Viewer."
+       name = "Load from SkyBlock PV",
+       desc = "Load Hoppity Egg Location data from API when opening the SkyBlock Profile Viewer mod."
     )
-    //#else
-    //$$@ConfigOption(
-    //$$    name = "Load from SkyBlock PV",
-    //$$    desc = "Load Hoppity Egg Location data from API when opening the SkyBlock Profile Viewer mod."
-    //$$)
-    //#endif
     @ConfigEditorBoolean
     @FeatureToggle
     var loadFromNeuPv: Boolean = true

@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object TrophyFishFillet {
@@ -35,7 +35,7 @@ object TrophyFishFillet {
         val info = TrophyFishManager.getInfo(trophyFishName) ?: return
         val rarity = TrophyRarity.getByName(trophyRarityName) ?: return
 
-        val multiplier = if (Keyboard.KEY_LSHIFT.isKeyHeld()) event.itemStack.stackSize else 1
+        val multiplier = if (GLFW.GLFW_KEY_LEFT_SHIFT.isKeyHeld()) event.itemStack.count else 1
         val filletValue = info.getFilletValue(rarity) * multiplier
 
         val filletPrice = filletValue * MAGMA_FISH.getPrice()

@@ -62,7 +62,7 @@ object SackDisplay {
         if (!SackApi.inventory.isInside()) return
         if (!config.highlightFull) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val lore = slot.stack.getLore()
+            val lore = slot.item.getLore()
             if (lore.any { it.startsWith("§7Stored: §a") }) {
                 slot.highlight(LorenzColor.RED)
             }
@@ -116,7 +116,7 @@ object SackDisplay {
                             }
                         },
                         highlightsOnHoverSlots = listOf(slot),
-                    ) { !NeuItems.neuHasFocus() }
+                    )
                     add(nameText)
 
 
@@ -286,7 +286,7 @@ object SackDisplay {
                                 BazaarApi.searchForBazaarItem(name.removeColor().dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),
-                        ) { !NeuItems.neuHasFocus() },
+                        ),
                     )
                     when (SackApi.gemstoneStackFilter) {
                         GemstoneQuality.ROUGH -> addAlignedNumber(gem.rough.addSeparators())

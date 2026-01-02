@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -48,7 +49,7 @@ object SkillExperience {
         if (event.inventoryName != "Your Skills") return
 
         for ((_, stack) in event.inventoryItems) {
-            val name = stack.displayName.removeColor()
+            val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
             if (!name.contains(" ")) continue
 
             val lore = stack.getLore()

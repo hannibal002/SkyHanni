@@ -19,7 +19,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.inventory.Slot
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import net.minecraft.world.inventory.Slot
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -55,13 +56,13 @@ object VisitorRewardWarning {
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorApi.inInventory) return
-        val stack = event.slot?.stack ?: return
+        val stack = event.slot?.item ?: return
 
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason
 
-        val isRefuseSlot = stack.displayName == "§cRefuse Offer"
-        val isAcceptSlot = stack.displayName == "§aAccept Offer"
+        val isRefuseSlot = stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cRefuse Offer"
+        val isAcceptSlot = stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aAccept Offer"
 
         val shouldBlock = blockReason?.run { blockRefusing && isRefuseSlot || !blockRefusing && isAcceptSlot } ?: false
         if (!config.bypassKey.isKeyHeld() && shouldBlock) {
@@ -92,8 +93,8 @@ object VisitorRewardWarning {
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         if (config.bypassKey.isKeyHeld()) return
 
-        val isRefuseSlot = event.itemStack.displayName == "§cRefuse Offer"
-        val isAcceptSlot = event.itemStack.displayName == "§aAccept Offer"
+        val isRefuseSlot = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cRefuse Offer"
+        val isAcceptSlot = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aAccept Offer"
 
         val blockReason = visitor.blockReason ?: return
         if (blockReason.blockRefusing && !isRefuseSlot) return

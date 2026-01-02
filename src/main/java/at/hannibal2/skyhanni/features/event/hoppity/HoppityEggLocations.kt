@@ -99,8 +99,7 @@ object HoppityEggLocations {
 
         val locationStr = StringUtils.pluralize(diff, "location", "locations")
 
-        val message = if (PlatformUtils.IS_LEGACY) "Click here to load $diff more collected egg $locationStr from NEU PV!"
-        else "Click here to load $diff more collected egg $locationStr from SkyBlock Profile Viewer!"
+        val message = "Click here to load $diff more collected egg $locationStr from SkyBlock Profile Viewer!"
 
         ChatUtils.clickableChat(
             message = message,

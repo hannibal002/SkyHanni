@@ -29,9 +29,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -39,7 +40,7 @@ object EssenceShopHelper {
 
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
-    private inline val GOLD_NUGGET_ITEM get() = Items.gold_nugget
+    private inline val GOLD_NUGGET_ITEM get() = Items.GOLD_NUGGET
 
     /**
      * Essence Upgrade Bounds
@@ -239,14 +240,14 @@ object EssenceShopHelper {
 
     private fun processEssenceShopHeader(event: InventoryOpenEvent) {
         val essenceHeaderStack = event.inventoryItems[4]
-        if (essenceHeaderStack == null || !essenceShopPattern.matches(essenceHeaderStack.displayName)) {
+        if (essenceHeaderStack == null || !essenceShopPattern.matches(essenceHeaderStack.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
             ErrorManager.logErrorWithData(
                 NoSuchElementException(""),
                 "Could not read current Essence Count from inventory",
                 extraData = listOf(
                     "inventoryName" to event.inventoryName,
-                    "essenceHeaderStack" to essenceHeaderStack?.displayName.orEmpty(),
-                    "populatedInventorySize" to event.inventoryItems.filter { it.value.displayName.isNotEmpty() }.size,
+                    "essenceHeaderStack" to essenceHeaderStack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty(),
+                    "populatedInventorySize" to event.inventoryItems.filter { it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() }.size,
                     "eventType" to event.javaClass.simpleName,
                 ).toTypedArray(),
             )

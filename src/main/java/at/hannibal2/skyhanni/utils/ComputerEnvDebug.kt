@@ -8,13 +8,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-//#if MC == 1.8.9
-import net.minecraftforge.fml.client.FMLClientHandler
-import net.minecraftforge.fml.common.Loader
-//#endif
 import java.lang.management.ManagementFactory
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
@@ -26,7 +21,6 @@ object ComputerEnvDebug {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         os(event)
-        java(event)
         launcher(event)
         ram(event)
         uptime(event)
@@ -88,35 +82,6 @@ object ComputerEnvDebug {
             null
         }
         return firstStack
-    }
-
-    private fun java(event: DebugDataCollectEvent) {
-        // outdated java 8 is only a mc 1.8.9 thing. in mc 1.21 we have modern java 21 anyway
-        if (!PlatformUtils.IS_LEGACY) return
-
-        event.title("Computer Java Version")
-        val version = System.getProperty("java.version")
-        val pattern = "1\\.8\\.0_(?<update>.*)".toPattern()
-        pattern.matchMatcher(version) {
-            group("update").toIntOrNull()?.let {
-                val devEnvironment = PlatformUtils.isDevEnvironment
-                if (it < 300 && !devEnvironment) {
-                    event.addData {
-                        add("Old java version: $it")
-                        add("Update to a newer version if you have performance issues.")
-                        add("For more infos: https://github.com/hannibal002/SkyHanni/blob/beta/docs/update_java.md")
-                    }
-                } else {
-                    if (devEnvironment) {
-                        event.addIrrelevant("Update version: $it (dev env)")
-                    } else {
-                        event.addIrrelevant("New update: $it")
-                    }
-                }
-                return
-            }
-        }
-        event.addData("Unknown java version: '$version'")
     }
 
     private fun os(event: DebugDataCollectEvent) {
@@ -227,40 +192,18 @@ object ComputerEnvDebug {
     private fun performanceMods(event: DebugDataCollectEvent) {
         if (PlatformUtils.isDevEnvironment) return
         event.title("Performance Mods")
-        //#if MC < 1.21
-        val hasOptifine = FMLClientHandler.instance().hasOptifine()
-        val hasPatcher = Loader.isModLoaded("patcher")
-        if (!hasOptifine || !hasPatcher) {
+        val hasSodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")
+        if (!hasSodium) {
             event.addData {
-                add("Optifine is ${if (hasOptifine) "" else "not"} installed")
-                add("Patcher is ${if (hasPatcher) "" else "not"} installed")
-                add("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
-                if (!hasOptifine) {
-                    add("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
-                }
-                if (!hasPatcher) {
-                    add("https://modrinth.com/mod/patcher")
-                }
+                add("Sodium is not installed")
+                add("This mod greatly improve performance")
+                add("https://modrinth.com/mod/sodium")
             }
         } else {
             event.addIrrelevant {
-                add("Optifine and Patcher are installed")
+                add("Sodium is installed")
             }
         }
-        //#else
-        //$$ val hasSodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")
-        //$$ if (!hasSodium) {
-        //$$     event.addData {
-        //$$         add("Sodium is not installed")
-        //$$         add("This mod greatly improve performance")
-        //$$         add("https://modrinth.com/mod/sodium")
-        //$$     }
-        //$$ } else {
-        //$$     event.addIrrelevant {
-        //$$         add("Sodium is installed")
-        //$$     }
-        //$$ }
-        //#endif
     }
 
     @HandleEvent

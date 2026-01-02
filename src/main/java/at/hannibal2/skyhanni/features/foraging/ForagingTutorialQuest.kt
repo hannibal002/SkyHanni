@@ -125,10 +125,6 @@ object ForagingTutorialQuest {
         ChatUtils.clickableChat(
             "Do you want to have help solving the Foraging Tutorial Quest? Click here!",
             onClick = {
-                if (PlatformUtils.IS_LEGACY) {
-                    ChatUtils.chat("§cYou need to be on a modern version of Minecraft to use this feature!")
-                    return@clickableChat
-                }
                 config.enabled = true
                 start(step)
             },
@@ -142,5 +138,5 @@ object ForagingTutorialQuest {
         )
     }
 
-    private fun isEnabled() = config.enabled && !PlatformUtils.IS_LEGACY
+    private fun isEnabled() = config.enabled
 }

@@ -6,60 +6,55 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraft.util.BlockPos
-import net.minecraft.util.MovingObjectPosition
-
-//#if MC > 1.21
-//$$ import net.minecraft.util.hit.BlockHitResult
-//$$ import net.minecraft.util.hit.EntityHitResult
-//#endif
+import net.minecraft.core.BlockPos
+import net.minecraft.network.protocol.game.ServerboundInteractPacket
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.EntityHitResult
+import net.minecraft.world.phys.HitResult
 
 object MinecraftInputHook {
     @JvmStatic
-    fun shouldCancelMouseRightClick(hitResult: MovingObjectPosition?): Boolean =
+    fun shouldCancelMouseRightClick(hitResult: HitResult?): Boolean =
         handleClick(
             hitResult,
             ClickType.RIGHT_CLICK,
-            C02PacketUseEntity.Action.INTERACT_AT,
+            ServerboundInteractPacket.ActionType.INTERACT_AT,
         )
 
     @JvmStatic
-    fun shouldCancelMouseLeftClick(hitResult: MovingObjectPosition?): Boolean =
+    fun shouldCancelMouseLeftClick(hitResult: HitResult?): Boolean =
         handleClick(
             hitResult,
             ClickType.LEFT_CLICK,
-            C02PacketUseEntity.Action.ATTACK,
+            ServerboundInteractPacket.ActionType.ATTACK,
         )
 
     @JvmStatic
     fun shouldCancelContinuedBlockBreak(
-        hitResult: MovingObjectPosition?,
+        hitResult: HitResult?,
         currentBlockPos: BlockPos,
     ): Boolean {
-        if (hitResult == null || hitResult.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return false
+        if (hitResult == null || hitResult.type != HitResult.Type.BLOCK) return false
 
-        val position = hitResult.getBlockPosCompat()
+        val position = (hitResult as BlockHitResult).blockPos
 
         if (currentBlockPos == position) return false
 
-        val itemInHand = InventoryUtils.getItemInHand()
-
-        val clickCancelled = ItemClickEvent(itemInHand, ClickType.LEFT_CLICK).post()
+        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
 
         return BlockClickEvent(
             ClickType.LEFT_CLICK,
             position.toLorenzVec(),
-            itemInHand,
+            InventoryUtils.getItemInHand(),
         ).also {
             if (clickCancelled) it.cancel()
         }.post()
     }
 
     private fun handleClick(
-        hitResult: MovingObjectPosition?,
+        hitResult: HitResult?,
         clickType: ClickType,
-        entityAction: C02PacketUseEntity.Action,
+        entityAction: ServerboundInteractPacket.ActionType,
     ): Boolean {
         if (hitResult == null) return false
 
@@ -67,12 +62,12 @@ object MinecraftInputHook {
 
         val clickCancelled = ItemClickEvent(itemInHand, clickType).post()
 
-        return when (hitResult.typeOfHit) {
-            MovingObjectPosition.MovingObjectType.MISS ->
+        return when (hitResult.type) {
+            HitResult.Type.MISS ->
                 clickCancelled
 
-            MovingObjectPosition.MovingObjectType.BLOCK -> {
-                val pos = hitResult.getBlockPosCompat()
+            HitResult.Type.BLOCK -> {
+                val pos = (hitResult as BlockHitResult).blockPos
                 BlockClickEvent(
                     clickType,
                     pos.toLorenzVec(),
@@ -82,11 +77,11 @@ object MinecraftInputHook {
                 }.post()
             }
 
-            MovingObjectPosition.MovingObjectType.ENTITY -> {
+            HitResult.Type.ENTITY -> {
                 EntityClickEvent(
                     clickType,
                     entityAction,
-                    hitResult.getEntityCompat(),
+                    (hitResult as EntityHitResult).entity,
                     itemInHand,
                 ).also {
                     if (clickCancelled) it.cancel()
@@ -94,18 +89,4 @@ object MinecraftInputHook {
             }
         }
     }
-
-    private fun MovingObjectPosition.getBlockPosCompat(): BlockPos =
-        //#if MC < 1.21
-        this.blockPos
-    //#else
-    //$$ (this as BlockHitResult).blockPos
-    //#endif
-
-    private fun MovingObjectPosition.getEntityCompat() =
-        //#if MC < 1.21
-        this.entityHit
-    //#else
-    //$$ (this as EntityHitResult).getEntity()
-    //#endif
 }

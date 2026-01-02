@@ -221,7 +221,7 @@ object TunnelsMaps {
     fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         event.slot ?: return
-        clickTranslate[event.slot.slotIndex]?.let {
+        clickTranslate[event.slot.containerSlot]?.let {
             event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
         }
     }
@@ -488,7 +488,7 @@ object TunnelsMaps {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         campfireKey(event)
         nextSpotKey(event)
     }
