@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
-import at.hannibal2.skyhanni.features.misc.navigation.AreaNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun

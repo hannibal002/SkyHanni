@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -12,8 +12,9 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
-import at.hannibal2.skyhanni.features.misc.IslandAreas.getAreaTag
-import at.hannibal2.skyhanni.features.misc.navigation.AreaNode
+import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreas
+import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreas.getAreaTag
+import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -33,7 +34,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 
 @SkyHanniModule
-object IslandAreaFeatures {
+object IslandAreaFeatures {//
     private val config get() = SkyHanniMod.feature.misc.navigation
     var smallAreas = setOf<String>()
 
@@ -192,7 +193,7 @@ object IslandAreaFeatures {
         }
     }
 
-    private fun buildAreaEntry(displayText: String, area: AreaNode, distance: Int): Searchable = Renderable.clickable(
+    private fun buildAreaEntry(displayText: String, area: AreaNode, distance: Int): Searchable = Renderable.Companion.clickable(
         "$displayText§7: §e$distance",
         tips = buildList {
             add("${area.tag.color.getChatColor()}${area.name}")
