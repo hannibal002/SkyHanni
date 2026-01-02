@@ -11,7 +11,6 @@ class GraphEditorState {
     var activeNode: GraphingNode? = null
         set(value) {
             field = value
-            // Logik bleibt erhalten, greift aber auf 'this' state zu
             selectedEdge = findEdgeBetweenActiveAndClosest()
             checkDissolve()
         }
@@ -25,12 +24,10 @@ class GraphEditorState {
     var selectedEdge: GraphingEdge? = null
     var dissolvePossible = false
 
-    // UI States können hier bleiben oder separat in einen "UIState"
     var seeThroughBlocks = true
     var inEditMode = false
     var inTutorialMode = false
 
-    // Text Input ist etwas speziell, passt aber gut hier rein
     val textBox = TextInput()
     var inTextMode = false
         set(value) {
