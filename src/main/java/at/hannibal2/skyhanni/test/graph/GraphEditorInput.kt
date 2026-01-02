@@ -63,7 +63,7 @@ object GraphEditorInput {
         handleSelect()
         handleRayCast()
         handleConnect()
-        handleThroughtBlocks()
+        handleThroughBlocks()
         if (config.dijkstraKey.isKeyClicked()) {
             GraphEditor.feedBackInTutorial("Calculated shortest route and cleared active node.")
             testDijkstra()
@@ -107,7 +107,7 @@ object GraphEditorInput {
         GraphEditor.activeNode = node
     }
 
-    private fun handleThroughtBlocks() {
+    private fun handleThroughBlocks() {
         if (!config.throughBlocksKey.isKeyClicked()) return
         GraphEditor.seeThroughBlocks = !GraphEditor.seeThroughBlocks
         GraphEditor.feedBackInTutorial(

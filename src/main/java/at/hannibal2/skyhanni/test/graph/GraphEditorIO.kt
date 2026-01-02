@@ -38,7 +38,6 @@ object GraphEditorIO {
                 val otherNode = if (node == edge.node1) edge.node2
                 else edge.node1
                 // TODO: Fix this to not use a bang bang
-                @Suppress("MapGetWithNotNullAssertionOperator")
                 nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
             }.sortedBy { it.second }
         }
@@ -62,7 +61,6 @@ object GraphEditorIO {
 
         val neighbors = graph.map { node ->
             // TODO: Fix this to not use bang bangs
-            @Suppress("MapGetWithNotNullAssertionOperator")
             node.neighbours.map {
                 GraphingEdge(
                     translation[node]!!,
