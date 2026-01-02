@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.events.AreaNodesUpdatedEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
@@ -63,8 +64,7 @@ object IslandAreaBackend {
             seenAreas += name
             AreaNode(node, name, tag, distance)
         }
-
-        IslandAreaFeatures.updateNodes(areaNodes)
+        AreaNodesUpdatedEvent(areaNodes).post()
     }
 
     private var hasMoved = false

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.AreaNodesUpdatedEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -53,15 +54,11 @@ object IslandAreaFeatures {
             color,
             onFound = {
                 targetNode = null
-                update()
+                IslandAreaBackend.update()
             },
             allowRerouting = true,
             condition = ::isAreaListEnabled,
         )
-        update()
-    }
-
-    fun update() {
         IslandAreaBackend.update()
     }
 
@@ -139,7 +136,9 @@ object IslandAreaFeatures {
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && IslandGraphs.currentIslandGraph != null
 
-    fun updateNodes(nodes: List<AreaNode>) {
+    @HandleEvent
+    fun onAreaNodesUpdated(event: AreaNodesUpdatedEvent) {
+        val nodes = event.nodes
         areaNodes = nodes
         smallAreas = nodes
             .filter { GraphNodeTag.SMALL_AREA in it.node.tags }
@@ -210,7 +209,7 @@ object IslandAreaFeatures {
             if (area.node == targetNode) {
                 targetNode = null
                 IslandGraphs.stop()
-                update()
+                IslandAreaBackend.update()
             } else {
                 setTarget(area.node)
             }
