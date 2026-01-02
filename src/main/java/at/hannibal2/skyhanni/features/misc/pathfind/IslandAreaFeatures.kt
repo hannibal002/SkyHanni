@@ -144,6 +144,7 @@ object IslandAreaFeatures {
     fun onWorldChange() {
         display = null
         targetNode = null
+        currentTitle?.stop()
     }
 
     private fun isAreaListEnabled(): Boolean = isEnabled() && areaListConfig.enabled.get()
