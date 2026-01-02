@@ -37,7 +37,7 @@ object GraphEditorIO {
         }
 
         val neighbours = nodes.map { node ->
-            val nodeEdges = edgesByNode[node] ?: emptyList()
+            val nodeEdges = edgesByNode[node].orEmpty()
 
             nodeEdges.map { edge ->
                 val otherNode = edge.getOther(node)

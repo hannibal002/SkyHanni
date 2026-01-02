@@ -3,13 +3,11 @@ package at.hannibal2.skyhanni.test.graph
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -23,7 +21,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
-import kotlin.text.ifEmpty
 
 @SkyHanniModule
 object GraphEditorInput {
