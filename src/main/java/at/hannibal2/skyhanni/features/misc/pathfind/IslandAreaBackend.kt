@@ -76,7 +76,7 @@ object IslandAreaBackend {
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || !event.isMod(2) || !hasMoved) return
-        update(shouldBuildDisplay = isPathfinderEnabled())
+        update()
         hasMoved = false
     }
 
@@ -92,19 +92,17 @@ object IslandAreaBackend {
         nodeMoved()
 
         DelayedRun.runDelayed(150.milliseconds) {
-            update(shouldBuildDisplay = isPathfinderEnabled())
+            update()
         }
     }
 
     // updating the position (mandatory for all other features), and builds the display (optionally)
-    fun update(shouldBuildDisplay: Boolean = true) {
+    fun update() {
         areaNodes.firstOrNull()?.let { area ->
             updateArea(area.name, onlyInternal = !area.isConfigVisible)
         }
 
-        if (shouldBuildDisplay) {
-            IslandAreaFeatures.redraw()
-        }
+        IslandAreaFeatures.redraw()
     }
 
     private fun updateArea(name: String, onlyInternal: Boolean) {
@@ -131,8 +129,6 @@ object IslandAreaBackend {
     fun GraphNode.getAreaTag(useConfig: Boolean = false): GraphNodeTag? = tags.firstOrNull {
         it in (if (config.includeSmallAreas || !useConfig) allAreas else onlyLargeAreas)
     }
-
-    private fun isPathfinderEnabled(): Boolean = areaListConfig.enabled.get()
 
     private fun isEnabled() = IslandGraphs.currentIslandGraph != null
 

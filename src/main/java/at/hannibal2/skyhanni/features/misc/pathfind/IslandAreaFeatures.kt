@@ -151,7 +151,11 @@ object IslandAreaFeatures {//
     }
 
     fun redraw() {
-        display = createDisplay()?.buildSearchBox(textInput)
+        if (!isPathfinderEnabled()) {
+            display = null
+            return
+        }
+        display = createDisplay().buildSearchBox(textInput)
     }
 
 
