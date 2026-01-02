@@ -126,7 +126,7 @@ object GiftProfitTracker {
     ).map { it.toPattern() }
     // </editor-fold>
 
-    private val tracker = SkyHanniItemTracker("Gift Tracker", { Data() }, { it.giftProfitTracker }) {
+    private val tracker = SkyHanniItemTracker("Gift Tracker", ::Data, { it.giftProfitTracker }) {
         drawDisplay(it)
     }
 
@@ -355,7 +355,8 @@ object GiftProfitTracker {
             )
         }
 
-        add(tracker.addTotalProfit(profit, totalRewards, "gift"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, totalRewards, "gift", duration, "Gifts"))
         tracker.addPriceFromButton(this)
     }
 

@@ -41,7 +41,7 @@ import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.client.player.LocalPlayer
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -366,7 +366,7 @@ object IslandGraphs {
     }
 
     private fun skipIfCloser(graph: Graph): Graph = if (graph.size > 1) {
-        val hideNearby = if (MinecraftCompat.localPlayer.onGround) 9 else 25
+        val hideNearby = if (MinecraftCompat.localPlayer.onGround()) 9 else 25
         Graph(graph.takeLastWhile { it.distanceSqToPlayer() > hideNearby })
     } else graph
 
@@ -409,7 +409,7 @@ object IslandGraphs {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (currentIslandGraph != null && event.isLocalPlayer) {
             hasMoved = true
         }
@@ -419,7 +419,7 @@ object IslandGraphs {
         // TODO cleanup
         val (fastestPath, _) = path.takeIf { it.first.isNotEmpty() } ?: return
         val nodes = fastestPath.toMutableList()
-        if (MinecraftCompat.localPlayer.onGround) {
+        if (MinecraftCompat.localPlayer.onGround()) {
             nodes.add(0, GraphNode(0, playerPosition))
         }
         renderPath(setPath, nodes)

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
@@ -46,7 +47,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.screens.Screen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -58,8 +59,6 @@ import kotlin.time.Duration.Companion.seconds
 object SkyHanniMod {
 
     fun preInit() {
-        PlatformUtils.checkIfNeuIsLoaded()
-
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
@@ -70,13 +69,13 @@ object SkyHanniMod {
     fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
-        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesRepoManager.initRepo()
+        if (PlatformUtils.getRepoPatternDumpLocation() == null) EnoughUpdatesRepoManager.initRepo()
         MinecraftConsoleFilter.initLogging()
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
         try {
-            SkyHanniRepoManager.initRepo()
+            if (PlatformUtils.getRepoPatternDumpLocation() == null) SkyHanniRepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
@@ -85,24 +84,18 @@ object SkyHanniMod {
 
     @HandleEvent
     fun onTick() {
-        screenToOpen?.let {
-            screenTicks++
-            if (screenTicks == 5) {
-                val title = InventoryUtils.openInventoryName()
-                if (shouldCloseScreen) {
-                    //#if MC < 1.21
-                    MinecraftCompat.localPlayer.closeScreen()
-                    //#else
-                    //$$ MinecraftCompat.localPlayer.closeHandledScreen()
-                    //#endif
-                    OtherInventoryData.close(title)
-                }
-                shouldCloseScreen = true
-                Minecraft.getMinecraft().displayGuiScreen(it)
-                screenTicks = 0
-                screenToOpen = null
-            }
+        val screenToOpen = screenToOpen ?: return
+        screenTicks++
+        if (screenTicks != 5) return
+        val title = InventoryUtils.openInventoryName()
+        if (shouldCloseScreen) {
+            MinecraftCompat.localPlayer.closeContainer()
+            OtherInventoryData.close(title)
         }
+        shouldCloseScreen = true
+        Minecraft.getInstance().setScreen(screenToOpen)
+        screenTicks = 0
+        this.screenToOpen = null
     }
 
     const val MODID: String = "skyhanni"
@@ -123,6 +116,7 @@ object SkyHanniMod {
     lateinit var visualWordsData: VisualWordsJson
     lateinit var petData: PetDataStorage
     lateinit var orderedWaypointsRoutesData: OrderedWaypointsRoutes
+    lateinit var customTodos: CustomTodosStorage
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
@@ -233,7 +227,7 @@ object SkyHanniMod {
         }
     }
 
-    var screenToOpen: GuiScreen? = null
+    var screenToOpen: Screen? = null
     var shouldCloseScreen: Boolean = true
     private var screenTicks = 0
     fun consoleLog(message: String) {

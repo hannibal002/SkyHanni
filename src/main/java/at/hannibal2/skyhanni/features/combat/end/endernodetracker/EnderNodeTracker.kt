@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.combat.end.EnderNodeConfig.EnderNodeDisplayEntry
-import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -31,6 +30,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -62,7 +62,7 @@ object EnderNodeTracker {
     // TODO add abstract logic with ohter pet drop chat messages
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 
-    private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) {
+    private val tracker = SkyHanniTracker("Ender Node Tracker", ::Data, { it.enderNodeTracker }) {
         drawDisplay(it)
     }
 
@@ -70,7 +70,7 @@ object EnderNodeTracker {
         @Expose var totalNodesMined: Long = 0,
         @Expose var totalEndermiteNests: Long = 0,
         @Expose var lootCount: MutableMap<EnderNode, Int> = mutableMapOf(),
-    ) : Resettable
+    ) : TrackerData()
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
@@ -125,7 +125,7 @@ object EnderNodeTracker {
         if (!isEnabled()) return
         miteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
             it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
-        }.sumOf { it.stackSize }
+        }.sumOf { it.count }
     }
 
     @HandleEvent
@@ -149,7 +149,7 @@ object EnderNodeTracker {
 
         val newMiteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
             it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
-        }.sumOf { it.stackSize }
+        }.sumOf { it.count }
 
         val change = newMiteGelInInventory - miteGelInInventory
         if (change > 0) {

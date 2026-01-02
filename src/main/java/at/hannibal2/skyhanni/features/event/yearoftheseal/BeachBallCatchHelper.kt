@@ -25,8 +25,8 @@ import at.hannibal2.skyhanni.utils.render.LineDrawer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -40,9 +40,9 @@ object BeachBallCatchHelper {
     private val NORMAL_BEACH_BALL by lazy { SkullTextureHolder.getTexture("NORMAL_BEACH_BALL") }
 //     private val GIANT_BEACH_BALL by lazy { SkullTextureHolder.getTexture("GIANT_BEACH_BALL") }
 
-    fun check(entity: EntityArmorStand) {
+    fun check(entity: ArmorStand) {
         if (entity.wearingSkullTexture(NORMAL_BEACH_BALL)) {
-            predictors.putIfAbsent(entity.entityId, Predictor(entity.getLorenzVec(), Variant.NORMAL))
+            predictors.putIfAbsent(entity.id, Predictor(entity.getLorenzVec(), Variant.NORMAL))
             println("normal detected")
             return
         }
@@ -54,7 +54,7 @@ object BeachBallCatchHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityEnterWorld(event: EntityEnterWorldEvent<EntityArmorStand>) {
+    fun onEntityEnterWorld(event: EntityEnterWorldEvent<ArmorStand>) {
         if (!isEnabled()) return
         DelayedRun.runDelayed(2.ticks) { check(event.entity) }
     }
@@ -121,7 +121,7 @@ object BeachBallCatchHelper {
         )
     }
 
-    private fun LorenzVec.getAABB(variant: Variant): AxisAlignedBB = when (variant) {
+    private fun LorenzVec.getAABB(variant: Variant): AABB = when (variant) {
         Variant.NORMAL -> add(-0.3, -0.3, -0.3).boundingToOffset(0.6, 0.6, 0.6)
         Variant.GIANT -> add(-0.9, -0.9, -0.9).boundingToOffset(1.8, 1.8, 1.8)
     }

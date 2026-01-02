@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -40,11 +41,11 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.inventory.ContainerChest
-import org.lwjgl.input.Keyboard.KEY_DOWN
-import org.lwjgl.input.Keyboard.KEY_LEFT
-import org.lwjgl.input.Keyboard.KEY_RIGHT
-import org.lwjgl.input.Keyboard.KEY_UP
+import net.minecraft.world.inventory.ChestMenu
+import org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN
+import org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT
+import org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT
+import org.lwjgl.glfw.GLFW.GLFW_KEY_UP
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
@@ -202,9 +203,9 @@ object CakeTracker {
         if (inCakeInventory) checkInventoryCakes()
         if (!inAuctionHouse) return
 
-        val containerChest = event.container as? ContainerChest ?: return
+        val containerChest = event.container as? ChestMenu ?: return
         containerChest.getUpperItems().forEach { (slot, _) ->
-            slotHighlightCache[slot.slotIndex]?.let { color ->
+            slotHighlightCache[slot.containerSlot]?.let { color ->
                 slot.highlight(color)
             }
         }
@@ -228,7 +229,7 @@ object CakeTracker {
     private fun checkCakeContainer(event: InventoryFullyOpenedEvent) {
         if (!cakeContainerPattern.matches(event.inventoryName)) return
         knownCakesInCurrentInventory = event.inventoryItems.values.mapNotNull { item ->
-            cakeNamePattern.matchMatcher(item.displayName) {
+            cakeNamePattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val year = group("year").formatInt()
                 addCake(year)
                 year
@@ -242,9 +243,9 @@ object CakeTracker {
         if (!auctionBrowserPattern.matches(event.inventoryName)) return false
         searchingForCakes = auctionCakeSearchPattern.matches(event.inventoryName)
         slotHighlightCache = event.inventoryItems.filter {
-            cakeNamePattern.matches(it.value.displayName)
+            cakeNamePattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())
         }.mapValues { (_, item) ->
-            val year = cakeNamePattern.matchGroup(item.displayName, "year")?.toInt() ?: -1
+            val year = cakeNamePattern.matchGroup(item.hoverName.formattedTextCompatLeadingWhiteLessResets(), "year")?.toInt() ?: -1
             val owned = storage?.ownedCakes?.contains(year) ?: false
             if (owned) config.ownedColor else config.missingColor
         }
@@ -274,7 +275,7 @@ object CakeTracker {
     private fun checkInventoryCakes() {
         if (timeOpenedCakeInventory.passedSince() < 500.milliseconds) return
         val currentYears = InventoryUtils.getItemsInOpenChest().mapNotNull { item ->
-            cakeNamePattern.matchGroup(item.stack.displayName, "year")?.toInt()
+            cakeNamePattern.matchGroup(item.item.hoverName.formattedTextCompatLeadingWhiteLessResets(), "year")?.toInt()
         }
 
         val addedYears = currentYears.filter { it !in knownCakesInCurrentInventory }
@@ -353,10 +354,10 @@ object CakeTracker {
                     renderable,
                     tips = getPriceHoverTooltip(displayType, colorCode),
                     onAnyClick = mapOf(
-                        KEY_LEFT to { changeSelectedSingular(-1) },
-                        KEY_UP to { changeSelectedSingular(-1) },
-                        KEY_RIGHT to { changeSelectedSingular(1) },
-                        KEY_DOWN to { changeSelectedSingular(1) },
+                        GLFW_KEY_LEFT to { changeSelectedSingular(-1) },
+                        GLFW_KEY_UP to { changeSelectedSingular(-1) },
+                        GLFW_KEY_RIGHT to { changeSelectedSingular(1) },
+                        GLFW_KEY_DOWN to { changeSelectedSingular(1) },
                         LEFT_MOUSE to { HypixelCommands.auctionSearch("New Year Cake (Year $selectedSingular)") },
                     ),
                 )

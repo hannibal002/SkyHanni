@@ -9,14 +9,17 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MythologicalCreatureType
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
+import at.hannibal2.skyhanni.events.diana.RareDianaMobFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.item.ItemStack
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object DianaApi {
@@ -34,6 +37,8 @@ object DianaApi {
 
     val ItemStack.isDianaSpade get() = getInternalName() in spades
 
+    val NeuInternalName.isDianaSpade get() = this in spades
+
     private fun hasSpadeInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isDianaSpade }
 
     var mythologicalCreatures = emptyMap<String, MythologicalCreatureType>()
@@ -46,10 +51,25 @@ object DianaApi {
     var sphinxQuestions = emptyMap<String, String>()
         private set
 
+    private val group = RepoPattern.group("event-diana")
+
+    /**
+     * REGEX-TEST: Minos Inquisitor
+     * REGEX-TEST: Sphinx
+     * REGEX-TEST: King Minos
+     * REGEX-TEST: Manticore
+     */
+    private val rareDianaMobNamePattern by group.pattern(
+        "rare-mob-name",
+        "(?:Minos Inquisitor|Sphinx|King Minos|Manticore)\\s*",
+    )
+
     @HandleEvent(onlyOnSkyblock = true)
-    fun onJoinWorld(event: EntityEnterWorldEvent<EntityOtherPlayerMP>) {
-        if (event.entity.name == "Minos Inquisitor") {
-            InquisitorFoundEvent(event.entity).post()
+    fun onJoinWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
+        val entity = event.entity
+        // TODO: fetch rare mobs from repo instead
+        if (rareDianaMobNamePattern.matches(entity.name.string.trim())) {
+            RareDianaMobFoundEvent(entity).post()
         }
     }
 

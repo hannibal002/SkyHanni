@@ -6,8 +6,9 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object TeleportPadCompactName {
@@ -18,7 +19,7 @@ object TeleportPadCompactName {
      */
     private val namePattern by patternGroup.pattern(
         "name",
-        "§.✦ §aWarp To (?<name>.*)"
+        "§.✦ §aWarp To (?<name>.*)",
     )
 
     /**
@@ -26,26 +27,22 @@ object TeleportPadCompactName {
      */
     private val noNamePattern by patternGroup.pattern(
         "noname",
-        "§.✦ §cNo Destination"
+        "§.✦ §cNo Destination",
     )
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStand>) {
         if (!SkyHanniMod.feature.misc.teleportPad.compactName) return
         val entity = event.entity
 
-        val name = entity.name
+        val name = entity.name.formattedTextCompatLessResets()
 
         noNamePattern.matchMatcher(name) {
             event.cancel()
         }
 
         namePattern.matchMatcher(name) {
-            //#if MC < 1.21
-            entity.customNameTag = group("name")
-            //#else
-            //$$ entity.setCustomName(net.minecraft.text.Text.of(group("name")))
-            //#endif
+            entity.customName = net.minecraft.network.chat.Component.nullToEmpty(group("name"))
         }
     }
 }

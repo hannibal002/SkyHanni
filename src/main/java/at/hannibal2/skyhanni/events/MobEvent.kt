@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.mob.Mob
-import net.minecraft.util.DamageSource
+import net.minecraft.world.damagesource.DamageSource
 
 open class MobEvent(val mob: Mob) : SkyHanniEvent() {
     open class Spawn(mob: Mob) : MobEvent(mob) {

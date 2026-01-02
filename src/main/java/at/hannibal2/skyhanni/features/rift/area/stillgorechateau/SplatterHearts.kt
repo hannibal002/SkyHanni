@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -24,7 +24,7 @@ object SplatterHearts {
     @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (event.type != EnumParticleTypes.HEART) return
+        if (event.type != ParticleTypes.HEART) return
         if (event.count != 3 || event.speed != 0f) return
 
         if (lastHearts.passedSince() > 50.milliseconds) {

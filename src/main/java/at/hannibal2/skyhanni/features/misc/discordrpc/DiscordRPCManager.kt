@@ -114,7 +114,7 @@ object DiscordRPCManager {
             )
             ChatUtils.clickableChat(
                 "Click here to retry.",
-                onClick = { startCommand() },
+                onClick = ::startCommand,
                 "§eClick to run /shrpcstart!",
             )
         }

@@ -115,22 +115,20 @@ object ProfileStorageData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
-        if (noTabListTime.isFarPast()) return
+    fun onSecondPassed() {
+        if (noTabListTime.isFarPast() || noTabListTime.passedSince() < 10.seconds) return
 
         playerSpecific?.let {
-            // do not try to load the data when hypixel has not yet send the profile loaded message
+            // Do not try to load the data when Hypixel has not yet sent the profile loaded message
             if (it.multipleProfiles && !hypixelDataLoaded) return
         }
 
-        if (noTabListTime.passedSince() < 3.seconds) return
         noTabListTime = SimpleTimeMark.now()
         val foundSkyBlockTabList = TabWidget.AREA.isActive
         if (foundSkyBlockTabList) {
             ChatUtils.clickableChat(
-                "§cCan not read profile name from tab list! Open /widget, enable the Profile Widget, " +
-                    "and give it high enough priority so that it is visible in tab list. " +
-                    "This is needed for the mod to function and therefore this warning cannot be disabled!",
+                "§cCannot read profile name from tab list! Open /widget and make sure the Profile Widget " +
+                    "is enabled and visible.",
                 onClick = {
                     HypixelCommands.widget()
                 },

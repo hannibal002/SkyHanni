@@ -123,7 +123,7 @@ object SlayerApi {
             if (!isInCorrectArea) {
                 add("currentAreaType: $currentAreaType")
                 add(" graph area: ${SkyBlockUtils.graphArea}")
-                with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
+                with(MinecraftCompat.localPlayer.blockPosition().toLorenzVec().roundTo(1)) {
                     add(" /shtestwaypoint $x $y $z pathfind")
                 }
             }
