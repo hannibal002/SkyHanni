@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaFeatures
-import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreas
+import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -438,7 +438,7 @@ object IslandGraphs {
 
     private fun onNewNode() {
         // TODO create an event
-        IslandAreas.nodeMoved()
+        IslandAreaBackend.nodeMoved()
         if (shouldAllowRerouting) {
             tryRerouting()
         }

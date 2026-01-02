@@ -23,7 +23,7 @@ import net.minecraft.client.player.LocalPlayer
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
-object IslandAreas {
+object IslandAreaBackend {
     private val config get() = SkyHanniMod.feature.misc.navigation
 
     private val areaListConfig get() = config.areasList

@@ -12,9 +12,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
-import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreas
-import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreas.getAreaTag
-import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
+import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend.getAreaTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -64,7 +62,7 @@ object IslandAreaFeatures {//
     }
 
     fun update() {
-        IslandAreas.update()
+        IslandAreaBackend.update()
     }
 
     var oldTitle: TitleContext? = null

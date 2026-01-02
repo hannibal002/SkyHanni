@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
-import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreas.getAreaTag
+import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend.getAreaTag
 
 // A GraphNode that has an area tag, representing a area border.
 data class AreaNode(
