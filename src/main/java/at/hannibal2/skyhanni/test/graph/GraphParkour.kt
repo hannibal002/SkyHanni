@@ -37,7 +37,7 @@ object GraphParkour {
     }
 
     private fun saveParkour() {
-        val graph = GraphEditor.compileGraph()
+        val graph = GraphEditorIO.compileGraph()
 
         val list = graphToList(graph) ?: return
 
@@ -130,7 +130,7 @@ object GraphParkour {
         val locations = readListFromClipboard() ?: return
         val graph = listToGraph(locations)
         GraphEditor.enable()
-        GraphEditor.import(graph)
+        GraphEditorIO.import(graph)
         IslandGraphs.pathFind(
             locations.first(),
             "Start of parkour",

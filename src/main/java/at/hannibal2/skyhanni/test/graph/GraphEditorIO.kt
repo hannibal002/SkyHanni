@@ -97,8 +97,8 @@ object GraphEditorIO {
         if (config.useAsIslandArea) {
             IslandGraphs.setNewGraph(compileGraph)
             GraphEditorBugFinder.runTests()
-            if (GraphEditor.active) {
-                GraphEditor.calculateNewAllNodeFind()
+            if (GraphEditorNodeFinder.active) {
+                GraphEditorNodeFinder.calculateNewAllNodeFind()
             }
         }
         val json = compileGraph.toJson()
