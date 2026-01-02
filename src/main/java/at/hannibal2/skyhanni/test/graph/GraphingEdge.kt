@@ -34,13 +34,13 @@ class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode, var directi
         direction = if (standpoint != node2) {
             when (direction) {
                 EdgeDirection.BOTH -> EdgeDirection.ONE_TO_TWO
-                EdgeDirection.ONE_TO_TWO -> EdgeDirection.TOW_TO_ONE
-                EdgeDirection.TOW_TO_ONE -> EdgeDirection.BOTH
+                EdgeDirection.ONE_TO_TWO -> EdgeDirection.TWO_TO_ONE
+                EdgeDirection.TWO_TO_ONE -> EdgeDirection.BOTH
             }
         } else {
             when (direction) {
-                EdgeDirection.BOTH -> EdgeDirection.TOW_TO_ONE
-                EdgeDirection.TOW_TO_ONE -> EdgeDirection.ONE_TO_TWO
+                EdgeDirection.BOTH -> EdgeDirection.TWO_TO_ONE
+                EdgeDirection.TWO_TO_ONE -> EdgeDirection.ONE_TO_TWO
                 EdgeDirection.ONE_TO_TWO -> EdgeDirection.BOTH
             }
         }
@@ -54,7 +54,7 @@ class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode, var directi
             "ToYou"
         }
 
-        EdgeDirection.TOW_TO_ONE -> if (standpoint != node1) {
+        EdgeDirection.TWO_TO_ONE -> if (standpoint != node1) {
             "ToYou"
         } else {
             "AwayFromYou"
@@ -64,7 +64,7 @@ class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode, var directi
     fun isValidDirectionFrom(standpoint: GraphingNode?) = when (direction) {
         EdgeDirection.BOTH -> true
         EdgeDirection.ONE_TO_TWO -> standpoint == node1
-        EdgeDirection.TOW_TO_ONE -> standpoint == node2
+        EdgeDirection.TWO_TO_ONE -> standpoint == node2
     }
 
     fun isValidConnectionFromTo(a: GraphingNode?, b: GraphingNode?): Boolean =

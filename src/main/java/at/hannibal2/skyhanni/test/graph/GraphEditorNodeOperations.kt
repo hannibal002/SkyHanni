@@ -79,7 +79,7 @@ object GraphEditorNodeOperations {
                 EdgeDirection.ONE_TO_TWO
 
             edge1.isValidConnectionFromTo(activeNode, neighbors1) && edge2.isValidConnectionFromTo(neighbors2, activeNode) ->
-                EdgeDirection.TOW_TO_ONE
+                EdgeDirection.TWO_TO_ONE
 
             else -> EdgeDirection.BOTH
         }
