@@ -29,7 +29,7 @@ object IslandAreaBackend {
     private val areaListConfig get() = config.areasList
 
     var areaNodes = listOf<AreaNode>()
-    private var nodeSaveJob: Job? = null
+    private var nodeUpdateJob: Job? = null
     private val nodeSaveMutex = Mutex()
 
     var currentArea = ""
@@ -44,8 +44,8 @@ object IslandAreaBackend {
     }
 
     fun nodeMoved() {
-        if (nodeSaveJob?.isActive == true) return
-        nodeSaveJob = SkyHanniMod.launchCoroutineWithMutex("§island area node moved", nodeSaveMutex) {
+        if (nodeUpdateJob?.isActive == true) return
+        nodeUpdateJob = SkyHanniMod.launchCoroutineWithMutex("§island area node moved", nodeSaveMutex) {
             updateNodes()
         }
     }
