@@ -419,11 +419,11 @@ object ChatUtils {
         SkyHanniMod.consoleLog(text)
     }
 
-    fun deleteChatMessage(chatId: Int) {
-        deleteChatMessage(setOf(chatId))
-    }
-
-    fun deleteChatMessage(chatIds: Set<Int>) {
-        chatLines.deleteChatLine(Int.MAX_VALUE) { it.chatLineID in chatIds }
-    }
+//     fun deleteChatMessage(chatId: Int) {
+//         deleteChatMessage(setOf(chatId))
+//     }
+//
+//     fun deleteChatMessage(chatIds: Set<Int>) {
+//         chatLines.deleteChatLine(Int.MAX_VALUE) { it.tag() in chatIds }
+//     }
 }

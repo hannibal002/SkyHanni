@@ -131,7 +131,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             description = "Reloads the local $commonName repo"
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                val progress = progressCategory.start("reloading local epo via /$reloadCommand")
+                val progress = progressCategory.start("reloading local repo via /$reloadCommand")
                 reloadLocalRepo(progress)
             }
         }

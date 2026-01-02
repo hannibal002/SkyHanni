@@ -76,8 +76,9 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
                     update.update()
                     // TODO make it work, ty
                 }
-            } else {
-                ChatUtils.deleteChatMessage(updates.map { it.chatId }.toSet())
+                // TODO find a way to delete by chat id
+//             } else {
+//                 ChatUtils.deleteChatMessage(updates.map { it.chatId }.toSet())
             }
         }
 
