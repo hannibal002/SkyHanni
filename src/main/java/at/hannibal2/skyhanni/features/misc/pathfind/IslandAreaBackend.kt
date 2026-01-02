@@ -56,11 +56,11 @@ object IslandAreaBackend {
 
         val (_, map) = GraphUtils.findFastestPaths(graph, closestNode) { it.getAreaTag() != null }
 
-        val alreadyFoundAreas = mutableSetOf<String>()
+        val seenAreas = mutableSetOf<String>()
         this.areaNodes = map.sorted().mapNotNull { (node, distance) ->
-            val name = node.name?.takeIf { it !in alreadyFoundAreas } ?: return@mapNotNull null
+            val name = node.name?.takeIf { it !in seenAreas } ?: return@mapNotNull null
             val tag = node.getAreaTag() ?: return@mapNotNull null
-            alreadyFoundAreas += name
+            seenAreas += name
             AreaNode(node, name, tag, distance)
         }
 
@@ -92,7 +92,7 @@ object IslandAreaBackend {
         }
     }
 
-    // updating the position and asks island area features to redraw the list.
+    // Updates the current area position and redraws the area list.
     fun update() {
         areaNodes.firstOrNull()?.let { area ->
             updateArea(area.name, onlyInternal = !area.isConfigVisible)

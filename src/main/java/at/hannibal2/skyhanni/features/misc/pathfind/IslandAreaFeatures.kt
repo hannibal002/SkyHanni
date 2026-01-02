@@ -65,7 +65,7 @@ object IslandAreaFeatures {
         IslandAreaBackend.update()
     }
 
-    var oldTitle: TitleContext? = null
+    var currentTitle: TitleContext? = null
 
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
@@ -74,10 +74,10 @@ object IslandAreaFeatures {
         // when this is a small area move and small areas are disabled via config
         if (!config.includeSmallAreas && name in smallAreas) return
 
-        oldTitle?.stop()
+        currentTitle?.stop()
         if (event.onlyInternal) return
         if (inAnArea && config.enterTitle) {
-            oldTitle = TitleManager.sendTitle("§aEntered $name!")
+            currentTitle = TitleManager.sendTitle("§aEntered $name!")
         }
     }
 
@@ -86,15 +86,14 @@ object IslandAreaFeatures {
         if (!isEnabled()) return
         if (!config.showInWorld) return
         for (area in areaNodes) {
-            val name = area.name
-            if (name == SkyBlockUtils.graphArea) continue
+            if (area.name == SkyBlockUtils.graphArea) continue
             if (area.isNoArea) continue
             if (!area.isConfigVisible) continue
 
             val position = area.node.position
             if (!position.canBeSeen(40.0)) continue
-            val color = area.tag.color.getChatColor()
-            event.drawDynamicText(position, color + name, 1.5)
+            val name = area.tag.color.getChatColor() + area.name
+            event.drawDynamicText(position, name, 1.5)
         }
     }
 
@@ -183,6 +182,7 @@ object IslandAreaFeatures {
 
         addSearchString("§eAreas nearby:")
         for (area in visibleNearby) {
+            // Compare by name as multiple nodes can share names
             val isTarget = area.name == targetNode?.name
             val color = if (isTarget) LorenzColor.GOLD else area.tag.color
             val coloredName = "${color.getChatColor()}${area.name}"
