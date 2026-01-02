@@ -147,9 +147,12 @@ value class Graph(
                     neighbourMap[node] = neighbors
                     reader.endObject()
                 }
+
+                val nodeLookup = list.associateBy { it.id }
                 neighbourMap.forEach { (node, edge) ->
                     node.neighbours = edge.associate { (id, distance) ->
-                        val neighbor = list.firstOrNull { it.id == id } ?: error("Node ${node.id} references non-existent neighbor $id")
+                        // NEU:
+                        val neighbor = nodeLookup[id] ?: error("Node ${node.id} references non-existent neighbor $id")
                         neighbor to distance
                     }
                 }
