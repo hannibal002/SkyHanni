@@ -35,7 +35,6 @@ object GraphEditorInput {
     private val nodes get() = GraphEditor.nodes
     private val edges get() = GraphEditor.edges
     private val textBox get() = GraphEditor.textBox
-    private val activeNode get() = GraphEditor.activeNode
     private val closestNode get() = GraphEditor.closestNode
     private val selectedEdge get() = GraphEditor.selectedEdge
 
@@ -48,7 +47,7 @@ object GraphEditorInput {
             editModeClicks()
             GraphEditor.inEditMode = false
         }
-        if ((activeNode != null) && config.editKey.isKeyHeld()) {
+        if ((GraphEditor.activeNode != null) && config.editKey.isKeyHeld()) {
             GraphEditor.inEditMode = true
             return
         }
@@ -82,7 +81,7 @@ object GraphEditorInput {
     }
 
     private fun handleText(): Boolean {
-        if (activeNode != null && config.textKey.isKeyClicked()) {
+        if (GraphEditor.activeNode != null && config.textKey.isKeyClicked()) {
             GraphEditor.inTextMode = true
             GraphEditor.feedBackInTutorial("Entered Text Mode.")
             return true
@@ -92,8 +91,8 @@ object GraphEditorInput {
 
     private fun handleEdgeCycle(selectedEdge: GraphingEdge) {
         if (!config.edgeCycle.isKeyClicked()) return
-        selectedEdge.cycleDirection(activeNode)
-        GraphEditor.feedBackInTutorial("Cycled Direction to: ${selectedEdge.cycleText(activeNode)}")
+        selectedEdge.cycleDirection(GraphEditor.activeNode)
+        GraphEditor.feedBackInTutorial("Cycled Direction to: ${selectedEdge.cycleText(GraphEditor.activeNode)}")
     }
 
     private fun handleSplit(selectedEdge: GraphingEdge) {
@@ -126,7 +125,7 @@ object GraphEditorInput {
 
     private fun handleSelect() {
         if (!config.selectKey.isKeyClicked()) return
-        GraphEditor.activeNode = if (activeNode == closestNode) {
+        GraphEditor.activeNode = if (GraphEditor.activeNode == closestNode) {
             GraphEditor.feedBackInTutorial("De-selected active node.")
             null
         } else {
@@ -138,36 +137,36 @@ object GraphEditorInput {
     private fun handleDissolve() {
         if (!GraphEditor.dissolvePossible || !config.dissolveKey.isKeyClicked()) return
         GraphEditor.feedBackInTutorial("Dissolved the node, now it is gone.")
-        val edgePair = edges.filter { it.isInEdge(activeNode) }
+        val edgePair = edges.filter { it.isInEdge(GraphEditor.activeNode) }
         val edge1 = edgePair[0]
         val edge2 = edgePair[1]
-        val neighbors1 = if (edge1.node1 == activeNode) edge1.node2 else edge1.node1
-        val neighbors2 = if (edge2.node1 == activeNode) edge2.node2 else edge2.node1
+        val neighbors1 = if (edge1.node1 == GraphEditor.activeNode) edge1.node2 else edge1.node1
+        val neighbors2 = if (edge2.node1 == GraphEditor.activeNode) edge2.node2 else edge2.node1
         val direction =
             if (edge1.direction == EdgeDirection.BOTH || edge2.direction == EdgeDirection.BOTH) EdgeDirection.BOTH else when {
-                edge1.isValidConnectionFromTo(neighbors1, activeNode) && edge2.isValidConnectionFromTo(
-                    activeNode,
+                edge1.isValidConnectionFromTo(neighbors1, GraphEditor.activeNode) && edge2.isValidConnectionFromTo(
+                    GraphEditor.activeNode,
                     neighbors2,
                 ) -> EdgeDirection.ONE_TO_TWO
 
-                edge1.isValidConnectionFromTo(activeNode, neighbors1) && edge2.isValidConnectionFromTo(
+                edge1.isValidConnectionFromTo(GraphEditor.activeNode, neighbors1) && edge2.isValidConnectionFromTo(
                     neighbors2,
-                    activeNode,
+                    GraphEditor.activeNode,
                 ) -> EdgeDirection.TOW_TO_ONE
 
                 else -> EdgeDirection.BOTH
             }
         edges.removeAll(edgePair)
-        nodes.remove(activeNode)
+        nodes.remove(GraphEditor.activeNode)
         GraphEditor.activeNode = null
         addEdge(neighbors1, neighbors2, direction)
     }
 
     private fun handleConnect() {
-        if (activeNode == closestNode || !config.connectKey.isKeyClicked()) return
-        val edge = GraphEditor.getEdgeIndex(activeNode, closestNode)
+        if (GraphEditor.activeNode == closestNode || !config.connectKey.isKeyClicked()) return
+        val edge = GraphEditor.getEdgeIndex(GraphEditor.activeNode, closestNode)
         if (edge == null) {
-            addEdge(activeNode, closestNode)
+            addEdge(GraphEditor.activeNode, closestNode)
             GraphEditor.feedBackInTutorial("Added new edge.")
         } else {
             edges.removeAt(edge)
@@ -228,7 +227,7 @@ object GraphEditorInput {
         if (!GraphEditor.inTextMode) return false
         textBox.handle()
         val text = textBox.finalText()
-        activeNode?.name = text.ifEmpty { null }
+        GraphEditor.activeNode?.name = text.ifEmpty { null }
         return true
     }
 
