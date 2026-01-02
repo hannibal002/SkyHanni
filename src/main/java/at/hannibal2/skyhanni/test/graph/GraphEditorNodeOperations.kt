@@ -16,15 +16,13 @@ object GraphEditorNodeOperations {
 
     fun addNode() {
         val closestNode = GraphEditor.closestNode
-        if (closestNode != null && closestNode.distanceSqToPlayer() < 9.0) {
-            if (closestNode == GraphEditor.activeNode) {
-                GraphEditor.feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
-                GraphEditor.nodes.remove(closestNode)
-                GraphEditor.edges.removeIf { it.isInEdge(closestNode) }
-                if (closestNode == GraphEditor.activeNode) GraphEditor.activeNode = null
-                GraphEditor.closestNode = null
-                return
-            }
+        if (closestNode != null && closestNode.distanceSqToPlayer() < 9.0 && closestNode == GraphEditor.activeNode) {
+            GraphEditor.feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
+            GraphEditor.nodes.remove(closestNode)
+            GraphEditor.edges.removeIf { it.isInEdge(closestNode) }
+            if (closestNode == GraphEditor.activeNode) GraphEditor.activeNode = null
+            GraphEditor.closestNode = null
+            return
         }
 
         if (GraphEditor.nodes.any { it.position == playerPosition }) {
