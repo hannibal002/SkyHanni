@@ -38,15 +38,16 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object IslandAreaFeatures {
     private val config get() = SkyHanniMod.feature.misc.navigation
-    var smallAreas = setOf<String>()
-
     private val areaListConfig get() = config.areasList
 
     var display: Renderable? = null
+    private var smallAreas = setOf<String>()
     private var targetNode: GraphNode? = null
     private val textInput = SearchTextInput()
     private var areaNodes = listOf<AreaNode>()
     private var visibleAreaNodes = listOf<AreaNode>()
+    private var currentTitle: TitleContext? = null
+    private var lastTitleTime = SimpleTimeMark.farPast()
 
     private fun setTarget(node: GraphNode) {
         targetNode = node
@@ -66,9 +67,6 @@ object IslandAreaFeatures {
         IslandAreaBackend.update()
     }
 
-    var currentTitle: TitleContext? = null
-    private var lastTitleTime = SimpleTimeMark.farPast()
-
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
         val name = event.area
@@ -84,7 +82,6 @@ object IslandAreaFeatures {
         currentTitle = TitleManager.sendTitle("§aEntered $name!")
         lastTitleTime = SimpleTimeMark.now()
     }
-
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick(event: SkyHanniTickEvent) {
