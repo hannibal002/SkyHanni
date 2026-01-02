@@ -203,21 +203,18 @@ object GraphEditorInput {
     private fun handleLoad(): Boolean {
         if (!config.loadKey.isKeyClicked()) return false
         runBlocking {
-            OSUtils.readFromClipboard()?.let {
-                try {
-                    Graph.fromJson(it)
-                } catch (e: Exception) {
-                    ErrorManager.logErrorWithData(
-                        e,
-                        "Import of graph failed.",
-                        "json" to it,
-                        ignoreErrorCache = true,
-                    )
-                    null
-                }
-            }?.let {
-                GraphEditorIO.import(it)
+            val json = OSUtils.readFromClipboard() ?: return@runBlocking
+            try {
+                val graph = Graph.fromJson(json)
+                GraphEditorIO.import(graph)
                 ChatUtils.chat("Loaded Graph from clip board.")
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "Import of graph failed: ${e.message}",
+                    "json" to json,
+                    ignoreErrorCache = true,
+                )
             }
         }
         return true

@@ -149,7 +149,8 @@ value class Graph(
                 }
                 neighbourMap.forEach { (node, edge) ->
                     node.neighbours = edge.associate { (id, distance) ->
-                        list.first { it.id == id } to distance
+                        val neighbor = list.firstOrNull { it.id == id } ?: error("Node ${node.id} references non-existent neighbor $id")
+                        neighbor to distance
                     }
                 }
                 reader.endObject()
