@@ -85,14 +85,15 @@ object IslandAreaFeatures {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showInWorld) return
-        for ((node, _) in areaNodes) {
-            val name = node.name ?: continue
+        for (area in areaNodes) {
+            val name = area.name
             if (name == SkyBlockUtils.graphArea) continue
-            if (name == "no_area") continue
-            val position = node.position
-            val areaTag = node.getAreaTag(useConfig = true) ?: continue
-            val color = areaTag.color.getChatColor()
-            if (!position.canBeSeen(40.0)) return
+            if (area.isNoArea) continue
+            if (!area.isConfigVisible) continue
+
+            val position = area.node.position
+            if (!position.canBeSeen(40.0)) continue
+            val color = area.tag.color.getChatColor()
             event.drawDynamicText(position, color + name, 1.5)
         }
     }
