@@ -166,7 +166,6 @@ object IslandAreaFeatures {
 
         val current = areaNodes.first()
         val nearby = areaNodes.drop(1)
-
         if (areaListConfig.includeCurrentArea.get()) {
             if (!current.isNoArea && current.isConfigVisible) {
                 addSearchString("§eCurrent area: ${current.tag.color.getChatColor()}${current.name}")
@@ -175,10 +174,14 @@ object IslandAreaFeatures {
             }
         }
 
-        addSearchString("§eAreas nearby:")
-
         val visibleNearby = nearby.filter { !it.isNoArea && it.isConfigVisible }
+        if (visibleNearby.isEmpty()) {
+            addSearchString("§cThere is only one area in ${SkyBlockUtils.currentIsland.displayName},")
+            addSearchString("§cnothing else to navigate to!")
+            return@buildList
+        }
 
+        addSearchString("§eAreas nearby:")
         for (area in visibleNearby) {
             val isTarget = area.name == targetNode?.name
             val color = if (isTarget) LorenzColor.GOLD else area.tag.color
@@ -186,11 +189,6 @@ object IslandAreaFeatures {
             val distance = area.distance.roundTo(0).toInt()
 
             add(buildAreaEntry(coloredName, area, distance))
-        }
-
-        if (visibleNearby.isEmpty()) {
-            addSearchString("§cThere is only one area in ${SkyBlockUtils.currentIsland.displayName},")
-            addSearchString("§cnothing else to navigate to!")
         }
     }
 
