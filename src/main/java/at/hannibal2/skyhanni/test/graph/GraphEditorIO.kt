@@ -35,10 +35,9 @@ object GraphEditorIO {
         }
         val neighbours = GraphEditor.nodes.map { node ->
             edges.filter { it.isInEdge(node) && it.isValidDirectionFrom(node) }.map { edge ->
-                val otherNode = if (node == edge.node1) edge.node2
-                else edge.node1
-                // TODO: Fix this to not use a bang bang
-                nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
+                val otherNode = if (node == edge.node1) edge.node2 else edge.node1
+                val index = indexedTable[otherNode.id] ?: error("Invalid node ID ${otherNode.id} referenced in edge")
+                nodes[index] to node.position.distance(otherNode.position)
             }.sortedBy { it.second }
         }
         nodes.forEachIndexed { index, node -> node.neighbours = neighbours[index].toMap() }
@@ -59,16 +58,16 @@ object GraphEditorIO {
         )
         val translation = graph.mapIndexed { index, node -> node to nodes[index] }.toMap()
 
-        val neighbors = graph.map { node ->
-            // TODO: Fix this to not use bang bangs
-            node.neighbours.map {
-                GraphingEdge(
-                    translation[node]!!,
-                    translation[it.key]!!,
-                    EdgeDirection.ONE_TO_TWO,
-                )
+        val neighbors = graph.flatMap { node ->
+            node.neighbours.mapNotNull { (neighbor, _) ->
+                val node1 = translation[node]
+                val node2 = translation[neighbor]
+                if (node1 == null || node2 == null) {
+                    error("Invalid edge reference: node ${node.id} <-> neighbor ${neighbor.id}")
+                }
+                GraphingEdge(node1, node2, EdgeDirection.ONE_TO_TWO)
             }
-        }.flatten()
+        }
 
         val reduced = neighbors.groupingBy { it }.reduce { _, accumulator, element ->
             if (
