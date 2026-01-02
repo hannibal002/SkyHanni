@@ -4,6 +4,8 @@ class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode, var directi
 
     fun isInEdge(node: GraphingNode?) = node1 == node || node2 == node
 
+    fun getOther(node: GraphingNode): GraphingNode = if (node == node1) node2 else node1
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

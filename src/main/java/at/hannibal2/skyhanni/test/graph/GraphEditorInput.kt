@@ -136,30 +136,41 @@ object GraphEditorInput {
 
     private fun handleDissolve() {
         if (!GraphEditor.dissolvePossible || !config.dissolveKey.isKeyClicked()) return
+
+        val activeNode = GraphEditor.activeNode ?: return
+
         GraphEditor.feedBackInTutorial("Dissolved the node, now it is gone.")
-        val edgePair = edges.filter { it.isInEdge(GraphEditor.activeNode) }
+        val edgePair = edges.filter { it.isInEdge(activeNode) }
         val edge1 = edgePair[0]
         val edge2 = edgePair[1]
-        val neighbors1 = if (edge1.node1 == GraphEditor.activeNode) edge1.node2 else edge1.node1
-        val neighbors2 = if (edge2.node1 == GraphEditor.activeNode) edge2.node2 else edge2.node1
-        val direction =
-            if (edge1.direction == EdgeDirection.BOTH || edge2.direction == EdgeDirection.BOTH) EdgeDirection.BOTH else when {
-                edge1.isValidConnectionFromTo(neighbors1, GraphEditor.activeNode) && edge2.isValidConnectionFromTo(
-                    GraphEditor.activeNode,
-                    neighbors2,
-                ) -> EdgeDirection.ONE_TO_TWO
 
-                edge1.isValidConnectionFromTo(GraphEditor.activeNode, neighbors1) && edge2.isValidConnectionFromTo(
-                    neighbors2,
-                    GraphEditor.activeNode,
-                ) -> EdgeDirection.TOW_TO_ONE
+        val neighbors1 = edge1.getOther(activeNode)
+        val neighbors2 = edge2.getOther(activeNode)
 
-                else -> EdgeDirection.BOTH
-            }
+        val direction = getDirection(edge1, edge2, neighbors1, activeNode, neighbors2)
         edges.removeAll(edgePair)
-        nodes.remove(GraphEditor.activeNode)
+        nodes.remove(activeNode)
         GraphEditor.activeNode = null
         addEdge(neighbors1, neighbors2, direction)
+    }
+
+    private fun getDirection(
+        edge1: GraphingEdge,
+        edge2: GraphingEdge,
+        neighbors1: GraphingNode,
+        activeNode: GraphingNode,
+        neighbors2: GraphingNode,
+    ): EdgeDirection {
+        if (edge1.direction == EdgeDirection.BOTH || edge2.direction == EdgeDirection.BOTH) return EdgeDirection.BOTH
+        return when {
+            edge1.isValidConnectionFromTo(neighbors1, activeNode) && edge2.isValidConnectionFromTo(activeNode, neighbors2) ->
+                EdgeDirection.ONE_TO_TWO
+
+            edge1.isValidConnectionFromTo(activeNode, neighbors1) && edge2.isValidConnectionFromTo(neighbors2, activeNode) ->
+                EdgeDirection.TOW_TO_ONE
+
+            else -> EdgeDirection.BOTH
+        }
     }
 
     private fun handleConnect() {

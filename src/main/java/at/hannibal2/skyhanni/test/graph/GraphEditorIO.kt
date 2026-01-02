@@ -40,7 +40,7 @@ object GraphEditorIO {
             val nodeEdges = edgesByNode[node] ?: emptyList()
 
             nodeEdges.map { edge ->
-                val otherNode = if (node == edge.node1) edge.node2 else edge.node1
+                val otherNode = edge.getOther(node)
                 val index = indexedTable[otherNode.id] ?: error("Invalid node ID ${otherNode.id} referenced in edge")
                 compiledNodes[index] to node.position.distance(otherNode.position)
             }.sortedBy { it.second }
