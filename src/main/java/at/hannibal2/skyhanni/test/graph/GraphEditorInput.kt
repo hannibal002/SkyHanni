@@ -58,11 +58,11 @@ object GraphEditorInput {
         if (handleLoad()) return
         handleClear()
         if (config.placeKey.isKeyClicked()) {
-            addNode()
+            GraphEditorNodeOperations.addNode()
         }
         handleSelect()
         handleRayCast()
-        handleConnect()
+        GraphEditorNodeOperations.handleConnect()
         handleThroughBlocks()
         if (config.dijkstraKey.isKeyClicked()) {
             GraphEditor.feedBackInTutorial("Calculated shortest route and cleared active node.")
@@ -77,7 +77,7 @@ object GraphEditorInput {
             handleSplit(selectedEdge)
             handleEdgeCycle(selectedEdge)
         }
-        handleDissolve()
+        GraphEditorNodeOperations.handleDissolve()
     }
 
     private fun handleText(): Boolean {
@@ -102,8 +102,8 @@ object GraphEditorInput {
         val node = GraphingNode(GraphEditor.id++, middle)
         nodes.add(node)
         edges.remove(selectedEdge)
-        addEdge(selectedEdge.node1, node, selectedEdge.direction)
-        addEdge(node, selectedEdge.node2, selectedEdge.direction)
+        GraphEditorNodeOperations.addEdge(selectedEdge.node1, node, selectedEdge.direction)
+        GraphEditorNodeOperations.addEdge(node, selectedEdge.node2, selectedEdge.direction)
         GraphEditor.activeNode = node
     }
 
@@ -131,59 +131,6 @@ object GraphEditorInput {
         } else {
             GraphEditor.feedBackInTutorial("Selected new active node.")
             closestNode
-        }
-    }
-
-    private fun handleDissolve() {
-        if (!GraphEditor.dissolvePossible || !config.dissolveKey.isKeyClicked()) return
-
-        val activeNode = GraphEditor.activeNode ?: return
-
-        GraphEditor.feedBackInTutorial("Dissolved the node, now it is gone.")
-        val edgePair = edges.filter { it.isInEdge(activeNode) }
-        val edge1 = edgePair[0]
-        val edge2 = edgePair[1]
-
-        val neighbors1 = edge1.getOther(activeNode)
-        val neighbors2 = edge2.getOther(activeNode)
-
-        val direction = getDirection(edge1, edge2, neighbors1, activeNode, neighbors2)
-        edges.removeAll(edgePair)
-        nodes.remove(activeNode)
-        GraphEditor.activeNode = null
-        addEdge(neighbors1, neighbors2, direction)
-    }
-
-    private fun getDirection(
-        edge1: GraphingEdge,
-        edge2: GraphingEdge,
-        neighbors1: GraphingNode,
-        activeNode: GraphingNode,
-        neighbors2: GraphingNode,
-    ): EdgeDirection {
-        if (edge1.direction == EdgeDirection.BOTH || edge2.direction == EdgeDirection.BOTH) return EdgeDirection.BOTH
-        return when {
-            edge1.isValidConnectionFromTo(neighbors1, activeNode) && edge2.isValidConnectionFromTo(activeNode, neighbors2) ->
-                EdgeDirection.ONE_TO_TWO
-
-            edge1.isValidConnectionFromTo(activeNode, neighbors1) && edge2.isValidConnectionFromTo(neighbors2, activeNode) ->
-                EdgeDirection.TOW_TO_ONE
-
-            else -> EdgeDirection.BOTH
-        }
-    }
-
-    private fun handleConnect() {
-        if (GraphEditor.activeNode == closestNode || !config.connectKey.isKeyClicked()) return
-        val edge = GraphEditor.getEdgeIndex(GraphEditor.activeNode, closestNode)
-        if (edge == null) {
-            addEdge(GraphEditor.activeNode, closestNode)
-            GraphEditor.feedBackInTutorial("Added new edge.")
-        } else {
-            edges.removeAt(edge)
-            GraphEditor.checkDissolve()
-            GraphEditor.selectedEdge = GraphEditor.findEdgeBetweenActiveAndClosest()
-            GraphEditor.feedBackInTutorial("Removed edge.")
         }
     }
 
@@ -245,7 +192,7 @@ object GraphEditorInput {
             GraphEditor.inTextMode = false
             GraphEditor.feedBackInTutorial("Exited Text Mode.")
             GraphEditor.activeNode?.let {
-                handleNameShortcut(it.name)?.let { (tag, name) ->
+                GraphEditorNodeOperations.handleNameShortcut(it.name)?.let { (tag, name) ->
                     it.tags.add(tag)
                     it.name = name
                 }
@@ -260,40 +207,6 @@ object GraphEditorInput {
         config.enabled = false
         GraphEditor.chatAtDisable()
         return false
-    }
-
-    private fun addNode() {
-        val closestNode = GraphEditor.closestNode
-        if (closestNode != null && closestNode.distanceSqToPlayer() < 9.0) {
-            if (closestNode == GraphEditor.activeNode) {
-                GraphEditor.feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
-                GraphEditor.nodes.remove(closestNode)
-                GraphEditor.edges.removeIf { it.isInEdge(closestNode) }
-                if (closestNode == GraphEditor.activeNode) GraphEditor.activeNode = null
-                GraphEditor.closestNode = null
-                return
-            }
-        }
-
-        if (GraphEditor.nodes.any { it.position == playerPosition }) {
-            GraphEditor.feedBackInTutorial("Can't create node, here is already another one.")
-            return
-        }
-        val node = GraphingNode(GraphEditor.id++, playerPosition)
-        GraphEditor.nodes.add(node)
-        GraphEditor.feedBackInTutorial("Added graph node.")
-        if (GraphEditor.activeNode == null) return
-        addEdge(GraphEditor.activeNode, node)
-    }
-
-    private fun addEdge(node1: GraphingNode?, node2: GraphingNode?, direction: EdgeDirection = EdgeDirection.BOTH): Boolean {
-        if (node1 == null || node2 == null || node1 == node2) return false
-        val edge = GraphingEdge(node1, node2, direction)
-        if (edge.isInEdge(GraphEditor.activeNode)) {
-            GraphEditor.checkDissolve()
-            GraphEditor.selectedEdge = GraphEditor.findEdgeBetweenActiveAndClosest()
-        }
-        return GraphEditor.edges.add(edge)
     }
 
     private fun testDijkstra() {
@@ -322,12 +235,6 @@ object GraphEditorInput {
             GraphEditor.highlightedNodes.zipWithNext { a, b -> GraphEditor.edges.firstOrNull { it.isValidConnectionFromTo(a, b) } }
                 .filterNotNull(),
         )
-    }
-
-    private fun handleNameShortcut(name: String?): Pair<GraphNodeTag, String>? = when (name) {
-        "fsoul" -> GraphNodeTag.FAIRY_SOUL to "Fairy Soul"
-        "na" -> GraphNodeTag.AREA to "no_area"
-        else -> null
     }
 
     private fun editModeClicks() {
