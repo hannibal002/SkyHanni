@@ -147,8 +147,7 @@ data class CustomTodo(
         if (readyAt.isInPast()) {
             timer = if (this.totalTriggers == 1) "§aReady"
             else "§a$triggers Left"
-        }
-        if (this.showOnlyWhenReady) return null
+        } else if (this.showOnlyWhenReady) return null
         if (this.showWhen != 0 && readyAt.timeUntil().inWholeSeconds > this.showWhen) return null
         return timer
     }
