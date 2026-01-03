@@ -23,10 +23,10 @@ object ZorroCapeContestProtection {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (!FarmingContestApi.inInventory) return
-        val cloak = EquipmentApi.getEquipment(EquipmentSlot.CLOAK)?.getInternalNameOrNull()
-        if (cloak == zorroCape) return
         val stack = event.item ?: return
         if (!JacobFarmingContestsInventory.isClaimableContest(stack)) return
+        val cloak = EquipmentApi.getEquipment(EquipmentSlot.CLOAK)?.getInternalNameOrNull()
+        if (cloak == zorroCape) return
 
         event.cancel()
         TitleManager.sendTitle(
