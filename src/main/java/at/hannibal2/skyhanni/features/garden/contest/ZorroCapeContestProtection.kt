@@ -35,7 +35,7 @@ object ZorroCapeContestProtection {
             location = TitleManager.TitleLocation.INVENTORY,
         )
         ChatUtils.notifyOrDisable(
-            "§cBlocked claiming Jacob Contest reward! §eUse a Zorro's Cape while opening farming contests.",
+            "§cBlocked Jacob's Contest reward claim! §eEquip §6Zorro's Cape §ewhen claiming contest rewards.",
             config::zorroCapeProtection,
         )
     }
