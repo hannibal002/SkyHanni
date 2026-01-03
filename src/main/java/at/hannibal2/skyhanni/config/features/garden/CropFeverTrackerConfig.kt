@@ -1,0 +1,63 @@
+package at.hannibal2.skyhanni.config.features.garden
+
+import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+
+class CropFeverTrackerConfig {
+    @Expose
+    @ConfigOption(name = "Enabled", desc = "Track your crop fever drops.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var enabled: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Only Show With Tool", desc = "Only show when holding a farming tool.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var showWithTool: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Only Show During Fever", desc = "Only show during a crop fever.")
+    @ConfigEditorBoolean
+    var showDuringFever: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Tracker Text",
+        desc = "Drag text to change the appearance of the overlay.\n"
+    )
+    @ConfigEditorDraggableList
+    val text: MutableList<CropFeverTrackerTextEntry> = mutableListOf(
+        CropFeverTrackerTextEntry.RNG_DROPS,
+        CropFeverTrackerTextEntry.SPACER_2,
+        CropFeverTrackerTextEntry.ITEM_DROPS,
+        CropFeverTrackerTextEntry.SPACER_1,
+        CropFeverTrackerTextEntry.FEVER_AMOUNT,
+        CropFeverTrackerTextEntry.TOTAL_BLOCKS,
+    )
+
+    enum class CropFeverTrackerTextEntry(private val displayName: String) {
+        TITLE("§6Crop Fever Tracker"),
+        RNG_DROPS("§7- §e17x §a§lUNCOMMON DROP\n§7- §e6x §9§lRARE DROP\n§7- §e1x §d§lCRAZY RARE DROP"),
+        ITEM_DROPS("§7120x §aEnchanted Melon Slice §61.8m\n§73x §9Enchanted Melon Block §6150k"),
+        FEVER_AMOUNT("§7Total Crop Fevers: §e5"),
+        FEVER_UPTIME("§7Crop Fever Uptime: §b4m 32s"),
+        TOTAL_BLOCKS("§7Total Blocks Broken: §e12,123"),
+        TOTAL_PROFIT("§7Total Profit: §618m"),
+        SPACER_1(""),
+        SPACER_2(""),
+        FEVER_BLOCKS("§7Blocks Broken During Fever: §e2,127")
+        ;
+
+        override fun toString() = displayName
+    }
+
+    @Expose
+    @ConfigLink(owner = CropFeverTrackerConfig::class, field = "enabled")
+    val position: Position = Position(80, 20)
+}
