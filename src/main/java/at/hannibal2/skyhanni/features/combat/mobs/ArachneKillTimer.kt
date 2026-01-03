@@ -41,7 +41,7 @@ object ArachneKillTimer {
      */
     private val arachneDeathPattern by patternGroup.pattern(
         "dead",
-        " +§r§6§lARACHNE DOWN!",
+        ".*§r§6§lARACHNE DOWN!",
     )
 
     /**
@@ -49,7 +49,7 @@ object ArachneKillTimer {
      */
     private val arachneDamagePattern by patternGroup.pattern(
         "damage",
-        " +§r§eYour Damage: §r§a[0-9,]+ §r§7\\(Position #[0-9,]+\\)",
+        ".*§r§eYour Damage: §r§a[0-9,]+ §r§7\\(Position #[0-9,]+\\)",
     )
 
     private var arachneSpawnedTime = SimpleTimeMark.farPast()
