@@ -154,7 +154,6 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
 
         val hover = buildList {
             add("§e$title")
-            add("§8SkyHanni Debug Log")
             add("")
             addAll(previousSteps)
             val currentTime = startOfCurrent?.format() ?: error("startOfCurrent is null")
@@ -220,7 +219,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
 
         private fun loadAvailableCategories(): List<List<Renderable>> = buildList {
             if (!showCategoryList) return emptyList()
-            add(listOf(Renderable.text( "§d§lChat Progress Categories")))
+            add(listOf(Renderable.text("§d§lChat Progress Categories")))
             add(listOf(Renderable.emptyText()))
 
             for (category in categories) {
@@ -251,8 +250,13 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
 
             display = Renderable.vertical(
                 buildList {
-                    add(Renderable.table(availableCategories, ySpacing = 2))
-                    addAll(getUpdates(activeCategories))
+                    if (availableCategories.isNotEmpty()) {
+                        add(Renderable.table(availableCategories, ySpacing = 2))
+                    }
+                    if (activeCategories.isNotEmpty()) {
+                        add(Renderable.text("§d§lDebug Log"))
+                        addAll(getUpdates(activeCategories))
+                    }
                 },
             )
         }
