@@ -19,9 +19,9 @@ object ZorroCapeContestProtection {
     private val config get() = SkyHanniMod.feature.garden.jacobContest
     private val zorroCape = "ZORROS_CAPE".toInternalName()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled()) return
+        if (!config.zorroCapeProtection) return
         if (!FarmingContestApi.inInventory) return
         val stack = event.item ?: return
         if (!JacobFarmingContestsInventory.isClaimableContest(stack)) return
@@ -39,6 +39,4 @@ object ZorroCapeContestProtection {
             config::zorroCapeProtection,
         )
     }
-
-    private fun isEnabled() = IslandType.GARDEN.isCurrent() && config.zorroCapeProtection
 }
