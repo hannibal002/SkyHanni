@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,11 +14,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darkRectButton
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
@@ -37,146 +31,19 @@ import kotlin.time.Duration.Companion.seconds
 class ChatProgressUpdates private constructor(val category: ChatProgressCategory) {
     private var startOfFirst: SimpleTimeMark? = null
     private var title: String? = null
-
     private var currentlyRunning = false
-
     private val previousSteps = mutableListOf<String>()
-
     private var startOfCurrent: SimpleTimeMark? = null
     private var currentStep: String? = null
     private var innerProgress = ""
-
     private var innerProgressMax = 0
     private val innerProgressCount = AtomicInteger(0)
-
+    var currentText: ProgressText? = null
 
     data class ProgressText(val text: String, val hoverText: String)
 
     init {
         updates.add(this)
-    }
-
-    class ChatProgressCategory(val categoryName: String) {
-
-        private var currentText: ProgressText? = null
-
-        val updates = mutableListOf<ChatProgressUpdates>()
-        var enabled = false
-
-        fun start(label: String): ChatProgressUpdates {
-            val progress = ChatProgressUpdates(this)
-            progress.start("$categoryName $label")
-            updates.add(progress)
-            return progress
-        }
-
-        fun toggle() {
-            enabled = !enabled
-            if (enabled) {
-                for (update in updates) {
-                    update.update()
-                }
-                updateDisplay()
-            }
-        }
-
-        fun getStatus(): String {
-            val state = if (enabled) "§aenabled" else "§cdisabled"
-            return "category $categoryName: $state"
-        }
-    }
-
-    @SkyHanniModule
-    companion object {
-
-        private var display: Renderable? = null
-        private val config get() = SkyHanniMod.feature.dev.devTool
-
-        fun buildDisplay(): Renderable {
-            val rows = buildList {
-                add(listOf(Renderable.text("§d§lChat Progress Categories")))
-                add(listOf(Renderable.emptyText()))
-
-                for (category in categories) {
-                    val stateColor = if (category.enabled) "§a" else "§c"
-                    val stateSymbol = if (category.enabled) "✓" else "✗"
-
-                    val nameRenderable = Renderable.text("§7${category.categoryName}")
-                    val stateRenderable = darkRectButton(
-                        content = Renderable.text("$stateColor$stateSymbol ${if (category.enabled) "Enabled" else "Disabled"}"),
-                        onClick = {
-                            category.toggle()
-                            updateDisplay()
-                        },
-                        startState = category.enabled,
-                        padding = 3,
-                    )
-
-                    add(listOf(nameRenderable, stateRenderable))
-
-                    // Show progress updates for enabled categories
-                    if (category.enabled) {
-                        for (update in category.updates) {
-                            update.currentText?.let { progress ->
-                                // TODO: Add hover support later, for now just show text
-                                add(listOf(Renderable.emptyText(), Renderable.text(progress.text)))
-                            }
-                        }
-                    }
-                }
-            }
-
-            return Renderable.table(rows, ySpacing = 2)
-        }
-
-        @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-        fun onRenderOverlay() {
-            display?.let {
-                config.chatProgressPosition.renderRenderable(display, "Chat Progress Updates")
-            }
-        }
-
-        private val categories = mutableListOf<ChatProgressCategory>()
-
-        fun category(categoryName: String): ChatProgressCategory {
-            val category = ChatProgressCategory(categoryName)
-            categories.add(category)
-            return category
-        }
-
-        private val updates = mutableListOf<ChatProgressUpdates>()
-
-        @HandleEvent
-        fun onCommandRegistration(event: CommandRegistrationEvent) {
-            event.registerBrigadier("shdebugprogress") {
-                description = "Toggling chat progress updates"
-                category = CommandCategory.DEVELOPER_DEBUG
-                argCallback("category", BrigadierArguments.greedyString(), categories.map { it.categoryName }) { name ->
-                    val category = categories.find { it.categoryName.equals(name, ignoreCase = true) }
-                    if (category == null) {
-                        ChatUtils.userError("no category name found '$name'")
-                        return@argCallback
-                    }
-                    category.toggle()
-                    ChatUtils.chat(category.getStatus())
-                }
-                simpleCallback {
-                    display = if (display == null) buildDisplay() else null
-                }
-            }
-        }
-
-        private fun updateDisplay() {
-            display = buildDisplay()
-        }
-
-        @HandleEvent(onlyOnSkyblock = true)
-        fun onTick(event: SkyHanniTickEvent) {
-            if (!event.isMod(2)) return
-            for (update in updates.filter { it.isEnabled() && it.currentlyRunning }) {
-                update.update()
-            }
-        }
     }
 
     private fun isEnabled() = category.enabled
@@ -308,15 +175,127 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
 
         currentText = ProgressText(text, hover.joinToString("\n"))
         if (isEnabled()) {
-            updateDisplay()
+            dirty = true
         }
     }
-
-    var currentText: ProgressText? = null
 
     private enum class Phase {
         START,
         UPDATE,
         END,
+    }
+
+    class ChatProgressCategory(val categoryName: String) {
+        val updates = mutableListOf<ChatProgressUpdates>()
+        var enabled = false
+
+        fun start(label: String): ChatProgressUpdates {
+            val progress = ChatProgressUpdates(this)
+            progress.start("$categoryName $label")
+            updates.add(progress)
+            return progress
+        }
+
+        fun toggle() {
+            enabled = !enabled
+            dirty = true
+        }
+
+        fun getStatus(): String {
+            val state = if (enabled) "§aenabled" else "§cdisabled"
+            return "category $categoryName: $state"
+        }
+    }
+
+    @SkyHanniModule
+    companion object {
+        private var display: Renderable? = null
+        private var dirty = false
+        private var showCategoryList = false
+        private val config get() = SkyHanniMod.feature.dev.devTool
+        private val categories = mutableListOf<ChatProgressCategory>()
+        private val updates = mutableListOf<ChatProgressUpdates>()
+
+        fun category(categoryName: String): ChatProgressCategory {
+            val category = ChatProgressCategory(categoryName)
+            categories.add(category)
+            return category
+        }
+
+        fun buildDisplay(): Renderable? {
+            val rows = buildList {
+                for (category in categories.filter { it.enabled }) {
+                    for (update in category.updates) {
+                        update.currentText?.let { progress ->
+                            // TODO: Add hover support later
+                            add(listOf(Renderable.text(progress.text)))
+                        }
+                    }
+                }
+
+                if (showCategoryList) {
+                    if (isNotEmpty()) add(listOf(Renderable.emptyText()))
+                    add(listOf(Renderable.text("§d§lChat Progress Categories")))
+                    add(listOf(Renderable.emptyText()))
+
+                    for (category in categories) {
+                        val stateColor = if (category.enabled) "§a" else "§c"
+                        val stateSymbol = if (category.enabled) "✓" else "✗"
+
+                        val nameRenderable = Renderable.text("§7${category.categoryName}")
+                        val stateRenderable = darkRectButton(
+                            content = Renderable.text("$stateColor$stateSymbol ${if (category.enabled) "Enabled" else "Disabled"}"),
+                            onClick = {
+                                category.toggle()
+                            },
+                            startState = category.enabled,
+                            padding = 3,
+                        )
+
+                        add(listOf(nameRenderable, stateRenderable))
+                    }
+                }
+            }
+
+            return if (rows.isEmpty()) null else Renderable.table(rows, ySpacing = 2)
+        }
+
+        private fun updateDisplay() {
+            display = buildDisplay()
+        }
+
+        @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+        fun onRenderOverlay() {
+            display?.let {
+                config.chatProgressPosition.renderRenderable(it, "Chat Progress Updates")
+            }
+        }
+
+        @HandleEvent
+        fun onCommandRegistration(event: CommandRegistrationEvent) {
+            event.registerBrigadier("shdebugprogress") {
+                description = "Toggling chat progress updates"
+                category = CommandCategory.DEVELOPER_DEBUG
+                simpleCallback {
+                    showCategoryList = !showCategoryList
+                    ChatUtils.chat("Category list: ${if (showCategoryList) "§ashown" else "§chidden"}")
+                    updateDisplay()
+                }
+            }
+        }
+
+        @HandleEvent(onlyOnSkyblock = true)
+        fun onTick(event: SkyHanniTickEvent) {
+            if (!event.isMod(2)) return
+
+            for (update in updates.filter { it.isEnabled() && it.currentlyRunning }) {
+                update.update()
+            }
+
+            if (dirty) {
+                updateDisplay()
+                dirty = false
+            }
+        }
     }
 }
