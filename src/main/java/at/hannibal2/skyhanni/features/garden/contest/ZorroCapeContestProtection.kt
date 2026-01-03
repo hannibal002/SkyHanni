@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ZorroCapeContestClaim {
+object ZorroCapeContestProtection {
 
     private val config get() = SkyHanniMod.feature.garden.jacobContest
     private val zorroCape = "ZORROS_CAPE".toInternalName()
@@ -36,9 +36,9 @@ object ZorroCapeContestClaim {
         )
         ChatUtils.notifyOrDisable(
             "§cBlocked claiming Jacob Contest reward! §eUse a Zorro's Cape while opening farming contests.",
-            config::claimWithZorroCape,
+            config::zorroCapeProtection,
         )
     }
 
-    private fun isEnabled() = IslandType.GARDEN.isCurrent() && config.claimWithZorroCape
+    private fun isEnabled() = IslandType.GARDEN.isCurrent() && config.zorroCapeProtection
 }

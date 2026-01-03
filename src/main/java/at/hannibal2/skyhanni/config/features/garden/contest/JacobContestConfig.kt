@@ -46,10 +46,10 @@ class JacobContestConfig {
 
     @Expose
     @ConfigOption(
-        name = "Claim with Zorro's Cape",
-        desc = "Block Jacob Farming Contest claims when without wearing a Zorro's Cape. Do not waste the 20% chance of duplicate medals!",
+        name = "Zorro's Cape Protection",
+        desc = "Block Jacob Farming Contest claims when not wearing a Zorro's Cape. Do not waste the 20% chance of duplicate medals!",
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var claimWithZorroCape: Boolean = false
+    var zorroCapeProtection: Boolean = false
 }
