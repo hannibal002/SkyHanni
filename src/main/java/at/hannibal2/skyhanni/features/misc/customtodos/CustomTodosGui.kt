@@ -26,9 +26,10 @@ object CustomTodosGui {
     private val config get() = SkyHanniMod.feature.misc.customTodos
 
     private fun matchString(todo: CustomTodo, text: String): Boolean {
+        if (!todo.isValid()) return false
         val cleanedText = if (todo.ignoreColorCodes) text.removeColor() else text
         return when (todo.triggerMatcher) {
-            CustomTodo.TriggerMatcher.REGEX -> cleanedText.matches(todo.trigger.toRegex())
+            CustomTodo.TriggerMatcher.REGEX -> cleanedText.matches(todo.getRegex() ?: return false)
             CustomTodo.TriggerMatcher.STARTS_WITH -> cleanedText.startsWith(todo.trigger)
             CustomTodo.TriggerMatcher.CONTAINS -> cleanedText.contains(todo.trigger)
             CustomTodo.TriggerMatcher.EQUALS -> cleanedText == todo.trigger
@@ -77,7 +78,12 @@ object CustomTodosGui {
         if (todos.isEmpty()) return
         val display = mutableListOf<Renderable>()
         for ((index, todo) in todos.withIndex()) {
-            val renderable = todo.getRenderable() ?: continue
+            val renderable: Renderable
+            try {
+                renderable = todo.getRenderable() ?: continue
+            } catch (e: Exception) {
+                continue
+            }
             if (config.separateGuis) {
                 todo.position.renderRenderable(renderable, posLabel = "${todo.label} $index")
             } else {

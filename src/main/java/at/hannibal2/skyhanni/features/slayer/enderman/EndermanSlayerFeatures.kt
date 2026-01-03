@@ -70,7 +70,7 @@ object EndermanSlayerFeatures {
         if (entity is ArmorStand) {
             if (showBeacon()) {
                 val stack = entity.getStandHelmet() ?: return
-                if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "Beacon" && entity.canBeSeen(viewDistance = 15.0, ignoreFrustum = true)) {
+                if (stack.hoverName.string == "Beacon" && entity.canBeSeen(viewDistance = 15.0, ignoreFrustum = true)) {
                     flyingBeacons.add(entity)
                     RenderLivingEntityHelper.setEntityColor(
                         entity,

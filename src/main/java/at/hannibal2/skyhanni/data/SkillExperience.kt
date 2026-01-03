@@ -49,7 +49,7 @@ object SkillExperience {
         if (event.inventoryName != "Your Skills") return
 
         for ((_, stack) in event.inventoryItems) {
-            val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = stack.hoverName.string.removeColor()
             if (!name.contains(" ")) continue
 
             val lore = stack.getLore()

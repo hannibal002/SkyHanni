@@ -162,7 +162,7 @@ object CroesusChestTracker {
             val lore = item.getLore()
 
             if (run.floor == null || run.floor == "F0") run.floor =
-                (if (masterPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())) "M" else "F") + (
+                (if (masterPattern.matches(item.hoverName)) "M" else "F") + (
                     lore.firstNotNullOfOrNull {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"

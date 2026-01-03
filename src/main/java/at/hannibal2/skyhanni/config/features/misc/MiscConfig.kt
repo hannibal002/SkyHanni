@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
+import at.hannibal2.skyhanni.config.features.misc.navigation.NavigationConfig
 import at.hannibal2.skyhanni.config.features.pets.PetConfig
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
 import com.google.gson.annotations.Expose
@@ -46,12 +47,8 @@ class MiscConfig {
     val stranded: StrandedConfig = StrandedConfig()
 
     @Expose
-    @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
-    val areaNavigation: AreaNavigationConfig = AreaNavigationConfig()
-
-    @Expose
-    @Category(name = "Pathfinding", desc = "General settings for Pathfinding/Navigating in different features.")
-    val pathfinding: PathfindConfig = PathfindConfig()
+    @Category(name = "Navigation", desc = "Navigation features and other related settings.")
+    val navigation: NavigationConfig = NavigationConfig()
 
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion

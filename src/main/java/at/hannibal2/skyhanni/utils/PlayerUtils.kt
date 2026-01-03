@@ -39,7 +39,7 @@ object PlayerUtils {
 
     fun getRawUuid(): UUID = MinecraftCompat.localPlayer.uuid
 
-    fun getName(): String = MinecraftCompat.localPlayer.name.formattedTextCompatLessResets()
+    fun getName(): String = MinecraftCompat.localPlayer.name.string
 
     fun inAir(): Boolean = !MinecraftCompat.localPlayer.onGround()
 

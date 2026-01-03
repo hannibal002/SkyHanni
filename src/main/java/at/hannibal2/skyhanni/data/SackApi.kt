@@ -327,12 +327,12 @@ object SackApi {
         if (!event.message.removeColor().startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.hover?.formattedTextCompat()?.removeColor()?.takeIf {
+            sibling.hover?.string?.removeColor()?.takeIf {
                 it.startsWith("Added")
             }
         }.orEmpty()
         val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.hover?.formattedTextCompat()?.removeColor()?.takeIf {
+            sibling.hover?.string?.removeColor()?.takeIf {
                 it.startsWith("Removed")
             }
         }.orEmpty()

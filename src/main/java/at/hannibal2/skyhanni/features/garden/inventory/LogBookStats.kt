@@ -125,7 +125,7 @@ object LogBookStats {
             return
         }
         for (item in event.inventoryItems.values) {
-            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aNext Page") continue
+            if (item.hoverName.string != "Next Page") continue
             pagePattern.firstMatcher(item.getLore()) {
                 currentPage = group("page").toInt() - 1
             }

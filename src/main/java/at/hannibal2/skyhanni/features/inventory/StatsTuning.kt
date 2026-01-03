@@ -46,7 +46,7 @@ object StatsTuning {
     }
 
     private fun templateStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aLoad") return false
+        if (stack.hoverName.string != "Load") return false
 
         var grab = false
         val list = mutableListOf<String>()
@@ -74,7 +74,7 @@ object StatsTuning {
     }
 
     private fun renderTunings(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aStats Tuning") return false
+        if (stack.hoverName.string != "Stats Tuning") return false
         val tunings = MaxwellApi.tunings ?: return false
 
         event.stackTip = tunings
