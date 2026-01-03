@@ -62,6 +62,7 @@ object GardenApi {
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
+    var lastBrokenCropType: CropType? = null
     var pestCooldownEndTime = SimpleTimeMark.farPast()
     var lastCropBrokenTime = SimpleTimeMark.farPast()
     val mushroomCowPet
@@ -186,8 +187,6 @@ object GardenApi {
     fun readCounter(itemStack: ItemStack): Long? =
         itemStack.getCultivatingCounter() ?: itemStack.getHoeExp() ?: itemStack.getOldHoeCounter()
 
-    fun readCultivatingCounter(itemStack: ItemStack): Long? = itemStack.getCultivatingCounter()
-
     fun CropType.getItemStackCopy(iconId: String): ItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory ||
@@ -209,7 +208,7 @@ object GardenApi {
 
     fun getCurrentlyFarmedCrop(): CropType? {
         val brokenCrop = if (toolInHand != null) GardenCropSpeed.lastBrokenCrop else null
-        return cropInHand ?: brokenCrop
+        return lastBrokenCropType ?: cropInHand ?: brokenCrop
     }
 
     private var lastLocation: LorenzVec? = null

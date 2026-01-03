@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenApi.lastBrokenCropType
 import at.hannibal2.skyhanni.features.garden.GardenApi.readCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
@@ -26,7 +27,6 @@ object GardenCropBreakTracker {
     private val counterData: MutableMap<String, Long>? get() = storage?.toolCounterData
     private val cropMap: MutableMap<CropType, Int> = mutableMapOf()
 
-    private var cropBrokenType: CropType? = null
     private var heldItem: ItemStack? = null
     private var itemHasCounter: Boolean = false
     private var mooshroomCowCrops: Int = 0
@@ -51,7 +51,7 @@ object GardenCropBreakTracker {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onCropBreak(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK) return
-        if (event.crop != cropBrokenType) cropBrokenType = event.crop
+        if (event.crop != lastBrokenCropType) lastBrokenCropType = event.crop
 
         if (GardenApi.mushroomCowPet) {
             mooshroomCowCrops += weightedRandomRound(CurrentPetApi.currentPet?.level ?: 0)
@@ -73,7 +73,7 @@ object GardenCropBreakTracker {
         val uuid = item.getItemUuid() ?: return
         val counter = readCounter(item) ?: return
 
-        val crop = cropBrokenType ?: event.itemStack.getCropType()
+        val crop = lastBrokenCropType ?: event.itemStack.getCropType()
         if (crop == null) return
 
         val old = counterData?.get(uuid) ?: return
