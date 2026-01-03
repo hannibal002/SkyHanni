@@ -200,11 +200,6 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
             enabled = !enabled
             dirty = true
         }
-
-        fun getStatus(): String {
-            val state = if (enabled) "§aenabled" else "§cdisabled"
-            return "category $categoryName: $state"
-        }
     }
 
     @SkyHanniModule
@@ -222,49 +217,57 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
             return category
         }
 
-        fun buildDisplay(): Renderable? {
-            val rows = buildList {
-                for (category in categories.filter { it.enabled }) {
-                    for (update in category.updates) {
-                        update.currentText?.let { progress ->
-                            // TODO: Add hover support later
-                            add(listOf(Renderable.text(progress.text)))
-                        }
-                    }
-                }
+        private fun buildTable(): List<List<Renderable>> = buildList {
+            showCategoryList()
 
-                if (showCategoryList) {
-                    if (isNotEmpty()) add(listOf(Renderable.emptyText()))
-                    add(listOf(Renderable.text("§d§lChat Progress Categories")))
-                    add(listOf(Renderable.emptyText()))
-
-                    for (category in categories) {
-                        val stateColor = if (category.enabled) "§a" else "§c"
-                        val stateSymbol = if (category.enabled) "✓" else "✗"
-
-                        val nameRenderable = Renderable.text("§7${category.categoryName}")
-                        val stateRenderable = darkRectButton(
-                            content = Renderable.text("$stateColor$stateSymbol ${if (category.enabled) "Enabled" else "Disabled"}"),
-                            onClick = {
-                                category.toggle()
-                            },
-                            startState = category.enabled,
-                            padding = 3,
+            for (category in categories.filter { it.enabled }) {
+                for (update in category.updates) {
+                    update.currentText?.let { progress ->
+                        val hoverable = Renderable.hoverTips(
+                            Renderable.text(progress.text),
+                            progress.hoverText.split("\n"),
                         )
-
-                        add(listOf(nameRenderable, stateRenderable))
+                        add(listOf(hoverable))
                     }
                 }
             }
+        }
 
-            return if (rows.isEmpty()) null else Renderable.table(rows, ySpacing = 2)
+        private fun MutableList<List<Renderable>>.showCategoryList() {
+            if (!showCategoryList) return
+            if (isNotEmpty()) add(listOf(Renderable.emptyText()))
+            add(listOf(Renderable.text("§d§lChat Progress Categories")))
+            add(listOf(Renderable.emptyText()))
+
+            for (category in categories) {
+                val stateColor = if (category.enabled) "§a" else "§c"
+                val stateSymbol = if (category.enabled) "✓" else "✗"
+
+                val nameRenderable = Renderable.text("§7${category.categoryName}")
+                val stateRenderable = darkRectButton(
+                    content = Renderable.text("$stateColor$stateSymbol ${if (category.enabled) "Enabled" else "Disabled"}"),
+                    onClick = {
+                        category.toggle()
+                    },
+                    startState = category.enabled,
+                    padding = 3,
+                )
+
+                add(listOf(nameRenderable, stateRenderable))
+            }
         }
 
         private fun updateDisplay() {
-            display = buildDisplay()
+            val rows = buildTable()
+            if (rows.isEmpty()) {
+                display = null
+                return
+            }
+            display = Renderable.table(rows, ySpacing = 2)
+
         }
 
-        @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+        @HandleEvent(GuiRenderEvent::class)
         fun onRenderOverlay() {
             display?.let {
                 config.chatProgressPosition.renderRenderable(it, "Chat Progress Updates")
