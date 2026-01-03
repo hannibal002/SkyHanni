@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.repo
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -11,7 +12,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
@@ -21,6 +22,9 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darkRectButton
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
+import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -30,7 +34,7 @@ import kotlin.time.Duration.Companion.seconds
  * This class allows to log actions and their duration of long, async tasks in chat.
  * Ideally for repo reload.
  */
-class ChatProgressUpdates private constructor(val category: ChatProgressCategory, private val chatId: Int) {
+class ChatProgressUpdates private constructor(val category: ChatProgressCategory) {
     private var startOfFirst: SimpleTimeMark? = null
     private var title: String? = null
 
@@ -66,8 +70,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
         var enabled = false
 
         fun start(label: String): ChatProgressUpdates {
-            val chatId = ChatUtils.getUniqueMessageId()
-            val progress = ChatProgressUpdates(this, chatId)
+            val progress = ChatProgressUpdates(this)
             progress.start("$categoryName $label")
             updates.add(progress)
             return progress
@@ -78,11 +81,8 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
             if (enabled) {
                 for (update in updates) {
                     update.update()
-                    // TODO make it work, ty
                 }
-                // TODO find a way to delete by chat id
-//             } else {
-//                 ChatUtils.deleteChatMessage(updates.map { it.chatId }.toSet())
+                updateDisplay()
             }
         }
 
@@ -95,43 +95,46 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     @SkyHanniModule
     companion object {
 
-        private var displayGui: Renderable? = null
+        private var display: Renderable? = null
+        private val config get() = SkyHanniMod.feature.dev.devTool
 
-        fun createGui(): Renderable {
-            val rows = buildList<List<Renderable>> {
-                add(listOf(text("§d§lChat Progress Categories")))
-                add(listOf(emptyText()))
+        fun buildDisplay(): Renderable {
+            val rows = buildList {
+                add(listOf(Renderable.text("§d§lChat Progress Categories")))
+                add(listOf(Renderable.emptyText()))
 
                 for (category in categories) {
                     val stateColor = if (category.enabled) "§a" else "§c"
                     val stateSymbol = if (category.enabled) "✓" else "✗"
 
-                    val nameRenderable = text("§7${category.categoryName}")
+                    val nameRenderable = Renderable.text("§7${category.categoryName}")
+                    for (updates in category.updates) {
+                        // TODO do something here
+                        updates.currentText
+                    }
                     val stateRenderable = darkRectButton(
-                        content = text("$stateColor$stateSymbol ${if (category.enabled) "Enabled" else "Disabled"}"),
+                        content = Renderable.text("$stateColor$stateSymbol ${if (category.enabled) "Enabled" else "Disabled"}"),
                         onClick = {
                             category.toggle()
-                            displayGui = createGui()
+                            updateDisplay()
                         },
                         startState = category.enabled,
-                        padding = 3
+                        padding = 3,
                     )
 
                     add(listOf(nameRenderable, stateRenderable))
                 }
             }
 
-            return table(rows, ySpacing = 2)
+            return Renderable.table(rows, ySpacing = 2)
         }
 
         @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
         fun onRenderOverlay() {
-            displayGui?.let {
-                // TODO do the rendering
+            display?.let {
+                config.chatProgressPosition.renderRenderable(display, "Chat Progress Updates")
             }
         }
-
-        val commandMessageId = ChatUtils.getUniqueMessageId()
 
         private val categories = mutableListOf<ChatProgressCategory>()
 
@@ -159,9 +162,13 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
                 }
                 simpleCallback {
                     val lines = categories.joinToString("\n") { it.getStatus() }
-                    ChatUtils.chat(lines, messageId = commandMessageId)
+                    // TODO do something here
                 }
             }
+        }
+
+        private fun updateDisplay() {
+            display = buildDisplay()
         }
 
         @HandleEvent(onlyOnSkyblock = true)
@@ -301,16 +308,18 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
 
         val delayedSending = DelayedSending("§e[Debug-Log] §f$text §7(hover for more info)", hover.joinToString("\n"))
         if (isEnabled()) {
-            delayedSending.send(chatId)
+            currentText = delayedSending
         } else {
             this.delayedSending = delayedSending
         }
     }
 
+    var currentText: DelayedSending? = null
+
     private fun testDelayedSending() {
         delayedSending?.let {
             if (MinecraftCompat.localPlayerOrNull != null) {
-                it.send(chatId)
+                currentText = it
                 delayedSending = null
             }
         }
@@ -322,4 +331,3 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
         END,
     }
 }
-
