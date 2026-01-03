@@ -59,7 +59,7 @@ sealed interface RepoFileSystem {
                     if (!outPath.startsWith(root.toPath())) {
                         throw RuntimeException(
                             "SkyHanni detected an invalid zip file. This is a potential security risk, " +
-                                    "please report this on the SkyHanni discord.",
+                                "please report this on the SkyHanni discord.",
                         )
                     }
                 }

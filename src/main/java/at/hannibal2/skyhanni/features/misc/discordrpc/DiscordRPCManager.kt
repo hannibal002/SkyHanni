@@ -52,7 +52,7 @@ object DiscordRPCManager {
     private var debugError = false
     private var debugStatusMessage = "nothing"
 
-    private val progressCategory =  ChatProgressUpdates.category("Discord RPC")
+    private val progressCategory = ChatProgressUpdates.category("Discord RPC")
 
     suspend fun start(progress: ChatProgressUpdates, fromCommand: Boolean = false) {
         progress.update("call start")
@@ -129,8 +129,7 @@ object DiscordRPCManager {
             if (isConnected()) {
                 setupPresenceJob(progress)
                 progress.end("Successfully updated")
-            }
-            else presenceJob?.cancel()
+            } else presenceJob?.cancel()
         }
         config.enabled.whenChanged { _, new ->
             if (!new) stop()
