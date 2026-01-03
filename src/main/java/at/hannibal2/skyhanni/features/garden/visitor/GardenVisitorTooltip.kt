@@ -62,16 +62,13 @@ object GardenVisitorTooltip {
         val offerItem = visitor.offer?.offerItem ?: return
         val lore = offerItem.getLore()
 
-        // Extract shopping list from tooltip
         readShoppingList(visitor, lore)
 
-        // Calculate economics IMMEDIATELY so blockReason can be set
         readToolTip(visitor, offerItem, lore.toMutableList())
 
-        visitor.lastLore = emptyList()  // Will be recalculated on hover
+        visitor.lastLore = emptyList()
         visitor.blockedLore = emptyList()
 
-        // Check if already ready (all items present)
         val alreadyReady = lore.any { it == "§eClick to give!" }
         if (alreadyReady) {
             VisitorApi.changeStatus(visitor, VisitorApi.VisitorStatus.READY, "tooltipClickToGive")
@@ -161,7 +158,6 @@ object GardenVisitorTooltip {
             totalPrice = 0.0
         }
 
-        // Store rewards and notify if needed
         if (foundRewards.isNotEmpty()) {
             val wasEmpty = visitor.allRewards.isEmpty()
             visitor.allRewards = foundRewards
@@ -180,7 +176,6 @@ object GardenVisitorTooltip {
         for ((i, formattedLine) in finalList.toMutableList().withIndex()) {
             val index = i + offset
 
-            // Add Garden Experience price
             if (config.inventory.experiencePrice) {
                 gardenExperiencePattern.matchMatcher(formattedLine) {
                     val gardenExp = group("amount").formatInt()
@@ -189,7 +184,6 @@ object GardenVisitorTooltip {
                 }
             }
 
-            // Add Copper economics
             copperPattern.matchMatcher(formattedLine) {
                 val copper = group("amount").formatInt()
                 val pricePerCopper = VisitorPriceCalculator.calculatePricePerCopper(totalPrice, copper)
@@ -215,7 +209,6 @@ object GardenVisitorTooltip {
                 finalList[index] = copperLine
             }
 
-            // Mark rewards section
             if (formattedLine.contains("Rewards")) {
                 readingShoppingList = false
             }
@@ -229,7 +222,6 @@ object GardenVisitorTooltip {
 
             val price = VisitorPriceCalculator.calculateItemPrice(internalName, amount)
 
-            // Add item price
             if (config.inventory.showPrice) {
                 val format = price.shortFormat()
                 finalList[index] = "$formattedLine §7(§6$format§7)"
@@ -237,7 +229,6 @@ object GardenVisitorTooltip {
 
             if (!readingShoppingList) continue
 
-            // Add exact amount and farming time for crops
             if (config.inventory.exactAmountAndTime) {
                 val farmingTime = VisitorPriceCalculator.calculateFarmingTime(internalName, amount)
                 if (farmingTime != null) {
@@ -259,7 +250,6 @@ object GardenVisitorTooltip {
 
         visitor.lastLore = finalList
 
-        // NOW calculate blockReason after all economics are calculated
         visitor.blockReason = visitor.blockReason()
     }
 

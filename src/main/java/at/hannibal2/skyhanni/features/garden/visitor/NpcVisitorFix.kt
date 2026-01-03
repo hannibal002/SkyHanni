@@ -47,14 +47,12 @@ object NpcVisitorFix {
     }
 
     private fun saveStaticVisitor(name: String, entity: ArmorStand) {
-        // clicked on the real visitor, ignoring
         if (lastVisitorOpen.passedSince() < 1.seconds) return
 
         val storage = GardenApi.storage ?: return
 
         val location = entity.getLorenzVec()
         storage.npcVisitorLocations[name]?.let {
-            // already stored
             if (it.distance(location) < 1) return
         }
 

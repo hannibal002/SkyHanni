@@ -126,12 +126,10 @@ object GardenVisitorChat {
         val visitor = event.visitor
         val name = visitor.visitorName
 
-        // Update visitor status (triggers shopping list refresh)
         GardenVisitorStatus.update()
 
         logger.log("New visitor detected: '$name'")
 
-        // Don't show notifications for visitors that spawned while offline
         if (SkyBlockUtils.lastWorldSwitch.passedSince() < 3.seconds) return
 
         sendArrivalNotification(visitor)

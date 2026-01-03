@@ -92,14 +92,12 @@ object GardenVisitorStatus {
             val visitorName = visitor.visitorName
             val entity = visitor.getEntity()
 
-            // Try to find entity if missing
             if (entity == null) {
                 NpcVisitorFix.findNametag(visitorName.removeColor())?.let {
                     findEntity(it, visitor)
                 }
             }
 
-            // Update status based on inventory
             if (visitor.status in setOf(
                     VisitorApi.VisitorStatus.WAITING,
                     VisitorApi.VisitorStatus.READY,
@@ -112,7 +110,6 @@ object GardenVisitorStatus {
                 }
             }
 
-            // Delegate highlighting to GardenVisitorHighlight
             if (entity is LivingEntity) {
                 GardenVisitorHighlight.updateEntityColor(visitor, entity)
             }

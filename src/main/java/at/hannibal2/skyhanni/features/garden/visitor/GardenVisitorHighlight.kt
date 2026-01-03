@@ -39,10 +39,8 @@ object GardenVisitorHighlight {
         val text = visitor.status.displayName
         val location = event.location
 
-        // Main status text
         event.parent.drawString(location.up(2.23), text)
 
-        // Reward warnings stacked above
         if (config.rewardWarning.showOverName) {
             drawRewardWarnings(visitor, event)
         }
@@ -84,7 +82,6 @@ object GardenVisitorHighlight {
                     config.highlightStatus == HighlightMode.BOTH
             }
         } else if (!GardenApi.inGarden()) {
-            // Clean up color when leaving garden
             RenderLivingEntityHelper.removeEntityColor(entity)
         }
     }
