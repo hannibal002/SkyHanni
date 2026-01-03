@@ -905,6 +905,7 @@ object ItemUtils {
 
     /**
      * Returns the display name of the item stack as string.
+     * This name is currently without color codes, we might wanna bring them back.
      */
     // TODO rename to name or displayName or whatever better version, once its possible to do so.
     val ItemStack.realDisplayName get() = hoverName.string
