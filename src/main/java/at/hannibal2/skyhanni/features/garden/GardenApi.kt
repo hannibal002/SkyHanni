@@ -45,9 +45,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
@@ -186,8 +185,6 @@ object GardenApi {
 
     fun readCounter(itemStack: ItemStack): Long? =
         itemStack.getCultivatingCounter() ?: itemStack.getHoeExp() ?: itemStack.getOldHoeCounter()
-
-    fun readHoeCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter()
 
     fun readCultivatingCounter(itemStack: ItemStack): Long? = itemStack.getCultivatingCounter()
 

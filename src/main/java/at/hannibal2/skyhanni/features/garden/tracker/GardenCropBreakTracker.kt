@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenApi.readCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.math.floor
 import kotlin.random.Random
 
@@ -72,17 +72,16 @@ object GardenCropBreakTracker {
         val item = event.itemStack
         val uuid = item.getItemUuid() ?: return
         val counter = readCounter(item) ?: return
-        val isHoe = GardenApi.readHoeCounter(item) != null
 
-        val crop = if (isHoe || cropBrokenType == null) event.itemStack.getCropType() else cropBrokenType
+        val crop = cropBrokenType ?: event.itemStack.getCropType()
         if (crop == null) return
 
         val old = counterData?.get(uuid) ?: return
-        val addedCounter = if (counter < 0 && old > 0) {
-            // 32 bit overflow protection
-            counter + 4_294_967_296 - old
-        } else {
-            counter - old
+        var addedCounter = counter - old
+
+        // cult counts both seeds and wheat so we have to split it, ratio is 1 wheat : 1.5 seeds
+        if (crop == CropType.WHEAT) {
+            addedCounter = (addedCounter * .4f).toLong()
         }
 
         addToCropMap(crop, addedCounter.toInt())

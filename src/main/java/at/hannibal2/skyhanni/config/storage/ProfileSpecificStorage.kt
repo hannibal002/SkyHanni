@@ -29,12 +29,10 @@ import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
-import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
-import at.hannibal2.skyhanni.features.garden.tracker.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker

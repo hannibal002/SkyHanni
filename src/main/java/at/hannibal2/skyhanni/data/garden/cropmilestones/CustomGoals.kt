@@ -68,6 +68,9 @@ object CustomGoals {
             CropType.SUGAR_CANE -> cane
             CropType.CACTUS -> cactus
             CropType.MUSHROOM -> mushroom
+            CropType.SUNFLOWER -> sunflower
+            CropType.WILD_ROSE -> rose
+            CropType.MOONFLOWER -> moonflower
         }
     }
 }

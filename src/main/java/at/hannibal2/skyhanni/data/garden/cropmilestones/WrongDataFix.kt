@@ -40,7 +40,7 @@ object WrongDataFix {
         for ((_, stack) in event.inventoryItems) {
             val crop = getCropTypeByLore(stack) ?: continue
             totalPattern.firstMatcher(stack.getLore()) {
-                val oldAmount = crop.getMilestoneCounter() ?: continue
+                val oldAmount = crop.getMilestoneCounter() ?: 0
                 val amount = group("name").formatLong()
                 val change = amount - oldAmount
                 forceUpdateMilestone(crop, change)
