@@ -44,7 +44,7 @@ object IslandAreaFeatures {
     private var smallAreas = setOf<String>()
     private var targetNode: GraphNode? = null
     private val textInput = SearchTextInput()
-    private var areaNodes = listOf<AreaNode>()
+    private val areaNodes get() = IslandAreaBackend.areaNodes
     private var visibleAreaNodes = listOf<AreaNode>()
     private var currentTitle: TitleContext? = null
     private var lastTitleTime = SimpleTimeMark.farPast()
@@ -151,11 +151,9 @@ object IslandAreaFeatures {
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && IslandGraphs.currentIslandGraph != null
 
-    @HandleEvent
-    fun onAreaNodesUpdated(event: AreaNodesUpdatedEvent) {
-        val nodes = event.nodes
-        areaNodes = nodes
-        smallAreas = nodes
+    @HandleEvent(AreaNodesUpdatedEvent::class)
+    fun onAreaNodesUpdated() {
+        smallAreas = areaNodes
             .filter { GraphNodeTag.SMALL_AREA in it.node.tags }
             .map { it.name }
             .toSet()
@@ -188,7 +186,7 @@ object IslandAreaFeatures {
 
         val visibleNearby = nearby.filter { !it.isNoArea && it.isConfigVisible }
         if (visibleNearby.isEmpty()) {
-            addSearchString("§cThere is only one area in ${SkyBlockUtils.currentIsland.displayName},")
+            addSearchString("§cThere is only one area in ${SkyBlockUtils.currentIsland.displayName}")
             addSearchString("§cnothing else to navigate to!")
             return@buildList
         }

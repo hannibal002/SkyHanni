@@ -44,7 +44,7 @@ object IslandAreaBackend {
 
     fun nodeMoved() {
         if (nodeUpdateJob?.isActive == true) return
-        nodeUpdateJob = SkyHanniMod.launchCoroutineWithMutex("§island area node moved", nodeSaveMutex) {
+        nodeUpdateJob = SkyHanniMod.launchCoroutineWithMutex("island area node moved", nodeSaveMutex) {
             updateNodes()
         }
     }
@@ -63,7 +63,7 @@ object IslandAreaBackend {
             seenAreas += name
             AreaNode(node, name, tag, distance)
         }
-        AreaNodesUpdatedEvent(areaNodes).post()
+        AreaNodesUpdatedEvent().post()
     }
 
     private var hasMoved = false

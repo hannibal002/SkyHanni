@@ -308,6 +308,7 @@ object IslandGraphs {
         stop()
         closestNode = null
         cachedNearbyNodes = emptyList()
+        lastCacheUpdate = SimpleTimeMark.farPast()
     }
 
     /**
