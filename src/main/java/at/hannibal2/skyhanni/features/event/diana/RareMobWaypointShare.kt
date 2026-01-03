@@ -27,10 +27,11 @@ import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
+import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.player.RemotePlayer
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -78,7 +79,7 @@ object RareMobWaypointShare {
     private var lastRareMob = -1
     private var lastShareTime = SimpleTimeMark.farPast()
 
-    private val rareMobsNearby = ConcurrentHashMap<Int, EntityOtherPlayerMP>()
+    private val rareMobsNearby = ConcurrentHashMap<Int, RemotePlayer>()
 
     private val _waypoints = ConcurrentHashMap<String, SharedRareMob>()
     val waypoints: Map<String, SharedRareMob>
@@ -97,7 +98,7 @@ object RareMobWaypointShare {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
-            rareMobsNearby.removeIf { it.value.isDead }
+            rareMobsNearby.removeIf { it.value.deceased }
         }
 
         _waypoints.removeIf { it.value.spawnTime.passedSince() > 75.seconds }
@@ -114,10 +115,10 @@ object RareMobWaypointShare {
     @HandleEvent
     fun onRareDianaMobFound(event: RareDianaMobFoundEvent) {
         val rareMob = event.entity
-        rareMobsNearby[rareMob.entityId] = rareMob
+        rareMobsNearby[rareMob.id] = rareMob
         GriffinBurrowHelper.update()
 
-        lastRareMob = rareMob.entityId
+        lastRareMob = rareMob.id
         checkRareMobFound()
     }
 
@@ -182,7 +183,7 @@ object RareMobWaypointShare {
         if (!isEnabled()) return
         if (event.health > 0) return
 
-        val entityId = event.entity.entityId
+        val entityId = event.entity.id
         if (entityId == rareMob) {
             sendDeath()
         }
@@ -192,7 +193,7 @@ object RareMobWaypointShare {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         if (event.keyCode == config.keyBindShare) sendRareMob()
     }
 
@@ -222,7 +223,7 @@ object RareMobWaypointShare {
             return
         }
 
-        if (rareMob.isDead) {
+        if (rareMob.deceased) {
             ChatUtils.chat("§cRare Mob is dead")
             return
         }

@@ -27,12 +27,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.Text
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.init.Items
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.Items
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -158,15 +158,15 @@ object FlowstateHelper {
         attemptClearDisplay()
     }
 
-    fun getTimerColor(timeRemaining: Duration): Text {
-        if (!config.colorfulTimer) return Text.of("§b")
+    fun getTimerColor(timeRemaining: Duration): Component {
+        if (!config.colorfulTimer) return Component.nullToEmpty("§b")
         return when (timeRemaining) {
-            in 0.seconds..2.seconds -> Text.of("§c")
+            in 0.seconds..2.seconds -> Component.nullToEmpty("§c")
             in 2.seconds..4.seconds -> ExtendedChatColor("#ec7b36", false).asText()
-            in 4.seconds..6.seconds -> Text.of("§e")
-            in 6.seconds..8.seconds -> Text.of("§a")
-            in 8.seconds..10.seconds -> Text.of("§2")
-            else -> Text.of("§6")
+            in 4.seconds..6.seconds -> Component.nullToEmpty("§e")
+            in 6.seconds..8.seconds -> Component.nullToEmpty("§a")
+            in 8.seconds..10.seconds -> Component.nullToEmpty("§2")
+            else -> Component.nullToEmpty("§6")
         }
     }
 
@@ -216,7 +216,7 @@ object FlowstateHelper {
         val luck = calculateFlowstateLuck(personalBest)
         event.addLuck(luck)
         val stack = ItemUtils.createItemStack(
-            Items.enchanted_book,
+            Items.ENCHANTED_BOOK,
             "§a✴ Flowstate Personal Best",
             arrayOf(
                 "§8Enchantment",
@@ -249,7 +249,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
             TIMER -> {
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                Renderable.text(Text.of("§7Time Remaining: ").append(timeRemaining.formatTime()))
+                Renderable.text(Component.nullToEmpty("§7Time Remaining: ").append(timeRemaining.formatTime()))
             }
 
             STREAK -> {
@@ -266,7 +266,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
                 Renderable.text(
-                    Text.of(
+                    Component.nullToEmpty(
                         "§7x${getStreakColor()}$blockBreakStreak " + "§6+${getSpeedBonus()}⸕ ",
                     ).append(
                         timeRemaining.formatTime(),
@@ -291,7 +291,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
     companion object {
         private val config get() = SkyHanniMod.feature.mining.flowstateHelper
 
-        private fun Duration.formatTime(): Text {
+        private fun Duration.formatTime(): Component {
             return getTimerColor(this).append(format(TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true))
         }
 

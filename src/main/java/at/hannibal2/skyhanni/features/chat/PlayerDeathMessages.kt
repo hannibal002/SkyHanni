@@ -12,7 +12,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import net.minecraft.client.player.RemotePlayer
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -53,9 +54,9 @@ object PlayerDeathMessages {
     }
 
     private fun checkOtherPlayers() {
-        val entities = EntityUtils.getEntitiesNextToPlayer<EntityOtherPlayerMP>(25.0)
+        val entities = EntityUtils.getEntitiesNextToPlayer<RemotePlayer>(25.0)
         for (otherPlayer in entities) {
-            lastTimePlayerSeen[otherPlayer.name] = SimpleTimeMark.now()
+            lastTimePlayerSeen[otherPlayer.name.formattedTextCompatLessResets()] = SimpleTimeMark.now()
         }
     }
 

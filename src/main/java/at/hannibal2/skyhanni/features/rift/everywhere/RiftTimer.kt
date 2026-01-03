@@ -17,14 +17,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.Text
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-//#endif
 
 @SkyHanniModule
 object RiftTimer {
@@ -34,11 +32,11 @@ object RiftTimer {
     private val patternGroup = RepoPattern.group("rift.everywhere")
 
     /**
-     * REGEX-TEST: 3150 §aф
+     * REGEX-TEST: 3150 ф
      */
     private val nametagPattern by patternGroup.pattern(
         "nametag.timer",
-        "(?<time>\\d+) §aф",
+        "(?<time>\\d+) ф",
     )
 
     private var display = emptyList<String>()
@@ -138,15 +136,11 @@ object RiftTimer {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
         if (!config.nametag) return
-        //#if MC < 1.21
-        val nametag = event.text.text
-        //#else
-        //$$ val nametag = event.text.formattedTextCompatLessResets()
-        //#endif
+        val nametag = event.text.string
         val time = nametagPattern.matchMatcher(nametag) {
             group("time")?.toIntOrNull()
         } ?: return
-        event.text = Text.of("${time.seconds.format()} §aф")
+        event.text = Component.nullToEmpty("${time.seconds.format()} §aф")
     }
 
     fun isEnabled() = RiftApi.inRift() && config.enabled

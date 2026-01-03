@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -371,13 +372,13 @@ object AttributeShardsData {
     }
 
     private fun processAttributeMenuItems() {
-        val items = InventoryUtils.getItemsInOpenChest().map { it.stack }
+        val items = InventoryUtils.getItemsInOpenChest().map { it.item }
         for (item in items) {
             val internalName = item.getInternalNameOrNull() ?: continue
             if (!isAttributeShard(internalName)) continue
             var tier = 0
             var toNextTier = 0
-            attributeShardNamePattern.matchMatcher(item.displayName) {
+            attributeShardNamePattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 tier = groupOrNull("tier")?.romanToDecimal() ?: 0
             }
             val lore = item.getLore()
@@ -391,7 +392,7 @@ object AttributeShardsData {
             }
         }
 
-        val advancedModeStack = InventoryUtils.getSlotAtIndex(52)?.stack?.orNull()
+        val advancedModeStack = InventoryUtils.getSlotAtIndex(52)?.item?.orNull()
         val advancedModeLore = advancedModeStack?.getLore().orEmpty()
         advancedModeNotUnlocked.firstMatcher(advancedModeLore) {
             addAllMissingShards()
@@ -414,7 +415,7 @@ object AttributeShardsData {
 
     private fun processHuntingBoxItems() {
         val slots = InventoryUtils.getItemsInOpenChest()
-        val items = slots.map { it.stack }
+        val items = slots.map { it.item }
         for (item in items) {
             val internalName = item.getInternalNameOrNull() ?: continue
             if (!isAttributeShard(internalName)) continue

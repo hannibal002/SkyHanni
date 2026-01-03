@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.utils.guide.GuideTab
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
 
 class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
 
@@ -29,7 +29,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
     @SkyHanniModule
     companion object {
 
-        fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGui
+        fun isInGui() = Minecraft.getInstance().screen is FFGuideGui
 
         private fun open() {
             CaptureFarmingGear.captureFarmingGear()
@@ -38,7 +38,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
         }
 
         fun updateDisplay() {
-            with(Minecraft.getMinecraft().currentScreen) {
+            with(Minecraft.getInstance().screen) {
                 if (this !is FFGuideGui) return
                 this.refreshPage()
             }
@@ -90,11 +90,11 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
             FortuneGuidePage.UPGRADES to UpgradePage({ currentCrop }, sizeX, sizeY - 2),
         )
         verticalTabs = listOf(
-            vTab(ItemStack(Items.gold_ingot), Renderable.text("§eBreakdown")) {
+            vTab(ItemStack(Items.GOLD_INGOT), Renderable.text("§eBreakdown")) {
                 currentPage = if (currentCrop == null) FortuneGuidePage.OVERVIEW else FortuneGuidePage.CROP
             },
             vTab(
-                ItemStack(Items.map),
+                ItemStack(Items.MAP),
                 Renderable.text("§eUpgrades"),
             ) {
                 currentPage = FortuneGuidePage.UPGRADES
@@ -102,7 +102,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
         )
         horizontalTabs = buildList {
             add(
-                hTab(ItemStack(Blocks.grass), Renderable.text("§eOverview")) {
+                hTab(ItemStack(Blocks.GRASS_BLOCK), Renderable.text("§eOverview")) {
                     currentCrop = null
 
                     it.pageSwitchHorizontal()

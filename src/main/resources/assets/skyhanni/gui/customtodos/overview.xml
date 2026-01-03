@@ -1,0 +1,36 @@
+<!-- Taken with permission from Not Enough Updates https://github.com/NotEnoughUpdates/NotEnoughUpdates -->
+<Root xmlns="http://notenoughupdates.org/moulconfig">
+    <Gui>
+        <Column>
+            <Meta afterClose="@afterClose"/>
+            <Center>
+                <Scale scale="2">
+                    <Text text="Custom TODOs"/>
+                </Scale>
+            </Center>
+            <Spacer height="5"/>
+            <ScrollPanel width="350" height="200">
+                <Array data="@todos">
+                    <Row>
+                        <Text text="@getLabel" width="200"/>
+                        <Switch value="@enabled"/>
+                        <Button onClick="@edit">
+                            <Text text="Edit"/>
+                        </Button>
+                        <Button onClick="@delete">
+                            <Text text="Delete"/>
+                        </Button>
+                    </Row>
+                </Array>
+            </ScrollPanel>
+            <Row>
+                <Button onClick="@addTodo">
+                    <Text text="Add new TODO"/>
+                </Button>
+                <Button onClick="@pasteTodo">
+                    <Text text="Paste TODO from Clipboard"/>
+                </Button>
+            </Row>
+        </Column>
+    </Gui>
+</Root>

@@ -6,18 +6,17 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
-import net.minecraft.item.ItemStack
-import net.minecraft.network.play.server.S2DPacketOpenWindow
-import net.minecraft.network.play.server.S2EPacketCloseWindow
-import net.minecraft.network.play.server.S2FPacketSetSlot
-//#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-//$$ import at.hannibal2.skyhanni.test.command.ErrorManager
-//$$ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket
-//$$ import net.minecraft.screen.ScreenHandlerType
-//#endif
+import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+import net.minecraft.network.protocol.game.ClientboundContainerClosePacket
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
+import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
+import net.minecraft.network.protocol.game.ServerboundContainerClosePacket
+import net.minecraft.world.inventory.MenuType
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object OtherInventoryData {
@@ -34,14 +33,12 @@ object OtherInventoryData {
         close()
     }
 
-    //#if MC > 1.21
-    //$$ @HandleEvent
-    //$$ fun onPacketSent(event: PacketSentEvent) {
-    //$$     if (event.packet is CloseHandledScreenC2SPacket) {
-    //$$         close()
-    //$$     }
-    //$$ }
-    //#endif
+    @HandleEvent
+    fun onPacketSent(event: PacketSentEvent) {
+        if (event.packet is ServerboundContainerClosePacket) {
+            close()
+        }
+    }
 
     fun close(title: String = currentInventoryName, reopenSameName: Boolean = false) {
         InventoryCloseEvent(title, reopenSameName).post()
@@ -56,66 +53,60 @@ object OtherInventoryData {
         }
     }
 
-    //#if MC > 1.21
-    //$$ private val slotCountMap = mapOf(
-    //$$     ScreenHandlerType.ANVIL to 3,
-    //$$     ScreenHandlerType.BEACON to 1,
-    //$$     ScreenHandlerType.BLAST_FURNACE to 3,
-    //$$     ScreenHandlerType.BREWING_STAND to 5,
-    //$$     ScreenHandlerType.CARTOGRAPHY_TABLE to 2,
-    //$$     ScreenHandlerType.CRAFTING to 9,
-    //$$     ScreenHandlerType.ENCHANTMENT to 2,
-    //$$     ScreenHandlerType.FURNACE to 3,
-    //$$     ScreenHandlerType.GENERIC_3X3 to 9,
-    //$$     ScreenHandlerType.GENERIC_9X1 to 9,
-    //$$     ScreenHandlerType.GENERIC_9X2 to 18,
-    //$$     ScreenHandlerType.GENERIC_9X3 to 27,
-    //$$     ScreenHandlerType.GENERIC_9X4 to 36,
-    //$$     ScreenHandlerType.GENERIC_9X5 to 45,
-    //$$     ScreenHandlerType.GENERIC_9X6 to 54,
-    //$$     ScreenHandlerType.GRINDSTONE to 3,
-    //$$     ScreenHandlerType.HOPPER to 5,
-    //$$     ScreenHandlerType.LECTERN to 1,
-    //$$     ScreenHandlerType.LOOM to 3,
-    //$$     ScreenHandlerType.MERCHANT to 3,
-    //$$     ScreenHandlerType.SHULKER_BOX to 27,
-    //$$     ScreenHandlerType.SMITHING to 3,
-    //$$     ScreenHandlerType.SMOKER to 3,
-    //$$     ScreenHandlerType.STONECUTTER to 1,
-    //$$ )
-    //#endif
+    private val slotCountMap = mapOf(
+        MenuType.ANVIL to 3,
+        MenuType.BEACON to 1,
+        MenuType.BLAST_FURNACE to 3,
+        MenuType.BREWING_STAND to 5,
+        MenuType.CARTOGRAPHY_TABLE to 2,
+        MenuType.CRAFTING to 9,
+        MenuType.ENCHANTMENT to 2,
+        MenuType.FURNACE to 3,
+        MenuType.GENERIC_3x3 to 9,
+        MenuType.GENERIC_9x1 to 9,
+        MenuType.GENERIC_9x2 to 18,
+        MenuType.GENERIC_9x3 to 27,
+        MenuType.GENERIC_9x4 to 36,
+        MenuType.GENERIC_9x5 to 45,
+        MenuType.GENERIC_9x6 to 54,
+        MenuType.GRINDSTONE to 3,
+        MenuType.HOPPER to 5,
+        MenuType.LECTERN to 1,
+        MenuType.LOOM to 3,
+        MenuType.MERCHANT to 3,
+        MenuType.SHULKER_BOX to 27,
+        MenuType.SMITHING to 3,
+        MenuType.SMOKER to 3,
+        MenuType.STONECUTTER to 1,
+    )
 
     @HandleEvent
     fun onInventoryDataReceiveEvent(event: PacketReceivedEvent) {
         val packet = event.packet
 
-        if (packet is S2EPacketCloseWindow) {
+        if (packet is ClientboundContainerClosePacket) {
             close()
         }
 
-        if (packet is S2DPacketOpenWindow) {
-            val title = packet.windowTitle.unformattedText
-            val windowId = packet.windowId
-            //#if MC < 1.21
-            val slotCount = packet.slotCount
-            //#else
-            //$$ val handlerType = packet.screenHandlerType
-            //$$ val slotCount = slotCountMap[handlerType] ?: ErrorManager.skyHanniError("Unknown screen handler type!", "screenName" to title)
-            //#endif
+        if (packet is ClientboundOpenScreenPacket) {
+            val title = packet.title.unformattedTextCompat()
+            val windowId = packet.containerId
+            val handlerType = packet.type
+            val slotCount = slotCountMap[handlerType] ?: ErrorManager.skyHanniError("Unknown screen handler type!", "screenName" to title)
             close(reopenSameName = title == currentInventory?.title)
 
             currentInventory = Inventory(windowId, title, slotCount)
             acceptItems = true
         }
 
-        if (packet is S2FPacketSetSlot) {
+        if (packet is ClientboundContainerSetSlotPacket) {
             if (!acceptItems) {
                 currentInventory?.let {
-                    if (it.windowId != packet.func_149175_c()) return
+                    if (it.windowId != packet.containerId) return
 
-                    val slot = packet.func_149173_d()
+                    val slot = packet.slot
                     if (slot < it.slotCount) {
-                        val itemStack = packet.func_149174_e()
+                        val itemStack = packet.item
                         if (itemStack.isNotEmpty()) {
                             it.items[slot] = itemStack
                             lateEvent = InventoryUpdatedEvent(it)
@@ -125,11 +116,11 @@ object OtherInventoryData {
                 return
             }
             currentInventory?.let {
-                if (it.windowId != packet.func_149175_c()) return
+                if (it.windowId != packet.containerId) return
 
-                val slot = packet.func_149173_d()
+                val slot = packet.slot
                 if (slot < it.slotCount) {
-                    val itemStack = packet.func_149174_e()
+                    val itemStack = packet.item
                     if (itemStack.isNotEmpty()) {
                         it.items[slot] = itemStack
                     }

@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
 object DraconicSacrificeTracker {
@@ -55,7 +55,7 @@ object DraconicSacrificeTracker {
             drawDisplay(it)
         }
 
-    private val altarArea = AxisAlignedBB(-601.0, 4.0, -282.0, -586.0, 15.0, -269.0)
+    private val altarArea = AABB(-601.0, 4.0, -282.0, -586.0, 15.0, -269.0)
     private val ESSENCE_DRAGON = "ESSENCE_DRAGON".toInternalName()
 
     data class Data(

@@ -32,7 +32,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -70,7 +70,7 @@ object GardenOptimalSpeed {
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiScreenOpen(event: GuiScreenOpenEvent) {
         if (!isRancherOverlayEnabled()) return
-        val gui = event.gui as? GuiEditSign ?: return
+        val gui = event.gui as? SignEditScreen ?: return
         if (!gui.isRancherSign()) return
 
         val crops = CropType.entries.map { it to it.getOptimalSpeed() }
@@ -101,7 +101,7 @@ object GardenOptimalSpeed {
     @HandleEvent
     fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!isRancherOverlayEnabled()) return
-        val gui = event.gui as? GuiEditSign ?: return
+        val gui = event.gui as? SignEditScreen ?: return
         if (!gui.isRancherSign()) return
         config.signPosition.renderRenderables(
             display,
@@ -171,7 +171,7 @@ object GardenOptimalSpeed {
     }
 
     private fun warn(optimalSpeed: Int) {
-        if (!MinecraftCompat.localPlayer.onGround) return
+        if (!MinecraftCompat.localPlayer.onGround()) return
         if (GardenApi.onUnfarmablePlot) return
         if (!config.warning) return
         if (!GardenApi.isCurrentlyFarming()) return

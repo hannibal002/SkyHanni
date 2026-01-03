@@ -32,8 +32,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.init.Blocks
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.level.block.Blocks
 import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.minutes
@@ -219,7 +219,7 @@ object ArrowGuessBurrow {
         if (!newArrow) return
 
         if (event.distanceToPlayer > 6) return
-        if (event.type != EnumParticleTypes.REDSTONE) return
+        if (event.type != ParticleTypes.DUST) return
         if (event.count != 0) return
         if (event.speed != 1.0f) return
 
@@ -269,7 +269,7 @@ object ArrowGuessBurrow {
             val shouldBeLoaded = InventoryUtils.getItemInHandAtTime(SimpleTimeMark.now() - 0.5.seconds)?.isDianaSpade
             if (shouldBeLoaded == true &&
                 !burrows.contains(guessEntry.getCurrent()) && // burrow is not found
-                guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.position.toLorenzVec()) < 900 // within 30 blocks
+                guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.blockPosition().toLorenzVec()) < 900 // within 30 blocks
             ) {
                 if (guessEntry.moveToNext()) {
 
@@ -357,7 +357,7 @@ object ArrowGuessBurrow {
         if (!pos.isInLoadedChunk()) {
             return true
         }
-        val isGround = pos.getBlockAt() == Blocks.grass
+        val isGround = pos.getBlockAt() == Blocks.GRASS_BLOCK
         val isValidBlockAbove = pos.up().getBlockAt() in GriffinBurrowHelper.allowedBlocksAboveGround
         return isGround && isValidBlockAbove
     }

@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
 
 @SkyHanniModule
 object GardenOptimalAngles {
@@ -28,7 +28,7 @@ object GardenOptimalAngles {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onGuiOpen(event: GuiScreenOpenEvent) {
         if (!config.signEnabled) return
-        val gui = event.gui as? GuiEditSign ?: return
+        val gui = event.gui as? SignEditScreen ?: return
         if (!gui.isMousematSign()) return
 
         val crops = CropType.entries.map { it to it.getAngles() }
@@ -74,7 +74,7 @@ object GardenOptimalAngles {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!config.signEnabled) return
-        val gui = event.gui as? GuiEditSign ?: return
+        val gui = event.gui as? SignEditScreen ?: return
         if (!gui.isMousematSign()) return
         config.signPosition.renderRenderables(
             display,

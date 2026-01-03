@@ -26,11 +26,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -129,7 +130,7 @@ object GardenPlotApi {
         return currentPlot?.greenhouse ?: false
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+    class Plot(val id: Int, var inventorySlot: Int, val box: AABB, val middle: LorenzVec)
 
     private var currentPlot: Plot? = null
 
@@ -317,7 +318,7 @@ object GardenPlotApi {
                 val a = LorenzVec(minX, 0.0, minY)
                 val b = LorenzVec(maxX, 256.0, maxY)
                 val middle = a.middle(b).copy(y = 10.0)
-                val box = a.axisAlignedTo(b).expand(0.0001, 0.0, 0.0001)
+                val box = a.axisAlignedTo(b).inflate(0.0001, 0.0, 0.0001)
                 list.add(Plot(id, slot, box, middle))
                 slot++
             }
@@ -368,11 +369,11 @@ object GardenPlotApi {
         for (plot in plots) {
             val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
             val lore = itemStack.getLore()
-            plotNamePattern.matchMatcher(itemStack.displayName) {
+            plotNamePattern.matchMatcher(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val plotName = group("name")
                 plot.name = plotName
             }
-            barnNamePattern.matchMatcher(itemStack.displayName) {
+            barnNamePattern.matchMatcher(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 plot.name = group("name")
             }
             plot.locked = false
@@ -441,7 +442,7 @@ object GardenPlotApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (event.isLocalPlayer) {
             DelayedRun.runDelayed(.5.seconds) {
                 checkCurrentPlot()

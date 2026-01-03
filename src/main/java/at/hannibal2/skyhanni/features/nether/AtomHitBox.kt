@@ -14,22 +14,22 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 import java.awt.Color
 
 @SkyHanniModule
 object AtomHitBox {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.atomHitBox
-    private val atomsList = mutableMapOf<EntityArmorStand, AtomType>()
+    private val atomsList = mutableMapOf<ArmorStand, AtomType>()
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled) return
-        atomsList.removeIfKey { !it.isEntityAlive }
+        atomsList.removeIfKey { !it.isAlive }
         for ((entity, atom) in atomsList) {
             if (entity.distanceToPlayer() > 50) continue
-            event.drawHitbox(entity.entityBoundingBox, atom.color)
+            event.drawHitbox(entity.boundingBox, atom.color)
             event.drawString(entity.getLorenzVec() - LorenzVec(0, 1, 0), atom.displayName)
         }
     }
@@ -38,7 +38,7 @@ object AtomHitBox {
     fun onTick() {
         if (!config.enabled) return
 
-        for (entity in EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(50.0)) {
+        for (entity in EntityUtils.getEntitiesNextToPlayer<ArmorStand>(50.0)) {
             val atom = entity.getWornSkullTexture()?.let(AtomType::fromTexture) ?: continue
             if (!atom.isSelected()) continue
             atomsList[entity] = atom

@@ -60,7 +60,7 @@ object SensitivityReducer {
 
     private fun updatePlayerStatus() {
         val newInBarn = GardenApi.onUnfarmablePlot
-        val newOnGround = MinecraftCompat.localPlayer.onGround
+        val newOnGround = MinecraftCompat.localPlayer.onGround()
 
         if (inBarn != newInBarn) {
             inBarn = newInBarn
@@ -162,5 +162,5 @@ object SensitivityReducer {
     }
 
     private fun isHoldingTool(): Boolean = GardenApi.toolInHand != null
-    private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && Minecraft.getMinecraft().currentScreen == null
+    private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null
 }

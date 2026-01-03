@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.item.ItemStack
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.item.ItemStack
 import java.awt.Color
 
 @SkyHanniModule
@@ -89,7 +89,7 @@ object AuctionHousePriceComparison {
         val veryBad = config.veryBad.toColor()
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val diff = slotPriceMap[slot.slotIndex] ?: continue
+            val diff = slotPriceMap[slot.containerSlot] ?: continue
             if (diff == 0L) {
                 slot.highlight(good)
                 continue
@@ -114,8 +114,8 @@ object AuctionHousePriceComparison {
         if (!isEnabled()) return
         event.slot ?: return
 
-        val diff = slotPriceMap[event.slot.slotIndex] ?: return
-        if (event.slot.inventory !is ContainerLocalMenu) return
+        val diff = slotPriceMap[event.slot.containerSlot] ?: return
+        if (event.slot.container !is SimpleContainer) return
 
         event.toolTip.add("")
         if (diff >= 0) {

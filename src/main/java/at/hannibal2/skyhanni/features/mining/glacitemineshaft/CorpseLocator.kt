@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 
 // TODO: Maybe implement automatic warp-in for chosen players if the user is not in a party.
 @SkyHanniModule
@@ -44,10 +44,10 @@ object CorpseLocator {
     // TODO: use entity events
     @OptIn(AllEntitiesGetter::class)
     private fun findCorpse() {
-        EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()
+        EntityUtils.getAllEntities().filterIsInstance<ArmorStand>()
             .filterNot { corpse -> MineshaftWaypoints.waypoints.any { it.location.distance(corpse.getLorenzVec()) <= 3 } }
             .filter { entity ->
-                entity.showArms && entity.hasNoBasePlate() && !entity.isInvisible
+                entity.showArms() && entity.showBasePlate().not() && !entity.isInvisible
             }
             .forEach { entity ->
                 val helmetName = entity.getStandHelmet()?.getInternalName() ?: return

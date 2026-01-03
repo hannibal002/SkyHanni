@@ -13,11 +13,11 @@ import at.hannibal2.skyhanni.events.minecraft.addAll
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.Calculator
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NeuCalculator
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.inventory.Slot
+import net.minecraft.world.inventory.Slot
 import java.util.Deque
 import java.util.LinkedList
 import kotlin.time.Duration.Companion.seconds
@@ -74,7 +74,7 @@ object GetFromSackApi {
 
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
-    fun Slot.getFromSackWhenClicked(items: List<PrimitiveItemStack>) = getFromSlotClickedSackItems(items, slotIndex)
+    fun Slot.getFromSackWhenClicked(items: List<PrimitiveItemStack>) = getFromSlotClickedSackItems(items, containerSlot)
 
     private val minimumDelay = 1.65.seconds
 
@@ -115,7 +115,7 @@ object GetFromSackApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipTextEvent) {
         event.slot ?: return
-        val list = inventoryMap[event.slot.slotIndex] ?: return
+        val list = inventoryMap[event.slot.containerSlot] ?: return
         event.toolTip.let { tip ->
             tip.add("")
             tip.add("§ePress right click to get from sack:")
@@ -177,9 +177,9 @@ object GetFromSackApi {
         } else args
 
         var amountString = arguments.last()
-        amountString = NeuCalculator.calculateOrNull(amountString)?.toString() ?: amountString
+        amountString = Calculator.calculateOrNull(amountString)?.toString() ?: amountString
 
-        if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
+        if (!amountString.isDouble()) return CommandResult.WRONG_ARGUMENT to null
 
         val itemString = arguments.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
         val replacedString = itemString.replace("_", " ")

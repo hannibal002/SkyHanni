@@ -26,8 +26,8 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object HuntingBoxValue {
@@ -51,9 +51,9 @@ object HuntingBoxValue {
         val table = mutableListOf<DisplayTableEntry>()
 
         for (slot in slots) {
-            val slotNumber = slot.slotNumber
+            val slotNumber = slot.index
             if (!isValidSlotNumber(slotNumber)) continue
-            val stack = slot.stack.orNull() ?: continue
+            val stack = slot.item.orNull() ?: continue
             processAttributeShardSlot(slotNumber, stack, table)
         }
 
