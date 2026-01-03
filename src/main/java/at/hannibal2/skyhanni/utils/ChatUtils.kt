@@ -405,6 +405,24 @@ object ChatUtils {
         )
     }
 
+    fun notifyOrDisable(
+        message: String,
+        option: KProperty0<*>,
+        oneTimeClick: Boolean = false,
+    ) {
+        val hint = if (SkyHanniMod.feature.chat.hideClickableHint) "" else
+            "\n§e[CLICK to disable this feature]"
+        clickableChat(
+            "$message$hint",
+            onClick = {
+                option.jumpToEditor()
+            },
+            hover = "§eClick to disable this feature!",
+            oneTimeClick = oneTimeClick,
+            replaceSameMessage = true,
+        )
+    }
+
     @Suppress("CAST_NEVER_SUCCEEDS")
     var GuiMessage.fullComponent: Component
         get() = (this as ChatLineData).skyHanni_fullComponent
