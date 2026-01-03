@@ -220,7 +220,6 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
 
         private fun loadAvailableCategories(): List<List<Renderable>> = buildList {
             if (!showCategoryList) return emptyList()
-            if (isNotEmpty()) add(listOf(Renderable.emptyText()))
             add(listOf(Renderable.text( "§d§lChat Progress Categories")))
             add(listOf(Renderable.emptyText()))
 
