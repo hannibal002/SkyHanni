@@ -46,26 +46,20 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     private var currentStep: String? = null
     private var innerProgress = ""
 
-    private var delayedSending: DelayedSending? = null
-
     private var innerProgressMax = 0
     private val innerProgressCount = AtomicInteger(0)
 
-    class DelayedSending(val text: String, val hover: String) {
-        fun send(chatId: Int) {
-            val hover = hover.asComponent()
-            val nextSend = TextHelper.text(text) {
-                this.hover = hover
-            }
-            nextSend.send(chatId)
-        }
-    }
+
+    data class ProgressText(val text: String, val hoverText: String)
 
     init {
         updates.add(this)
     }
 
     class ChatProgressCategory(val categoryName: String) {
+
+        private var currentText: ProgressText? = null
+
         val updates = mutableListOf<ChatProgressUpdates>()
         var enabled = false
 
@@ -108,10 +102,6 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
                     val stateSymbol = if (category.enabled) "✓" else "✗"
 
                     val nameRenderable = Renderable.text("§7${category.categoryName}")
-                    for (updates in category.updates) {
-                        // TODO do something here
-                        updates.currentText
-                    }
                     val stateRenderable = darkRectButton(
                         content = Renderable.text("$stateColor$stateSymbol ${if (category.enabled) "Enabled" else "Disabled"}"),
                         onClick = {
@@ -123,6 +113,16 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
                     )
 
                     add(listOf(nameRenderable, stateRenderable))
+
+                    // Show progress updates for enabled categories
+                    if (category.enabled) {
+                        for (update in category.updates) {
+                            update.currentText?.let { progress ->
+                                // TODO: Add hover support later, for now just show text
+                                add(listOf(Renderable.emptyText(), Renderable.text(progress.text)))
+                            }
+                        }
+                    }
                 }
             }
 
@@ -161,8 +161,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
                     ChatUtils.chat(category.getStatus())
                 }
                 simpleCallback {
-                    val lines = categories.joinToString("\n") { it.getStatus() }
-                    // TODO do something here
+                    display = if (display == null) buildDisplay() else null
                 }
             }
         }
@@ -174,11 +173,8 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
         @HandleEvent(onlyOnSkyblock = true)
         fun onTick(event: SkyHanniTickEvent) {
             if (!event.isMod(2)) return
-            for (update in updates.filter { it.isEnabled() }) {
-                update.testDelayedSending()
-                if (update.currentlyRunning) {
-                    update.update()
-                }
+            for (update in updates.filter { it.isEnabled() && it.currentlyRunning }) {
+                update.update()
             }
         }
     }
@@ -284,46 +280,39 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     }
 
     private fun update() {
-        val title = title ?: error("currentStep is null")
+        val title = title ?: error("title is null")
         val currentStep = currentStep ?: error("currentStep is null")
         val totalTime = startOfFirst?.format() ?: error("startOfFirst is null: $currentStep")
 
-        val hover = mutableListOf<String>()
-        hover.add("§e$title")
-        hover.add("§8SkyHanni Debug Log")
-        hover.add("")
-        hover.addAll(previousSteps)
-        val currentTime = startOfCurrent?.format() ?: error("startOfCurrent is null")
-        val currentLine = "§8- §f$currentStep $innerProgress$currentTime"
-        hover.add(currentLine)
-        hover.add("")
-
-        val text = if (currentlyRunning) {
-            hover.add("§7Running for: $totalTime")
-            currentLine
-        } else {
-            hover.add("§aDone after: $totalTime")
-            "$currentStep $totalTime"
-        }
-
-        val delayedSending = DelayedSending("§e[Debug-Log] §f$text §7(hover for more info)", hover.joinToString("\n"))
-        if (isEnabled()) {
-            currentText = delayedSending
-        } else {
-            this.delayedSending = delayedSending
-        }
-    }
-
-    var currentText: DelayedSending? = null
-
-    private fun testDelayedSending() {
-        delayedSending?.let {
-            if (MinecraftCompat.localPlayerOrNull != null) {
-                currentText = it
-                delayedSending = null
+        val hover = buildList {
+            add("§e$title")
+            add("§8SkyHanni Debug Log")
+            add("")
+            addAll(previousSteps)
+            val currentTime = startOfCurrent?.format() ?: error("startOfCurrent is null")
+            val currentLine = "§8- §f$currentStep $innerProgress$currentTime"
+            add(currentLine)
+            add("")
+            if (currentlyRunning) {
+                add("§7Running for: $totalTime")
+            } else {
+                add("§aDone after: $totalTime")
             }
         }
+
+        val text = if (currentlyRunning) {
+            "§8- §f$currentStep $innerProgress${startOfCurrent?.format()}"
+        } else {
+            "§a✓ §f$currentStep $totalTime"
+        }
+
+        currentText = ProgressText(text, hover.joinToString("\n"))
+        if (isEnabled()) {
+            updateDisplay()
+        }
     }
+
+    var currentText: ProgressText? = null
 
     private enum class Phase {
         START,
