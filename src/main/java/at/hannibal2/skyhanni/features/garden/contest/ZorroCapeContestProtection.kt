@@ -33,11 +33,11 @@ object ZorroCapeContestProtection {
         val isBulkClaim = stack.realDisplayName == "§6Bulk Claim"
         if (claimableContest || isBulkClaim) {
             event.cancel()
-            notify()
+            notifyUser()
         }
     }
 
-    private fun notify() {
+    private fun notifyUser() {
         TitleManager.sendTitle(
             titleText = "§cNo Zorro's Cape equipped!",
             duration = 2.seconds,
