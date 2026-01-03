@@ -8,9 +8,6 @@ import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils.CHAT_PREFIX
-import at.hannibal2.skyhanni.utils.ChatUtils.DEBUG_PREFIX
-import at.hannibal2.skyhanni.utils.ChatUtils.USER_ERROR_PREFIX
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage

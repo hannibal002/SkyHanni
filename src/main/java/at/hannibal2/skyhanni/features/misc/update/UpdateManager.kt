@@ -134,7 +134,7 @@ object UpdateManager {
                     ChatUtils.chat("§aSkyHanni didn't find a new update.")
                 }
             },
-            Minecraft.getInstance()
+            Minecraft.getInstance(),
         )
     }
 
