@@ -30,7 +30,7 @@ object ZorroCapeContestProtection {
 
         val stack = event.item ?: return
         val claimableContest = JacobFarmingContestsInventory.isClaimableContest(stack)
-        val isBulkClaim = stack.realDisplayName == "§6Bulk Claim"
+        val isBulkClaim = stack.realDisplayName == "Bulk Claim"
         if (claimableContest || isBulkClaim) {
             event.cancel()
             notifyUser()
