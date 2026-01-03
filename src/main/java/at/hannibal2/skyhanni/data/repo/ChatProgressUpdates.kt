@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
@@ -17,6 +19,8 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darkRectButton
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -90,6 +94,42 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
 
     @SkyHanniModule
     companion object {
+
+        private var displayGui: Renderable? = null
+
+        fun createGui(): Renderable {
+            val rows = buildList<List<Renderable>> {
+                add(listOf(text("§d§lChat Progress Categories")))
+                add(listOf(emptyText()))
+
+                for (category in categories) {
+                    val stateColor = if (category.enabled) "§a" else "§c"
+                    val stateSymbol = if (category.enabled) "✓" else "✗"
+
+                    val nameRenderable = text("§7${category.categoryName}")
+                    val stateRenderable = darkRectButton(
+                        content = text("$stateColor$stateSymbol ${if (category.enabled) "Enabled" else "Disabled"}"),
+                        onClick = {
+                            category.toggle()
+                            displayGui = createGui()
+                        },
+                        startState = category.enabled,
+                        padding = 3
+                    )
+
+                    add(listOf(nameRenderable, stateRenderable))
+                }
+            }
+
+            return table(rows, ySpacing = 2)
+        }
+
+        @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+        fun onRenderOverlay() {
+            displayGui?.let {
+                // TODO do the rendering
+            }
+        }
 
         val commandMessageId = ChatUtils.getUniqueMessageId()
 
