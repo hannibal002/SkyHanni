@@ -36,10 +36,9 @@ object HuntrapMisclickPrevention {
 
         if (lastNotified.passedSince() < 10.seconds) return
         lastNotified = SimpleTimeMark.now()
-        ChatUtils.clickableChat(
-            "Prevented clicking an empty trap in Hunting Toolkit! Click here to disable this feature.",
-            { config::huntrapMisclick.jumpToEditor() },
-            replaceSameMessage = true,
+        ChatUtils.notifyOrDisable(
+            "Prevented clicking an empty trap in Hunting Toolkit!",
+            config::huntrapMisclick,
         )
     }
 }

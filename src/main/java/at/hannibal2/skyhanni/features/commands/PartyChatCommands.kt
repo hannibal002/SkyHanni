@@ -69,13 +69,9 @@ object PartyChatCommands {
             requiresPartyLead = false,
             executable = {
                 if (!CurrentPing.isEnabled()) {
-                    ChatUtils.clickableChat(
+                    ChatUtils.notifyOrDisable(
                         "Ping API is disabled, the ping command won't work!",
-                        prefixColor = "§c",
-                        onClick = {
-                            devConfig::pingApi.jumpToEditor()
-                        },
-                        hover = "§eClick to find setting in the config!",
+                        devConfig::pingApi,
                     )
                     return@PartyChatCommand
                 }

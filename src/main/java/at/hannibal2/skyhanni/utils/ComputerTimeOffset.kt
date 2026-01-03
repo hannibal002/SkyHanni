@@ -94,11 +94,10 @@ object ComputerTimeOffset {
             if (timeoutWarned.passedSince() > 10.minutes) {
                 timeoutMap[ntpServer] = 0
                 timeoutWarned = SimpleTimeMark.now()
-                ChatUtils.clickableChat(
+                ChatUtils.notifyOrDisable(
                     "NTP server $ntpServer is not responding ($timeouts failures). Check your connection, " +
                         "try disconnecting from any VPNs/proxies, or click here to change NTP servers.",
-                    hover = "Click to open Dev Config",
-                    onClick = { devConfig::ntpServer.jumpToEditor() }
+                    devConfig::ntpServer,
                 )
             }
             return@runCatching null

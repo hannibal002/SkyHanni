@@ -49,12 +49,10 @@ object ChargeBottleNotification {
         if (bottlesInInventory.isEmpty()) return
         val size = bottlesInInventory.size
 
-        ChatUtils.clickableChat(
+        ChatUtils.notifyOrDisable(
             "You are currently fishing, but " +
-                "${bottlesInInventory.createCommaSeparatedList()} ${StringUtils.pluralize(size, "is", "are")} full. " +
-                "Click here to disable this notification.",
-            { config::chargeBottleNotification.jumpToEditor() },
-            replaceSameMessage = true,
+                "${bottlesInInventory.createCommaSeparatedList()} ${StringUtils.pluralize(size, "is", "are")} full",
+            config::chargeBottleNotification,
         )
     }
 

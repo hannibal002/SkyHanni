@@ -405,6 +405,11 @@ object ChatUtils {
         )
     }
 
+    /**
+     * Almost identical to chatAndOpenConfig and clickToActionOrDisable.
+     * Diff to chatAndOpenConfig: uses the wording "disable" as alternative, not "open config".
+     * Diff to clickToActionOrDisable: does not offer a normal click and action behavior.
+     */
     fun notifyOrDisable(
         message: String,
         option: KProperty0<*>,
@@ -414,9 +419,7 @@ object ChatUtils {
             "\n§e[CLICK to disable this feature]"
         clickableChat(
             "$message$hint",
-            onClick = {
-                option.jumpToEditor()
-            },
+            onClick = { option.jumpToEditor() },
             hover = "§eClick to disable this feature!",
             oneTimeClick = oneTimeClick,
             replaceSameMessage = true,

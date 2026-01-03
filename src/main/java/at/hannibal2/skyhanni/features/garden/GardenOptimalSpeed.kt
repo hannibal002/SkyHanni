@@ -165,7 +165,7 @@ object GardenOptimalSpeed {
 
         if (config.showOnHUD) config.pos.renderRenderable(
             Renderable.text("§$colorCode$text"),
-            posLabel = "Garden Optimal Speed"
+            posLabel = "Garden Optimal Speed",
         )
         if (speed != currentSpeed && !recentlySwitchedTool) warn(speed)
     }
@@ -194,12 +194,7 @@ object GardenOptimalSpeed {
                 action = { HypixelCommands.setMaxSpeed(optimalSpeed) },
             )
         } else {
-            ChatUtils.clickableChat(
-                text,
-                onClick = { config::onlyWarnRanchers.jumpToEditor() },
-                hover = "§eClick to disable this feature!",
-                replaceSameMessage = true,
-            )
+            ChatUtils.notifyOrDisable(text, config::onlyWarnRanchers,)
         }
     }
 
