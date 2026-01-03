@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addsToMilestone
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CustomGoals.getCustomGoal
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
@@ -379,16 +380,17 @@ object CropMilestonesApi {
                 chat("§cReset Crop Milestones!")
             }
         }
-        event.registerBrigadier("shshowcropcache") {
-            description = "Show Cached Milestone Information."
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback {
-                for (crop in cropMilestoneTierCache) {
-                    chat("Crop: ${crop.key}, Tier: ${crop.value}")
-                }
-                for (crop in amountToNextTierCache) {
-                    chat("Crop: ${crop.key}, Progress: ${crop.value}")
-                }
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Crop Milestones Api")
+        event.addIrrelevant {
+            for (crop in cropMilestoneTierCache) {
+                add("Crop: ${crop.key}, Tier: ${crop.value}")
+            }
+            for (crop in amountToNextTierCache) {
+                add("Crop: ${crop.key}, Progress: ${crop.value}")
             }
         }
     }
