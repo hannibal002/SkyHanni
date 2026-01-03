@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darkRectButton
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -217,26 +218,10 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
             return category
         }
 
-        private fun buildTable(): List<List<Renderable>> = buildList {
-            showCategoryList()
-
-            for (category in categories.filter { it.enabled }) {
-                for (update in category.updates) {
-                    update.currentText?.let { progress ->
-                        val hoverable = Renderable.hoverTips(
-                            Renderable.text(progress.text),
-                            progress.hoverText.split("\n"),
-                        )
-                        add(listOf(hoverable))
-                    }
-                }
-            }
-        }
-
-        private fun MutableList<List<Renderable>>.showCategoryList() {
-            if (!showCategoryList) return
+        private fun loadAvailableCategories(): List<List<Renderable>> = buildList {
+            if (!showCategoryList) return emptyList()
             if (isNotEmpty()) add(listOf(Renderable.emptyText()))
-            add(listOf(Renderable.text("§d§lChat Progress Categories")))
+            add(listOf(Renderable.text( "§d§lChat Progress Categories")))
             add(listOf(Renderable.emptyText()))
 
             for (category in categories) {
@@ -258,13 +243,35 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
         }
 
         private fun updateDisplay() {
-            val rows = buildTable()
-            if (rows.isEmpty()) {
+            val availableCategories = loadAvailableCategories()
+            val activeCategories = categories.filter { it.enabled }
+            if (availableCategories.isEmpty() && activeCategories.isEmpty()) {
                 display = null
                 return
             }
-            display = Renderable.table(rows, ySpacing = 2)
 
+            display = Renderable.vertical(
+                buildList {
+                    add(Renderable.table(availableCategories, ySpacing = 2))
+                    addAll(getUpdates(activeCategories))
+                },
+            )
+        }
+
+        private fun getUpdates(activeCategories: List<ChatProgressCategory>): MutableList<Renderable> {
+            val updates = mutableListOf<Renderable>()
+            for (category in activeCategories) {
+                for (update in category.updates) {
+                    update.currentText?.let { progress ->
+                        val hoverable = Renderable.hoverTips(
+                            Renderable.text(progress.text),
+                            progress.hoverText.split("\n"),
+                        )
+                        updates.add(hoverable)
+                    }
+                }
+            }
+            return updates
         }
 
         @HandleEvent(GuiRenderEvent::class)
