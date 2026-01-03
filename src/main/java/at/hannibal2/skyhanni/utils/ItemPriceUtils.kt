@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemApi
+import at.hannibal2.skyhanni.features.mining.crystalhollows.ChChestMessageAnalyser.items
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -214,5 +215,27 @@ object ItemPriceUtils {
                 }
             }
         }
+    }
+
+
+    fun NeuInternalName.getSumPriceForCount(
+        count: Int,
+        priceSource: ItemPriceSource,
+    ): Double? {
+        if (priceSource== ItemPriceSource.NPC_SELL) {
+            return getNpcPrice() * count
+        }
+        val bazaarData = getBazaarData()?.product ?: return null
+        val offers = if (priceSource == ItemPriceSource.BAZAAR_INSTANT_SELL) bazaarData.buySummary else bazaarData.sellSummary
+        var remaining = count
+        var totalPrice = 0.0
+        for (offer in offers) {
+            val takeAmount = offer.amount.coerceAtMost(remaining.toLong()).toInt()
+            totalPrice += takeAmount * offer.pricePerUnit
+            remaining -= takeAmount
+            if (remaining <= 0) break
+        }
+        if (remaining > 0) return null
+        return totalPrice
     }
 }

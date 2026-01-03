@@ -10,8 +10,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getSumPriceForCount
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -41,9 +42,11 @@ object SuperCraftingInventory {
         if (!invDetector.isInside()) return
         if (!config.warnCoinWasteEnabled) return
         if (HypixelData.noTrade) return
-        val profit = getProfit() ?: return
+        val craftingAmount = getSuperCraftingCount() ?: return
+        val maxCraftingAmount = getSuperCraftingMaxCount() ?: return
+        val profit = getProfit(craftingAmount, maxCraftingAmount) ?: return
         if (event.clickedButton != 0) return
-        if (event.blockWasteClick(profit)) {
+        if (blockWasteClick(profit, craftingAmount, maxCraftingAmount)) {
             SoundUtils.playErrorSound()
             TitleManager.sendTitle(
                 "§cCraft-click Prevented (Big Loss Detected)",
@@ -56,8 +59,19 @@ object SuperCraftingInventory {
         }
     }
 
-    fun getProfit(): Double? {
-        val craftCount = getSuperCraftingCount() ?: return null
+    private fun getSuperCraftingMaxCount(): Int {
+        val slots = InventoryUtils.getItemsInOpenChestWithNull()
+        val pickaxeSlot = slots.get(32)
+        val minimum = pickaxeSlot.item.getLore().mapNotNull {
+            val it = it.removeColor()
+            return@mapNotNull craftingResourcePattern.matchMatcher(it) {
+                groupOrNull("amount")?.replace(",", "")?.toIntOrNull()
+            }
+        }.min()
+        return minimum
+    }
+
+    fun getProfit(craftingAmount: Int, maxCraftingAmount: Int): Double? {
         val materials = getRecipeMaterials()
         if (materials.containsKey(null)) return null
         val resultItem = getResultItem() ?: return null
@@ -65,14 +79,14 @@ object SuperCraftingInventory {
         val recipeMultiplier = resultItem.second ?: return null
 
         val itemsPrice = materials.mapValues {
-            it.value * (craftCount / recipeMultiplier)
+            it.value * (craftingAmount / recipeMultiplier)
         }.mapValues {
-            val price = it.key!!.getPriceOrNull(ItemPriceSource.BAZAAR_INSTANT_SELL) ?: return null
-            it.value * price
+            //The materials are always summed up already by the getRecipeMaterials function
+            val key = it.key!!
+            return key.getSumPriceForCount(it.value,ItemPriceSource.BAZAAR_INSTANT_SELL)
         }.sumAllValues()
 
-        val resultItemPrice = resultItem.first.getPriceOrNull(ItemPriceSource.BAZAAR_INSTANT_BUY) ?: return null
-        val totalResultPrice = resultItemPrice * craftCount
+        val totalResultPrice = resultItem.first.getSumPriceForCount(craftingAmount,ItemPriceSource.BAZAAR_INSTANT_BUY) ?: return null
 
         return totalResultPrice - itemsPrice
     }
@@ -119,16 +133,26 @@ object SuperCraftingInventory {
         "crafting.count",
         ".*Crafting (?<count>[0-9,]+) item.*",
     )
+    val craftingResourcePattern by craftingPatternGroup.pattern(
+        "crafting.resource",
+        " *([✔✖]) [0-9,]+/[0-9,]+ \\((?<amount>[0-9,]+)x\\) (?<resource>.+)",
+    )
 
-    private fun GuiContainerEvent.SlotClickEvent.blockWasteClick(profit: Double): Boolean {
+    private fun blockWasteClick(profit: Double, craftingAmount: Int, maxCraftingAmount: Int): Boolean {
         if (!config.warnCoinWasteEnabled) return false
         if (KeyboardManager.isControlKeyDown()) return false
-        if (profit >= -getWarnAmount() * 1_000_000L) return false
-        return true
+        if (profit < -getWarnAmount() * 1_000_000L) return true
+        if (profit < -getBulkWarnAmount() * 1_000_000L && craftingAmount == maxCraftingAmount) return true
+        return false
     }
 
     fun getWarnAmount(): Double {
         return if (BitsApi.hasCookieBuff()) config.warnCoinWasteWithCookie
         else config.warnCoinWaste
+    }
+
+    fun getBulkWarnAmount(): Double {
+        return if (BitsApi.hasCookieBuff()) config.warnCoinWasteMaxResourcesWithCookie
+        else config.warnCoinWasteMaxResources
     }
 }
