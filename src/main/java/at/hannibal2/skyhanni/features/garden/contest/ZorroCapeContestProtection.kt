@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.realDisplayName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import kotlin.time.Duration.Companion.seconds
 
@@ -23,12 +24,20 @@ object ZorroCapeContestProtection {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.zorroCapeProtection) return
         if (!FarmingContestApi.inInventory) return
-        val stack = event.item ?: return
-        if (!JacobFarmingContestsInventory.isClaimableContest(stack)) return
+
         val cloak = EquipmentApi.getEquipment(EquipmentSlot.CLOAK)?.getInternalNameOrNull()
         if (cloak == zorroCape) return
 
-        event.cancel()
+        val stack = event.item ?: return
+        val claimableContest = JacobFarmingContestsInventory.isClaimableContest(stack)
+        val isBulkClaim = stack.realDisplayName == "§6Bulk Claim"
+        if (claimableContest || isBulkClaim) {
+            event.cancel()
+            notify()
+        }
+    }
+
+    private fun notify() {
         TitleManager.sendTitle(
             titleText = "§cNo Zorro's Cape equipped!",
             duration = 2.seconds,
