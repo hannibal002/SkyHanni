@@ -112,7 +112,7 @@ object GardenVisitorCompactChat {
             } else rewardColor
 
             val amountString = if (amount != null) {
-                if (discardRewardNamePattern.matcher(reward).matches()) "$amount"
+                if (discardRewardNamePattern.matcher(reward).matches()) amount
                 else "$amount "
             } else {
                 if (altAmount == null) "" else "$altAmount "

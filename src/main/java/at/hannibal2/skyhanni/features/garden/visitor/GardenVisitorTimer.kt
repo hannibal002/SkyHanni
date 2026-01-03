@@ -67,13 +67,13 @@ object GardenVisitorTimer {
             }
         }
 
-    @HandleEvent
-    fun onVisitorArrival(event: VisitorArrivalEvent) {
+    @HandleEvent(VisitorArrivalEvent::class)
+    fun onVisitorArrival() {
         visitorJustArrived = true
     }
 
-    @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
         display = null
         lastMillis = 0.seconds
         sixthVisitorArrivalTime = SimpleTimeMark.farPast()
@@ -82,8 +82,8 @@ object GardenVisitorTimer {
 
     // TODO split up into multiple smaller functions
     @Suppress("CyclomaticComplexMethod")
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onSecondPassed() {
         var visitorsAmount = VisitorApi.visitorsInTabList(TabListData.getTabList()).size
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
@@ -212,8 +212,8 @@ object GardenVisitorTimer {
         lastMillis = sixthVisitorArrivalTime.timeUntil()
     }
 
-    @HandleEvent
-    fun onCropClick(event: CropClickEvent) {
+    @HandleEvent(CropClickEvent::class)
+    fun onCropClick() {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
 
@@ -223,8 +223,8 @@ object GardenVisitorTimer {
         }
     }
 
-    @HandleEvent
-    fun onPestKill(event: PestKillEvent) {
+    @HandleEvent(PestKillEvent::class)
+    fun onPestKill() {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 30.seconds
 
