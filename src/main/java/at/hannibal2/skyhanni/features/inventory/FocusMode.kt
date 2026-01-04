@@ -47,16 +47,18 @@ object FocusMode {
                     add("§7Press $keyName to disable!".asComponent())
                 }
                 val separator = "-----------------"
-                if (inAuctionHouse && event.toolTip.any { it.string.contains(separator) }) {
-                    var index = 0
+                if (inAuctionHouse) {
+                    var index = -1
                     for ((i, component) in event.toolTip.withIndex()) {
                         if (component.string.contains(separator)) {
                             index = i
                             break
                         }
                     }
-                    val ahLore = event.toolTip.drop(index).take(20)
-                    addAll(ahLore)
+                    if (index > -1) {
+                        val ahLore = event.toolTip.drop(index).take(20)
+                        addAll(ahLore)
+                    }
                 }
             }.toMutableList()
             event.toolTip.clear()
