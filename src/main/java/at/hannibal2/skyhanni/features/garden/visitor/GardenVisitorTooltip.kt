@@ -121,6 +121,8 @@ object GardenVisitorTooltip {
      * The heavy lifting. Parses the entire tooltip, calculates economics,
      * and generates enriched tooltip lines.
      */
+    // TODO throw an axe on this function to split it up
+    @Suppress("LongMethod", "CyclomaticComplexMethod", "LoopWithTooManyJumpStatements")
     private fun readToolTip(visitor: VisitorApi.Visitor, itemStack: ItemStack?, toolTip: MutableList<String>) {
         val stack = itemStack ?: error("Accept offer item not found for visitor ${visitor.visitorName}")
 

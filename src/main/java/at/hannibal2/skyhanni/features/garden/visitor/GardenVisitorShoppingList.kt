@@ -295,6 +295,8 @@ object GardenVisitorShoppingList {
 
     private fun hideExtraGuis() = GardenApi.hideExtraGuis() && !VisitorApi.inInventory
 
+    // TODO cut this function down in smaller checks, idk which one, just less than 5 return statements so detekt is happy
+    @Suppress("ReturnCount")
     private fun showGui(): Boolean {
         if (IslandType.HUB.isCurrent()) {
             if (config.inBazaarAlley && SkyBlockUtils.graphArea == "Bazaar Alley") {
