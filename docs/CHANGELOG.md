@@ -14,6 +14,11 @@
 
 + Mute Banshee screams. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/5007)
 
+#### Farming
+
++ Added Zorro's Cape Contest Protection. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5029)
+  + Requires equipping Zorro's Cape to claim Jacob's Farming Contest rewards.
+
 #### Misc
 
 + Added Particle Colour Fixer. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4993)
@@ -50,6 +55,10 @@
 + Added support for cron expressions in /shtodos. - nopo (https://github.com/hannibal002/SkyHanni/pull/5012)
 + Improved misc performance around the mod. - nopo (https://github.com/hannibal002/SkyHanni/pull/5016)
   + May cause issues 🙂.
++ `/shnavigate` now instantly navigates if there is only one match. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4995)
+  + Can be disabled in config.
++ Added `/shnav` as alias to `/shnavigate`. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4995)
+
 ### Fixes
 
 #### Foraging
@@ -60,10 +69,13 @@
 #### Inventory
 
 + Fixed Custom Wardrobe not rendering players on 1.21.8+. - nopo (https://github.com/hannibal002/SkyHanni/pull/4984)
++ Fixed enchants in Custom Wardrobe appearing white. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5028)
++ Fixed Focus mode breaking enchant parsing. - nopo (https://github.com/hannibal002/SkyHanni/pull/5036)
 
 #### Farming
 
 + Fixed Stereo Harmony Disc Replacer not working on 1 vinyl. - nopo (https://github.com/hannibal002/SkyHanni/pull/4983)
++ Fixed Farming milestone display not working on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/5023)
 
 #### Mining
 
@@ -73,6 +85,11 @@
 #### Fishing
 
 + Fixed Pet Drop Rarity not working for fished pets. - Luna (https://github.com/hannibal002/SkyHanni/pull/4998)
++ Fixed some pet rules breaking double hook detection. - appable (https://github.com/hannibal002/SkyHanni/pull/5030)
+
+#### Combat
+
++ Fixed Arachne Kill Timer. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/5035)
 
 #### Misc
 
@@ -85,6 +102,9 @@
 + Fixed Setting sound levels on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/4991)
 + Fixed performance issue with blank /shtodos. - nopo (https://github.com/hannibal002/SkyHanni/pull/5012)
 + Fixed performance issue with regex /shtodos matching. - nopo (https://github.com/hannibal002/SkyHanni/pull/5012)
++ Fixed /gfs calculation not working with suffixes (i.e. 1s or 1e). - nopo (https://github.com/hannibal002/SkyHanni/pull/5031)
++ Fixed Only Show When Ready /shtodos never showing. - nopo (https://github.com/hannibal002/SkyHanni/pull/5032)
++ Fixed RenderSystem errors on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/5023)
 
 ### Technical Details
 
@@ -106,6 +126,10 @@
 + Removed 1.8.9 shader code. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5014)
 + Removed many instances of TextCompat. - nopo (https://github.com/hannibal002/SkyHanni/pull/5016)
 + Use Components and Fabric's tooltip event for better mod compat. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5021)
++ `DelayedRun.runNextTick` now uses Minecraft's built-in scheduler. - Luna (https://github.com/hannibal002/SkyHanni/pull/5034)
++ Added `DelayedRun.runNextTick`, which calls `Minecraft#execute`, and replaces `DelayedRun.onThread.execute`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5034)
+  + Where an `Executor` is required, `Minecraft.getInstance()` is passed directly, since it serves as one.
+
 ### Removed Features
 
 + Removed 1.8.9 support. - nopo (https://github.com/hannibal002/SkyHanni/pull/4978)
