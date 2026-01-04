@@ -54,6 +54,7 @@ object GardenVisitorChat {
         "§aYou gave some of the required items!",
     )
 
+    // TODO use event.chatComponent.string instead of event.message here
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         handleArrivalMessage(event)
