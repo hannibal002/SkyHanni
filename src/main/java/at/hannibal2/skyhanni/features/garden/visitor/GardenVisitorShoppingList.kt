@@ -257,8 +257,7 @@ object GardenVisitorShoppingList {
     @HandleEvent(GuiRenderEvent::class)
     fun onRenderOverlay() {
         if (!config.enabled) return
-        val currentScreen = Minecraft.getInstance().screen
-        if (currentScreen is SignEditScreen) return
+        if (Minecraft.getInstance().screen is SignEditScreen) return
 
         renderDisplay()
     }

@@ -28,6 +28,7 @@ object GardenVisitorHighlight {
     // Special visitor items for blinking effect
     private val LEGENDARY_JERRY = "JERRY;4".toInternalName()
     private val SPACE_HELM = "DCTR_SPACE_HELM".toInternalName()
+    private val ENCHANTED_BOOK = "ENCHANTED_BOOK".toInternalName()
 
     /**
      * Renders text above a visitor's head.
@@ -101,6 +102,7 @@ object GardenVisitorHighlight {
         when {
             cleanName == "Jerry" -> ItemBlink.setBlink(LEGENDARY_JERRY.getItemStackOrNull(), 5_000)
             cleanName.contains("Spaceman") -> ItemBlink.setBlink(SPACE_HELM.getItemStackOrNull(), 5_000)
+            cleanName.contains("Rhino") -> ItemBlink.setBlink(ENCHANTED_BOOK.getItemStackOrNull(), 5_000)
         }
     }
 }
