@@ -184,20 +184,18 @@ object GardenVisitorShoppingList {
         if (hasIngredients && (amount - amountInSacks) > 0) {
             val leftToCraft = amount - amountInSacks
             list.addString(" §7(")
-            val isInSign = Minecraft.getInstance().screen is SignEditScreen
-            val hoverTip = if (isInSign) {
-                "§eClick to insert craft amount into sign!"
-            } else {
-                "§eClick to view recipe!"
-            }
-            val runnable = {
-                if (isInSign) {
-                    SignUtils.setTextIntoSign("$leftToCraft")
-                } else {
-                    HypixelCommands.viewRecipe(internalName)
-                }
-            }
-            list.add(Renderable.clickable("§aCraftable!", runnable, tips = listOf(hoverTip)) { GardenApi.inGarden() })
+            val renderable = Renderable.clickable(
+                "§aCraftable!",
+                {
+                    if (Minecraft.getInstance().screen is SignEditScreen) {
+                        SignUtils.setTextIntoSign("$leftToCraft")
+                    } else {
+                        HypixelCommands.viewRecipe(internalName)
+                    }
+                },
+                tips = listOf("Click to view recipe or paste craft amount into sign!"),
+            ) { GardenApi.inGarden() }
+            list.add(renderable)
             list.addString("§7)")
         }
     }
