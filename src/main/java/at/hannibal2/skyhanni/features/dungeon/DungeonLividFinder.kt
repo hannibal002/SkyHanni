@@ -84,7 +84,6 @@ object DungeonLividFinder {
         "Smile" to LorenzColor.GREEN,
         "Frog" to LorenzColor.DARK_GREEN,
     )
-
     /**
      * REGEX-TEST: §2﴾ §2§lLivid§r§r §a7M§c❤ §2﴿
      * REGEX-TEST: §5﴾ §5§lLivid§r§r §a7M§c❤ §5﴿
@@ -107,14 +106,13 @@ object DungeonLividFinder {
     fun onRepoReload(event: RepositoryReloadEvent) {
         if (lividTextureToColor.isNotEmpty()) lividTextureToColor.clear()
         val data = event.getConstant<LividSolverJson>("dungeons/LividSolver")
-        val map = data.livids
-        for ((color, lividInfo) in map) {
-            val repoColor = LorenzColor.entries.firstOrNull { it.name == color } ?: continue
-            if (!lividNameToColor.containsKey(lividInfo.name)) {
-                lividNameToColor.add(Pair(lividInfo.name, repoColor))
-            }
+        for ((color, lividInfo) in data.livids) {
+            val repoColor = LorenzColor.entries.firstOrNull { it.toString() == color } ?: continue
             if (!lividTextureToColor.containsKey(lividInfo.skin)) {
                 lividTextureToColor.add(Pair(lividInfo.skin, repoColor))
+            }
+            if (!lividNameToColor.containsKey(lividInfo.name)) {
+                lividNameToColor.add(Pair(lividInfo.name, repoColor))
             }
         }
     }
