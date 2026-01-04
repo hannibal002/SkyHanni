@@ -264,7 +264,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
-            dungeonPotionPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+            dungeonPotionPattern.matchMatcher(item.hoverName.string.removeColor()) {
                 return when (val level = group("level").romanToDecimal()) {
                     in 1..2 -> "§f$level"
                     in 3..4 -> "§a$level"

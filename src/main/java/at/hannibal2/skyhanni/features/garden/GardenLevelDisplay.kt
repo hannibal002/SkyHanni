@@ -135,7 +135,7 @@ object GardenLevelDisplay {
             "SkyBlock Menu" -> event.inventoryItems[10] ?: return
             else -> return
         }
-        gardenItemNamePattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+        gardenItemNamePattern.matchMatcher(item.hoverName.string.removeColor()) {
             val level = groupOrNull("currentLevel")
             if (level != null) useRomanNumerals = level.isRoman()
         } ?: return

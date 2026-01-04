@@ -403,7 +403,7 @@ object GardenVisitorFeatures {
     }
 
     fun onTooltip(visitor: VisitorApi.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
-        if (itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aAccept Offer") return
+        if (itemStack.hoverName.string != "Accept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)

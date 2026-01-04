@@ -112,7 +112,7 @@ object DeepCavernsGuide {
         showStartIcon = true
 
         event.inventoryItems[31]?.let {
-            if (it.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aObsidian Sanctuary") {
+            if (it.hoverName.string != "Obsidian Sanctuary") {
                 start()
             }
         }

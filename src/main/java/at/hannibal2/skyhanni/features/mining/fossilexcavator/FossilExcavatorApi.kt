@@ -61,7 +61,7 @@ object FossilExcavatorApi {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inInventory) return
         val slots = InventoryUtils.getItemsInOpenChest()
-        val itemNames = slots.map { it.item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() }
+        val itemNames = slots.map { it.item.hoverName.string.removeColor() }
         inExcavatorMenu = itemNames.any { it == "Start Excavator" }
     }
 

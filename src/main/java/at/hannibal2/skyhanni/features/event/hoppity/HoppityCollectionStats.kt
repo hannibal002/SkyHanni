@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -357,7 +357,7 @@ object HoppityCollectionStats {
             val newLore = if (!collectionConfig.descriptiveMilestones) stack.getLore()
             else buildDescriptiveMilestoneLore(stack)
 
-            newItemStack.setLore(newLore)
+            newItemStack.setLoreString(newLore)
             newItemStack.setCustomItemName(stack.hoverName.formattedTextCompatLeadingWhiteLessResets())
             replacementCache[stack.hoverName.formattedTextCompatLeadingWhiteLessResets()] = newItemStack
         }
@@ -799,7 +799,7 @@ object HoppityCollectionStats {
 
     private fun logRabbits(event: InventoryFullyOpenedEvent) {
         for (item in event.inventoryItems.values) {
-            val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets()?.removeColor()?.takeIfKnownRabbit() ?: continue
+            val itemName = item.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.removeColor()?.takeIfKnownRabbit() ?: continue
 
             val itemLore = item.getLore()
             saveLocationRabbit(itemName, itemLore)

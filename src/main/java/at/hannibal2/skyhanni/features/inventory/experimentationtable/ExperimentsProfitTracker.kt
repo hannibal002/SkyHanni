@@ -175,7 +175,7 @@ object ExperimentsProfitTracker {
     }
 
     private fun NeuInternalName.formatWarningString(amount: Int) = buildString {
-        val displayName = getItemStackOrNull()?.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: "XP Bottle"
+        val displayName = getItemStackOrNull()?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: "XP Bottle"
         val amountFormat = "§8${amount}x ".takeIf { amount > 1 }.orEmpty()
         appendLine("§aExperiments Tracker§7:")
         appendLine("§eAutomatically tracked usage of $amountFormat$displayName §ewhile near the Experimentation Table§7.")

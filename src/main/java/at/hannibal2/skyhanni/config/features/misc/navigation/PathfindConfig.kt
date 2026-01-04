@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.misc
+package at.hannibal2.skyhanni.config.features.misc.navigation
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 class PathfindConfig {
 
     @Expose
-    @ConfigOption(name = "Feedback Mode", desc = "How pathfinding progress/feedback should be displayed.")
+    @ConfigOption(name = "Feedback Mode", desc = "How navigation progress is displayed.")
     @ConfigEditorDropdown
     @SearchTag("navigation navigate pathfind")
     val feedbackMode: Property<FeedbackMode> = Property.of(FeedbackMode.GUI)
@@ -35,8 +35,8 @@ class PathfindConfig {
     @Expose
     @ConfigOption(
         name = "Chat Update Interval",
-        desc = "Change how often the chat message should update the distance.\n" +
-            "§cOnly applies while in Chat feedback mode."
+        desc = "How often the chat message updates.\n" +
+            "§cOnly in Chat feedback mode.",
     )
     @ConfigEditorDropdown
     @SearchTag("navigation, pathfind")
@@ -48,7 +48,7 @@ class PathfindConfig {
         SHORT("1/4 second", 250.milliseconds),
         LESS_SHORT("1/2 second", 500.milliseconds),
         MID("Every second", 1.seconds),
-        A_BIT_LONGER("Every 2 second", 2.seconds),
+        A_BIT_LONGER("Every 2 seconds", 2.seconds),
         LONG("5 seconds", 5.seconds),
         ;
 

@@ -119,8 +119,8 @@ object UserLuckBreakdown {
             inMiscStats = false
             return
         }
-        val inventoryName = event.inventoryItems[4]?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty()
-        if (inventoryName != "§dMiscellaneous Stats") return
+        val inventoryName = event.inventoryItems[4]?.hoverName?.string.orEmpty()
+        if (inventoryName != "Miscellaneous Stats") return
         inMiscStats = true
         replaceSlot = findValidSlot(event.inventoryItemsWithNull)
         val showAllStatsLore = event.inventoryItems[50]?.getLore() ?: listOf("")

@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.toGameProfile
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemModel
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
@@ -55,7 +55,7 @@ object ComponentUtils {
                 ErrorManager.skyHanniError("stack display name is null", "extra attributes" to nbtInfo.extraAttributes)
             }
             if (display.lore != null) {
-                stack.setLore(display.lore)
+                stack.setLoreString(display.lore)
             }
         }
         if (nbtInfo.skullOwner != null) {

@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.withColor
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 
 data class FormattedEnchant(
@@ -9,18 +13,18 @@ data class FormattedEnchant(
     private val stacking: String,
     private val isRoman: Boolean,
 ) : Comparable<FormattedEnchant> {
-    private val loreDescription: MutableList<String> = mutableListOf()
+    private val loreDescription: MutableList<Component> = mutableListOf()
 
-    fun addLore(lineOfLore: String) = loreDescription.add(lineOfLore)
+    fun addLore(lineOfLore: Component) = loreDescription.add(lineOfLore)
 
     fun getLore() = loreDescription
 
     override fun compareTo(other: FormattedEnchant) = this.enchant.compareTo(other.enchant)
 
-    fun getFormattedString(itemStack: ItemStack?): String {
-        val builder = StringBuilder()
-        builder.append(enchant.getFormattedName(level, itemStack)).append(" ").append(if (isRoman) level.toRoman() else level)
-
-        return if (!stacking.contains("empty")) builder.append("§8$stacking").toString() else builder.toString()
+    fun getComponent(itemStack: ItemStack?): Component {
+        val component = enchant.getComponent(level, itemStack).append(if (isRoman) " ${level.toRoman()}" else " $level")
+        if (!stacking.contains("empty"))
+            component.append(Component.literal(stacking).withColor(ChatFormatting.GRAY))
+        return component
     }
 }

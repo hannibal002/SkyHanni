@@ -23,6 +23,8 @@ import at.hannibal2.skyhanni.utils.compat.hover
 
 @SkyHanniModule
 object NavigationHelper {
+    private val config get() = SkyHanniMod.feature.misc.navigation
+
     private val messageId = ChatUtils.getUniqueMessageId()
 
     val allowedTags = listOf(
@@ -66,6 +68,13 @@ object NavigationHelper {
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
+        if (config.allowInstantNavigation && locations.size == 1) {
+            val (name, node) = locations.first()
+            node.pathFind(label = name, allowRerouting = true, condition = { true })
+            sendNavigateMessageWithContent("§7Only one location found, navigating to §r$name", goBack)
+            return
+        }
+
         TextHelper.displayPaginatedList(
             title,
             locations,
@@ -85,12 +94,15 @@ object NavigationHelper {
         }
     }
 
-    private fun sendNavigateMessage(name: String, goBack: () -> Unit) {
-        val componentText = "§7Navigating to §r$name".asComponent()
+    private fun sendNavigateMessageWithContent(content: String, goBack: () -> Unit) {
+        val componentText = content.asComponent()
         componentText.onClick(onClick = goBack)
         componentText.hover = "§eClick to stop navigating and return to previous search".asComponent()
         componentText.send(messageId)
     }
+
+    private fun sendNavigateMessage(name: String, goBack: () -> Unit) =
+        sendNavigateMessageWithContent("§7Started navigating to §r$name§7. ", goBack)
 
     private fun calculateNames(distances: Map<GraphNode, Double>): List<Pair<String, GraphNode>> {
         val names = mutableMapOf<String, GraphNode>()
@@ -132,6 +144,7 @@ object NavigationHelper {
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shnavigate") {
             description = "Using path finder to go to locations"
+            aliases = listOf("shnav")
             legacyCallbackArgs { onCommand(it) }
         }
     }

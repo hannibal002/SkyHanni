@@ -32,11 +32,11 @@ object RiftTimer {
     private val patternGroup = RepoPattern.group("rift.everywhere")
 
     /**
-     * REGEX-TEST: 3150 §aф
+     * REGEX-TEST: 3150 ф
      */
     private val nametagPattern by patternGroup.pattern(
         "nametag.timer",
-        "(?<time>\\d+) §aф",
+        "(?<time>\\d+) ф",
     )
 
     private var display = emptyList<String>()
@@ -136,7 +136,7 @@ object RiftTimer {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
         if (!config.nametag) return
-        val nametag = event.text.formattedTextCompatLessResets()
+        val nametag = event.text.string
         val time = nametagPattern.matchMatcher(nametag) {
             group("time")?.toIntOrNull()
         } ?: return

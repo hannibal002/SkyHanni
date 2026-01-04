@@ -43,19 +43,20 @@ object KeyboardManager {
 
     fun isModifierKeyDown() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
 
+    //#if MC < 1.21.9
+    private fun Int.matchesClosureKey() = Minecraft.getInstance().options.keyInventory.matches(this, this)
+    //#else
+    //$$ private fun Int.matchesClosureKey() = Minecraft.getInstance().options.keyInventory.matches(KeyEvent(this, this, 0))
+    //#endif
+
     @JvmStatic
     fun checkIsInventoryClosure(keycode: Int): Boolean {
         // Holding shift bypasses closure checks
         if (isShiftKeyDown()) return false
 
-        val isClose =
-        //#if MC < 1.21.9
-            Minecraft.getInstance().options.keyInventory.matches(keycode, keycode) || keycode == GLFW.GLFW_KEY_ESCAPE
-        //#else
-        //$$ Minecraft.getInstance().options.keyInventory.matches(KeyEvent(keycode, keycode, 0)) || keycode == GLFW.GLFW_KEY_ESCAPE
-        //#endif
-
+        val isClose = keycode.matchesClosureKey() || keycode == GLFW.GLFW_KEY_ESCAPE
         if (!isClose) return false
+
         return AttemptedInventoryCloseEvent().post()
     }
 

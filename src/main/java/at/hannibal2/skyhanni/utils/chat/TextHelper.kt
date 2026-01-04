@@ -55,7 +55,7 @@ object TextHelper {
     fun Component.suffix(suffix: String): Component = join(this, suffix)
     fun Component.wrap(prefix: String, suffix: String) = this.prefix(prefix).suffix(suffix)
 
-    fun Component.width(): Int = Minecraft.getInstance().font.width(this.formattedTextCompat())
+    fun Component.width(): Int = Minecraft.getInstance().font.width(this.string)
 
     fun Component.fitToChat(): Component {
         val width = this.width()

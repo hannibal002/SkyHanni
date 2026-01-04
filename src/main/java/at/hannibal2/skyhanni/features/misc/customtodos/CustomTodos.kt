@@ -37,6 +37,12 @@ class CustomTodos(
             }
         }
 
+        fun save() {
+            val todosList = ObservableList<CustomTodoEditor>(mutableListOf())
+            SkyHanniMod.customTodos.customTodos.forEach { todosList.add(CustomTodoEditor(it, todosList)) }
+            CustomTodos(todosList).save()
+        }
+
     }
 
     @Bind

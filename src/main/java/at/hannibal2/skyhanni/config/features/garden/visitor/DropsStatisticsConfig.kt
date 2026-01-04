@@ -39,6 +39,7 @@ class DropsStatisticsConfig {
             DropsStatisticsTextEntry.COPPER_DYE,
             DropsStatisticsTextEntry.HYPERCHARGE_CHIP,
             DropsStatisticsTextEntry.QUICKDRAW_CHIP,
+            DropsStatisticsTextEntry.FARMING_EXP_BOOST_EPIC,
         )
     )
 
@@ -79,6 +80,7 @@ class DropsStatisticsConfig {
         HARVEST_HARBINGER("§b1 §9Harvest Harbinger V"),
         HYPERCHARGE_CHIP("§b3 §9Hypercharge Chip"),
         QUICKDRAW_CHIP("§b7 §9Quickdraw Chip"),
+        FARMING_EXP_BOOST_EPIC("§b1 §5Farming Exp Boost"),
         ;
 
         override fun toString() = displayName

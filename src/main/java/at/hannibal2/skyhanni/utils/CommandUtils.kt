@@ -143,10 +143,11 @@ object CommandUtils {
     }
 
     fun <T : CommandContextAwareObject> numberCalculate(args: Iterable<String>, context: T, use: (T, Long) -> Unit): Int {
-        NeuCalculator.calculateOrNull(args.firstOrNull())?.toLong()?.let { use(context, it) } ?: {
+        val expr = args.firstOrNull() ?: return 0
+        Calculator.calculateOrNull(expr)?.toLong()?.let { use(context, it) } ?: {
             context.errorMessage = "Invalid number/calculation: '${args.firstOrNull()}'"
         }
-        return args.firstOrNull()?.let { 1 } ?: 0
+        return 1
     }
 }
 

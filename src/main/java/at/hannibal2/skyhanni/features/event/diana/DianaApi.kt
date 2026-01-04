@@ -68,7 +68,7 @@ object DianaApi {
     fun onJoinWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         val entity = event.entity
         // TODO: fetch rare mobs from repo instead
-        if (rareDianaMobNamePattern.matches(entity.name.formattedTextCompatLessResets().trim())) {
+        if (rareDianaMobNamePattern.matches(entity.name.string.trim())) {
             RareDianaMobFoundEvent(entity).post()
         }
     }

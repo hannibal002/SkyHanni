@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
+import at.hannibal2.skyhanni.config.features.misc.navigation.NavigationConfig
 import at.hannibal2.skyhanni.config.features.pets.PetConfig
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
 import com.google.gson.annotations.Expose
@@ -15,6 +16,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -22,6 +24,7 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.glfw.GLFW
 
+@Suppress("AvoidBritishSpelling")
 class MiscConfig {
     @Expose
     @Category(name = "Pets", desc = "Pets Settings")
@@ -44,12 +47,8 @@ class MiscConfig {
     val stranded: StrandedConfig = StrandedConfig()
 
     @Expose
-    @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
-    val areaNavigation: AreaNavigationConfig = AreaNavigationConfig()
-
-    @Expose
-    @Category(name = "Pathfinding", desc = "General settings for Pathfinding/Navigating in different features.")
-    val pathfinding: PathfindConfig = PathfindConfig()
+    @Category(name = "Navigation", desc = "Navigation features and other related settings.")
+    val navigation: NavigationConfig = NavigationConfig()
 
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
@@ -385,6 +384,11 @@ class MiscConfig {
     val lastStorage: LastStorageConfig = LastStorageConfig()
 
     @Expose
+    @ConfigOption(name = "Custom Todos", desc = "")
+    @Accordion
+    val customTodos: CustomTodosConfig = CustomTodosConfig()
+
+    @Expose
     @ConfigOption(
         name = "Maintain Volume During Warnings",
         desc = "Do not change game volume levels when warning sounds are played.",
@@ -470,4 +474,20 @@ class MiscConfig {
     @FeatureToggle
     @OnlyModern
     var fixDoubleClicks: Boolean = true
+
+
+    @ConfigOption(name = "Color Particle Warning", desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.§f")
+    @ConfigEditorInfoText
+    @SearchTag("Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes Fix Colored Particles")
+    var notice: String = ""
+
+    @Expose
+    @ConfigOption(
+        name = "Fix Colored Particles",
+        desc = "Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("Colour Spell Spawn Specific")
+    var fixColorParticles: Boolean = false
 }
