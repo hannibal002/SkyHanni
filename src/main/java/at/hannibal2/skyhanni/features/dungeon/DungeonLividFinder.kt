@@ -64,13 +64,16 @@ object DungeonLividFinder {
     // This only happens when in f5/m5 bossfight, so the performance impact is minimal
     @OptIn(AllEntitiesGetter::class)
     private val lividEntities: List<RemotePlayer>
-        get() = EntityUtils.getEntities<RemotePlayer>().filterTo(mutableListOf()) { it.isNpc() && (lividNamePattern.matches(it.name.string) || (lividTextureToColor.containsKey(it.getSkinTexture()))) }
+        get() = EntityUtils.getEntities<RemotePlayer>()
+            .filterTo(mutableListOf()) {
+                it.isNpc() && (lividNamePattern.matches(it.name.string) || (lividTextureToColor.containsKey(it.getSkinTexture())))
+            }
 
     private var color: LorenzColor? = null
 
 
-    private var lividTextureToColor = mutableMapOf<String, LorenzColor>()
-    private var lividNameToColor = mutableMapOf(
+    private val lividTextureToColor = mutableMapOf<String, LorenzColor>()
+    private val lividNameToColor = mutableMapOf(
         "Vendetta" to LorenzColor.WHITE,
         "Doctor" to LorenzColor.GRAY,
         "Crossed" to LorenzColor.LIGHT_PURPLE,
