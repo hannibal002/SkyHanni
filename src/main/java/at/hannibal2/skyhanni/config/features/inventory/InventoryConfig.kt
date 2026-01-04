@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyModern
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig
@@ -16,8 +15,6 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
@@ -97,7 +94,6 @@ class InventoryConfig {
     @ConfigOption(name = "Super Crafting Coin Waste", desc = "")
     @Accordion
     val superCraftingCoinWaste: SuperCraftingCoinWasteConfig = SuperCraftingCoinWasteConfig()
-
 
     @Expose
     @ConfigOption(name = "Stats Tuning", desc = "")

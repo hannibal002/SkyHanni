@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getSumPriceForCount
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getTotalPriceForCount
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -28,14 +29,39 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SuperCraftingInventory {
     val config = SkyHanniMod.feature.inventory.superCraftingCoinWaste
+
+    val craftingPatternGroup = RepoPatternGroup("supercraftinginventory")
+    val craftingCount by craftingPatternGroup.pattern(
+        "crafting.count",
+        ".*Crafting (?<count>[0-9,]+) item.*",
+    )
+    val craftingResourcePattern by craftingPatternGroup.pattern(
+        "crafting.resource",
+        " *([✔✖]) [0-9,]+/[0-9,]+ \\((?<amount>[0-9,]+)x\\) (?<resource>.+)",
+    )
+
+    val inventoryPattern by craftingPatternGroup.pattern(
+        "inventory.name",
+        "(?<itemname>.*) Recipe",
+    )
     val invDetector = InventoryDetector(
         onOpenInventory = { },
         checkInventoryName = { name ->
-            name.matches(".* Recipe".toRegex())
+            inventoryPattern.matches(name)
         },
         onCloseInventory = {
         },
     )
+
+    fun getWarnAmount(): Double {
+        return if (BitsApi.hasCookieBuff()) config.warnCoinWasteWithCookie
+        else config.withoutCookie.warnCoinWaste
+    }
+
+    fun getBulkWarnAmount(): Double {
+        return if (BitsApi.hasCookieBuff()) config.warnCoinWasteMaxResourcesWithCookie
+        else config.withoutCookie.warnCoinWasteMaxResources
+    }
 
     @HandleEvent
     fun onClick(event: GuiContainerEvent.SlotClickEvent) {
@@ -50,8 +76,8 @@ object SuperCraftingInventory {
             SoundUtils.playErrorSound()
             TitleManager.sendTitle(
                 "§cCraft-click Prevented (Big Loss Detected)",
-                subtitleText = "§7Hold §eControl §7to bypass. You can safe §c${String.format("%,.1f", -profit)}§6 Coins§7 by " +
-                    "instant selling the resources to the §6Bazaar§7 and instant buying the item directly.",
+                subtitleText = "§7Hold §eControl §7to bypass. You could save §c${String.format("%,.1f", -profit)}§6 Coins§7 by " +
+                    "selling the required resources directly to the §6Bazaar§7 and then instant-buying the finished item.",
                 duration = 2.seconds,
                 location = TitleManager.TitleLocation.INVENTORY,
             )
@@ -83,10 +109,10 @@ object SuperCraftingInventory {
         }.mapValues {
             //The materials are always summed up already by the getRecipeMaterials function
             val key = it.key!!
-            return key.getSumPriceForCount(it.value,ItemPriceSource.BAZAAR_INSTANT_SELL)
+            return key.getTotalPriceForCount(it.value, ItemPriceSource.BAZAAR_INSTANT_SELL)
         }.sumAllValues()
 
-        val totalResultPrice = resultItem.first.getSumPriceForCount(craftingAmount,ItemPriceSource.BAZAAR_INSTANT_BUY) ?: return null
+        val totalResultPrice = resultItem.first.getTotalPriceForCount(craftingAmount, ItemPriceSource.BAZAAR_INSTANT_BUY) ?: return null
 
         return totalResultPrice - itemsPrice
     }
@@ -128,31 +154,10 @@ object SuperCraftingInventory {
         }
     }
 
-    val craftingPatternGroup = RepoPatternGroup("supercraftinginventory")
-    val craftingCount by craftingPatternGroup.pattern(
-        "crafting.count",
-        ".*Crafting (?<count>[0-9,]+) item.*",
-    )
-    val craftingResourcePattern by craftingPatternGroup.pattern(
-        "crafting.resource",
-        " *([✔✖]) [0-9,]+/[0-9,]+ \\((?<amount>[0-9,]+)x\\) (?<resource>.+)",
-    )
-
     private fun blockWasteClick(profit: Double, craftingAmount: Int, maxCraftingAmount: Int): Boolean {
-        if (!config.warnCoinWasteEnabled) return false
         if (KeyboardManager.isControlKeyDown()) return false
         if (profit < -getWarnAmount() * 1_000_000L) return true
         if (profit < -getBulkWarnAmount() * 1_000_000L && craftingAmount == maxCraftingAmount) return true
         return false
-    }
-
-    fun getWarnAmount(): Double {
-        return if (BitsApi.hasCookieBuff()) config.warnCoinWasteWithCookie
-        else config.warnCoinWaste
-    }
-
-    fun getBulkWarnAmount(): Double {
-        return if (BitsApi.hasCookieBuff()) config.warnCoinWasteMaxResourcesWithCookie
-        else config.warnCoinWasteMaxResources
     }
 }

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemApi
-import at.hannibal2.skyhanni.features.mining.crystalhollows.ChChestMessageAnalyser.items
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -217,12 +216,11 @@ object ItemPriceUtils {
         }
     }
 
-
-    fun NeuInternalName.getSumPriceForCount(
+    fun NeuInternalName.getTotalPriceForCount(
         count: Int,
         priceSource: ItemPriceSource,
     ): Double? {
-        if (priceSource== ItemPriceSource.NPC_SELL) {
+        if (priceSource == ItemPriceSource.NPC_SELL) {
             return getNpcPrice() * count
         }
         val bazaarData = getBazaarData()?.product ?: return null
