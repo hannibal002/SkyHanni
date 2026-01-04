@@ -70,7 +70,7 @@ object DungeonLividFinder {
 
 
     private var lividTextureToColor = mutableMapOf<String, LorenzColor>()
-    private val lividNameColor = mapOf(
+    private var lividNameToColor = mutableMapOf(
         "Vendetta" to LorenzColor.WHITE,
         "Doctor" to LorenzColor.GRAY,
         "Crossed" to LorenzColor.LIGHT_PURPLE,
@@ -102,13 +102,16 @@ object DungeonLividFinder {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        lividTextureToColor.clear()
+        if (lividTextureToColor.isNotEmpty()) lividTextureToColor.clear()
         val data = event.getConstant<LividSolverJson>("dungeons/LividSolver")
-        val map = data.lividSkins
-        for ((color, skin) in map) {
-            if (!lividTextureToColor.containsKey(skin)) {
-                val repoColor = LorenzColor.entries.firstOrNull { it.name == color } ?: continue
-                lividTextureToColor.add(Pair(skin, repoColor))
+        val map = data.livids
+        for ((color, lividInfo) in map) {
+            val repoColor = LorenzColor.entries.firstOrNull { it.name == color } ?: continue
+            if (!lividNameToColor.containsKey(lividInfo.name)) {
+                lividNameToColor.add(Pair(lividInfo.name, repoColor))
+            }
+            if (!lividTextureToColor.containsKey(lividInfo.skin)) {
+                lividTextureToColor.add(Pair(lividInfo.skin, repoColor))
             }
         }
     }
@@ -123,7 +126,7 @@ object DungeonLividFinder {
         for (entity in lividEntities) {
             val lividColor = entity.getLividColor() ?: run {
                 lividNamePattern.matchMatcher(entity.name.toString()) {
-                    val namecolor = lividNameColor[group("name")] ?: continue
+                    val namecolor = lividNameToColor[group("name")] ?: continue
                     val texture = entity.getSkinTexture() ?: continue
                     ChatUtils.debug("Unknown Livid Skin found $texture $namecolor ${group("name")}")
                     lividTextureToColor.add(Pair(texture, namecolor))
