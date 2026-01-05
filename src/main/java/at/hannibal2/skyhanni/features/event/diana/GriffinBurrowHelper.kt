@@ -197,7 +197,7 @@ object GriffinBurrowHelper {
 
         event.addData {
             add("targetLocation: ${targetLocation?.printWithAccuracy(1)}")
-            add("additionalGuesses: ${allGuesses.size}")
+            add("allGuesses: ${allGuesses.size}")
             for (guess in allGuesses) {
                 add("  ${guess.getCurrent().printWithAccuracy(1)} (size=${guess.guesses.size}) (type=${guess.burrowType})")
             }
@@ -321,7 +321,8 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
 
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
-            // TODO remove based on last blocks clicked
+            mobAlive = false
+            BurrowApi.lastBurrowInteracted?.let { removeGuess(it) }
         }
 
         BurrowApi.lastBurrowInteracted?.let {
@@ -364,6 +365,7 @@ object GriffinBurrowHelper {
         allGuessesTimers.clear()
         targetLocation = null
         GriffinBurrowParticleFinder.reset()
+        mobAlive = false
 
         BurrowWarpHelper.currentWarp = null
         if (isEnabled()) {
@@ -373,6 +375,7 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onWorldChange() {
+        mobAlive = false
         if (config.clearOnWorldChange) resetAllData()
     }
 
