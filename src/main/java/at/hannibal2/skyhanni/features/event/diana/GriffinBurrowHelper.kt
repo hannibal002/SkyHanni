@@ -110,7 +110,6 @@ object GriffinBurrowHelper {
 
     private val allGuessesTimers = mutableMapOf<GuessEntry, SimpleTimeMark>() // hypixel itself removes burrows after 30m
     private val allGuesses = mutableListOf<GuessEntry>()
-    private var lastBurrowInteracted: LorenzVec? = null
 
     private var shouldFocusOnRareMob = false
     private var mobAlive = false
@@ -118,7 +117,7 @@ object GriffinBurrowHelper {
     data class GuessEntry(
         val guesses: List<LorenzVec>,
         var burrowType: BurrowType = BurrowType.UNKNOWN,
-        var range: Int = 0, //TODO
+        var range: Int = 0,
         var currentIndex: Int = 0,
     ) {
         fun getCurrent(): LorenzVec = guesses[currentIndex]
@@ -137,17 +136,36 @@ object GriffinBurrowHelper {
 
             return false
         }
-        fun moveToNext(): Boolean {
-            val nextIndex = currentIndex + 1
-            if (nextIndex in guesses.indices) {
-                currentIndex = nextIndex
-                if (!isBlockValid(guesses[nextIndex])) {
-                    return moveToNext()
+        fun checkRemove(): Boolean {
+            // remove guesses older than 30 minutes
+            allGuessesTimers[this]?.passedSince()?.let {
+                if (it > 30.minutes) {
+                    return true
                 }
-                BurrowGuessEvent(this).post()
-                checkMoveGuess()
-                return true
-            } else return false
+            }
+
+            // don't attempt to move mob burrows if a mob is alive
+            if (mobAlive && this.burrowType == BurrowType.MOB) return false
+
+            var shouldMove = false
+            if (!isBlockValid(this.getCurrent())) shouldMove = true
+
+            val now = SimpleTimeMark.now()
+            val shouldBeLoaded = InventoryUtils.getItemInHandDuringTimeframe(now - 0.3.seconds, now - 0.8.seconds)?.isDianaSpade
+            if (shouldBeLoaded == true &&
+                !GriffinBurrowParticleFinder.containsBurrow(this.getCurrent()) && // burrow is not found
+                this.getCurrent().distanceSq(MinecraftCompat.localPlayer.position().toLorenzVec()) < 900 // within 30 blocks
+            ) { shouldMove = true }
+
+            if (shouldMove) {
+                val nextIndex = currentIndex + 1
+                if (nextIndex in guesses.indices) {
+                    currentIndex = nextIndex
+                    BurrowGuessEvent(this).post()
+                    return false
+                } else return true // remove if it should have moved but cant
+            }
+            return false
         }
     }
 
@@ -167,10 +185,6 @@ object GriffinBurrowHelper {
     fun addGuess(guess: GuessEntry) {
         allGuesses.add(guess)
         allGuessesTimers[guess] = SimpleTimeMark.now()
-    }
-
-    fun getKnownBurrows(): List<GuessEntry> {
-       return allGuesses.filter { it.burrowType != BurrowType.UNKNOWN }
     }
 
     @HandleEvent
@@ -195,7 +209,6 @@ object GriffinBurrowHelper {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         update()
-        checkMoveGuess()
     }
 
     fun update() {
@@ -213,38 +226,9 @@ object GriffinBurrowHelper {
                 BurrowWarpHelper.shouldUseWarps(it)
             }
         }
-    }
 
-    fun checkMoveGuess() {
-        val burrows = getKnownBurrows().flatMap { it.guesses }
-        val toDelete = mutableSetOf<GuessEntry>()
-        for (guessEntry in allGuesses) {
-
-            // remove guesses older than 30 minutes
-            allGuessesTimers[guessEntry]?.passedSince()?.let {
-                if (it > 30.minutes) {
-                    toDelete.add(guessEntry)
-                    continue
-                }
-            }
-
-            // don't attempt to move mob burrows if a mob is alive
-            if (mobAlive && guessEntry.burrowType == BurrowType.MOB) continue
-
-            var shouldMove = false
-            if (!isBlockValid(guessEntry.getCurrent())) shouldMove = true
-
-            val now = SimpleTimeMark.now()
-            val shouldBeLoaded = InventoryUtils.getItemInHandDuringTimeframe(now - 0.3.seconds, now - 0.8.seconds)?.isDianaSpade
-            if (shouldBeLoaded == true &&
-                !burrows.contains(guessEntry.getCurrent()) && // burrow is not found
-                guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.position().toLorenzVec()) < 900 // within 30 blocks
-            ) { shouldMove = true }
-
-            if (shouldMove) {
-                if (!guessEntry.moveToNext()) toDelete.add(guessEntry)
-            }
-        }
+        // attempt to move all guesses
+        val toDelete = allGuesses.filter { it.checkRemove() }.toSet()
         allGuesses.removeAll(toDelete)
         allGuessesTimers.keys.removeAll(toDelete)
     }
@@ -328,7 +312,6 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
         if (event.distance > 10 && event.isLocalPlayer) {
             update()
-            checkMoveGuess()
         }
     }
 
@@ -340,7 +323,7 @@ object GriffinBurrowHelper {
             // TODO remove based on last blocks clicked
         }
 
-        lastBurrowInteracted?.let {
+        BurrowApi.lastBurrowInteracted?.let {
             val burrowDugMatcher = burrowDugPattern.matcher(event.message)
             if (burrowDugMatcher.find()) {
                 val current = burrowDugMatcher.group("current").toInt()
@@ -575,7 +558,7 @@ object GriffinBurrowHelper {
 
         val burrows = allGuesses.flatMap { it.guesses }
         if (burrows.contains(location)) {
-            lastBurrowInteracted = location
+            BurrowApi.lastBurrowInteracted = location
         }
     }
 

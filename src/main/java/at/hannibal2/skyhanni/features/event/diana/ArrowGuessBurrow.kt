@@ -61,6 +61,7 @@ object ArrowGuessBurrow {
             }
             return
         }
+        println("found arrow guess: $guess") //TODO remove
     }
 
     fun getArrowRange(offset: LorenzVec): IntRange? {
@@ -154,6 +155,8 @@ object ArrowGuessBurrow {
         // arrow is a block above the center of the start block
         val adjustedBase = base.down(1.5) // this is always an exact multiple of 0.5
         val adjustedTip = tip.down(1.5)
+
+        BurrowApi.lastBurrowInteracted?.let { if (adjustedBase.distanceSq(it) > 5) return null } // not your arrow
 
         return RaycastUtils.Ray(adjustedBase, adjustedTip.minus(adjustedBase).normalize())
     }
