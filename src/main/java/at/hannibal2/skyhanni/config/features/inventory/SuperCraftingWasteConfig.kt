@@ -7,38 +7,51 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class SuperCraftingCoinWasteConfig {
+class SuperCraftingWasteConfig {
     @Expose
-    @ConfigOption(name = "Warn about Super Crafting Coin Waste", desc = "Warns you when you can save more than Xm coins by insta buying the item and instant selling the materials.")
+    @ConfigOption(
+        name = "Warn about Super Crafting Coin Waste",
+        desc = "Warns you when you can save more than Xm coins by insta buying the item and instant selling the materials.",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
-    val warnCoinWasteEnabled: Boolean = true
+    val enabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Minimum Amount", desc = "The minimum amount of coins (in millions) you must save.")
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 50.0f, minStep = 0.1f)
-    val warnCoinWasteWithCookie: Double = 10.0
+    val normal: Double = 10.0
 
     @Expose
-    @ConfigOption(name = "Minimum Amount if Max Resource Usage", desc = "Minimum amount of coins when compacting items due to space reasons.")
+    @ConfigOption(
+        name = "Minimum Amount if Max Resource Usage",
+        desc = "Minimum amount of coins when compacting items due to space reasons.",
+    )
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 50.0f, minStep = 0.1f)
-    val warnCoinWasteMaxResourcesWithCookie: Double = 5.0
+    val maxResource: Double = 5.0
 
     @Expose
     @Accordion
     @ConfigOption(name = "Values without Cookie", desc = "Like the others but when you don't have Cookie Buff active → no /bz access")
-    val withoutCookie = WithoutCookieSuperCraftingCoinWasteConfig()
+    val withoutCookieValues = WithoutCookie()
 
-    class WithoutCookieSuperCraftingCoinWasteConfig{
-        @Expose
-        @ConfigOption(name = "Minimum Amount if Max Resource Usage", desc = "Minimum amount of coins when compacting items due to space reasons.")
-        @ConfigEditorSlider(minValue = 0.1f, maxValue = 100.0f, minStep = 0.1f)
-        val warnCoinWasteMaxResources: Double = 10.0
+    class WithoutCookie {
 
         @Expose
-        @ConfigOption(name = "Minimum Amount", desc = "The minimum amount of coins (in millions) you must save (instant sell and insta buy " +
-            "for wanted) to get a warning.")
+        @ConfigOption(
+            name = "Minimum Amount",
+            desc = "The minimum amount of coins (in millions) you must save (instant sell and insta buy " +
+                "for wanted) to get a warning.",
+        )
         @ConfigEditorSlider(minValue = 0.1f, maxValue = 100.0f, minStep = 0.1f)
-        val warnCoinWaste: Double = 20.0
+        val normal: Double = 20.0
+
+        @Expose
+        @ConfigOption(
+            name = "Minimum Amount if Max Resource Usage",
+            desc = "Minimum amount of coins when compacting items due to space reasons.",
+        )
+        @ConfigEditorSlider(minValue = 0.1f, maxValue = 100.0f, minStep = 0.1f)
+        val maxResource: Double = 10.0
     }
 }

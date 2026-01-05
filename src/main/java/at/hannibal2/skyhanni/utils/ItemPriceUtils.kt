@@ -215,25 +215,4 @@ object ItemPriceUtils {
             }
         }
     }
-
-    fun NeuInternalName.getTotalPriceForCount(
-        count: Int,
-        priceSource: ItemPriceSource,
-    ): Double? {
-        if (priceSource == ItemPriceSource.NPC_SELL) {
-            return getNpcPrice() * count
-        }
-        val bazaarData = getBazaarData()?.product ?: return null
-        val offers = if (priceSource == ItemPriceSource.BAZAAR_INSTANT_SELL) bazaarData.buySummary else bazaarData.sellSummary
-        var remaining = count
-        var totalPrice = 0.0
-        for (offer in offers) {
-            val takeAmount = offer.amount.coerceAtMost(remaining.toLong()).toInt()
-            totalPrice += takeAmount * offer.pricePerUnit
-            remaining -= takeAmount
-            if (remaining <= 0) break
-        }
-        if (remaining > 0) return null
-        return totalPrice
-    }
 }

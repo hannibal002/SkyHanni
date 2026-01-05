@@ -91,9 +91,9 @@ class InventoryConfig {
     val rngMeter: RngMeterConfig = RngMeterConfig()
 
     @Expose
-    @ConfigOption(name = "Super Crafting Coin Waste", desc = "")
+    @ConfigOption(name = "Super Crafting", desc = "")
     @Accordion
-    val superCraftingCoinWaste: SuperCraftingCoinWasteConfig = SuperCraftingCoinWasteConfig()
+    val superCrafting: SuperCrafting = SuperCrafting()
 
     @Expose
     @ConfigOption(name = "Stats Tuning", desc = "")

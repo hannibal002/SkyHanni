@@ -115,7 +115,7 @@ object BazaarApi {
 
     private var taxRate: Double
         get() = storage?.taxRate ?: 1.25
-        private set(value) {
+        set(value) {
             storage?.taxRate = value
         }
 
@@ -286,4 +286,27 @@ object BazaarApi {
     }
 
     fun isBazaarOrderInventory(inventoryName: String): Boolean = inventoryBazaarOrdersPattern.matches(inventoryName)
+
+    fun calculatePriceOffAvailableOrders(
+        item: NeuInternalName, count: Int,
+        priceSource: SimpleTransactionType,
+    ): Double? {
+        val bazaarData = item.getBazaarData()?.product ?: return null
+        val offers = if (priceSource == SimpleTransactionType.BUY_ORDER) bazaarData.buySummary else bazaarData.sellSummary
+        var remaining = count
+        var totalPrice = 0.0
+        for (offer in offers) {
+            val takeAmount = offer.amount.coerceAtMost(remaining.toLong()).toInt()
+            totalPrice += takeAmount * offer.pricePerUnit
+            remaining -= takeAmount
+            if (remaining <= 0) break
+        }
+        if (remaining > 0) return null
+        return totalPrice
+    }
+
+    enum class SimpleTransactionType {
+        BUY_ORDER,
+        SELL_OFFER,
+    }
 }
