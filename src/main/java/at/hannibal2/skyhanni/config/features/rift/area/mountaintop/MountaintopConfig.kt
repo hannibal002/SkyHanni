@@ -22,7 +22,7 @@ class MountaintopConfig {
 
     @Expose
     @ConfigOption(
-        name = "Mountaintop Flower Pot Enigma Soul Helper",
+        name = "Flower Pot Enigma Soul Helper",
         desc = "Show the dropdown location to the hard to reach flower pot during the parkour for the Enigma Soul in Rose's End.",
     )
     @ConfigEditorBoolean
