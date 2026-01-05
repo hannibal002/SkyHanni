@@ -172,8 +172,7 @@ object GriffinBurrowHelper {
     fun removeGuess(location: LorenzVec) {
         val toRemove = allGuesses.filter { it.contains(location) }
         for (item in toRemove) {
-            allGuesses.remove(item)
-            allGuessesTimers.remove(item)
+            removeGuess(item)
         }
     }
 
@@ -231,6 +230,8 @@ object GriffinBurrowHelper {
         val toDelete = allGuesses.filter { it.checkRemove() }.toSet()
         allGuesses.removeAll(toDelete)
         allGuessesTimers.keys.removeAll(toDelete)
+
+        if (!toDelete.isEmpty()) update()
     }
 
     // TODO add option to only focus on last guess - highly requersted method that is less optimal for money per hour. users choice
@@ -382,52 +383,6 @@ object GriffinBurrowHelper {
         val isGround = pos.getBlockAt() == Blocks.GRASS_BLOCK
         val isValidBlockAbove = pos.up().getBlockAt() in allowedBlocksAboveGround
         return isGround && isValidBlockAbove
-    }
-
-    private fun findBlock(point: LorenzVec): LorenzVec {
-        if (!point.isInLoadedChunk()) {
-            return point.copy(y = LocationUtils.playerLocation().y)
-        }
-        findGround(point)?.let {
-            return it
-        }
-
-        return findBlockBelowAir(point)
-    }
-
-    private fun findGround(point: LorenzVec): LorenzVec? {
-        fun isValidGround(y: Double): Boolean {
-            val isGround = point.copy(y = y).getBlockAt() == Blocks.GRASS_BLOCK
-            val isValidBlockAbove = point.copy(y = y + 1).getBlockAt() in allowedBlocksAboveGround
-            return isGround && isValidBlockAbove
-        }
-
-        var gY = 140.0
-        while (!isValidGround(gY)) {
-            gY--
-            if (gY < 65) {
-                // no ground detected, find the lowest block below air
-                return null
-            }
-        }
-        return point.copy(y = gY)
-    }
-
-    private fun findBlockBelowAir(point: LorenzVec): LorenzVec {
-        val start = 65.0
-        var gY = start
-        while (point.copy(y = gY).getBlockAt() != Blocks.AIR) {
-            gY++
-            if (gY > 140) {
-                // no blocks at this spot, assuming outside of island
-                return point.copy(y = LocationUtils.playerLocation().y)
-            }
-        }
-
-        if (gY == start) {
-            return point.copy(y = LocationUtils.playerLocation().y)
-        }
-        return point.copy(y = gY - 1)
     }
 
     @HandleEvent
