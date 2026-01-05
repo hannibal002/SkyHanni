@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -41,6 +42,7 @@ import at.hannibal2.skyhanni.utils.compat.addLeaves
 import at.hannibal2.skyhanni.utils.compat.addLeaves2
 import at.hannibal2.skyhanni.utils.compat.addRedFlower
 import at.hannibal2.skyhanni.utils.compat.addTallGrass
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
@@ -50,7 +52,7 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.phys.HitResult
+import java.awt.Color
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -111,6 +113,7 @@ object GriffinBurrowHelper {
     private var lastBurrowInteracted: LorenzVec? = null
 
     private var shouldFocusOnRareMob = false
+    private var mobAlive = false
 
     data class GuessEntry(
         val guesses: List<LorenzVec>,
@@ -225,6 +228,9 @@ object GriffinBurrowHelper {
                 }
             }
 
+            // don't attempt to move mob burrows if a mob is alive
+            if (mobAlive && guessEntry.burrowType == BurrowType.MOB) continue
+
             var shouldMove = false
             if (!isBlockValid(guessEntry.getCurrent())) shouldMove = true
 
@@ -301,6 +307,7 @@ object GriffinBurrowHelper {
     @HandleEvent
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
+        mobAlive = false
         removeGuess(location)
 
         // finished chain
@@ -340,6 +347,7 @@ object GriffinBurrowHelper {
                 val max = burrowDugMatcher.group("max").toInt()
                 BurrowDugEvent(it, current, max).post()
             } else if (genericMythologicalSpawnPattern.matches(event.message)) {
+                mobAlive = true
                 removeGuess(it)
                 addGuess(GuessEntry(listOf(it), BurrowType.MOB))
             } else if (treasureDugPattern.matches(event.message)) {
@@ -500,9 +508,13 @@ object GriffinBurrowHelper {
             if (target == null) return
             val location = target.getCurrent()
             val distance = location.distance(playerLocation)
+            val text = when (target.burrowType) {
+                BurrowType.UNKNOWN -> "${if (currentWarp != null) "§b" else "§f"}Guess"
+                else -> target.burrowType.text
+            }
 
             event.drawColor(location, target.burrowType.color, distance > 10)
-            event.drawDynamicText(location.up(), target.burrowType.text, 1.5)
+            event.drawDynamicText(location.up(), text, 1.5)
 
             return
         }
@@ -526,6 +538,15 @@ object GriffinBurrowHelper {
                         val formattedDistance = distance.toInt().addSeparators()
                         event.drawDynamicText(location.up(), "§e${formattedDistance}m", 1.7, yOff = 10f)
                     }
+                }
+            }
+
+            if (config.renderSubGuesses) {
+                var lineStart = location
+                for (subGuess in guess.guesses.drop(guess.currentIndex + 1)) {
+                    event.drawColor(subGuess, Color.LIGHT_GRAY.toChromaColor(), false)
+                    event.draw3DLine(lineStart, subGuess, Color.LIGHT_GRAY.toChromaColor(), 1, false)
+                    lineStart = subGuess
                 }
             }
 
@@ -554,7 +575,6 @@ object GriffinBurrowHelper {
 
         val burrows = allGuesses.flatMap { it.guesses }
         if (burrows.contains(location)) {
-            println("setting last interacted")
             lastBurrowInteracted = location
         }
     }

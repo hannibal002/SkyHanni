@@ -94,6 +94,14 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(
+        name = "Render SubGuesses",
+        desc = "If there are multiple possible blocks will render them all in a greyed out chain"
+    )
+    @ConfigEditorBoolean
+    var renderSubGuesses: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Clear On World Change",
         desc = "clear all guess data on world change"
     )
