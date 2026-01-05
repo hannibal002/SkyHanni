@@ -42,7 +42,7 @@ object PatcherSendCoordinates {
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.enabled) return
 
-        val message = event.message.removeColor()
+        val message = event.cleanMessage
         coordinatePattern.matchMatcher(message) {
             var description = group("playerName").split(" ").last()
             val x = group("x").toFloat()

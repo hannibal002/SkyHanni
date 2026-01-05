@@ -196,7 +196,7 @@ object RescueMissionWaypoints {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (config.hostagePath) {
-            agentDialoguePattern.matchMatcher(event.message.removeColor()) {
+            agentDialoguePattern.matchMatcher(event.cleanMessage) {
                 tier?.let {
                     startParkour()
                 } ?: run {

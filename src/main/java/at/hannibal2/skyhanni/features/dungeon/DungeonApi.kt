@@ -275,11 +275,11 @@ object DungeonApi {
             started = true
             DungeonStartEvent(floor).post()
         }
-        if (event.message.removeColor().matches(uniqueClassBonus)) {
+        if (event.cleanMessage.matches(uniqueClassBonus)) {
             isUniqueClass = true
         }
 
-        killPattern.matchMatcher(event.message.removeColor()) {
+        killPattern.matchMatcher(event.cleanMessage) {
             val bossCollections = bossStorage ?: return
             val boss = DungeonFloor.byBossName(group("boss"))
             if (matches() && boss != null && boss !in bossCollections) {

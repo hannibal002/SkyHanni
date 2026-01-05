@@ -152,7 +152,7 @@ object GardenVisitorDropStatistics {
         if (!ProfileStorageData.loaded) return
         if (lastAccept.passedSince() > 1.seconds) return
 
-        val message = event.message.removeColor().trim()
+        val message = event.cleanMessage.trim()
         val storage = GardenApi.storage?.visitorDrops ?: return
 
         patternStorageAccessorMap.forEach { (pattern, accessor) ->

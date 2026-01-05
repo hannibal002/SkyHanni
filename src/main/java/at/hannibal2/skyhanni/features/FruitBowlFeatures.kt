@@ -190,7 +190,7 @@ object FruitBowlFeatures {
     fun onSystemMessage(event: SystemMessageEvent) {
         if (!inHand) return
 
-        val message = event.message.removeColor()
+        val message = event.cleanMessage
 
         if (chatFoundAllPattern.matches(message) && inHand) {
             DelayedRun.runDelayed(500.milliseconds) {

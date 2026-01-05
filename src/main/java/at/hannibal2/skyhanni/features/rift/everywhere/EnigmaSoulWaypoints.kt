@@ -234,7 +234,7 @@ object EnigmaSoulWaypoints {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        if (foundPattern.matches(event.message.removeColor().trim())) {
+        if (foundPattern.matches(event.cleanMessage.trim())) {
             hideClosestSoul()
         }
     }

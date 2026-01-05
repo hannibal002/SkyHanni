@@ -40,7 +40,7 @@ object PabloHelper {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (lastSentMessage.passedSince() < 5.minutes) return
-        val itemName = patterns.matchMatchers(event.message.removeColor()) {
+        val itemName = patterns.matchMatchers(event.cleanMessage) {
             group("flower")
         } ?: return
 

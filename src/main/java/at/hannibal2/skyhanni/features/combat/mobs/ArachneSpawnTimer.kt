@@ -71,7 +71,7 @@ object ArachneSpawnTimer {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        val message = event.message.removeColor().lowercase()
+        val message = event.cleanMessage.lowercase()
 
         if (arachneFragmentPattern.matches(message) || arachneCrystalPattern.matches(message)) {
             if (arachneCrystalPattern.matches(message)) {

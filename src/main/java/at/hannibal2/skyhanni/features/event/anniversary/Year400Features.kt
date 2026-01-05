@@ -170,7 +170,7 @@ object Year400Features {
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent) {
         if (!config.teamFinder) return
-        if (!fatPlayerMessagePattern.matches(event.message.removeColor())) return
+        if (!fatPlayerMessagePattern.matches(event.cleanMessage)) return
         if (lastClickedPlayerTime.passedSince() >= 500.milliseconds) return
 
         val lastPlayer = lastClickedPlayer ?: return

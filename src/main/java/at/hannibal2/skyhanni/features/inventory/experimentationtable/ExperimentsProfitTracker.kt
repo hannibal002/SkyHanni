@@ -89,7 +89,7 @@ object ExperimentsProfitTracker {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        experimentRenewPattern.matchMatcher(event.message.removeColor()) {
+        experimentRenewPattern.matchMatcher(event.cleanMessage) {
             val increments = mapOf(1 to 150, 2 to 300, 3 to 500)
             tracker.modify {
                 it.bitCost += increments.getValue(group("current").toInt())

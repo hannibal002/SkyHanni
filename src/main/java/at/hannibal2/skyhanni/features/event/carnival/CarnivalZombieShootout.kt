@@ -182,7 +182,7 @@ object CarnivalZombieShootout {
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.enabled || HypixelData.skyBlockArea != "Carnival") return
 
-        val message = event.message.removeColor()
+        val message = event.cleanMessage
 
         if (startPattern.matches(message)) {
             started = true

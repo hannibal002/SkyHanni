@@ -101,7 +101,7 @@ object FrozenTreasureTracker {
     fun onChat(event: SkyHanniChatEvent) {
         if (!ProfileStorageData.loaded) return
 
-        val message = event.message.removeColor().trim()
+        val message = event.cleanMessage.trim()
 
         compactPattern.matchMatcher(message) {
             tracker.modify {

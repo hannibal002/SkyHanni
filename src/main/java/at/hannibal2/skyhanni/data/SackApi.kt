@@ -324,7 +324,7 @@ object SackApi {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!event.message.removeColor().startsWith("[Sacks]")) return
+        if (!event.cleanMessage.startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
             sibling.hover?.string?.removeColor()?.takeIf {

@@ -540,7 +540,7 @@ object CaptureFarmingGear {
     fun onChat(event: SkyHanniChatEvent) {
         val storage = GardenApi.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
-        val msg = event.message.removeColor().trim()
+        val msg = event.cleanMessage.trim()
         fortuneUpgradePattern.matchMatcher(msg) {
             ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = group("level").romanToDecimal()
             return
