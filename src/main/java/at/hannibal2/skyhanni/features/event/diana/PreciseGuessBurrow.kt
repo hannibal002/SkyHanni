@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.GuessLogic
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -23,6 +22,8 @@ object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val bezierFitter = ParticlePathBezierFitter(3)
+
+    private var lastGuess: GriffinBurrowHelper.GuessEntry? = null
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onIslandChange() {
@@ -50,13 +51,18 @@ object PreciseGuessBurrow {
         bezierFitter.addPoint(currLoc)
 
         val guessPosition = guessBurrowLocation() ?: return
-        if (bezierFitter.count() <= 5) return
+        //if (bezierFitter.count() <= 5) return
 
-        BurrowGuessEvent(
-            GriffinBurrowHelper.GuessEntry(
-                listOf(guessPosition.down(0.5).roundToBlock()),
-            )
-        ).post()
+        val guessEntry = GriffinBurrowHelper.GuessEntry(
+            listOf(guessPosition.down(0.5).roundToBlock()),
+        )
+
+        if (lastGuess != guessEntry) {
+            lastGuess?.let { GriffinBurrowHelper.removeGuess(it) }
+            BurrowGuessEvent(guessEntry).post()
+            lastGuess = guessEntry
+        }
+
     }
 
     private fun guessBurrowLocation(): LorenzVec? = bezierFitter.solve()
@@ -75,6 +81,7 @@ object PreciseGuessBurrow {
             return
         }
         bezierFitter.reset()
+        lastGuess = null
         lastDianaSpade = SimpleTimeMark.now()
     }
 
@@ -105,5 +112,5 @@ object PreciseGuessBurrow {
         event.move(74, "event.diana.burrowsSoopyGuess", "event.diana.guess")
     }
 
-    private fun isEnabled() = DianaApi.isDoingDiana() && config.guess && config.guessLogic == GuessLogic.PRECISE_GUESS
+    private fun isEnabled() = DianaApi.isDoingDiana() && config.guess
 }

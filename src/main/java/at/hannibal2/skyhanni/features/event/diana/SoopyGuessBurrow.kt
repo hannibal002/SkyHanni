@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.GuessLogic
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
@@ -270,5 +269,5 @@ object SoopyGuessBurrow {
         }
     }
 
-    private fun isEnabled() = DianaApi.isDoingDiana() && config.guess && config.guessLogic == GuessLogic.SOOPY_GUESS
+    private fun isEnabled() = false && DianaApi.isDoingDiana() && config.guess
 }

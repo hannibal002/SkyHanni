@@ -2,25 +2,18 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RaycastUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.minutes
@@ -41,86 +34,13 @@ object ArrowGuessBurrow {
 
     private var newArrow = true
 
-    // deific spade insta breaks grass and hits the block behind it before chat messages if you left-click
-    private var lastBurrowPos = emptyList<LorenzVec>() // TODO used for newBurrow
-
-    private object DebugSesh { //TODO move/delete
-        var debugActive = false
-        var renderAll = false
-        var timeStarted = SimpleTimeMark.farPast()
-
-        var guessesMade = 0
-        var preciseGuesses = 0
-        var couldNotFindGuess = 0
-
-        fun printData() {
-            val output =
-                """
-                |=== Arrow Guess Debug Session ===
-                |Active: $debugActive
-                |Running for: ${timeStarted.passedSince().format()}
-                |Bobby detected: ${PlatformUtils.isModInstalled("bobby")}
-                |
-                |Statistics:
-                |  Total guesses made: $guessesMade
-                |  Precise guesses: $preciseGuesses
-                |  Could not find guess: $couldNotFindGuess
-                |  Precision rate: ${"%.1f".format(preciseGuesses * 100.0 / guessesMade)}%
-                """.trimMargin()
-
-            println(output)
-        }
-
-        fun clear() {
-            printData()
-            timeStarted = SimpleTimeMark.now()
-            renderAll = false
-            guessesMade = 0
-            preciseGuesses = 0
-            couldNotFindGuess = 0
-        }
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shdebugarrowguesssession") {
-            description = "start, stop, or check status of a diana arrow guess debug session"
-            category = CommandCategory.DEVELOPER_DEBUG
-
-            literalCallback("start") {
-                ChatUtils.chat("debug session started")
-                if (!DebugSesh.debugActive) {
-                    DebugSesh.debugActive = true
-                    DebugSesh.timeStarted = SimpleTimeMark.now()
-                    DebugSesh.printData()
-                }
-            }
-
-            literalCallback("stop") {
-                ChatUtils.chat("check your console/latestlog to see data")
-                DebugSesh.debugActive = false
-                DebugSesh.clear()
-            }
-
-            literalCallback("status") {
-                ChatUtils.chat("check your console/latestlog to see data")
-                DebugSesh.printData()
-            }
-
-            literalCallback("toggleRenderAllGuesses") {
-                DebugSesh.renderAll = !DebugSesh.renderAll
-                ChatUtils.chat("render all now ${DebugSesh.renderAll}")
-            }
-        }
-    }
-
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!newArrow) return
 
         if (event.distanceToPlayer > 6) return
-        if (event.type != EnumParticleTypes.REDSTONE) return
+        if (event.type != ParticleTypes.DUST) return
         if (event.count != 0) return
         if (event.speed != 1.0f) return
 
@@ -131,6 +51,7 @@ object ArrowGuessBurrow {
         points.add(event.location)
 
         val arrow = detectArrow(points) ?: return
+        GriffinBurrowHelper.removeGuess(arrow.origin)
         newArrow = false
         points.clear()
         val guess = findClosestValidBlockToRayNew(arrow, range) ?: run {

@@ -7,7 +7,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -41,19 +40,6 @@ class DianaConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var guess: Boolean = false
-
-    enum class GuessLogic(private val displayName: String) {
-        SOOPY_GUESS("Soopy"),
-        PRECISE_GUESS("Precise"),
-        ;
-
-        override fun toString(): String = displayName
-    }
-
-    @Expose
-    @ConfigOption(name = "Guessing Logic", desc = "Change which guess strategy to use.")
-    @ConfigEditorDropdown
-    var guessLogic: GuessLogic = GuessLogic.PRECISE_GUESS
 
     @Expose
     @ConfigOption(
@@ -105,6 +91,14 @@ class DianaConfig {
     )
     @ConfigEditorBoolean
     var warnOnChainComp: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Clear On World Change",
+        desc = "clear all guess data on world change"
+    )
+    @ConfigEditorBoolean
+    var clearOnWorldChange: Boolean = false
 
     @Expose
     @ConfigOption(

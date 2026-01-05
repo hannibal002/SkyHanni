@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
@@ -46,8 +47,10 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.init.Blocks
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.HitResult
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -57,9 +60,9 @@ object GriffinBurrowHelper {
     private val config get() = SkyHanniMod.feature.event.diana
 
     val allowedBlocksAboveGround = buildList {
-        add(Blocks.air)
-        add(Blocks.yellow_flower)
-        add(Blocks.spruce_fence)
+        add(Blocks.AIR)
+        add(Blocks.DANDELION)
+        add(Blocks.SPRUCE_FENCE)
         addLeaves()
         addLeaves2()
         addTallGrass()
@@ -75,7 +78,7 @@ object GriffinBurrowHelper {
      */
     private val burrowDugPattern by patternGroup.pattern(
         "burrow-dug-capture",
-        "§eYou (?<type>finished the Griffin burrow chain!|dug out a Griffin Burrow!) §r§7\\((?<current>\\d+)/(?<max>\\d+)\\)"
+        "§eYou (?<type>finished the Griffin burrow chain!|dug out a Griffin Burrow!) §r§7\\((?<current>\\d+)/(?<max>\\d+)\\)",
     )
 
     /**
@@ -105,7 +108,6 @@ object GriffinBurrowHelper {
 
     private val allGuessesTimers = mutableMapOf<GuessEntry, SimpleTimeMark>() // hypixel itself removes burrows after 30m
     private val allGuesses = mutableListOf<GuessEntry>()
-    private val recentBlocksClicked = mutableListOf<LorenzVec>()
     private var lastBurrowInteracted: LorenzVec? = null
 
     private var shouldFocusOnRareMob = false
@@ -114,7 +116,7 @@ object GriffinBurrowHelper {
         val guesses: List<LorenzVec>,
         var burrowType: BurrowType = BurrowType.UNKNOWN,
         var range: Int = 0, //TODO
-        var currentIndex: Int = 0
+        var currentIndex: Int = 0,
     ) {
         fun getCurrent(): LorenzVec = guesses[currentIndex]
         fun contains(vec: LorenzVec): Boolean {
@@ -152,6 +154,11 @@ object GriffinBurrowHelper {
             allGuesses.remove(item)
             allGuessesTimers.remove(item)
         }
+    }
+
+    fun removeGuess(guess: GuessEntry) {
+        allGuesses.remove(guess)
+        allGuessesTimers.remove(guess)
     }
 
     fun addGuess(guess: GuessEntry) {
@@ -205,11 +212,12 @@ object GriffinBurrowHelper {
         }
     }
 
-    fun checkMoveGuess() { //TODO or delete burrow (already does kinda)
+    fun checkMoveGuess() {
         val burrows = getKnownBurrows().flatMap { it.guesses }
         val toDelete = mutableSetOf<GuessEntry>()
         for (guessEntry in allGuesses) {
 
+            // remove guesses older than 30 minutes
             allGuessesTimers[guessEntry]?.passedSince()?.let {
                 if (it > 30.minutes) {
                     toDelete.add(guessEntry)
@@ -220,10 +228,11 @@ object GriffinBurrowHelper {
             var shouldMove = false
             if (!isBlockValid(guessEntry.getCurrent())) shouldMove = true
 
-            val shouldBeLoaded = InventoryUtils.getItemInHandAtTime(SimpleTimeMark.now() - 0.5.seconds)?.isDianaSpade //TODO better
+            val now = SimpleTimeMark.now()
+            val shouldBeLoaded = InventoryUtils.getItemInHandDuringTimeframe(now - 0.3.seconds, now - 0.8.seconds)?.isDianaSpade
             if (shouldBeLoaded == true &&
                 !burrows.contains(guessEntry.getCurrent()) && // burrow is not found
-                guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.position.toLorenzVec()) < 900 // within 30 blocks
+                guessEntry.getCurrent().distanceSq(MinecraftCompat.localPlayer.position().toLorenzVec()) < 900 // within 30 blocks
             ) { shouldMove = true }
 
             if (shouldMove) {
@@ -258,7 +267,6 @@ object GriffinBurrowHelper {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
 
         if (allGuesses.flatMap { it.guesses }.any { event.guess.contains(it) }) {
-            println("already guessed")
             return
         }
 
@@ -275,7 +283,6 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
-        println("burrow detected")
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val burrowLocation = event.burrowLocation
         val currentEntry = allGuesses.firstOrNull { it.contains(burrowLocation) }
@@ -294,14 +301,13 @@ object GriffinBurrowHelper {
     @HandleEvent
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
-        println("burrow dug at: $location")
         removeGuess(location)
 
         // finished chain
         if (event.current == event.max && config.warnOnChainComp) {
             // finished chain
             if (config.warnOnChainComp) {
-                val playerLoc = MinecraftCompat.localPlayer.position.toLorenzVec()
+                val playerLoc = MinecraftCompat.localPlayer.position().toLorenzVec()
                 val anyClose = allGuesses.filter { it.getCurrent().distanceSq(playerLoc) < 8100 }
                 if (anyClose.isEmpty()) TitleManager.sendTitle("§eUse Spade")
             }
@@ -311,7 +317,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
         if (event.distance > 10 && event.isLocalPlayer) {
             update()
@@ -322,34 +328,22 @@ object GriffinBurrowHelper {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
+
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             // TODO remove based on last blocks clicked
         }
 
-        // send burrow dug event
-        val burrowDugMatcher = burrowDugPattern.matcher(event.message)
-        if (burrowDugMatcher.find()) {
-            val current = burrowDugMatcher.group("current").toInt()
-            val max = burrowDugMatcher.group("max").toInt()
-
-            val burrows = allGuesses.flatMap { it.guesses }
-            for (block in recentBlocksClicked.asReversed()) {
-                if (burrows.contains(block)) {
-                    lastBurrowInteracted == block
-                    BurrowDugEvent(block, current, max).post()
-                    return
-                }
-            }
-            recentBlocksClicked.clear()
-
-        } else if (genericMythologicalSpawnPattern.matches(event.message)) {
-            println("adding mob burrow from mob")
-            lastBurrowInteracted?.let {
+        lastBurrowInteracted?.let {
+            val burrowDugMatcher = burrowDugPattern.matcher(event.message)
+            if (burrowDugMatcher.find()) {
+                val current = burrowDugMatcher.group("current").toInt()
+                val max = burrowDugMatcher.group("max").toInt()
+                BurrowDugEvent(it, current, max).post()
+            } else if (genericMythologicalSpawnPattern.matches(event.message)) {
+                removeGuess(it)
                 addGuess(GuessEntry(listOf(it), BurrowType.MOB))
-            }
-        }else if (treasureDugPattern.matches(event.message)) {
-            println("adding start burrow from treasure")
-            lastBurrowInteracted?.let {
+            } else if (treasureDugPattern.matches(event.message)) {
+                removeGuess(it)
                 addGuess(GuessEntry(listOf(it), BurrowType.START))
             }
         }
@@ -376,7 +370,6 @@ object GriffinBurrowHelper {
     private fun resetAllData() {
         allGuesses.clear()
         allGuessesTimers.clear()
-        recentBlocksClicked.clear()
         targetLocation = null
         GriffinBurrowParticleFinder.reset()
 
@@ -388,14 +381,14 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onWorldChange() {
-        resetAllData()
+        if (config.clearOnWorldChange) resetAllData()
     }
 
     fun isBlockValid(pos: LorenzVec): Boolean {
         if (!pos.isInLoadedChunk()) {
             return true
         }
-        val isGround = pos.getBlockAt() == Blocks.grass
+        val isGround = pos.getBlockAt() == Blocks.GRASS_BLOCK
         val isValidBlockAbove = pos.up().getBlockAt() in allowedBlocksAboveGround
         return isGround && isValidBlockAbove
     }
@@ -413,7 +406,7 @@ object GriffinBurrowHelper {
 
     private fun findGround(point: LorenzVec): LorenzVec? {
         fun isValidGround(y: Double): Boolean {
-            val isGround = point.copy(y = y).getBlockAt() == Blocks.grass
+            val isGround = point.copy(y = y).getBlockAt() == Blocks.GRASS_BLOCK
             val isValidBlockAbove = point.copy(y = y + 1).getBlockAt() in allowedBlocksAboveGround
             return isGround && isValidBlockAbove
         }
@@ -432,7 +425,7 @@ object GriffinBurrowHelper {
     private fun findBlockBelowAir(point: LorenzVec): LorenzVec {
         val start = 65.0
         var gY = start
-        while (point.copy(y = gY).getBlockAt() != Blocks.air) {
+        while (point.copy(y = gY).getBlockAt() != Blocks.AIR) {
             gY++
             if (gY > 140) {
                 // no blocks at this spot, assuming outside of island
@@ -514,7 +507,7 @@ object GriffinBurrowHelper {
             return
         }
 
-        for (guess in allGuesses) {
+        for (guess in allGuesses.toList()) {
             val location = guess.getCurrent()
             val distance = location.distance(playerLocation)
             val burrowType = guess.burrowType
@@ -551,9 +544,19 @@ object GriffinBurrowHelper {
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
 
-        val location = event.position
-        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
-        recentBlocksClicked.add(location)
+        var location = event.position
+        if (event.clickType == ClickType.RIGHT_CLICK) {
+            val hitResult = MinecraftCompat.localPlayer.pick(6.0, 0.0F, true)
+            location = (hitResult as BlockHitResult).blockPos.toLorenzVec()
+        }
+
+        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.GRASS_BLOCK) return
+
+        val burrows = allGuesses.flatMap { it.guesses }
+        if (burrows.contains(location)) {
+            println("setting last interacted")
+            lastBurrowInteracted = location
+        }
     }
 
     private fun isEnabled() = DianaApi.isDoingDiana()
