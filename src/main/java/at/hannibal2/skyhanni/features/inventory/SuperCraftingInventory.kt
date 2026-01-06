@@ -38,15 +38,26 @@ object SuperCraftingInventory {
     private val config get() = SkyHanniMod.feature.inventory.superCrafting.waste
 
     private val craftingPatternGroup = RepoPatternGroup("supercrafting-inventory")
+    /**
+     * REGEX-TEST: Crafting 1,111 items into your sacks!
+     */
     private val craftingCount by craftingPatternGroup.pattern(
         "crafting.count",
         ".*Crafting (?<count>[0-9,]+) item.*",
     )
+
+    /**
+     * REGEX-TEST: ✔ 177,889/32 (5,559x) Enchanted Glowstone Dust
+     * REGEX-TEST: ✖ 84/128 (-44) Enchanted Redstone
+     */
     private val craftingResourcePattern by craftingPatternGroup.pattern(
         "crafting.resource",
-        " *([✔✖]) [0-9,]+/[0-9,]+ \\((?<amount>[0-9,]+)x\\) (?<resource>.+)",
+        " *(?<sufficient>[✔✖]) [0-9,]+/[0-9,]+ \\((?<amount>[0-9,]+)x\\) (?<resource>.+)",
     )
 
+    /**
+     * [REGEX-TEST] Enchanted Redstone Recipe
+     */
     private val inventoryPattern by craftingPatternGroup.pattern(
         "inventory.name",
         "(?<itemname>.*) Recipe",
