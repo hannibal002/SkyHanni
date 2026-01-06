@@ -303,7 +303,7 @@ object ChatUtils {
     }
 
     private fun refreshChat() {
-        DelayedRun.onThread.execute {
+        DelayedRun.runOrNextTick {
             chatGui.rescaleChat()
         }
     }
@@ -400,6 +400,27 @@ object ChatUtils {
                 }
             },
             hover = "§eClick to $actionName!\n§eShift-Click or Control-Click to disable this feature!",
+            oneTimeClick = oneTimeClick,
+            replaceSameMessage = true,
+        )
+    }
+
+    /**
+     * Almost identical to chatAndOpenConfig and clickToActionOrDisable.
+     * Diff to chatAndOpenConfig: uses the wording "disable" as alternative, not "open config".
+     * Diff to clickToActionOrDisable: does not offer a normal click and action behavior.
+     */
+    fun notifyOrDisable(
+        message: String,
+        option: KProperty0<*>,
+        oneTimeClick: Boolean = false,
+    ) {
+        val hint = if (SkyHanniMod.feature.chat.hideClickableHint) "" else
+            "\n§e[CLICK to disable this feature]"
+        clickableChat(
+            "$message$hint",
+            onClick = { option.jumpToEditor() },
+            hover = "§eClick to disable this feature!",
             oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
         )

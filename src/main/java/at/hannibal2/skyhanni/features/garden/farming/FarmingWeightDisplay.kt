@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.minecraft.client.Minecraft
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.time.Duration.Companion.minutes
@@ -192,21 +193,23 @@ object FarmingWeightDisplay {
         if (rankGoal == -1) rankGoal = getRankGoal()
         val leaderboard = getLeaderboardFormat()
 
-        val list = mutableListOf<Renderable>()
-        list.add(
-            Renderable.clickable(
-                "§6$lbName§7: $weight$leaderboard",
-                tips = listOf("§eClick to open your Farming Profile."),
-                onLeftClick = { openWebsite(PlayerUtils.getName()) },
-            ),
-        )
+        Minecraft.getInstance().execute {
+            val list = mutableListOf<Renderable>()
+            list.add(
+                Renderable.clickable(
+                    "§6$lbName§7: $weight$leaderboard",
+                    tips = listOf("§eClick to open your Farming Profile."),
+                    onLeftClick = { openWebsite(PlayerUtils.getName()) },
+                ),
+            )
 
-        if (isEtaEnabled() && (weightPerSecond != -1.0 || config.overtakeETAAlways)) {
-            getETA()?.let {
-                list.add(it)
+            if (isEtaEnabled() && (weightPerSecond != -1.0 || config.overtakeETAAlways)) {
+                getETA()?.let {
+                    list.add(it)
+                }
             }
+            display = list
         }
-        display = list
     }
 
     private fun getLeaderboardFormat(): String {

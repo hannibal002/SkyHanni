@@ -479,7 +479,9 @@ object GuiRenderUtils {
     //$$     val guiHeight = window.height.toFloat() / window.guiScale.toFloat()
     //$$     val slice = projectionMatrix.getBuffer(guiWidth, guiHeight)
     //$$     RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
-    //$$     RenderSystem.setupDefaultState()
+    //$$     RenderSystem.getModelViewStack().pushMatrix()
+    //$$     RenderSystem.getModelViewStack().identity()
+    //$$     val textureMatrixBackup = Matrix4f(RenderSystem.getTextureMatrix())
     //$$     RenderSystem.resetTextureMatrix()
     //$$
     //$$     // We have to use our own MatrixStack, because the DrawContext matrices are a 2D matrix now
@@ -527,6 +529,8 @@ object GuiRenderUtils {
     //#endif
     //$$     matrices.popPose()
     //$$     RenderSystem.teardownOverlayColor()
+    //$$     RenderSystem.getModelViewStack().popMatrix()
+    //$$     RenderSystem.getTextureMatrix().set(textureMatrixBackup)
     //$$     RenderSystem.restoreProjectionMatrix()
     //$$ }
     //$$
