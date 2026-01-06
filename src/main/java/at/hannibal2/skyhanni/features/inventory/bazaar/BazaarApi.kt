@@ -287,6 +287,13 @@ object BazaarApi {
 
     fun isBazaarOrderInventory(inventoryName: String): Boolean = inventoryBazaarOrdersPattern.matches(inventoryName)
 
+    /**
+     * Gets the Sum of Coins you can get when using the specified sell type to sell the item.
+     *
+     * For example if you want to instant sell 71680 enchanted coal from sack you cant use top offer only.
+     *
+     * The best offers may be inflated and you are selling all the items so you must use the prices in each order as such.
+     */
     fun calculatePriceOffAvailableOrders(
         item: NeuInternalName, count: Int,
         priceSource: SimpleTransactionType,
