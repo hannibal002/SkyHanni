@@ -61,7 +61,6 @@ object ArrowGuessBurrow {
             }
             return
         }
-        println("found arrow guess: $guess") //TODO remove
     }
 
     fun getArrowRange(offset: LorenzVec): IntRange? {

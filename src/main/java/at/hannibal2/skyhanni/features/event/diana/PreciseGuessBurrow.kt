@@ -40,6 +40,7 @@ object PreciseGuessBurrow {
         lastLavaParticle = SimpleTimeMark.now()
         val currLoc = event.location
         if (lastDianaSpade.passedSince() > 3.seconds) return
+        GriffinBurrowHelper.removeSpadeWarnTitle()
         if (bezierFitter.isEmpty()) {
             bezierFitter.addPoint(currLoc)
             return

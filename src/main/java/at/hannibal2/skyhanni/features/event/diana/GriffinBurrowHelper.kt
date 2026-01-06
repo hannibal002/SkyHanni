@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
@@ -36,6 +35,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addDoublePlant
 import at.hannibal2.skyhanni.utils.compat.addLeaves
@@ -53,6 +53,7 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.BlockHitResult
 import java.awt.Color
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -111,6 +112,9 @@ object GriffinBurrowHelper {
     private val allGuessesTimers = mutableMapOf<GuessEntry, SimpleTimeMark>() // hypixel itself removes burrows after 30m
     private val allGuesses = mutableListOf<GuessEntry>()
 
+    // used because insta-breaking a block makes it invalid would be better to store valid blocks in repo
+    private val recentClickedBlocks = TimeLimitedSet<LorenzVec>(1.seconds)
+
     private var shouldFocusOnRareMob = false
     private var mobAlive = false
 
@@ -119,6 +123,7 @@ object GriffinBurrowHelper {
         var burrowType: BurrowType = BurrowType.UNKNOWN,
         var range: Int = 0,
         var currentIndex: Int = 0,
+        var ignoreParticleCheckUntil: SimpleTimeMark = SimpleTimeMark.now()
     ) {
         fun getCurrent(): LorenzVec = guesses[currentIndex]
         fun contains(vec: LorenzVec): Boolean {
@@ -143,6 +148,8 @@ object GriffinBurrowHelper {
                     return true
                 }
             }
+
+            if (ignoreParticleCheckUntil.passedSince() < 0.milliseconds) return false
 
             // don't attempt to move mob burrows if a mob is alive
             if (mobAlive && this.burrowType == BurrowType.MOB) return false
@@ -334,29 +341,16 @@ object GriffinBurrowHelper {
             } else if (genericMythologicalSpawnPattern.matches(event.message)) {
                 mobAlive = true
                 removeGuess(it)
-                addGuess(GuessEntry(listOf(it), BurrowType.MOB))
+                addGuess(GuessEntry(listOf(it), BurrowType.MOB, ignoreParticleCheckUntil = SimpleTimeMark.now() + 2.seconds))
             } else if (treasureDugPattern.matches(event.message)) {
                 removeGuess(it)
-                addGuess(GuessEntry(listOf(it), BurrowType.START))
+                addGuess(GuessEntry(listOf(it), BurrowType.START, ignoreParticleCheckUntil = SimpleTimeMark.now() + 2.seconds))
             }
         }
 
         // talking to Diana NPC
         if (event.message == "§6Poof! §r§eYou have cleared your griffin burrows!") {
             resetAllData()
-        }
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onUseAbility(event: ItemClickEvent) {
-        if (!isEnabled()) return
-        val item = event.itemInHand ?: return
-        if (!item.isDianaSpade) return
-
-        if (config.warnOnFail || config.warnOnChainComp) {
-            TitleManager.conditionallyStopTitle { currentTitle ->
-                currentTitle == "§eUse Spade"
-            }
         }
     }
 
@@ -383,9 +377,17 @@ object GriffinBurrowHelper {
         if (!pos.isInLoadedChunk()) {
             return true
         }
-        val isGround = pos.getBlockAt() == Blocks.GRASS_BLOCK
+        val isGround = recentClickedBlocks.contains(pos) || pos.getBlockAt() == Blocks.GRASS_BLOCK
         val isValidBlockAbove = pos.up().getBlockAt() in allowedBlocksAboveGround
         return isGround && isValidBlockAbove
+    }
+
+    fun removeSpadeWarnTitle() {
+        if (config.warnOnFail || config.warnOnChainComp) {
+            TitleManager.conditionallyStopTitle { currentTitle ->
+                currentTitle == "§eUse Spade"
+            }
+        }
     }
 
     @HandleEvent
