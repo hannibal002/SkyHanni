@@ -48,15 +48,14 @@ object SuperCraftingInventory {
 
     /**
      * REGEX-TEST: ✔ 177,889/32 (5,559x) Enchanted Glowstone Dust
-     * REGEX-TEST: ✖ 84/128 (-44) Enchanted Redstone
      */
     private val craftingResourcePattern by craftingPatternGroup.pattern(
         "crafting.resource",
-        " *(?<sufficient>[✔✖]) [0-9,]+/[0-9,]+ \\((?<amount>[0-9,]+)x\\) (?<resource>.+)",
+        " *✔ [0-9,]+/[0-9,]+ \\((?<amount>[0-9,]+)x\\) (?<resource>.+)",
     )
 
     /**
-     * [REGEX-TEST] Enchanted Redstone Recipe
+     * [REGEX-TEST]: Enchanted Redstone Recipe
      */
     private val inventoryPattern by craftingPatternGroup.pattern(
         "inventory.name",
