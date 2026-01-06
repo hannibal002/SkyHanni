@@ -142,19 +142,15 @@ object NavigationHelper {
         }
     }
 
-    // so why does this rule exist ?
-    @Suppress("LoopWithTooManyJumpStatements")
     private fun getNames(): List<String> {
         val graph = IslandGraphs.currentIslandGraph ?: return emptyList()
-        val list = mutableListOf<String>()
-        for (node in graph) {
-            val name = node.name ?: continue
-            if (name == AreaNode.NO_AREA) continue
-            if (name == SkyBlockUtils.graphArea) continue
-            val remainingTags = node.tags.filter { it in allowedTags }
-            if (remainingTags.isEmpty()) continue
-            list.add(name)
-        }
-        return list
+        return graph.filter { it.isValidAreaNode() }.mapNotNull { it.name }
+    }
+
+    private fun GraphNode.isValidAreaNode(): Boolean {
+        val name = name ?: return false
+        if (name == AreaNode.NO_AREA) return false
+        if (name == SkyBlockUtils.graphArea) return false
+        return tags.any { it in allowedTags }
     }
 }
