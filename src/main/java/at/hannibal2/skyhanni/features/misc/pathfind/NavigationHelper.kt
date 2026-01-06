@@ -142,6 +142,7 @@ object NavigationHelper {
         }
     }
 
+    @Suppress("LoopWithTooManyJumpStatements") // so why does this rule exist ?
     private fun getNames(): List<String> {
         val graph = IslandGraphs.currentIslandGraph ?: return emptyList()
         val list = mutableListOf<String>()

@@ -97,7 +97,7 @@ object HoppityEventSummary {
             simpleCallback {
                 ChatUtils.clickableChat(
                     "§c§lWARNING! §r§7This will reset §call §7Hoppity Event stats for §call §7years. " +
-                            "Click here or type §c/shresethoppityeventstats confirm §7to confirm.",
+                        "Click here or type §c/shresethoppityeventstats confirm §7to confirm.",
                     onClick = HoppityEventSummary::resetStats,
                 )
             }

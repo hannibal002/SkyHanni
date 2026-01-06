@@ -678,8 +678,8 @@ object IslandGraphs {
                 ChatUtils.userError("Usage: /shreportlocation <reason>")
                 ChatUtils.chat(
                     "Give a reason that explains what's wrong at this location, e.g.: " +
-                            "pathfinding goes through wall, ignores obvious shortcut, " +
-                            "missing npc/fishing hotspot/skyblock area name in /shnavigate..",
+                        "pathfinding goes through wall, ignores obvious shortcut, " +
+                        "missing npc/fishing hotspot/skyblock area name in /shnavigate..",
                 )
             }
         }
