@@ -4,9 +4,9 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class SuperCrafting {
+class SuperCraftingConfig {
     @Expose
     @Accordion
     @ConfigOption(name = "Super Crafting Coin Waste", desc = "Settings for Super Crafting Coin Waste warnings.")
-    val waste = SuperCraftingWasteConfig()
+    var waste = SuperCraftingWasteConfig()
 }

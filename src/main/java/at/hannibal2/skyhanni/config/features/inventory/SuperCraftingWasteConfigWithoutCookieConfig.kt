@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class SuperCraftingWasteConfigWithoutCookie {
+class SuperCraftingWasteConfigWithoutCookieConfig {
 
     @Expose
     @ConfigOption(
@@ -13,7 +13,7 @@ class SuperCraftingWasteConfigWithoutCookie {
             "for wanted) to get a warning.",
     )
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 100.0f, minStep = 0.1f)
-    val normal: Double = 20.0
+    var normal: Double = 20.0
 
     @Expose
     @ConfigOption(
@@ -21,5 +21,5 @@ class SuperCraftingWasteConfigWithoutCookie {
         desc = "Minimum amount of coins when compacting items due to space reasons.",
     )
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 100.0f, minStep = 0.1f)
-    val maxResource: Double = 10.0
+    var maxResource: Double = 10.0
 }
