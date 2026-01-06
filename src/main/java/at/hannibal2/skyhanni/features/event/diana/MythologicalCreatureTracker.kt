@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper.genericMythologicalSpawnPattern
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MythologicalCreatureTracker {
@@ -54,6 +56,12 @@ object MythologicalCreatureTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
+
+        if (config.shardWarn) {
+            if (creatureMatch == "Cretan Bull" || creatureMatch == "Harpy" || creatureMatch == "Minotaur") {
+                TitleManager.sendTitle("Black Hole", duration = 2.seconds)
+            }
+        }
 
         BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
 
