@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup
+import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.AirItem
 import kotlin.time.Duration.Companion.seconds
 
@@ -76,9 +77,10 @@ object SuperCraftingInventory {
         if (!wasteConfig.enabled) return
         if (HypixelData.noTrade) return
         if (event.clickedButton != 0) return
-        val craftingAmount = getSuperCraftingCount() ?: return
-        val maxCraftingAmount = getSuperCraftingMaxCount()
-        val profit = getProfit(craftingAmount) ?: return
+        val slots = InventoryUtils.getItemsInOpenChestWithNull()
+        val craftingAmount = getSuperCraftingCount(slots) ?: return
+        val maxCraftingAmount = getSuperCraftingMaxCount(slots)
+        val profit = getProfit(slots, craftingAmount) ?: return
         if (blockWasteClick(profit, craftingAmount, maxCraftingAmount)) {
             SoundUtils.playErrorSound()
             TitleManager.sendTitle(
@@ -97,8 +99,7 @@ object SuperCraftingInventory {
         }
     }
 
-    private fun getSuperCraftingMaxCount(): Long {
-        val slots = InventoryUtils.getItemsInOpenChestWithNull()
+    private fun getSuperCraftingMaxCount(slots: List<Slot>): Long {
         val pickaxeSlot = slots[32]
         val minimum = pickaxeSlot.item.getLore().mapNotNull {
             val loreLine = it.removeColor()
@@ -109,9 +110,9 @@ object SuperCraftingInventory {
         return minimum
     }
 
-    fun getProfit(craftingAmount: Long): Double? {
-        val materials = getRecipeMaterials() ?: return null
-        val resultItem = getResultItem() ?: return null
+    fun getProfit(slots: List<Slot>, craftingAmount: Long): Double? {
+        val materials = getRecipeMaterials(slots) ?: return null
+        val resultItem = getResultItem(slots) ?: return null
 
         val recipeMultiplier = resultItem.second
 
@@ -133,8 +134,7 @@ object SuperCraftingInventory {
         return totalResultPrice - itemsPrice
     }
 
-    fun getRecipeMaterials(): Map<NeuInternalName, Int>? {
-        val slots = InventoryUtils.getItemsInOpenChestWithNull()
+    fun getRecipeMaterials(slots: List<Slot>): Map<NeuInternalName, Int>? {
         return materialSlots.map { slots[it] }.map {
             val name = it.item.getInternalNameOrNull()
             if (name != null) return@map name to it.item.count
@@ -145,16 +145,14 @@ object SuperCraftingInventory {
         }.filter { it.key != NeuInternalName.NONE }
     }
 
-    fun getSuperCraftingCount(): Long? {
-        val slots = InventoryUtils.getItemsInOpenChestWithNull()
+    fun getSuperCraftingCount(slots: List<Slot>): Long? {
         val lore = slots[PICKAXE_SLOT].item.getSingleLineLore().removeColor()
         return craftingCount.matchMatcher(lore) {
             groupOrNull("count")?.formatLongOrNull()
         }
     }
 
-    fun getResultItem(): Pair<NeuInternalName, Int>? {
-        val slots = InventoryUtils.getItemsInOpenChestWithNull()
+    fun getResultItem(slots: List<Slot>): Pair<NeuInternalName, Int>? {
         val item = slots[RESULT_SLOT].item
         return item.getInternalNameOrNull().let {
             if (item.item is AirItem) return null
