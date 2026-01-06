@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.chat.ShortenCoins.formatChatCoins
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -95,7 +96,10 @@ object SuperCraftingInventory {
         craftingResourcePattern.matchMatcher(it.removeColor()) {
             groupOrNull("amount")?.formatLongOrNull()
         }
-    }.min()
+    }.minOrNull() ?: ErrorManager.skyHanniError(
+        "crafting resource line not found",
+        "lore" to slots.map { slot -> slot.item.getLore().map { line -> line.removeColor() } },
+    )
 
     private fun getProfit(slots: List<Slot>, craftingAmount: Long): Double? {
         val materials = getRecipeMaterials(slots)
