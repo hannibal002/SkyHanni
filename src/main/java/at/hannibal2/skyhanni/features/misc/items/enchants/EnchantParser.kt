@@ -169,6 +169,7 @@ object EnchantParser {
     }
 
     private fun warnAaronMaxEnchant() {
+        if (!PlatformUtils.isModInstalled("aaron-mod")) return
         val aaron = OtherModsSettings.aaron()
 
         if (aaron.isEnabled("skyblock.enchantments.rainbowMaxEnchants")) {
