@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
@@ -33,6 +34,7 @@ object ArrowGuessBurrow {
     private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
 
     private var newArrow = true
+    private var failures = 0
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -54,12 +56,34 @@ object ArrowGuessBurrow {
         GriffinBurrowHelper.removeGuess(arrow.origin)
         newArrow = false
         points.clear()
-        val guess = findClosestValidBlockToRayNew(arrow, range) ?: run {
-            // TODO log null count
+        findClosestValidBlockToRayNew(arrow, range) ?: run {
+            failures++
             if (config.warnOnFail) {
                 TitleManager.sendTitle("§eUse Spade", duration = 3.seconds)
             }
             return
+        }
+    }
+
+    @HandleEvent
+    fun onBurrowDug(event: BurrowDugEvent) {
+        if (event.current != event.max) {
+            points.clear()
+            newArrow = true
+        }
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Arrow Burrow Guess")
+
+        if (!DianaApi.isDoingDiana()) {
+            event.addIrrelevant("not doing diana")
+            return
+        }
+
+        event.addData {
+            add("failures: $failures")
         }
     }
 
@@ -69,14 +93,6 @@ object ArrowGuessBurrow {
             LorenzVec(255, 255, 0) -> IntRange(112, 282) // red
             LorenzVec(255, 0, 0) -> IntRange(281, 600) // black
             else -> null
-        }
-    }
-
-    @HandleEvent
-    fun onBurrowDug(event: BurrowDugEvent) {
-        if (event.current != event.max) {
-            points.clear()
-            newArrow = true
         }
     }
 

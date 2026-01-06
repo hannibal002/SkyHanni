@@ -241,7 +241,7 @@ object GriffinBurrowHelper {
         if (!toDelete.isEmpty()) update()
     }
 
-    // TODO add option to only focus on last guess - highly requersted method that is less optimal for money per hour. users choice
+    // TODO add option to only focus on last guess - highly requested method that is less optimal for money per hour. users choice
     // TODO pathfind alg / check closest to any warp point
     private fun calculateNewTarget(): LorenzVec? {
         val locations = mutableListOf<LorenzVec>()
