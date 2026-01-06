@@ -65,7 +65,10 @@ object AuctionHouseCopyUnderbidPrice {
         }
         val newPrice = price * item.count - 1
         OSUtils.copyToClipboard("$newPrice")
-        ChatUtils.chat("Copied ${newPrice.addSeparators()} to clipboard. (Copy Underbid Price)")
+        ChatUtils.chat(
+            "Copied ${newPrice.addSeparators()} to clipboard. (Copy Underbid Price)",
+            replaceSameMessage = true,
+        )
     }
 
     @HandleEvent(onlyOnSkyblock = true)
