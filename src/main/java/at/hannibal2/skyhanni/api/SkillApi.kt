@@ -527,11 +527,12 @@ object SkillApi {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shskills") {
+        event.registerBrigadier("shskills") {
             description = "Skills XP/Level related command"
             category = CommandCategory.USERS_ACTIVE
-            callback { onCommand(it) }
-            autoComplete { args ->
+            legacyCallbackArgs { onCommand(it) }
+            // todo auto complete
+            /*autoComplete { args ->
                 when (args.size) {
                     1 -> listOf("levelwithxp", "xpforlevel", "goal")
                     2 -> if (args[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
@@ -541,7 +542,7 @@ object SkillApi {
 
                     else -> listOf()
                 }
-            }
+            }*/
         }
     }
 }

@@ -213,7 +213,7 @@ object ComputerEnvDebug {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shuptime") {
+        event.registerBrigadier("shuptime") {
             description = "Shows the time since the start of minecraft"
             category = CommandCategory.USERS_RESET
             callback {

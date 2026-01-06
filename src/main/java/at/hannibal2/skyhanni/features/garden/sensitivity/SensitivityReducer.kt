@@ -138,10 +138,10 @@ object SensitivityReducer {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shsensreduce") {
+        event.registerBrigadier("shsensreduce") {
             description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"
             category = CommandCategory.USERS_ACTIVE
-            callback { manualToggle() }
+            simpleCallback { manualToggle() }
         }
     }
 

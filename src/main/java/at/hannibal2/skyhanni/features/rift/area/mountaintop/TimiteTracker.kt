@@ -108,10 +108,10 @@ object TimiteTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresettimitetracker") {
+        event.registerBrigadier("shresettimitetracker") {
             description = "Resets the Timite Tracker."
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

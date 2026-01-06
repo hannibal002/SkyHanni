@@ -46,7 +46,7 @@ object BrigadierUtils {
         return SuggestionProvider { _, builder ->
             val remaining = builder.remainingLowerCase
             for (option in supplier()) {
-                if (option.startsWith(remaining)) {
+                if (option.lowercase().startsWith(remaining)) {
                     builder.suggest(option)
                 }
             }

@@ -35,7 +35,7 @@ object PlatformUtils {
         event.registerBrigadier("shmodlist") {
             description = "Get a Discord-formatted list of all loaded mods"
             category = CommandCategory.USERS_ACTIVE
-            callback {
+            simpleCallback {
                 val loadedMods = getLoadedMods().filter {
                     it.id in allowedFabricReports || !it.id.startsWith("fabric-")
                 }

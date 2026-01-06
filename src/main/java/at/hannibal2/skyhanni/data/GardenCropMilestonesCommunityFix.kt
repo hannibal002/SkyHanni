@@ -164,10 +164,10 @@ object GardenCropMilestonesCommunityFix {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shreadcropmilestonefromclipboard") {
+        event.registerBrigadier("shreadcropmilestonefromclipboard") {
             description = "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
             category = CommandCategory.DEVELOPER_TEST
-            callback { readDataFromClipboard() }
+            simpleCallback { readDataFromClipboard() }
         }
     }
 }

@@ -70,11 +70,11 @@ object LockMouseLook {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shmouselock") {
+        event.registerBrigadier("shmouselock") {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlockmouse")
-            callback { toggleLock() }
+            simpleCallback { toggleLock() }
         }
     }
 }

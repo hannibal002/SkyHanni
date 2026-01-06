@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -66,20 +66,6 @@ object PacketTest {
     private var full = false
 
     private val entityMap = mutableMapOf<Int, MutableList<Packet<*>>>()
-
-    private fun command(args: Array<String>) {
-        if (args.size == 1 && args[0].isInt()) {
-            sendEntityPacketData(args[0].toInt())
-            return
-        }
-        if (args.size == 1 && (args[0] == "full" || args[0] == "all")) {
-            full = !full
-            ChatUtils.chat("Packet test full: $full")
-            return
-        }
-
-        toggle()
-    }
 
     private fun sendEntityPacketData(id: Int) {
         ChatUtils.chat("Packet Entity Data: $id")
@@ -286,10 +272,19 @@ object PacketTest {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestpacket") {
+        event.registerBrigadier("shtestpacket") {
             description = "Logs incoming and outgoing packets to the console"
             category = CommandCategory.DEVELOPER_TEST
-            callback { command(it) }
+            literalCallback("full", "all") {
+                full = !full
+                ChatUtils.chat("Packet test full: $full")
+            }
+            argCallback("entityId", BrigadierArguments.integer()) {
+                sendEntityPacketData(it)
+            }
+            simpleCallback {
+                toggle()
+            }
         }
     }
 }
