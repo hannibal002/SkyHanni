@@ -57,7 +57,7 @@ object UbikReminder {
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.ubikReminder) return
         val storage = ProfileStorageData.profileSpecific?.rift ?: return
-        val message = event.chatComponent.string
+        val message = event.cleanMessage
 
         if (ubikRoundPattern.matches(message)) {
             storage.ubikRemindTime = 2.hours.fromNow()
