@@ -24,7 +24,8 @@ object GriffinBurrowParticleFinder {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
-    fun containsBurrow(location: LorenzVec): Boolean { return burrows.containsKey(location) }
+
+    fun containsBurrow(location: LorenzVec): Boolean = burrows.containsKey(location)
 
     private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
 
@@ -33,7 +34,7 @@ object GriffinBurrowParticleFinder {
      */
     private val finishedChainPattern by patternGroup.pattern(
         "chain-finished",
-        "§eYou finished the Griffin burrow chain! §r§7\\(\\d+/\\d+\\)"
+        "§eYou finished the Griffin burrow chain! §r§7\\(\\d+/\\d+\\)",
     )
 
     @HandleEvent
@@ -155,7 +156,7 @@ object GriffinBurrowParticleFinder {
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,
-        var lastSeen: SimpleTimeMark = SimpleTimeMark.now()
+        var lastSeen: SimpleTimeMark = SimpleTimeMark.now(),
     ) {
 
         fun getType(): BurrowType = when (this.type) {

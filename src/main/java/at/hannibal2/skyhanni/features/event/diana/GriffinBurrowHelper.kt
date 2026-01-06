@@ -123,7 +123,7 @@ object GriffinBurrowHelper {
         var burrowType: BurrowType = BurrowType.UNKNOWN,
         var range: Int = 0,
         var currentIndex: Int = 0,
-        var ignoreParticleCheckUntil: SimpleTimeMark = SimpleTimeMark.now()
+        var ignoreParticleCheckUntil: SimpleTimeMark = SimpleTimeMark.now(),
     ) {
         fun getCurrent(): LorenzVec = guesses[currentIndex]
         fun contains(vec: LorenzVec): Boolean {
@@ -141,6 +141,7 @@ object GriffinBurrowHelper {
 
             return false
         }
+
         fun checkRemove(): Boolean {
             // remove guesses older than 30 minutes
             allGuessesTimers[this]?.passedSince()?.let {
@@ -162,7 +163,9 @@ object GriffinBurrowHelper {
             if (shouldBeLoaded == true &&
                 !GriffinBurrowParticleFinder.containsBurrow(this.getCurrent()) && // burrow is not found
                 this.getCurrent().distanceSq(MinecraftCompat.localPlayer.position().toLorenzVec()) < 900 // within 30 blocks
-            ) { shouldMove = true }
+            ) {
+                shouldMove = true
+            }
 
             if (shouldMove) {
                 val nextIndex = currentIndex + 1

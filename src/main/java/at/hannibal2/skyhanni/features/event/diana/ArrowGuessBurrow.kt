@@ -179,7 +179,7 @@ object ArrowGuessBurrow {
     private fun getPointsWithinDistance(
         points: Iterable<LorenzVec>,
         origin: LorenzVec,
-        maxDist: Double
+        maxDist: Double,
     ): Int {
         val maxDistSq = maxDist * maxDist
         return points.count { it != origin && it.distanceSq(origin) <= maxDistSq }
@@ -204,7 +204,7 @@ object ArrowGuessBurrow {
         visited: MutableSet<LorenzVec>,
         points: Iterable<LorenzVec>,
         numPoints: Int,
-        maxDist: Double
+        maxDist: Double,
     ): Boolean {
         if (line.size == numPoints) return true // line completed
 
