@@ -299,7 +299,7 @@ object BazaarApi {
         priceSource: SimpleTransactionType,
     ): Double? {
         val bazaarData = item.getBazaarData()?.product ?: return null
-        val offers = if (priceSource == SimpleTransactionType.BUY_ORDER) bazaarData.buySummary else bazaarData.sellSummary
+        val offers = if (priceSource == SimpleTransactionType.SELL_OFFER) bazaarData.buySummary else bazaarData.sellSummary
         var remaining = count
         var totalPrice = 0.0
         for (offer in offers) {
