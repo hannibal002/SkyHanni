@@ -12,13 +12,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItemStackProvider
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -114,19 +113,17 @@ object SuperCraftingInventory {
         val materials = getRecipeMaterials(slots)
         val resultItem = getResultItem(slots)
 
-        val recipeMultiplier = resultItem.second
+        val recipeMultiplier = resultItem.amount
 
-        val itemsPrice = materials.mapValues {
-            it.value * (craftingAmount / recipeMultiplier)
-        }.mapValues {
-            // The materials are always summed up already by the getRecipeMaterials function
-            val key = it.key
-            val price = BazaarApi.calculatePriceOffAvailableOrders(key, it.value, BazaarApi.SimpleTransactionType.BUY_ORDER)
-            return@mapValues price ?: return null
-        }.sumAllValues()
+        val itemsPrice = materials.sumOf { material ->
+            val totalAmount = material.amount * (craftingAmount / recipeMultiplier)
+            BazaarApi.calculatePriceOffAvailableOrders(
+                material.internalName, totalAmount, BazaarApi.SimpleTransactionType.BUY_ORDER,
+            ) ?: return null
+        }
 
         val totalResultPrice = BazaarApi.calculatePriceOffAvailableOrders(
-            resultItem.first,
+            resultItem.internalName,
             craftingAmount,
             BazaarApi.SimpleTransactionType.SELL_OFFER,
         ) ?: return null
@@ -137,11 +134,10 @@ object SuperCraftingInventory {
     private fun getRecipeMaterials(slots: List<Slot>) = materialSlots.mapNotNull { slotIndex ->
         val item = slots[slotIndex].item
         if (item.isEmpty) return@mapNotNull null
-        val name = item.getInternalNameOrNull()
+        item.toPrimitiveStackOrNull()
             ?: error("Unknown item in crafting slot: ${item.displayName}")
-        name to item.count
-    }.groupBy { it.first }.mapValues { entry ->
-        entry.value.sumOf { it.second }
+    }.groupBy { it.internalName }.map { (name, stacks) ->
+        PrimitiveItemStack(name, stacks.sumOf { it.amount })
     }
 
     private fun getSuperCraftingCount(slots: List<Slot>): Long? {
@@ -151,11 +147,11 @@ object SuperCraftingInventory {
         }
     }
 
-    private fun getResultItem(slots: List<Slot>): Pair<NeuInternalName, Int> {
+    private fun getResultItem(slots: List<Slot>): PrimitiveItemStack {
         val item = slots[RESULT_SLOT].item
         if (item.isEmpty) error("Result slot is empty")
-        val name = item.getInternalNameOrNull() ?: error("internal name is null: ${item.displayName}")
-        return name to item.count
+        return item.toPrimitiveStackOrNull()
+            ?: error("internal name is null: ${item.displayName}")
     }
 
     private fun blockWasteClick(profit: Double, craftingAmount: Long, maxCraftingAmount: Long): Boolean {
