@@ -32,8 +32,8 @@ object SuperCraftingInventory {
     private val materialSlots = listOf(
         10, 11, 12, 19, 20, 21, 28, 29, 30,
     )
-    private val pickaxeSlotIndex = 32
-    private val resultSlotIndex = 25
+    private const val PICKAXE_SLOT = 32
+    private const val RESULT_SLOT = 25
     private val wasteConfig = SkyHanniMod.feature.inventory.superCrafting.waste
 
     private val craftingPatternGroup = RepoPatternGroup("supercrafting-inventory")
@@ -146,8 +146,7 @@ object SuperCraftingInventory {
 
     fun getSuperCraftingCount(): Int? {
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
-        val pickaxeSlot = slots[pickaxeSlotIndex]
-        val lore = pickaxeSlot.item.getSingleLineLore().removeColor()
+        val lore = slots[PICKAXE_SLOT].item.getSingleLineLore().removeColor()
         return craftingCount.matchMatcher(lore) {
             groupOrNull("count")?.formatIntOrNull()
         }
@@ -155,10 +154,10 @@ object SuperCraftingInventory {
 
     fun getResultItem(): Pair<NeuInternalName, Int>? {
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
-        val resultSlot = slots[resultSlotIndex]
-        return resultSlot.item.getInternalNameOrNull().let {
-            if (resultSlot.item.item is AirItem) return null
-            (it ?: NeuInternalName.NONE) to resultSlot.item.count
+        val item = slots[RESULT_SLOT].item
+        return item.getInternalNameOrNull().let {
+            if (item.item is AirItem) return null
+            (it ?: NeuInternalName.NONE) to item.count
         }
     }
 
