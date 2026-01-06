@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.features.chat.ShortenCoins.formatChatCoins
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -82,7 +83,7 @@ object SuperCraftingInventory {
             SoundUtils.playErrorSound()
             TitleManager.sendTitle(
                 "§cCraft-click Prevented (Big Loss Detected)",
-                subtitleText = "§7Hold §eControl §7to bypass. You could save §c${String.format("%,.1f", -profit)}§6 Coins§7 by " +
+                subtitleText = "§7Hold §eControl §7to bypass. You could save §c${(-profit).formatChatCoins()} Coins §7by " +
                     "selling the required resources directly to the §6Bazaar§7 and then instant-buying the finished item.",
                 duration = 2.seconds,
                 location = TitleManager.TitleLocation.INVENTORY,
@@ -99,8 +100,8 @@ object SuperCraftingInventory {
     private fun getSuperCraftingMaxCount(): Int {
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
         val pickaxeSlot = slots[32]
-        val minimum = pickaxeSlot.item.getLore().mapNotNull { loreLine ->
-            val loreLine = loreLine.removeColor()
+        val minimum = pickaxeSlot.item.getLore().mapNotNull {
+            val loreLine = it.removeColor()
             return@mapNotNull craftingResourcePattern.matchMatcher(loreLine) {
                 groupOrNull("amount")?.formatIntOrNull()
             }
@@ -117,7 +118,7 @@ object SuperCraftingInventory {
         val itemsPrice = materials.mapValues {
             it.value * (craftingAmount / recipeMultiplier)
         }.mapValues {
-            //The materials are always summed up already by the getRecipeMaterials function
+            // The materials are always summed up already by the getRecipeMaterials function
             val key = it.key
             val price = BazaarApi.calculatePriceOffAvailableOrders(key, it.value, BazaarApi.SimpleTransactionType.BUY_ORDER)
             return@mapValues price ?: return null
@@ -139,7 +140,7 @@ object SuperCraftingInventory {
             if (name != null) return@map name to it.item.count
             if (it.item.item is AirItem) return@map NeuInternalName.NONE to 0
             else return null
-        }.groupBy { it.first }.mapValues { it ->
+        }.groupBy { it.first }.mapValues {
             it.value.sumOf { it.second }
         }.filter { it.key != NeuInternalName.NONE }
     }
