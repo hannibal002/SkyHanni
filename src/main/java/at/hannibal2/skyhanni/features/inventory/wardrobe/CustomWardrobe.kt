@@ -44,9 +44,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.TooltipFlag
 import java.awt.Color
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
@@ -260,8 +258,7 @@ object CustomWardrobe {
     private fun getToolTip(stack: ItemStack, slot: WardrobeSlot): List<Component>? {
         try {
             // Get tooltip from minecraft and other mods
-            // TODO add support for advanced tooltip (F3+H)
-            val toolTips = stack.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, TooltipFlag.NORMAL)
+            val toolTips = stack.getTooltip(Minecraft.getInstance().options.advancedItemTooltips)
 
             return toolTips
         } catch (e: Exception) {
