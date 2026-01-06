@@ -14,8 +14,8 @@ object FixChimeraDescription {
     private val patternGroup = RepoPattern.group("data.collection.api")
 
     /**
-     * REGEX-TEST: Copies §a60% §7of your active
-     * REGEX-TEST: Copies §a80% §7of your active
+     * REGEX-TEST: Copies 60% of your active
+     * REGEX-TEST: Copies 80% of your active
      */
     private val percentagePattern by patternGroup.pattern(
         "fix.chimera-description",

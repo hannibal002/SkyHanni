@@ -19,6 +19,9 @@ object RestorePieceOfWizardPortalLore {
 
     private val item = "WIZARD_PORTAL_MEMENTO".toInternalName()
 
+    /**
+     * REGEX-TEST: Earned by: [MVP+] Throwpo
+     */
     private val earnedPattern by RepoPattern.pattern(
         "misc.restore.wizard.portal.earned",
         "Earned by:.*"

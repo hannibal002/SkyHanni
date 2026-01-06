@@ -96,7 +96,9 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
     }
 
     private fun splitLine(comp: Component): List<FormattedCharSequence> {
-        return ComponentRenderUtils.wrapComponents(comp, w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10), Minecraft.getInstance().font)
+        return ComponentRenderUtils.wrapComponents(
+            comp, w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10), Minecraft.getInstance().font
+        )
     }
 
     override fun onInitGui() {

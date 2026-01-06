@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.network.chat.Component
 import java.awt.Color
 
 object ColorUtils {

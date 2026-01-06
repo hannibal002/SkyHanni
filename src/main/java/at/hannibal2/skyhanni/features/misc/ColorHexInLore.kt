@@ -50,7 +50,7 @@ object ColorHexInLore {
         for ((index, component) in event.toolTip.withIndex()) {
             for (sibling in component.siblings) {
                 // ill fix it in a separate pr
-                if (sibling.string.contains("#")) {} // blah blah do something
+                // if (sibling.string.contains("#")) {} // blah blah do something
             }
         }
     }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.rgb
@@ -221,7 +222,7 @@ object WorldRenderUtils {
         } else if (component != null) {
             drawString(location, component, seeThroughBlocks, color, scale, shadow, yOffset, backGroundColor)
         } else {
-            throw IllegalArgumentException("Both string and Component are null")
+            ErrorManager.skyHanniError("Both string and Component are null")
         }
     }
 
