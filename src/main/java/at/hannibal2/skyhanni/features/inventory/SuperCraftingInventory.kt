@@ -34,7 +34,7 @@ object SuperCraftingInventory {
     )
     private const val PICKAXE_SLOT = 32
     private const val RESULT_SLOT = 25
-    private val config = SkyHanniMod.feature.inventory.superCrafting.waste
+    private val config get() = SkyHanniMod.feature.inventory.superCrafting.waste
 
     private val craftingPatternGroup = RepoPatternGroup("supercrafting-inventory")
     private val craftingCount by craftingPatternGroup.pattern(
