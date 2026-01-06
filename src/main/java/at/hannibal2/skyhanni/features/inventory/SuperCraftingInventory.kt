@@ -97,16 +97,12 @@ object SuperCraftingInventory {
         }
     }
 
-    private fun getSuperCraftingMaxCount(slots: List<Slot>): Long {
-        val pickaxeSlot = slots[32]
-        val minimum = pickaxeSlot.item.getLore().mapNotNull {
-            val loreLine = it.removeColor()
-            return@mapNotNull craftingResourcePattern.matchMatcher(loreLine) {
-                groupOrNull("amount")?.formatLongOrNull()
-            }
-        }.min()
-        return minimum
-    }
+    private fun getSuperCraftingMaxCount(slots: List<Slot>) = slots[PICKAXE_SLOT].item.getLore().mapNotNull {
+        val loreLine = it.removeColor()
+        return@mapNotNull craftingResourcePattern.matchMatcher(loreLine) {
+            groupOrNull("amount")?.formatLongOrNull()
+        }
+    }.min()
 
     private fun getProfit(slots: List<Slot>, craftingAmount: Long): Double? {
         val materials = getRecipeMaterials(slots)
