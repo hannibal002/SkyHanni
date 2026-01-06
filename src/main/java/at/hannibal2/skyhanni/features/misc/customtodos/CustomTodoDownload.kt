@@ -76,7 +76,7 @@ object CustomTodoDownload {
     }
 
     private fun getTodoIds(): List<String> {
-        return todos?.map { it.id } ?: listOf()
+        return todos?.map { it.id }.orEmpty()
     }
 
     @HandleEvent
