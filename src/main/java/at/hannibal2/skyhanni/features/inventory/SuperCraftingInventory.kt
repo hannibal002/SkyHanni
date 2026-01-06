@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItemStackProvider
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.AirItem
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -61,12 +61,12 @@ object SuperCraftingInventory {
         },
     )
 
-    fun getWarnAmount(): Double {
+    private fun getWarnAmount(): Double {
         return if (BitsApi.hasCookieBuff()) wasteConfig.normal
         else wasteConfig.withoutCookieValues.normal
     }
 
-    fun getBulkWarnAmount(): Double {
+    private fun getBulkWarnAmount(): Double {
         return if (BitsApi.hasCookieBuff()) wasteConfig.maxResource
         else wasteConfig.withoutCookieValues.maxResource
     }
@@ -110,9 +110,9 @@ object SuperCraftingInventory {
         return minimum
     }
 
-    fun getProfit(slots: List<Slot>, craftingAmount: Long): Double? {
-        val materials = getRecipeMaterials(slots) ?: return null
-        val resultItem = getResultItem(slots) ?: return null
+    private fun getProfit(slots: List<Slot>, craftingAmount: Long): Double? {
+        val materials = getRecipeMaterials(slots)
+        val resultItem = getResultItem(slots)
 
         val recipeMultiplier = resultItem.second
 
@@ -134,30 +134,28 @@ object SuperCraftingInventory {
         return totalResultPrice - itemsPrice
     }
 
-    fun getRecipeMaterials(slots: List<Slot>): Map<NeuInternalName, Int>? {
-        return materialSlots.map { slots[it] }.map {
-            val name = it.item.getInternalNameOrNull()
-            if (name != null) return@map name to it.item.count
-            if (it.item.item is AirItem) return@map NeuInternalName.NONE to 0
-            else return null
-        }.groupBy { it.first }.mapValues {
-            it.value.sumOf { it.second }
-        }.filter { it.key != NeuInternalName.NONE }
+    private fun getRecipeMaterials(slots: List<Slot>) = materialSlots.mapNotNull { slotIndex ->
+        val item = slots[slotIndex].item
+        if (item.isEmpty) return@mapNotNull null
+        val name = item.getInternalNameOrNull()
+            ?: error("Unknown item in crafting slot: ${item.displayName}")
+        name to item.count
+    }.groupBy { it.first }.mapValues { entry ->
+        entry.value.sumOf { it.second }
     }
 
-    fun getSuperCraftingCount(slots: List<Slot>): Long? {
+    private fun getSuperCraftingCount(slots: List<Slot>): Long? {
         val lore = slots[PICKAXE_SLOT].item.getSingleLineLore().removeColor()
         return craftingCount.matchMatcher(lore) {
             groupOrNull("count")?.formatLongOrNull()
         }
     }
 
-    fun getResultItem(slots: List<Slot>): Pair<NeuInternalName, Int>? {
+    private fun getResultItem(slots: List<Slot>): Pair<NeuInternalName, Int> {
         val item = slots[RESULT_SLOT].item
-        return item.getInternalNameOrNull().let {
-            if (item.item is AirItem) return null
-            (it ?: NeuInternalName.NONE) to item.count
-        }
+        if (item.isEmpty) error("Result slot is empty")
+        val name = item.getInternalNameOrNull() ?: error("internal name is null: ${item.displayName}")
+        return name to item.count
     }
 
     private fun blockWasteClick(profit: Double, craftingAmount: Long, maxCraftingAmount: Long): Boolean {
