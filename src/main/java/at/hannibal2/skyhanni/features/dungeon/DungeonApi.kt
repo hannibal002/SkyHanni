@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
@@ -275,11 +274,11 @@ object DungeonApi {
             started = true
             DungeonStartEvent(floor).post()
         }
-        if (event.message.removeColor().matches(uniqueClassBonus)) {
+        if (event.cleanMessage.matches(uniqueClassBonus)) {
             isUniqueClass = true
         }
 
-        killPattern.matchMatcher(event.message.removeColor()) {
+        killPattern.matchMatcher(event.cleanMessage) {
             val bossCollections = bossStorage ?: return
             val boss = DungeonFloor.byBossName(group("boss"))
             if (matches() && boss != null && boss !in bossCollections) {

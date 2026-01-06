@@ -225,7 +225,7 @@ object ChatManager {
         predicate: (GuiMessage) -> Boolean,
         reason: String? = null,
     ) {
-        DelayedRun.onThread.execute {
+        DelayedRun.runOrNextTick {
             indexOfFirst {
                 predicate(it)
             }.takeIf { it != -1 }?.let {
@@ -254,7 +254,7 @@ object ChatManager {
         reason: String? = null,
         predicate: (GuiMessage) -> Boolean,
     ) {
-        DelayedRun.onThread.execute {
+        DelayedRun.runOrNextTick {
             val iterator = iterator()
             var removed = 0
             while (iterator.hasNext() && removed < amount) {

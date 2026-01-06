@@ -10,10 +10,12 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -32,20 +34,38 @@ object UbikReminder {
     private val cube by AutoUpdatingItemStack("UBIKS_CUBE")
 
     /**
-     * REGEX-TEST: §6§lROUND 7 §r§6(§r§lFINAL§r§6)§r§l: §r§eYou chose §r§c§lSTEAL §r§eand gained §r§55,000 Motes§r§e!
-     * REGEX-TEST: §6§lROUND 7 §r§6(§r§6§lFINAL§r§6)§r§6§l: §r§eYou chose §r§c§lSTEAL §r§eand gained §r§55,000 Motes§r§e!
+     * REGEX-TEST: ROUND 7 (FINAL): You chose STEAL and gained 55,000 Motes!
      */
     private val ubikRoundPattern by patternGroup.pattern(
-        "reminder",
-        "§6§lROUND [5-9] §r§6\\(§r(?:§6)?§lFINAL§r§6\\)§r(?:§6)?§l: §r§eYou chose .*",
+        "reminder-nocolor",
+        "ROUND \\d+ \\(FINAL\\): You chose \\w+ and gained [\\d,]+ Motes!",
+    )
+
+    /**
+     * REGEX-TEST: SPLIT! You need to wait 1h 23m 45s before you can play again.
+     * REGEX-TEST: SPLIT! You need to wait 1h 23m before you can play again.
+     * REGEX-TEST: SPLIT! You need to wait 12m 34s before you can play again.
+     * REGEX-TEST: SPLIT! You need to wait 12m before you can play again.
+     * REGEX-TEST: SPLIT! You need to wait 12s before you can play again.
+     */
+    private val cooldownPattern by patternGroup.pattern(
+        "cooldown",
+        "SPLIT! You need to wait (?<duration>.+) before you can play again\\.",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.ubikReminder) return
         val storage = ProfileStorageData.profileSpecific?.rift ?: return
-        if (ubikRoundPattern.matches(event.message)) {
+        val message = event.cleanMessage
+
+        if (ubikRoundPattern.matches(message)) {
             storage.ubikRemindTime = 2.hours.fromNow()
+            return
+        }
+
+        cooldownPattern.matchMatcher(message) {
+            storage.ubikRemindTime = TimeUtils.getDuration(group("duration")).fromNow()
         }
     }
 

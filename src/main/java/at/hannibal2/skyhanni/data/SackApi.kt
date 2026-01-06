@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -324,7 +323,7 @@ object SackApi {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!event.message.removeColor().startsWith("[Sacks]")) return
+        if (!event.cleanMessage.startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
             sibling.hover?.string?.removeColor()?.takeIf {

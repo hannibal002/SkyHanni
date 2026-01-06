@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -585,7 +586,7 @@ object GraphEditor {
 
     private fun handleNameShortcut(name: String?): Pair<GraphNodeTag, String>? = when (name) {
         "fsoul" -> GraphNodeTag.FAIRY_SOUL to "Fairy Soul"
-        "na" -> GraphNodeTag.AREA to "no_area"
+        "na" -> GraphNodeTag.AREA to AreaNode.NO_AREA
         else -> null
     }
 

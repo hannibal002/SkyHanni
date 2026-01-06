@@ -410,6 +410,8 @@ object PetStorageApi {
         )
     }
 
+    fun isAutopetMessage(message: String): Boolean = autoPetMessagePattern.matches(message)
+
     fun resolvePetDataOrNull(
         name: String,
         rarity: LorenzRarity? = null,

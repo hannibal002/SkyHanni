@@ -55,7 +55,7 @@ data class CustomTodo(
     }
 
     fun isValid(): Boolean {
-        return isEnabled && timer >= 0 && (trigger.isNotBlank() && !cronEnabled) || (cronEnabled && cronExpression.isNotBlank())
+        return isEnabled && timer >= 0 && ((trigger.isNotBlank() && !cronEnabled) || (cronEnabled && cronExpression.isNotBlank()))
     }
 
     fun setDoneNow() {
