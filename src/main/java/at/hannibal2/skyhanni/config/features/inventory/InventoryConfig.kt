@@ -93,7 +93,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(name = "Super Crafting", desc = "")
     @Accordion
-    var superCrafting: SuperCraftingConfig = SuperCraftingConfig()
+    val superCrafting: SuperCraftingConfig = SuperCraftingConfig()
 
     @Expose
     @ConfigOption(name = "Stats Tuning", desc = "")
