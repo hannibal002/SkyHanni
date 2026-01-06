@@ -33,25 +33,5 @@ class SuperCraftingWasteConfig {
     @Expose
     @Accordion
     @ConfigOption(name = "Values without Cookie", desc = "Like the others but when you don't have Cookie Buff active → no /bz access")
-    val withoutCookieValues = WithoutCookie()
-
-    class WithoutCookie {
-
-        @Expose
-        @ConfigOption(
-            name = "Minimum Amount",
-            desc = "The minimum amount of coins (in millions) you must save (instant sell and insta buy " +
-                "for wanted) to get a warning.",
-        )
-        @ConfigEditorSlider(minValue = 0.1f, maxValue = 100.0f, minStep = 0.1f)
-        val normal: Double = 20.0
-
-        @Expose
-        @ConfigOption(
-            name = "Minimum Amount if Max Resource Usage",
-            desc = "Minimum amount of coins when compacting items due to space reasons.",
-        )
-        @ConfigEditorSlider(minValue = 0.1f, maxValue = 100.0f, minStep = 0.1f)
-        val maxResource: Double = 10.0
-    }
+    val withoutCookieValues = SuperCraftingWasteConfigWithoutCookie()
 }

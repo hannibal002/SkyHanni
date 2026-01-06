@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -28,23 +29,28 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SuperCraftingInventory {
-    val wasteConfig = SkyHanniMod.feature.inventory.superCrafting.waste
+    private val materialSlots = listOf(
+        10, 11, 12, 19, 20, 21, 28, 29, 30,
+    )
+    private val pickaxeSlotIndex = 32
+    private val resultSlotIndex = 25
+    private val wasteConfig = SkyHanniMod.feature.inventory.superCrafting.waste
 
-    val craftingPatternGroup = RepoPatternGroup("supercraftinginventory")
-    val craftingCount by craftingPatternGroup.pattern(
+    private val craftingPatternGroup = RepoPatternGroup("supercrafting-inventory")
+    private val craftingCount by craftingPatternGroup.pattern(
         "crafting.count",
         ".*Crafting (?<count>[0-9,]+) item.*",
     )
-    val craftingResourcePattern by craftingPatternGroup.pattern(
+    private val craftingResourcePattern by craftingPatternGroup.pattern(
         "crafting.resource",
         " *([✔✖]) [0-9,]+/[0-9,]+ \\((?<amount>[0-9,]+)x\\) (?<resource>.+)",
     )
 
-    val inventoryPattern by craftingPatternGroup.pattern(
+    private val inventoryPattern by craftingPatternGroup.pattern(
         "inventory.name",
         "(?<itemname>.*) Recipe",
     )
-    val invDetector = InventoryDetector(
+    private val invDetector = InventoryDetector(
         onOpenInventory = { },
         checkInventoryName = { name ->
             inventoryPattern.matches(name)
@@ -68,10 +74,10 @@ object SuperCraftingInventory {
         if (!invDetector.isInside()) return
         if (!wasteConfig.enabled) return
         if (HypixelData.noTrade) return
+        if (event.clickedButton != 0) return
         val craftingAmount = getSuperCraftingCount() ?: return
         val maxCraftingAmount = getSuperCraftingMaxCount()
         val profit = getProfit(craftingAmount) ?: return
-        if (event.clickedButton != 0) return
         if (blockWasteClick(profit, craftingAmount, maxCraftingAmount)) {
             SoundUtils.playErrorSound()
             TitleManager.sendTitle(
@@ -81,9 +87,11 @@ object SuperCraftingInventory {
                 duration = 2.seconds,
                 location = TitleManager.TitleLocation.INVENTORY,
             )
-            ChatUtils.chatAndOpenConfig("Blocked a craft since instant selling the materials and instant buying the item(s) directly is " +
-                "significantly cheaper. You can hold §cControl §ewhile clicking to bypass this warning. ",
-                wasteConfig::enabled )
+            ChatUtils.chatAndOpenConfig(
+                "Blocked a craft since instant selling the materials and instant buying the item(s) directly is " +
+                    "significantly cheaper. You can hold §cControl §ewhile clicking to bypass this warning. ",
+                wasteConfig::enabled,
+            )
             event.cancel()
         }
     }
@@ -91,18 +99,17 @@ object SuperCraftingInventory {
     private fun getSuperCraftingMaxCount(): Int {
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
         val pickaxeSlot = slots[32]
-        val minimum = pickaxeSlot.item.getLore().mapNotNull {
-            val it = it.removeColor()
-            return@mapNotNull craftingResourcePattern.matchMatcher(it) {
-                groupOrNull("amount")?.replace(",", "")?.toIntOrNull()
+        val minimum = pickaxeSlot.item.getLore().mapNotNull { loreLine ->
+            val loreLine = loreLine.removeColor()
+            return@mapNotNull craftingResourcePattern.matchMatcher(loreLine) {
+                groupOrNull("amount")?.formatIntOrNull()
             }
         }.min()
         return minimum
     }
 
     fun getProfit(craftingAmount: Int): Double? {
-        val materials = getRecipeMaterials()
-        if (materials.containsKey(null)) return null
+        val materials = getRecipeMaterials() ?: return null
         val resultItem = getResultItem() ?: return null
 
         val recipeMultiplier = resultItem.second
@@ -111,9 +118,9 @@ object SuperCraftingInventory {
             it.value * (craftingAmount / recipeMultiplier)
         }.mapValues {
             //The materials are always summed up already by the getRecipeMaterials function
-            val key = it.key!!
+            val key = it.key
             val price = BazaarApi.calculatePriceOffAvailableOrders(key, it.value, BazaarApi.SimpleTransactionType.BUY_ORDER)
-            return@mapValues price?: return null
+            return@mapValues price ?: return null
         }.sumAllValues()
 
         val totalResultPrice = BazaarApi.calculatePriceOffAvailableOrders(
@@ -125,37 +132,30 @@ object SuperCraftingInventory {
         return totalResultPrice - itemsPrice
     }
 
-    fun getRecipeMaterials(): Map<NeuInternalName?, Int> {
+    fun getRecipeMaterials(): Map<NeuInternalName, Int>? {
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
-        return listOf(
-            slots[10], slots[11], slots[12],
-            slots[19], slots[20], slots[21],
-            slots[28], slots[29], slots[30],
-        ).map {
+        return materialSlots.map { slots[it] }.map {
             val name = it.item.getInternalNameOrNull()
             if (name != null) return@map name to it.item.count
             if (it.item.item is AirItem) return@map NeuInternalName.NONE to 0
-            else return@map null to it.item.count
+            else return null
         }.groupBy { it.first }.mapValues { it ->
-            it.value.sumOf {
-                it.second
-            }
+            it.value.sumOf { it.second }
         }.filter { it.key != NeuInternalName.NONE }
     }
 
     fun getSuperCraftingCount(): Int? {
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
-        val pickaxeSlot = slots[32]
+        val pickaxeSlot = slots[pickaxeSlotIndex]
         val lore = pickaxeSlot.item.getSingleLineLore().removeColor()
-        val craftingCount = craftingCount.matchMatcher(lore) {
-            groupOrNull("count")?.replace(",", "")?.toIntOrNull()
+        return craftingCount.matchMatcher(lore) {
+            groupOrNull("count")?.formatIntOrNull()
         }
-        return craftingCount
     }
 
     fun getResultItem(): Pair<NeuInternalName, Int>? {
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
-        val resultSlot = slots[25]
+        val resultSlot = slots[resultSlotIndex]
         return resultSlot.item.getInternalNameOrNull().let {
             if (resultSlot.item.item is AirItem) return null
             (it ?: NeuInternalName.NONE) to resultSlot.item.count
