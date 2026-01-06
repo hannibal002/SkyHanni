@@ -39,6 +39,7 @@ data class CustomTodo(
     @Expose var triggersLeft: MutableMap<String, Int> = mutableMapOf(),
     @Expose var cronEnabled: Boolean = false,
     @Expose var cronExpression: String = "",
+    @Expose var downloaded: Boolean = false,
 ) {
     enum class TriggerMatcher {
         REGEX,

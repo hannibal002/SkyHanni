@@ -12,5 +12,6 @@ data class CommunityTodo(
     @Expose val id: String,
     @Expose val author: String,
     @Expose val icon: String,
+    @Expose @SerializedName("discord_thread") val discordThread: String,
     @Expose @SerializedName("todo_data") val todoData: String,
 )
