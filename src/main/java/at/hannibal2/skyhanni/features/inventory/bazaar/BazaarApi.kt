@@ -295,7 +295,7 @@ object BazaarApi {
      * The best offers may be inflated and you are selling all the items so you must use the prices in each order as such.
      */
     fun calculatePriceOffAvailableOrders(
-        item: NeuInternalName, count: Int,
+        item: NeuInternalName, count: Long,
         priceSource: SimpleTransactionType,
     ): Double? {
         val bazaarData = item.getBazaarData()?.product ?: return null
@@ -303,7 +303,7 @@ object BazaarApi {
         var remaining = count
         var totalPrice = 0.0
         for (offer in offers) {
-            val takeAmount = offer.amount.coerceAtMost(remaining.toLong()).toInt()
+            val takeAmount = offer.amount.coerceAtMost(remaining)
             totalPrice += takeAmount * offer.pricePerUnit
             remaining -= takeAmount
             if (remaining <= 0) break

@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -97,19 +97,19 @@ object SuperCraftingInventory {
         }
     }
 
-    private fun getSuperCraftingMaxCount(): Int {
+    private fun getSuperCraftingMaxCount(): Long {
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
         val pickaxeSlot = slots[32]
         val minimum = pickaxeSlot.item.getLore().mapNotNull {
             val loreLine = it.removeColor()
             return@mapNotNull craftingResourcePattern.matchMatcher(loreLine) {
-                groupOrNull("amount")?.formatIntOrNull()
+                groupOrNull("amount")?.formatLongOrNull()
             }
         }.min()
         return minimum
     }
 
-    fun getProfit(craftingAmount: Int): Double? {
+    fun getProfit(craftingAmount: Long): Double? {
         val materials = getRecipeMaterials() ?: return null
         val resultItem = getResultItem() ?: return null
 
@@ -145,11 +145,11 @@ object SuperCraftingInventory {
         }.filter { it.key != NeuInternalName.NONE }
     }
 
-    fun getSuperCraftingCount(): Int? {
+    fun getSuperCraftingCount(): Long? {
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
         val lore = slots[PICKAXE_SLOT].item.getSingleLineLore().removeColor()
         return craftingCount.matchMatcher(lore) {
-            groupOrNull("count")?.formatIntOrNull()
+            groupOrNull("count")?.formatLongOrNull()
         }
     }
 
@@ -162,7 +162,7 @@ object SuperCraftingInventory {
         }
     }
 
-    private fun blockWasteClick(profit: Double, craftingAmount: Int, maxCraftingAmount: Int): Boolean {
+    private fun blockWasteClick(profit: Double, craftingAmount: Long, maxCraftingAmount: Long): Boolean {
         if (KeyboardManager.isControlKeyDown()) return false
         if (profit < -getWarnAmount() * 1_000_000L) return true
         if (profit < -getBulkWarnAmount() * 1_000_000L && craftingAmount == maxCraftingAmount) return true
