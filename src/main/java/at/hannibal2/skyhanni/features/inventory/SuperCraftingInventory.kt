@@ -55,7 +55,7 @@ object SuperCraftingInventory {
     )
 
     /**
-     * [REGEX-TEST]: Enchanted Redstone Recipe
+     * REGEX-TEST: Enchanted Redstone Recipe
      */
     private val inventoryPattern by craftingPatternGroup.pattern(
         "inventory.name",
