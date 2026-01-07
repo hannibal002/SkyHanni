@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -202,14 +203,16 @@ object InstanceChestProfit {
             add(listOf(Renderable.emptyText()))
             add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color${total.formatCoin()}")))
 
-            add(listOf(Renderable.emptyText()))
-            add(listOf(Renderable.text("§d§lAll Chest Profits")))
+            if (IslandType.CATACOMBS.isCurrent() || IslandType.KUUDRA_ARENA.isCurrent()) {
+                add(listOf(Renderable.emptyText()))
+                add(listOf(Renderable.text("§d§lAll Chest Profits")))
 
-            for (it in chestProfits.entries.sortedByDescending { it.value }) {
-                color = if (it.value < 0) "§c"
-                else "§a"
+                for (it in chestProfits.entries.sortedByDescending { it.value }) {
+                    color = if (it.value < 0) "§c"
+                    else "§a"
 
-                add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
+                    add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
+                }
             }
         }
 
