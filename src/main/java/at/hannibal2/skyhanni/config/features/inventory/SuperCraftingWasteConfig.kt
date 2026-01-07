@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SuperCraftingWasteConfig {
+
     @Expose
     @ConfigOption(
         name = "Enabled",
