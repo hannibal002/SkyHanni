@@ -84,6 +84,7 @@ object SuperCraftingInventory {
         if (!config.enabled) return
         if (HypixelData.noTrade) return
         if (event.clickedButton != 0) return
+        if (event.slotId != PICKAXE_SLOT) return
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
         val craftingAmount = getSuperCraftingCount(slots) ?: return
         val profit = getProfit(slots, craftingAmount) ?: return
