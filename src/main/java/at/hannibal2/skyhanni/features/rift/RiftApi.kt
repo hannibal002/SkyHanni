@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object RiftApi {
@@ -38,7 +38,7 @@ object RiftApi {
 
     fun ItemStack.motesNpcPrice(): Double? {
         if (isRiftExportable() && wasRiftTransferred()) return null
-        return getInternalName().motesNpcPrice()?.times(stackSize)
+        return getInternalName().motesNpcPrice()?.times(count)
     }
 
     fun NeuInternalName.motesNpcPrice(): Double? {

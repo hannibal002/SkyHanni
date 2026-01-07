@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class SensitivityReducerConfig {
     @Expose
@@ -28,8 +28,8 @@ class SensitivityReducerConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "When selected above, press this key to reduce the mouse sensitivity.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_N)
-    var keybind: Int = Keyboard.KEY_N
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_N)
+    var keybind: Int = GLFW.GLFW_KEY_N
 
     @Expose
     @ConfigOption(name = "Reducing factor", desc = "Change by how much the sensitivity is lowered by.")

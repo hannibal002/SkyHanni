@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
@@ -233,8 +232,7 @@ object AttributeShardOverlay {
                 "§cif there is an error with the data",
             ),
             onLeftClick = {
-                storage?.forEach { it.value.amountInBox = 0 }
-                ChatUtils.chat("Reset hunting box shards data")
+                AttributeShardsData.resetHuntingBoxShards()
                 reconstructDisplay()
             }
         )

@@ -1,17 +1,13 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Timer;
+import net.minecraft.client.DeltaTracker;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(Minecraft.class)
 public interface AccessorMinecraft {
 
-    @Accessor("timer")
-    //#if MC < 1.21
-    Timer getTimer();
-    //#else
-    //$$ RenderTickCounter.Dynamic getTimer();
-    //#endif
+    @Accessor("deltaTracker")
+    DeltaTracker.Timer getTimer();
 }

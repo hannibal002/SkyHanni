@@ -14,10 +14,11 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.ItemStack
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object BazaarOrderHelper {
@@ -60,7 +61,7 @@ object BazaarOrderHelper {
         val slots = mutableMapOf<Int, LorenzColor>()
         val errorItems = mutableSetOf<NeuInternalName>()
         for ((slot, stack) in inventoryItems) {
-            bazaarItemNamePattern.matchMatcher(stack.displayName) {
+            bazaarItemNamePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val buyOrSell = group("type").let { (it == "BUY") to (it == "SELL") }
                 if (buyOrSell.let { !it.first && !it.second }) return@matchMatcher
 
@@ -80,10 +81,10 @@ object BazaarOrderHelper {
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!inventory.isInside()) return
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is ContainerScreen) return
+        val chest = event.container as ChestMenu
         for ((slot, _) in chest.getUpperItems()) {
-            highlightedSlots[slot.slotNumber]?.let {
+            highlightedSlots[slot.index]?.let {
                 slot.highlight(it)
             }
         }

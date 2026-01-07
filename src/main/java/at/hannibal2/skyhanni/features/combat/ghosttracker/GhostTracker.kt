@@ -78,7 +78,7 @@ object GhostTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Ghost Tracker",
-        { Data() },
+        ::Data,
         { it.ghostStorage.ghostTracker },
     ) { drawDisplay(it) }
 
@@ -161,7 +161,9 @@ object GhostTracker {
         config.ghostTrackerText.forEach { line ->
             addSearchString(line.line(data))
         }
-        add(tracker.addTotalProfit(profit, data.kills, "kill"))
+
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.kills, "kill", duration, "Kills"))
     }
 
     @HandleEvent

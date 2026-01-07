@@ -26,14 +26,12 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -46,9 +44,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.init.Blocks
-import org.lwjgl.input.Keyboard
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -56,10 +53,10 @@ object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val allowedBlocksAboveGround = buildList {
-        add(Blocks.air)
-        add(Blocks.yellow_flower)
-        add(Blocks.spruce_fence)
+    val allowedBlocksAboveGround = buildList {
+        add(Blocks.AIR)
+        add(Blocks.DANDELION)
+        add(Blocks.SPRUCE_FENCE)
         addLeaves()
         addLeaves2()
         addTallGrass()
@@ -78,17 +75,19 @@ object GriffinBurrowHelper {
         }
     }
 
+    var newBurrow = true
     private var latestGuess: Guess? = null
     private val additionalGuesses = mutableListOf<Guess>()
 
     private var allGuessLocations: List<LorenzVec> = emptyList()
 
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
-    var lastTitleSentTime = SimpleTimeMark.farPast()
     private var shouldFocusOnRareMob = false
 
     private var testList = listOf<LorenzVec>()
     private var testGriffinSpots = false
+
+    val guessCount get() = allGuessLocations.size
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -118,6 +117,7 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
         update()
         loadTestGriffinSpots()
+        ArrowGuessBurrow.checkMoveGuess(particleBurrows)
     }
 
     private fun loadTestGriffinSpots() {
@@ -205,7 +205,7 @@ object GriffinBurrowHelper {
         update()
     }
 
-    private fun removePreciseGuess(location: LorenzVec) {
+    fun removePreciseGuess(location: LorenzVec) {
         latestGuess?.let {
             if (it.precise && location == it.getLocation()) {
                 latestGuess = null
@@ -229,13 +229,15 @@ object GriffinBurrowHelper {
         particleBurrows = particleBurrows.editCopy { remove(location) }
         removePreciseGuess(location)
         update()
+        newBurrow = true
     }
 
     @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
         if (event.distance > 10 && event.isLocalPlayer) {
             update()
+            ArrowGuessBurrow.checkMoveGuess(particleBurrows)
         }
     }
 
@@ -257,6 +259,12 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
+
+        if (config.warnIfInaccurateArrowGuess) {
+            TitleManager.conditionallyStopTitle { currentTitle ->
+                currentTitle == "§eUse Spade"
+            }
+        }
 
         additionalGuesses.removeIf {
             it.getLocation().distanceToPlayerIgnoreY() < 10
@@ -294,7 +302,7 @@ object GriffinBurrowHelper {
 
     private fun findGround(point: LorenzVec): LorenzVec? {
         fun isValidGround(y: Double): Boolean {
-            val isGround = point.copy(y = y).getBlockAt() == Blocks.grass
+            val isGround = point.copy(y = y).getBlockAt() == Blocks.GRASS_BLOCK
             val isValidBlockAbove = point.copy(y = y + 1).getBlockAt() in allowedBlocksAboveGround
             return isGround && isValidBlockAbove
         }
@@ -313,7 +321,7 @@ object GriffinBurrowHelper {
     private fun findBlockBelowAir(point: LorenzVec): LorenzVec {
         val start = 65.0
         var gY = start
-        while (point.copy(y = gY).getBlockAt() != Blocks.air) {
+        while (point.copy(y = gY).getBlockAt() != Blocks.AIR) {
             gY++
             if (gY > 140) {
                 // no blocks at this spot, assuming outside of island
@@ -333,8 +341,6 @@ object GriffinBurrowHelper {
 
         showTestLocations(event)
 
-        showWarpSuggestions()
-
         val playerLocation = LocationUtils.playerLocation()
         if (config.inquisitorSharing.enabled) {
             for (rareMob in RareMobWaypointShare.waypoints.values) {
@@ -345,14 +351,14 @@ object GriffinBurrowHelper {
                 if (distance > 10) {
                     // TODO use round(1)
                     val formattedDistance = distance.toInt().addSeparators()
-                    event.drawDynamicText(location.up(), "§d§lRare Diana Mob §e${formattedDistance}m", 1.7)
+                    event.drawDynamicText(location.up(), "§d§l${rareMob.mobName} §e${formattedDistance}m", 1.7)
                 } else {
-                    event.drawDynamicText(location.up(), "§d§lRare Diana Mob", 1.7)
+                    event.drawDynamicText(location.up(), "§d§l${rareMob.mobName}", 1.7)
                 }
                 if (distance < 5) {
                     RareMobWaypointShare.maybeRemove(rareMob)
                 }
-                event.drawDynamicText(location.up(), "§eFrom §b${rareMob.displayName}", 1.6, yOff = 9f)
+                event.drawDynamicText(location.up(), "§eFrom §b${rareMob.playerDisplayName}", 1.6, yOff = 9f)
 
                 if (config.inquisitorSharing.showDespawnTime) {
                     val spawnTime = rareMob.spawnTime
@@ -430,7 +436,7 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
 
         val location = event.position
-        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
+        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.GRASS_BLOCK) return
         removePreciseGuess(location)
 
         if (particleBurrows.containsKey(location)) {
@@ -440,21 +446,6 @@ object GriffinBurrowHelper {
                     particleBurrows = particleBurrows.editCopy { keys.remove(location) }
                 }
             }
-        }
-    }
-
-    private fun showWarpSuggestions() {
-        if (!config.burrowNearestWarp) return
-        val warp = BurrowWarpHelper.currentWarp ?: return
-
-        val text = "§bWarp to " + warp.displayName
-        val keybindSuffix = if (config.keyBindWarp != Keyboard.KEY_NONE) {
-            val keyName = KeyboardManager.getKeyName(config.keyBindWarp)
-            " §7(§ePress $keyName§7)"
-        } else ""
-        if (lastTitleSentTime.passedSince() > 2.seconds) {
-            lastTitleSentTime = SimpleTimeMark.now()
-            TitleManager.sendTitle(text + keybindSuffix, duration = 2.seconds)
         }
     }
 

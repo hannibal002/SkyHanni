@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import net.minecraft.entity.player.InventoryPlayer
-import net.minecraft.init.Items
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -30,7 +30,7 @@ object GardenVisitorSupercraft {
 
     private val superCraftItem by lazy {
         ItemUtils.createItemStack(
-            Items.golden_pickaxe,
+            Items.GOLDEN_PICKAXE,
             "§bSupercraft",
             "§8(From SkyHanni)",
             "",
@@ -95,7 +95,7 @@ object GardenVisitorSupercraft {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!hasIngredients) return
-        if (event.inventory is InventoryPlayer) return
+        if (event.inventory is Inventory) return
 
         if (event.slot == 31) {
             event.replace(superCraftItem)

@@ -69,7 +69,7 @@ object PurseApi {
                 return PurseChangeCause.GAIN_DICE_ROLL
             }
 
-            if (Minecraft.getMinecraft().currentScreen == null) {
+            if (Minecraft.getInstance().screen == null) {
                 if (inventoryCloseTime.passedSince() > 2.seconds) {
                     return PurseChangeCause.GAIN_MOB_KILL
                 }

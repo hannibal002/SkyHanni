@@ -52,7 +52,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTracker.BucketData>(
     "Pest Profit Tracker",
-    { BucketData() },
+    ::BucketData,
     { it.garden.pestProfitTracker },
     { drawDisplay(it) },
 ) {
@@ -258,7 +258,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             )
         }
 
-        add(addTotalProfit(profit, bucketData.getTotalPestCount(), "kill"))
+        val duration = bucketData.getTotalUptime()
+        addAll(addTotalProfit(profit, bucketData.getTotalPestCount(), "kill", duration, "Kills"))
 
         addPriceFromButton(this)
     }

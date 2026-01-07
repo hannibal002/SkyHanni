@@ -34,7 +34,7 @@ import com.google.gson.annotations.Expose
 @SkyHanniModule
 object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.BucketData>(
     "Corpse Tracker",
-    { BucketData() },
+    ::BucketData,
     { it.mining.mineshaft.corpseProfitTracker },
     { drawDisplay(it) },
 ) {
@@ -127,7 +127,8 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
             )
         }
 
-        add(addTotalProfit(profit, bucketData.getCorpseCount(), "loot"))
+        val duration = bucketData.getTotalUptime()
+        addAll(addTotalProfit(profit, bucketData.getCorpseCount(), "corpse", duration, "Corpses"))
 
         addPriceFromButton(this)
     }

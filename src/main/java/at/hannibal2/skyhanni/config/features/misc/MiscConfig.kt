@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
-import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
+import at.hannibal2.skyhanni.config.features.misc.navigation.NavigationConfig
 import at.hannibal2.skyhanni.config.features.pets.PetConfig
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
 import com.google.gson.annotations.Expose
@@ -16,13 +16,15 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
+@Suppress("AvoidBritishSpelling")
 class MiscConfig {
     @Expose
     @Category(name = "Pets", desc = "Pets Settings")
@@ -45,12 +47,8 @@ class MiscConfig {
     val stranded: StrandedConfig = StrandedConfig()
 
     @Expose
-    @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
-    val areaNavigation: AreaNavigationConfig = AreaNavigationConfig()
-
-    @Expose
-    @Category(name = "Pathfinding", desc = "General settings for Pathfinding/Navigating in different features.")
-    val pathfinding: PathfindConfig = PathfindConfig()
+    @Category(name = "Navigation", desc = "Navigation features and other related settings.")
+    val navigation: NavigationConfig = NavigationConfig()
 
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
@@ -82,11 +80,6 @@ class MiscConfig {
     @Accordion
     @Expose
     val quickModMenuSwitch: QuickModMenuSwitchConfig = QuickModMenuSwitchConfig()
-
-    @Expose
-    @ConfigOption(name = "Glowing Dropped Items", desc = "")
-    @Accordion
-    val glowingDroppedItems: GlowingDroppedItemsConfig = GlowingDroppedItemsConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Party Members", desc = "")
@@ -236,16 +229,6 @@ class MiscConfig {
     var xpInInventory: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Red Scoreboard Numbers",
-        desc = "Hide the red scoreboard numbers on the right side of the screen.",
-    )
-    @OnlyLegacy
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var hideScoreboardNumbers: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Hide Piggy", desc = "Replace 'Piggy' with 'Purse' in the Scoreboard.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -277,16 +260,6 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideFireOverlay: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Better Sign Editing",
-        desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.",
-    )
-    @ConfigEditorBoolean
-    @OnlyLegacy
-    @FeatureToggle
-    var betterSignEditing: Boolean = true
 
     @Expose
     @ConfigOption(name = "Movement Speed", desc = "Show the player movement speed in blocks per second.")
@@ -325,12 +298,6 @@ class MiscConfig {
     @SearchTag("Elizabeth Community Center")
     @FeatureToggle
     var accountUpgradeReminder: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "NEU Heavy Pearls", desc = "Fix NEU's Heavy Pearl detection.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var fixNeuHeavyPearls: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -417,6 +384,11 @@ class MiscConfig {
     val lastStorage: LastStorageConfig = LastStorageConfig()
 
     @Expose
+    @ConfigOption(name = "Custom Todos", desc = "")
+    @Accordion
+    val customTodos: CustomTodosConfig = CustomTodosConfig()
+
+    @Expose
     @ConfigOption(
         name = "Maintain Volume During Warnings",
         desc = "Do not change game volume levels when warning sounds are played.",
@@ -424,16 +396,6 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var maintainGameVolume: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "NEU Soul Path Find",
-        desc = "When showing §e/neusouls on§7, show a pathfind to the faily souls missing and a percentage of souls done in chat.",
-    )
-    @ConfigEditorBoolean
-    @OnlyLegacy
-    @FeatureToggle
-    var neuSoulsPathFind: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -500,8 +462,8 @@ class MiscConfig {
 
     @Expose
     @ConfigOption(name = "Abiphone Hotkey", desc = "Answer incoming abiphone calls with a hotkey.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var abiphoneAcceptKey: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var abiphoneAcceptKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -512,4 +474,20 @@ class MiscConfig {
     @FeatureToggle
     @OnlyModern
     var fixDoubleClicks: Boolean = true
+
+
+    @ConfigOption(name = "Color Particle Warning", desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.§f")
+    @ConfigEditorInfoText
+    @SearchTag("Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes Fix Colored Particles")
+    var notice: String = ""
+
+    @Expose
+    @ConfigOption(
+        name = "Fix Colored Particles",
+        desc = "Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("Colour Spell Spawn Specific")
+    var fixColorParticles: Boolean = false
 }

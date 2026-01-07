@@ -46,6 +46,9 @@
         "fabric-language-kotlin": ">=1.13.2+kotlin.2.1.20",
         "minecraft": "1.21.10"
     },
+    "breaks": {
+        "exordium": "*"
+    },
     "contact": {
         "homepage": "https://modrinth.com/mod/skyhanni",
         "issues": "https://discord.gg/skyhanni-997079228510117908"
