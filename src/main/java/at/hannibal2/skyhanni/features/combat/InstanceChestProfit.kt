@@ -204,7 +204,6 @@ object InstanceChestProfit {
 
             if (chestProfits.isNotEmpty()) {
                 add(listOf(Renderable.emptyText()))
-                add(listOf(Renderable.emptyText()))
                 add(listOf(Renderable.text("§d§lAll Chest Profits")))
 
                 for (it in chestProfits.entries.sortedByDescending { it.value }) {
