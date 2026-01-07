@@ -79,7 +79,7 @@ object SuperCraftingInventory {
     } * 1_000_000L
 
     @HandleEvent
-    fun onClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!invDetector.isInside()) return
         if (!config.enabled) return
         if (HypixelData.noTrade) return
@@ -93,7 +93,7 @@ object SuperCraftingInventory {
         val diff = (-profit).formatChatCoins()
         TitleManager.sendTitle(
             "§cSuper Crafting Blocked (Potential Loss)",
-            subtitleText = "§7Hold §eControl Key §7to bypass. Potential savings: §c$diff",
+            subtitleText = "§7Hold §eControl Key §7to bypass. Potential loss: §c$diff",
             duration = 2.seconds,
             location = TitleManager.TitleLocation.INVENTORY,
         )

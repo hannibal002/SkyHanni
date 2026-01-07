@@ -25,7 +25,7 @@ class SuperCraftingWasteConfig {
     @Expose
     @ConfigOption(
         name = "Bulk Threshold",
-        desc = "Threshold when crafting maximum amount.",
+        desc = "Minimum savings (in millions) when crafting maximum amount.",
     )
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 50.0f, minStep = 0.1f)
     var bulkThreshold: Double = 5.0

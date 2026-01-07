@@ -17,7 +17,7 @@ class SuperCraftingWithoutCookieConfig {
     @Expose
     @ConfigOption(
         name = "Bulk Threshold",
-        desc = "Threshold when crafting maximum amount without Cookie Buff.",
+        desc = "Minimum savings (in millions) when crafting maximum amount without Cookie Buff."
     )
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 100.0f, minStep = 0.1f)
     var bulkThreshold: Double = 10.0
