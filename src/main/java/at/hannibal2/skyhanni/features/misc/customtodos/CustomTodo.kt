@@ -160,20 +160,15 @@ data class CustomTodo(
         val cron = CronExpression(this.cronExpression)
         val timeMark = SimpleTimeMark(cron.getNextValidTimeAfter(date).time)
         val nextTime = timeMark + this.timer.seconds
-        val timer: String
-        if (timeMark.isInPast() && nextTime.isInFuture()) {
-            timer = "§aReady"
-        } else {
-            if (nextTime.isInPast()) {
-                this.readyAtOnCurrentProfile = SimpleTimeMark.now()
-            }
-            if (this.showOnlyWhenReady) return null
-            if (this.showWhen != 0 && timeMark.timeUntil().inWholeSeconds > this.showWhen) return null
 
-            timer = timeMark.timeUntil().format(maxUnits = 2)
+        if (timeMark.isInPast() && nextTime.isInFuture()) return "§aReady"
+        if (nextTime.isInPast()) {
+            readyAtOnCurrentProfile = SimpleTimeMark.now()
         }
+        if (showOnlyWhenReady) return null
+        if (showWhen != 0 && timeMark.timeUntil().inWholeSeconds > showWhen) return null
 
-        return timer
+        return timeMark.timeUntil().format(maxUnits = 2)
     }
 
     private var compiledRegex: Regex? = null
