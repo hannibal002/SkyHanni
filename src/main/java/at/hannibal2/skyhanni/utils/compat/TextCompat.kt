@@ -284,5 +284,10 @@ fun List<Any>.mapToComponents(): List<Component> {
 }
 
 fun Component.replace(oldValue: String, newValue: String): Component {
-    return Component.literal(this.string.replace(oldValue, newValue)).withStyle(this.style)
+    // this isnt perfect
+    for (index in this.siblings.indices) {
+        val sibling = this.siblings[index]
+        this.siblings[index] = Component.literal(sibling.string.replace(oldValue, newValue)).withStyle(sibling.style)
+    }
+    return this
 }
