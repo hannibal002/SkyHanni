@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.rgb
@@ -24,6 +25,7 @@ import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.ShapeRenderer
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.AABB
 import org.joml.Matrix4f
@@ -32,6 +34,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+@Suppress("LargeClass")
 object WorldRenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
@@ -206,7 +209,78 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawString(
         location: LorenzVec,
+        text: String?,
+        component: Component?,
+        seeThroughBlocks: Boolean = false,
+        color: Color? = null,
+        scale: Double = 0.53333333,
+        shadow: Boolean = false,
+        yOffset: Float = 0f,
+        backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
+    ) {
+        if (text != null) {
+            drawString(location, text, seeThroughBlocks, color, scale, shadow, yOffset, backGroundColor)
+        } else if (component != null) {
+            drawString(location, component, seeThroughBlocks, color, scale, shadow, yOffset, backGroundColor)
+        } else {
+            ErrorManager.skyHanniError("Both string and Component are null")
+        }
+    }
+
+    fun SkyHanniRenderWorldEvent.drawString(
+        location: LorenzVec,
         text: String,
+        seeThroughBlocks: Boolean = false,
+        color: Color? = null,
+        scale: Double = 0.53333333,
+        shadow: Boolean = false,
+        yOffset: Float = 0f,
+        backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
+    ) {
+        if (this.isCurrentlyDeferring) {
+            DeferredDrawer.deferString(
+                location,
+                text,
+                color,
+                scale,
+                shadow,
+                yOffset,
+                backGroundColor,
+                !seeThroughBlocks,
+            )
+            return
+        }
+
+        val matrix = Matrix4f()
+        val cameraPos = camera.position
+        val fr = Minecraft.getInstance().font
+        val adjustedScale = (scale * 0.05).toFloat()
+
+        matrix.translate(
+            (location.x - cameraPos.x()).toFloat(),
+            (location.y - cameraPos.y() + yOffset * adjustedScale).toFloat(),
+            (location.z - cameraPos.z()).toFloat(),
+        ).rotate(camera.rotation()).scale(adjustedScale, -adjustedScale, adjustedScale)
+
+        val x = -fr.width(text) / 2f
+
+        fr.drawInBatch(
+            text,
+            x,
+            0f,
+            color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
+            shadow,
+            matrix,
+            vertexConsumers,
+            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL,
+            backGroundColor,
+            LightTexture.FULL_BRIGHT,
+        )
+    }
+
+    fun SkyHanniRenderWorldEvent.drawString(
+        location: LorenzVec,
+        text: Component,
         seeThroughBlocks: Boolean = false,
         color: Color? = null,
         scale: Double = 0.53333333,

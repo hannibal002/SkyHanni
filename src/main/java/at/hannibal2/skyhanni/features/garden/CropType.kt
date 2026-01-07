@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.ServerTime
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
@@ -120,7 +120,7 @@ enum class CropType(
         }
 
         fun getTimeFlower(): CropType {
-            val time = MinecraftCompat.localWorld.dayTime % 24000
+            val time = ServerTime.dayTime % 24000
             // pretty sure great spook will break this
             return if (time >= 12000) MOONFLOWER else SUNFLOWER
         }

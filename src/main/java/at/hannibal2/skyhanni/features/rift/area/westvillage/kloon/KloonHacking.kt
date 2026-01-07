@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -135,7 +134,7 @@ object KloonHacking {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onChat(event: SkyHanniChatEvent) {
         if (!wearingHelmet) return
-        colorPattern.matchMatcher(event.message.removeColor()) {
+        colorPattern.matchMatcher(event.cleanMessage) {
             val storage = ProfileStorageData.profileSpecific?.rift ?: return
             val color = group("color")
             val completedTerminal = KloonTerminal.entries.firstOrNull { it.name == color } ?: return

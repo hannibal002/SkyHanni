@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -71,7 +70,7 @@ object ArachneSpawnTimer {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        val message = event.message.removeColor().lowercase()
+        val message = event.cleanMessage.lowercase()
 
         if (arachneFragmentPattern.matches(message) || arachneCrystalPattern.matches(message)) {
             if (arachneCrystalPattern.matches(message)) {
