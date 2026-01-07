@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
@@ -51,7 +51,6 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.phys.BlockHitResult
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -121,25 +120,12 @@ object GriffinBurrowHelper {
     data class GuessEntry(
         val guesses: List<LorenzVec>,
         var burrowType: BurrowType = BurrowType.UNKNOWN,
-        var range: Int = 0,
         var currentIndex: Int = 0,
         var ignoreParticleCheckUntil: SimpleTimeMark = SimpleTimeMark.now(),
     ) {
         fun getCurrent(): LorenzVec = guesses[currentIndex]
         fun contains(vec: LorenzVec): Boolean {
-            // exact match
-            if (guesses.contains(vec)) return true
-
-            // check if within range
-            if (range > 0) {
-                val withinRange = guesses.any { guess ->
-                    val distanceSq = guess.distanceSq(vec)
-                    distanceSq <= range * range
-                }
-                if (withinRange) return true
-            }
-
-            return false
+            return guesses.contains(vec)
         }
 
         fun checkRemove(): Boolean {
@@ -150,10 +136,7 @@ object GriffinBurrowHelper {
                 }
             }
 
-            if (ignoreParticleCheckUntil.passedSince() < 0.milliseconds) return false
-
-            // don't attempt to move mob burrows if a mob is alive
-            if (mobAlive && this.burrowType == BurrowType.MOB) return false
+            if (shouldKeepGuess()) return false
 
             var shouldMove = false
             if (!isBlockValid(this.getCurrent())) shouldMove = true
@@ -175,6 +158,17 @@ object GriffinBurrowHelper {
                     return false
                 } else return true // remove if it should have moved but cant
             }
+            return false
+        }
+
+        private fun shouldKeepGuess(): Boolean {
+
+            // burrows that are known from the previous dug even if particles don't update
+            if (ignoreParticleCheckUntil.passedSince() < 0.milliseconds) return true
+
+            // don't attempt to move mob burrows if a mob is alive
+            if (mobAlive && this.burrowType == BurrowType.MOB) return true
+
             return false
         }
     }
@@ -376,6 +370,11 @@ object GriffinBurrowHelper {
         if (config.clearOnWorldChange) resetAllData()
     }
 
+    @HandleEvent
+    fun onProfileChange(event: ProfileJoinEvent) {
+        resetAllData()
+    }
+
     fun isBlockValid(pos: LorenzVec): Boolean {
         if (!pos.isInLoadedChunk()) {
             return true
@@ -399,29 +398,7 @@ object GriffinBurrowHelper {
 
         val playerLocation = LocationUtils.playerLocation()
         if (config.inquisitorSharing.enabled) {
-            for (rareMob in RareMobWaypointShare.waypoints.values) {
-                val location = rareMob.location
-                // TODO add chroma color support via config
-                event.drawColor(location, LorenzColor.LIGHT_PURPLE.toChromaColor())
-                val distance = location.distance(playerLocation)
-                if (distance > 10) {
-                    // TODO use round(1)
-                    val formattedDistance = distance.toInt().addSeparators()
-                    event.drawDynamicText(location.up(), "§d§l${rareMob.mobName} §e${formattedDistance}m", 1.7)
-                } else {
-                    event.drawDynamicText(location.up(), "§d§l${rareMob.mobName}", 1.7)
-                }
-                if (distance < 5) {
-                    RareMobWaypointShare.maybeRemove(rareMob)
-                }
-                event.drawDynamicText(location.up(), "§eFrom §b${rareMob.playerDisplayName}", 1.6, yOff = 9f)
-
-                if (config.inquisitorSharing.showDespawnTime) {
-                    val spawnTime = rareMob.spawnTime
-                    val format = (75.seconds - spawnTime.passedSince()).format()
-                    event.drawDynamicText(location.up(), "§eDespawns in §b$format", 1.6, yOff = 18f)
-                }
-            }
+            renderRareMobs(event, playerLocation)
         }
 
         val currentWarp = BurrowWarpHelper.currentWarp
@@ -449,7 +426,9 @@ object GriffinBurrowHelper {
             return
         }
 
-        if (!config.multiGuesses) {
+        if (config.multiGuesses) {
+            renderAllGuesses(event, playerLocation)
+        } else {
             val target = allGuesses.firstOrNull { it.getCurrent() == targetLocation }
             if (target == null) return
             val location = target.getCurrent()
@@ -461,10 +440,37 @@ object GriffinBurrowHelper {
 
             event.drawColor(location, target.burrowType.color, distance > 10)
             event.drawDynamicText(location.up(), text, 1.5)
-
-            return
         }
 
+    }
+
+    private fun renderRareMobs(event: SkyHanniRenderWorldEvent, playerLocation: LorenzVec) {
+        for (rareMob in RareMobWaypointShare.waypoints.values) {
+            val location = rareMob.location
+            // TODO add chroma color support via config
+            event.drawColor(location, LorenzColor.LIGHT_PURPLE.toChromaColor())
+            val distance = location.distance(playerLocation)
+            if (distance > 10) {
+                // TODO use round(1)
+                val formattedDistance = distance.toInt().addSeparators()
+                event.drawDynamicText(location.up(), "§d§l${rareMob.mobName} §e${formattedDistance}m", 1.7)
+            } else {
+                event.drawDynamicText(location.up(), "§d§l${rareMob.mobName}", 1.7)
+            }
+            if (distance < 5) {
+                RareMobWaypointShare.maybeRemove(rareMob)
+            }
+            event.drawDynamicText(location.up(), "§eFrom §b${rareMob.playerDisplayName}", 1.6, yOff = 9f)
+
+            if (config.inquisitorSharing.showDespawnTime) {
+                val spawnTime = rareMob.spawnTime
+                val format = (75.seconds - spawnTime.passedSince()).format()
+                event.drawDynamicText(location.up(), "§eDespawns in §b$format", 1.6, yOff = 18f)
+            }
+        }
+    }
+
+    private fun renderAllGuesses(event: SkyHanniRenderWorldEvent, playerLocation: LorenzVec) {
         for (guess in allGuesses.toList()) {
             val location = guess.getCurrent()
             val distance = location.distance(playerLocation)
@@ -478,7 +484,7 @@ object GriffinBurrowHelper {
             if (burrowType == BurrowType.UNKNOWN) {
                 if (!config.guess) return
                 else {
-                    val textColor = if (currentWarp != null && targetLocation == location) "§b" else "§f"
+                    val textColor = if (BurrowWarpHelper.currentWarp != null && targetLocation == location) "§b" else "§f"
                     text = "${textColor}Guess"
                     if (distance > 5) {
                         val formattedDistance = distance.toInt().addSeparators()
@@ -511,12 +517,7 @@ object GriffinBurrowHelper {
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
 
-        var location = event.position
-        if (event.clickType == ClickType.RIGHT_CLICK) {
-            val hitResult = MinecraftCompat.localPlayer.pick(6.0, 0.0F, true)
-            location = (hitResult as BlockHitResult).blockPos.toLorenzVec()
-        }
-
+        val location = event.position
         if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.GRASS_BLOCK) return
 
         val burrows = allGuesses.flatMap { it.guesses }

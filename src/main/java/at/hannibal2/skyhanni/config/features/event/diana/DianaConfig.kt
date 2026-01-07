@@ -79,7 +79,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Warn On Failure",
-        desc = "Sends \"Use Spade\" title when arrow guess fails",
+        desc = "Sends \"Use Spade\" title when arrow guess fails.",
     )
     @ConfigEditorBoolean
     var warnOnFail: Boolean = true
@@ -87,7 +87,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Warn On Chain Complete",
-        desc = "Sends \"Use Spade\" title when you complete a chain and there is not a burrow within 90 blocks",
+        desc = "Sends \"Use Spade\" title when you complete a chain and there is not a burrow within 90 blocks.",
     )
     @ConfigEditorBoolean
     var warnOnChainComp: Boolean = true
@@ -95,7 +95,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Render SubGuesses",
-        desc = "If there are multiple possible blocks will render them all in a greyed out chain",
+        desc = "If there are multiple possible blocks will render them all in a greyed out chain.",
     )
     @ConfigEditorBoolean
     var renderSubGuesses: Boolean = false
@@ -103,7 +103,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Clear On World Change",
-        desc = "clear all guess data on world change",
+        desc = "Clear all guess data on world change.",
     )
     @ConfigEditorBoolean
     var clearOnWorldChange: Boolean = false
