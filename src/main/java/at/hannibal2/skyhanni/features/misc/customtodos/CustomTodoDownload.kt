@@ -33,7 +33,7 @@ object CustomTodoDownload {
                     return@argCallback
                 }
                 for (todo in todos) {
-                    if (todo.id == id) {
+                    if (todo.id.lowercase() == id.lowercase()) {
                         val template = CustomTodo.fromTemplate(todo.todoData) ?: run {
                             ChatUtils.userError("Todo is invalid, please report this on discord")
                             return@argCallback
