@@ -106,10 +106,10 @@ data class CustomTodo(
         private const val TEMPLATE_PREFIX = "SH:CUSTOMTODO/"
         const val MS_IN_A_DAY = (24 * 60 * 60 * 1000)
 
-        fun fromTemplate(data: String): CustomTodo? {
+        fun fromTemplate(data: String, printErrors: Boolean = false): CustomTodo? {
             val maybeDecoded = TemplateUtil.maybeDecodeTemplate(TEMPLATE_PREFIX, data, CustomTodo::class.java)
                 ?: TemplateUtil.maybeDecodeTemplate(NEU_TEMPLATE_PREFIX, data, CustomTodo::class.java)
-            if (maybeDecoded == null) {
+            if (maybeDecoded == null && printErrors) {
                 ChatUtils.chat("§cInvalid Todo")
             }
             return maybeDecoded?.also {
@@ -122,7 +122,7 @@ data class CustomTodo(
     fun toTemplate(): String {
         return TemplateUtil.encodeTemplate(
             TEMPLATE_PREFIX,
-            this.copy(readyAt = mutableMapOf(), triggersLeft = mutableMapOf()),
+            this.copy(readyAt = mutableMapOf(), triggersLeft = mutableMapOf(), downloaded = false),
         )
     }
 
@@ -158,7 +158,7 @@ data class CustomTodo(
         val cron = CronExpression(this.cronExpression)
         val timeMark = SimpleTimeMark(cron.getNextValidTimeAfter(date).time)
         val nextTime = timeMark + this.timer.seconds
-        var timer = ""
+        val timer: String
         if (timeMark.isInPast() && nextTime.isInFuture()) {
             timer = "§aReady"
         } else {

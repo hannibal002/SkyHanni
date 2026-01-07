@@ -30,6 +30,9 @@
                 <Button onClick="@pasteTodo">
                     <Text text="Paste TODO from Clipboard"/>
                 </Button>
+                <Button onClick="@viewCommunityTodos">
+                    <Text text="View Community TODOs"/>
+                </Button>
             </Row>
         </Column>
     </Gui>

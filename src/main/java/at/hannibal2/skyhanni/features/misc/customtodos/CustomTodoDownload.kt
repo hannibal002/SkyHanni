@@ -12,11 +12,19 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.XmlUtils
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
+import com.google.gson.Gson
+import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
+import io.github.notenoughupdates.moulconfig.observer.ObservableList
 
 @SkyHanniModule
 object CustomTodoDownload {
 
-    private var todos: List<CommunityTodo>? = null
+    var todos: List<CommunityTodo> = listOf()
+        private set
+
+    private val gson: Gson by lazy { BaseGsonBuilder.gson().disableHtmlEscaping().create() }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -25,7 +33,7 @@ object CustomTodoDownload {
             description = "Download community /shtodos"
 
             argCallback("name", BrigadierArguments.greedyString(), BrigadierUtils.dynamicSuggestionProvider { getTodoIds() }) { id ->
-                val todos = todos ?: run {
+                if (todos.isEmpty()) {
                     ChatUtils.userError("Invalid repo data")
                     return@argCallback
                 }
@@ -44,7 +52,12 @@ object CustomTodoDownload {
                 ChatUtils.userError("Todo not found")
             }
             simpleCallback {
-                ChatUtils.userError("Do /shdownloadtodo <id>")
+                val todosList = ObservableList<CustomTodoEditor>(mutableListOf())
+                SkyHanniMod.customTodos.customTodos.forEach { todosList.add(CustomTodoEditor(it, todosList)) }
+                XmlUtils.openXmlScreen(
+                    CommunityTodoViewer(todos, todosList),
+                    MyResourceLocation("skyhanni", "gui/customtodos/communitytodos.xml")
+                )
             }
         }
         event.registerBrigadier("shexportcommunitytodo") {
@@ -59,30 +72,19 @@ object CustomTodoDownload {
     private fun convertTodoData() {
         SkyHanniMod.launchIOCoroutine("export custom todo for repo") {
             val clipboard = ClipboardUtils.readFromClipboard()?.trim() ?: return@launchIOCoroutine
-            val customTodo = CustomTodo.fromTemplate(clipboard) ?: return@launchIOCoroutine
-            val output = """
-                {
-                    "name": "${customTodo.label}",
-                    "id": "id",
-                    "author": "author",
-                    "icon": "${customTodo.icon}",
-                    "discord_thread": "",
-                    "todo_data": "$clipboard"
-                }
-            """.trimIndent()
-            ClipboardUtils.copyToClipboard(output)
+            val output = CommunityTodo("TODO id", "TODO author", "TODO thread", clipboard)
+            ClipboardUtils.copyToClipboard(gson.toJson(output))
             ChatUtils.chat("Copied data to clipboard")
         }
     }
 
     private fun getTodoIds(): List<String> {
-        return todos?.map { it.id }.orEmpty()
+        return todos.map { it.id }
     }
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val constant = event.getConstant<CommunityTodosJson>("community/CommunityTodos")
-        todos = constant.communityTodos
-
+        todos = constant.communityTodos.filter { CustomTodo.fromTemplate(it.todoData) != null }
     }
 }

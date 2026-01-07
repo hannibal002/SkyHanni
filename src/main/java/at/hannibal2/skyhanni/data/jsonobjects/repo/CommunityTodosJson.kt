@@ -8,10 +8,8 @@ data class CommunityTodosJson(
 )
 
 data class CommunityTodo(
-    @Expose val name: String,
     @Expose val id: String,
     @Expose val author: String,
-    @Expose val icon: String,
     @Expose @SerializedName("discord_thread") val discordThread: String,
     @Expose @SerializedName("todo_data") val todoData: String,
 )
