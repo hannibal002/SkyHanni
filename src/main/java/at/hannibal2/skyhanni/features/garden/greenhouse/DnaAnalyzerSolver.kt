@@ -23,6 +23,7 @@ object DnaAnalyzerSolver {
     private val config get() = SkyHanniMod.feature.garden.dnaAnalyzerSolver
 
     private var inInventory = false
+    private var fakeInventory = false
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -32,6 +33,7 @@ object DnaAnalyzerSolver {
     @HandleEvent
     fun onInventoryClose() {
         inInventory = false
+        fakeInventory = false
         currentBoard = null
     }
 
@@ -62,7 +64,7 @@ object DnaAnalyzerSolver {
             if (i < 9 || i > 44) continue
             val row = (i / 9) - 1
             val column = i % 9
-            initialBoard[column][row] = stack.toColor()
+            initialBoard[column][row] = stack.toColor() ?: return
         }
         currentBoard = DnaBoard(initialBoard)
     }
@@ -237,7 +239,7 @@ object DnaAnalyzerSolver {
         YELLOW;
 
         companion object {
-            fun ItemStack.toColor(): Colors {
+            fun ItemStack.toColor(): Colors? {
                 val name = this.hoverName.formattedTextCompatLeadingWhiteLessResets()
                 if (name.startsWith("§cDNA")) {
                     return RED
@@ -248,10 +250,11 @@ object DnaAnalyzerSolver {
                 } else if (name.startsWith("§aDNA")) {
                     return GREEN
                 }
-                ErrorManager.skyHanniError("unknown color", "name" to name)
+                fakeInventory = true
+                return null
             }
         }
     }
 
-    private fun isEnabled() = config.enabled && inInventory
+    private fun isEnabled() = config.enabled && inInventory && !fakeInventory
 }
