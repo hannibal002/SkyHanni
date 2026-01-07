@@ -206,7 +206,7 @@ class DungeonConfig {
 
     @ConfigOption(
         name = "§cInstance Chest Profit",
-        desc = "Chest Profit is Stored in a seperator config Area, click the button to jump to Dungeon Chest Profit/Croesus Profit Settings.",
+        desc = "click the button to jump to Dungeon Chest Profit/Croesus Profit Settings.",
     )
     @ConfigEditorButton(buttonText = "Go")
     val chestOverlayRunnable = Runnable { SkyHanniMod.feature.combat.instanceChestProfit::enabled.jumpToEditor() }

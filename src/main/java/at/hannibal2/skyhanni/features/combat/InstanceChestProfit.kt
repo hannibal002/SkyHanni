@@ -159,7 +159,7 @@ object InstanceChestProfit {
     private var inCroesusRunMenu = false
     private var chestDisplay: Renderable? = null
     private var croesusDisplay: Renderable? = null
-    private var alreadyProcessedChests = mutableListOf<CroesusChestType>()
+    private val alreadyProcessedChests = mutableListOf<CroesusChestType>()
     private val croesusDisplayList = mutableListOf<Renderable>()
     private var slotToHighlight: Pair<Int, Double>? = null
 
