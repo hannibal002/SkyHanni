@@ -168,7 +168,7 @@ object InstanceChestProfit {
         }
 
         val newDisplay = buildList {
-            add(listOf(Renderable.text("§d§l$inventoryName Chest Profit")))
+            add(listOf(Renderable.text("§d§l$inventoryName Profit")))
             add(listOf(Renderable.emptyText()))
 
             var total = 0.0
