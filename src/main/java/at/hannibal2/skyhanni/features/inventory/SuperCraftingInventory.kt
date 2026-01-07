@@ -92,7 +92,7 @@ object SuperCraftingInventory {
         SoundUtils.playErrorSound()
         val diff = (-profit).formatChatCoins()
         TitleManager.sendTitle(
-            "§cCraft-click Prevented (Big Loss Detected)",
+            "§cSuper Crafting Blocked (Potential Loss)",
             subtitleText = "§7Hold §eControl §7to bypass. Potential savings: §c$diff",
             duration = 2.seconds,
             location = TitleManager.TitleLocation.INVENTORY,
