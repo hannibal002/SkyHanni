@@ -67,8 +67,10 @@ object DungeonLividFinder {
         get() = EntityUtils.getEntities<RemotePlayer>()
             .filterTo(mutableListOf()) {
                 it.isNpc() &&
-                    (lividNamePattern.matches(it.name.formattedTextCompatLessResets()) ||
-                        lividTextureToColor.containsKey(it.getSkinTexture()))
+                    (
+                        lividNamePattern.matches(it.name.formattedTextCompatLessResets()) ||
+                            lividTextureToColor.containsKey(it.getSkinTexture())
+                        )
             }
 
     private var color: LorenzColor? = null
@@ -332,9 +334,7 @@ object DungeonLividFinder {
             add("livid: '${livid?.name.formattedTextCompatLessResets()}'")
             add("color: '${color?.name}'")
             add("lividTextureToColor:")
-            for ((key, value) in lividTextureToColor) {
-                add("  ${value}: ${key}")
-            }
+            for ((key, value) in lividTextureToColor) add("  $value: $key")
         }
     }
 }
