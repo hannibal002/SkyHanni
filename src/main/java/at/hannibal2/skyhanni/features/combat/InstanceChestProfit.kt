@@ -159,6 +159,7 @@ object InstanceChestProfit {
     private var inCroesusRunMenu = false
     private var chestDisplay: Renderable? = null
     private var croesusDisplay: Renderable? = null
+    private var alreadyProcessedChests = mutableListOf<CroesusChestType>()
     private val croesusDisplayList = mutableListOf<Renderable>()
     private var slotToHighlight: Pair<Int, Double>? = null
 
@@ -207,7 +208,12 @@ object InstanceChestProfit {
         if (inCroesusRunMenu) {
             event.inventoryItems.forEach { (slot, item) ->
                 val chestType = CroesusChestType.getByStackName(item.hoverName.formattedTextCompat())
-                if (chestType != null) parseCroesusChest(item, chestType, slot)
+                if (chestType != null) {
+                    if (!alreadyProcessedChests.contains(chestType)) {
+                        alreadyProcessedChests.add(chestType)
+                        parseCroesusChest(item, chestType, slot)
+                    }
+                }
             }
             createCroesusDisplay()
         }
@@ -228,6 +234,7 @@ object InstanceChestProfit {
         inDungeonChest = false
         inKuudraChest = false
         inCroesusRunMenu = false
+        alreadyProcessedChests.clear()
         croesusDisplayList.clear()
         slotToHighlight = null
         croesusDisplay = null
