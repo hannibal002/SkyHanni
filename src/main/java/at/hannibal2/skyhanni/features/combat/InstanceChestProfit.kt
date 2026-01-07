@@ -129,6 +129,11 @@ object InstanceChestProfit {
     }
 
     private fun createDisplay(inventoryName: String, items: Map<Int, ItemStack>) {
+        /**
+         * Kuudra chests say "Free Chest Chest" and "Paid Chest Chest" due to Hypixel issue
+         */
+        val fixedInventoryName = inventoryName.replace("Chest Chest", "Chest")
+
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
             if (fakeItemNamePattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())) return@forEach
@@ -169,7 +174,7 @@ object InstanceChestProfit {
         }
 
         val newDisplay = buildList {
-            add(listOf(Renderable.text("§d§l$inventoryName Profit")))
+            add(listOf(Renderable.text("§d§l$fixedInventoryName Profit")))
             add(listOf(Renderable.emptyText()))
 
             var total = 0.0
@@ -195,7 +200,7 @@ object InstanceChestProfit {
                 add(listOf(Renderable.text(it.key), Renderable.text(coins)))
             }
 
-            chestProfits[inventoryName] = total
+            chestProfits[fixedInventoryName] = total
 
             var color = if (total < 0) "§c"
             else "§a"
