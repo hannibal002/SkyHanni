@@ -90,7 +90,13 @@ object AshfangHighlights {
     }
 
     private fun getColor(distance: Double, text: String): Component =
-        ExtendedChatColor(ColorUtils.blendRGB(LorenzColor.GREEN.toColor(), LorenzColor.RED.toColor(), distance / MAX_DISTANCE).rgb).asText(text)
+        ExtendedChatColor(
+            ColorUtils.blendRGB(
+                LorenzColor.GREEN.toColor(),
+                LorenzColor.RED.toColor(),
+                distance / MAX_DISTANCE
+            ).rgb
+        ).asText(text)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

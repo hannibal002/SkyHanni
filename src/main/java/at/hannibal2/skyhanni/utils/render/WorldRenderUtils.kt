@@ -34,6 +34,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+@Suppress("LargeClass")
 object WorldRenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
