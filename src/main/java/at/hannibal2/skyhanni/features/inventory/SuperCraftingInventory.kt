@@ -70,13 +70,13 @@ object SuperCraftingInventory {
         config.threshold
     } else {
         config.withoutCookie.threshold
-    }
+    } * 1_000_000L
 
     private fun getBulkWarnAmount() = if (BitsApi.hasCookieBuff()) {
         config.bulkThreshold
     } else {
         config.withoutCookie.bulkThreshold
-    }
+    } * 1_000_000L
 
     @HandleEvent
     fun onClick(event: GuiContainerEvent.SlotClickEvent) {
@@ -93,13 +93,13 @@ object SuperCraftingInventory {
         val diff = (-profit).formatChatCoins()
         TitleManager.sendTitle(
             "§cSuper Crafting Blocked (Potential Loss)",
-            subtitleText = "§7Hold §eControl §7to bypass. Potential savings: §c$diff",
+            subtitleText = "§7Hold §eControl Key §7to bypass. Potential savings: §c$diff",
             duration = 2.seconds,
             location = TitleManager.TitleLocation.INVENTORY,
         )
         ChatUtils.chatAndOpenConfig(
             "Blocked a craft since instant selling the materials and instant buying the item(s) directly is " +
-                "significantly cheaper (§c$diff). You can hold §cControl §ewhile clicking to bypass this warning.",
+                "significantly cheaper (§c$diff§e)",
             config::enabled,
         )
         event.cancel()
@@ -110,7 +110,7 @@ object SuperCraftingInventory {
             groupOrNull("amount")?.formatLongOrNull()
         }
     }.minOrNull() ?: ErrorManager.skyHanniError(
-        "crafting resource line not found",
+        "Crafting resource line not found",
         "lore" to slots.map { slot -> slot.item.getLore().map { line -> line.removeColor() } },
     )
 
@@ -141,7 +141,7 @@ object SuperCraftingInventory {
         if (item.isEmpty) return@mapNotNull null
         item.toPrimitiveStackOrNull() ?: ErrorManager.skyHanniError(
             "Could not resolve internal name",
-            "item" to item.displayName,
+            "item" to item.hoverName.string,
         )
     }.groupBy { it.internalName }.map { (name, stacks) ->
         PrimitiveItemStack(name, stacks.sumOf { it.amount })
@@ -166,8 +166,8 @@ object SuperCraftingInventory {
 
     private fun blockWasteClick(profit: Double, craftingAmount: Long, maxCraftingAmount: Long) = when {
         KeyboardManager.isControlKeyDown() -> false
-        profit < -getWarnAmount() * 1_000_000L -> true
-        profit < -getBulkWarnAmount() * 1_000_000L && craftingAmount == maxCraftingAmount -> true
+        profit < -getWarnAmount() -> true
+        profit < -getBulkWarnAmount() && craftingAmount == maxCraftingAmount -> true
         else -> false
     }
 }
