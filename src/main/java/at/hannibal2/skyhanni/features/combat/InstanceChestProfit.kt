@@ -168,10 +168,7 @@ object InstanceChestProfit {
         }
 
         val newDisplay = buildList {
-            val chestName = if (inDungeonChest) "Dungeon"
-            else if (inKuudraChest) "Kuudra"
-            else ""
-            add(listOf(Renderable.text("§d§l$chestName Chest Profit")))
+            add(listOf(Renderable.text("§d§l$inventoryName Chest Profit")))
             add(listOf(Renderable.emptyText()))
 
             var total = 0.0
