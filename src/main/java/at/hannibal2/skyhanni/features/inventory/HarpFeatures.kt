@@ -140,7 +140,7 @@ object HarpFeatures {
     private var isGuiScaled = false
 
     private fun setGuiScale() {
-        Minecraft.getInstance().execute {
+        DelayedRun.runOrNextTick {
             guiSetting = getMinecraftGuiScale()
             setMinecraftGuiScale(0)
             isGuiScaled = true
@@ -150,7 +150,7 @@ object HarpFeatures {
 
     private fun unSetGuiScale() {
         if (!isGuiScaled) return
-        Minecraft.getInstance().execute {
+        DelayedRun.runOrNextTick {
             setMinecraftGuiScale(guiSetting)
             isGuiScaled = false
         }

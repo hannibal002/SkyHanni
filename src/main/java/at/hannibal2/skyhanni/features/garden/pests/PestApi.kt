@@ -102,9 +102,12 @@ object PestApi {
         "scoreboard.plot.no-pests",
         "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
     )
+    /**
+     * REGEX-TEST: §4§lൠ §cThis plot has §25 §2ൠ Pests§c!
+     */
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!",
+        "§4§lൠ §cThis plot has §.(?<amount>\\d+) §2ൠ Pests?§c!",
     )
 
     /**
@@ -158,11 +161,11 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST: §a§lPLAYING
+     * REGEX-TEST: PLAYING
      */
     val stereoPlayingItemPattern by patternGroup.pattern(
         "stereo.playing.item",
-        "§a§lPLAYING",
+        "PLAYING",
     )
 
     private var gardenJoinTime = SimpleTimeMark.farPast()

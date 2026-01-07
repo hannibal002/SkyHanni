@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
@@ -107,7 +108,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                     else "Visiting a Garden"
                 }
 
-                else -> location.takeIf { it != "None" && it != "invalid" && it != "no_area" }
+                else -> location.takeIf { it != "None" && it != "invalid" && it != AreaNode.NO_AREA }
                     ?: lastKnownDisplayStrings[LOCATION].orEmpty()
             }
             // Only display None if we don't have a last known area
@@ -169,7 +170,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     ITEM(
         {
             InventoryUtils.getItemInHand()?.let {
-                String.format(java.util.Locale.US, "Holding ${it.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()}")
+                String.format(java.util.Locale.US, "Holding ${it.hoverName.string.removeColor()}")
             } ?: "No item in hand"
         },
     ),
@@ -275,7 +276,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         {
             // Logic for getting the currently held stacking enchant is from Skytils
             val itemInHand = InventoryUtils.getItemInHand()
-            val itemName = itemInHand?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.removeColor().orEmpty()
+            val itemName = itemInHand?.hoverName?.string?.removeColor().orEmpty()
 
             fun getProgressPercent(amount: Int, levels: List<Int>): String {
                 var percent = "MAXED"

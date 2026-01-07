@@ -211,7 +211,7 @@ object FastFairySoulsPathfinder {
         if (event.inventoryName != "Fairy Souls Guide") return
 
         for (stack in event.inventoryItems.values) {
-            val island = IslandType.getByNameOrNull(stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) ?: continue
+            val island = IslandType.getByNameOrNull(stack.hoverName.string.removeColor()) ?: continue
             val have = stack.getLore().firstOrNull()?.let {
                 loreSoulPattern.matchMatcher(it) {
                     group("have").toIntOrNull()

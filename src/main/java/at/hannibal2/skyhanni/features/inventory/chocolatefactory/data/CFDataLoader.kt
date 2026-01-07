@@ -323,7 +323,7 @@ object CFDataLoader {
     private fun processChocolateItem(item: ItemStack) {
         val profileStorage = profileStorage ?: return
 
-        CFApi.chocolateAmountPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+        CFApi.chocolateAmountPattern.matchMatcher(item.hoverName.string.removeColor()) {
             profileStorage.currentChocolate = group("amount").formatLong()
         }
         for (line in item.getLore()) {
@@ -470,7 +470,7 @@ object CFDataLoader {
 
         if (slotIndex !in CFApi.otherUpgradeSlots && slotIndex !in CFApi.rabbitSlots) return
 
-        val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+        val itemName = item.hoverName.string.removeColor()
         val lore = item.getLore()
         val upgradeCost = CFApi.getChocolateBuyCost(lore)
         val averageChocolate = ChocolateAmount.averageChocPerSecond().roundTo(2)

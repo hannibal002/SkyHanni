@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -165,7 +164,7 @@ object GardenOptimalSpeed {
 
         if (config.showOnHUD) config.pos.renderRenderable(
             Renderable.text("§$colorCode$text"),
-            posLabel = "Garden Optimal Speed"
+            posLabel = "Garden Optimal Speed",
         )
         if (speed != currentSpeed && !recentlySwitchedTool) warn(speed)
     }
@@ -194,12 +193,7 @@ object GardenOptimalSpeed {
                 action = { HypixelCommands.setMaxSpeed(optimalSpeed) },
             )
         } else {
-            ChatUtils.clickableChat(
-                text,
-                onClick = { config::onlyWarnRanchers.jumpToEditor() },
-                hover = "§eClick to disable this feature!",
-                replaceSameMessage = true,
-            )
+            ChatUtils.notifyOrDisable(text, config::onlyWarnRanchers,)
         }
     }
 

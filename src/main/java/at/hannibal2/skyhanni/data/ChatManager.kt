@@ -72,7 +72,7 @@ object ChatManager {
 
     private fun getRecentMessageHistoryWithSearch(searchTerm: String): List<MessageFilteringResult> =
         messageHistory.toList().map { it.second }
-            .filter { it.message.formattedTextCompat().removeColor().contains(searchTerm, ignoreCase = true) }
+            .filter { it.message.string.removeColor().contains(searchTerm, ignoreCase = true) }
 
     enum class ActionKind(format: Any) {
         BLOCKED(ChatFormatting.RED.toString() + ChatFormatting.BOLD),
@@ -225,7 +225,7 @@ object ChatManager {
         predicate: (GuiMessage) -> Boolean,
         reason: String? = null,
     ) {
-        DelayedRun.onThread.execute {
+        DelayedRun.runOrNextTick {
             indexOfFirst {
                 predicate(it)
             }.takeIf { it != -1 }?.let {
@@ -254,7 +254,7 @@ object ChatManager {
         reason: String? = null,
         predicate: (GuiMessage) -> Boolean,
     ) {
-        DelayedRun.onThread.execute {
+        DelayedRun.runOrNextTick {
             val iterator = iterator()
             var removed = 0
             while (iterator.hasNext() && removed < amount) {

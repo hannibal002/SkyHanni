@@ -108,7 +108,7 @@ object ExperimentsAddonsHelper {
         chronHasBeenEmpty = false
     }
 
-    private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+    private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (hoverName.string.removeColor()) {
         "Green" -> LorenzColor.DARK_GREEN
         "Lime" -> LorenzColor.GREEN
         "Pink" -> LorenzColor.LIGHT_PURPLE
@@ -307,7 +307,7 @@ object ExperimentsAddonsHelper {
         val orderedUltrasequencerSlots = inventoryItems.filter {
             it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().trim().isNotEmpty()
         }.mapNotNull { (slot, stack) ->
-            val sequenceNumber = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().toIntOrNull() ?: return@mapNotNull null
+            val sequenceNumber = stack.hoverName.string.removeColor().toIntOrNull() ?: return@mapNotNull null
             currentUltraSequencerRound = maxOf(currentUltraSequencerRound, sequenceNumber)
             if (sequenceNumber !in ultrasequencerDyeMap) ultrasequencerDyeMap[sequenceNumber] = stack
             UltraSequencerSlot(

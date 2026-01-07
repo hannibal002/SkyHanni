@@ -468,6 +468,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to display total Trophy Fish count in Odger's inventory. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3526)
 + Added Rare Sea Creature Party Announcer. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/3672)
     + Sends a message to party chat when a rare sea creature is caught.
++ Mute Banshee screams. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/5007)
 
 </details>
 <details open><summary>
@@ -817,6 +818,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added DNA Analyser Solver. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
 + Added Hoe Level Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
 + Mute Hoe Level Up Sound. - nopo (https://github.com/hannibal002/SkyHanni/pull/4966)
++ Added Zorro's Cape Contest Protection. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5029)
+  + Requires equipping Zorro's Cape to claim Jacob's Farming Contest rewards.
 
 ### Garden Pests
 

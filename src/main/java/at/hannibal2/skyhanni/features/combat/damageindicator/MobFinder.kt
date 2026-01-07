@@ -156,7 +156,7 @@ class MobFinder {
 
     private fun tryAddDungeonF2(mob: Mob): EntityResult? {
         val entity = mob.baseEntity
-        if (entity.name.formattedTextCompatLessResets() == "Summon " && entity is RemotePlayer) {
+        if (entity.name.string == "Summon " && entity is RemotePlayer) {
             if (floor2summons1 && !floor2summonsDiedOnce.contains(entity)) {
                 if (entity.findHealthReal().toInt() != 0) {
                     return EntityResult(floor2summons1SpawnTime, bossType = BossType.DUNGEON_F2_SUMMON)
@@ -170,7 +170,7 @@ class MobFinder {
 
         if (floor2secondPhase && entity is RemotePlayer) {
             // TODO only show scarf after (all/at least x) summons are dead?
-            if (entity.name.formattedTextCompatLessResets() == "Scarf ") {
+            if (entity.name.string == "Scarf ") {
                 return EntityResult(
                     floor2secondPhaseSpawnTime,
                     finalDungeonBoss = true,
