@@ -214,16 +214,16 @@ object InstanceChestProfit {
         add(listOf(Renderable.emptyText()))
         add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color${total.formatCoin()}")))
 
-        if (IslandType.CATACOMBS.isCurrent() || IslandType.KUUDRA_ARENA.isCurrent()) {
-            add(listOf(Renderable.emptyText()))
-            add(listOf(Renderable.text("§d§lAll Chest Profits")))
+        if (!IslandType.CATACOMBS.isCurrent() && !IslandType.KUUDRA_ARENA.isCurrent()) return@buildList
 
-            for (it in chestProfits.entries.sortedByDescending { it.value }) {
-                color = if (it.value < 0) "§c"
-                else "§a"
+        add(listOf(Renderable.emptyText()))
+        add(listOf(Renderable.text("§d§lAll Chest Profits")))
 
-                add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
-            }
+        for (it in chestProfits.entries.sortedByDescending { it.value }) {
+            color = if (it.value < 0) "§c"
+            else "§a"
+
+            add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
         }
     }
 
