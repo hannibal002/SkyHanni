@@ -121,8 +121,8 @@ data class CustomTodo(
             }
         }
 
-        fun fromTemplate(data: String, printErrors: Boolean = false): CustomTodo {
-            return fromTemplateOrNull(data, printErrors) ?: ErrorManager.skyHanniError(
+        fun fromTemplate(data: String): CustomTodo {
+            return fromTemplateOrNull(data) ?: ErrorManager.skyHanniError(
                 "Invalid todo",
                 "data" to data
             )

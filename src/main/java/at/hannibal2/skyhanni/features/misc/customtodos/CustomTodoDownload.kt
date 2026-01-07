@@ -64,6 +64,7 @@ object CustomTodoDownload {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val constant = event.getConstant<CommunityTodosJson>("community/CommunityTodos")
-        todos = constant.communityTodos.filter { CustomTodo.fromTemplateOrNull(it.todoData) != null }
+        constant.communityTodos.forEach { CustomTodo.fromTemplate(it.todoData) }
+        todos = constant.communityTodos
     }
 }
