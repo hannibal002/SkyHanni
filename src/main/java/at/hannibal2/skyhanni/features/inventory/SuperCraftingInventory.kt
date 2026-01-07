@@ -93,7 +93,7 @@ object SuperCraftingInventory {
         val diff = (-profit).formatChatCoins()
         TitleManager.sendTitle(
             "§cSuper Crafting Blocked (Potential Loss)",
-            subtitleText = "§7Hold §eControl Key §7to bypass. Potential loss: §c$diff",
+            subtitleText = "§7Hold §e${KeyboardManager.getModifierKeyName()} §7to bypass. Potential loss: §c$diff",
             duration = 2.seconds,
             location = TitleManager.TitleLocation.INVENTORY,
         )
@@ -119,6 +119,10 @@ object SuperCraftingInventory {
         val resultItem = getResultItem(slots)
 
         val recipeMultiplier = resultItem.amount
+        if (recipeMultiplier == 0) ErrorManager.skyHanniError(
+            "Result item amount is 0",
+            "item" to resultItem,
+        )
 
         val itemsPrice = materials.sumOf { material ->
             val totalAmount = material.amount * (craftingAmount / recipeMultiplier)
@@ -141,7 +145,7 @@ object SuperCraftingInventory {
         if (item.isEmpty) return@mapNotNull null
         item.toPrimitiveStackOrNull() ?: ErrorManager.skyHanniError(
             "Could not resolve internal name",
-            "item" to item.hoverName.string,
+            "item" to item,
         )
     }.groupBy { it.internalName }.map { (name, stacks) ->
         PrimitiveItemStack(name, stacks.sumOf { it.amount })
@@ -160,12 +164,12 @@ object SuperCraftingInventory {
         return item.toPrimitiveStackOrNull()
             ?: ErrorManager.skyHanniError(
                 "Unknown item in result slot",
-                "item" to item.hoverName.string,
+                "item" to item,
             )
     }
 
     private fun blockWasteClick(profit: Double, craftingAmount: Long, maxCraftingAmount: Long) = when {
-        KeyboardManager.isControlKeyDown() -> false
+        KeyboardManager.isModifierKeyDown() -> false
         profit < -getWarnAmount() -> true
         profit < -getBulkWarnAmount() && craftingAmount == maxCraftingAmount -> true
         else -> false
