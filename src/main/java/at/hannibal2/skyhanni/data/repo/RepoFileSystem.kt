@@ -59,7 +59,7 @@ sealed interface RepoFileSystem {
                     if (!outPath.startsWith(root.toPath())) {
                         throw RuntimeException(
                             "SkyHanni detected an invalid zip file. This is a potential security risk, " +
-                                "please report this on the SkyHanni discord."
+                                "please report this on the SkyHanni discord.",
                         )
                     }
                 }
@@ -130,7 +130,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         if (flushJob == null) {
             progress.update("start new launchIOCoroutine task")
             flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk", timeout = 2.minutes) {
-                saveToDisk(diskRoot)
+                saveToDisk(progress.category, diskRoot)
             }
         }
         progress.update("loadFromZip end")
@@ -148,9 +148,8 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         return DiskRepoFileSystem(diskRoot)
     }
 
-    private fun saveToDisk(root: File) {
-        val progress = ChatProgressUpdates()
-        progress.start("saveToDisk start")
+    private fun saveToDisk(group: ChatProgressUpdates.ChatProgressCategory, root: File) {
+        val progress = group.start("saveToDisk")
 
         val base = root.toPath()
         progress.update("createDirectoriesFor")

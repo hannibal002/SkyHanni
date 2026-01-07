@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.collectWhile
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.consumeWhile
@@ -53,6 +54,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -730,11 +732,11 @@ object HoppityCollectionStats {
             }
             table.add(
                 DisplayTableEntry(
-                    title,
-                    "§a$displayFound§7/§a$displayTotal",
+                    title.asComponent(),
+                    "§a$displayFound§7/§a$displayTotal".asComponent(),
                     displayTotal.toDouble(),
                     rarity.item,
-                    hover,
+                    hover.mapToComponents(),
                 ),
             )
         }

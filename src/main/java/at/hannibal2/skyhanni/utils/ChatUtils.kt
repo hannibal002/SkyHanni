@@ -439,5 +439,4 @@ object ChatUtils {
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)
     }
-
 }

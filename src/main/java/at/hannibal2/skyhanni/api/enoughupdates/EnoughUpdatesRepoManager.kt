@@ -19,6 +19,7 @@ object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>(
 
 
     override val reloadCommand: String = "neureloadrepo"
+    override val progressCategory = ChatProgressUpdates.category("NotEnoughUpdates Repo")
     override val statusCommand: String = "neurepostatus"
     override val updateCommand: String = "neuresetrepo"
 

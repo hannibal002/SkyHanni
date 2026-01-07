@@ -29,7 +29,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.addStrikethorugh
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.world.item.ItemStack
@@ -154,11 +156,11 @@ object CFShopPrice {
             }
             table.add(
                 DisplayTableEntry(
-                    product.name.addStrikethorugh(!product.canBeBought),
-                    "§6§l$perFormat",
+                    product.name.addStrikethorugh(!product.canBeBought).asComponent(),
+                    "§6§l$perFormat".asComponent(),
                     factor,
                     product.item,
-                    hover,
+                    hover.mapToComponents(),
                     highlightsOnHoverSlots = product.slot?.let { listOf(it) }.orEmpty(),
                 ),
             )

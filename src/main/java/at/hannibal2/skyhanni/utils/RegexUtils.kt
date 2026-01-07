@@ -8,6 +8,9 @@ object RegexUtils {
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
+    inline fun <T> Pattern.matchMatcher(text: Component, consumer: Matcher.() -> T) =
+        matcher(text.string).let { if (it.matches()) consumer(it) else null }
+
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
 
