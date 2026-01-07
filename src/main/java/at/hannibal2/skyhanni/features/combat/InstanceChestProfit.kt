@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
+import at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
@@ -97,6 +99,7 @@ object InstanceChestProfit {
     private var inDungeonChest = false
     private var inKuudraChest = false
     private var display: Renderable? = null
+    private val chestProfits: MutableMap<String, Double> = mutableMapOf()
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -115,7 +118,7 @@ object InstanceChestProfit {
             else -> return
         }
 
-        createDisplay(event.inventoryItems)
+        createDisplay(event.inventoryName, event.inventoryItems)
     }
 
     @HandleEvent(InventoryCloseEvent::class)
@@ -124,7 +127,7 @@ object InstanceChestProfit {
         inKuudraChest = false
     }
 
-    private fun createDisplay(items: Map<Int, ItemStack>) {
+    private fun createDisplay(inventoryName: String, items: Map<Int, ItemStack>) {
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
             if (fakeItemNamePattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())) return@forEach
@@ -194,11 +197,26 @@ object InstanceChestProfit {
                 add(listOf(Renderable.text(it.key), Renderable.text(coins)))
             }
 
+            chestProfits[inventoryName] = total
+
             val color = if (total < 0) "§c"
             else "§a"
 
             add(listOf(Renderable.emptyText()))
             add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color ${total.formatCoin()}")))
+
+            if (chestProfits.isNotEmpty()) {
+                add(listOf(Renderable.emptyText()))
+                add(listOf(Renderable.emptyText()))
+                add(listOf(Renderable.text("§d§lAll Chest Profits")))
+
+                for (it in chestProfits.entries.sortedByDescending { it.value }) {
+                    val color = if (it.value < 0) "§c"
+                    else "§a"
+
+                    add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
+                }
+            }
         }
 
         display = Renderable.table(newDisplay, ySpacing = 1)
@@ -221,5 +239,15 @@ object InstanceChestProfit {
         if (!config.enabled || (!inDungeonChest && !inKuudraChest)) return
 
         config.position.renderRenderable(display, posLabel = "Instance Chest Profit")
+    }
+
+    @HandleEvent(DungeonEnterEvent::class)
+    fun onEnterDungeon() {
+        chestProfits.clear()
+    }
+
+    @HandleEvent(KuudraEnterEvent::class)
+    fun onEnterKuudra() {
+        chestProfits.clear()
     }
 }
