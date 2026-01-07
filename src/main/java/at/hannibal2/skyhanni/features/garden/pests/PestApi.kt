@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -326,9 +327,9 @@ object PestApi {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
         val type = PestType.getByNameOrNull(event.mob.name) ?: return
-        val plot = GardenPlotApi.plots.find { it.box.isVecInside(event.mob.centerCords.toVec3()) } ?: return
+        val plot = GardenPlotApi.plots.find { it.box.isInside(event.mob.centerCords) } ?: return
         if (lastCheckedPlot != plot.id) gardenPestTypes[plot] = listOf()
-        if (plot.pests >= 1 && !plot.isPestCountInaccurate && (gardenPestTypes.get(plot)?.size ?: 0) == plot.pests) return
+        if (plot.pests >= 1 && !plot.isPestCountInaccurate && (gardenPestTypes[plot]?.size ?: 0) == plot.pests) return
 
         gardenPestTypes.addToPlot(plot, type)
         lastCheckedPlot = plot.id
