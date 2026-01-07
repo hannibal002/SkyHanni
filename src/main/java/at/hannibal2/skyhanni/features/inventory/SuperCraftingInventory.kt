@@ -126,12 +126,12 @@ object SuperCraftingInventory {
 
         val itemsPrice = materials.sumOf { material ->
             val totalAmount = material.amount * (craftingAmount / recipeMultiplier)
-            BazaarApi.calculatePriceOffAvailableOrders(
+            BazaarApi.calculatePriceOfAvailableOrders(
                 material.internalName, totalAmount, BazaarApi.SimpleTransactionType.BUY_ORDER,
             ) ?: return null
         }
 
-        val totalResultPrice = BazaarApi.calculatePriceOffAvailableOrders(
+        val totalResultPrice = BazaarApi.calculatePriceOfAvailableOrders(
             resultItem.internalName,
             craftingAmount,
             BazaarApi.SimpleTransactionType.SELL_OFFER,
