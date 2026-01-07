@@ -176,10 +176,7 @@ object InstanceChestProfit {
         display = Renderable.table(buildDisplay(fixedInventoryName, itemsWithCost), ySpacing = 1)
     }
 
-    private fun buildDisplay(
-        fixedInventoryName: String,
-        itemsWithCost: MutableMap<String, Double>,
-    ) = buildList {
+    private fun buildDisplay(fixedInventoryName: String, itemsWithCost: Map<String, Double>) = buildList {
         add(listOf(Renderable.text("§d§l$fixedInventoryName Profit")))
         add(listOf(Renderable.emptyText()))
 
