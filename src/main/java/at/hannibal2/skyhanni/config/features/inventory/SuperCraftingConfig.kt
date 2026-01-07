@@ -5,6 +5,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SuperCraftingConfig {
+
     @Expose
     @Accordion
     @ConfigOption(name = "Waste Warning", desc = "")
