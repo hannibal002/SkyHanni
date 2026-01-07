@@ -115,6 +115,8 @@ data class CustomTodo(
             return maybeDecoded?.also {
                 it.readyAt.clear()
                 it.triggersLeft.clear()
+                it.isEnabled = true
+                it.position = Position(10, 10)
             }
         }
     }
