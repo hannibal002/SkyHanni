@@ -202,16 +202,14 @@ object InstanceChestProfit {
             add(listOf(Renderable.emptyText()))
             add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color${total.formatCoin()}")))
 
-            if (chestProfits.isNotEmpty()) {
-                add(listOf(Renderable.emptyText()))
-                add(listOf(Renderable.text("§d§lAll Chest Profits")))
+            add(listOf(Renderable.emptyText()))
+            add(listOf(Renderable.text("§d§lAll Chest Profits")))
 
-                for (it in chestProfits.entries.sortedByDescending { it.value }) {
-                    color = if (it.value < 0) "§c"
-                    else "§a"
+            for (it in chestProfits.entries.sortedByDescending { it.value }) {
+                color = if (it.value < 0) "§c"
+                else "§a"
 
-                    add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
-                }
+                add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
             }
         }
 
