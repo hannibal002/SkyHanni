@@ -239,12 +239,12 @@ object InstanceChestProfit {
     }
 
     @HandleEvent(DungeonEnterEvent::class)
-    fun onEnterDungeon() {
+    fun onDungeonEnter() {
         chestProfits.clear()
     }
 
     @HandleEvent(KuudraEnterEvent::class)
-    fun onEnterKuudra() {
+    fun onKuudraEnter() {
         chestProfits.clear()
     }
 }
