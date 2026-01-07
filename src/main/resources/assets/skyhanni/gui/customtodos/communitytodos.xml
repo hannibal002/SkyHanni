@@ -8,13 +8,17 @@
                     <Text text="Community TODOs"/>
                 </Scale>
             </Center>
+            <Center>
+                <Text text="Post your todos on the discord for them to be featured!"/>
+            </Center>
+            <Spacer height="10"/>
             <Row>
                 <Text text="Search: "/>
                 <TextField value="@search"/>
                 <Text text="@poll"/>
             </Row>
-            <Spacer height="20"/>
-            <ScrollPanel width="560" height="400">
+            <Spacer height="15"/>
+            <ScrollPanel width="540" height="400">
                 <Array data="@searchResults">
                     <Row>
                         <Spacer width="20"/>
