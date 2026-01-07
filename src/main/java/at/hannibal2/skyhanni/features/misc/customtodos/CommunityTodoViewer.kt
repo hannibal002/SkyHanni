@@ -93,10 +93,15 @@ class CommunityTodoViewer(
         @Bind
         fun download() {
             if (downloaded) return
-            currentTodos.add(CustomTodoEditor(todo.also {
-                it.downloaded = true
-                it.downloadedId = communityInfo.id
-            }, currentTodos))
+            currentTodos.add(
+                CustomTodoEditor(
+                    todo.also {
+                        it.downloaded = true
+                        it.downloadedId = communityInfo.id
+                    },
+                    currentTodos
+                )
+            )
             downloaded = true
         }
 
