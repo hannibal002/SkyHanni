@@ -79,6 +79,7 @@ class CustomTodoEditor(
             from.triggersLeft,
             cronEnabled,
             cronExpression,
+            from.downloaded
         )
     }
 
@@ -288,7 +289,7 @@ class CustomTodoEditor(
 
     @Bind
     fun getLabel(): StructuredText {
-        return label.replace("&&", "§").asStructuredText()
+        return (label.replace("&&", "§") + if (from.downloaded) " §a(Downloaded)" else "").asStructuredText()
     }
 
     @Bind
@@ -308,6 +309,7 @@ class CustomTodoEditor(
 
     @Bind
     fun edit() {
+        from.downloaded = false
         XmlUtils.openXmlScreen(this, MyResourceLocation("skyhanni", "gui/customtodos/edit.xml"))
     }
 }
