@@ -110,7 +110,7 @@ object SuperCraftingInventory {
             groupOrNull("amount")?.formatLongOrNull()
         }
     }.minOrNull() ?: ErrorManager.skyHanniError(
-        "Crafting resource line not found",
+        "Super Crafting resource line not found",
         "lore" to slots.map { slot -> slot.item.getLore().map { line -> line.removeColor() } },
     )
 
