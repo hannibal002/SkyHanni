@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_PAGES
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
@@ -34,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderabl
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import kotlin.math.min
@@ -234,7 +235,7 @@ object CustomWardrobe {
             val stack = slot.armor.getOrNull(armorIndex)?.copy()
             var renderable = Renderable.placeholder(containerWidth, hoverableSizes[armorIndex])
             if (stack != null) {
-                val toolTip = getToolTip(stack, slot, armorIndex)
+                val toolTip = getToolTip(stack, slot)
                 if (toolTip != null) {
                     renderable = Renderable.hoverTips(
                         renderable,
@@ -254,21 +255,10 @@ object CustomWardrobe {
         return Renderable.vertical(loreList, spacing = 1)
     }
 
-    private fun getToolTip(
-        stack: ItemStack,
-        slot: WardrobeSlot,
-        armorIndex: Int,
-    ): List<String>? {
+    private fun getToolTip(stack: ItemStack, slot: WardrobeSlot): List<Component>? {
         try {
             // Get tooltip from minecraft and other mods
-            // TODO add support for advanced tooltip (F3+H)
-            val toolTips = stack.getTooltipCompat(false)
-
-            // Modify tooltip via SkyHanni Events
-            val mcSlotId = slot.inventorySlots[armorIndex]
-            // if the slot is null, we don't fire LorenzToolTipEvent at all.
-            val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: return toolTips
-            ToolTipEvent(mcSlot, stack, toolTips).post()
+            val toolTips = stack.getTooltip(Minecraft.getInstance().options.advancedItemTooltips)
 
             return toolTips
         } catch (e: Exception) {

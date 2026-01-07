@@ -24,7 +24,7 @@ object SoundUtils {
     val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun SoundInstance.playSound() {
-        DelayedRun.onThread.execute {
+        DelayedRun.runOrNextTick {
             val category = this.source
 
             val oldLevel = Minecraft.getInstance().options.getSoundSourceVolume(category)
@@ -33,7 +33,7 @@ object SoundUtils {
             try {
                 Minecraft.getInstance().soundManager.play(this)
             } catch (e: IllegalArgumentException) {
-                if (e.message?.startsWith("value already present:") == true) return@execute
+                if (e.message?.startsWith("value already present:") == true) return@runOrNextTick
                 ErrorManager.logErrorWithData(
                     e,
                     "Failed to play a sound",

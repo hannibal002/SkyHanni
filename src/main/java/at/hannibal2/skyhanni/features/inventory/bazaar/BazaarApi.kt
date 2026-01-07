@@ -238,7 +238,7 @@ object BazaarApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        val message = event.message.removeColor()
+        val message = event.cleanMessage
         transactionPattern.matchMatcher(message) {
             val item = group("item")
             val coins = group("coins").formatDoubleOrNull() ?: return

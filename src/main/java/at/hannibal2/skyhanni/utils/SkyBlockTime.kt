@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import kotlin.time.Duration
 
 /**
@@ -140,7 +139,7 @@ data class SkyBlockTime(
             }
         }
 
-        fun isDay(): Boolean = MinecraftCompat.localWorld.dayTime % 24000 in 1..12000
+        fun isDay(): Boolean = ServerTime.dayTime % 24000 in 1..12000
 
         fun getSBMonthByName(month: String): Int {
             var monthNr = 0

@@ -42,7 +42,7 @@ object TeleportPadCompactName {
         }
 
         namePattern.matchMatcher(name) {
-            entity.customName = net.minecraft.network.chat.Component.nullToEmpty(group("name"))
+            entity.customName = net.minecraft.network.chat.Component.literal(group("name"))
         }
     }
 }

@@ -20,7 +20,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -80,11 +82,11 @@ object SkyMartCopperPrice {
                 }
                 table.add(
                     DisplayTableEntry(
-                        "$itemName§f:",
-                        "§6§l$perFormat",
+                        "$itemName§f:".asComponent(),
+                        "§6§l$perFormat".asComponent(),
                         factor,
                         internalName,
-                        hover,
+                        hover.mapToComponents(),
                         highlightsOnHoverSlots = listOf(slot),
                     ),
                 )

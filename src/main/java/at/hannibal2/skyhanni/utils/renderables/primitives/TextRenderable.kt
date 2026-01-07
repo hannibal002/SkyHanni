@@ -57,19 +57,15 @@ class TextRenderable internal constructor(
 ) : Renderable {
 
     companion object {
-        operator fun Renderable.invoke(string: String): TextRenderable = TextRenderable(Component.nullToEmpty(string))
+        operator fun Renderable.invoke(string: String): TextRenderable = TextRenderable(Component.literal(string))
     }
 
-    override val width by lazy { (Minecraft.getInstance().font.width(fixStupid(text)) * scale).toInt() + 1 }
+    override val width by lazy { (Minecraft.getInstance().font.width(text) * scale).toInt() + 1 }
     override val height = (9 * scale).toInt() + 1
 
     private val inverseScale = 1 / scale
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-        RenderableUtils.renderString(fixStupid(text), scale, color, inverseScale)
-    }
-
-    private fun fixStupid(text: Component): Component {
-        return text
+        RenderableUtils.renderString(text, scale, color, inverseScale)
     }
 }

@@ -108,7 +108,7 @@ object NavigationHelper {
         val names = mutableMapOf<String, GraphNode>()
         for (node in distances.sorted().keys) {
             // hiding areas that are none
-            if (node.name == "no_area") continue
+            if (node.name == AreaNode.NO_AREA) continue
             // no need to navigate to the current area
             if (node.name == SkyBlockUtils.graphArea) continue
             val tag = node.tags.first { it in allowedTags }
