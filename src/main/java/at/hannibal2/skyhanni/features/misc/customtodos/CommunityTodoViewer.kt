@@ -47,6 +47,7 @@ class CommunityTodoViewer(
 
     @Bind
     fun afterClose() {
+        CustomTodos(currentTodos).save()
         CustomTodos.save()
     }
 
