@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test.graph
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -111,7 +112,7 @@ object GraphEditorNodeOperations {
 
     fun handleNameShortcut(name: String?): Pair<GraphNodeTag, String>? = when (name) {
         "fsoul" -> GraphNodeTag.FAIRY_SOUL to "Fairy Soul"
-        "na" -> GraphNodeTag.AREA to "no_area"
+        "na" -> GraphNodeTag.AREA to AreaNode.NO_AREA
         else -> null
     }
 }
