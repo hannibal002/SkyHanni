@@ -72,7 +72,7 @@ object DungeonLividFinder {
     private var color: LorenzColor? = null
 
     private val lividTextureToColor = mutableMapOf<String, LorenzColor>()
-    private val lividNameToColor = mutableMapOf(
+    private var lividNameToColor = mapOf(
         "Vendetta" to LorenzColor.WHITE,
         "Doctor" to LorenzColor.GRAY,
         "Crossed" to LorenzColor.LIGHT_PURPLE,
@@ -105,11 +105,15 @@ object DungeonLividFinder {
     fun onRepoReload(event: RepositoryReloadEvent) {
         lividTextureToColor.clear()
         val data = event.getConstant<LividSolverJson>("dungeons/LividSolver")
+        val names = mutableMapOf<String, LorenzColor>()
         for ((color, lividInfo) in data.livids) {
             val colorCode = color.getOrNull(1) ?: continue
             val repoColor = LorenzColor.entries.firstOrNull { it.chatColorCode == colorCode } ?: continue
             lividTextureToColor[lividInfo.skin] = repoColor
-            lividNameToColor[lividInfo.name] = repoColor
+            names[lividInfo.name] = repoColor
+        }
+        if (names.isNotEmpty()) {
+            lividNameToColor = names
         }
     }
 
