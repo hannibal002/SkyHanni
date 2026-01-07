@@ -173,55 +173,58 @@ object InstanceChestProfit {
             }
         }
 
-        val newDisplay = buildList {
-            add(listOf(Renderable.text("§d§l$fixedInventoryName Profit")))
-            add(listOf(Renderable.emptyText()))
+        display = Renderable.table(buildDisplay(fixedInventoryName, itemsWithCost), ySpacing = 1)
+    }
 
-            var total = 0.0
-            var displayedCost = false
+    private fun buildDisplay(
+        fixedInventoryName: String,
+        itemsWithCost: MutableMap<String, Double>,
+    ) = buildList {
+        add(listOf(Renderable.text("§d§l$fixedInventoryName Profit")))
+        add(listOf(Renderable.emptyText()))
 
-            val revenue = itemsWithCost.values.filter { it > 0 }.sum()
-            add(listOf(Renderable.text("§a§lTotal Revenue"), Renderable.text("§a${revenue.formatCoin()}")))
+        var total = 0.0
+        var displayedCost = false
 
-            itemsWithCost.forEach {
-                val coinsColor = if (it.value < 0) "§c"
-                else "§a"
+        val revenue = itemsWithCost.values.filter { it > 0 }.sum()
+        add(listOf(Renderable.text("§a§lTotal Revenue"), Renderable.text("§a${revenue.formatCoin()}")))
 
-                if (!displayedCost && it.value < 0) {
-                    val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
-                    add(listOf(Renderable.emptyText()))
-                    add(listOf(Renderable.text("§c§lTotal Cost"), Renderable.text("§c${cost.formatCoin()}")))
-                    displayedCost = true
-                }
-
-                val coins = "$coinsColor${it.value.formatCoin()}"
-
-                total += it.value
-                add(listOf(Renderable.text(it.key), Renderable.text(coins)))
-            }
-
-            chestProfits[fixedInventoryName] = total
-
-            var color = if (total < 0) "§c"
+        itemsWithCost.forEach {
+            val coinsColor = if (it.value < 0) "§c"
             else "§a"
 
-            add(listOf(Renderable.emptyText()))
-            add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color${total.formatCoin()}")))
-
-            if (IslandType.CATACOMBS.isCurrent() || IslandType.KUUDRA_ARENA.isCurrent()) {
+            if (!displayedCost && it.value < 0) {
+                val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
                 add(listOf(Renderable.emptyText()))
-                add(listOf(Renderable.text("§d§lAll Chest Profits")))
-
-                for (it in chestProfits.entries.sortedByDescending { it.value }) {
-                    color = if (it.value < 0) "§c"
-                    else "§a"
-
-                    add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
-                }
+                add(listOf(Renderable.text("§c§lTotal Cost"), Renderable.text("§c${cost.formatCoin()}")))
+                displayedCost = true
             }
+
+            val coins = "$coinsColor${it.value.formatCoin()}"
+
+            total += it.value
+            add(listOf(Renderable.text(it.key), Renderable.text(coins)))
         }
 
-        display = Renderable.table(newDisplay, ySpacing = 1)
+        chestProfits[fixedInventoryName] = total
+
+        var color = if (total < 0) "§c"
+        else "§a"
+
+        add(listOf(Renderable.emptyText()))
+        add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color${total.formatCoin()}")))
+
+        if (IslandType.CATACOMBS.isCurrent() || IslandType.KUUDRA_ARENA.isCurrent()) {
+            add(listOf(Renderable.emptyText()))
+            add(listOf(Renderable.text("§d§lAll Chest Profits")))
+
+            for (it in chestProfits.entries.sortedByDescending { it.value }) {
+                color = if (it.value < 0) "§c"
+                else "§a"
+
+                add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
+            }
+        }
     }
 
     private fun getKuudraEssenceBonus(): Double {
