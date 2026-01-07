@@ -203,7 +203,7 @@ object InstanceChestProfit {
             else "§a"
 
             add(listOf(Renderable.emptyText()))
-            add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color ${total.formatCoin()}")))
+            add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color${total.formatCoin()}")))
 
             if (chestProfits.isNotEmpty()) {
                 add(listOf(Renderable.emptyText()))
