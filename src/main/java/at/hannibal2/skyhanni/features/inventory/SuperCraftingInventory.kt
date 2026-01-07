@@ -38,6 +38,7 @@ object SuperCraftingInventory {
     private val config get() = SkyHanniMod.feature.inventory.superCrafting.waste
 
     private val craftingPatternGroup = RepoPatternGroup("supercrafting-inventory")
+
     /**
      * REGEX-TEST: Crafting 1,111 items into your sacks!
      */

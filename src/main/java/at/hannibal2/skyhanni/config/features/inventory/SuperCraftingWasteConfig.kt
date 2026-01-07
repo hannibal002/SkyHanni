@@ -11,7 +11,7 @@ class SuperCraftingWasteConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Warns you when you can save more than Xm coins by insta buying the item and instant selling the materials.",
+        desc = "Warns you when you can save more than Xm coins by instant buying the item and instant selling the materials.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
