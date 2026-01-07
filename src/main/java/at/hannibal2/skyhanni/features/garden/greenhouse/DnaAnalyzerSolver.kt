@@ -60,7 +60,7 @@ object DnaAnalyzerSolver {
         if (!isEnabled()) return
         val initialBoard = MutableList(9) { MutableList(4) { Colors.GREEN } }
         for ((i, stack) in event.inventoryItems) {
-            if (i < 9 || i > 44) continue
+            if (i !in 9..44) continue
             val row = (i / 9) - 1
             val column = i % 9
             initialBoard[column][row] = stack.toColor() ?: return
@@ -68,8 +68,8 @@ object DnaAnalyzerSolver {
         currentBoard = DnaBoard(initialBoard)
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, onlyOnSkyblock = true)
+    fun onBackgroundDrawn() {
         if (!isEnabled()) return
         val board = currentBoard ?: return
 
@@ -240,17 +240,17 @@ object DnaAnalyzerSolver {
         companion object {
             fun ItemStack.toColor(): Colors? {
                 val name = this.hoverName.formattedTextCompatLeadingWhiteLessResets()
-                if (name.startsWith("§cDNA")) {
-                    return RED
-                } else if (name.startsWith("§eDNA")) {
-                    return YELLOW
-                } else if (name.startsWith("§9DNA")) {
-                    return BLUE
-                } else if (name.startsWith("§aDNA")) {
-                    return GREEN
+                return when {
+                    name.startsWith("§cDNA") -> RED
+                    name.startsWith("§eDNA") -> YELLOW
+                    name.startsWith("§9DNA") -> BLUE
+                    name.startsWith("§aDNA") -> GREEN
+
+                    else -> {
+                        fakeInventory = true
+                        null
+                    }
                 }
-                fakeInventory = true
-                return null
             }
         }
     }
