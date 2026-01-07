@@ -48,7 +48,7 @@ class CustomTodos(
     @Bind
     fun pasteTodo() {
         SkyHanniMod.launchIOCoroutine("import custom todos") {
-            val customTodo = CustomTodo.fromTemplate(ClipboardUtils.readFromClipboard() ?: return@launchIOCoroutine, printErrors = true)
+            val customTodo = CustomTodo.fromTemplateOrNull(ClipboardUtils.readFromClipboard() ?: return@launchIOCoroutine, printErrors = true)
             DelayedRun.runNextTick {
                 todos.add(CustomTodoEditor(customTodo ?: return@runNextTick, todos))
                 save()

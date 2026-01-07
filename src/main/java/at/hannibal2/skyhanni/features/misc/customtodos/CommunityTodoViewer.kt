@@ -66,8 +66,7 @@ class CommunityTodoViewer(
 
     class CommunityTodoInfo(private val communityInfo: CommunityTodo, private val currentTodos: ObservableList<CustomTodoEditor>) {
 
-        @Suppress("UnsafeCallOnNullableType")
-        val todo = CustomTodo.fromTemplate(communityInfo.todoData)!!
+        val todo = CustomTodo.fromTemplate(communityInfo.todoData)
 
         private var downloaded = false
 

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.customtodos
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -106,7 +107,7 @@ data class CustomTodo(
         private const val TEMPLATE_PREFIX = "SH:CUSTOMTODO/"
         const val MS_IN_A_DAY = (24 * 60 * 60 * 1000)
 
-        fun fromTemplate(data: String, printErrors: Boolean = false): CustomTodo? {
+        fun fromTemplateOrNull(data: String, printErrors: Boolean = false): CustomTodo? {
             val maybeDecoded = TemplateUtil.maybeDecodeTemplate(TEMPLATE_PREFIX, data, CustomTodo::class.java)
                 ?: TemplateUtil.maybeDecodeTemplate(NEU_TEMPLATE_PREFIX, data, CustomTodo::class.java)
             if (maybeDecoded == null && printErrors) {
@@ -118,6 +119,13 @@ data class CustomTodo(
                 it.isEnabled = true
                 it.position = Position(10, 10)
             }
+        }
+
+        fun fromTemplate(data: String, printErrors: Boolean = false): CustomTodo {
+            return fromTemplateOrNull(data, printErrors) ?: ErrorManager.skyHanniError(
+                "Invalid todo",
+                "data" to data
+            )
         }
     }
 

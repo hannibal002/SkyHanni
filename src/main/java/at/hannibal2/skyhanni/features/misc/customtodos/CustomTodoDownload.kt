@@ -34,7 +34,7 @@ object CustomTodoDownload {
                 }
                 for (todo in todos) {
                     if (todo.id.equals(id, ignoreCase = true)) {
-                        val template = CustomTodo.fromTemplate(todo.todoData) ?: run {
+                        val template = CustomTodo.fromTemplateOrNull(todo.todoData) ?: run {
                             ChatUtils.userError("Todo is invalid, please report this on discord")
                             return@argCallback
                         }
@@ -64,6 +64,6 @@ object CustomTodoDownload {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val constant = event.getConstant<CommunityTodosJson>("community/CommunityTodos")
-        todos = constant.communityTodos.filter { CustomTodo.fromTemplate(it.todoData) != null }
+        todos = constant.communityTodos.filter { CustomTodo.fromTemplateOrNull(it.todoData) != null }
     }
 }
