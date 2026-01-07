@@ -79,7 +79,7 @@ class CustomTodoEditor(
             from.triggersLeft,
             cronEnabled,
             cronExpression,
-            from.downloaded
+            from.downloaded,
         )
     }
 

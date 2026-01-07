@@ -33,7 +33,7 @@ object CustomTodoDownload {
                     return@argCallback
                 }
                 for (todo in todos) {
-                    if (todo.id.lowercase() == id.lowercase()) {
+                    if (todo.id.equals(id, ignoreCase = true)) {
                         val template = CustomTodo.fromTemplate(todo.todoData) ?: run {
                             ChatUtils.userError("Todo is invalid, please report this on discord")
                             return@argCallback
@@ -51,7 +51,7 @@ object CustomTodoDownload {
                 SkyHanniMod.customTodos.customTodos.forEach { todosList.add(CustomTodoEditor(it, todosList)) }
                 XmlUtils.openXmlScreen(
                     CommunityTodoViewer(todos, todosList),
-                    MyResourceLocation("skyhanni", "gui/customtodos/communitytodos.xml")
+                    MyResourceLocation("skyhanni", "gui/customtodos/communitytodos.xml"),
                 )
             }
         }

@@ -60,7 +60,7 @@ class CustomTodos(
     fun viewCommunityTodos() {
         XmlUtils.openXmlScreen(
             CommunityTodoViewer(CustomTodoDownload.todos, todos),
-            MyResourceLocation("skyhanni", "gui/customtodos/communitytodos.xml")
+            MyResourceLocation("skyhanni", "gui/customtodos/communitytodos.xml"),
         )
     }
 
