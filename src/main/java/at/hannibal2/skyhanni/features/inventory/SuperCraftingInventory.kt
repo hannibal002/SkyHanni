@@ -67,15 +67,15 @@ object SuperCraftingInventory {
     )
 
     private fun getWarnAmount() = if (BitsApi.hasCookieBuff()) {
-        config.minimumAmount
+        config.threshold
     } else {
-        config.withoutCookie.minimumAmount
+        config.withoutCookie.threshold
     }
 
     private fun getBulkWarnAmount() = if (BitsApi.hasCookieBuff()) {
-        config.minimumAmountMaxResource
+        config.bulkThreshold
     } else {
-        config.withoutCookie.minimumAmountMaxResource
+        config.withoutCookie.bulkThreshold
     }
 
     @HandleEvent
@@ -90,16 +90,16 @@ object SuperCraftingInventory {
         val maxCraftingAmount = getSuperCraftingMaxCount(slots)
         if (!blockWasteClick(profit, craftingAmount, maxCraftingAmount)) return
         SoundUtils.playErrorSound()
+        val diff = (-profit).formatChatCoins()
         TitleManager.sendTitle(
             "§cCraft-click Prevented (Big Loss Detected)",
-            subtitleText = "§7Hold §eControl §7to bypass. You could save §c${(-profit).formatChatCoins()} Coins §7by " +
-                "selling the required resources directly to the §6Bazaar§7 and then instant-buying the finished item.",
+            subtitleText = "§7Hold §eControl §7to bypass. Potential savings: §c$diff",
             duration = 2.seconds,
             location = TitleManager.TitleLocation.INVENTORY,
         )
         ChatUtils.chatAndOpenConfig(
             "Blocked a craft since instant selling the materials and instant buying the item(s) directly is " +
-                "significantly cheaper. You can hold §cControl §ewhile clicking to bypass this warning. ",
+                "significantly cheaper (§c$diff). You can hold §cControl §ewhile clicking to bypass this warning.",
             config::enabled,
         )
         event.cancel()
@@ -140,7 +140,7 @@ object SuperCraftingInventory {
         val item = slots[slotIndex].item
         if (item.isEmpty) return@mapNotNull null
         item.toPrimitiveStackOrNull() ?: ErrorManager.skyHanniError(
-            "Unknown item in crafting slot",
+            "Could not resolve internal name",
             "item" to item.displayName,
         )
     }.groupBy { it.internalName }.map { (name, stacks) ->
@@ -159,7 +159,7 @@ object SuperCraftingInventory {
         if (item.isEmpty) ErrorManager.skyHanniError("Result slot is empty")
         return item.toPrimitiveStackOrNull()
             ?: ErrorManager.skyHanniError(
-                "internal name is null",
+                "Unknown item in result slot",
                 "item" to item.hoverName.string,
             )
     }

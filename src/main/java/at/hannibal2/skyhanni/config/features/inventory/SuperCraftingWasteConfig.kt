@@ -11,27 +11,27 @@ class SuperCraftingWasteConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Warns you when you can save more than Xm coins by instant buying the item and instant selling the materials.",
+        desc = "Warn and block from super crafting when buying the result and selling materials saves coins.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Minimum Amount", desc = "The minimum amount of coins (in millions) you must save.")
+    @ConfigOption(name = "Threshold", desc = "Minimum savings (in millions) to trigger warning.")
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 50.0f, minStep = 0.1f)
-    var minimumAmount: Double = 10.0
+    var threshold: Double = 10.0
 
     @Expose
     @ConfigOption(
-        name = "Minimum Amount if Max Resource Usage",
-        desc = "Minimum amount of coins when compacting items due to space reasons.",
+        name = "Bulk Threshold",
+        desc = "Threshold when crafting maximum amount.",
     )
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 50.0f, minStep = 0.1f)
-    var minimumAmountMaxResource: Double = 5.0
+    var bulkThreshold: Double = 5.0
 
     @Expose
     @Accordion
-    @ConfigOption(name = "Values without Cookie", desc = "Like the others but when you don't have Cookie Buff active → no /bz access")
+    @ConfigOption(name = "Without Cookie", desc = "")
     var withoutCookie = SuperCraftingWithoutCookieConfig()
 }

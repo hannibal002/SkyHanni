@@ -8,17 +8,17 @@ class SuperCraftingWithoutCookieConfig {
 
     @Expose
     @ConfigOption(
-        name = "Minimum Amount",
-        desc = "The minimum amount of coins (in millions) you must save (instant sell and instant buy for wanted) to get a warning.",
+        name = "Threshold",
+        desc = "Minimum savings (in millions) to trigger warning without Cookie Buff.",
     )
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 100.0f, minStep = 0.1f)
-    var minimumAmount: Double = 20.0
+    var threshold: Double = 20.0
 
     @Expose
     @ConfigOption(
-        name = "Minimum Amount if Max Resource Usage",
-        desc = "Minimum amount of coins when compacting items due to space reasons.",
+        name = "Bulk Threshold",
+        desc = "Threshold when crafting maximum amount without Cookie Buff.",
     )
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 100.0f, minStep = 0.1f)
-    var minimumAmountMaxResource: Double = 10.0
+    var bulkThreshold: Double = 10.0
 }
