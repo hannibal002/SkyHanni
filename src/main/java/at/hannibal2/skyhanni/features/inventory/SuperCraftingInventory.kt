@@ -98,7 +98,7 @@ object SuperCraftingInventory {
             location = TitleManager.TitleLocation.INVENTORY,
         )
         ChatUtils.chatAndOpenConfig(
-            "Blocked a craft since instant selling the materials and instant buying the item(s) directly is " +
+            "Super Craft Blocked: Instant selling the materials and instant buying the item(s) directly is " +
                 "significantly cheaper (§c$diff§e)",
             config::enabled,
         )
