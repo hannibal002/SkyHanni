@@ -11,10 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.CommunityTodosJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.XmlUtils
-import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
-import com.google.gson.Gson
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 
@@ -23,8 +20,6 @@ object CustomTodoDownload {
 
     var todos: List<CommunityTodo> = listOf()
         private set
-
-    private val gson: Gson by lazy { BaseGsonBuilder.gson().disableHtmlEscaping().create() }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -59,22 +54,6 @@ object CustomTodoDownload {
                     MyResourceLocation("skyhanni", "gui/customtodos/communitytodos.xml")
                 )
             }
-        }
-        event.registerBrigadier("shexportcommunitytodo") {
-            category = CommandCategory.DEVELOPER_TEST
-            description = "Export todos for the community repo"
-            simpleCallback {
-                convertTodoData()
-            }
-        }
-    }
-
-    private fun convertTodoData() {
-        SkyHanniMod.launchIOCoroutine("export custom todo for repo") {
-            val clipboard = ClipboardUtils.readFromClipboard()?.trim() ?: return@launchIOCoroutine
-            val output = CommunityTodo("TODO id", "TODO author", "TODO thread", clipboard)
-            ClipboardUtils.copyToClipboard(gson.toJson(output))
-            ChatUtils.chat("Copied data to clipboard")
         }
     }
 
