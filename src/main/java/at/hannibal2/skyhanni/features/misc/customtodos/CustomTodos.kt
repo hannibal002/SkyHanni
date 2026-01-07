@@ -50,7 +50,7 @@ class CustomTodos(
         SkyHanniMod.launchIOCoroutine("import custom todos") {
             val customTodo = CustomTodo.fromTemplateOrNull(
                 ClipboardUtils.readFromClipboard() ?: return@launchIOCoroutine,
-                printErrors = true
+                printErrors = true,
             )
             DelayedRun.runNextTick {
                 todos.add(CustomTodoEditor(customTodo ?: return@runNextTick, todos))
