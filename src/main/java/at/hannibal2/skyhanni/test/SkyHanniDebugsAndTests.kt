@@ -140,8 +140,9 @@ object SkyHanniDebugsAndTests {
     private fun asyncTest(args: Array<String>) {
         ChatUtils.chat("§fTest successful!")
 
-        val progress = ChatProgressUpdates()
-        progress.start("a")
+        val group = ChatProgressUpdates.category("Test")
+        group.enabled = true
+        val progress = group.start("a")
         progress.update("b")
         progress.end("c")
     }

@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -160,7 +159,8 @@ enum class MiningEventType(
         CompressFormat.DEFAULT, null -> normalTextWithIcon
     }
 
-    fun getRenderableAsPast(): Renderable = getRenderable().darken(0.4f)
+    // todo on 1.8 this used to make it darker, the shader we had for that is gone now so idk
+    fun getRenderableAsPast(): Renderable = getRenderable()
 
     companion object {
         private val config get() = SkyHanniMod.feature.mining.miningEvent

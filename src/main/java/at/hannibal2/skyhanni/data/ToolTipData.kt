@@ -51,7 +51,7 @@ object ToolTipData {
             if (tooltipCopy.size > i && tooltipCopy[i] == line) {
                 newTooltip.add(originalToolTip[i])
             } else {
-                newTooltip.add(Component.nullToEmpty(tooltip[i]))
+                newTooltip.add(Component.literal(tooltip[i]))
             }
         }
         return newTooltip
