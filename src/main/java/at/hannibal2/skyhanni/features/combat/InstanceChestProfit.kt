@@ -196,7 +196,7 @@ object InstanceChestProfit {
 
             chestProfits[inventoryName] = total
 
-            val color = if (total < 0) "§c"
+            var color = if (total < 0) "§c"
             else "§a"
 
             add(listOf(Renderable.emptyText()))
@@ -208,7 +208,7 @@ object InstanceChestProfit {
                 add(listOf(Renderable.text("§d§lAll Chest Profits")))
 
                 for (it in chestProfits.entries.sortedByDescending { it.value }) {
-                    val color = if (it.value < 0) "§c"
+                    color = if (it.value < 0) "§c"
                     else "§a"
 
                     add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
