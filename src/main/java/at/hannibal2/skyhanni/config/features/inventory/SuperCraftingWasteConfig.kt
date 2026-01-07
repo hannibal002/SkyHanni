@@ -20,7 +20,7 @@ class SuperCraftingWasteConfig {
     @Expose
     @ConfigOption(name = "Minimum Amount", desc = "The minimum amount of coins (in millions) you must save.")
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 50.0f, minStep = 0.1f)
-    var normal: Double = 10.0
+    var minimumAmount: Double = 10.0
 
     @Expose
     @ConfigOption(
@@ -28,10 +28,10 @@ class SuperCraftingWasteConfig {
         desc = "Minimum amount of coins when compacting items due to space reasons.",
     )
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 50.0f, minStep = 0.1f)
-    var maxResource: Double = 5.0
+    var minimumAmountMaxResource: Double = 5.0
 
     @Expose
     @Accordion
     @ConfigOption(name = "Values without Cookie", desc = "Like the others but when you don't have Cookie Buff active → no /bz access")
-    var withoutCookieValues = SuperCraftingWasteConfigWithoutCookieConfig()
+    var withoutCookie = SuperCraftingWithoutCookieConfig()
 }

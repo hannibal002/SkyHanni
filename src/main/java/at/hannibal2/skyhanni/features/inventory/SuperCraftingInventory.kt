@@ -66,14 +66,16 @@ object SuperCraftingInventory {
         checkInventoryName = { name -> inventoryPattern.matches(name) },
     )
 
-    private fun getWarnAmount(): Double {
-        return if (BitsApi.hasCookieBuff()) config.normal
-        else config.withoutCookieValues.normal
+    private fun getWarnAmount() = if (BitsApi.hasCookieBuff()) {
+        config.minimumAmount
+    } else {
+        config.withoutCookie.minimumAmount
     }
 
-    private fun getBulkWarnAmount(): Double {
-        return if (BitsApi.hasCookieBuff()) config.maxResource
-        else config.withoutCookieValues.maxResource
+    private fun getBulkWarnAmount() = if (BitsApi.hasCookieBuff()) {
+        config.minimumAmountMaxResource
+    } else {
+        config.withoutCookie.minimumAmountMaxResource
     }
 
     @HandleEvent
@@ -137,8 +139,10 @@ object SuperCraftingInventory {
     private fun getRecipeMaterials(slots: List<Slot>) = materialSlots.mapNotNull { slotIndex ->
         val item = slots[slotIndex].item
         if (item.isEmpty) return@mapNotNull null
-        item.toPrimitiveStackOrNull()
-            ?: error("Unknown item in crafting slot: ${item.displayName}")
+        item.toPrimitiveStackOrNull() ?: ErrorManager.skyHanniError(
+            "Unknown item in crafting slot",
+            "item" to item.displayName,
+        )
     }.groupBy { it.internalName }.map { (name, stacks) ->
         PrimitiveItemStack(name, stacks.sumOf { it.amount })
     }
@@ -152,9 +156,12 @@ object SuperCraftingInventory {
 
     private fun getResultItem(slots: List<Slot>): PrimitiveItemStack {
         val item = slots[RESULT_SLOT].item
-        if (item.isEmpty) error("Result slot is empty")
+        if (item.isEmpty) ErrorManager.skyHanniError("Result slot is empty")
         return item.toPrimitiveStackOrNull()
-            ?: error("internal name is null: ${item.displayName}")
+            ?: ErrorManager.skyHanniError(
+                "internal name is null",
+                "item" to item.hoverName.string,
+            )
     }
 
     private fun blockWasteClick(profit: Double, craftingAmount: Long, maxCraftingAmount: Long) = when {
