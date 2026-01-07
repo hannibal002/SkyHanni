@@ -18,7 +18,7 @@
                 <Text text="@poll"/>
             </Row>
             <Spacer height="15"/>
-            <ScrollPanel width="540" height="400">
+            <ScrollPanel width="540" height="@getHeight">
                 <Array data="@searchResults">
                     <Row>
                         <Spacer width="20"/>

@@ -11,6 +11,7 @@ import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigPlatform
 import io.github.notenoughupdates.moulconfig.xml.Bind
+import net.minecraft.client.Minecraft
 
 class CommunityTodoViewer(
     communityTodos: List<CommunityTodo>,
@@ -49,6 +50,18 @@ class CommunityTodoViewer(
     fun afterClose() {
         CustomTodos(currentTodos).save()
         CustomTodos.save()
+    }
+
+    @Bind
+    fun getHeight(): Int {
+        val scale = Minecraft.getInstance().options.guiScale().get()
+        return when (scale) {
+            1 -> 500
+            2 -> 400
+            3 -> 300
+            4 -> 200
+            else -> 100
+        }
     }
 
     class CommunityTodoInfo(private val communityInfo: CommunityTodo, private val currentTodos: ObservableList<CustomTodoEditor>) {
