@@ -48,6 +48,13 @@ object MythologicalCreatureTracker {
         ),
     ) { drawDisplay(it) }
 
+    // TODO create a draggable list from repo one that can be done
+    private val shardMobs = listOf<String>(
+        "Cretan Bull",
+        "Harpy",
+        "Minotaur",
+    )
+
     data class Data(
         @Expose var since: MutableMap<String, Int> = mutableMapOf(),
         @Expose var count: MutableMap<String, Int> = mutableMapOf(),
@@ -58,7 +65,7 @@ object MythologicalCreatureTracker {
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
 
         if (config.shardWarn) {
-            if (creatureMatch == "Cretan Bull" || creatureMatch == "Harpy" || creatureMatch == "Minotaur") {
+            if (shardMobs.contains(creatureMatch)) {
                 TitleManager.sendTitle("Black Hole", duration = 2.seconds)
             }
         }
