@@ -80,7 +80,10 @@ object AuctionHouseCopyUnderbidPrice {
         auctionPricePattern.firstMatcher(stack.getLore()) {
             val underbid = group("coins").formatLong() - 1
             OSUtils.copyToClipboard("$underbid")
-            ChatUtils.chat("Copied ${underbid.addSeparators()} to clipboard.")
+            ChatUtils.chat(
+                "Copied ${underbid.addSeparators()} to clipboard.",
+                replaceSameMessage = true,
+            )
         }
     }
 
