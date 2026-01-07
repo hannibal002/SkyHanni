@@ -66,11 +66,10 @@ object DungeonLividFinder {
     private val lividEntities: List<RemotePlayer>
         get() = EntityUtils.getEntities<RemotePlayer>()
             .filterTo(mutableListOf()) {
-                it.isNpc() && (lividNamePattern.matches(it.name.string) || (lividTextureToColor.containsKey(it.getSkinTexture())))
+                it.isNpc() && (lividNamePattern.matches(it.name.formattedTextCompatLessResets()) || (lividTextureToColor.containsKey(it.getSkinTexture())))
             }
 
     private var color: LorenzColor? = null
-
 
     private val lividTextureToColor = mutableMapOf<String, LorenzColor>()
     private val lividNameToColor = mutableMapOf(
@@ -84,6 +83,7 @@ object DungeonLividFinder {
         "Smile" to LorenzColor.GREEN,
         "Frog" to LorenzColor.DARK_GREEN,
     )
+
     /**
      * REGEX-TEST: §2﴾ §2§lLivid§r§r §a7M§c❤ §2﴿
      * REGEX-TEST: §5﴾ §5§lLivid§r§r §a7M§c❤ §5﴿
@@ -93,30 +93,25 @@ object DungeonLividFinder {
         "^§(?<colorCode>.)﴾ §.§lLivid.*$",
     )
 
-
     /**
      * REGEX-TEST: Doctor Livid
      */
     private val lividNamePattern by RepoPattern.pattern(
         "dungeon.f5.livid.name",
-        "^(?<type>\\w+) Livid$",
+        "^(?<name>\\w+) Livid$",
     )
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        if (lividTextureToColor.isNotEmpty()) lividTextureToColor.clear()
+        lividTextureToColor.clear()
         val data = event.getConstant<LividSolverJson>("dungeons/LividSolver")
         for ((color, lividInfo) in data.livids) {
-            val repoColor = LorenzColor.entries.firstOrNull { it.toString() == color } ?: continue
-            if (!lividTextureToColor.containsKey(lividInfo.skin)) {
-                lividTextureToColor.add(Pair(lividInfo.skin, repoColor))
-            }
-            if (!lividNameToColor.containsKey(lividInfo.name)) {
-                lividNameToColor.add(Pair(lividInfo.name, repoColor))
-            }
+            val colorCode = color.getOrNull(1) ?: continue
+            val repoColor = LorenzColor.entries.firstOrNull { it.chatColorCode == colorCode } ?: continue
+            lividTextureToColor[lividInfo.skin] = repoColor
+            lividNameToColor[lividInfo.name] = repoColor
         }
     }
-
 
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
@@ -126,13 +121,15 @@ object DungeonLividFinder {
 
         for (entity in lividEntities) {
             val lividColor = entity.getLividColor() ?: run {
-                lividNamePattern.matchMatcher(entity.name.toString()) {
-                    val namecolor = lividNameToColor[group("name")] ?: continue
-                    val texture = entity.getSkinTexture() ?: continue
-                    ChatUtils.debug("Unknown Livid Skin found $texture $namecolor ${group("name")}")
-                    lividTextureToColor.add(Pair(texture, namecolor))
-                    continue
+                lividNamePattern.matchMatcher(entity.name.formattedTextCompatLessResets()) {
+                    val name = group("name")
+                    val nameColor = lividNameToColor[name] ?: return@matchMatcher
+                    val texture = entity.getSkinTexture() ?: return@matchMatcher
+                    ChatUtils.debug("Unknown Livid Skin found $texture $nameColor $name")
+                    lividTextureToColor.add(texture to nameColor)
+                    return@run nameColor
                 }
+                return@run null
             }
             if (lividColor == color) {
                 livid = entity
@@ -328,8 +325,9 @@ object DungeonLividFinder {
             add("blockColor: ${blockLocation.getBlockStateAt()}")
             add("livid: '${livid?.name.formattedTextCompatLessResets()}'")
             add("color: ${color?.name}")
-            for (livid in lividTextureToColor) {
-                add("${livid.value}: ${livid.key}")
+            add("lividTextureToColor:")
+            for ((key, value) in lividTextureToColor) {
+                add("  ${value}: ${key}")
             }
         }
     }
