@@ -38,7 +38,10 @@ object CustomTodoDownload {
                             ChatUtils.userError("Todo is invalid, please report this on discord")
                             return@argCallback
                         }
-                        SkyHanniMod.customTodos.customTodos.add(template.also { it.downloaded = true })
+                        SkyHanniMod.customTodos.customTodos.add(template.also {
+                            it.downloaded = true
+                            it.downloadedId = todo.id
+                        })
                         CustomTodos.save()
                         ChatUtils.chat("Todo downloaded successfully. Use /shtodos to edit it")
                         return@argCallback

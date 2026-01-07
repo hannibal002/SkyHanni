@@ -23,7 +23,12 @@ class CommunityTodoViewer(
 
     private var lastSearch: String? = null
 
-    private val allCommunityTodos = communityTodos.map { CommunityTodoInfo(it, currentTodos) }
+    private val allCommunityTodos = communityTodos.map { communityTodo ->
+        CommunityTodoInfo(communityTodo, currentTodos).also { communityTodoInfo ->
+            communityTodoInfo.downloaded =
+                currentTodos.any { todo -> todo.into().downloadedId == communityTodoInfo.communityInfo.id }
+        }
+    }
     private val searchCache = ObservableList(mutableListOf<CommunityTodoInfo>())
 
     @Bind
@@ -63,11 +68,11 @@ class CommunityTodoViewer(
         }
     }
 
-    class CommunityTodoInfo(private val communityInfo: CommunityTodo, private val currentTodos: ObservableList<CustomTodoEditor>) {
+    class CommunityTodoInfo(val communityInfo: CommunityTodo, private val currentTodos: ObservableList<CustomTodoEditor>) {
 
         val todo = CustomTodo.fromTemplate(communityInfo.todoData)
 
-        private var downloaded = false
+        var downloaded = false
 
         @Bind
         fun getItemStack(): IItemStack {
@@ -88,7 +93,10 @@ class CommunityTodoViewer(
         @Bind
         fun download() {
             if (downloaded) return
-            currentTodos.add(CustomTodoEditor(todo.also { it.downloaded = true }, currentTodos))
+            currentTodos.add(CustomTodoEditor(todo.also {
+                it.downloaded = true
+                it.downloadedId = communityInfo.id
+            }, currentTodos))
             downloaded = true
         }
 

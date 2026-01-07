@@ -41,6 +41,7 @@ data class CustomTodo(
     @Expose var cronEnabled: Boolean = false,
     @Expose var cronExpression: String = "",
     @Expose var downloaded: Boolean = false,
+    @Expose var downloadedId: String = "",
 ) {
     enum class TriggerMatcher {
         REGEX,
@@ -132,7 +133,7 @@ data class CustomTodo(
     fun toTemplate(): String {
         return TemplateUtil.encodeTemplate(
             TEMPLATE_PREFIX,
-            this.copy(readyAt = mutableMapOf(), triggersLeft = mutableMapOf(), downloaded = false),
+            this.copy(readyAt = mutableMapOf(), triggersLeft = mutableMapOf(), downloaded = false, downloadedId = ""),
         )
     }
 

@@ -80,6 +80,7 @@ class CustomTodoEditor(
             cronEnabled,
             cronExpression,
             from.downloaded,
+            from.downloadedId,
         )
     }
 
@@ -310,6 +311,7 @@ class CustomTodoEditor(
     @Bind
     fun edit() {
         from.downloaded = false
+        from.downloadedId = ""
         XmlUtils.openXmlScreen(this, MyResourceLocation("skyhanni", "gui/customtodos/edit.xml"))
     }
 }
