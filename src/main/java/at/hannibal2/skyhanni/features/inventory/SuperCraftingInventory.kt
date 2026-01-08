@@ -49,10 +49,13 @@ object SuperCraftingInventory {
 
     /**
      * REGEX-TEST: ✔ 177,889/32 (5,559x) Enchanted Glowstone Dust
+     * REGEX-TEST: ✔ 2,067/320 Enchanted Cocoa Beans
+     * REGEX-TEST: ✔ 1,747/1,600 Enchanted Cocoa Beans
      */
+    @Suppress("RepoPatternUnnamedGroup")
     private val craftingResourcePattern by craftingPatternGroup.pattern(
         "crafting.resource",
-        " *✔ [0-9,]+/[0-9,]+ \\((?<amount>[0-9,]+)x\\) (?<resource>.+)",
+        " *✔ (?<owned>[0-9,])+/(?<used>[0-9,])+ (\\([0-9,]+x\\) )?(?<resource>.+)",
     )
 
     /**
@@ -88,7 +91,7 @@ object SuperCraftingInventory {
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
         val craftingAmount = getSuperCraftingCount(slots) ?: return
         val profit = getProfit(slots, craftingAmount) ?: return
-        val maxCraftingAmount = getSuperCraftingMaxCount(slots)
+        val maxCraftingAmount = getSuperCraftingMaxCount(slots, craftingAmount)
         if (!blockWasteClick(profit, craftingAmount, maxCraftingAmount)) return
         SoundUtils.playErrorSound()
         val diff = (-profit).formatChatCoins()
@@ -106,9 +109,13 @@ object SuperCraftingInventory {
         event.cancel()
     }
 
-    private fun getSuperCraftingMaxCount(slots: List<Slot>) = slots[PICKAXE_SLOT].item.getLore().mapNotNull {
+    private fun getSuperCraftingMaxCount(slots: List<Slot>, craftingAmount: Long) = slots[PICKAXE_SLOT].item.getLore().mapNotNull {
         craftingResourcePattern.matchMatcher(it.removeColor()) {
-            groupOrNull("amount")?.formatLongOrNull()
+            val owned = groupOrNull("owned")?.formatLongOrNull() ?: return@matchMatcher null
+            val used = groupOrNull("used")?.formatLongOrNull() ?: return@matchMatcher null
+            val matsPerCraft = used/craftingAmount
+            val maxPossible = owned / matsPerCraft
+            return@matchMatcher maxPossible
         }
     }.minOrNull() ?: ErrorManager.skyHanniError(
         "Super Crafting resource line not found",
