@@ -55,7 +55,7 @@ object SuperCraftingInventory {
     @Suppress("RepoPatternUnnamedGroup")
     private val craftingResourcePattern by craftingPatternGroup.pattern(
         "crafting.resource",
-        " *✔ (?<owned>[0-9,])+/(?<used>[0-9,])+ (\\([0-9,]+x\\) )?(?<resource>.+)",
+        " *✔ (?<owned>[0-9,]+)/(?<used>[0-9,]+) (\\([0-9,]+x\\) )?(?<resource>.+)",
     )
 
     /**
