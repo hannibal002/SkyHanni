@@ -3,11 +3,14 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
+import at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
@@ -162,6 +165,8 @@ object InstanceChestProfit {
     private val alreadyProcessedChests = mutableListOf<CroesusChestType>()
     private val croesusDisplayList = mutableListOf<Renderable>()
     private var slotToHighlight: Pair<Int, Double>? = null
+    private var display: Renderable? = null
+    private val chestProfits: MutableMap<String, Double> = mutableMapOf()
 
     enum class CroesusChestType(val stackChestName: String) {
         WOOD("Wood"),
@@ -217,7 +222,7 @@ object InstanceChestProfit {
             createCroesusDisplay()
         }
 
-        createDisplay(event.inventoryItems)
+        createDisplay(event.inventoryName, event.inventoryItems)
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true)
@@ -327,7 +332,12 @@ object InstanceChestProfit {
         count * getPrice(NeuInternalName.fromItemName(name))
     } ?: 0.0
 
-    private fun createDisplay(items: Map<Int, ItemStack>) {
+    private fun createDisplay(inventoryName: String, items: Map<Int, ItemStack>) {
+        /**
+         * Kuudra chests say "Free Chest Chest" and "Paid Chest Chest" due to Hypixel issue
+         */
+        val fixedInventoryName = inventoryName.replace("Chest Chest", "Chest")
+
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
             if (fakeItemNamePattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())) return@forEach
@@ -363,44 +373,55 @@ object InstanceChestProfit {
             }
         }
 
+        display = Renderable.table(buildDisplay(fixedInventoryName, itemsWithCost), ySpacing = 1)
+    }
 
-        val list = buildList {
-            val chestName = if (inDungeonChest) "Dungeon"
-            else if (inKuudraChest) "Kuudra"
-            else ""
-            add(("§d§l$chestName Chest Profit"))
-            add((" "))
+    private fun buildDisplay(fixedInventoryName: String, itemsWithCost: Map<String, Double>) = buildList {
+        add(listOf(Renderable.text("§d§l$fixedInventoryName Profit")))
+        add(listOf(Renderable.emptyText()))
 
-            var total = 0.0
-            var displayedCost = false
+        var total = 0.0
+        var displayedCost = false
 
-            val revenue = itemsWithCost.values.filter { it > 0 }.sum()
-            add("§a§lTotal Revenue §a${revenue.formatCoin()}")
+        val revenue = itemsWithCost.values.filter { it > 0 }.sum()
+        add("§a§lTotal Revenue §a${revenue.formatCoin()}")
 
-            itemsWithCost.forEach {
-                val coinsColor = if (it.value < 0) "§c"
-                else "§a"
-
-                if (!displayedCost && it.value < 0) {
-                    val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
-                    add(" ")
-                    add("§c§lTotal Cost §c${cost.formatCoin()}")
-                    displayedCost = true
-                }
-
-                val coins = "$coinsColor${it.value.formatCoin()}"
-
-                total += it.value
-                add("${it.key} $coins")
-            }
-
-            val color = if (total < 0) "§c"
+        itemsWithCost.forEach {
+            val coinsColor = if (it.value < 0) "§c"
             else "§a"
 
-            add("")
-            add("$color§lProfit $color${total.formatCoin()}")
+            if (!displayedCost && it.value < 0) {
+                val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
+                add(" ")
+                add("§c§lTotal Cost §c${cost.formatCoin()}")
+                displayedCost = true
+            }
+
+            val coins = "$coinsColor${it.value.formatCoin()}"
+
+            total += it.value
+            add("${it.key} $coins")
         }
-        chestDisplay = Renderable.vertical(list.map { Renderable.text(it) }, spacing = 1)
+
+        chestProfits[fixedInventoryName] = total
+
+        var color = if (total < 0) "§c"
+        else "§a"
+
+        add(listOf(Renderable.emptyText()))
+        add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color${total.formatCoin()}")))
+
+        if (!IslandType.CATACOMBS.isCurrent() && !IslandType.KUUDRA_ARENA.isCurrent()) return@buildList
+
+        add(listOf(Renderable.emptyText()))
+        add(listOf(Renderable.text("§d§lAll Chest Profits")))
+
+        for (it in chestProfits.entries.sortedByDescending { it.value }) {
+            color = if (it.value < 0) "§c"
+            else "§a"
+
+            add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
+        }
     }
 
     private fun getKuudraEssenceBonus(): Double =
@@ -428,5 +449,15 @@ object InstanceChestProfit {
                 posLabel = "Croesus Chest Profit",
             )
         }
+    }
+
+    @HandleEvent(DungeonEnterEvent::class)
+    fun onDungeonEnter() {
+        chestProfits.clear()
+    }
+
+    @HandleEvent(KuudraEnterEvent::class)
+    fun onKuudraEnter() {
+        chestProfits.clear()
     }
 }

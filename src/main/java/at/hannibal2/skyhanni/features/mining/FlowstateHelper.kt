@@ -159,14 +159,14 @@ object FlowstateHelper {
     }
 
     fun getTimerColor(timeRemaining: Duration): Component {
-        if (!config.colorfulTimer) return Component.nullToEmpty("§b")
+        if (!config.colorfulTimer) return Component.literal("§b")
         return when (timeRemaining) {
-            in 0.seconds..2.seconds -> Component.nullToEmpty("§c")
-            in 2.seconds..4.seconds -> ExtendedChatColor("#ec7b36", false).asText()
-            in 4.seconds..6.seconds -> Component.nullToEmpty("§e")
-            in 6.seconds..8.seconds -> Component.nullToEmpty("§a")
-            in 8.seconds..10.seconds -> Component.nullToEmpty("§2")
-            else -> Component.nullToEmpty("§6")
+            in 0.seconds..2.seconds -> Component.literal("§c")
+            in 2.seconds..4.seconds -> ExtendedChatColor("#ec7b36").asText()
+            in 4.seconds..6.seconds -> Component.literal("§e")
+            in 6.seconds..8.seconds -> Component.literal("§a")
+            in 8.seconds..10.seconds -> Component.literal("§2")
+            else -> Component.literal("§6")
         }
     }
 
@@ -249,7 +249,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
             TIMER -> {
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                Renderable.text(Component.nullToEmpty("§7Time Remaining: ").append(timeRemaining.formatTime()))
+                Renderable.text(Component.literal("§7Time Remaining: ").append(timeRemaining.formatTime()))
             }
 
             STREAK -> {
@@ -266,7 +266,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
                 Renderable.text(
-                    Component.nullToEmpty(
+                    Component.literal(
                         "§7x${getStreakColor()}$blockBreakStreak " + "§6+${getSpeedBonus()}⸕ ",
                     ).append(
                         timeRemaining.formatTime(),

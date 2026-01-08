@@ -25,7 +25,7 @@ object TextHelper {
 
     fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
     fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent =
-        (Component.nullToEmpty(this) as MutableComponent).also(init)
+        Component.literal(this).also(init)
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
     fun join(vararg components: Any?, separator: Component? = null): Component {
@@ -179,10 +179,10 @@ object TextHelper {
 
     fun createGradientText(start: Color, end: Color, string: String): Component {
         val length = string.length.toDouble()
-        var text = Component.nullToEmpty("")
+        var text = Component.literal("")
         for ((index, char) in string.withIndex()) {
             val color = ColorUtils.blendRGB(start, end, index / length).rgb
-            text = text.append(ExtendedChatColor(color).asText().append(char.toString()))
+            text = text.append(ExtendedChatColor(color).asText(char.toString()))
         }
         return text
     }

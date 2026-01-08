@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import net.minecraft.network.chat.Component
 import net.minecraft.world.phys.AABB
 import java.awt.Color
 
@@ -67,6 +68,7 @@ object DeferredDrawer {
             event.drawString(
                 string.location,
                 string.text,
+                string.component,
                 seeThroughBlocks = true,
                 string.color,
                 string.scale,
@@ -80,6 +82,7 @@ object DeferredDrawer {
             event.drawString(
                 string.location,
                 string.text,
+                string.component,
                 seeThroughBlocks = false,
                 string.color,
                 string.scale,
@@ -130,7 +133,25 @@ object DeferredDrawer {
         backgroundColor: Int,
         depth: Boolean,
     ) {
-        val deferredString = DeferredString(location, text, color, scale, shadow, yOffset, backgroundColor)
+        val deferredString = DeferredString(location, text, null, color, scale, shadow, yOffset, backgroundColor)
+        if (depth) {
+            stringsDepth.add(deferredString)
+        } else {
+            stringsNoDepth.add(deferredString)
+        }
+    }
+
+    fun deferString(
+        location: LorenzVec,
+        component: Component,
+        color: Color?,
+        scale: Double,
+        shadow: Boolean,
+        yOffset: Float,
+        backgroundColor: Int,
+        depth: Boolean,
+    ) {
+        val deferredString = DeferredString(location, null, component, color, scale, shadow, yOffset, backgroundColor)
         if (depth) {
             stringsDepth.add(deferredString)
         } else {
@@ -153,7 +174,8 @@ object DeferredDrawer {
 
     data class DeferredString(
         val location: LorenzVec,
-        val text: String,
+        val text: String?,
+        val component: Component?,
         val color: Color?,
         val scale: Double,
         val shadow: Boolean,

@@ -50,7 +50,7 @@ object QuickCraftFeatures {
         if (needsQuickCraftConfirmation(event.itemStack)) {
             for ((index, line) in event.toolTip.withIndex()) {
                 if (line.string.removeColor() == "Click to craft!") {
-                    event.toolTip.set(index, Component.nullToEmpty("§c${KeyboardManager.getModifierKeyName()} + Click to craft!"))
+                    event.toolTip.set(index, Component.literal("§c${KeyboardManager.getModifierKeyName()} + Click to craft!"))
                     break
                 }
             }
