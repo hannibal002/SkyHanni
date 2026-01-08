@@ -52,10 +52,9 @@ object SuperCraftingInventory {
      * REGEX-TEST: ✔ 2,067/320 Enchanted Cocoa Beans
      * REGEX-TEST: ✔ 1,747/1,600 Enchanted Cocoa Beans
      */
-    @Suppress("RepoPatternUnnamedGroup")
     private val craftingResourcePattern by craftingPatternGroup.pattern(
         "crafting.resource",
-        " *✔ (?<owned>[0-9,]+)/(?<used>[0-9,]+) (\\([0-9,]+x\\) )?(?<resource>.+)",
+        " *✔ (?<owned>[0-9,]+)/(?<used>[0-9,]+) (?:\\([0-9,]+x\\) )?(?<resource>.+)",
     )
 
     /**
