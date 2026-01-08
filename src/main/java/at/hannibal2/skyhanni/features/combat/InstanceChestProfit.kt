@@ -161,12 +161,11 @@ object InstanceChestProfit {
     private var inDungeonChest = false
     private var inKuudraChest = false
     private var inCroesusRunMenu = false
-    private var chestDisplay: Renderable? = null
     private var croesusDisplay: Renderable? = null
     private val alreadyProcessedChests = mutableListOf<CroesusChestType>()
     private val croesusDisplayList = mutableListOf<Renderable>()
     private var slotToHighlight: Pair<Int, Double>? = null
-    private var display: Renderable? = null
+    private var chestDisplay: Renderable? = null
     private val chestProfits: MutableMap<String, Double> = mutableMapOf()
 
     enum class CroesusChestType(val stackChestName: String) {
@@ -374,7 +373,7 @@ object InstanceChestProfit {
             }
         }
 
-        display = Renderable.vertical(buildDisplay(fixedInventoryName, itemsWithCost), spacing = 1)
+        chestDisplay = Renderable.vertical(buildDisplay(fixedInventoryName, itemsWithCost), spacing = 1)
     }
 
     private fun buildDisplay(fixedInventoryName: String, itemsWithCost: Map<String, Double>) = buildList {
