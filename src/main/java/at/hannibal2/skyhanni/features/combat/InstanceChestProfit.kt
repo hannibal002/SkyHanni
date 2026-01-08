@@ -164,7 +164,7 @@ object InstanceChestProfit {
     private var slotToHighlight: Pair<Int, Double>? = null
 
     enum class CroesusChestType(val stackChestName: String) {
-        WOOD("§fWood"),
+        WOOD("Wood"),
         GOLD("§6Gold"),
         DIAMOND("§bDiamond"),
         EMERALD("§2Emerald"),
@@ -178,7 +178,6 @@ object InstanceChestProfit {
             fun getByStackName(stackName: String): CroesusChestType? {
                 var newStackName = stackName
                 chestFutureProofing.matchMatcher(stackName) {
-
                     newStackName = group("chestname")
                 }
                 return entries.firstOrNull { it.stackChestName == newStackName }
