@@ -113,7 +113,9 @@ object SuperCraftingInventory {
         craftingResourcePattern.matchMatcher(it.removeColor()) {
             val owned = groupOrNull("owned")?.formatLongOrNull() ?: return@matchMatcher null
             val used = groupOrNull("used")?.formatLongOrNull() ?: return@matchMatcher null
-            val matsPerCraft = used/craftingAmount
+            if (used == 0L || owned == 0L) return@matchMatcher null
+            val matsPerCraft = used / craftingAmount
+            if (matsPerCraft == 0L) return@matchMatcher null
             val maxPossible = owned / matsPerCraft
             return@matchMatcher maxPossible
         }
