@@ -103,7 +103,7 @@ private val textColorLUT = ChatFormatting.entries
     .toMap()
 
 fun Style.chatStyle() = buildString {
-    color?.let { append(it.toChatFormatting()?.toString() ?: "§r") }
+    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.formatValue()}>") }
     if (isBold) append("§l")
     if (isItalic) append("§o")
     if (isUnderlined) append("§n")
@@ -170,7 +170,7 @@ fun Style.setClickRunCommand(text: String): Style {
 }
 
 fun Style.setHoverShowText(text: String): Style {
-    return this.withHoverEvent(HoverEvent.ShowText(Component.nullToEmpty(text)))
+    return this.withHoverEvent(HoverEvent.ShowText(Component.literal(text)))
 }
 
 fun Style.setHoverShowText(text: Component): Style {
@@ -266,7 +266,28 @@ val formattingPattern = Regex("§.(?:§.)?")
 fun Component.append(newText: String): Component {
     val mutableText = this as MutableComponent
     if (mutableText.string.matches(formattingPattern)) {
-        return Component.nullToEmpty(mutableText.string + newText)
+        return Component.literal(mutableText.string + newText)
     }
     return mutableText.append(newText)
+}
+
+fun List<Any>.mapToComponents(): List<Component> {
+    val newList = mutableListOf<Component>()
+    for (entry in this) {
+        when (entry) {
+            is String -> newList.add(Component.literal(entry))
+            is Component -> newList.add(entry)
+            else -> throw IllegalArgumentException("$entry is not String or Component")
+        }
+    }
+    return newList
+}
+
+fun Component.replace(oldValue: String, newValue: String): Component {
+    // this isnt perfect
+    for (index in this.siblings.indices) {
+        val sibling = this.siblings[index]
+        this.siblings[index] = Component.literal(sibling.string.replace(oldValue, newValue)).withStyle(sibling.style)
+    }
+    return this
 }

@@ -24,11 +24,14 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
@@ -92,7 +95,7 @@ object AnitaMedalProfit {
 
     private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item)
-        if (isInvalidItemName(itemName)) return
+        if (isInvalidItemName(itemName.string)) return
 
         val requiredItems = getRequiredItems(item)
         val additionalMaterials = getAdditionalMaterials(requiredItems)
@@ -101,7 +104,7 @@ object AnitaMedalProfit {
         // Ignore items without medal cost, e.g. InfiniDirt Wand
         val bronzeCost = getBronzeCost(requiredItems) ?: return
 
-        val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
+        val (name, amount) = ItemUtils.readItemAmount(itemName.formattedTextCompatLeadingWhiteLessResets()) ?: return
 
         var internalName = NeuInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
@@ -137,16 +140,16 @@ object AnitaMedalProfit {
         table.add(
             DisplayTableEntry(
                 itemName,
-                "$color$profitPerBronzeFormat",
+                "$color$profitPerBronzeFormat".asComponent(),
                 profitPerBronze,
                 internalName,
-                hover,
+                hover.mapToComponents(),
                 highlightsOnHoverSlots = listOf(slot),
             ),
         )
     }
 
-    private fun MutableList<String>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
+    private fun MutableList<Any>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
         for ((internalName, amount) in additionalMaterials) {
             add(internalName.getPriceName(amount))
         }
@@ -154,18 +157,18 @@ object AnitaMedalProfit {
 
     private val invalidItemNames = listOf(
         " ",
-        "§cClose",
-        "§eUnique Gold Medals",
-        "§aMedal Trades",
+        "Close",
+        "Unique Gold Medals",
+        "Medal Trades",
     )
 
     private fun isInvalidItemName(itemName: String): Boolean = itemName in invalidItemNames
 
-    private fun getItemName(item: ItemStack): String {
-        val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+    private fun getItemName(item: ItemStack): Component {
+        val name = item.hoverName
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
-            item.repoItemName
+            item.repoItemName.asComponent()
         } else name
     }
 

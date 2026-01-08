@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.realDisplayName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,7 +30,7 @@ object ZorroCapeContestProtection {
 
         val stack = event.item ?: return
         val claimableContest = JacobFarmingContestsInventory.isClaimableContest(stack)
-        val isBulkClaim = stack.realDisplayName == "Bulk Claim"
+        val isBulkClaim = stack.cleanName() == "Bulk Claim"
         if (claimableContest || isBulkClaim) {
             event.cancel()
             notifyUser()
