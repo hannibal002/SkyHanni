@@ -109,20 +109,21 @@ object SuperCraftingInventory {
         event.cancel()
     }
 
-    private fun getSuperCraftingMaxCount(slots: List<Slot>, craftingAmount: Long) = slots[PICKAXE_SLOT].item.getLore().mapNotNull {
-        craftingResourcePattern.matchMatcher(it.removeColor()) {
-            val owned = groupOrNull("owned")?.formatLongOrNull() ?: return@matchMatcher null
-            val used = groupOrNull("used")?.formatLongOrNull() ?: return@matchMatcher null
-            if (used == 0L || owned == 0L) return@matchMatcher null
-            val matsPerCraft = used / craftingAmount
-            if (matsPerCraft == 0L) return@matchMatcher null
-            val maxPossible = owned / matsPerCraft
-            return@matchMatcher maxPossible
-        }
-    }.minOrNull() ?: ErrorManager.skyHanniError(
+    private fun getSuperCraftingMaxCount(slots: List<Slot>, craftingAmount: Long) = slots[PICKAXE_SLOT].item.getLore()
+        .mapNotNull { calculateMaxPossible(it, craftingAmount) }
+        .minOrNull() ?: ErrorManager.skyHanniError(
         "Super Crafting resource line not found",
         "lore" to slots.map { slot -> slot.item.getLore().map { line -> line.removeColor() } },
     )
+
+    private fun calculateMaxPossible(string: String, craftingAmount: Long) = craftingResourcePattern.matchMatcher(string.removeColor()) {
+        val owned = groupOrNull("owned")?.formatLongOrNull() ?: return null
+        val used = groupOrNull("used")?.formatLongOrNull() ?: return null
+        if (used == 0L || owned == 0L) return null
+        val matsPerCraft = used / craftingAmount
+        if (matsPerCraft == 0L) return null
+        owned / matsPerCraft
+    }
 
     private fun getProfit(slots: List<Slot>, craftingAmount: Long): Double? {
         val materials = getRecipeMaterials(slots)
