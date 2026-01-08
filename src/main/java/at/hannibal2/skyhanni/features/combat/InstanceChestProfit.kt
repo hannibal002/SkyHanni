@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
@@ -373,18 +374,18 @@ object InstanceChestProfit {
             }
         }
 
-        display = Renderable.table(buildDisplay(fixedInventoryName, itemsWithCost), ySpacing = 1)
+        display = Renderable.vertical(buildDisplay(fixedInventoryName, itemsWithCost), spacing = 1)
     }
 
     private fun buildDisplay(fixedInventoryName: String, itemsWithCost: Map<String, Double>) = buildList {
-        add(listOf(Renderable.text("§d§l$fixedInventoryName Profit")))
-        add(listOf(Renderable.emptyText()))
+        add(Renderable.text("§d§l$fixedInventoryName Profit"))
+        add(Renderable.emptyText())
 
         var total = 0.0
         var displayedCost = false
 
         val revenue = itemsWithCost.values.filter { it > 0 }.sum()
-        add("§a§lTotal Revenue §a${revenue.formatCoin()}")
+        add(Renderable.text("§a§lTotal Revenue §a${revenue.formatCoin()}"))
 
         itemsWithCost.forEach {
             val coinsColor = if (it.value < 0) "§c"
@@ -392,15 +393,15 @@ object InstanceChestProfit {
 
             if (!displayedCost && it.value < 0) {
                 val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
-                add(" ")
-                add("§c§lTotal Cost §c${cost.formatCoin()}")
+                add(Renderable.text(" "))
+                add(Renderable.text("§c§lTotal Cost §c${cost.formatCoin()}"))
                 displayedCost = true
             }
 
             val coins = "$coinsColor${it.value.formatCoin()}"
 
             total += it.value
-            add("${it.key} $coins")
+            add(Renderable.text("${it.key} $coins"))
         }
 
         chestProfits[fixedInventoryName] = total
@@ -408,19 +409,19 @@ object InstanceChestProfit {
         var color = if (total < 0) "§c"
         else "§a"
 
-        add(listOf(Renderable.emptyText()))
-        add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color${total.formatCoin()}")))
+        add(Renderable.emptyText())
+        add(Renderable.text("$color§lProfit $color${total.formatCoin()}"))
 
         if (!IslandType.CATACOMBS.isCurrent() && !IslandType.KUUDRA_ARENA.isCurrent()) return@buildList
 
-        add(listOf(Renderable.emptyText()))
-        add(listOf(Renderable.text("§d§lAll Chest Profits")))
+        add(Renderable.emptyText())
+        add(Renderable.text("§d§lAll Chest Profits"))
 
         for (it in chestProfits.entries.sortedByDescending { it.value }) {
             color = if (it.value < 0) "§c"
             else "§a"
 
-            add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
+            add(Renderable.text("${it.key} $color${it.value.formatCoin()}"))
         }
     }
 
