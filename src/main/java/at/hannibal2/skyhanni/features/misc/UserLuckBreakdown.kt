@@ -185,7 +185,7 @@ object UserLuckBreakdown {
         event.slot ?: return
         if (!inMiscStats) return
         if (inCustomBreakdown && event.slot.containerSlot == 48) {
-            event.toolTip[1] = Component.nullToEmpty("§7To Your Stats Breakdown")
+            event.toolTip[1] = Component.literal("§7To Your Stats Breakdown")
         }
         if (event.slot.containerSlot != 4 || inCustomBreakdown) return
         val luckEvent = getOrPostLuckEvent()

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -140,7 +140,7 @@ object HarpFeatures {
     private var isGuiScaled = false
 
     private fun setGuiScale() {
-        Minecraft.getInstance().execute {
+        DelayedRun.runOrNextTick {
             guiSetting = getMinecraftGuiScale()
             setMinecraftGuiScale(0)
             isGuiScaled = true
@@ -150,7 +150,7 @@ object HarpFeatures {
 
     private fun unSetGuiScale() {
         if (!isGuiScaled) return
-        Minecraft.getInstance().execute {
+        DelayedRun.runOrNextTick {
             setMinecraftGuiScale(guiSetting)
             isGuiScaled = false
         }
@@ -216,10 +216,10 @@ object HarpFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!config.hideMelodyTooltip) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
-        if (event.slot.container !is SimpleContainer) return
+        if (event.slot?.container !is SimpleContainer) return
         event.cancel()
     }
 }

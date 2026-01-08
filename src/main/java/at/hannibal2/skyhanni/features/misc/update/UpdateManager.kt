@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
@@ -28,6 +27,7 @@ import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
 import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
+import net.minecraft.client.Minecraft
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
 import kotlin.time.Duration
@@ -134,7 +134,7 @@ object UpdateManager {
                     ChatUtils.chat("§aSkyHanni didn't find a new update.")
                 }
             },
-            DelayedRun.onThread,
+            Minecraft.getInstance(),
         )
     }
 
@@ -154,7 +154,7 @@ object UpdateManager {
                 ChatUtils.chat("Download of update complete. ")
                 ChatUtils.chat("§aThe update will be installed after your next restart.")
             },
-            DelayedRun.onThread,
+            Minecraft.getInstance(),
         )
     }
 

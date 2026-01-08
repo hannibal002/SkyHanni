@@ -215,7 +215,7 @@ open class SkyHanniTracker<Data : TrackerData>(
                 tips = listOf(
                     "§eⓘ §7Uptime tracked only from",
                     "§7SkyHanni version 6.0.0 onwards",
-                )
+                ),
             )
         } else {
             Renderable.text("§eSession Uptime: §b${sessionUptime.format()}$pausedText")

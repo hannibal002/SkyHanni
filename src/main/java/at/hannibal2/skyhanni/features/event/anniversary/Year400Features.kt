@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -170,7 +169,7 @@ object Year400Features {
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent) {
         if (!config.teamFinder) return
-        if (!fatPlayerMessagePattern.matches(event.message.removeColor())) return
+        if (!fatPlayerMessagePattern.matches(event.cleanMessage)) return
         if (lastClickedPlayerTime.passedSince() >= 500.milliseconds) return
 
         val lastPlayer = lastClickedPlayer ?: return

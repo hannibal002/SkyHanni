@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -175,11 +176,13 @@ object JacobFarmingContestsInventory {
         val chest = event.container as ChestMenu
 
         for ((slot, stack) in chest.getUpperItems()) {
-            if (stack.getLore().any { it == "§eClick to claim reward!" }) {
+            if (isClaimableContest(stack)) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }
     }
+
+    fun isClaimableContest(stack: ItemStack): Boolean = stack.getLore().lastOrNull() == "§eClick to claim reward!"
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipTextEvent) {
