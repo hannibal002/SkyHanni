@@ -116,7 +116,7 @@ class TrackerConfig {
         name = "AFK timeout",
         desc = "Pause the tracker if it is not modified for this amount of seconds."
     )
-    @Searchtag("uptime")
+    @SearchTag("uptime")
     @ConfigEditorSlider(minValue = 15f, maxValue = 900f, minStep = 15f)
     var afkTimeout: Int = 60
 
