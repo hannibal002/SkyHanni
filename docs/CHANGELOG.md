@@ -1,4 +1,4 @@
-# SkyHanni - Change Log
+#chagem SkyHanni - Change Log
 
 ## Version 7.0.0
 
@@ -19,10 +19,18 @@
 + Added Zorro's Cape Contest Protection. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5029)
   + Requires equipping Zorro's Cape to claim Jacob's Farming Contest rewards.
 
+#### Inventory
+
++ Added Anti Super Crafting Overpay. - Hype_the_Time (https://github.com/hannibal002/SkyHanni/pull/5022)
+    + Blocks Super Crafts (bypassable) if you can save more than X coins by instantly selling the mats and instant buying the item directly.
+
 #### Misc
 
 + Added Particle Colour Fixer. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4993)
   + This makes particles have the same colours as they do on 1.8.
++ Added downloading community shtodos. - nopo & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5048)
+    + Access via /shtodos or download directly from /shdownloadtodo.
+    + If you want your own todos featured, post them in Discord.
 
 ### Improvements
 
@@ -46,7 +54,15 @@
 + Enchants can now have custom colours. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5021)
   + Added an 'Advanced' section to allow for custom colours for enchant tiers instead of the usual Minecraft presets.
 + You can now customise Ultimate enchant colour. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5021)
++ Show all instance chest profits in the instance chest profit display. - frostyy1905 (https://github.com/hannibal002/SkyHanni/pull/5054)
 
+#### Rift
+
++ Ubik's Cube timer will now automatically update if you try to use it while on cooldown. - Luna (https://github.com/hannibal002/SkyHanni/pull/5045)
+
+#### Events
+
++ Increased speed and accuracy of griffin burrow detection. - SidOfThe7Cs (https://github.com/hannibal002/SkyHanni/pull/5051)
 
 #### Misc
 
@@ -58,6 +74,8 @@
 + `/shnavigate` now instantly navigates if there is only one match. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4995)
   + Can be disabled in config.
 + Added `/shnav` as alias to `/shnavigate`. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4995)
++ Island area rendering is now more performant. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5026)
++ Sunflower/Moonflower and animated pet skin variants are now correctly detected when using a time changer mod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5044)
 
 ### Fixes
 
@@ -71,16 +89,22 @@
 + Fixed Custom Wardrobe not rendering players on 1.21.8+. - nopo (https://github.com/hannibal002/SkyHanni/pull/4984)
 + Fixed enchants in Custom Wardrobe appearing white. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5028)
 + Fixed Focus mode breaking enchant parsing. - nopo (https://github.com/hannibal002/SkyHanni/pull/5036)
++ Fixed colour hex in lore feature not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5018)
++ Fixed current chest profit number misalignment. - frostyy1905 (https://github.com/hannibal002/SkyHanni/pull/5054)
++ Fixed small performance issue with enchant parsing. - nopo (https://github.com/hannibal002/SkyHanni/pull/5049)
++ Fixed some items being incorrectly shown as NPC sellable with Not Clickable Items enabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/5038)
 
 #### Farming
 
 + Fixed Stereo Harmony Disc Replacer not working on 1 vinyl. - nopo (https://github.com/hannibal002/SkyHanni/pull/4983)
 + Fixed Farming milestone display not working on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/5023)
++ Fixed DNA Solver working in the Ultimate DNA Shard menu. - nopo (https://github.com/hannibal002/SkyHanni/pull/5053)
 
 #### Mining
 
 + Fixed structure chests sometimes being incorrectly highlighted as chests dug up from powder mining. - Luna (https://github.com/hannibal002/SkyHanni/pull/4989)
 + Fixed Powder Chest Timer sometimes not detecting chests. - Luna (https://github.com/hannibal002/SkyHanni/pull/5013)
++ Fixed SkyMart price per copper feature not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5041)
 
 #### Fishing
 
@@ -90,6 +114,22 @@
 #### Combat
 
 + Fixed Arachne Kill Timer. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/5035)
+
+#### Event
+
++ Fixed Diana Rare Mob Waypoints not sharing the rare mob's name. - Stella (https://github.com/hannibal002/SkyHanni/pull/5040)
+
+#### Chat
+
++ Fixed Copy Underbid Price feature spamming the chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5052)
+
+#### Garden
+
++ Fixed plots with pests not being properly detected in the desk. - Luna (https://github.com/hannibal002/SkyHanni/pull/5046)
+
+#### Rift
+
++ Fixed the Timite Evolution Timer feature resetting every time you moved your mouse. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4962)
 
 #### Misc
 
@@ -105,6 +145,9 @@
 + Fixed /gfs calculation not working with suffixes (i.e. 1s or 1e). - nopo (https://github.com/hannibal002/SkyHanni/pull/5031)
 + Fixed Only Show When Ready /shtodos never showing. - nopo (https://github.com/hannibal002/SkyHanni/pull/5032)
 + Fixed RenderSystem errors on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/5023)
++ Fixed area titles showing too frequently when crossing borders. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5026)
++ Fixed crash with Lunar when entering the Garden. - Soopyboo32 (https://github.com/hannibal002/SkyHanni/pull/5043)
++ Fixed Cron /shtodos not being able to be disabled. - nopo (https://github.com/hannibal002/SkyHanni/pull/5042)
 
 ### Technical Details
 
@@ -129,6 +172,14 @@
 + `DelayedRun.runNextTick` now uses Minecraft's built-in scheduler. - Luna (https://github.com/hannibal002/SkyHanni/pull/5034)
 + Added `DelayedRun.runNextTick`, which calls `Minecraft#execute`, and replaces `DelayedRun.onThread.execute`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5034)
   + Where an `Executor` is required, `Minecraft.getInstance()` is passed directly, since it serves as one.
++ Added `/shdebugprogress` command to toggle chat progress updates by category. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4769)
++ Added AreaNodesUpdatedEvent. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5026)
++ Added cleanMessage to SkyHanniChatEvent. - nopo (https://github.com/hannibal002/SkyHanni/pull/5047)
++ Added pest type detection. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/4801)
++ Added support for rendering Components in the world instead of strings. - nopo (https://github.com/hannibal002/SkyHanni/pull/5018)
++ Converted more places to use Components instead of string nonsense. - nopo (https://github.com/hannibal002/SkyHanni/pull/5018)
++ Refactored ChatProgressUpdates to use per-category toggles instead of global debug mode. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4769)
++ Refactored island area system into backend/features modules. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5026)
 
 ### Removed Features
 

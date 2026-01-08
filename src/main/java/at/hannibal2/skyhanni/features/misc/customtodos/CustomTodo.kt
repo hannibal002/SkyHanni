@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.customtodos
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -39,6 +40,8 @@ data class CustomTodo(
     @Expose var triggersLeft: MutableMap<String, Int> = mutableMapOf(),
     @Expose var cronEnabled: Boolean = false,
     @Expose var cronExpression: String = "",
+    @Expose var downloaded: Boolean = false,
+    @Expose var downloadedId: String = "",
 ) {
     enum class TriggerMatcher {
         REGEX,
@@ -105,23 +108,32 @@ data class CustomTodo(
         private const val TEMPLATE_PREFIX = "SH:CUSTOMTODO/"
         const val MS_IN_A_DAY = (24 * 60 * 60 * 1000)
 
-        fun fromTemplate(data: String): CustomTodo? {
+        fun fromTemplateOrNull(data: String, printErrors: Boolean = false): CustomTodo? {
             val maybeDecoded = TemplateUtil.maybeDecodeTemplate(TEMPLATE_PREFIX, data, CustomTodo::class.java)
                 ?: TemplateUtil.maybeDecodeTemplate(NEU_TEMPLATE_PREFIX, data, CustomTodo::class.java)
-            if (maybeDecoded == null) {
+            if (maybeDecoded == null && printErrors) {
                 ChatUtils.chat("§cInvalid Todo")
             }
             return maybeDecoded?.also {
                 it.readyAt.clear()
                 it.triggersLeft.clear()
+                it.isEnabled = true
+                it.position = Position(10, 10)
             }
+        }
+
+        fun fromTemplate(data: String): CustomTodo {
+            return fromTemplateOrNull(data) ?: ErrorManager.skyHanniError(
+                "Invalid todo",
+                "data" to data
+            )
         }
     }
 
     fun toTemplate(): String {
         return TemplateUtil.encodeTemplate(
             TEMPLATE_PREFIX,
-            this.copy(readyAt = mutableMapOf(), triggersLeft = mutableMapOf()),
+            this.copy(readyAt = mutableMapOf(), triggersLeft = mutableMapOf(), downloaded = false, downloadedId = ""),
         )
     }
 
@@ -157,20 +169,15 @@ data class CustomTodo(
         val cron = CronExpression(this.cronExpression)
         val timeMark = SimpleTimeMark(cron.getNextValidTimeAfter(date).time)
         val nextTime = timeMark + this.timer.seconds
-        var timer = ""
-        if (timeMark.isInPast() && nextTime.isInFuture()) {
-            timer = "§aReady"
-        } else {
-            if (nextTime.isInPast()) {
-                this.readyAtOnCurrentProfile = SimpleTimeMark.now()
-            }
-            if (this.showOnlyWhenReady) return null
-            if (this.showWhen != 0 && timeMark.timeUntil().inWholeSeconds > this.showWhen) return null
 
-            timer = timeMark.timeUntil().format(maxUnits = 2)
+        if (timeMark.isInPast() && nextTime.isInFuture()) return "§aReady"
+        if (nextTime.isInPast()) {
+            readyAtOnCurrentProfile = SimpleTimeMark.now()
         }
+        if (showOnlyWhenReady) return null
+        if (showWhen != 0 && timeMark.timeUntil().inWholeSeconds > showWhen) return null
 
-        return timer
+        return timeMark.timeUntil().format(maxUnits = 2)
     }
 
     private var compiledRegex: Regex? = null
