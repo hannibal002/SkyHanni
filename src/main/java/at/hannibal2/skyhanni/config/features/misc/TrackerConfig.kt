@@ -109,7 +109,7 @@ class TrackerConfig {
         desc = "Only show uptime and profit per hour when the tracker is on session mode."
     )
     @ConfigEditorBoolean
-    val onlyShowSession: Property<Boolean> = Property.of(true)
+    val onlyShowSession: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
