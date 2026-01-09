@@ -20,8 +20,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonArray
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 
@@ -175,8 +173,8 @@ object SensitivityReducer {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(80, "garden.sensitivityReducerConfig", "garden.sensitivityReducer")
         event.move(81, "garden.sensitivityReducer.showGUI", "garden.sensitivityReducer.showGui")
-        event.transform(115, "garden.sensitivityReducer.mode") { element ->
-            event.add(115, "garden.sensitivityReducer.enabled") { JsonPrimitive("OFF" != element.asString) }
+        event.transform(116, "garden.sensitivityReducer.mode") { element ->
+            event.add(116, "garden.sensitivityReducer.enabled") { JsonPrimitive("OFF" != element.asString) }
             val newList = JsonArray()
             when (element.asString) {
                 "OFF" -> {
