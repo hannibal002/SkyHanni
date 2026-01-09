@@ -79,19 +79,6 @@ class EnchantParsingConfig {
     val advancedEnchantColors: AdvancedEnchantmentColors = AdvancedEnchantmentColors()
 
     @Expose
-    @ConfigOption(name = "Comma Format", desc = "Change the format of the comma after each enchant.")
-    @ConfigEditorDropdown
-    val commaFormat: Property<CommaFormat> = Property.of(CommaFormat.COPY_ENCHANT)
-
-    enum class CommaFormat(private val displayName: String) {
-        COPY_ENCHANT("Copy enchant format"),
-        DEFAULT("Default (Blue)"),
-        ;
-
-        override fun toString() = displayName
-    }
-
-    @Expose
     @ConfigOption(
         name = "Hide Vanilla Enchants",
         desc = "Hide the regular vanilla enchants usually found in the first 1-2 lines of lore."

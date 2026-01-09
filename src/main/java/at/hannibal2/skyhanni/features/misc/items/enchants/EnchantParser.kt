@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig
-import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig.CommaFormat
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -27,14 +26,12 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.createHoverEvent
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.mojang.blaze3d.systems.RenderSystem
-import java.util.TreeSet
-import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
+import java.util.TreeSet
 
 /**
  * Modified Enchant Parser from [SkyblockAddons](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/features/enchants/EnchantManager.java)
@@ -47,32 +44,24 @@ object EnchantParser {
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     // Pattern to check that the line contains ONLY enchants (and the other bits that come with a valid enchant line)
     /**
-     * REGEX-TEST: §9Champion VI §r§81.2M
-     * REGEX-TEST: §9Cultivating VII §r§83,271,717
-     * REGEX-TEST: §5§o§9Compact X
-     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
-     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
-     * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
-     * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     * All previous regex tests are considered invalid due to new enchant formatting by Hypixel,
+     * re-populate the tests over time with new examples I guess. (The tests are what is returned
+     * from running `formattedTextCompat()` on a lore line, which is what is used against the regex)
+     *
+     * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
      */
     val enchantmentExclusivePattern by patternGroup.pattern(
         "exclusive",
-        "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?§9, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
+        "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
     )
 
     /**
-     * REGEX-TEST: §9Champion VI §r§81.2M
-     * REGEX-TEST: §9Cultivating VII §r§83,271,717
-     * REGEX-TEST: §5§o§9Compact X
-     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
-     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
-     * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
-     * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
      */
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
+        "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
 
     private var currentItem: ItemStack? = null
@@ -123,7 +112,6 @@ object EnchantParser {
             config.advancedEnchantColors.advancedGoodColor,
             config.advancedEnchantColors.useAdvancedPoorColor,
             config.advancedEnchantColors.advancedPoorColor,
-            config.commaFormat,
             config.hideVanillaEnchants,
             config.hideEnchantDescriptions,
             ChromaManager.config.enabled,
@@ -401,7 +389,6 @@ object EnchantParser {
     }
 
     private fun normalFormatting(insertEnchants: MutableList<Component>) {
-        val commaFormat = config.commaFormat.get()
         var component = Component.empty()
 
         val lastElement = orderedEnchants.last
@@ -410,10 +397,7 @@ object EnchantParser {
 
             if (i % maxEnchantsPerLine != maxEnchantsPerLine - 1 && orderedEnchant != lastElement) {
                 // Add comma
-                if (commaFormat == CommaFormat.COPY_ENCHANT)
-                    component.siblings.last().append(", ")
-                else
-                    component.append(Component.literal(", ").withColor(ChatFormatting.BLUE))
+                component.siblings.last().append(", ")
             } else {
                 insertEnchants.add(component)
 
@@ -428,7 +412,6 @@ object EnchantParser {
     }
 
     private fun compressedFormatting(insertEnchants: MutableList<Component>) {
-        val commaFormat = config.commaFormat.get()
         var component = Component.empty()
 
         val lastElement = orderedEnchants.last
@@ -442,10 +425,7 @@ object EnchantParser {
             } else {
                 if (i % 3 != 2 && orderedEnchant != lastElement) {
                     // Add comma
-                    if (commaFormat == CommaFormat.COPY_ENCHANT)
-                        component.siblings.last().append(", ")
-                    else
-                        component.append(Component.literal(", ").withColor(ChatFormatting.BLUE))
+                    component.siblings.last().append(", ")
                 } else {
                     insertEnchants.add(component)
                     component = Component.empty()
