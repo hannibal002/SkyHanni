@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.CRIMSON_ARMOR
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.isSelected
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getArmorKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -14,8 +14,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object ItemStars {
@@ -34,14 +36,14 @@ object ItemStars {
     )
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onTooltip(event: ToolTipEvent) {
+    fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         val stack = event.itemStack
-        if (stack.stackSize != 1) return
+        if (stack.count != 1) return
         val stars = stack.grabStarCount() ?: return
-        starPattern.findMatcher(stack.displayName) {
+        starPattern.findMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             val name = group("name")
-            event.toolTip[0] = "$name §c$stars✪"
+            event.toolTip[0] = Component.literal("$name §c$stars✪")
         }
     }
 
@@ -58,7 +60,7 @@ object ItemStars {
         val internalName = getInternalNameOrNull() ?: return null
         val baseStars = getDungeonStarCount() ?: getStarCount()
         if (!internalName.isKuudraArmor()) return baseStars
-        val tier = internalName.getKuudraTier() ?: return baseStars
+        val tier = internalName.getArmorKuudraTier() ?: return baseStars
         return (baseStars ?: 0) + (tier - 1) * 10
     }
 

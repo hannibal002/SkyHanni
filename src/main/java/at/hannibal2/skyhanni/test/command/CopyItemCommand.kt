@@ -12,7 +12,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
-import net.minecraft.item.ItemStack
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CopyItemCommand {
@@ -29,7 +30,7 @@ object CopyItemCommand {
     fun copyItemToClipboard(itemStack: ItemStack) {
         val resultList = mutableListOf<String>()
         resultList.add("internal name: " + itemStack.getInternalName().asString())
-        resultList.add("display name: '" + itemStack.displayName.toString() + "'")
+        resultList.add("display name: '" + itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().toString() + "'")
         resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
         resultList.add("lore:")
         for (line in itemStack.getLore()) {

@@ -3,10 +3,6 @@ package at.hannibal2.skyhanni.config.commands
 import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
 import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
-import com.mojang.brigadier.CommandDispatcher
-//#if MC < 1.21
-import net.minecraft.command.ICommand
-//#endif
 
 class CommandBuilder(name: String) : CommandBuilderBase(name) {
     private var autoComplete: ((Array<String>) -> List<String>) = { listOf() }
@@ -23,10 +19,6 @@ class CommandBuilder(name: String) : CommandBuilderBase(name) {
     fun autoComplete(autoComplete: (Array<String>) -> List<String>) {
         this.autoComplete = autoComplete
     }
-
-    //#if MC < 1.21
-    override fun toCommand(dispatcher: CommandDispatcher<Any?>) = SimpleCommand(name.lowercase(), aliases, callback, autoComplete)
-    //#endif
 }
 
 sealed class CommandBuilderBase(override val name: String) : CommandData {
@@ -39,19 +31,9 @@ sealed class CommandBuilderBase(override val name: String) : CommandData {
 
 class ComplexCommandBuilder<O : CommandContextAwareObject, A : CommandArgument<O>>(name: String) : CommandBuilderBase(name) {
     lateinit var specifiers: Collection<A>
-    //#if TODO
-    lateinit var context: (ComplexCommand<O>) -> O
-    //#endif
 
     private var realDescription: String = ""
 
-    //#if MC < 1.21
-    override fun toCommand(dispatcher: CommandDispatcher<Any?>): ICommand {
-        return ComplexCommand(name.lowercase(), specifiers, context, aliases).also {
-            realDescription = it.constructHelp(description)
-        }
-    }
-    //#endif
 
     override val descriptor get() = realDescription
 }

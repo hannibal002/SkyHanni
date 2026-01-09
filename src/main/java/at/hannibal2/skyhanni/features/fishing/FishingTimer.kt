@@ -165,7 +165,7 @@ object FishingTimer {
     @HandleEvent
     fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         if (event.keyCode != config.manualResetTimer) return
 
         mobDespawnTime.replaceAll { _, _ ->

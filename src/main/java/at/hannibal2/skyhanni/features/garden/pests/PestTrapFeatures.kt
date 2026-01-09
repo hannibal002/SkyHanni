@@ -12,18 +12,18 @@ import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.MAX_TRAPS
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.fullTraps
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.noBaitTraps
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.trapsPlaced
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.audio.ISound
+import net.minecraft.client.resources.sounds.SoundInstance
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 
@@ -52,7 +52,7 @@ object PestTrapFeatures {
     private val virtualReminderInterval get() = max(10, reminderInterval.get()).seconds
     private var nextWarningMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private val soundString get(): String = config.warningConfig.warningSound.get()
-    private var warningSound: ISound? = refreshSound()
+    private var warningSound: SoundInstance? = refreshSound()
 
     private fun getNextWarningMark() = SimpleTimeMark.now() + virtualReminderInterval
     private fun refreshSound() = soundString.takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f) }
@@ -61,8 +61,8 @@ object PestTrapFeatures {
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!PestTrapApi.inInventory) return
         if (!config.releaseHotkey.isKeyHeld()) return
-        if (event.guiContainer !is AccessorGuiContainer) return
-        InventoryCompat.clickInventorySlot(16, mouseButton = 0, mode = 0)
+        if (event.guiContainer !is AccessorHandledScreen) return
+        InventoryUtils.clickSlot(16)
     }
 
     @HandleEvent(ConfigLoadEvent::class)

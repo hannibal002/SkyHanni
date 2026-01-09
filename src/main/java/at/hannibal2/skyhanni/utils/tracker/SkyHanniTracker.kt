@@ -34,8 +34,8 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -124,7 +124,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     fun renderDisplay(position: Position) {
         if (hideInEstimatedItemValue() && EstimatedItemValue.isCurrentlyShowing()) return
 
-        var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
+        var currentlyOpen = Minecraft.getInstance().screen?.let { it is InventoryScreen || it is ContainerScreen } ?: false
         if (!currentlyOpen && hideOutsideInventory() && this is SkyHanniItemTracker) {
             return
         }
@@ -232,7 +232,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
                     addAll(
                         "§eⓘ §7Uptime tracked only from",
                         "§7SkyHanni version 6.0.0 onwards",
-                    )
+                    ),
                 }
             }
         )

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
 import com.mojang.blaze3d.buffers.Std140SizeCalculator
 import java.nio.ByteBuffer
-import net.minecraft.client.gl.DynamicUniformStorage
+import net.minecraft.client.renderer.DynamicUniformStorage
 
 class SkyHanniCircleUniform : AutoCloseable {
     private val UNIFORM_SIZE = Std140SizeCalculator().putFloat().putFloat().get()
@@ -12,11 +12,11 @@ class SkyHanniCircleUniform : AutoCloseable {
     val storage = DynamicUniformStorage<UniformValue>("SkyHanni Circle UBO", UNIFORM_SIZE, 2)
 
     fun writeWith(angle1: Float, angle2: Float): GpuBufferSlice {
-        return storage.write(UniformValue(angle1, angle2))
+        return storage.writeUniform(UniformValue(angle1, angle2))
     }
 
     fun clear() {
-        storage.clear()
+        storage.endFrame()
     }
 
     override fun close() {
@@ -26,7 +26,7 @@ class SkyHanniCircleUniform : AutoCloseable {
     data class UniformValue(
         val angle1: Float,
         val angle2: Float,
-    ) : DynamicUniformStorage.Uploadable {
+    ) : DynamicUniformStorage.DynamicUniform {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)
                 .putFloat(angle1)
