@@ -53,7 +53,8 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
         @Expose var rngDrops: MutableMap<CropType, MutableMap<RngDropEnum, Long>> = EnumMap(CropType::class.java),
     ) : BucketedItemTrackerData<CropType>(CropType::class) {
         override fun getDescription(bucket: CropType?, timesGained: Long): List<String> {
-            val dropRate = if (timesGained == 0L) 0 else blocksBrokenDuring[bucket]?.div(timesGained) ?: 0
+            val blocksBroken = blocksBrokenDuring[bucket] ?: getTotalDuringCount()
+            val dropRate = if (timesGained == 0L) 0 else blocksBroken.div(timesGained)
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Average Blocks Broken Per Drop: §c$dropRate.",
@@ -231,10 +232,16 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
             cropFeverAmount + partialFeverAmount
         }
 
+        val blocksOutside = if (bucketData.selectedBucket == null) {
+            bucketData.getTotalOutsideCount()
+        } else {
+            bucketData.blocksBrokenOutside[bucketData.selectedBucket]
+        }
+
         val breaksPerFever: Long = if (feverAmount == 0L) {
             0L
         } else {
-            (bucketData.blocksBrokenOutside[bucketData.selectedBucket] ?: 0L) / feverAmount
+            (blocksOutside ?: 0L) / feverAmount
         }
 
         lineMap[CropFeverTrackerTextEntry.FEVER_AMOUNT] =
@@ -311,7 +318,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
                 CropFeverTrackerTextEntry.TOTAL_PROFIT -> {
                     val duration = bucketData.getTotalUptime()
                     addAll(
-                        addTotalProfit(profit, bucketData.getTotalFeverCount(), "drop", duration, "Drops"),
+                        addTotalProfit(profit, bucketData.getTotalFeverCount(), "fever", duration, "Fevers"),
                     )
                 }
                 else -> { lineMap[line]?.let { add(it) } }
