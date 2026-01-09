@@ -232,7 +232,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
                     addAll(
                         "§eⓘ §7Uptime tracked only from",
                         "§7SkyHanni version 6.0.0 onwards",
-                    ),
+                    )
                 }
             }
         )
