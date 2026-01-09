@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager.SensitivityState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -50,6 +51,9 @@ object SensitivityReducer {
         config.reducingFactor.afterChange {
             MouseSensitivityManager.destroyCache()
         }
+        config.enabled.afterChange {
+            autoToggle()
+        }
         config.onlyPlot.afterChange {
             autoToggle()
         }
@@ -86,11 +90,12 @@ object SensitivityReducer {
     }
 
     private fun autoToggleIfNeeded() {
-        when (config.mode) {
-            SensitivityReducerConfig.Mode.OFF -> toggleIfCondition { false }
-            SensitivityReducerConfig.Mode.TOOL -> toggleIfCondition(::isHoldingTool)
-            SensitivityReducerConfig.Mode.KEYBIND -> toggleIfCondition(::isHoldingKey)
-        }
+        val shouldActivate =
+            (config.mode.contains(SensitivityReducerConfig.Mode.TOOL) && isHoldingTool()) || (config.mode.contains(SensitivityReducerConfig.Mode.FISHING_ROD) && isHoldingFishingRod()) || (config.mode.contains(
+                SensitivityReducerConfig.Mode.KEYBIND,
+            ) && isHoldingKey())
+
+        toggleIfCondition { shouldActivate }
     }
 
     private fun toggleIfCondition(check: () -> Boolean) {
@@ -101,6 +106,10 @@ object SensitivityReducer {
     }
 
     private fun autoToggle() {
+        if (!config.enabled.get()) {
+            if (isActive) disable()
+            return
+        }
         if (config.onlyPlot.get() && inBarn) {
             if (isActive) disable()
             return
@@ -162,5 +171,6 @@ object SensitivityReducer {
     }
 
     private fun isHoldingTool(): Boolean = GardenApi.toolInHand != null
+    private fun isHoldingFishingRod(): Boolean = FishingApi.holdingRod
     private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null
 }
