@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapConfig
 import com.google.gson.annotations.Expose
@@ -68,13 +67,6 @@ class DungeonConfig {
     var highlightDeathmites: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Highlight Teammates", desc = "Highlight Dungeon teammates with a glowing outline.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    @OnlyLegacy
-    var highlightTeammates: Boolean = true
-
-    @Expose
     @ConfigOption(
         name = "Architect Notifier",
         desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed.\n" +
@@ -120,7 +112,7 @@ class DungeonConfig {
     val lividFinder: LividFinderConfig = LividFinderConfig()
 
     @Expose
-    @ConfigOption(name = "Trinity", desc = "")
+    @ConfigOption(name = "Trinity Helper", desc = "")
     @Accordion
     val trinityHelper: TrinityConfig = TrinityConfig()
 
@@ -199,4 +191,13 @@ class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var springBootsNotification: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Secret Tracker Locator",
+        desc = "Shows the secret that the secret tracker is pointing to.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var dungeonSecretCompass: Boolean = true
 }

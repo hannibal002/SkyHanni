@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object KuudraProfileViewerBlocker {
@@ -19,7 +19,7 @@ object KuudraProfileViewerBlocker {
         if (!config.disableProfileViewerInKuudra) return
 
         if (event.clickType != ClickType.RIGHT_CLICK) return
-        if (event.clickedEntity !is EntityPlayer) return
+        if (event.clickedEntity !is Player) return
         if (event.clickedEntity.isNpc()) return
 
         event.cancel()

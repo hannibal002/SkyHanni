@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TabListData
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 object QuestLoader {
 

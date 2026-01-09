@@ -33,6 +33,14 @@ class MythologicalMobTrackerConfig {
 
     @Expose
     @ConfigOption(
+        name = "Black Hole Title",
+        desc = "Sends \"Black Hole\" title when a Cretan Bull, Harpy, or Minotaur spawns",
+    )
+    @ConfigEditorBoolean
+    var shardWarn: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Tracker Settings",
         desc = ""
     )

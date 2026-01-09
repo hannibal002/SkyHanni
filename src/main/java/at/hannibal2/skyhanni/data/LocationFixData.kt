@@ -5,14 +5,14 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.LocationFixJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
 object LocationFixData {
 
     private val locationFixes = mutableMapOf<IslandType, List<LocationFix>>()
 
-    private data class LocationFix(val area: AxisAlignedBB, val realLocation: String)
+    private data class LocationFix(val area: AABB, val realLocation: String)
 
     // priority set to low so that IslandType can load their island names from repo earlier
     @HandleEvent(priority = HandleEvent.LOW)

@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.entity.EntityLivingBase
+import net.minecraft.world.entity.LivingEntity
 
 @SkyHanniModule
 object DungeonMobManager {
@@ -66,7 +66,7 @@ object DungeonMobManager {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onEntityMove(event: EntityMoveEvent<EntityLivingBase>) {
+    fun onEntityMove(event: EntityMoveEvent<LivingEntity>) {
         val mob = event.entity.mob ?: return
         if (felOnTheGround.remove(mob)) {
             felMoving.add(mob)

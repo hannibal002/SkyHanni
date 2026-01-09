@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.Entity
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.Entity
 
 @SkyHanniModule
 object RiftGunthersRace {
@@ -114,7 +114,7 @@ object RiftGunthersRace {
         if (!RiftApi.inRiftRace) return
 
         val entity = event.entity
-        if (entity is EntityOtherPlayerMP && !entity.isNpc()) {
+        if (entity is RemotePlayer && !entity.isNpc()) {
             event.cancel()
         }
     }

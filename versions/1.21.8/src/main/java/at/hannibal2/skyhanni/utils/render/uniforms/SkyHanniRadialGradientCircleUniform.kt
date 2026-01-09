@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils.render.uniforms
 import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
 import com.mojang.blaze3d.buffers.Std140SizeCalculator
-import net.minecraft.client.gl.DynamicUniformStorage
+import net.minecraft.client.renderer.DynamicUniformStorage
 import org.joml.Vector4f
 import java.nio.ByteBuffer
 
@@ -24,13 +24,13 @@ class SkyHanniRadialGradientCircleUniform : AutoCloseable {
         phaseOffset: Float,
         reverse: Int,
     ): GpuBufferSlice {
-        return storage.write(
+        return storage.writeUniform(
             UniformValue(angle, startColor, endColor, progress, phaseOffset, reverse),
         )
     }
 
     fun clear() {
-        storage.clear()
+        storage.endFrame()
     }
 
     override fun close() {
@@ -44,7 +44,7 @@ class SkyHanniRadialGradientCircleUniform : AutoCloseable {
         val progress: Float,
         val phaseOffset: Float,
         val reverse: Int,
-    ) : DynamicUniformStorage.Uploadable {
+    ) : DynamicUniformStorage.DynamicUniform {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)
                 .putFloat(angle)

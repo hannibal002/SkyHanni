@@ -43,7 +43,7 @@ object ComposterInventoryNumbers {
 
         val stack = event.stack
 
-        val slotNumber = event.slot.slotNumber
+        val slotNumber = event.slot.index
 
         // Composts Available
         if (slotNumber == 13) {

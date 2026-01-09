@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.renderer.SubmitNodeStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(OrderedRenderCommandQueueImpl.ItemCommand.class)
+@Mixin(SubmitNodeStorage.ItemSubmit.class)
 public class MixinItemCommand implements GlowingStateStore {
 
     @Unique
