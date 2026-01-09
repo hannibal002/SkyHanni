@@ -148,7 +148,6 @@ object GardenApi {
         val toolItem = InventoryUtils.getItemInHand()
         val crop = toolItem?.getCropType()
         val newTool = getToolInHand(toolItem, crop)
-        // TODO verify logic and move into function
         if (itemInHand?.getItemUuid() != toolItem?.getItemUuid() || crop != cropInHand && !(toolInHand == null && newTool == null)) {
             toolInHand = newTool
             cropInHand = crop
