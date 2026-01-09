@@ -285,7 +285,7 @@ object InstanceChestProfit {
         chestType: CroesusChestType,
         totalValue: Double,
         contents: MutableList<String>,
-        favouriteText: String
+        favouriteText: String,
     ): Renderable = Renderable.hoverTips(
         "${chestType.stackChestName}: ${totalValue.formatCoin()} $favouriteText",
         contents,
@@ -424,12 +424,12 @@ object InstanceChestProfit {
                 )
             }
         if (config.croesusAllChestsOverlay && InventoryUtils.inInventory())
-        if (isInCroesusMenu()){
-            config.croesusPosition.renderRenderable(
-                croesusDisplay,
-                posLabel = "Croesus Chest Profit",
-            )
-        }
+            if (isInCroesusMenu()) {
+                config.croesusPosition.renderRenderable(
+                    croesusDisplay,
+                    posLabel = "Croesus Chest Profit",
+                )
+            }
     }
 
     @HandleEvent(DungeonEnterEvent::class)
