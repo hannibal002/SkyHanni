@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.misc.IslandAreas
+import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -24,7 +24,7 @@ object SkyBlockUtils {
     val currentIsland get() = SkyBlockIslandTest.testIsland ?: HypixelData.skyBlockIsland
 
     // almost always prefer this over scoreboardArea
-    val graphArea get() = if (inSkyBlock) IslandAreas.currentArea else null
+    val graphArea get() = if (inSkyBlock) IslandAreaBackend.currentArea else null
 
     // Only use scoreboardArea if graph data is not useable in this scenario.
     val scoreboardArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null

@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import net.minecraft.init.Items
+import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -68,7 +68,7 @@ object HoppityEggsCompactChat {
         val lockedValue = lockedHitmanClaimCount
         val storageValue = ProfileStorageData.profileSpecific?.chocolateFactory?.hitmanStats?.availableHitmanEggs
         val inventoryValue = if (InventoryUtils.openInventoryName() == "Claim All") {
-            InventoryUtils.getItemsInOpenChest().count { it.stack.item == Items.skull }
+            InventoryUtils.getItemsInOpenChest().count { it.item.item == Items.PLAYER_HEAD }
         } else null
         return lockedValue ?: storageValue ?: inventoryValue ?: 0
     }

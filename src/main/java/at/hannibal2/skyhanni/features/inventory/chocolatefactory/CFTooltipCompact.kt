@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -24,7 +25,7 @@ object CFTooltipCompact {
         if (!CFApi.inChocolateFactory) return
 
         if (config.tooltipMove) {
-            if (event.slot.slotNumber <= 44) {
+            if (event.slot.index <= 44) {
                 lastHover = SimpleTimeMark.now()
                 tooltipToHover = event.toolTip.toList().map { partyModeReplace(it) }
                 event.cancel()
@@ -55,7 +56,7 @@ object CFTooltipCompact {
         if (!lore.any { it == "§7§eClick to uncover the meaning of life!" }) return
         if (lastClick.passedSince() >= 1.seconds && !config.compactOnClickAlways) return
         val list = mutableListOf<String>()
-        list.add(itemStack.displayName)
+        list.add(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets())
         lore.getOrNull(5)?.let {
             list.add(it)
         }

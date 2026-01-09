@@ -47,13 +47,6 @@ object ColorFormattingHelper {
             autoOpen = false,
             prefix = false,
         )
-        ChatUtils.chat(
-            "§eYou can also uses SkyHanni's system for any colors. " +
-                "This is different from chroma. " +
-                "Simply type §6&#&f&f&9&a&2&e&/ §efor color §#§f§f§9§a§2§e§/#ff9a2e§e " +
-                "(adds §6& §ebefore every characters including §6#§e, ends with '§6&/§e').",
-            false,
-        )
         ChatUtils.clickableLinkChat(
             "§z[Click here to open color picker color-hex.com]",
             url = "https://www.color-hex.com",

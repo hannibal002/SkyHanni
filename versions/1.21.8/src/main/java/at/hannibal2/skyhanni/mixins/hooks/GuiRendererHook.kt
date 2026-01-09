@@ -12,11 +12,11 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation
 import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.render.state.GlyphGuiElementRenderState
-import net.minecraft.client.gui.render.state.SimpleGuiElementRenderState
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.render.state.GlyphRenderState
+import net.minecraft.client.gui.render.state.GuiElementRenderState
 //#if MC > 1.21.8
-//$$ import net.minecraft.client.font.BakedGlyphImpl.DrawnGlyph
+//$$ import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
 //#endif
 
 object GuiRendererHook {
@@ -27,7 +27,7 @@ object GuiRendererHook {
         if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return
 
         val chromaSize: Float = ChromaManager.config.chromaSize * (GuiScreenUtils.displayWidth / 100f)
-        var ticks = (ClientEvents.totalTicks) + (MinecraftClient.getInstance() as AccessorMinecraft).timer.getTickProgress(true)
+        var ticks = (ClientEvents.totalTicks) + (Minecraft.getInstance() as AccessorMinecraft).timer.getGameTimeDeltaPartialTick(true)
         ticks = when (ChromaManager.config.chromaDirection) {
             Direction.FORWARD_RIGHT, Direction.BACKWARD_RIGHT -> ticks
             Direction.FORWARD_LEFT, Direction.BACKWARD_LEFT -> -ticks
@@ -52,14 +52,14 @@ object GuiRendererHook {
         chromaBufferSlice?.let { renderPass.setUniform("SkyHanniChromaUniforms", it) } ?: return
     }
 
-    fun replacePipeline(state: SimpleGuiElementRenderState, original: Operation<RenderPipeline>): RenderPipeline {
+    fun replacePipeline(state: GuiElementRenderState, original: Operation<RenderPipeline>): RenderPipeline {
         if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return original.call(state)
 
-        if (state is GlyphGuiElementRenderState) {
+        if (state is GlyphRenderState) {
             //#if MC < 1.21.9
             val glyphColor = state.instance().style().color
             //#else
-            //$$ val drawnGlyph = state.renderable as? DrawnGlyph ?: return original.call(state)
+            //$$ val drawnGlyph = state.renderable as? GlyphInstance ?: return original.call(state)
             //$$ val glyphColor = drawnGlyph.style.color
             //#endif
             if (glyphColor != null && glyphColor.name == "chroma") {

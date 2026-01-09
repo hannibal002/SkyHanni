@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class FusionKeybindsConfig {
 
@@ -22,14 +22,14 @@ class FusionKeybindsConfig {
     @Expose
     @ConfigOption(name = "Repeat Fusion Keybind", desc = "Keybind to repeat the previous fusion.")
     @SearchTag("hunting box")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     @OnlyModern
-    var repeatFusionKeybind: Int = Keyboard.KEY_NONE
+    var repeatFusionKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Confirm Fusion Keybind", desc = "Keybind to confirm the current fusion.")
     @SearchTag("hunting box")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     @OnlyModern
-    var confirmFusionKeybind: Int = Keyboard.KEY_NONE
+    var confirmFusionKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 }

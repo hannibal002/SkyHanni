@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import net.minecraft.client.render.entity.state.EntityRenderState
-import net.minecraft.entity.Entity
+import net.minecraft.client.renderer.entity.state.EntityRenderState
+import net.minecraft.world.entity.Entity
 
 private var savedEntity: Entity? = null
 private var savedEntityRenderState: EntityRenderStateStore? = null

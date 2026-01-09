@@ -11,22 +11,16 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-private fun createPlayerHead(): ItemStack =
-    //#if MC < 1.16
-    ItemStack(Items.skull, 1, 3)
-//#else
-//$$ ItemStack(Items.PLAYER_HEAD)
-//#endif
+private fun createPlayerHead(): ItemStack = ItemStack(Items.PLAYER_HEAD)
 
 enum class MiningEventType(
     val eventName: String,
@@ -45,7 +39,7 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val compass = Renderable.item(ItemStack(Items.compass), 0.45)
+            val compass = Renderable.item(ItemStack(Items.COMPASS), 0.45)
             val wind = Renderable.text("§9≈", scale = 0.75)
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
@@ -120,7 +114,7 @@ enum class MiningEventType(
         160.seconds,
         color = LorenzColor.GOLD,
         dwarvenSpecific = true,
-        iconInput = ItemStack(Items.name_tag).overrideId("MINING_RAFFLE_TICKET"),
+        iconInput = ItemStack(Items.NAME_TAG).overrideId("MINING_RAFFLE_TICKET"),
     ),
     MITHRIL_GOURMAND(
         "MITHRIL GOURMAND",
@@ -165,7 +159,8 @@ enum class MiningEventType(
         CompressFormat.DEFAULT, null -> normalTextWithIcon
     }
 
-    fun getRenderableAsPast(): Renderable = getRenderable().darken(0.4f)
+    // todo on 1.8 this used to make it darker, the shader we had for that is gone now so idk
+    fun getRenderableAsPast(): Renderable = getRenderable()
 
     companion object {
         private val config get() = SkyHanniMod.feature.mining.miningEvent

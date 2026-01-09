@@ -4,18 +4,48 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
-import net.minecraft.client.renderer.GLAllocation
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.Tessellator
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.util.AxisAlignedBB
-import org.lwjgl.opengl.GL11
+import net.minecraft.world.phys.AABB
 import java.awt.Color
-import java.nio.FloatBuffer
 
-class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator, val lineWidth: Int, val depth: Boolean) {
+class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent, val lineWidth: Int, val depth: Boolean) {
 
-    val worldRenderer = tessellator.worldRenderer
+    private val queuedLines = mutableListOf<QueuedLine>()
+
+    @PublishedApi
+    internal fun drawQueuedLines() {
+        if (queuedLines.isEmpty()) return
+
+        val layer = SkyHanniRenderLayers.getLines(lineWidth.toDouble(), !depth)
+        val buf = event.vertexConsumers.getBuffer(layer)
+        val matrix = event.matrices.last()
+
+        for (line in queuedLines) {
+            buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
+                .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
+                .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
+
+            buf.addVertex(matrix.pose(), line.p2.x.toFloat(), line.p2.y.toFloat(), line.p2.z.toFloat())
+                .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
+                .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
+        }
+
+        queuedLines.clear()
+    }
+
+    private fun addQueuedLine(p1: LorenzVec, p2: LorenzVec, color: Color) {
+        val last = queuedLines.lastOrNull()
+
+        if (last == null) {
+            queuedLines.add(QueuedLine(p1, p2, color))
+            return
+        }
+
+        if (last.p2 != p1) {
+            drawQueuedLines()
+        }
+
+        queuedLines.add(QueuedLine(p1, p2, color))
+    }
 
     fun drawPath(path: List<LorenzVec>, color: Color, bezierPoint: Double = 1.0) {
         if (bezierPoint < 0) {
@@ -47,7 +77,7 @@ class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator
         }
     }
 
-    fun drawEdges(axisAlignedBB: AxisAlignedBB, color: Color) {
+    fun drawEdges(axisAlignedBB: AABB, color: Color) {
         // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
         for ((p1, p2) in axisAlignedBB.calculateEdges()) {
             draw3DLine(p1, p2, color)
@@ -55,20 +85,7 @@ class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator
     }
 
     fun draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color) {
-        GL11.glLineWidth(lineWidth.toFloat())
-        if (!depth) {
-            GL11.glDisable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(false)
-        }
-        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
-        worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(p1.x, p1.y, p1.z).endVertex()
-        worldRenderer.pos(p2.x, p2.y, p2.z).endVertex()
-        tessellator.draw()
-        if (!depth) {
-            GL11.glEnable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(true)
-        }
+        addQueuedLine(p1, p2, color)
     }
 
     fun drawBezier2(
@@ -78,38 +95,27 @@ class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator
         color: Color,
         segments: Int = 30,
     ) {
-        GL11.glLineWidth(lineWidth.toFloat())
-        if (!depth) {
-            GL11.glDisable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(false)
-        }
-        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
-        val ctrlPoints = p1.toFloatArray() + p2.toFloatArray() + p3.toFloatArray()
-        bezier2Buffer.clear()
-        ctrlPoints.forEach {
-            bezier2Buffer.put(it)
-        }
-        bezier2Buffer.flip()
-        GL11.glMap1f(
-            GL11.GL_MAP1_VERTEX_3,
-            0f,
-            1f,
-            3,
-            3,
-            bezier2Buffer,
-        )
+        for (i in 0 until segments) {
+            val t1 = i.toFloat() / segments
+            val t2 = (i + 1).toFloat() / segments
 
-        GL11.glEnable(GL11.GL_MAP1_VERTEX_3)
+            val point1 = calculateBezierPoint(t1, p1, p2, p3)
+            val point2 = calculateBezierPoint(t2, p1, p2, p3)
 
-        GL11.glBegin(GL11.GL_LINE_STRIP)
-        for (i in 0..segments) {
-            GL11.glEvalCoord1f(i.toFloat() / segments.toFloat())
+            addQueuedLine(point1, point2, color)
         }
-        GL11.glEnd()
-        if (!depth) {
-            GL11.glEnable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(true)
-        }
+    }
+
+    private fun calculateBezierPoint(t: Float, p1: LorenzVec, p2: LorenzVec, p3: LorenzVec): LorenzVec {
+        val u = 1 - t
+        val tt = t * t
+        val uu = u * u
+
+        val x = uu * p1.x + 2 * u * t * p2.x + tt * p3.x
+        val y = uu * p1.y + 2 * u * t * p2.y + tt * p3.y
+        val z = uu * p1.z + 2 * u * t * p2.z + tt * p3.z
+
+        return LorenzVec(x, y, z)
     }
 
     companion object {
@@ -119,28 +125,24 @@ class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator
             depth: Boolean,
             crossinline draws: LineDrawer.() -> Unit,
         ) {
-            GlStateManager.enableBlend()
-            GlStateManager.disableLighting()
-            GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-            GlStateManager.disableTexture2D()
-            GlStateManager.disableCull()
-            GlStateManager.disableAlpha()
+            event.matrices.pushPose()
 
-            GlStateManager.pushMatrix()
-            val inverseView = WorldRenderUtils.getViewerPos(event.partialTicks)
-            WorldRenderUtils.translate(inverseView.negated())
+            val inverseView = WorldRenderUtils.getViewerPos().negated()
+            event.matrices.translate(inverseView.x, inverseView.y, inverseView.z)
 
-            draws.invoke(LineDrawer(Tessellator.getInstance(), lineWidth, depth))
+            val lineDrawer = LineDrawer(event, lineWidth, depth)
+            draws.invoke(lineDrawer)
+            lineDrawer.drawQueuedLines()
 
-            GlStateManager.popMatrix()
-
-            GlStateManager.enableAlpha()
-            GlStateManager.enableTexture2D()
-            GlStateManager.enableCull()
-            GlStateManager.disableBlend()
-            GlStateManager.color(1f, 1f, 1f, 1f)
+            event.matrices.popPose()
         }
-
-        private val bezier2Buffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(9)
     }
+}
+
+private data class QueuedLine(
+    val p1: LorenzVec,
+    val p2: LorenzVec,
+    val color: Color,
+) {
+    val normal = p2.minus(p1).normalize()
 }

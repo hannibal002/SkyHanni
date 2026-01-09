@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig
@@ -88,6 +89,11 @@ class InventoryConfig {
     @ConfigOption(name = "RNG Meter", desc = "")
     @Accordion
     val rngMeter: RngMeterConfig = RngMeterConfig()
+
+    @Expose
+    @ConfigOption(name = "Super Crafting", desc = "")
+    @Accordion
+    val superCrafting: SuperCraftingConfig = SuperCraftingConfig()
 
     @Expose
     @ConfigOption(name = "Stats Tuning", desc = "")
@@ -358,4 +364,15 @@ class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var savePrivateIslandChests: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Middle Click Fix",
+        desc = "Fixes not being able to middle click items in inventories (e.g. to disable a full set bonus or rune).",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("pick block")
+    @OnlyModern
+    var middleClickFix: Boolean = true
 }

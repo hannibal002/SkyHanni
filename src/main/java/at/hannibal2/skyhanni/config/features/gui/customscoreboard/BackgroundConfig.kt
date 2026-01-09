@@ -54,5 +54,5 @@ class BackgroundConfig {
             "You can use this website to add your own image into as your Scoreboard Background."
     )
     @ConfigEditorButton(buttonText = "Create")
-    val runnable: Runnable = Runnable { openBrowser("https://j10a1n15.github.io/j10a1n15/pages/background.html") }
+    val runnable: Runnable = Runnable { openBrowser("https://meowdd.ing/scoreboard?mod=sh") }
 }
