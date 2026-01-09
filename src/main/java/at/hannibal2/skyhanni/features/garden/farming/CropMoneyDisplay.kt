@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -60,7 +59,7 @@ object CropMoneyDisplay {
     private val toolHasBountiful get() = GardenApi.storage?.toolWithBountiful
 
     private var moneyPerHour: Map<NeuInternalName, CropMoneyData> = mutableMapOf()
-    private val extraMoneyPerHour: ExtraMoneyData = ExtraMoneyData(0.0, 0.0, 0.0)
+    private val extraMoneyPerHour: ExtraMoneyData = ExtraMoneyData(0.0, 0.0)
 
     private val BOX_OF_SEEDS by AutoUpdatingItemStack("BOX_OF_SEEDS")
     private val SEEDS = "SEEDS".toInternalName()
@@ -169,25 +168,6 @@ object CropMoneyDisplay {
                 val mushroomPrice = (redPrice + brownPrice) / 2
                 val perSecond = GardenCropSpeed.getRecentBPS() * it.multiplier * mushroomPrice
                 extraMoneyPerHour.mushroomCowCoins = perSecond * 60 * 60
-            }
-
-            val itemInHand = InventoryUtils.getItemInHand()?.getInternalName()
-            if (itemInHand?.contains("DICER") == true && config.dicer) {
-                val (dicerDrops, internalName) = when (it) {
-                    CropType.MELON -> GardenCropSpeed.latestMelonDicer to "ENCHANTED_MELON".toInternalName()
-                    CropType.PUMPKIN -> GardenCropSpeed.latestPumpkinDicer to "ENCHANTED_PUMPKIN".toInternalName()
-
-                    else -> ErrorManager.skyHanniError(
-                        "Unknown dicer detected.",
-                        "crop" to it,
-                        "item in hand" to itemInHand,
-                    )
-                }
-                val bazaarData = internalName.getBazaarData()
-                val price =
-                    if (SkyBlockUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160
-                    else (bazaarData.instantSellPrice + bazaarData.instantBuyPrice) / 320
-                extraMoneyPerHour.dicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
             }
 
             if (config.armor) {
@@ -416,15 +396,13 @@ object CropMoneyDisplay {
     data class ExtraMoneyData(
         var mushroomCowCoins: Double,
         var armorCoins: Double,
-        var dicerCoins: Double,
     ) {
         override fun toString(): String = """
             extraMushroomCowPerkCoins: ${mushroomCowCoins.addSeparators()}
             extraArmorCoins: ${armorCoins.addSeparators()}
-            extraDicerCoins: ${dicerCoins.addSeparators()}
         """.trimIndent()
 
-        val total get() = armorCoins + dicerCoins + mushroomCowCoins
+        val total get() = armorCoins + mushroomCowCoins
     }
 
     data class CropMoneyData(
