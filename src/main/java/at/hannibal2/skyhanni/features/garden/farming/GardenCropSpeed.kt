@@ -51,7 +51,6 @@ object GardenCropSpeed {
                     )
                 }
                 checkSpeed()
-                update()
             }
         }
     }

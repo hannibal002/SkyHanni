@@ -21,8 +21,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -256,12 +257,12 @@ object EffectApi {
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun readSalts(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SALTS)) return
-        saltTabPattern.firstMatcher(event.lines) {
+        saltTabPattern.matchAll(event.lines) {
             val effect = group("effect")
             val duration = TimeUtils.getDuration(group("time"))
             val salt = NonGodPotEffect.entries.firstOrNull {
                 it.tabListName == effect
-            } ?: return@firstMatcher
+            } ?: return@matchAll
             EffectDurationChangeEvent(salt, EffectDurationChangeType.SET, duration).post()
         }
     }
@@ -286,13 +287,13 @@ object EffectApi {
     private fun InventoryUpdatedEvent.isGodPotEffectsFilterSelect(): Boolean =
         effectsInventoryPattern.matches(this.inventoryName) &&
             this.inventoryItems.values.firstOrNull {
-                filterPattern.matches(it.displayName)
+                filterPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets())
             }?.getLore()?.any {
                 godPotEffectsFilterSelectPattern.matches(it)
             } ?: false
 
     private fun ItemStack.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
-        displayName.contains(it.inventoryItemName)
+        hoverName.formattedTextCompatLeadingWhiteLessResets().contains(it.inventoryItemName)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

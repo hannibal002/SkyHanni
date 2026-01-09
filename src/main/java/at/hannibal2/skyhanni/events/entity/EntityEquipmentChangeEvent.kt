@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.events.entity
 
 import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
-import net.minecraft.entity.Entity
-import net.minecraft.item.ItemStack
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.item.ItemStack
 
 data class EntityEquipmentChangeEvent<T : Entity>(
     val entity: T,

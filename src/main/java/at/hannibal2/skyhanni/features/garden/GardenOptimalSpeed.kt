@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -20,8 +19,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -32,7 +31,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -70,7 +69,7 @@ object GardenOptimalSpeed {
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiScreenOpen(event: GuiScreenOpenEvent) {
         if (!isRancherOverlayEnabled()) return
-        val gui = event.gui as? GuiEditSign ?: return
+        val gui = event.gui as? SignEditScreen ?: return
         if (!gui.isRancherSign()) return
 
         val crops = CropType.entries.map { it to it.getOptimalSpeed() }
@@ -101,7 +100,7 @@ object GardenOptimalSpeed {
     @HandleEvent
     fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!isRancherOverlayEnabled()) return
-        val gui = event.gui as? GuiEditSign ?: return
+        val gui = event.gui as? SignEditScreen ?: return
         if (!gui.isRancherSign()) return
         config.signPosition.renderRenderables(
             display,
@@ -142,6 +141,8 @@ object GardenOptimalSpeed {
             CropType.SUGAR_CANE -> sugarCane
             CropType.CACTUS -> cactus
             CropType.MUSHROOM -> mushroom
+            CropType.SUNFLOWER, CropType.MOONFLOWER -> sunMoonFlower
+            CropType.WILD_ROSE -> wildRose
         }
     }
 
@@ -161,13 +162,16 @@ object GardenOptimalSpeed {
 
         val colorCode = if (recentlySwitchedTool) "7" else if (speed != currentSpeed) "c" else "a"
 
-        if (config.showOnHUD) config.pos.renderString("§$colorCode$text", posLabel = "Garden Optimal Speed")
+        if (config.showOnHUD) config.pos.renderRenderable(
+            Renderable.text("§$colorCode$text"),
+            posLabel = "Garden Optimal Speed",
+        )
         if (speed != currentSpeed && !recentlySwitchedTool) warn(speed)
     }
 
     private fun warn(optimalSpeed: Int) {
-        if (!MinecraftCompat.localPlayer.onGround) return
-        if (GardenApi.onBarnPlot) return
+        if (!MinecraftCompat.localPlayer.onGround()) return
+        if (GardenApi.onUnfarmablePlot) return
         if (!config.warning) return
         if (!GardenApi.isCurrentlyFarming()) return
         if (lastWarnTime.passedSince() < 20.seconds) return
@@ -189,12 +193,7 @@ object GardenOptimalSpeed {
                 action = { HypixelCommands.setMaxSpeed(optimalSpeed) },
             )
         } else {
-            ChatUtils.clickableChat(
-                text,
-                onClick = { config::onlyWarnRanchers.jumpToEditor() },
-                hover = "§eClick to disable this feature!",
-                replaceSameMessage = true,
-            )
+            ChatUtils.notifyOrDisable(text, config::onlyWarnRanchers,)
         }
     }
 

@@ -26,8 +26,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
-import net.minecraft.block.BlockChest
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.ChestBlock
 import java.util.NavigableMap
 import java.util.TreeMap
 
@@ -115,7 +115,7 @@ object StorageApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
         if (!shouldReCheck) return
-        currentStorage?.items = InventoryUtils.getItemsInOpenChestWithNull().map { it.stack }.drop(9)
+        currentStorage?.items = InventoryUtils.getItemsInOpenChestWithNull().map { it.item }.drop(9)
         shouldReCheck = false
         shouldSave = true
     }
@@ -149,9 +149,9 @@ object StorageApi {
             }
             when {
                 chest.primaryCords.distanceSqToPlayer() > 30 * 30 -> false
-                chest.primaryCords.getBlockAt() !is BlockChest -> true
-                chest.secondaryCords == null -> getNeighbourBlocks(chest.primaryCords).any { it.second is BlockChest }
-                else -> chest.secondaryCords.getBlockAt() !is BlockChest
+                chest.primaryCords.getBlockAt() !is ChestBlock -> true
+                chest.secondaryCords == null -> getNeighbourBlocks(chest.primaryCords).any { it.second is ChestBlock }
+                else -> chest.secondaryCords.getBlockAt() !is ChestBlock
             }.also {
                 if (it) ChatUtils.debug("Removed Private Island Chest at: ${chest.primaryCords}")
             }
@@ -208,7 +208,7 @@ object StorageApi {
     fun onBlockClick(event: BlockClickEvent) {
         if (event.clickType != ClickType.RIGHT_CLICK) return
         if (!isPrivateIslandStorageEnabled()) return
-        val chest = event.getBlockState.block as? BlockChest ?: return
+        val chest = event.getBlockState.block as? ChestBlock ?: return
         // Double Chest Check
         val otherChest = getNeighbourBlocks(event.position).firstOrNull { it.second == chest }?.first
         if (otherChest == null) {

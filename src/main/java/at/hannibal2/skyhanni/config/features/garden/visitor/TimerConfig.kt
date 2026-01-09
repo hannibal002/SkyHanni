@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class TimerConfig {
     @Expose
@@ -23,6 +24,7 @@ class TimerConfig {
         desc = "Estimate when the sixth visitor in the queue will arrive.\n" +
             "§eMay be inaccurate with co-op members farming simultaneously."
     )
+    @SearchTag("6th")
     @ConfigEditorBoolean
     var sixthVisitorEnabled: Boolean = true
 
@@ -32,6 +34,7 @@ class TimerConfig {
         desc = "Notify when it is believed that the sixth visitor has arrived.\n" +
             "§eMay be inaccurate with co-op members farming simultaneously."
     )
+    @SearchTag("6th")
     @ConfigEditorBoolean
     @FeatureToggle
     var sixthVisitorWarning: Boolean = true
@@ -40,8 +43,9 @@ class TimerConfig {
     @ConfigOption(
         name = "New Visitor Ping",
         desc = "Ping you when you are less than 10 seconds away from getting a new visitor.\n" +
-            "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event."
+            "§eUseful for getting Ephemeral Gratitudes during the Great Spook event."
     )
+    @SearchTag("halloween")
     @ConfigEditorBoolean
     var newVisitorPing: Boolean = false
 

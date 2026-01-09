@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.block.Block
-import net.minecraft.init.Blocks
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import java.util.concurrent.ConcurrentLinkedQueue
 
 @SkyHanniModule
@@ -54,7 +54,7 @@ object LivingCaveSnakeFeatures {
         val old = event.oldState.block
         val new = event.newState.block
 
-        if (new == Blocks.lapis_block) {
+        if (new == Blocks.LAPIS_BLOCK) {
             originalBlocks[location] = old
             addedList.add(location)
         }
@@ -112,7 +112,7 @@ object LivingCaveSnakeFeatures {
     fun onTick() {
         if (!isEnabled()) return
 
-        if (SkyBlockUtils.debug && MinecraftCompat.localPlayer.isSneaking && snakes.isNotEmpty()) {
+        if (SkyBlockUtils.debug && MinecraftCompat.localPlayer.isShiftKeyDown && snakes.isNotEmpty()) {
             snakes.clear()
             ChatUtils.debug("Snakes reset.", replaceSameMessage = true)
             return

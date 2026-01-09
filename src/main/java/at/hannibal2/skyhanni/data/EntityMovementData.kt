@@ -12,10 +12,11 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.entity.EntityLivingBase
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.entity.LivingEntity
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -42,9 +43,9 @@ object EntityMovementData {
         val startTime: SimpleTimeMark = SimpleTimeMark.now()
     }
 
-    private val entityLocation = mutableMapOf<EntityLivingBase, LorenzVec>()
+    private val entityLocation = mutableMapOf<LivingEntity, LorenzVec>()
 
-    fun addToTrack(entity: EntityLivingBase) {
+    fun addToTrack(entity: LivingEntity) {
         if (entity !in entityLocation) {
             entityLocation[entity] = entity.getLorenzVec()
         }
@@ -71,7 +72,7 @@ object EntityMovementData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!event.isLocalPlayer) return
 
         val nextData = nextTeleport ?: return
@@ -93,7 +94,7 @@ object EntityMovementData {
         addToTrack(MinecraftCompat.localPlayer)
 
         for (entity in entityLocation.keys) {
-            if (entity.isDead) continue
+            if (entity.deceased) continue
 
             val newLocation = entity.getLorenzVec()
             val oldLocation = entityLocation[entity]!!

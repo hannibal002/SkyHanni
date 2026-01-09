@@ -12,7 +12,7 @@ object TestShowSlotNumber {
     @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (SkyHanniMod.feature.dev.showSlotNumberKey.isKeyHeld()) {
-            val slotIndex = event.slot.slotIndex
+            val slotIndex = event.slot.containerSlot
             event.stackTip = "$slotIndex"
         }
     }
