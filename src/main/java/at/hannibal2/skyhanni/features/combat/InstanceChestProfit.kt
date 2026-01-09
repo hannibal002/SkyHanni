@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.combat.InstanceChestAPI.isInstanceChestGUI
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
@@ -26,7 +27,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -203,17 +204,16 @@ object InstanceChestProfit {
         val slots = slotsWithFavourites
         if (!inCroesusRunMenu) return
         slots.forEach {
-            if (it == event.stack.hoverName.formattedTextCompat()) event.stackTip = "✪"
+            if (it == event.stack.hoverName.formattedTextCompat()) event.stackTip = "§6✪"
         }
     }
 
     @HandleEvent
     fun onKey(event: GuiKeyPressEvent) {
-        if (!config.keybind.isKeyClicked()) return
+        if (!config.keybind.isKeyHeld()) return
         if (!isInstanceChestGUI()) return
         val favouriteItems = profileStorage?.instanceChestFavouriteItems ?: mutableListOf()
         stackUnderCursor()?.getInternalNameOrNull()?.let {
-            ChatUtils.chat("Reached Stack Under Cursor, item ID is $it")
             if (favouriteItems.contains(it)) {
                 favouriteItems.remove(it)
                 ChatUtils.chat("Removed ${it.repoItemName} from Favourites List.")
@@ -429,7 +429,8 @@ object InstanceChestProfit {
 
     @HandleEvent(GuiRenderEvent::class)
     fun onRenderOverlay() {
-        if (config.enabled && (isInstanceChestGUI())) {
+        if (config.enabled && InventoryUtils.inInventory())
+            if (isInstanceChestGUI()) {
             config.position.renderRenderable(
                 chestDisplay,
                 posLabel = "Instance Chest Profit",

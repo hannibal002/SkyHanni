@@ -40,11 +40,12 @@ object InstanceChestAPI {
                 val newStackName = fixInstanceChestName(stackName)
                 return entries.firstOrNull { it.stackChestName == newStackName }
             }
+
             fun getByInventoryName(): CroesusChestType? {
                 var inventoryName = InventoryUtils.openInventoryName()
-                inventoryName = inventoryName.replace("Chest Chest", "Chest")
-                inventoryName = inventoryName.replace("Chest" ,"")
-                return entries.firstOrNull { it.stackChestName.removeColor() == inventoryName}
+                inventoryName = inventoryName.replace(" Chest Chest", "")
+                inventoryName = inventoryName.replace(" Chest", "")
+                return entries.firstOrNull { it.stackChestName.removeColor() == inventoryName }
             }
         }
     }
