@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -34,33 +35,24 @@ object CropCollectionApi {
             CropCollectionType.BREAKING_CROPS,
             CropCollectionType.MOOSHROOM_COW,
             CropCollectionType.PEST_BASE,
-            CropCollectionType.DICER,
+            CropCollectionType.CROP_FEVER,
+            CropCollectionType.GREENHOUSE,
             CropCollectionType.PEST_RNG,
         )
 
-    private fun addCollectionCommand(cropText: String, amount: Long, typeText: String) {
-        val crop = CropType.getByNameOrNull(cropText.replace("_", " ")) ?: run {
-            ChatUtils.userError("Invalid crop! Format is /shaddcropcollection <crop> <amount> <type>")
-            return
-        }
-        val type = if (typeText == "") CropCollectionType.UNKNOWN else CropCollectionType.getByName(typeText.replace("_", " ")) ?: run {
-            ChatUtils.userError("Invalid type! Format is /shaddcropcollection <crop> <amount> <type>")
-            return
-        }
-
+    private fun addCollectionCommand(crop: CropType, amount: Long, type: CropCollectionType) {
         crop.addCollectionCounter(type, amount)
-        ChatUtils.chat("Added ${amount.addSeparators()} of type $type to $cropText")
-
+        ChatUtils.chat("Added ${amount.addSeparators()} of type $type to $crop")
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shaddcropcollection") {
             description = "Add an amount to a certain crop collection."
-            category = CommandCategory.DEVELOPER_DEBUG
-            arg("crop", BrigadierArguments.string()) { crop ->
+            category = CommandCategory.DEVELOPER_TEST
+            arg("crop", EnumArgumentType.custom<CropType>({ it.simpleName })) { crop ->
                 arg("amount", BrigadierArguments.long()) { amount ->
-                    arg("type", BrigadierArguments.string()) { type ->
+                    arg("type", EnumArgumentType.custom<CropCollectionType>({ it.displayName })) { type ->
                         callback { addCollectionCommand(getArg(crop), getArg(amount), getArg(type)) }
                     }
                 }

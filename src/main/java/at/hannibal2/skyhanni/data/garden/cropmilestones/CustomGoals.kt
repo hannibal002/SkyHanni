@@ -78,7 +78,7 @@ object CustomGoals {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Crop Milestones Custom Goal")
-        event.addIrrelevant{
+        event.addIrrelevant {
             add(milestoneCustomGoals.toString())
         }
     }

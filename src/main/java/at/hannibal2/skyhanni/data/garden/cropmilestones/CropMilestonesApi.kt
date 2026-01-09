@@ -366,7 +366,7 @@ object CropMilestonesApi {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(70, "#profile.garden.cropCounter", "#profile.garden.cropMilestoneCounter")
+        event.move(116, "#profile.garden.cropCounter", "#profile.garden.cropMilestoneCounter")
     }
 
     @HandleEvent
