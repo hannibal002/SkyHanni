@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -40,7 +39,7 @@ object FrozenTreasureTracker {
     private var stoppedChecks = 0
     private val tracker = SkyHanniTracker(
         "Frozen Treasure Tracker",
-        { Data() },
+        ::Data,
         { it.frozenTreasureTracker },
         trackerConfig = { config.perTrackerConfig }
     ) {
@@ -106,7 +105,7 @@ object FrozenTreasureTracker {
     fun onChat(event: SkyHanniChatEvent) {
         if (!ProfileStorageData.loaded) return
 
-        val message = event.message.removeColor().trim()
+        val message = event.cleanMessage.trim()
 
         compactPattern.matchMatcher(message) {
             tracker.modify {

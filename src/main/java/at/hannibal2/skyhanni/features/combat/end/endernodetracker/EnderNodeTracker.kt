@@ -64,7 +64,7 @@ object EnderNodeTracker {
 
     private val tracker = SkyHanniTracker(
         "Ender Node Tracker",
-        { Data() },
+        ::Data,
         { it.enderNodeTracker },
         drawDisplay = { drawDisplay(it) },
         trackerConfig = { config.perTrackerConfig }
@@ -129,7 +129,7 @@ object EnderNodeTracker {
         if (!isEnabled()) return
         miteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
             it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
-        }.sumOf { it.stackSize }
+        }.sumOf { it.count }
     }
 
     @HandleEvent
@@ -153,7 +153,7 @@ object EnderNodeTracker {
 
         val newMiteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
             it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
-        }.sumOf { it.stackSize }
+        }.sumOf { it.count }
 
         val change = newMiteGelInInventory - miteGelInInventory
         if (change > 0) {

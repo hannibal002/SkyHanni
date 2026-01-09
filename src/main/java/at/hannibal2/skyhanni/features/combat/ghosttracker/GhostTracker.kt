@@ -78,7 +78,7 @@ object GhostTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Ghost Tracker",
-        { Data() },
+        ::Data,
         { it.ghostStorage.ghostTracker },
         drawDisplay = { drawDisplay(it) },
         trackerConfig = { config.perTrackerConfig }
@@ -232,7 +232,7 @@ object GhostTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!inArea) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
-        if (event.coins !in 200.0..2_000.0) return
+        if (event.coins !in 200.0..15_000.0) return
         tracker.addCoins(event.coins.toInt(), false)
     }
 

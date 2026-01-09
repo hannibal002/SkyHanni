@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 
 @SkyHanniModule
@@ -20,8 +21,13 @@ object DungeonTrinityHelper {
             // https://hypixel.net/threads/best-way-to-get-trinitys-number-instead-of-acquiring-actual-friends.5489159/
             group("amount")?.toIntOrNull()?.takeIf { it >= 5 } ?: return@matchMatcherFirstLine
 
-            TitleManager.sendTitle("§dTrinity ?!?!")
-            if (config.sendPartyChat) HypixelCommands.partyChat("5 Puzzle dungeon, watch out for Trinity room")
+            TitleManager.sendTitle("§dPossible Trinity")
+            val msg = "5 puzzle dungeon, watch out for possible Trinity room!"
+            if (config.sendPartyChat) {
+                HypixelCommands.partyChat("[SkyHanni] $msg")
+            } else {
+                ChatUtils.chat(msg)
+            }
         }
     }
 }

@@ -127,7 +127,7 @@ object GiftProfitTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Gift Tracker",
-        { Data() },
+        ::Data,
         { it.giftProfitTracker },
         trackerConfig = { config.perTrackerConfig }
     ) {

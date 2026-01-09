@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -51,10 +52,10 @@ object InfernoMinionFeatures {
         if (!inInventory) return
 
         val containsFuel =
-            NeuInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.displayName) in fuelItemIds
+            NeuInternalName.fromItemNameOrNull(event.container.getSlot(19).item.hoverName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
         if (!containsFuel) return
 
-        if (event.slot?.slotNumber == 19 || event.slot?.slotNumber == 53) {
+        if (event.slot?.index == 19 || event.slot?.index == 53) {
             if (KeyboardManager.isModifierKeyDown()) return
             event.cancel()
         }
@@ -65,15 +66,15 @@ object InfernoMinionFeatures {
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
 
-        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.displayName) in fuelItemIds
+        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
         if (!containsFuel) return
 
-        if (event.slot.slotNumber == 19) {
+        if (event.slot.index == 19) {
             event.toolTip.add("")
             event.toolTip.add("§c[SkyHanni] is blocking you from taking this out!")
             event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
         }
-        if (event.slot.slotNumber == 53) {
+        if (event.slot.index == 53) {
             event.toolTip.add("")
             event.toolTip.add("§c[SkyHanni] is blocking you from picking this minion up!")
             event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")

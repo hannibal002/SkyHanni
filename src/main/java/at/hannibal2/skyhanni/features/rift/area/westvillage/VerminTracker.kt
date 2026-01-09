@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -73,7 +74,7 @@ object VerminTracker {
 
     private val tracker = SkyHanniTracker(
         "Vermin Tracker",
-        { Data() },
+        ::Data,
         { it.rift.verminTracker },
         trackerConfig = { config.perTrackerConfig }
     ) {
@@ -127,9 +128,9 @@ object VerminTracker {
             ?.getExtraAttributes() ?: return
 
         val bagCounts = mapOf(
-            VerminType.SILVERFISH to bag.getInteger("vacuumed_silverfish"),
-            VerminType.SPIDER to bag.getInteger("vacuumed_spider"),
-            VerminType.FLY to bag.getInteger("vacuumed_mosquito"),
+            VerminType.SILVERFISH to bag.getIntOrDefault("vacuumed_silverfish"),
+            VerminType.SPIDER to bag.getIntOrDefault("vacuumed_spider"),
+            VerminType.FLY to bag.getIntOrDefault("vacuumed_mosquito"),
         )
         VerminType.entries.forEach { addVermin(it, bagCounts[it] ?: 0) }
     }

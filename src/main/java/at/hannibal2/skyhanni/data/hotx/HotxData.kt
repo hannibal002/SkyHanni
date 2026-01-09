@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data.hotx
 
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
-import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
 import java.util.regex.Pattern
 
 // Abstraction for Heart of the Mountain/Forest

@@ -14,7 +14,7 @@
 
 ## What it does
 
-SkyHanni is a Forge mod for Minecraft 1.8.9 that adds many useful features to [Hypixel SkyBlock](https://wiki.hypixel.net/Main_Page). With SkyHanni you have access to:
+SkyHanni is a Fabric 1.21 and Forge 1.8.9 Minecraft mod that adds many useful features to [Hypixel SkyBlock](https://wiki.hypixel.net/Main_Page). With SkyHanni you have access to:
 
 * **Helpful GUIs:** View important information at a glance.
 * **Extra Chat Messages:** Receive reminders and tips at the right moment.

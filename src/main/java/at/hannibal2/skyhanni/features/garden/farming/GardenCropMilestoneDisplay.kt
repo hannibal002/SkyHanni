@@ -117,7 +117,7 @@ object GardenCropMilestoneDisplay {
             val crop = item.getCropType() ?: return
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
-                val addedCounter = (counter - old).toInt()
+                val addedCounter = if (old > counter) counter.toInt() else (counter - old).toInt()
                 FarmingWeightDisplay.addCrop(crop, addedCounter)
                 update()
                 crop.setCounter(crop.getCounter() + addedCounter)

@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class TrophyFishDisplayConfig {
     @Expose
@@ -37,8 +37,8 @@ class TrophyFishDisplayConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var keybind: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Hunter Armor", desc = "Only show when wearing a full Hunter Armor or Ember Armor.")
