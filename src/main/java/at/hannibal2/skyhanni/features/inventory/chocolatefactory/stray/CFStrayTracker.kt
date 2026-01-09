@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -39,7 +40,7 @@ import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -141,7 +142,7 @@ object CFStrayTracker {
 
     private val tracker = SkyHanniTracker(
         "Stray Tracker",
-        { Data() },
+        ::Data,
         { it.chocolateFactory.strayTracker },
         trackerConfig = { config.strayTrackerConfig }
     ) {
@@ -277,10 +278,10 @@ object CFStrayTracker {
     fun onSecondPassed() {
         if (!isEnabled()) return
         InventoryUtils.getItemsInOpenChest().filter {
-            claimedStraysSlots.contains(it.slotIndex)
+            claimedStraysSlots.contains(it.containerSlot)
         }.forEach {
-            if (!strayCaughtPattern.matches(it.stack.displayName)) {
-                claimedStraysSlots.removeAt(claimedStraysSlots.indexOf(it.slotIndex))
+            if (!strayCaughtPattern.matches(it.item.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+                claimedStraysSlots.removeAt(claimedStraysSlots.indexOf(it.containerSlot))
             }
         }
     }

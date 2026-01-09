@@ -12,8 +12,8 @@ object FixedRateTimerManager {
 
     init {
         fixedRateTimer(name = "skyhanni-fixed-rate-timer-manager", period = 1000L) {
-            DelayedRun.onThread.execute {
-                if (!SkyBlockUtils.onHypixel) return@execute
+            DelayedRun.runOrNextTick {
+                if (!SkyBlockUtils.onHypixel) return@runOrNextTick
                 SecondPassedEvent(totalSeconds).post()
                 totalSeconds++
             }

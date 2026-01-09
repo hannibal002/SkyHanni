@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -42,7 +41,7 @@ object PatcherSendCoordinates {
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.enabled) return
 
-        val message = event.message.removeColor()
+        val message = event.cleanMessage
         coordinatePattern.matchMatcher(message) {
             var description = group("playerName").split(" ").last()
             val x = group("x").toFloat()

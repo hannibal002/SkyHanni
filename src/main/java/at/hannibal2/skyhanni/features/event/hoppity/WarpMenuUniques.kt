@@ -3,12 +3,14 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -30,12 +32,13 @@ object WarpMenuUniques {
     private val config get() = SkyHanniMod.feature.event.hoppityEggs.warpMenu
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!config.enabled) return
         if (!HoppityApi.isHoppityEvent()) return
+        event.slot ?: return
         if (InventoryUtils.openInventoryName() != "Fast Travel") return
 
-        val name = islandNamePattern.matchMatcher(event.slot.stack.displayName) {
+        val name = islandNamePattern.matchMatcher(event.slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             group("name")
         } ?: return
 

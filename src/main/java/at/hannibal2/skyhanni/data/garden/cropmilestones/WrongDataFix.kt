@@ -8,10 +8,12 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.clearM
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCropTypeByLore
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.inaccurateMilestone
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.isMaxMilestone
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.levelUpPattern
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.storage
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.tabListPattern
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.tabListMaxPattern
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.tabListPercentPattern
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.totalPattern
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -40,7 +42,7 @@ object WrongDataFix {
         for ((_, stack) in event.inventoryItems) {
             val crop = getCropTypeByLore(stack) ?: continue
             totalPattern.firstMatcher(stack.getLore()) {
-                val oldAmount = crop.getMilestoneCounter() ?: continue
+                val oldAmount = crop.getMilestoneCounter() ?: 0
                 val amount = group("name").formatLong()
                 val change = amount - oldAmount
                 forceUpdateMilestone(crop, change)
@@ -66,12 +68,18 @@ object WrongDataFix {
     @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
-        tabListPattern.firstMatcher(event.lines) {
+        tabListPercentPattern.firstMatcher(event.lines) {
             val tier = group("tier").toInt()
             val percentage = group("percentage").toDouble()
             val cropName = group("crop")
 
             checkTabDifference(cropName, tier, percentage)
+        }
+        tabListMaxPattern.firstMatcher(event.lines) {
+            val tier = group("tier").toInt()
+            val cropName = group("crop")
+
+            setCropToMaxTier(cropName, tier)
         }
     }
 
@@ -117,6 +125,22 @@ object WrongDataFix {
             changedValue(crop, newValue, "tab list", smallestPercentage.toInt())
         }
         tabListCropProgress[crop] = newValue
+    }
+
+    private fun setCropToMaxTier(cropName: String, tier: Int) {
+        val crop = CropType.getByNameOrNull(cropName)
+        if (crop == null) {
+            ChatUtils.debug("GardenCropMilestoneFix: crop is null: '$cropName'")
+            return
+        }
+
+        val cropAmount = crop.milestoneTotalCropsForTier(tier)
+        if (!crop.isMaxMilestone()) {
+            val oldAmount = crop.getMilestoneCounter() ?: 0
+            val change = cropAmount - oldAmount
+            if (change < 0) return
+            forceUpdateMilestone(crop, change)
+        }
     }
 
     private fun forceUpdateMilestone(crop: CropType, amount: Long) {

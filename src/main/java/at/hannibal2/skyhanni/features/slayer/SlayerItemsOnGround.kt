@@ -11,32 +11,25 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
-import net.minecraft.entity.item.EntityItem
-import net.minecraft.init.Items
+import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.item.SpawnEggItem
 import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.16
-//$$ import net.minecraft.item.SpawnEggItem
-//#endif
 
 @SkyHanniModule
 object SlayerItemsOnGround {
 
     private val config get() = SlayerApi.config.itemsOnGround
 
-    private val itemsOnGround = TimeLimitedCache<EntityItem, String>(2.seconds)
+    private val itemsOnGround = TimeLimitedCache<ItemEntity, String>(2.seconds)
 
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
-            val itemStack = entityItem.entityItem
-            //#if MC < 1.16
-            if (itemStack.item == Items.spawn_egg) continue
-            //#else
-            //$$ if (itemStack.item is SpawnEggItem) continue
-            //#endif
+        for (entityItem in EntityUtils.getEntitiesNextToPlayer<ItemEntity>(15.0)) {
+            val itemStack = entityItem.item
+            if (itemStack.item is SpawnEggItem) continue
             if (itemStack.getInternalName() == NeuInternalName.NONE) continue
-            val (name, price) = SlayerApi.getItemNameAndPrice(itemStack.getInternalName(), itemStack.stackSize)
+            val (name, price) = SlayerApi.getItemNameAndPrice(itemStack.getInternalName(), itemStack.count)
             if (config.minimumPrice > price) continue
             itemsOnGround[entityItem] = name
         }

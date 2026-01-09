@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class DebugConfig {
     @Expose
@@ -70,8 +70,8 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var copyInternalName: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var copyInternalName: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Show NPC Price", desc = "Show NPC price in item lore.")
@@ -105,13 +105,13 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Copy Item Data", desc = "Copies item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var copyItemData: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var copyItemData: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Copy Compressed Item Data", desc = "Copies compressed item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var copyItemDataCompressed: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var copyItemDataCompressed: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -168,8 +168,8 @@ class DebugConfig {
         name = "Bypass Advanced Tab List",
         desc = "The Advanced Player Tab list is disabled while pressing this hotkey.",
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var bypassAdvancedPlayerTabList: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var bypassAdvancedPlayerTabList: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "SkyBlock Area", desc = "Show your current area and graph area in SkyBlock while F3 is open.")
@@ -195,6 +195,11 @@ class DebugConfig {
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
     val assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
+
+    @Expose
+    @ConfigOption(name = "Set Mayor on Start", desc = "Set assumed mayor to disabled on game start.")
+    @ConfigEditorBoolean
+    var disableAssumeMayor: Boolean = true
 
     @Expose
     @ConfigOption(name = "Always Year of Pig", desc = "Assumes the Year of the Pig is always active, even if it is not.")

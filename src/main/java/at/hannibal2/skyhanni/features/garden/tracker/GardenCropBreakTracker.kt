@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenApi.lastBrokenCropType
 import at.hannibal2.skyhanni.features.garden.GardenApi.readCounter
 import at.hannibal2.skyhanni.features.garden.GardenApi.readCultivatingCounter
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay.SEEDS
@@ -20,7 +21,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.math.floor
 import kotlin.random.Random
 
@@ -30,7 +31,6 @@ object GardenCropBreakTracker {
     private val counterData: MutableMap<String, Long>? get() = storage?.toolCounterData
     private val cropMap: MutableMap<CropType, Int> = mutableMapOf()
 
-    private var cropBrokenType: CropType? = null
     private var heldItem: ItemStack? = null
     private var itemHasCounter: Boolean = false
     private var itemHasBountiful = false
@@ -64,7 +64,7 @@ object GardenCropBreakTracker {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onCropBreak(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK) return
-        if (event.crop != cropBrokenType) cropBrokenType = event.crop
+        if (event.crop != lastBrokenCropType) lastBrokenCropType = event.crop
 
         if (GardenApi.mushroomCowPet) {
             mooshroomCowCrops += weightedRandomRound(CurrentPetApi.currentPet?.level ?: 0)
@@ -85,17 +85,16 @@ object GardenCropBreakTracker {
         val item = event.itemStack
         val uuid = item.getItemUuid() ?: return
         val counter = readCounter(item) ?: return
-        val isHoe = GardenApi.readHoeCounter(item) != null
 
-        val crop = if (isHoe || cropBrokenType == null) event.itemStack.getCropType() else cropBrokenType
+        val crop = lastBrokenCropType ?: event.itemStack.getCropType()
         if (crop == null) return
 
         val old = counterData?.get(uuid) ?: return
-        val addedCounter = if (counter < 0 && old > 0) {
-            // 32 bit overflow protection
-            counter + 4_294_967_296 - old
-        } else {
-            counter - old
+        var addedCounter = counter - old
+
+        // cult counts both seeds and wheat so we have to split it, ratio is 1 wheat : 1.5 seeds
+        if (crop == CropType.WHEAT) {
+            addedCounter = (addedCounter * .4f).toLong()
         }
 
         addToCropMap(crop, addedCounter.toInt())

@@ -6,7 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,8 +19,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.item.ItemStack
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.item.ItemStack
 import java.awt.Color
 
 @SkyHanniModule
@@ -34,7 +35,7 @@ object AuctionHousePriceComparison {
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        inInventory = event.inventoryName.startsWith("Auctions")
+        inInventory = event.inventoryName.startsWith("Auctions") || event.inventoryName.startsWith("Cosmetics Browser")
         if (!inInventory) return
 
         bestPrice = 0L
@@ -88,7 +89,7 @@ object AuctionHousePriceComparison {
         val veryBad = config.veryBad.toColor()
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val diff = slotPriceMap[slot.slotIndex] ?: continue
+            val diff = slotPriceMap[slot.containerSlot] ?: continue
             if (diff == 0L) {
                 slot.highlight(good)
                 continue
@@ -109,11 +110,12 @@ object AuctionHousePriceComparison {
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
+        event.slot ?: return
 
-        val diff = slotPriceMap[event.slot.slotIndex] ?: return
-        if (event.slot.inventory !is ContainerLocalMenu) return
+        val diff = slotPriceMap[event.slot.containerSlot] ?: return
+        if (event.slot.container !is SimpleContainer) return
 
         event.toolTip.add("")
         if (diff >= 0) {

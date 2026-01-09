@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
@@ -174,6 +175,8 @@ object HypixelData {
     var skyBlockAreaWithSymbol: String? = null
 
     var playerAmountOnIsland = 0
+
+    private val progressCategory = ChatProgressUpdates.category("Hypixel Data")
 
     // Data from locraw
     var locrawData: JsonObject? = null
@@ -363,7 +366,7 @@ object HypixelData {
     fun onChat(event: SkyHanniChatEvent) {
         if (!SkyBlockUtils.onHypixel) return
 
-        val message = event.message.removeColor().lowercase()
+        val message = event.cleanMessage.lowercase()
         if (message.startsWith("your profile was changed to:")) {
             val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
             if (profileName == newProfile) return
@@ -422,8 +425,7 @@ object HypixelData {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
                 SkyHanniMod.launchIOCoroutine("hypixel join repo update") {
-                    val progress = ChatProgressUpdates()
-                    progress.start("hypixel join repo update check")
+                    val progress = progressCategory.start("hypixel join repo update check")
                     SkyHanniRepoManager.displayRepoStatus(progress, joinEvent = true)
                     EnoughUpdatesRepoManager.displayRepoStatus(progress, joinEvent = true)
                     progress.end("done with checking both repos")
@@ -496,23 +498,19 @@ object HypixelData {
 
     private fun checkHypixel() {
         if (!hasScoreboardUpdated) return
-        val mc = Minecraft.getMinecraft()
-        val player = MinecraftCompat.localPlayerOrNull ?: return
+        val mc = Minecraft.getInstance()
+        MinecraftCompat.localPlayerOrNull ?: return
 
         var hypixel = false
 
-        //#if MC < 1.21
-        val clientBrand = player.clientBrand
-        //#else
-        //$$ val clientBrand = mc.networkHandler?.brand
-        //#endif
+        val clientBrand = mc.connection?.serverBrand()
         clientBrand?.let {
             if (it.contains("hypixel", ignoreCase = true)) {
                 hypixel = true
             }
         }
 
-        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP.orEmpty()) {
+        serverNameConnectionPattern.matchMatcher(mc.currentServer?.ip.orEmpty()) {
             hypixel = true
             if (group("prefix") == "alpha.") {
                 hypixelAlpha = true
@@ -612,7 +610,7 @@ object HypixelData {
         val world = MinecraftCompat.localWorldOrNull ?: return null
 
         val objective = world.scoreboard.getSidebarObjective() ?: return null
-        val displayName = objective.displayName
+        val displayName = objective.displayName.formattedTextCompat()
         return displayName
     }
 

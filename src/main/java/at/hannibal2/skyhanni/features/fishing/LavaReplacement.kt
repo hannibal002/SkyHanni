@@ -40,7 +40,7 @@ object LavaReplacement {
         val newActive = shouldReplace()
         if (newActive == isActive) return
         isActive = newActive
-        Minecraft.getMinecraft().renderGlobal.loadRenderers()
+        Minecraft.getInstance().levelRenderer.allChanged()
     }
 
     private fun shouldReplace(): Boolean {

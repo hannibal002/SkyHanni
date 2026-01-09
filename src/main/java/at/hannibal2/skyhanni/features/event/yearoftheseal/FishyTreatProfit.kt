@@ -23,12 +23,16 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object FishyTreatProfit {
@@ -59,7 +63,7 @@ object FishyTreatProfit {
             // ignore the last line of menu items
             if (slot > 44) continue
             // background items
-            if (item.displayName == " ") continue
+            if (item.hoverName.string == " ") continue
             try {
                 readItem(slot, item, table)
             } catch (e: Throwable) {
@@ -96,7 +100,7 @@ object FishyTreatProfit {
 
         val additionalCost = getAdditionalCost(additionalMaterials)
 
-        val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
+        val (name, amount) = ItemUtils.readItemAmount(itemName.formattedTextCompatLeadingWhiteLessResets()) ?: return
 
         var internalName = NeuInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
@@ -132,26 +136,26 @@ object FishyTreatProfit {
         table.add(
             DisplayTableEntry(
                 itemName,
-                "$color$profitPerFishyFormat",
+                "$color$profitPerFishyFormat".asComponent(),
                 profitPerFishy,
                 internalName,
-                hover,
+                hover.mapToComponents(),
                 highlightsOnHoverSlots = listOf(slot),
             ),
         )
     }
 
-    private fun MutableList<String>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
+    private fun MutableList<Any>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
         for ((internalName, amount) in additionalMaterials) {
             add(internalName.getPriceName(amount, internalName.getPrice(priceSource)))
         }
     }
 
-    private fun getItemName(item: ItemStack): String {
-        val name = item.displayName
+    private fun getItemName(item: ItemStack): Component {
+        val name = item.hoverName
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
-            item.repoItemName
+            item.repoItemName.asComponent()
         } else name
     }
 
@@ -197,7 +201,7 @@ object FishyTreatProfit {
                     ErrorManager.logErrorStateWithData(
                         "Error in FishyTreat Profit", "Could not read item amount",
                         "rawItemName" to rawItemName,
-                        "name" to item.displayName,
+                        "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                         "lore" to lore,
                     )
                     continue

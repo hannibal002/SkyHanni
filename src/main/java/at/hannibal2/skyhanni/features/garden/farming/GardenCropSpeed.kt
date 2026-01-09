@@ -44,7 +44,6 @@ object GardenCropSpeed {
         fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
             if (isEnabled()) {
                 checkSpeed()
-                update()
             }
         }
     }

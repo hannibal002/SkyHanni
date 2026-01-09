@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.replace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -27,7 +27,7 @@ object ColorfulItemStats {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltipEvent(event: ItemHoverEvent) {
+    fun onTooltipEvent(event: ToolTipEvent) {
         if (!config.enabled) return
 
         for ((index, line) in event.toolTip.withIndex()) {

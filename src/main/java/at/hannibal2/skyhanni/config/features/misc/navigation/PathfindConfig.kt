@@ -1,0 +1,57 @@
+package at.hannibal2.skyhanni.config.features.misc.navigation
+
+import at.hannibal2.skyhanni.config.core.config.Position
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
+import io.github.notenoughupdates.moulconfig.observer.Property
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+
+class PathfindConfig {
+
+    @Expose
+    @ConfigOption(name = "Feedback Mode", desc = "How navigation progress is displayed.")
+    @ConfigEditorDropdown
+    @SearchTag("navigation navigate pathfind")
+    val feedbackMode: Property<FeedbackMode> = Property.of(FeedbackMode.GUI)
+
+    enum class FeedbackMode(private val displayName: String) {
+        NONE("None"),
+        CHAT("Chat"),
+        GUI("GUI Element"),
+        ;
+
+        override fun toString() = displayName
+    }
+
+    @Expose
+    @ConfigLink(owner = PathfindConfig::class, field = "feedbackMode")
+    val position: Position = Position(200, 200)
+
+    @Expose
+    @ConfigOption(
+        name = "Chat Update Interval",
+        desc = "How often the chat message updates.\n" +
+            "§cOnly in Chat feedback mode.",
+    )
+    @ConfigEditorDropdown
+    @SearchTag("navigation, pathfind")
+    var chatUpdateInterval: UpdateInterval = UpdateInterval.PERFECT
+
+    enum class UpdateInterval(private val displayName: String, val duration: Duration) {
+        IMMEDIATELY("1/20 second", 0.seconds),
+        PERFECT("1/10 second", 100.milliseconds),
+        SHORT("1/4 second", 250.milliseconds),
+        LESS_SHORT("1/2 second", 500.milliseconds),
+        MID("Every second", 1.seconds),
+        A_BIT_LONGER("Every 2 seconds", 2.seconds),
+        LONG("5 seconds", 5.seconds),
+        ;
+
+        override fun toString() = displayName
+    }
+}

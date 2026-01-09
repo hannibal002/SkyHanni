@@ -115,7 +115,7 @@ object CropCollectionTracker {
 
         val farming = cropData.getCollection(CropCollectionType.MOOSHROOM_COW) +
             cropData.getCollection(CropCollectionType.BREAKING_CROPS) +
-            cropData.getCollection(CropCollectionType.DICER)
+            cropData.getCollection(CropCollectionType.CROP_FEVER)
 
         lineMap[CropCollectionDisplayText.FARMING] = StringRenderable("§7Farming: §e${farming.addSeparators()}").toSearchable()
 
@@ -129,9 +129,9 @@ object CropCollectionTracker {
                 "§7- Mooshroom Cow: §e${cropData.getCollection(CropCollectionType.MOOSHROOM_COW).addSeparators()}"
             ).toSearchable()
 
-        lineMap[CropCollectionDisplayText.DICER] =
+        lineMap[CropCollectionDisplayText.CROP_FEVER] =
             StringRenderable(
-                "§7- Dicer Drops: §e${cropData.getCollection(CropCollectionType.DICER).addSeparators()}"
+                "§7- Crop Fever Drops: §e${cropData.getCollection(CropCollectionType.CROP_FEVER).addSeparators()}"
             ).toSearchable()
 
         val pests = cropData.getCollection(CropCollectionType.PEST_BASE) + cropData.getCollection(CropCollectionType.PEST_RNG)
@@ -156,7 +156,7 @@ object CropCollectionTracker {
 
         val farming = cropData.getCollection(CropCollectionType.MOOSHROOM_COW) +
             cropData.getCollection(CropCollectionType.BREAKING_CROPS) +
-            cropData.getCollection(CropCollectionType.DICER)
+            cropData.getCollection(CropCollectionType.CROP_FEVER)
 
         add("§7Farming: §e${farming.addSeparators()}")
 
@@ -164,7 +164,7 @@ object CropCollectionTracker {
 
         add("§7- Mooshroom Cow: §e${cropData.getCollection(CropCollectionType.MOOSHROOM_COW).addSeparators()}")
 
-        add("§7- Dicer Drops: §e${cropData.getCollection(CropCollectionType.DICER).addSeparators()}")
+        add("§7- Dicer Drops: §e${cropData.getCollection(CropCollectionType.CROP_FEVER).addSeparators()}")
 
         val pests = cropData.getCollection(CropCollectionType.PEST_BASE) + cropData.getCollection(CropCollectionType.PEST_RNG)
         add("§2Pests: §e${pests.addSeparators()}")

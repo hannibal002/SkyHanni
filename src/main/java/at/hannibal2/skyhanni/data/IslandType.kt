@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.phys.AABB
 
 enum class IslandType(private val nameFallback: String) {
     PRIVATE_ISLAND("Private Island"),
@@ -97,7 +97,7 @@ enum class IslandType(private val nameFallback: String) {
             val islandDataMap = data.islands.mapValues {
                 val island = it.value
                 val boundingBox = island.bounds?.let { bounds ->
-                    AxisAlignedBB(
+                    AABB(
                         bounds.minX.toDouble(), 0.0, bounds.minZ.toDouble(),
                         bounds.maxX.toDouble(), 256.0, bounds.maxZ.toDouble(),
                     )
@@ -123,5 +123,5 @@ data class IslandData(
     val name: String,
     val apiName: String?,
     val maxPlayers: Int,
-    val boundingBox: AxisAlignedBB?,
+    val boundingBox: AABB?,
 )

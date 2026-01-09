@@ -59,6 +59,21 @@ class CropTypeRankGoalsConfig : TypeRankGoalGenericConfig<CropType>() {
     @ConfigEditorText
     val mushroom: Property<String> = Property.of("10000")
 
+    @Expose
+    @ConfigOption(name = "Sunflower", desc = "")
+    @ConfigEditorText
+    val sunflower: Property<String> = Property.of("10000")
+
+    @Expose
+    @ConfigOption(name = "Moonflower", desc = "")
+    @ConfigEditorText
+    val moonflower: Property<String> = Property.of("10000")
+
+    @Expose
+    @ConfigOption(name = "Wild Rose", desc = "")
+    @ConfigEditorText
+    val rose: Property<String> = Property.of("10000")
+
     override fun getConfig(type: CropType): KProperty0<Property<String>> = when (type) {
         CropType.WHEAT -> this::wheat
         CropType.CARROT -> this::carrot
@@ -70,5 +85,8 @@ class CropTypeRankGoalsConfig : TypeRankGoalGenericConfig<CropType>() {
         CropType.SUGAR_CANE -> this::cane
         CropType.CACTUS -> this::cactus
         CropType.MUSHROOM -> this::mushroom
+        CropType.SUNFLOWER -> this::sunflower
+        CropType.MOONFLOWER -> this::moonflower
+        CropType.WILD_ROSE -> this::rose
     }
 }

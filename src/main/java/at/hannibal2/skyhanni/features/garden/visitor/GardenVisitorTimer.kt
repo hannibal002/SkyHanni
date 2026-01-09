@@ -193,7 +193,7 @@ object GardenVisitorTimer {
 
     init {
         RenderDisplayHelper(
-            condition = { isEnabled() },
+            condition = ::isEnabled,
             outsideInventory = true,
             inOwnInventory = true,
         ) {
