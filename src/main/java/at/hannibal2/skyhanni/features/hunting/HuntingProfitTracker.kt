@@ -40,6 +40,7 @@ object HuntingProfitTracker {
         "Hunting Profit Tracker",
         { Data() },
         { it.hunting.huntingProfitTracker },
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
     data class Data(

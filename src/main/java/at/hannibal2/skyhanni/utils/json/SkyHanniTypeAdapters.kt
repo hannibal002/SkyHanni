@@ -84,8 +84,6 @@ object SkyHanniTypeAdapters {
 
     val SESSION_UPTIME: TypeAdapter<SessionUptime> = SessionUptimeTypeAdapter()
 
-    val SESSION_UPTIME: TypeAdapter<SessionUptime> = SessionUptimeTypeAdapter()
-
     val SKYBLOCK_STAT: TypeAdapter<SkyblockStat> = SimpleStringTypeAdapter(
         { name.lowercase() },
         { SkyblockStat.getValue(this.uppercase()) },

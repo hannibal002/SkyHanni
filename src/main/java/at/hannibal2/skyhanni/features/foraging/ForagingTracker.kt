@@ -50,12 +50,12 @@ private typealias DropCategory = ForagingTrackerConfig.TreeGiftBonusDropCategory
 
 @SkyHanniModule
 object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeType, ForagingTrackerLegacy.BucketData>(
-        "Foraging Tracker",
-        { ForagingTrackerLegacy.BucketData() },
-        { it.foraging.trackerData },
-        { drawDisplay(it) },
-        trackerConfig = { SkyHanniMod.feature.foraging.tracker.perTrackerConfig }
-    ){
+    "Foraging Tracker",
+    { ForagingTrackerLegacy.BucketData() },
+    { it.foraging.trackerData },
+    { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.foraging.tracker.perTrackerConfig },
+) {
     private val config get() = SkyHanniMod.feature.foraging.tracker
 
     init {

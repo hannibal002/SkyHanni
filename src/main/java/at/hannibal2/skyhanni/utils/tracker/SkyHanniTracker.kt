@@ -11,8 +11,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -35,9 +33,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiInventory
-import kotlin.time.Duration
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import kotlin.time.Duration

@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -317,7 +316,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
     }
 
     private fun shouldShowProfitPerHour() =
-        config.profitPerHour.get() && !(getDisplayMode() == DisplayMode.TOTAL && config.onlyShowSession.get())
+        config.itemTracker.profitPerHour.get() && !(getDisplayMode() == DisplayMode.TOTAL && config.onlyShowSession.get())
 
     private fun profitPerHourRenderable(profit: Double, duration: Duration): Renderable {
         if (duration == 0.seconds) return Renderable.empty()
