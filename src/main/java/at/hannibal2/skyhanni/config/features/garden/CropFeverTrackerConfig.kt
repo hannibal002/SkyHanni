@@ -35,6 +35,7 @@ class CropFeverTrackerConfig {
     @ConfigEditorDraggableList
     val text: Property<MutableList<CropFeverTrackerTextEntry>> = Property.of(
         mutableListOf(
+            CropFeverTrackerTextEntry.TITLE,
             CropFeverTrackerTextEntry.RNG_DROPS,
             CropFeverTrackerTextEntry.SPACER_2,
             CropFeverTrackerTextEntry.ITEM_DROPS,
