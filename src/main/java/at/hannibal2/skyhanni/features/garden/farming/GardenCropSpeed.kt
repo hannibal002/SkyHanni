@@ -3,8 +3,6 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerDropsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerType
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -45,11 +43,6 @@ object GardenCropSpeed {
         // TODO use SecondPassedEvent + passedSince
         fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
             if (isEnabled()) {
-                if (GardenApi.mushroomCowPet) {
-                    CropType.MUSHROOM.setCounter(
-                        CropType.MUSHROOM.getCounter() + blocksBroken * (lastBrokenCrop?.multiplier ?: 1),
-                    )
-                }
                 checkSpeed()
             }
         }
