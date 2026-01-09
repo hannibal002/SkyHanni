@@ -41,12 +41,10 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiInventory
-import java.time.LocalDate
-import kotlin.reflect.KClass
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import java.time.LocalDate
+import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -246,7 +244,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
                     addAll(
                         "§eⓘ §7Uptime tracked only from",
                         "§7SkyHanni version 6.0.0 onwards",
-                    ),
+                    )
                 }
             }
         )
