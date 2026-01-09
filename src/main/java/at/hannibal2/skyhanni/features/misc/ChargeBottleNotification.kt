@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fishing.IsFishingDetection.isFishing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
@@ -49,12 +48,10 @@ object ChargeBottleNotification {
         if (bottlesInInventory.isEmpty()) return
         val size = bottlesInInventory.size
 
-        ChatUtils.clickableChat(
+        ChatUtils.notifyOrDisable(
             "You are currently fishing, but " +
-                "${bottlesInInventory.createCommaSeparatedList()} ${StringUtils.pluralize(size, "is", "are")} full. " +
-                "Click here to disable this notification.",
-            { config::chargeBottleNotification.jumpToEditor() },
-            replaceSameMessage = true,
+                "${bottlesInInventory.createCommaSeparatedList()} ${StringUtils.pluralize(size, "is", "are")} full",
+            config::chargeBottleNotification,
         )
     }
 

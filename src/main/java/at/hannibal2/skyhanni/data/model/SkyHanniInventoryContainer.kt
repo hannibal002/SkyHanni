@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.RenderableInventory.fak
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 class SkyHanniInventoryContainer(
     @Expose val internalName: String,

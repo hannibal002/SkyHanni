@@ -31,7 +31,7 @@ object ShinyOrbTracker {
     private val SHINY_ROD_ITEM = "SHINY_ROD".toInternalName()
     private val tracker = SkyHanniItemTracker(
         "Shiny Orb Tracker",
-        { ShinyOrbData() },
+        ::ShinyOrbData,
         { it.shinyOrbTracker },
     ) { drawDisplay(it) }
 

@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.OnlyLegacy
-import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import com.google.gson.annotations.Expose
@@ -12,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class DebugConfig {
     @Expose
@@ -72,8 +70,8 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var copyInternalName: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var copyInternalName: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Show NPC Price", desc = "Show NPC price in item lore.")
@@ -107,13 +105,13 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Copy Item Data", desc = "Copies item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var copyItemData: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var copyItemData: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Copy Compressed Item Data", desc = "Copies compressed item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var copyItemDataCompressed: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var copyItemDataCompressed: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -170,8 +168,8 @@ class DebugConfig {
         name = "Bypass Advanced Tab List",
         desc = "The Advanced Player Tab list is disabled while pressing this hotkey.",
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var bypassAdvancedPlayerTabList: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var bypassAdvancedPlayerTabList: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "SkyBlock Area", desc = "Show your current area and graph area in SkyBlock while F3 is open.")
@@ -237,13 +235,6 @@ class DebugConfig {
     @ConfigOption(name = "Addons Debug", desc = "Enable extra Superpairs Addons debug info.")
     @ConfigEditorBoolean
     var addonsDebug: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Aura Propaganda", desc = "Make sure to vote for hannibal2 :)")
-    @ConfigEditorBoolean
-    @OnlyModern
-    @OnlyLegacy
-    var auraPropaganda: Boolean = true
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")

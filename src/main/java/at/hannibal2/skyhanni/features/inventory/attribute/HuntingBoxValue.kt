@@ -20,14 +20,16 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object HuntingBoxValue {
@@ -51,9 +53,9 @@ object HuntingBoxValue {
         val table = mutableListOf<DisplayTableEntry>()
 
         for (slot in slots) {
-            val slotNumber = slot.slotNumber
+            val slotNumber = slot.index
             if (!isValidSlotNumber(slotNumber)) continue
-            val stack = slot.stack.orNull() ?: continue
+            val stack = slot.item.orNull() ?: continue
             processAttributeShardSlot(slotNumber, stack, table)
         }
 
@@ -149,11 +151,11 @@ object HuntingBoxValue {
 
         table.add(
             DisplayTableEntry(
-                "${internalName.repoItemName} §8x$amountOwned",
-                "§6${totalPriceInstantSell.addSeparators()}",
+                "${internalName.repoItemName} §8x$amountOwned".asComponent(),
+                "§6${totalPriceInstantSell.addSeparators()}".asComponent(),
                 totalPriceInstantSell,
                 internalName,
-                hover,
+                hover.mapToComponents(),
                 highlightsOnHoverSlots = listOf(slotNumber),
             ),
         )

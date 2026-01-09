@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapConfig
 import com.google.gson.annotations.Expose
@@ -66,13 +65,6 @@ class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightDeathmites: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Highlight Teammates", desc = "Highlight Dungeon teammates with a glowing outline.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    @OnlyLegacy
-    var highlightTeammates: Boolean = true
 
     @Expose
     @ConfigOption(

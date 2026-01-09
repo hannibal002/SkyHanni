@@ -62,7 +62,7 @@ object EnderNodeTracker {
     // TODO add abstract logic with ohter pet drop chat messages
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 
-    private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) {
+    private val tracker = SkyHanniTracker("Ender Node Tracker", ::Data, { it.enderNodeTracker }) {
         drawDisplay(it)
     }
 
@@ -125,7 +125,7 @@ object EnderNodeTracker {
         if (!isEnabled()) return
         miteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
             it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
-        }.sumOf { it.stackSize }
+        }.sumOf { it.count }
     }
 
     @HandleEvent
@@ -149,7 +149,7 @@ object EnderNodeTracker {
 
         val newMiteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
             it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
-        }.sumOf { it.stackSize }
+        }.sumOf { it.count }
 
         val change = newMiteGelInInventory - miteGelInInventory
         if (change > 0) {

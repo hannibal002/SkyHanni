@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
-import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
@@ -22,7 +21,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class GuiConfig {
     @Expose
@@ -48,13 +47,13 @@ class GuiConfig {
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var keyBindOpen: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var keyBindOpen: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Reset Hotkey", desc = "Key to press hovering a gui element to reset it's position and scale in the GUI Editor.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_R)
-    var keyBindReset: Int = Keyboard.KEY_R
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_R)
+    var keyBindReset: Int = GLFW.GLFW_KEY_R
 
     @Expose
     @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all SkyHanni GUIs.")
@@ -167,13 +166,6 @@ class GuiConfig {
     @Expose
     @ConfigLink(owner = GuiConfig::class, field = "tpsDisplay")
     val tpsDisplayPosition: Position = Position(10, 10)
-
-    @Expose
-    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    @OnlyLegacy
-    var configButtonOnPause: Boolean = true
 
     @Expose
     @ConfigOption(name = "Widen Config", desc = "Make SkyHanni's config window wider. (~1.5x)")

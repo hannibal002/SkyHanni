@@ -31,11 +31,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -52,7 +52,7 @@ object ExperimentsProfitTracker {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
     private val tracker = SkyHanniItemTracker(
         "Experiments Profit Tracker",
-        { Data() },
+        ::Data,
         { it.experimentation.experimentsProfitTracker },
     ) { drawDisplay(it) }
 
@@ -88,7 +88,7 @@ object ExperimentsProfitTracker {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        experimentRenewPattern.matchMatcher(event.message.removeColor()) {
+        experimentRenewPattern.matchMatcher(event.cleanMessage) {
             val increments = mapOf(1 to 150, 2 to 300, 3 to 500)
             tracker.modify {
                 it.bitCost += increments.getValue(group("current").toInt())
@@ -115,7 +115,7 @@ object ExperimentsProfitTracker {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !bottlesInventory.isInside() || !allowedSlots.contains(event.slotId)) return
-        val internalName = event.slot?.stack?.getInternalNameOrNull()?.takeIf {
+        val internalName = event.slot?.item?.getInternalNameOrNull()?.takeIf {
             experienceBottlePattern.matches(it.asString())
         } ?: return
 
@@ -174,7 +174,7 @@ object ExperimentsProfitTracker {
     }
 
     private fun NeuInternalName.formatWarningString(amount: Int) = buildString {
-        val displayName = getItemStackOrNull()?.displayName ?: "XP Bottle"
+        val displayName = getItemStackOrNull()?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: "XP Bottle"
         val amountFormat = "§8${amount}x ".takeIf { amount > 1 }.orEmpty()
         appendLine("§aExperiments Tracker§7:")
         appendLine("§eAutomatically tracked usage of $amountFormat$displayName §ewhile near the Experimentation Table§7.")

@@ -1,16 +1,18 @@
 package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class DianaConfig {
     // TODO rename to highlightRareMobs
@@ -38,19 +40,6 @@ class DianaConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var guess: Boolean = false
-
-    enum class GuessLogic(private val displayName: String) {
-        SOOPY_GUESS("Soopy"),
-        PRECISE_GUESS("Precise"),
-        ;
-
-        override fun toString(): String = displayName
-    }
-
-    @Expose
-    @ConfigOption(name = "Guessing Logic", desc = "Change which guess strategy to use.")
-    @ConfigEditorDropdown
-    var guessLogic: GuessLogic = GuessLogic.PRECISE_GUESS
 
     @Expose
     @ConfigOption(
@@ -80,6 +69,47 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(
+        name = "Guess From Arrow",
+        desc = "Guess next burrow location in chain instantly from the particle arrow.\n" +
+            "It is recommended to use bobby for better results.",
+    )
+    @ConfigEditorBoolean
+    var guessFromArrow: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Warn On Failure",
+        desc = "Sends \"Use Spade\" title when arrow guess fails.",
+    )
+    @ConfigEditorBoolean
+    var warnOnFail: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Warn On Chain Complete",
+        desc = "Sends \"Use Spade\" title when you complete a chain and there is not a burrow within 90 blocks.",
+    )
+    @ConfigEditorBoolean
+    var warnOnChainComp: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Render SubGuesses",
+        desc = "If there are multiple possible blocks will render them all in a greyed out chain.",
+    )
+    @ConfigEditorBoolean
+    var renderSubGuesses: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Clear On World Change",
+        desc = "Clear all guess data on world change.",
+    )
+    @ConfigEditorBoolean
+    var clearOnWorldChange: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Nearest Warp",
         desc = "Warp to the nearest warp point on the hub, if closer to the next burrow.",
     )
@@ -88,8 +118,20 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(name = "Warp Key", desc = "Press this key to warp to nearest burrow waypoint.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var keyBindWarp: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var keyBindWarp: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(
+        name = "Warp Distance",
+        desc = "How much closer a warp needs to be than you to suggest it.",
+    )
+    @ConfigEditorSlider(minValue = 0.0f, maxValue = 200.0f, minStep = 1.0f)
+    var warpDistanceDifference: Int = 10
+
+    @Expose
+    @ConfigLink(owner = DianaConfig::class, field = "burrowNearestWarp")
+    val warpGuiPosition: Position = Position(327, 125, scale = 2.6f)
 
     @Expose
     @ConfigOption(name = "Ignored Warps", desc = "")

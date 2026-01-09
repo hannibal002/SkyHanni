@@ -31,8 +31,8 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.passive.EntityPig
+import net.minecraft.world.entity.animal.Pig
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -126,7 +126,7 @@ object PigFeaturesApi {
 
         orbChargedChatPattern.matchMatcher(message) {
             val orbEntity = tryFindOrb(LocationUtils.playerLocation())
-            ShinyOrbChargedEvent(orbEntity?.entityId).post()
+            ShinyOrbChargedEvent(orbEntity?.id).post()
         }
 
         orbLootedChatPattern.matchMatcher(message) {
@@ -145,8 +145,8 @@ object PigFeaturesApi {
 
     private val ORB_SKULL by lazy { SkullTextureHolder.getTexture("SHINY_PIG_ORB") }
 
-    private fun tryFindOrb(location: LorenzVec): EntityArmorStand? {
-        val nearbyStands = EntityUtils.getEntitiesNearby<EntityArmorStand>(location, 5.0).toList()
+    private fun tryFindOrb(location: LorenzVec): ArmorStand? {
+        val nearbyStands = EntityUtils.getEntitiesNearby<ArmorStand>(location, 5.0).toList()
         val sortedStands = nearbyStands.sortedBy { it.distanceTo(location) }
         return sortedStands.firstOrNull { stand ->
             stand.wearingSkullTexture(ORB_SKULL)
@@ -182,19 +182,19 @@ object PigFeaturesApi {
         if (InventoryUtils.getItemInHand()?.getInternalNameOrNull() != SHINY_ORB_ITEM) return
 
         val entity = event.clickedEntity
-        if (entity is EntityPig && entity.mob?.name == "SHINY PIG") entity.handlePigClick()
+        if (entity is Pig && entity.mob?.name == "SHINY PIG") entity.handlePigClick()
     }
 
-    private fun EntityPig.handlePigClick() {
+    private fun Pig.handlePigClick() {
         val pigStartingLocation = this.getLorenzVec()
         DelayedRun.runDelayed(1.seconds) {
-            if (dataSetList.any { it.pigEntityId == this.entityId }) return@runDelayed
+            if (dataSetList.any { it.pigEntityId == this.id }) return@runDelayed
             val orbEntity = tryFindOrb(pigStartingLocation)
             orbEntity ?: return@runDelayed
             data.add(
                 ShinyOrbData(
-                    pigEntityId = this.entityId,
-                    shinyOrbEntityId = orbEntity.entityId,
+                    pigEntityId = this.id,
+                    shinyOrbEntityId = orbEntity.id,
                     shinyOrbLocation = orbEntity.getLorenzVec() + LorenzVec(0, 2, 0),
                     spawnTime = SimpleTimeMark.now(),
                 ),

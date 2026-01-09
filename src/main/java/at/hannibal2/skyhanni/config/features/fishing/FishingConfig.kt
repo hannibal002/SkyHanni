@@ -117,4 +117,10 @@ class FishingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var lineToHotspot: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Mute Banshee sounds", desc = "Disables the screams of a Banshee.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteBanshee: Boolean = false
 }

@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class InquisitorSharingConfig {
     @Expose
@@ -31,8 +31,8 @@ class InquisitorSharingConfig {
 
     @Expose
     @ConfigOption(name = "Share Key", desc = "Press this key to share your Rare Diana Mob Waypoint.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Y)
-    var keyBindShare: Int = Keyboard.KEY_Y
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_Y)
+    var keyBindShare: Int = GLFW.GLFW_KEY_Y
 
     @Expose
     @ConfigOption(name = "Rare Diana Mob Sound", desc = "")
