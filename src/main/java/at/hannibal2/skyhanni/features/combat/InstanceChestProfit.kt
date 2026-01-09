@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent
 import at.hannibal2.skyhanni.features.combat.InstanceChestAPI.CroesusChestType
+import at.hannibal2.skyhanni.features.combat.InstanceChestAPI.isInCroesusMenu
 import at.hannibal2.skyhanni.features.combat.InstanceChestAPI.isInstanceChestGUI
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -111,16 +112,6 @@ object InstanceChestProfit {
         "§aReroll Shard",
     )
 
-    /**
-     * REGEX-TEST: Master Catacombs - Floor II
-     * REGEX-TEST: Catacombs - Floor V
-     * REGEX-TEST: Kuudra - Infernal
-     */
-    private val runNameCroesus by patternGroup.pattern(
-        "runname",
-        ".*Catacombs - Flo.*|Kuudra - .*",
-    )
-
 
     /**
      * REGEX-TEST: §61,000,000 Coins
@@ -151,8 +142,6 @@ object InstanceChestProfit {
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
 
-    // TODO replace those three "in chest" booleans with inventory detectors
-    private var inCroesusRunMenu = false
     private var croesusDisplay: Renderable? = null
     private val alreadyProcessedChests = mutableListOf<CroesusChestType>()
     private val croesusDisplayList = mutableListOf<Renderable>()
@@ -167,10 +156,7 @@ object InstanceChestProfit {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.enabled && !config.croesusAllChestsOverlay && !config.croesusHighlight) return
 
-        val name = event.inventoryName
-        if (runNameCroesus.matches(name) && (config.croesusHighlight || config.croesusAllChestsOverlay)) inCroesusRunMenu = true
-
-        if (inCroesusRunMenu) {
+        if (isInCroesusMenu() && (config.croesusAllChestsOverlay || config.croesusHighlight)) {
             event.inventoryItems.forEach { (slot, item) ->
                 val chestType = CroesusChestType.getByStackName(item.hoverName.formattedTextCompatLeadingWhite())
                 if (chestType != null) {
@@ -189,7 +175,7 @@ object InstanceChestProfit {
     @HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         val slot = slotToHighlight?.first
-        if (inCroesusRunMenu && slot != null && config.croesusHighlight) {
+        if (isInCroesusMenu() && slot != null && config.croesusHighlight) {
             event.container.slots[slot].highlight(LorenzColor.GREEN)
         }
     }
@@ -197,9 +183,9 @@ object InstanceChestProfit {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderItemTipEvent) {
         val slots = slotsWithFavourites
-        if (!inCroesusRunMenu) return
+        if (!isInCroesusMenu()) return
         slots.forEach {
-            if (it == event.stack.hoverName.formattedTextCompat()) event.stackTip = "§6✪"
+            if (it == event.stack.hoverName.formattedTextCompat()) event.stackTip = "§6✯"
         }
     }
 
@@ -222,7 +208,6 @@ object InstanceChestProfit {
 
     @HandleEvent(InventoryCloseEvent::class)
     fun onInventoryClose() {
-        inCroesusRunMenu = false
         alreadyProcessedChests.clear()
         croesusDisplayList.clear()
         slotsWithFavourites.clear()
@@ -236,6 +221,7 @@ object InstanceChestProfit {
         chestTips.add("${chestType.stackChestName}:")
         var totalPrice = 0.0
         var cost = 0.0
+        var favouriteText = ""
         itemStack?.getLore()?.forEach { loreLine ->
             if (alreadyOpened.matches(loreLine)) return
             if (chestCostCroesus.matches(loreLine) || dungeonChestKey.matches(loreLine)) {
@@ -252,8 +238,11 @@ object InstanceChestProfit {
                     itemInternalName = itemName.toInternalName()
                 }
                 val internalName = itemInternalName
+                var favourited = ""
                 if (profileStorage?.instanceChestFavouriteItems?.contains(internalName) == true) {
                     slotsWithFavourites.add(chestType.stackChestName)
+                    favourited = "§6✯"
+                    favouriteText = "§6Contains Favourited Item"
                 }
                 if (internalName != null) {
                     itemPrice = getPrice(internalName)
@@ -265,7 +254,7 @@ object InstanceChestProfit {
                         itemPrice = -1.0
                     }
                     if (itemPrice != -1.0) {
-                        chestTips.add(" ${internalName.repoItemName}: ${itemPrice.formatCoin()} ")
+                        chestTips.add(" ${internalName.repoItemName}: ${itemPrice.formatCoin()} $favourited")
                         totalPrice += itemPrice
                         chestList.add(internalName)
                     }
@@ -286,8 +275,8 @@ object InstanceChestProfit {
             }
         }
         chestTips.add("Cost: ${cost.formatCoin()}")
-        chestTips.add("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f)")
-        croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, chestTips))
+        chestTips.add("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f) $favouriteText")
+        croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, chestTips, favouriteText))
     }
 
     private fun getPrice(internalName: NeuInternalName): Double = internalName.getPrice(config.priceSource)
@@ -296,8 +285,9 @@ object InstanceChestProfit {
         chestType: CroesusChestType,
         totalValue: Double,
         contents: MutableList<String>,
+        favouriteText: String
     ): Renderable = Renderable.hoverTips(
-        "${chestType.stackChestName}: ${totalValue.formatCoin()}",
+        "${chestType.stackChestName}: ${totalValue.formatCoin()} $favouriteText",
         contents,
     )
 
@@ -433,7 +423,8 @@ object InstanceChestProfit {
                     posLabel = "Instance Chest Profit",
                 )
             }
-        if (config.croesusAllChestsOverlay && inCroesusRunMenu) {
+        if (config.croesusAllChestsOverlay && InventoryUtils.inInventory())
+        if (isInCroesusMenu()){
             config.croesusPosition.renderRenderable(
                 croesusDisplay,
                 posLabel = "Croesus Chest Profit",

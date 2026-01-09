@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -22,6 +23,16 @@ object InstanceChestAPI {
     private val chestFutureProofing by patternGroup.pattern(
         "kuudrachest",
         "(?<chestname>§.(?:Free|Paid))(?: Chest)?",
+    )
+
+    /**
+     * REGEX-TEST: Master Catacombs - Floor II
+     * REGEX-TEST: Catacombs - Floor V
+     * REGEX-TEST: Kuudra - Infernal
+     */
+    private val runNameCroesus by patternGroup.pattern(
+        "runname",
+        ".*Catacombs - Flo.*|Kuudra - .*",
     )
 
     enum class CroesusChestType(val stackChestName: String) {
@@ -49,6 +60,8 @@ object InstanceChestAPI {
             }
         }
     }
+
+    fun isInCroesusMenu() = runNameCroesus.matches(InventoryUtils.openInventoryName())
 
     fun isInstanceChestGUI() = CroesusChestType.getByInventoryName() != null
 
