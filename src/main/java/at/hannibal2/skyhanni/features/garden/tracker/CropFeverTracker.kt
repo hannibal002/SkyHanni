@@ -158,15 +158,19 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5) || blocksBrokenCache.isEmpty()) return
-        blocksBrokenCache.forEach { cache ->
+
+        val iterator = blocksBrokenCache.entries.iterator()
+        while (iterator.hasNext()) {
+            val (key, value) = iterator.next()
             modify { data ->
                 if (isCropFever) {
-                    data.blocksBrokenDuring.addOrPut(cache.key, cache.value)
+                    data.blocksBrokenDuring.addOrPut(key, value)
                 } else {
-                    data.blocksBrokenOutside.addOrPut(cache.key, cache.value)
+                    data.blocksBrokenOutside.addOrPut(key, value)
                 }
-                blocksBrokenCache.remove(cache.key)
             }
+
+            iterator.remove()
         }
     }
 
