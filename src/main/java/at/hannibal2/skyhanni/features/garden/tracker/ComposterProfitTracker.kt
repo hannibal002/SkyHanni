@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.addPriceF
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -35,7 +36,7 @@ import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTimedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
@@ -116,13 +117,15 @@ object ComposterProfitTracker {
     // check for items inserted by clicking on them
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!GardenApi.onBarnPlot) return
         // player inventory slots
-        if (event.slotId >= 54 && composterInventory.isInside()) {
+        if (event.slot?.isTopInventory() == false && composterInventory.isInside()) {
             val item = event.item?.getInternalNameOrNull() ?: return
             val primitiveItem = NeuItems.getPrimitiveMultiplier(item).internalName
             if (primitiveItem !in organicMatter.keys + fuelFactors.keys) return
             // composter will refuse items if full with no warning message
-            validateSlotClick(event.item, event.slotId)
+            val itemCopy = event.item.copy()
+            validateSlotClick(itemCopy, event.item)
             return
         }
         if (event.slotId == 11 && InventoryUtils.openInventoryName().startsWith("Insert ")) {
@@ -184,16 +187,15 @@ object ComposterProfitTracker {
     }
 
     // make sure items clicked on were actually added
-    private fun validateSlotClick(item: ItemStack, slotId: Int) {
+    private fun validateSlotClick(oldItem: ItemStack, newItem: ItemStack) {
         DelayedRun.runDelayed(.5.seconds) {
-            val itemName = item.getInternalNameOrNull() ?: return@runDelayed
-            val amount = item.stackSize
-            val newItem = InventoryUtils.getItemAtSlotNumber(slotId)
-            if (newItem == item) return@runDelayed
-            if (newItem?.getInternalNameOrNull() != itemName) {
+            val itemName = oldItem.getInternalNameOrNull() ?: return@runDelayed
+            val amount = oldItem.count
+            if (newItem == oldItem) return@runDelayed
+            if (newItem.getInternalNameOrNull() != itemName) {
                 addItem(itemName, amount)
             } else {
-                val diff = amount - newItem.stackSize
+                val diff = amount - newItem.count
                 if (diff <= 0) return@runDelayed
                 addItem(itemName, diff)
             }

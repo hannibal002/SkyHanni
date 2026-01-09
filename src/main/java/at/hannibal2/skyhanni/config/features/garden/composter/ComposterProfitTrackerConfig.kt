@@ -15,7 +15,7 @@ class ComposterProfitTrackerConfig {
     @ConfigOption(name = "Enabled", desc = "Track crops spent and compost earned.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    var enabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Only in Composter", desc = "Only show tracker when in the composter menu.")
