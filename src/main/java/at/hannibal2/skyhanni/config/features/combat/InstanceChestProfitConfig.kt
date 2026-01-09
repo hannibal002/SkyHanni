@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.utils.ItemPriceSource
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import org.lwjgl.glfw.GLFW
 
 class InstanceChestProfitConfig {
     // TODO since this feature toggle no longer enables the whole category, it should be renamed
@@ -43,6 +45,14 @@ class InstanceChestProfitConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var croesusHighlight: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Favourite Item Keybind",
+        desc = "Press This Key while Hovering an item in a chest to add it to favourites which will Star chests containing this item in Croesus."
+    )
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigLink(owner = InstanceChestProfitConfig::class, field = "croesusAllChestsOverlay")

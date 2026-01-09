@@ -6,15 +6,18 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.combat.InstanceChestAPI.CroesusChestType
+import at.hannibal2.skyhanni.features.combat.InstanceChestAPI.isInstanceChestGUI
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
@@ -23,6 +26,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -37,7 +41,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhite
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
@@ -114,19 +120,6 @@ object InstanceChestProfit {
         ".*Catacombs - Flo.*|Kuudra - .*",
     )
 
-    /**
-     * REGEX-TEST: §6Paid Chest
-     * REGEX-TEST: §6Paid
-     * REGEX-TEST: §fFree Chest
-     * REGEX-TEST: §fFree
-     */
-    /* Dungeon chests are just the chest Type for example just 'Emerald', Kuudra CURRENTLY has them as Free Chest/Paid Chest in the same UI
-    if the Croesus main UI shows just Paid/Free this regex pattern should be removable mainly
-    if the Croesus UI starts showing like "Emerald Chest" as the Chest Name the Regex should include all the cata chest names too then. */
-    private val chestFutureProofing by patternGroup.pattern(
-        "kuudrachest",
-        "(?<chestname>§.(?:Free|Paid))(?: Chest)?",
-    )
 
     /**
      * REGEX-TEST: §61,000,000 Coins
@@ -158,37 +151,16 @@ object InstanceChestProfit {
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
 
     // TODO replace those three "in chest" booleans with inventory detectors
-    private var inDungeonChest = false
-    private var inKuudraChest = false
     private var inCroesusRunMenu = false
     private var croesusDisplay: Renderable? = null
     private val alreadyProcessedChests = mutableListOf<CroesusChestType>()
     private val croesusDisplayList = mutableListOf<Renderable>()
     private var slotToHighlight: Pair<Int, Double>? = null
+    private var slotsWithFavourites: MutableList<String> = mutableListOf()
     private var chestDisplay: Renderable? = null
     private val chestProfits: MutableMap<String, Double> = mutableMapOf()
+    private val profileStorage get() = ProfileStorageData.profileSpecific
 
-    enum class CroesusChestType(val stackChestName: String) {
-        WOOD("Wood"),
-        GOLD("§6Gold"),
-        DIAMOND("§bDiamond"),
-        EMERALD("§2Emerald"),
-        OBSIDIAN("§5Obsidian"),
-        BEDROCK("§8Bedrock"),
-        FREE("§fFree"),
-        PAID("§6Paid"),
-        ;
-
-        companion object {
-            fun getByStackName(stackName: String): CroesusChestType? {
-                var newStackName = stackName
-                chestFutureProofing.matchMatcher(stackName) {
-                    newStackName = group("chestname")
-                }
-                return entries.firstOrNull { it.stackChestName == newStackName }
-            }
-        }
-    }
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -196,13 +168,6 @@ object InstanceChestProfit {
 
         val name = event.inventoryName
         when {
-            DungeonApi.DungeonChest.getByInventoryName(name) != null && config.enabled -> {
-                inDungeonChest = true
-            }
-
-            KuudraApi.KuudraChest.getByInventoryName(name) != null && config.enabled -> {
-                inKuudraChest = true
-            }
 
             runNameCroesus.matches(name) && (config.croesusHighlight || config.croesusAllChestsOverlay) -> inCroesusRunMenu = true
 
@@ -211,7 +176,7 @@ object InstanceChestProfit {
 
         if (inCroesusRunMenu) {
             event.inventoryItems.forEach { (slot, item) ->
-                val chestType = CroesusChestType.getByStackName(item.hoverName.formattedTextCompat())
+                val chestType = CroesusChestType.getByStackName(item.hoverName.formattedTextCompatLeadingWhite())
                 if (chestType != null) {
                     if (!alreadyProcessedChests.contains(chestType)) {
                         alreadyProcessedChests.add(chestType)
@@ -233,13 +198,39 @@ object InstanceChestProfit {
         }
     }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onRenderItemTip(event: RenderItemTipEvent) {
+        val slots = slotsWithFavourites
+        if (!inCroesusRunMenu) return
+        slots.forEach {
+            if (it == event.stack.hoverName.formattedTextCompat()) event.stackTip = "✪"
+        }
+    }
+
+    @HandleEvent
+    fun onKey(event: GuiKeyPressEvent) {
+        if (!config.keybind.isKeyClicked()) return
+        if (!isInstanceChestGUI()) return
+        val favouriteItems = profileStorage?.instanceChestFavouriteItems ?: mutableListOf()
+        stackUnderCursor()?.getInternalNameOrNull()?.let {
+            ChatUtils.chat("Reached Stack Under Cursor, item ID is $it")
+            if (favouriteItems.contains(it)) {
+                favouriteItems.remove(it)
+                ChatUtils.chat("Removed ${it.repoItemName} from Favourites List.")
+            } else {
+                favouriteItems.add(it)
+                ChatUtils.chat("Added ${it.repoItemName} to Favourites List.")
+            }
+        }
+        profileStorage?.instanceChestFavouriteItems = favouriteItems
+    }
+
     @HandleEvent(InventoryCloseEvent::class)
     fun onInventoryClose() {
-        inDungeonChest = false
-        inKuudraChest = false
         inCroesusRunMenu = false
         alreadyProcessedChests.clear()
         croesusDisplayList.clear()
+        slotsWithFavourites.clear()
         slotToHighlight = null
         croesusDisplay = null
     }
@@ -266,6 +257,7 @@ object InstanceChestProfit {
                     itemInternalName = itemName.toInternalName()
                 }
                 val internalName = itemInternalName
+                if (profileStorage?.instanceChestFavouriteItems?.contains(internalName) == true) slotsWithFavourites.add(chestType.stackChestName)
                 if (internalName != null) {
                     itemPrice = getPrice(internalName)
                     essencePattern.matchMatcher(loreLine) {
@@ -437,7 +429,7 @@ object InstanceChestProfit {
 
     @HandleEvent(GuiRenderEvent::class)
     fun onRenderOverlay() {
-        if (config.enabled && (inDungeonChest || inKuudraChest)) {
+        if (config.enabled && (isInstanceChestGUI())) {
             config.position.renderRenderable(
                 chestDisplay,
                 posLabel = "Instance Chest Profit",

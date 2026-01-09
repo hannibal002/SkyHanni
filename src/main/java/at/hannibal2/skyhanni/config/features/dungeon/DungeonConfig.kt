@@ -205,7 +205,7 @@ class DungeonConfig {
     var dungeonSecretCompass: Boolean = true
 
     @ConfigOption(
-        name = "§cInstance Chest Profit",
+        name = "Instance Chest Profit",
         desc = "click the button to jump to Dungeon Chest Profit/Croesus Profit Settings.",
     )
     @ConfigEditorButton(buttonText = "Go")
