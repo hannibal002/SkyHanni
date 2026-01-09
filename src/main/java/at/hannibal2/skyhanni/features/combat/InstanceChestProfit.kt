@@ -275,7 +275,7 @@ object InstanceChestProfit {
             }
         }
         chestTips.add("Cost: ${cost.formatCoin()}")
-        chestTips.add("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f) $favouriteText")
+        chestTips.add("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f) ")
         croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, chestTips, favouriteText))
     }
 
