@@ -329,11 +329,11 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetcropfevertracker") {
+        event.registerBrigadier("shresetcropfevertracker") {
             aliases = listOf("shresetcft")
             description = "Resets the Crop Fever Tracker"
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }
