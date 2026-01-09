@@ -157,7 +157,7 @@ object InstanceChestProfit {
     private val alreadyProcessedChests = mutableListOf<CroesusChestType>()
     private val croesusDisplayList = mutableListOf<Renderable>()
     private var slotToHighlight: Pair<Int, Double>? = null
-    private var slotsWithFavourites: MutableList<String> = mutableListOf()
+    private val slotsWithFavourites: MutableList<String> = mutableListOf()
     private var chestDisplay: Renderable? = null
     private val chestProfits: MutableMap<String, Double> = mutableMapOf()
     private val profileStorage get() = ProfileStorageData.profileSpecific
