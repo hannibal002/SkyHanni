@@ -69,11 +69,6 @@ class GardenConfig {
     val gardenLevels: GardenLevelConfig = GardenLevelConfig()
 
     @Expose
-    @ConfigOption(name = "Farming Weight", desc = "")
-    @Accordion
-    val eliteFarmingWeights: EliteFarmingWeightConfig = EliteFarmingWeightConfig()
-
-    @Expose
     @ConfigOption(name = "Money per Hour", desc = "")
     @Accordion
     val moneyPerHours: MoneyPerHourConfig = MoneyPerHourConfig()
