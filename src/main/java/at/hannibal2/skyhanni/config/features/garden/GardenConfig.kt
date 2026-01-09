@@ -70,11 +70,6 @@ class GardenConfig {
     val gardenLevels: GardenLevelConfig = GardenLevelConfig()
 
     @Expose
-    @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")
-    @Accordion
-    val dicerRngDropTracker: DicerRngDropTrackerConfig = DicerRngDropTrackerConfig()
-
-    @Expose
     @ConfigOption(name = "Crop Collection Tracker", desc = "Crop Collection Tracker Settings")
     @Accordion
     val cropCollectionTracker: CropCollectionsConfig = CropCollectionsConfig()
@@ -163,6 +158,16 @@ class GardenConfig {
     val trackerUptimeSettings: GardenTrackerUptimeConfig = GardenTrackerUptimeConfig()
 
     @Expose
+    @ConfigOption(name = "Hoe Levels Display", desc = "")
+    @Accordion
+    val hoeLevelDisplay: HoeLevelsDisplayConfig = HoeLevelsDisplayConfig()
+
+    @Expose
+    @ConfigOption(name = "DNA Analyzer Solver", desc = "")
+    @Accordion
+    val dnaAnalyzerSolver: DnaAnalyzerSolverConfig = DnaAnalyzerSolverConfig()
+
+    @Expose
     @ConfigOption(
         name = "Plot Price",
         desc = "Show the price of the plot in coins when inside the Configure Plots inventory.",
@@ -170,12 +175,6 @@ class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var plotPrice: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var fungiCutterWarn: Boolean = true
 
     @Expose
     @ConfigOption(

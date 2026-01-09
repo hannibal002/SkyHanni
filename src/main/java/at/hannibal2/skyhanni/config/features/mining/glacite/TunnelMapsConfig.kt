@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class TunnelMapsConfig {
     @Expose
@@ -41,8 +41,8 @@ class TunnelMapsConfig {
         name = "Campfire Hotkey",
         desc = "Hotkey to warp to the campfire. If the travel scroll is not unlocked, show a path to the campfire instead."
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var campfireKey: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var campfireKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -54,8 +54,8 @@ class TunnelMapsConfig {
 
     @Expose
     @ConfigOption(name = "Next Spot Hotkey", desc = "Hotkey to select the next spot.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var nextSpotHotkey: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var nextSpotHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Left Click Pigeon", desc = "Left click the Royal Pigeon to go to the next spot.")

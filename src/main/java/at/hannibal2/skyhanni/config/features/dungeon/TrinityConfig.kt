@@ -10,14 +10,14 @@ class TrinityConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Sends a title when Trinity is likely to appear on dungeon (when there are 5 puzzles).",
+        desc = "Sends a title when Trinity is likely to appear in the dungeon (when there are 5 puzzles).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Notify party", desc = "Automatically send message to party to watch out for Trinity.")
+    @ConfigOption(name = "Notify Party", desc = "Automatically send a message to the party to watch out for Trinity.")
     @ConfigEditorBoolean
     var sendPartyChat: Boolean = false
 

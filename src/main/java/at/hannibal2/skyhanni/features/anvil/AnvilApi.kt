@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -29,15 +29,15 @@ object AnvilApi {
         DelayedRun.runNextTick {
             if (!inventory.isInside()) return@runNextTick
             for (slot in InventoryUtils.getItemsInOpenChestWithNull()) {
-                if (slot.slotNumber == 29) {
-                    val left = slot.stack.orNull()
+                if (slot.index == 29) {
+                    val left = slot.item.orNull()
                     if (this.left?.getInternalName() != left?.getInternalName()) {
                         this.left = left
                         postEvent()
                     }
                 }
-                if (slot.slotNumber == 33) {
-                    val right = slot.stack.orNull()
+                if (slot.index == 33) {
+                    val right = slot.item.orNull()
                     if (this.right?.getInternalName() != right?.getInternalName()) {
                         this.right = right
                         postEvent()

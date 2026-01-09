@@ -66,7 +66,7 @@ object ChangelogViewer {
     }
 
     private fun openChangelog() {
-        if (Minecraft.getMinecraft().currentScreen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen = ChangeLogViewerScreen()
+        if (Minecraft.getInstance().screen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen = ChangeLogViewerScreen()
     }
 
     private suspend fun getChangelog() {
@@ -137,7 +137,7 @@ object ChangelogViewer {
             description = "Shows the specified changelog. No arguments shows the latest changelog."
             category = CommandCategory.USERS_ACTIVE
             //#if TODO
-            context = { CommandContext() }
+            //$$ context = { CommandContext() }
             //#endif
             specifiers = listOf(
                 CommandArgument(

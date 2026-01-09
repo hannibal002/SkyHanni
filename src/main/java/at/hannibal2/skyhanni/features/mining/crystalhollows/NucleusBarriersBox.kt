@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
 object NucleusBarriersBox {
@@ -25,7 +25,7 @@ object NucleusBarriersBox {
     private var inNucleus = false
 
     private enum class Crystal(
-        val boundingBox: AxisAlignedBB,
+        val boundingBox: AABB,
         val configColorOption: Property<ChromaColour>,
     ) {
         AMBER(

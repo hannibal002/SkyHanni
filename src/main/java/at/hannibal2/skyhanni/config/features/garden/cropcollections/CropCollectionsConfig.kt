@@ -52,7 +52,7 @@ class CropCollectionsConfig {
         FARMING("From Farming: 8,111,881"),
         BREAKING_CROPS("- Breaking Crops: 4,111,987"),
         MOOSHROOM_COW("- Mooshroom Cow: 123,812"),
-        DICER("- Dicer Drops: 178,991"),
+        CROP_FEVER("- Crop Fever Drops: 178,991"),
         PESTS("From Pests: 3,455,192"),
         PEST_RNG("- Pest Crop RNG: 211,192"),
         PEST_BASE("- Pest Base Drops: 129,128"),

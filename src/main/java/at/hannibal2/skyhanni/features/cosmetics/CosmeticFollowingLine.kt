@@ -76,7 +76,7 @@ object CosmeticFollowingLine {
         val playerLocation = event.exactLocation(MinecraftCompat.localPlayer).up(0.3)
 
         latestLocations = latestLocations.editCopy {
-            val locationSpot = LocationSpot(SimpleTimeMark.now(), MinecraftCompat.localPlayer.onGround)
+            val locationSpot = LocationSpot(SimpleTimeMark.now(), MinecraftCompat.localPlayer.onGround())
             this[playerLocation] = locationSpot
             values.removeIf { it.time.passedSince() > 600.milliseconds }
         }
@@ -122,7 +122,7 @@ object CosmeticFollowingLine {
             }
 
             locations = locations.editCopy {
-                this[playerLocation] = LocationSpot(SimpleTimeMark.now(), MinecraftCompat.localPlayer.onGround)
+                this[playerLocation] = LocationSpot(SimpleTimeMark.now(), MinecraftCompat.localPlayer.onGround())
             }
         }
     }
