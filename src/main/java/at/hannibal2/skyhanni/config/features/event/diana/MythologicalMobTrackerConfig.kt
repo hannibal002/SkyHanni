@@ -28,4 +28,12 @@ class MythologicalMobTrackerConfig {
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat messages when digging up a mythological mob.")
     @ConfigEditorBoolean
     var hideChat: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Black Hole Title",
+        desc = "Sends \"Black Hole\" title when a Cretan Bull, Harpy, or Minotaur spawns",
+    )
+    @ConfigEditorBoolean
+    var shardWarn: Boolean = false
 }

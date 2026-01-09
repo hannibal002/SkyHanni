@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -26,6 +25,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
@@ -135,14 +135,14 @@ object PowderTracker {
     }
 
     private val tracker =
-        SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker }) { formatDisplay(drawDisplay(it)) }
+        SkyHanniTracker("Powder Tracker", ::Data, { it.powderTracker }) { formatDisplay(drawDisplay(it)) }
 
     data class Data(
         @Expose var totalChestPicked: Long = 0,
         @Expose var totalHardStoneCompacted: Long = 0,
         // TODO remove this field and transform this into a ItemProfitTracker
         @Expose var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf(),
-    ) : Resettable
+    ) : TrackerData()
 
     init {
         tracker.initRenderer({ config.position }) { shouldShowDisplay() }

@@ -21,10 +21,13 @@ internal enum class FFInfos(
         },
     ),
     FARMING_LEVEL(UNIVERSAL, { FFStats.baseFF }, FFTypes.FARMING_LVL, 240),
+    ATTRIBUTE_SHARDS(UNIVERSAL, { FFStats.baseFF }, FFTypes.ATTRIBUTE_SHARDS, 90),
     BESTIARY(UNIVERSAL, { FFStats.baseFF }, FFTypes.BESTIARY, 66),
     GARDEN_PLOTS(UNIVERSAL, { FFStats.baseFF }, FFTypes.PLOTS, 72),
     ANITA_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.ANITA, 60),
     COMMUNITY_SHOP(UNIVERSAL, { FFStats.baseFF }, FFTypes.COMMUNITY_SHOP, 40),
+    DARK_CACAO_TRUFFLE(UNIVERSAL, { FFStats.baseFF }, FFTypes.DARK_CACAO_TRUFFLE, 5),
+    RELIC_OF_POWER(UNIVERSAL, { FFStats.baseFF }, FFTypes.RELIC_OF_POWER, 5),
     CAKE_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.CAKE, 5),
     TOTAL_ARMOR(UNIVERSAL, { FarmingItemType.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.TOTAL),
     BASE_ARMOR(

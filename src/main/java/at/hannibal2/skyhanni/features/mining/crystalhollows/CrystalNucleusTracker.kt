@@ -57,7 +57,7 @@ object CrystalNucleusTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Crystal Nucleus Tracker",
-        { Data() },
+        ::Data,
         { it.mining.crystalNucleusTracker },
     ) { drawDisplay(it) }
 
@@ -177,7 +177,8 @@ object CrystalNucleusTracker {
                 ).toSearchable(),
             )
 
-            add(tracker.addTotalProfit(profit, data.runsCompleted, "run"))
+            val duration = data.getTotalUptime()
+            addAll(tracker.addTotalProfit(profit, data.runsCompleted, "run", duration, "Runs"))
         } else {
             addSearchString("§7Do a run to start tracking!")
         }
@@ -198,7 +199,7 @@ object CrystalNucleusTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() },
+            condition = ::isEnabled,
             onRender = {
                 tracker.renderDisplay(config.position)
             },

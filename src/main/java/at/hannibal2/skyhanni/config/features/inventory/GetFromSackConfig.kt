@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class GetFromSackConfig {
     // TODO rename to queued
@@ -49,6 +49,6 @@ class GetFromSackConfig {
         name = "GfS Keybind",
         desc = "Fills your inventory with the item you are hovering over."
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var keybind: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
 }

@@ -55,4 +55,19 @@ class CustomGoalConfig {
     @ConfigOption(name = "Mushroom", desc = "")
     @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
     val mushroom: Property<Float> = Property.of(46f)
+
+    @Expose
+    @ConfigOption(name = "Moonflower", desc = "")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
+    val moonflower: Property<Float> = Property.of(46f)
+
+    @Expose
+    @ConfigOption(name = "Sunflower", desc = "")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
+    val sunflower: Property<Float> = Property.of(46f)
+
+    @Expose
+    @ConfigOption(name = "Wild Rose", desc = "")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 46f, minStep = 1f)
+    val rose: Property<Float> = Property.of(46f)
 }

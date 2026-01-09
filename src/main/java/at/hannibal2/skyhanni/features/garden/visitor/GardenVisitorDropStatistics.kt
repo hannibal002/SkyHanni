@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -35,6 +34,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonPrimitive
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -151,7 +151,7 @@ object GardenVisitorDropStatistics {
         if (!ProfileStorageData.loaded) return
         if (lastAccept.passedSince() > 1.seconds) return
 
-        val message = event.message.removeColor().trim()
+        val message = event.cleanMessage.trim()
         val storage = GardenApi.storage?.visitorDrops ?: return
 
         patternStorageAccessorMap.forEach { (pattern, accessor) ->
@@ -328,6 +328,13 @@ object GardenVisitorDropStatistics {
             }
 
             ConfigManager.gson.toJsonTree(map, MutableMap::class.java)
+        }
+
+        event.transform(113, "${newPrefix}textFormat") { element ->
+            element.asJsonArray.apply {
+                add(JsonPrimitive("HYPERCHARGE_CHIP"))
+                add(JsonPrimitive("QUICKDRAW_CHIP"))
+            }
         }
     }
 

@@ -161,7 +161,7 @@ object SunGeckoHelper {
             if (currentBoss == null) {
                 currentBoss = mob
             } else {
-                if (currentBoss?.baseEntity?.isEntityAlive == false ||
+                if (currentBoss?.baseEntity?.isAlive == false ||
                     (currentBoss?.health?.toInt() ?: 0) < 20
                 ) {
                     currentBoss = mob
@@ -176,7 +176,7 @@ object SunGeckoHelper {
 
         updateDisplay()
 
-        if (currentBoss?.baseEntity?.isEntityAlive == false) {
+        if (currentBoss?.baseEntity?.isAlive == false) {
             currentBoss = null
         }
 

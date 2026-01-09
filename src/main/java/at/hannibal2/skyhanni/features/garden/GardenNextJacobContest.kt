@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
@@ -53,7 +54,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -90,10 +91,10 @@ object GardenNextJacobContest {
         contest.crops.contains(cropName) && config.otherGuis
     } ?: false
 
-    fun resetContestData() {
+    fun resetContestData(force: Boolean = false) {
         knownContests = listOf()
         fetchedFromElite = false
-        lastFetchAttempted = SimpleTimeMark.farPast()
+        if (force) lastFetchAttempted = SimpleTimeMark.farPast()
         fetchContestsIfAble()
     }
 
@@ -255,7 +256,7 @@ object GardenNextJacobContest {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) return@mapNotNull null
 
-            val day = dayPattern.matchMatcher(item.displayName) {
+            val day = dayPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 group("day").toInt()
             } ?: return@mapNotNull null
 
@@ -300,7 +301,7 @@ object GardenNextJacobContest {
         if (config.shareAutomatically == ShareContestsEntry.ASK) {
             ChatUtils.clickableChat(
                 "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
-                onClick = { shareContests() },
+                onClick = ::shareContests,
                 "§eClick to submit!",
                 oneTimeClick = true,
             )
@@ -431,7 +432,7 @@ object GardenNextJacobContest {
         val cropTextNoColor = crops.joinToString(", ") {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
-        if (config.warnPopup && !Minecraft.getMinecraft().inGameHasFocus) {
+        if (config.warnPopup && !Minecraft.getInstance().isWindowActive) {
             SkyHanniMod.launchCoroutine("garden jacob contest openPopupWindow") {
                 DialogUtils.openPopupWindow(
                     title = "SkyHanni Jacob Contest Notification",
@@ -530,5 +531,13 @@ object GardenNextJacobContest {
         val base = "garden.jacobContest.nextContest"
         event.move(101, "misc.inventoryLoadPos", "$base.inventoryPosition")
         event.move(101, "$base.pos", "$base.position")
+
+        event.transform(111, "$base.warnFor") { element ->
+            element.asJsonArray.apply {
+                add(JsonPrimitive(CropType.SUNFLOWER.name))
+                add(JsonPrimitive(CropType.MOONFLOWER.name))
+                add(JsonPrimitive(CropType.WILD_ROSE.name))
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,7 +36,7 @@ object IsFishingDetection {
         }
 
         if (lastInAreaTime.passedSince() < 5.seconds) {
-            if (EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(5.0)
+            if (EntityUtils.getEntitiesNextToPlayer<ArmorStand>(5.0)
                     .filter { FishingApi.seaCreatureCount(it) > 0 }.any()
             ) {
                 lastSeaCreatureKillArea = LocationUtils.playerLocation()

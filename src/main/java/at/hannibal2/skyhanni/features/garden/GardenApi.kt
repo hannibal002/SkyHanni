@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
+import at.hannibal2.skyhanni.features.garden.CropType.Companion.isTimeFlower
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.checkCurrentPlot
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
@@ -43,12 +44,13 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
-import net.minecraft.item.ItemStack
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.AABB
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
@@ -60,12 +62,14 @@ object GardenApi {
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
+    var lastBrokenCropType: CropType? = null
     var pestCooldownEndTime = SimpleTimeMark.farPast()
     var lastCropBrokenTime = SimpleTimeMark.farPast()
     val mushroomCowPet
         get() = CurrentPetApi.isCurrentPetOrHigherRarity(RARE_MOOSHROOM_COW_PET_ITEM)
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
+    val onUnfarmablePlot get() = inGarden() && (inBarn || GardenPlotApi.inGreenhouse())
     val storage get() = ProfileStorageData.profileSpecific?.garden
     val config get() = SkyHanniMod.feature.garden
     var totalAmountVisitorsExisting = 0
@@ -77,20 +81,12 @@ object GardenApi {
             }
         }
     private val cropIconCache = TimeLimitedCache<String, ItemStack>(10.minutes)
-    private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
+    val barnArea = AABB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
-    // TODO USE SH-REPO
-    private val otherToolsList = listOf(
-        "BASIC_GARDENING_HOE",
-        "ADVANCED_GARDENING_AXE",
-        "BASIC_GARDENING_AXE",
-        "ADVANCED_GARDENING_HOE",
-        "ROOKIE_HOE",
-        "BINGHOE",
-    )
+    private var extraFarmingTools: Set<NeuInternalName> = setOf()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSendPacket(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
         checkItemInHand()
     }
 
@@ -110,9 +106,10 @@ object GardenApi {
         if (!inGarden()) return
         if (event.isMod(10, 1)) {
             inBarn = barnArea.isPlayerInside()
+            if (cropInHand.isTimeFlower()) checkItemInHand()
 
             // We ignore random hypixel moments
-            Minecraft.getMinecraft().currentScreen ?: return
+            Minecraft.getInstance().screen ?: return
             checkItemInHand()
         }
     }
@@ -151,7 +148,7 @@ object GardenApi {
         val toolItem = InventoryUtils.getItemInHand()
         val crop = toolItem?.getCropType()
         val newTool = getToolInHand(toolItem, crop)
-        if (itemInHand?.getItemUuid() != toolItem?.getItemUuid() && !(toolInHand == null && newTool == null)) {
+        if (itemInHand?.getItemUuid() != toolItem?.getItemUuid() || crop != cropInHand && !(toolInHand == null && newTool == null)) {
             toolInHand = newTool
             cropInHand = crop
             itemInHand = toolItem
@@ -166,9 +163,8 @@ object GardenApi {
         return if (isOtherTool(internalName)) internalName.asString() else null
     }
 
-    private fun isOtherTool(internalName: NeuInternalName): Boolean {
-        return internalName.asString() in otherToolsList
-    }
+    private fun isOtherTool(internalName: NeuInternalName): Boolean =
+        internalName in extraFarmingTools
 
     fun inGarden() = IslandType.GARDEN.isCurrent()
 
@@ -181,14 +177,14 @@ object GardenApi {
 
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
+        if (internalName.startsWith("THEORETICAL_HOE_SUNFLOWER")) {
+            return CropType.getTimeFlower()
+        }
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
-    fun readCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter()
-
-    fun readHoeCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter()
-
-    fun readCultivatingCounter(itemStack: ItemStack): Long? = itemStack.getCultivatingCounter()
+    fun readCounter(itemStack: ItemStack): Long? =
+        itemStack.getCultivatingCounter() ?: itemStack.getHoeExp() ?: itemStack.getOldHoeCounter()
 
     fun CropType.getItemStackCopy(iconId: String): ItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
 
@@ -211,7 +207,7 @@ object GardenApi {
 
     fun getCurrentlyFarmedCrop(): CropType? {
         val brokenCrop = if (toolInHand != null) GardenCropSpeed.lastBrokenCrop else null
-        return cropInHand ?: brokenCrop
+        return lastBrokenCropType ?: cropInHand ?: brokenCrop
     }
 
     private var lastLocation: LorenzVec? = null
@@ -219,7 +215,7 @@ object GardenApi {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
         val blockState = event.getBlockState
-        val cropBroken = blockState.getCropType() ?: return
+        val cropBroken = blockState.getCropType(event.position) ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
 
         val position = event.position
@@ -279,6 +275,7 @@ object GardenApi {
         val data = event.getConstant<GardenJson>("Garden")
         gardenExperience = data.gardenExp
         totalAmountVisitorsExisting = data.visitors.size
+        extraFarmingTools = data.extraFarmingTools
     }
 
     private var gardenExperience = listOf<Int>()

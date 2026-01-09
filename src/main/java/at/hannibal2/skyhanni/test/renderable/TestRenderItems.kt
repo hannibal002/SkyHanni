@@ -16,10 +16,10 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
-import net.minecraft.util.EnumFacing
+import net.minecraft.core.Direction
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule(devOnly = true)
 object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
@@ -29,7 +29,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
     private val animationFrames = listOf(ItemStackAnimationFrame(boxOfSeedsProvider, ticks = 0))
 
     private val spinningStacks by lazy {
-        EnumFacing.Axis.entries.map {
+        Direction.Axis.entries.map {
             val rotationDef = ItemStackRotationDefinition(
                 axis = it,
                 rotationSpeed = 65.0,
@@ -55,8 +55,8 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
         val labels = scaleList.map { Renderable.text(it.roundTo(1).toString()) }
 
         val items = listOf(
-            ItemStack(Blocks.glass_pane), ItemStack(Items.diamond_sword), ItemStack(Items.skull),
-            ItemStack(Blocks.melon_block),
+            ItemStack(Blocks.GLASS_PANE), ItemStack(Items.DIAMOND_SWORD), ItemStack(Items.PLAYER_HEAD),
+            ItemStack(Blocks.MELON),
         ).map { item ->
             scaleList.map { Renderable.item(item, it, 0).renderBounds() }
         } + listOf(scaleList.map { Renderable.item(bambooProvider, it, 0).renderBounds() })
@@ -69,7 +69,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
                     table(tableContent),
                     horizontal(
                         text("Default:").renderBounds(),
-                        item(ItemStack(Items.diamond_sword)).renderBounds(),
+                        item(ItemStack(Items.DIAMOND_SWORD)).renderBounds(),
                         spacing = 1,
                     ),
                 ),

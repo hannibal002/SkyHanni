@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
@@ -59,7 +60,6 @@ object PageScrolling {
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
-        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return
         if (!currentlyScrollable && cooldown.isInFuture()) return
         if (!scroll.isMouseEventValid()) return
 
@@ -75,9 +75,9 @@ object PageScrolling {
         if (dWheel == 0) return
         val patterns = if ((dWheel > 0) xor config.invertScroll) forwardPattern else backwardPattern
         val slot = InventoryUtils.getItemsInOpenChest().firstOrNull {
-            patterns.matches(it.stack?.displayName)
+            patterns.matches(it.item?.hoverName.formattedTextCompatLeadingWhiteLessResets())
         } ?: return
-        InventoryUtils.clickSlot(slot.slotNumber)
+        InventoryUtils.clickSlot(slot.index)
 
         currentlyScrollable = false
         cooldown = 1.0.seconds.fromNow()
