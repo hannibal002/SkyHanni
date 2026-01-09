@@ -455,10 +455,6 @@ class ProfileSpecificStorage(
         @Expose
         var toolCounterData: MutableMap<String, Long> = HashMap()
 
-        // have to store both counters for wheat tools to calculate seed drops
-        @Expose
-        var wheatCultivatingCounterData: MutableMap<String, Long> = HashMap()
-
         @Expose
         var cropUpgrades: MutableMap<CropType, Int> = enumMapOf()
 

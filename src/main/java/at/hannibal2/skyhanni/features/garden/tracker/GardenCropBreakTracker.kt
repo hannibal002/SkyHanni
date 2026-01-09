@@ -15,12 +15,11 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenApi.lastBrokenCropType
 import at.hannibal2.skyhanni.features.garden.GardenApi.readCounter
-import at.hannibal2.skyhanni.features.garden.GardenApi.readCultivatingCounter
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay.SEEDS
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import net.minecraft.world.item.ItemStack
 import kotlin.math.floor
 import kotlin.random.Random
@@ -43,7 +42,7 @@ object GardenCropBreakTracker {
         heldItem = event.toolItem
         if (event.toolItem == null || event.toolInHand == null) return
         val counter = readCounter(event.toolItem)
-        itemHasBountiful = event.toolItem.displayName.removeColor().startsWith("Bountiful")
+        itemHasBountiful = event.toolItem.getReforgeModifier() == "bountiful"
 
         if (counter == null) {
             itemHasCounter = false
@@ -54,11 +53,6 @@ object GardenCropBreakTracker {
 
         val uuid = event.toolItem.getItemUuid() ?: return
         counterData?.put(uuid, counter)
-
-        if (event.toolItem.getCropType() == CropType.WHEAT) {
-            val cultivatingCounter = readCultivatingCounter(event.toolItem) ?: return
-            storage?.wheatCultivatingCounterData?.put(uuid, cultivatingCounter)
-        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -94,30 +88,16 @@ object GardenCropBreakTracker {
 
         // cult counts both seeds and wheat so we have to split it, ratio is 1 wheat : 1.5 seeds
         if (crop == CropType.WHEAT) {
+            val seeds = (addedCounter * .6f).toInt()
+            if (itemHasBountiful) bountifulCoins += seeds * .2
+
+            seedAmount += seeds
             addedCounter = (addedCounter * .4f).toLong()
         }
 
         addToCropMap(crop, addedCounter.toInt())
         if (itemHasBountiful) bountifulCoins += addedCounter * .2
         counterData?.set(uuid, counter)
-
-        // handle seeds
-        if (item.getCropType() == CropType.WHEAT) {
-            val cultCounter = readCultivatingCounter(event.itemStack) ?: return
-            val oldCult = storage?.wheatCultivatingCounterData?.get(uuid) ?: return
-            val addedCult = if (cultCounter < 0 && oldCult > 0) {
-                // 32 bit overflow protection
-                cultCounter + 4_294_967_296 - oldCult
-            } else {
-                cultCounter - oldCult
-            }
-
-            val seedDiff = addedCult - addedCounter
-            seedAmount += seedDiff.toInt()
-            if (itemHasBountiful) bountifulCoins += seedDiff * .2
-
-            storage?.wheatCultivatingCounterData?.set(uuid, cultCounter)
-        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

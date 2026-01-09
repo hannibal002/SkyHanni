@@ -7,9 +7,11 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.GardenProfitTrackerConfig
 import at.hannibal2.skyhanni.config.features.garden.GardenProfitTrackerConfig.GardenProfitTextEntry
 import at.hannibal2.skyhanni.config.features.garden.GardenProfitTrackerConfig.HarvestedCropsMode
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
@@ -102,6 +104,14 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
             else -> null
         }
         if (name != null) addItem(GardenTrackerTypes.CONSUMABLES, name, -1, false)
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onItemGain(event: ItemAddEvent) {
+        if (!GardenApi.isCurrentlyFarming()) return
+        val RAREFINDER = "RAREFINDER_GARDEN_CHIP".toInternalName()
+        if (event.internalName != RAREFINDER) return
+        addItem(GardenTrackerTypes.BREAKING_CROPS, RAREFINDER, 1, false)
     }
 
     class TimeData : TimedTrackerData<BucketData>({ BucketData() })
@@ -426,7 +436,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
                 var bountifulCoins = 0L
                 val itemList = data.cropCollection.map {
                     val eligibleTypes =
-                        setOf(CropCollectionType.BREAKING_CROPS, CropCollectionType.MOOSHROOM_COW, CropCollectionType.DICER)
+                        setOf(CropCollectionType.BREAKING_CROPS, CropCollectionType.MOOSHROOM_COW, CropCollectionType.CROP_FEVER)
                     val cropAmount =
                         it.value.cropCollectionType.filter { type -> type.key in eligibleTypes }.sumAllValues().toLong()
                     bountifulCoins += ((it.value.cropCollectionType[CropCollectionType.BREAKING_CROPS] ?: 0L) * .2).toLong()
