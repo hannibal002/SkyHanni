@@ -52,7 +52,8 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
     getStorage,
     extraDisplayModes,
     drawDisplay = drawDisplay,
-    customUptimeControl = customUptimeControl) {
+    customUptimeControl = customUptimeControl
+) {
 
     companion object {
         private val config get() = SkyHanniMod.feature.misc.tracker
