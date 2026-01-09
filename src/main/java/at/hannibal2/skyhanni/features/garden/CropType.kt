@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ServerTime
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import net.minecraft.world.item.ItemStack
@@ -24,12 +24,12 @@ enum class CropType(
     val eliteLbName: String = simpleName,
     val internalName: NeuInternalName = cropName.replace(" ", "_").toInternalName(),
     val compactedName: NeuInternalName = "Enchanted_${internalName.asString()}".toInternalName(),
-    val superCompactedName: NeuInternalName = "Compacted_${internalName.asString()}".toInternalName()
+    val superCompactedName: NeuInternalName = "Compacted_${internalName.asString()}".toInternalName(),
 ) {
 
     WHEAT(
         "Wheat", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0,
-        { ItemStack(Items.WHEAT) }, "wheat", FarmingItemType.WHEAT, superCompactedName = "ENCHANTED_HAY_BALE".toInternalName()
+        { ItemStack(Items.WHEAT) }, "wheat", FarmingItemType.WHEAT, superCompactedName = "ENCHANTED_HAY_BALE".toInternalName(),
     ),
     CARROT(
         "Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0,
@@ -39,47 +39,48 @@ enum class CropType(
     POTATO(
         "Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0,
         { ItemStack(Items.POTATO) }, "potato", FarmingItemType.POTATO,
-        superCompactedName = "ENCHANTED_BAKED_POTATO".toInternalName(), replenish = true, internalName = "POTATO_ITEM".toInternalName()
+        superCompactedName = "ENCHANTED_BAKED_POTATO".toInternalName(), replenish = true, internalName = "POTATO_ITEM".toInternalName(),
     ),
     NETHER_WART(
         "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
         { ItemStack(Items.NETHER_WART) }, "wart", FarmingItemType.NETHER_WART,
         superCompactedName = "MUTANT_NETHER_STALK".toInternalName(), replenish = true, enchantName = "warts", eliteLbName = "netherwart",
-        internalName = "nether_stalk".toInternalName()
+        internalName = "nether_stalk".toInternalName(),
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
         { ItemStack(Blocks.CARVED_PUMPKIN) }, "pumpkin", FarmingItemType.PUMPKIN,
-        superCompactedName = "POLISHED_PUMPKIN".toInternalName()
+        superCompactedName = "POLISHED_PUMPKIN".toInternalName(),
     ),
     MELON(
         "Melon Slice", "MELON_DICER", "SQUASH", 5.0,
         { ItemStack(Items.MELON_SLICE) }, "melon", FarmingItemType.MELON,
-        superCompactedName = "ENCHANTED_MELON_BLOCK".toInternalName(), internalName = "MELON".toInternalName()
+        superCompactedName = "ENCHANTED_MELON_BLOCK".toInternalName(), internalName = "MELON".toInternalName(),
     ),
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
         { DyeCompat.BROWN.createStack() }, "cocoa",
         FarmingItemType.COCOA_BEANS, superCompactedName = "ENCHANTED_COOKIE".toInternalName(), replenish = true, enchantName = "coco",
-       compactedName = "ENCHANTED_COCOA".toInternalName()
+        compactedName = "ENCHANTED_COCOA".toInternalName(),
     ),
     SUGAR_CANE(
         "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
         { ItemStack(Items.SUGAR_CANE) }, "cane", FarmingItemType.SUGAR_CANE,
         superCompactedName = "ENCHANTED_SUGAR_CANE".toInternalName(), enchantName = "cane", eliteLbName = "sugarcane",
-        compactedName = "ENCHANTED_SUGAR".toInternalName()
+        compactedName = "ENCHANTED_SUGAR".toInternalName(),
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
         { ItemStack(Blocks.CACTUS) }, "cactus", FarmingItemType.CACTUS, superCompactedName = "ENCHANTED_CACTUS".toInternalName(),
-        compactedName = "ENCHANTED_CACTUS_GREEN".toInternalName()
+        compactedName = "ENCHANTED_CACTUS_GREEN".toInternalName(),
     ),
+
     // choice of red over brown is entirely arbitrary
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
         { ItemStack(Blocks.RED_MUSHROOM_BLOCK) }, "mushroom", FarmingItemType.MUSHROOM,
         superCompactedName = "ENCHANTED_HUGE_MUSHROOM_2".toInternalName(), enchantName = "mushrooms",
-        internalName = "red_mushroom".toInternalName()
+        internalName = "red_mushroom".toInternalName(),
     ),
     SUNFLOWER(
         "Sunflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,

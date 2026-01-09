@@ -60,7 +60,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
     { it.garden.gardenProfitTracker },
     drawDisplay = { drawDisplay(it) },
     trackerConfig = { SkyHanniMod.feature.garden.profitTracker.perTrackerConfig },
-    customUptimeControl = true
+    customUptimeControl = true,
 ) {
     val config get() = GardenApi.config.profitTracker
     val BITS = "skyblock_bit".toInternalName()
@@ -80,7 +80,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
             config.coinsPerCopper,
             config.useNpcPrice,
             config.includeHarvestedCrops,
-            config.compactMode
+            config.compactMode,
         ) {
             update()
         }
@@ -121,14 +121,14 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
         @Expose var visitorCoinsSpent: Long = 0L,
         @Expose var composterCoinsSpent: Long = 0L,
         @Expose var sprayCoinsSpent: Long = 0L,
-        @Expose var blocksBroken: Long = 0L
+        @Expose var blocksBroken: Long = 0L,
     ) : BucketedItemTrackerData<GardenTrackerTypes, SessionUptime.Garden>(GardenTrackerTypes::class, SessionUptime.Garden::class) {
         private val baseCrops: Set<NeuInternalName> =
             CropType.entries.map { it.internalName }.toSet() + SEEDS + SKYBLOCK_COIN
 
         override fun getDescription(bucket: GardenTrackerTypes?, timesGained: Long): List<String> {
             return listOf(
-                "§7You have gained this §e${timesGained.addSeparators()} times."
+                "§7You have gained this §e${timesGained.addSeparators()} times.",
             )
         }
 
@@ -152,7 +152,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
                 timesGained = value.timesGained,
                 totalAmount = amount.toLong(),
                 hidden = value.hidden,
-                lastTimeUpdated = value.lastTimeUpdated
+                lastTimeUpdated = value.lastTimeUpdated,
             )
             acc.merge(neuInternalName, trackedItem, ::mergeBuckets)
         }
@@ -183,7 +183,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
                                     // handling for skyblock coins
                                     acc.merge(key, value, ::mergeBuckets)
                                     return@forEach
-                                }                                
+                                }
                                 val compactedCrop = when (config.compactMode.get()) {
                                     HarvestedCropsMode.BASE -> crop.internalName
                                     HarvestedCropsMode.COMPACTED -> crop.compactedName
@@ -209,6 +209,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
                 COPPER -> config.coinsPerCopper.get().toDouble()
                 in npcSellItems ->
                     if (config.useNpcPrice.get()) internalName.getNpcPrice() else super.getCustomPricePer(internalName, tracker)
+
                 else -> super.getCustomPricePer(internalName, tracker)
             }
         }
@@ -370,7 +371,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
             fun addItems(
                 entries: Map<String, TrackerData<*>>,
                 type: GardenTrackerTypes,
-                values: (Any) -> List<Triple<NeuInternalName, Long, Long>>
+                values: (Any) -> List<Triple<NeuInternalName, Long, Long>>,
             ) {
                 entries.forEach { (string, data) ->
                     for ((key, amount, timesGained) in values(data)) {
@@ -379,7 +380,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
                             key,
                             amount,
                             false,
-                            timesGained
+                            timesGained,
                         )
                     }
                 }
@@ -387,7 +388,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
 
             addItems(
                 pestStorage?.getEntries(displayMode) ?: continue,
-                GardenTrackerTypes.PESTS
+                GardenTrackerTypes.PESTS,
             ) { dataAny ->
                 val data = dataAny as PestProfitTracker.BucketData
                 data.flattenBucketsItems().map {
@@ -397,7 +398,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
 
             addItems(
                 rareCropStorage?.getEntries(displayMode) ?: continue,
-                GardenTrackerTypes.BREAKING_CROPS
+                GardenTrackerTypes.BREAKING_CROPS,
             ) { dataAny ->
                 val data = dataAny as ArmorDropTracker.Data
                 data.drops.entries.map {
@@ -407,7 +408,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
             val composterEntries = composterStorage?.getEntries(displayMode) ?: continue
             addItems(
                 composterEntries,
-                GardenTrackerTypes.COMPOSTER
+                GardenTrackerTypes.COMPOSTER,
             ) { dataAny ->
                 val data = dataAny as ComposterProfitTracker.Data
                 listOf(Triple("COMPOST".toInternalName(), data.compostGained, data.compostGained))
@@ -415,7 +416,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
             val visitorEntries = visitorStorage?.getEntries(displayMode) ?: continue
             addItems(
                 visitorEntries,
-                GardenTrackerTypes.VISITORS
+                GardenTrackerTypes.VISITORS,
             ) { dataAny ->
                 val data = dataAny as VisitorDropTracker.BucketData
                 val itemList = data.flattenBucketsItems().map {
@@ -430,7 +431,7 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
 
             addItems(
                 cropCollectionStorage?.getEntries(displayMode) ?: continue,
-                GardenTrackerTypes.BREAKING_CROPS
+                GardenTrackerTypes.BREAKING_CROPS,
             ) { dataAny ->
                 val data = dataAny as CropCollectionTracker.Data
                 var bountifulCoins = 0L
