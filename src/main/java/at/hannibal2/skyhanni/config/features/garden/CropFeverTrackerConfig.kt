@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class CropFeverTrackerConfig {
     @Expose
@@ -32,13 +33,15 @@ class CropFeverTrackerConfig {
         desc = "Drag text to change the appearance of the overlay.\n"
     )
     @ConfigEditorDraggableList
-    val text: MutableList<CropFeverTrackerTextEntry> = mutableListOf(
-        CropFeverTrackerTextEntry.RNG_DROPS,
-        CropFeverTrackerTextEntry.SPACER_2,
-        CropFeverTrackerTextEntry.ITEM_DROPS,
-        CropFeverTrackerTextEntry.SPACER_1,
-        CropFeverTrackerTextEntry.FEVER_AMOUNT,
-        CropFeverTrackerTextEntry.TOTAL_BLOCKS,
+    val text: Property<MutableList<CropFeverTrackerTextEntry>> = Property.of(
+        mutableListOf(
+            CropFeverTrackerTextEntry.RNG_DROPS,
+            CropFeverTrackerTextEntry.SPACER_2,
+            CropFeverTrackerTextEntry.ITEM_DROPS,
+            CropFeverTrackerTextEntry.FEVER_AMOUNT,
+            CropFeverTrackerTextEntry.TOTAL_BLOCKS,
+            CropFeverTrackerTextEntry.TOTAL_PROFIT
+        )
     )
 
     enum class CropFeverTrackerTextEntry(private val displayName: String) {
@@ -49,8 +52,8 @@ class CropFeverTrackerConfig {
         FEVER_DURATION("§7Crop Fever Duration: §b4m 32s"),
         TOTAL_BLOCKS("§7Total Blocks Broken: §e12,123"),
         TOTAL_PROFIT("§7Total Profit: §618m"),
-        SPACER_1(""),
-        SPACER_2(""),
+        SPACER_1(" "),
+        SPACER_2(" "),
         ;
 
         override fun toString() = displayName

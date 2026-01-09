@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.CropFeverTrackerConfig.CropFeverTrackerTextEntry
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -76,10 +78,12 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
         fun getTotalDuringCount(): Long = blocksBrokenDuring.values.sum()
         fun getTotalOutsideCount(): Long = blocksBrokenOutside.values.sum()
         fun getTotalFeverDuration(): Duration = cropFeverDuration.values.fold(Duration.ZERO) { acc, stopwatch ->
-            acc + stopwatch.getDuration()}
+            acc + stopwatch.getDuration()
+        }
     }
 
     private val patternGroup = RepoPattern.group("garden.cropfever")
+
     /**
      * REGEX-TEST: RARE DROP! You dropped 48x Enchanted Melon Slice!
      * REGEX-TEST: UNCOMMON DROP! You dropped 24x Enchanted Melon Slice!
@@ -94,7 +98,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
      */
     private val cropFeverStart by patternGroup.pattern(
         "start",
-        "^WOAH! You caught a case of the CROP FEVER for 60 seconds!"
+        "^WOAH! You caught a case of the CROP FEVER for 60 seconds!",
     )
 
     /**
@@ -102,7 +106,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
      */
     private val cropFeverEnd by patternGroup.pattern(
         "end",
-        "^GONE! Your CROP FEVER has been cured!"
+        "^GONE! Your CROP FEVER has been cured!",
     )
 
     private val config get() = GardenApi.config.cropFeverTracker
@@ -125,9 +129,8 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
                 val amount = group("amount").formatInt()
                 val crop = NeuInternalName.fromItemNameOrNull(group("crop")) ?: return
 
-                val currentFarmedCrop = GardenApi.getCurrentlyFarmedCrop() ?:
-                CropType.getByNameOrNull(crop.makePrimitiveStack().itemName) ?:
-                return
+                val currentFarmedCrop =
+                    GardenApi.getCurrentlyFarmedCrop() ?: CropType.getByNameOrNull(crop.makePrimitiveStack().itemName) ?: return
 
                 addItem(currentFarmedCrop, crop, amount, false)
 
@@ -154,15 +157,15 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (!event.isMod(5)) return
+        if (!event.isMod(5) || blocksBrokenCache.isEmpty()) return
         blocksBrokenCache.forEach { cache ->
-            modify {data ->
+            modify { data ->
                 if (isCropFever) {
                     data.blocksBrokenDuring.addOrPut(cache.key, cache.value)
                 } else {
                     data.blocksBrokenOutside.addOrPut(cache.key, cache.value)
                 }
-                blocksBrokenCache[cache.key] = 0
+                blocksBrokenCache.remove(cache.key)
             }
         }
     }
@@ -172,6 +175,13 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
         update()
         if (!isCropFever) return
         stopCropFever()
+    }
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.text) {
+            update()
+        }
     }
 
     init {
@@ -227,8 +237,8 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
             Renderable.hoverTips(
                 Renderable.text("§7$bucketName Crop Fevers: §e${feverAmount.addSeparators()}"),
                 tips = listOf(
-                    Renderable.text("§7Average Breaks per Fever: §e${breaksPerFever.addSeparators()}")
-                )
+                    Renderable.text("§7Average Breaks per Fever: §e${breaksPerFever.addSeparators()}"),
+                ),
             ).toSearchable()
 
         val feverUptime: Duration = bucketData.getTotalFeverDuration()
@@ -247,8 +257,8 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
             Renderable.text("§7$bucketName Crops Broken: §e${totalBlocks.addSeparators()}"),
             tips = listOf(
                 Renderable.text("§7During Crop Fever: §e${totalDuring.addSeparators()}"),
-                Renderable.text("§7Outside of Crop Fever: §e${totalOutside.addSeparators()}")
-                )
+                Renderable.text("§7Outside of Crop Fever: §e${totalOutside.addSeparators()}"),
+            ),
         ).toSearchable()
 
         lineMap[CropFeverTrackerTextEntry.SPACER_1] = Renderable.placeholder(10).toSearchable()
@@ -270,32 +280,37 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
 
         RngDropEnum.entries.forEach {
             val drops = rngMap[it] ?: 0
-            val blocksBroken = data.blocksBrokenOutside[data.selectedBucket] ?: 0
+            val blocksBroken = if (data.selectedBucket == null) data.getTotalOutsideCount()
+            else data.blocksBrokenOutside[data.selectedBucket] ?: 0
             val breaksPerDrop = if (blocksBroken == 0L) 0 else drops / blocksBroken
-            add(Renderable.hoverTips(
-                Renderable.text("§7- §e${drops}x $it"),
-                tips = listOf(Renderable.text("§7Block Breaks per Drop: ${breaksPerDrop.addSeparators()}")),
-            ).toSearchable())
+            add(
+                Renderable.hoverTips(
+                    Renderable.text("§7- §e${drops}x $it"),
+                    tips = listOf(Renderable.text("§7Block Breaks per Drop: ${breaksPerDrop.addSeparators()}")),
+                ).toSearchable(),
+            )
         }
     }
+
     private fun formatDisplay(
         lineMap: MutableMap<CropFeverTrackerTextEntry, Searchable>,
-        bucketData: BucketData
+        bucketData: BucketData,
     ): List<Searchable> = buildList {
         val rngDropList: List<Searchable> = buildRngDropList(bucketData)
         addSearchString("§e§lCrop Fever Tracker")
         addBucketSelector(this, bucketData, "Crop Type")
         val profit = drawItems(bucketData, { true }, mutableListOf())
-        config.text.forEach{ line ->
-            if (line == CropFeverTrackerTextEntry.ITEM_DROPS) {
-                drawItems(bucketData, { true }, this)
-            } else if (line == CropFeverTrackerTextEntry.RNG_DROPS) {
-                addAll(rngDropList)
-            } else if (line == CropFeverTrackerTextEntry.TOTAL_PROFIT) {
-                val duration = bucketData.getTotalUptime()
-                addAll(addTotalProfit(profit, bucketData.getTotalFeverCount(), "drop", duration, "Drops"))
-            } else {
-                lineMap[line]?.let { add(it) }
+        config.text.get().forEach { line ->
+            when (line) {
+                CropFeverTrackerTextEntry.ITEM_DROPS -> { drawItems(bucketData, { true }, this) }
+                CropFeverTrackerTextEntry.RNG_DROPS -> { addAll(rngDropList) }
+                CropFeverTrackerTextEntry.TOTAL_PROFIT -> {
+                    val duration = bucketData.getTotalUptime()
+                    addAll(
+                        addTotalProfit(profit, bucketData.getTotalFeverCount(), "drop", duration, "Drops"),
+                    )
+                }
+                else -> { lineMap[line]?.let { add(it) } }
             }
         }
         addPriceFromButton(this)
