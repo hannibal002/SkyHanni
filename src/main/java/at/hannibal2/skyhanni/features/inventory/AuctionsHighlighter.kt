@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.inventory.ChestMenu
 
 @SkyHanniModule
 object AuctionsHighlighter {
@@ -43,9 +43,9 @@ object AuctionsHighlighter {
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.highlightAuctions) return
-        if (event.gui !is GuiChest) return
+        if (event.gui !is ContainerScreen) return
 
-        val chest = event.container as ContainerChest
+        val chest = event.container as ChestMenu
         if (InventoryUtils.openInventoryName() != "Manage Auctions") return
 
         for ((slot, stack) in chest.getUpperItems()) {

@@ -85,9 +85,6 @@ object FarmingLaneFeatures {
                     " §7(${movementState.label}§7)"
                 } else ""
                 add("§7Time remaining: $color$format$suffix")
-                if (MovementSpeedDisplay.usingLegacySoulSandSpeed && config.distanceSoulSandWarning) {
-                    add("§7Using inaccurate soul sand speed!")
-                }
             }
         }
     }
@@ -188,11 +185,10 @@ object FarmingLaneFeatures {
             return MovementState.TOO_SLOW
         }
         // only calculate the time if the speed has not changed
-        if (!MovementSpeedDisplay.usingLegacySoulSandSpeed) {
-            if (sameSpeedCounter < 6) {
-                return MovementState.CALCULATING
-            }
+        if (sameSpeedCounter < 6) {
+            return MovementState.CALCULATING
         }
+
 
         return MovementState.NORMAL
     }

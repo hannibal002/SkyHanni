@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.garden.cropmilestones
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -25,7 +26,7 @@ object CustomGoals {
             milestoneCustomGoals.clear()
             for (crop in this) {
                 milestoneCustomGoals[crop] = crop.customGoalFromConfig()
-                ChatUtils.debug("Set custom goal: ${milestoneCustomGoals[crop]}")
+                ChatUtils.debug("Set custom goal: ${milestoneCustomGoals[crop]} ${crop.customGoalFromConfig()}")
             }
             GardenCropMilestoneDisplay.update()
             ChatUtils.debug("$milestoneCustomGoals")
@@ -36,7 +37,7 @@ object CustomGoals {
             ConditionalUtils.onToggle(crop.getCustomGoalConfig()) {
                 milestoneCustomGoals.replace(crop, crop.customGoalFromConfig())
                 GardenCropMilestoneDisplay.update()
-                ChatUtils.debug("Custom goal $crop set")
+                ChatUtils.debug("Custom goal $crop set: ${crop.customGoalFromConfig()}")
             }
         }
     }
@@ -68,6 +69,17 @@ object CustomGoals {
             CropType.SUGAR_CANE -> cane
             CropType.CACTUS -> cactus
             CropType.MUSHROOM -> mushroom
+            CropType.SUNFLOWER -> sunflower
+            CropType.WILD_ROSE -> rose
+            CropType.MOONFLOWER -> moonflower
+        }
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Crop Milestones Custom Goal")
+        event.addIrrelevant {
+            add(milestoneCustomGoals.toString())
         }
     }
 }

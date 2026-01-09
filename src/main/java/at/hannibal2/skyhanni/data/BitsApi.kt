@@ -25,8 +25,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
@@ -294,7 +295,7 @@ object BitsApi {
     }
 
     private fun handleSkyBlockMenu(stacks: Collection<ItemStack>) {
-        val cookieStack = stacks.lastOrNull { cookieGuiStackPattern.matches(it.displayName) }
+        val cookieStack = stacks.lastOrNull { cookieGuiStackPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) }
 
         // If the cookie stack is null, then the player should not have any bits to claim
         if (cookieStack == null) {
@@ -332,7 +333,7 @@ object BitsApi {
     }
 
     private fun processFameRankStacks(stacks: Collection<ItemStack>) {
-        val stack = stacks.firstOrNull { fameRankGuiStackPattern.matches(it.displayName) } ?: return
+        val stack = stacks.firstOrNull { fameRankGuiStackPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return
         fun fameRankOrNull(rank: String) {
             fameRank = FameRanks.getByName(rank) ?: run {
                 ErrorManager.logErrorWithData(
@@ -361,7 +362,7 @@ object BitsApi {
     }
 
     private fun processBitsStacks(stacks: Collection<ItemStack>) {
-        val stack = stacks.firstOrNull { bitsStackPattern.matches(it.displayName) } ?: return
+        val stack = stacks.firstOrNull { bitsStackPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return
         var foundAvailable = false
         var foundBits = false
         for (line in stack.getLore()) {
@@ -385,7 +386,7 @@ object BitsApi {
     }
 
     private fun processCookieStacks(stacks: Collection<ItemStack>) {
-        val stack = stacks.firstOrNull { cookieGuiStackPattern.matches(it.displayName) } ?: return
+        val stack = stacks.firstOrNull { cookieGuiStackPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return
         for (line in stack.getLore()) {
             cookieDurationPattern.matchMatcher(line) {
                 val duration = TimeUtils.getDuration(group("time"))
@@ -402,7 +403,7 @@ object BitsApi {
     }
 
     private fun handleMuseumGui(stacks: Collection<ItemStack>) {
-        val stack = stacks.firstOrNull { museumRewardStackPattern.matches(it.displayName) } ?: return
+        val stack = stacks.firstOrNull { museumRewardStackPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return
 
         museumMilestonePattern.firstMatcher(stack.getLore()) {
             profileStorage?.museumMilestone = group("milestone").formatInt()

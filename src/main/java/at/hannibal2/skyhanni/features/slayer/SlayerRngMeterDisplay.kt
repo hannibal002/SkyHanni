@@ -272,7 +272,7 @@ object SlayerRngMeterDisplay {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { shouldShowDisplay() },
+            condition = ::shouldShowDisplay,
             onRender = {
                 config.pos.renderRenderables(display, posLabel = "RNG Meter Display")
             },

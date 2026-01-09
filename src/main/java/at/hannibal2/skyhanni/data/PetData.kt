@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackAnimationFrame
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.util.UUID
 
 data class PetDataStorage(

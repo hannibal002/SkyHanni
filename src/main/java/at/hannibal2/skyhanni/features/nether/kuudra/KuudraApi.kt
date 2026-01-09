@@ -44,14 +44,28 @@ object KuudraApi {
         "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
-    val kuudraTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
+    /**
+     * Hypixel currently duplicate the word Chest in the inventory name (NOT ITEM STACKS) of Kuudra chests in Croesus/Vesuvius
+     * REGEX-TEST: Paid Chest
+     * REGEX-TEST: Paid Chest Chest
+     * REGEX-TEST: Free Chest
+     * REGEX-TEST: Free Chest Chest
+     */
+    private val kuudraChestPattern by patternGroup.pattern(
+        "kuudrachest",
+        "(?<chesttype>(?:Paid|Free) Chest)(?: Chest)?",
+    )
+
+    val kuudraTiers = listOf("basic", "hot", "burning", "fiery", "infernal")
+
+    val kuudraArmorTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
     val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
     fun NeuInternalName.isKuudraArmor(): Boolean = kuudraArmorPattern.matches(asString())
 
-    fun NeuInternalName.getKuudraTier(): Int? {
+    fun NeuInternalName.getArmorKuudraTier(): Int? {
         val tier = kuudraArmorPattern.matchGroup(asString(), "tier") ?: return null
-        return (kuudraTiers.indexOf(tier) + 1).takeIf { it != 0 }
+        return (kuudraArmorTiers.indexOf(tier) + 1).takeIf { it != 0 }
     }
 
     fun NeuInternalName.removeKuudraTier(): NeuInternalName {
@@ -70,7 +84,15 @@ object KuudraApi {
         ;
 
         companion object {
-            fun getByInventoryName(inventory: String) = entries.firstOrNull { it.inventory == inventory }
+            fun getByInventoryName(inventory: String): KuudraChest? {
+                var realInventory = inventory
+                if (kuudraChestPattern.matches(inventory)) {
+                    kuudraChestPattern.matchMatcher(inventory) {
+                        realInventory = group("chesttype")
+                    }
+                }
+                return entries.firstOrNull { it.inventory == realInventory }
+            }
         }
     }
 
@@ -95,6 +117,14 @@ object KuudraApi {
             val tier = kuudraTier ?: return
             KuudraCompleteEvent(tier).post()
         }
+    }
+
+    fun getKuudraRunTierName(tier: Int): String {
+        return kuudraTiers[tier - 1]
+    }
+
+    fun getKuudraRunTierNumber(tier: String?): Int {
+        return kuudraTiers.indexOf(tier)
     }
 
 }

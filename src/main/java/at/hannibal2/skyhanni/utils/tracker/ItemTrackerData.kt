@@ -7,6 +7,9 @@ import kotlin.reflect.KClass
 
 abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerData<T>(clazz) {
 
+    // default implementation, delegates to below
+    open fun getDescription(item: TrackedItem) = getDescription(item.timesGained)
+
     abstract fun getDescription(timesGained: Long): List<String>
 
     abstract fun getCoinName(item: TrackedItem): String

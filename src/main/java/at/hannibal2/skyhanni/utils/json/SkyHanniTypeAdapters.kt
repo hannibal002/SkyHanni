@@ -25,7 +25,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
@@ -88,16 +88,6 @@ object SkyHanniTypeAdapters {
 
     val SESSION_UPTIME: TypeAdapter<SessionUptime> = SessionUptimeTypeAdapter()
 
-    val CROP_TYPE: TypeAdapter<CropType> = SimpleStringTypeAdapter(
-        { name },
-        { CropType.getByName(this) },
-    )
-
-    val PEST_TYPE: TypeAdapter<PestType> = SimpleStringTypeAdapter(
-        { name },
-        { PestType.getByName(this) },
-    )
-
     val SKYBLOCK_STAT: TypeAdapter<SkyblockStat> = SimpleStringTypeAdapter(
         { name.lowercase() },
         { SkyblockStat.getValue(this.uppercase()) },
@@ -107,6 +97,8 @@ object SkyHanniTypeAdapters {
 
     val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
     val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>(IslandType.UNKNOWN)
+    val CROP_TYPE = SimpleStringTypeAdapter.forEnum<CropType>(CropType.WHEAT)
+    val PEST_TYPE = SimpleStringTypeAdapter.forEnum<PestType>(PestType.UNKNOWN)
     val RARITY = SimpleStringTypeAdapter.forEnum<LorenzRarity>()
 
     val LOCALE_DATE = object : TypeAdapter<LocalDate>() {
@@ -118,8 +110,6 @@ object SkyHanniTypeAdapters {
             return LocalDate.parse(reader.nextString())
         }
     }
-
-
 
     inline fun <reified T> GsonBuilder.registerTypeAdapter(
         crossinline write: (JsonWriter, T) -> Unit,

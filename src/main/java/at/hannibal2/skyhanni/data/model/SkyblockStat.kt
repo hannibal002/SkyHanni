@@ -124,9 +124,12 @@ enum class SkyblockStat(
     MELON_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Melon Slice Fortune $VALUE_PATTERN"),
     MUSHROOM_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Mushroom Fortune $VALUE_PATTERN"),
     CACTUS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cactus Fortune $VALUE_PATTERN"),
-    NETHER_WART_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Nether Wart Fortune $VALUE_PATTERN"),
+    NETHER_STALK_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Nether Wart Fortune $VALUE_PATTERN"),
     COCOA_BEANS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cocoa Beans Fortune $VALUE_PATTERN"),
     SUGAR_CANE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sugar Cane Fortune $VALUE_PATTERN"),
+    SUNFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sunflower Fortune $VALUE_PATTERN"),
+    MOONFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Moonflower Fortune $VALUE_PATTERN"),
+    WILD_ROSE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Wild Rose Fortune $VALUE_PATTERN"),
 
     MINING_SPREAD(
         "§e▚",
@@ -160,6 +163,8 @@ enum class SkyblockStat(
     RIFT_DAMAGE("§5❁", " *Rift Damage: §r§5❁$VALUE_PATTERN", " *§5❁ Rift Damage §f$VALUE_PATTERN"),
     MANA_REGEN("§b⚡", " *Mana Regen: §r§b⚡$VALUE_PATTERN", " *§b⚡ Mana Regen §f$VALUE_PATTERN"),
     HEARTS("§c♥", " *Hearts: §r§c♥$VALUE_PATTERN", " *§c♥ Hearts §f$VALUE_PATTERN"),
+
+    TRACKING("§d❃", " *Tracking: §r§d❃$VALUE_PATTERN", " *§d❃ Tracking §f$VALUE_PATTERN"),
 
     UNKNOWN("§c?", "", "")
     ;
@@ -196,7 +201,7 @@ enum class SkyblockStat(
     companion object {
 
         val fontSizeOfLargestIcon by lazy {
-            entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.icon) } + 1
+            entries.maxOf { Minecraft.getInstance().font.width(it.icon) } + 1
         }
 
         fun getValueOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.name == string || it.hypxelId == string }
@@ -272,6 +277,8 @@ enum class SkyblockStat(
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(69, "#profile.stats.TRUE_DEFENCE", "#profile.stats.TRUE_DEFENSE")
+            event.move(112, "#profile.stats.NETHER_WART_FORTUNE", "#profile.stats.NETHER_STALK_FORTUNE")
+            event.remove(113, "#profile.stats.null")
         }
     }
 }

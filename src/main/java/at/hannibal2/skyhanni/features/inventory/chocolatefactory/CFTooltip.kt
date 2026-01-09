@@ -17,7 +17,7 @@ object CFTooltip {
         if (!CFApi.inChocolateFactory) return
         if (!config.extraTooltipStats) return
 
-        val slotIndex = event.slot.slotNumber
+        val slotIndex = event.slot.index
         if (slotIndex !in CFApi.otherUpgradeSlots && slotIndex !in CFApi.rabbitSlots) return
 
         val upgradeInfo = CFApi.factoryUpgrades.find { it.slotIndex == slotIndex } ?: return

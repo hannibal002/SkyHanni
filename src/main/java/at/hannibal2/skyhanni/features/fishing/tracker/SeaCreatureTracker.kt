@@ -37,7 +37,7 @@ object SeaCreatureTracker {
 
     private val tracker = SkyHanniTracker(
         "Sea Creature Tracker",
-        { Data() },
+        ::Data,
         { it.fishing.seaCreatureTracker },
         trackerConfig = { config.perTrackerConfig }
     ) {

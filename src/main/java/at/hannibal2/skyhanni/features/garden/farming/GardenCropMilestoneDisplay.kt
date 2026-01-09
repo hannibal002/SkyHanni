@@ -176,7 +176,7 @@ object GardenCropMilestoneDisplay {
         val speed = GardenCropSpeed.averageBlocksPerSecond
         val farmingFortuneSpeed = ((100.0 + farmingFortune) * crop.baseDrops * speed / 100).roundTo(1).toInt()
 
-        if (farmingFortuneSpeed > 0) {
+        if (farmingFortuneSpeed > 0 && crop == getCurrentlyFarmedCrop()) {
             crop.setSpeed(farmingFortuneSpeed)
             if (!crop.isMaxMilestone() || overflowDisplay) {
                 val missing = need - have
