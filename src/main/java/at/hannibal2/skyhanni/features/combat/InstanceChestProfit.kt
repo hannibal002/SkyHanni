@@ -168,12 +168,7 @@ object InstanceChestProfit {
         if (!config.enabled && !config.croesusAllChestsOverlay && !config.croesusHighlight) return
 
         val name = event.inventoryName
-        when {
-
-            runNameCroesus.matches(name) && (config.croesusHighlight || config.croesusAllChestsOverlay) -> inCroesusRunMenu = true
-
-            else -> return
-        }
+        if (runNameCroesus.matches(name) && (config.croesusHighlight || config.croesusAllChestsOverlay)) inCroesusRunMenu = true
 
         if (inCroesusRunMenu) {
             event.inventoryItems.forEach { (slot, item) ->
@@ -188,7 +183,7 @@ object InstanceChestProfit {
             createCroesusDisplay()
         }
 
-        createDisplay(event.inventoryName, event.inventoryItems)
+        if (isInstanceChestGUI() && config.enabled) createDisplay(event.inventoryName, event.inventoryItems)
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true)
