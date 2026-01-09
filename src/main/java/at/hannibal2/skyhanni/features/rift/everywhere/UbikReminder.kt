@@ -59,7 +59,7 @@ object UbikReminder {
     init {
         InventoryDetector(
             onOpenInventory = {
-                if (!config.ubikReminder) return
+                if (!config.ubikReminder) return@InventoryDetector
                 storage?.ubikRemindTime = 2.hours.fromNow()
             },
         ) { name -> inventoryPattern.matches(name) }
