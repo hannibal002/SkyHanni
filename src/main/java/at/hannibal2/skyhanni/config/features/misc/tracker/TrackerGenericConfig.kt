@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 open class TrackerGenericConfig {
@@ -35,12 +36,13 @@ open class TrackerGenericConfig {
         desc = "Pause the tracker if it is not modified for this amount of seconds."
     )
     @ConfigEditorSlider(minValue = 15f, maxValue = 900f, minStep = 15f)
-    var afkTimeout: Int = 300
+    var afkTimeout: Int = 60
 
     @Expose
     @ConfigOption(name = "Tracker Search", desc = "Add a search bar to tracker GUIs.")
+    @SearchTag("uptime")
     @ConfigEditorBoolean
-    val trackerSearchEnabled: Property<Boolean> = Property.of(true)
+    val trackerSearchEnabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
