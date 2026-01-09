@@ -431,11 +431,11 @@ object InstanceChestProfit {
     fun onRenderOverlay() {
         if (config.enabled && InventoryUtils.inInventory())
             if (isInstanceChestGUI()) {
-            config.position.renderRenderable(
-                chestDisplay,
-                posLabel = "Instance Chest Profit",
-            )
-        }
+                config.position.renderRenderable(
+                    chestDisplay,
+                    posLabel = "Instance Chest Profit",
+                )
+            }
         if (config.croesusAllChestsOverlay && inCroesusRunMenu) {
             config.croesusPosition.renderRenderable(
                 croesusDisplay,
