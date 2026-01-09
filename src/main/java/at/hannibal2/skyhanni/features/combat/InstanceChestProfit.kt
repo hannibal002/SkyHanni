@@ -257,7 +257,9 @@ object InstanceChestProfit {
                     itemInternalName = itemName.toInternalName()
                 }
                 val internalName = itemInternalName
-                if (profileStorage?.instanceChestFavouriteItems?.contains(internalName) == true) slotsWithFavourites.add(chestType.stackChestName)
+                if (profileStorage?.instanceChestFavouriteItems?.contains(internalName) == true) {
+                    slotsWithFavourites.add(chestType.stackChestName)
+                }
                 if (internalName != null) {
                     itemPrice = getPrice(internalName)
                     essencePattern.matchMatcher(loreLine) {
