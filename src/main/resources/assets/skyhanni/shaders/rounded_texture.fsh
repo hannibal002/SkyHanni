@@ -1,15 +1,17 @@
-#version 120
+#version 150
+
+in vec2 texCoord;
 
 uniform float scaleFactor;
 uniform float radius;
 uniform float smoothness;
 uniform vec2 halfSize;
 uniform vec2 centerPos;
+uniform mat4 modelViewMatrix;
 
-uniform sampler2D outTexture;
+uniform sampler2D textureSampler;
 
-varying vec2 outTextureCoords;
-varying vec4 outColor;
+out vec4 outColor;
 
 // From https://www.shadertoy.com/view/WtdSDs
 float roundedRectSDF(vec2 center, vec2 halfSize, float radius) {
@@ -17,10 +19,10 @@ float roundedRectSDF(vec2 center, vec2 halfSize, float radius) {
 }
 
 void main() {
-    float xScale = gl_ModelViewMatrix[0][0];
-    float yScale = gl_ModelViewMatrix[1][1];
-    float xTranslation = gl_ModelViewMatrix[3][0];
-    float yTranslation = gl_ModelViewMatrix[3][1];
+    float xScale = modelViewMatrix[0][0];
+    float yScale = modelViewMatrix[1][1];
+    float xTranslation = modelViewMatrix[3][0];
+    float yTranslation = modelViewMatrix[3][1];
 
     vec2 newHalfSize = vec2(halfSize.x * xScale, halfSize.y * yScale);
 
@@ -33,5 +35,5 @@ void main() {
 
     float distance = roundedRectSDF(gl_FragCoord.xy - newCenterPos, newHalfSize, radius);
     float smoothed = 1.0 - smoothstep(0.0, smoothness, distance);
-    gl_FragColor = (texture2D(outTexture, outTextureCoords) * outColor) * vec4(1.0, 1.0, 1.0, smoothed);
+    outColor = texture(textureSampler, texCoord) * vec4(1.0, 1.0, 1.0, smoothed);
 }

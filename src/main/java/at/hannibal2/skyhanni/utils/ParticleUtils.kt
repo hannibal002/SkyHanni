@@ -1,19 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
-import net.minecraft.util.EnumParticleTypes
-//#if MC > 1.21
-//$$ import net.minecraft.util.Identifier
-//#endif
+import net.minecraft.resources.ResourceLocation
 
 object ParticleUtils {
 
-    //#if MC < 1.21
-    fun getParticleTypeByName(name: String): EnumParticleTypes? =
-        EnumParticleTypes.entries.firstOrNull {
-            it.name.equals(name, ignoreCase = true)
-        }
-    //#else
-    //$$ fun getParticleTypeByName(name: String, shouldError: Boolean = false): Identifier? = Identifier.of(name.lowercase())
-    //#endif
+    fun getParticleTypeByName(name: String, shouldError: Boolean = false): ResourceLocation? = ResourceLocation.parse(name.lowercase())
 
 }

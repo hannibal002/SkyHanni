@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -44,7 +44,7 @@ object PestParticleWaypoint {
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !PestApi.hasVacuumInHand()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
-        if (MinecraftCompat.localPlayer.isSneaking) return
+        if (MinecraftCompat.localPlayer.isShiftKeyDown) return
         reset()
         lastPestTrackerUse = SimpleTimeMark.now()
     }
@@ -53,7 +53,7 @@ object PestParticleWaypoint {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
 
-        if (config.hideParticles && event.type == EnumParticleTypes.FIREWORKS_SPARK) event.cancel()
+        if (config.hideParticles && event.type == ParticleTypes.FIREWORK) event.cancel()
 
         if (lastPestTrackerUse.passedSince() > 5.seconds) return
         when {
@@ -85,10 +85,10 @@ object PestParticleWaypoint {
     }
 
     private fun ReceiveParticleEvent.isEnchantmentTable(): Boolean =
-        type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 10 && speed == -2f && offset.isZero()
+        type == ParticleTypes.ENCHANT && count == 10 && speed == -2f && offset.isZero()
 
     private fun ReceiveParticleEvent.isVillagerAngry(): Boolean =
-        type == EnumParticleTypes.VILLAGER_ANGRY && count == 1 && speed == 0f && offset.isZero()
+        type == ParticleTypes.ANGRY_VILLAGER && count == 1 && speed == 0f && offset.isZero()
 
     @HandleEvent
     fun onWorldChange() = reset()

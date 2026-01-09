@@ -52,7 +52,7 @@ object CropUpgrades {
         if (event.inventoryName != "Crop Upgrades") return
 
         for (item in event.inventoryItems.values) {
-            val crop = CropType.getByNameOrNull(item.displayName.removeColor()) ?: continue
+            val crop = CropType.getByNameOrNull(item.hoverName.string.removeColor()) ?: continue
             tierPattern.firstMatcher(item.getLore()) {
                 val level = group("level").formatInt()
                 crop.setUpgradeLevel(level)

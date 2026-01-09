@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -49,7 +48,7 @@ object SackDisplay {
     init {
         RenderDisplayHelper(
             inventory = SackApi.inventory,
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         ) {
             config.position.renderRenderables(
                 display, extraSpace = config.extraSpace, posLabel = "Sacks Items",
@@ -62,7 +61,7 @@ object SackDisplay {
         if (!SackApi.inventory.isInside()) return
         if (!config.highlightFull) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val lore = slot.stack.getLore()
+            val lore = slot.item.getLore()
             if (lore.any { it.startsWith("§7Stored: §a") }) {
                 slot.highlight(LorenzColor.RED)
             }
@@ -116,7 +115,7 @@ object SackDisplay {
                             }
                         },
                         highlightsOnHoverSlots = listOf(slot),
-                    ) { !NeuItems.neuHasFocus() }
+                    )
                     add(nameText)
 
 
@@ -286,7 +285,7 @@ object SackDisplay {
                                 BazaarApi.searchForBazaarItem(name.removeColor().dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),
-                        ) { !NeuItems.neuHasFocus() },
+                        ),
                     )
                     when (SackApi.gemstoneStackFilter) {
                         GemstoneQuality.ROUGH -> addAlignedNumber(gem.rough.addSeparators())

@@ -43,6 +43,12 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerti
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import net.minecraft.client.Minecraft
+import kotlin.math.abs
+import kotlin.math.min
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -286,6 +292,23 @@ object FarmingWeightDisplay {
         val name = if (it.size == 1) it[0] else PlayerUtils.getName()
         openWebsite(name, ignoreCooldown = true)
     }
+
+    // still needed when first joining garden and if they cant make https requests
+    private val backupCropWeights = mapOf(
+        CropType.WHEAT to 100_000.0,
+        CropType.CARROT to 300_000.0,
+        CropType.POTATO to 298_328.17,
+        CropType.SUGAR_CANE to 198_885.45,
+        CropType.NETHER_WART to 248_606.81,
+        CropType.PUMPKIN to 99_236.12,
+        CropType.MELON to 488_435.88,
+        CropType.MUSHROOM to 90_944.27,
+        CropType.COCOA_BEANS to 276_733.75,
+        CropType.CACTUS to 178_730.65,
+        CropType.MOONFLOWER to 200_000.0,
+        CropType.SUNFLOWER to 200_000.0,
+        CropType.WILD_ROSE to 200_000.0,
+    )
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

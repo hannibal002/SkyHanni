@@ -17,7 +17,8 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -217,9 +218,10 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onTooltip(event: ToolTipEvent) {
+    fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
-        clickTranslate[event.slot.slotIndex]?.let {
+        event.slot ?: return
+        clickTranslate[event.slot.containerSlot]?.let {
             event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
         }
     }
@@ -316,7 +318,7 @@ object TunnelsMaps {
 
     init {
         RenderDisplayHelper(
-            condition = { isEnabled() },
+            condition = ::isEnabled,
             inOwnInventory = true,
         ) {
             display = drawDisplay()
@@ -486,7 +488,7 @@ object TunnelsMaps {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (Minecraft.getInstance().screen != null) return
         campfireKey(event)
         nextSpotKey(event)
     }

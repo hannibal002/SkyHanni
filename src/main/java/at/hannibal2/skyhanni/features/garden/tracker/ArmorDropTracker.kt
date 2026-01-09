@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
@@ -17,6 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.seconds
@@ -33,31 +34,44 @@ object ArmorDropTracker {
 
     private val config get() = GardenApi.config.armorDropTracker
 
+    private val patternGroup = RepoPattern.group("garden.armordrops")
+
     /**
      * REGEX-TEST: FERMENTO_CHESTPLATE
      * REGEX-TEST: CROPIE_BOOTS
      * REGEX-TEST: SQUASH_HELMET
      */
-    private val armorPattern by RepoPattern.pattern(
-        "garden.armordrops.armor",
-        "(?:FERMENTO|CROPIE|SQUASH|MELON)_(?:LEGGINGS|CHESTPLATE|BOOTS|HELMET)",
+    private val armorPattern by patternGroup.pattern(
+        "armor",
+        "(?:HELIANTHUS|FERMENTO|CROPIE|SQUASH|MELON)_(?:LEGGINGS|CHESTPLATE|BOOTS|HELMET)",
     )
 
     private var hasArmor = false
 
-    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker }) {
+    private val tracker = SkyHanniTracker("Armor Drop Tracker", ::Data, { it.garden.armorDropTracker }) {
         drawDisplay(it)
     }
 
     data class Data(
-        @Expose var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
-    ) : Resettable
+        @Expose
+        var drops: MutableMap<ArmorDropType, Int> = mutableMapOf(),
+    ) : TrackerData()
 
-    // Todo use repo pattern
-    enum class ArmorDropType(val dropName: String, val chatMessage: String) {
-        CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
-        SQUASH("§5Squash", "§6§lRARE CROP! §r§f§r§5Squash §r§b(Armor Set Bonus)"),
-        FERMENTO("§6Fermento", "§6§lRARE CROP! §r§f§r§6Fermento §r§b(Armor Set Bonus)"),
+    init {
+        ArmorDropType.entries.forEach { it.chatPattern }
+    }
+
+    enum class ArmorDropType(val dropName: String, chatMessage: String) {
+        CROPIE("§aCropie", "§6§lRARE CROP! §r§f§r§aCropie §r§b\\(Armor Set Bonus\\)"),
+        SQUASH("§9Squash", "§6§lRARE CROP! §r§f§r§9Squash §r§b\\(Armor Set Bonus\\)"),
+        FERMENTO("§5Fermento", "§6§lRARE CROP! §r§f§r§5Fermento §r§b\\(Armor Set Bonus\\)"),
+        HELIANTHUS("§6Helianthus", "§6§lRARE CROP! §r§f§r§6Helianthus §r§b\\(Armor Set Bonus\\)"),
+        ;
+
+        val chatPattern by patternGroup.pattern(
+            name.lowercase(),
+            chatMessage,
+        )
     }
 
     @HandleEvent
@@ -68,7 +82,7 @@ object ArmorDropTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         for (dropType in ArmorDropType.entries) {
-            if (dropType.chatMessage != event.message) continue
+            if (!dropType.chatPattern.matches(event.message)) continue
             addDrop(dropType)
             if (config.hideChat) {
                 event.blockedReason = "farming_armor_drops"
@@ -142,7 +156,7 @@ object ArmorDropTracker {
             val armorName = armorDropInfo[armorDropName]?.armorType ?: return 0.0
             val pieceCount = InventoryUtils.getArmor()
                 .mapNotNull { it?.getInternalName()?.asString() }
-                .count { it.contains(armorName) || it.contains("FERMENTO") }
+                .count { it.contains(armorName) || it.contains("FERMENTO") || it.contains("HELIANTHUS") }
 
             val dropRates = armorDropInfo[armorDropName]?.chance ?: return 0.0
             var dropRate = 0.0

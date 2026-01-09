@@ -57,7 +57,7 @@ object ComposterApi {
     fun getOrganicMatter() = tabListData[ComposterDisplay.DataType.ORGANIC_MATTER]?.removeColor()?.formatLong() ?: 0
 
     fun maxOrganicMatter(addOne: ComposterUpgrade?) =
-        40_000 + ComposterUpgrade.ORGANIC_MATTER_CAP.getLevel(addOne) * 20_000
+        40_000 + ComposterUpgrade.ORGANIC_MATTER_CAP.getLevel(addOne) * 30_000
 
     fun multiDropChance(addOne: ComposterUpgrade?) = ComposterUpgrade.MULTI_DROP.getLevel(addOne) * 0.03
 

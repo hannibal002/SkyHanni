@@ -107,7 +107,8 @@ object SlayerProfitTracker {
         }
         // TODO spawn costs in repo
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
-            if (coins < -150000 || coins > 0) {
+            val coinsCap = -350_000
+            if (coins < coinsCap || coins > 0) {
                 ChatUtils.debug("Wrong Slayer Spawn Cost! Ignoring!")
                 return
             }
@@ -140,7 +141,7 @@ object SlayerProfitTracker {
                     category,
                 ) { Data() }
             }
-            SkyHanniItemTracker("$categoryName Profit Tracker", { Data() }, getStorage) { drawDisplay(it) }
+            SkyHanniItemTracker("$categoryName Profit Tracker", ::Data, getStorage) { drawDisplay(it) }
         }
     }
 
@@ -201,7 +202,8 @@ object SlayerProfitTracker {
             ).toSearchable(),
         )
 
-        add(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss", duration, "Bosses"))
 
         tracker.addPriceFromButton(this)
     }
@@ -223,7 +225,7 @@ object SlayerProfitTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { shouldShowDisplay() },
+            condition = ::shouldShowDisplay,
             onRender = {
                 getTracker()?.renderDisplay(config.pos)
             },

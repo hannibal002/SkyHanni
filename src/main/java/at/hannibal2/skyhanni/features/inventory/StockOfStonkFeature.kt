@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.transformAt
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -75,7 +76,7 @@ object StockOfStonkFeature {
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-        if (!itemPattern.matches(event.itemStack.displayName)) return
+        if (!itemPattern.matches(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
         var stonksReward = 0
         var index = 0
         var bestValueIndex = 0
