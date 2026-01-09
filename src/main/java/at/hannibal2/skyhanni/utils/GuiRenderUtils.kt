@@ -18,6 +18,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
@@ -94,6 +95,14 @@ object GuiRenderUtils {
     }
 
     fun drawString(str: Component, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
+        DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
+    }
+
+    fun drawString(str: FormattedCharSequence, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
+        DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
+    }
+
+    fun drawString(str: FormattedCharSequence, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
     }
 
@@ -470,7 +479,9 @@ object GuiRenderUtils {
     //$$     val guiHeight = window.height.toFloat() / window.guiScale.toFloat()
     //$$     val slice = projectionMatrix.getBuffer(guiWidth, guiHeight)
     //$$     RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
-    //$$     RenderSystem.setupDefaultState()
+    //$$     RenderSystem.getModelViewStack().pushMatrix()
+    //$$     RenderSystem.getModelViewStack().identity()
+    //$$     val textureMatrixBackup = Matrix4f(RenderSystem.getTextureMatrix())
     //$$     RenderSystem.resetTextureMatrix()
     //$$
     //$$     // We have to use our own MatrixStack, because the DrawContext matrices are a 2D matrix now
@@ -518,6 +529,8 @@ object GuiRenderUtils {
     //#endif
     //$$     matrices.popPose()
     //$$     RenderSystem.teardownOverlayColor()
+    //$$     RenderSystem.getModelViewStack().popMatrix()
+    //$$     RenderSystem.getTextureMatrix().set(textureMatrixBackup)
     //$$     RenderSystem.restoreProjectionMatrix()
     //$$ }
     //$$

@@ -7,7 +7,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -42,19 +41,6 @@ class DianaConfig {
     @FeatureToggle
     var guess: Boolean = false
 
-    enum class GuessLogic(private val displayName: String) {
-        SOOPY_GUESS("Soopy"),
-        PRECISE_GUESS("Precise"),
-        ;
-
-        override fun toString(): String = displayName
-    }
-
-    @Expose
-    @ConfigOption(name = "Guessing Logic", desc = "Change which guess strategy to use.")
-    @ConfigEditorDropdown
-    var guessLogic: GuessLogic = GuessLogic.PRECISE_GUESS
-
     @Expose
     @ConfigOption(
         name = "Multi Guesses",
@@ -85,18 +71,42 @@ class DianaConfig {
     @ConfigOption(
         name = "Guess From Arrow",
         desc = "Guess next burrow location in chain instantly from the particle arrow.\n" +
-            "It is recommended to use bobby for better results."
+            "It is recommended to use bobby for better results.",
     )
     @ConfigEditorBoolean
     var guessFromArrow: Boolean = true
 
     @Expose
     @ConfigOption(
-        name = "Warn If Inaccurate",
-        desc = "Sends a title message telling you to use your spade if arrow guess has a high chance of being wrong."
+        name = "Warn On Failure",
+        desc = "Sends \"Use Spade\" title when arrow guess fails.",
     )
     @ConfigEditorBoolean
-    var warnIfInaccurateArrowGuess: Boolean = false
+    var warnOnFail: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Warn On Chain Complete",
+        desc = "Sends \"Use Spade\" title when you complete a chain and there is not a burrow within 90 blocks.",
+    )
+    @ConfigEditorBoolean
+    var warnOnChainComp: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Render SubGuesses",
+        desc = "If there are multiple possible blocks will render them all in a greyed out chain.",
+    )
+    @ConfigEditorBoolean
+    var renderSubGuesses: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Clear On World Change",
+        desc = "Clear all guess data on world change.",
+    )
+    @ConfigEditorBoolean
+    var clearOnWorldChange: Boolean = false
 
     @Expose
     @ConfigOption(

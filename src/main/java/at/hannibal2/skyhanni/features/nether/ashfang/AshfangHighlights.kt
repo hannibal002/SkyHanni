@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.getExtendedColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
@@ -83,13 +84,19 @@ object AshfangHighlights {
     private fun SkyHanniRenderWorldEvent.drawBlendedColorString(location: LorenzVec, text: String) {
         val distance = location.distanceToPlayer()
         if (distance < MAX_DISTANCE) {
-            val colorCode = getColorCode(distance)
-            drawString(location.add(y = 2.5), colorCode + text)
+            val string = getColor(distance, text)
+            drawString(location.add(y = 2.5), string)
         }
     }
 
-    private fun getColorCode(distance: Double): String =
-        ColorUtils.blendRGB(LorenzColor.GREEN.toColor(), LorenzColor.RED.toColor(), distance / MAX_DISTANCE).getExtendedColorCode()
+    private fun getColor(distance: Double, text: String): Component =
+        ExtendedChatColor(
+            ColorUtils.blendRGB(
+                LorenzColor.GREEN.toColor(),
+                LorenzColor.RED.toColor(),
+                distance / MAX_DISTANCE
+            ).rgb
+        ).asText(text)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -44,7 +44,7 @@ object InvisibugHighlighter {
 
         if (!nearestArmorStand.isCompletelyDefault()) return
 
-        DelayedRun.onThread.execute { invisibugEntities.add(nearestArmorStand) }
+        DelayedRun.runOrNextTick { invisibugEntities.add(nearestArmorStand) }
 
     }
 

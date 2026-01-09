@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
@@ -182,7 +181,7 @@ object CarnivalZombieShootout {
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.enabled || HypixelData.skyBlockArea != "Carnival") return
 
-        val message = event.message.removeColor()
+        val message = event.cleanMessage
 
         if (startPattern.matches(message)) {
             started = true

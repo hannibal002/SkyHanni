@@ -14,101 +14,79 @@ import net.minecraft.world.phys.HitResult
 
 object MinecraftInputHook {
     @JvmStatic
-    fun shouldCancelMouseRightClick(blockHitResult: HitResult?): Boolean {
-        if (blockHitResult == null) return false
-
-        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post()
-
-        val cancelled = when (blockHitResult.type) {
-            HitResult.Type.MISS -> {
-                clickCancelled
-            }
-
-            HitResult.Type.BLOCK -> {
-                val position = blockHitResult.location.toLorenzVec()
-                BlockClickEvent(
-                    ClickType.RIGHT_CLICK,
-                    position,
-                    InventoryUtils.getItemInHand(),
-                ).also {
-                    if (clickCancelled) it.cancel()
-                }.post()
-            }
-
-            HitResult.Type.ENTITY -> {
-                EntityClickEvent(
-                    ClickType.RIGHT_CLICK,
-                    ServerboundInteractPacket.ActionType.INTERACT_AT,
-                    (blockHitResult as EntityHitResult).entity,
-                    InventoryUtils.getItemInHand(),
-                ).also {
-                    if (clickCancelled) it.cancel()
-                }.post()
-            }
-        }
-
-        return cancelled
-    }
+    fun shouldCancelMouseRightClick(hitResult: HitResult?): Boolean =
+        handleClick(
+            hitResult,
+            ClickType.RIGHT_CLICK,
+            ServerboundInteractPacket.ActionType.INTERACT_AT,
+        )
 
     @JvmStatic
-    fun shouldCancelMouseLeftClick(blockHitResult: HitResult?): Boolean {
-        if (blockHitResult == null) return false
-
-        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
-
-        val cancelled = when (blockHitResult.type) {
-            HitResult.Type.MISS -> {
-                clickCancelled
-            }
-
-            HitResult.Type.BLOCK -> {
-                val position = (blockHitResult as BlockHitResult).blockPos
-                BlockClickEvent(
-                    ClickType.LEFT_CLICK,
-                    position.toLorenzVec(),
-                    InventoryUtils.getItemInHand(),
-                ).also {
-                    if (clickCancelled) it.cancel()
-                }.post()
-            }
-
-            HitResult.Type.ENTITY -> {
-                EntityClickEvent(
-                    ClickType.LEFT_CLICK,
-                    ServerboundInteractPacket.ActionType.ATTACK,
-                    (blockHitResult as EntityHitResult).entity,
-                    InventoryUtils.getItemInHand(),
-                ).also {
-                    if (clickCancelled) it.cancel()
-                }.post()
-            }
-        }
-
-        return cancelled
-    }
+    fun shouldCancelMouseLeftClick(hitResult: HitResult?): Boolean =
+        handleClick(
+            hitResult,
+            ClickType.LEFT_CLICK,
+            ServerboundInteractPacket.ActionType.ATTACK,
+        )
 
     @JvmStatic
     fun shouldCancelContinuedBlockBreak(
-        blockHitResult: HitResult?,
+        hitResult: HitResult?,
         currentBlockPos: BlockPos,
     ): Boolean {
-        if (blockHitResult == null || blockHitResult.type != HitResult.Type.BLOCK) return false
+        if (hitResult == null || hitResult.type != HitResult.Type.BLOCK) return false
 
-        val position = (blockHitResult as BlockHitResult).blockPos
+        val position = (hitResult as BlockHitResult).blockPos
 
         if (currentBlockPos == position) return false
 
         val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
 
-        val cancelled = BlockClickEvent(
+        return BlockClickEvent(
             ClickType.LEFT_CLICK,
             position.toLorenzVec(),
             InventoryUtils.getItemInHand(),
         ).also {
             if (clickCancelled) it.cancel()
         }.post()
+    }
 
+    private fun handleClick(
+        hitResult: HitResult?,
+        clickType: ClickType,
+        entityAction: ServerboundInteractPacket.ActionType,
+    ): Boolean {
+        if (hitResult == null) return false
 
-        return cancelled
+        val itemInHand = InventoryUtils.getItemInHand()
+
+        val clickCancelled = ItemClickEvent(itemInHand, clickType).post()
+
+        return when (hitResult.type) {
+            HitResult.Type.MISS ->
+                clickCancelled
+
+            HitResult.Type.BLOCK -> {
+                val pos = (hitResult as BlockHitResult).blockPos
+                BlockClickEvent(
+                    clickType,
+                    pos.toLorenzVec(),
+                    itemInHand,
+                ).also {
+                    if (clickCancelled) it.cancel()
+                }.post()
+            }
+
+            HitResult.Type.ENTITY -> {
+                EntityClickEvent(
+                    clickType,
+                    entityAction,
+                    (hitResult as EntityHitResult).entity,
+                    itemInHand,
+                ).also {
+                    if (clickCancelled) it.cancel()
+                }.post()
+            }
+        }
     }
 }

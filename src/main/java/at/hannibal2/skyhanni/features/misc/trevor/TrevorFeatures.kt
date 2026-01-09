@@ -130,7 +130,7 @@ object TrevorFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onChat(event: SkyHanniChatEvent) {
-        val formattedMessage = event.message.removeColor()
+        val formattedMessage = event.cleanMessage
 
         mobDiedPattern.matchMatcher(event.message) {
             TrevorSolver.resetLocation()

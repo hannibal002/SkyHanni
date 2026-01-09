@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
@@ -493,7 +494,9 @@ object HideNotClickableItems {
             name = name.substring(0, name.length - amountText.length)
         }
 
-        if (!clickToSellPattern.anyMatches(stack.getLore()) && stack.getInternalNameOrNull()?.getNpcPriceOrNull() == null) {
+        val sellable = clickToSellPattern.anyMatches(stack.getLore()) ||
+            (stack.getItemId() != "PET" && (stack.getInternalNameOrNull()?.getNpcPriceOrNull() ?: 0.0) > 0)
+        if (!sellable) {
             hideReason = "This item cannot be sold at the NPC!"
             return true
         }
