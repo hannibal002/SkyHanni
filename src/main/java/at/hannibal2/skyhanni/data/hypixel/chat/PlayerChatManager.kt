@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.IChatComponent
+import net.minecraft.network.chat.Component
 
 /**
  * Reading normal chat events, and splitting them up into many different player chat events, with all available extra information
@@ -226,7 +226,7 @@ object PlayerChatManager {
 
     private fun SkyHanniChatEvent.handleChat(
         blockedReason: String?,
-        chatComponent: IChatComponent,
+        chatComponent: Component,
     ) {
         blockedReason?.let {
             this.blockedReason = it

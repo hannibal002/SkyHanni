@@ -138,7 +138,7 @@ object PowderTracker {
     private val tracker =
         SkyHanniTracker(
             "Powder Tracker",
-            { Data() },
+            ::Data,
             { it.powderTracker },
             trackerConfig = { config.perTrackerConfig }
         ) { formatDisplay(drawDisplay(it)) }

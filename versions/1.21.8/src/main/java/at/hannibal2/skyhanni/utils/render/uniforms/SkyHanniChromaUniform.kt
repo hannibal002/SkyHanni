@@ -4,7 +4,7 @@ import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
 import com.mojang.blaze3d.buffers.Std140SizeCalculator
 import java.nio.ByteBuffer
-import net.minecraft.client.gl.DynamicUniformStorage
+import net.minecraft.client.renderer.DynamicUniformStorage
 
 class SkyHanniChromaUniform : AutoCloseable {
     private val UNIFORM_SIZE = Std140SizeCalculator().putFloat().putFloat().putFloat().putInt().get()
@@ -17,7 +17,7 @@ class SkyHanniChromaUniform : AutoCloseable {
         saturation: Float,
         forwardDirection: Int,
     ): GpuBufferSlice {
-        return storage.write(
+        return storage.writeUniform(
             UniformValue(chromaSize, timeOffset, saturation, forwardDirection),
         )
     }
@@ -25,7 +25,7 @@ class SkyHanniChromaUniform : AutoCloseable {
     // Imperative to clear DynamicUniformStorage every frame.
     // Handled in MixinRenderSystem.
     fun clear() {
-        storage.clear()
+        storage.endFrame()
     }
 
     override fun close() {
@@ -37,7 +37,7 @@ class SkyHanniChromaUniform : AutoCloseable {
         val timeOffset: Float,
         val saturation: Float,
         val forwardDirection: Int,
-    ) : DynamicUniformStorage.Uploadable {
+    ) : DynamicUniformStorage.DynamicUniform {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)
                 .putFloat(chromaSize)

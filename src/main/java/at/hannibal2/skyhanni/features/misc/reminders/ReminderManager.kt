@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.wrap
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.suggest
-import net.minecraft.util.IChatComponent
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -155,12 +155,12 @@ object ReminderManager {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        val remindersToSend = mutableListOf<IChatComponent>()
+        val remindersToSend = mutableListOf<Component>()
 
         for ((id, reminder) in getSortedReminders()) {
             if (!reminder.shouldRemind(config.interval.minutes)) continue
             reminder.lastReminder = SimpleTimeMark.now()
-            var actionsComponent: IChatComponent? = null
+            var actionsComponent: Component? = null
 
             if (!config.autoDeleteReminders) {
                 actionsComponent = TextHelper.join(

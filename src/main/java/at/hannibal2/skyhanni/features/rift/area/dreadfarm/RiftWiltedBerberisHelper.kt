@@ -22,8 +22,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
-import net.minecraft.init.Blocks
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.level.block.Blocks
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -56,8 +56,8 @@ object RiftWiltedBerberisHelper {
 
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
-        if (MinecraftCompat.localPlayer.onGround) {
-            isOnFarmland = LocationUtils.getBlockBelowPlayer().getBlockAt() == Blocks.farmland
+        if (MinecraftCompat.localPlayer.onGround()) {
+            isOnFarmland = LocationUtils.getBlockBelowPlayer().getBlockAt() == Blocks.FARMLAND
         }
     }
 
@@ -73,7 +73,7 @@ object RiftWiltedBerberisHelper {
         val location = event.location
         val berberis = nearestBerberis(location)
 
-        if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
+        if (event.type != ParticleTypes.FIREWORK) {
             if (config.hideParticles && berberis != null) {
                 event.cancel()
             }

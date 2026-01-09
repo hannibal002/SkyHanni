@@ -2,7 +2,8 @@ package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.misc.PathfindConfig
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.navigation.PathfindConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -12,15 +13,16 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.util.ChatComponentText
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object NavigationFeedback {
 
-    private val config get() = SkyHanniMod.feature.misc.pathfinding
+    private val config get() = SkyHanniMod.feature.misc.navigation.pathfinding
     private val pathFindMessageId = ChatUtils.getUniqueMessageId()
     private var guiRenderable: Renderable? = null
     private var lastChatMessageSent = SimpleTimeMark.farPast()
@@ -36,10 +38,12 @@ object NavigationFeedback {
 
     private fun isActive() = navActive || navLastActive.passedSince() < 3.seconds
 
-    fun setNavInactive() { navActive = false }
+    fun setNavInactive() {
+        navActive = false
+    }
 
     fun sendPathFindMessage(message: String) = sendPathFindMessage(message.asComponent())
-    fun sendPathFindMessage(component: ChatComponentText): Boolean {
+    fun sendPathFindMessage(component: Component): Boolean {
         navActive = true
         navLastActive = SimpleTimeMark.now()
         return when (config.feedbackMode.get()) {
@@ -50,19 +54,19 @@ object NavigationFeedback {
         }
     }
 
-    private fun sendChatFeedback(component: ChatComponentText): Boolean {
+    private fun sendChatFeedback(component: Component): Boolean {
         if (lastChatMessageSent.passedSince() < config.chatUpdateInterval.duration) return false
         component.send(pathFindMessageId)
         lastChatMessageSent = SimpleTimeMark.now()
         return true
     }
 
-    private fun sendGuiFeedback(component: ChatComponentText): Boolean {
-        val guiFormattedText = component.formattedText.replace("§e[SkyHanni] ", "§e")
+    private fun sendGuiFeedback(component: Component): Boolean {
+        val guiFormattedText = component.formattedTextCompat().replace("§e[SkyHanni] ", "§e")
         guiRenderable = Renderable.clickable(
             Renderable.text(guiFormattedText),
             onLeftClick = IslandGraphs::cancelClick,
-            tips = listOf("§eClick to stop navigating!")
+            tips = listOf("§eClick to stop navigating!"),
         )
         return true
     }
@@ -78,5 +82,10 @@ object NavigationFeedback {
                 }
             },
         )
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(114, "misc.pathfinding", "misc.navigation.pathfinding")
     }
 }
