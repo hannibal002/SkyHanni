@@ -146,7 +146,7 @@ object InstanceChestProfit {
     private val alreadyProcessedChests = mutableListOf<CroesusChestType>()
     private val croesusDisplayList = mutableListOf<Renderable>()
     private var slotToHighlight: Pair<Int, Double>? = null
-    private val slotsWithFavourites: MutableList<String> = mutableListOf()
+    private val slotsWithFavorites: MutableList<String> = mutableListOf()
     private var chestDisplay: Renderable? = null
     private val chestProfits: MutableMap<String, Double> = mutableMapOf()
     private val profileStorage get() = ProfileStorageData.profileSpecific
@@ -182,7 +182,7 @@ object InstanceChestProfit {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        val slots = slotsWithFavourites
+        val slots = slotsWithFavorites
         if (!isInCroesusMenu()) return
         slots.forEach {
             if (it == event.stack.hoverName.formattedTextCompat()) event.stackTip = "§6✯"
@@ -192,24 +192,24 @@ object InstanceChestProfit {
     @HandleEvent
     fun onKey(event: GuiKeyPressEvent) {
         if (!config.keybind.isKeyHeld()) return
-        val favouriteItems = profileStorage?.instanceChestFavouriteItems ?: mutableListOf()
+        val favoriteItems = profileStorage?.instanceChestFavoriteItems ?: mutableListOf()
         stackUnderCursor()?.getInternalNameOrNull()?.let {
-            if (favouriteItems.contains(it)) {
-                favouriteItems.remove(it)
-                ChatUtils.chat("Removed ${it.repoItemName}§e from Favourites List.")
+            if (favoriteItems.contains(it)) {
+                favoriteItems.remove(it)
+                ChatUtils.chat("Removed ${it.repoItemName}§e from Favorites List.")
             } else {
-                favouriteItems.add(it)
-                ChatUtils.chat("Added ${it.repoItemName}§e to Favourites List.")
+                favoriteItems.add(it)
+                ChatUtils.chat("Added ${it.repoItemName}§e to Favorites List.")
             }
         }
-        profileStorage?.instanceChestFavouriteItems = favouriteItems
+        profileStorage?.instanceChestFavoriteItems = favoriteItems
     }
 
     @HandleEvent(InventoryCloseEvent::class)
     fun onInventoryClose() {
         alreadyProcessedChests.clear()
         croesusDisplayList.clear()
-        slotsWithFavourites.clear()
+        slotsWithFavorites.clear()
         slotToHighlight = null
         croesusDisplay = null
     }
@@ -220,7 +220,7 @@ object InstanceChestProfit {
         chestTips.add("${chestType.stackChestName}:")
         var totalPrice = 0.0
         var cost = 0.0
-        var favouriteText = ""
+        var favoriteText = ""
         itemStack?.getLore()?.forEach { loreLine ->
             if (alreadyOpened.matches(loreLine)) return
             if (chestCostCroesus.matches(loreLine) || dungeonChestKey.matches(loreLine)) {
@@ -237,11 +237,11 @@ object InstanceChestProfit {
                     itemInternalName = itemName.toInternalName()
                 }
                 val internalName = itemInternalName
-                var favourited = ""
-                if (profileStorage?.instanceChestFavouriteItems?.contains(internalName) == true) {
-                    slotsWithFavourites.add(chestType.stackChestName)
-                    favourited = "§6✯"
-                    favouriteText = "§6Contains Favourited Item"
+                var favorited = ""
+                if (profileStorage?.instanceChestFavoriteItems?.contains(internalName) == true) {
+                    slotsWithFavorites.add(chestType.stackChestName)
+                    favorited = "§6✯"
+                    favoriteText = "§6Contains Favorited Item"
                 }
                 if (internalName != null) {
                     itemPrice = getPrice(internalName)
@@ -253,7 +253,7 @@ object InstanceChestProfit {
                         itemPrice = -1.0
                     }
                     if (itemPrice != -1.0) {
-                        chestTips.add(" ${internalName.repoItemName}: ${itemPrice.formatCoin()} $favourited")
+                        chestTips.add(" ${internalName.repoItemName}: ${itemPrice.formatCoin()} $favorited")
                         totalPrice += itemPrice
                         chestList.add(internalName)
                     }
@@ -275,7 +275,7 @@ object InstanceChestProfit {
         }
         chestTips.add("Cost: ${cost.formatCoin()}")
         chestTips.add("Profit: ${totalPrice.formatCoin()} §f(Pre Cost Profit ${preCostPrice.formatCoin()}§f) ")
-        croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, chestTips, favouriteText))
+        croesusDisplayList.add(createCroesusSingleChestDisplay(chestType, totalPrice, chestTips, favoriteText))
     }
 
     private fun getPrice(internalName: NeuInternalName): Double = internalName.getPrice(config.priceSource)
@@ -284,9 +284,9 @@ object InstanceChestProfit {
         chestType: CroesusChestType,
         totalValue: Double,
         contents: MutableList<String>,
-        favouriteText: String,
+        favoriteText: String,
     ): Renderable = Renderable.hoverTips(
-        "${chestType.stackChestName}: ${totalValue.formatCoin()} $favouriteText",
+        "${chestType.stackChestName}: ${totalValue.formatCoin()} $favoriteText",
         contents,
     )
 

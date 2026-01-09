@@ -48,8 +48,8 @@ class InstanceChestProfitConfig {
 
     @Expose
     @ConfigOption(
-        name = "Favourite Item Keybind",
-        desc = "Press while Hovering an item to add/remove it from favourites which will Star chests containing this item in Croesus."
+        name = "Favorite Item Keybind",
+        desc = "Press while Hovering an item to add/remove it from favorites which will Star chests containing this item in Croesus."
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var keybind: Int = GLFW.GLFW_KEY_UNKNOWN

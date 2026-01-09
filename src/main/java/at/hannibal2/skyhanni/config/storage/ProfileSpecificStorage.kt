@@ -101,7 +101,7 @@ class ProfileSpecificStorage(
     }
 
     @Expose
-    var instanceChestFavouriteItems: MutableList<NeuInternalName> = mutableListOf()
+    var instanceChestFavoriteItems: MutableList<NeuInternalName> = mutableListOf()
 
     // - commands
     @Expose
