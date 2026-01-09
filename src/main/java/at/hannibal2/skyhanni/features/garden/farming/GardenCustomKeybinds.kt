@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.system.MCVersion
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
@@ -27,7 +27,7 @@ object GardenCustomKeybinds {
 
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
-    private val versionAllowsDuplicateKeybinds by lazy { MCVersion.currentMcVersion >= MCVersion.fromString("1.21.9") }
+    private val versionAllowsDuplicateKeybinds by lazy { PlatformUtils.isMcAbove("1.21.9") }
 
     private var map: Map<KeyMapping, Int> = emptyMap()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
