@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Font;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(FontRenderer.class)
+@Mixin(Font.class)
 public abstract class ExtendedColorPatch {
 
     @Shadow(remap = false)
@@ -82,7 +82,7 @@ public abstract class ExtendedColorPatch {
         method = "renderStringAtPos",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/FontRenderer;setColor(FFFF)V",
+            target = "Lnet/minecraft/client/gui/Font;setColor(FFFF)V",
             ordinal = 0,
             shift = At.Shift.AFTER,
             remap = false

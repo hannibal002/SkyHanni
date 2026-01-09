@@ -6,7 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import org.intellij.lang.annotations.Language
 
@@ -29,7 +31,7 @@ class SkyblockGuideHighlightFeature private constructor(
     inventory: RepoPattern,
     loreCondition: RepoPattern,
     private val onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
-    private val onTooltip: (ToolTipEvent) -> Unit = {},
+    private val onTooltip: (ToolTipTextEvent) -> Unit = {},
 ) {
 
     private val inventoryPattern by inventory
@@ -41,7 +43,7 @@ class SkyblockGuideHighlightFeature private constructor(
         @Language("RegExp") inventory: String,
         @Language("RegExp") loreCondition: String,
         onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
-        onTooltip: (ToolTipEvent) -> Unit = {},
+        onTooltip: (ToolTipTextEvent) -> Unit = {},
     ) : this(
         config,
         patternGroup.pattern("$key.$KEY_PREFIX_INVENTORY", inventory),
@@ -56,7 +58,7 @@ class SkyblockGuideHighlightFeature private constructor(
         @Language("RegExp") inventory: String,
         loreCondition: RepoPattern,
         onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
-        onTooltip: (ToolTipEvent) -> Unit = {},
+        onTooltip: (ToolTipTextEvent) -> Unit = {},
     ) : this(
         config,
         patternGroup.pattern("$key.$KEY_PREFIX_INVENTORY", inventory),
@@ -102,16 +104,17 @@ class SkyblockGuideHighlightFeature private constructor(
             if (!isEnabled()) return
             if (activeObject == null) return
 
-            event.container.inventorySlots
-                .filter { missing.contains(it.slotNumber) }
+            event.container.slots
+                .filter { missing.contains(it.index) }
                 .forEach { it.highlight(LorenzColor.RED) }
         }
 
         @HandleEvent
-        fun onTooltip(event: ToolTipEvent) {
+        fun onTooltip(event: ToolTipTextEvent) {
             if (!isEnabled()) return
+            event.slot ?: return
             val current = activeObject ?: return
-            if (!missing.contains(event.slot.slotNumber)) return
+            if (!missing.contains(event.slot.index)) return
             current.onTooltip.invoke(event)
         }
 
@@ -127,7 +130,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
             for ((slot, item) in event.inventoryItems) {
                 if (slot == 4) continue // Overview Item
-                val loreAndName = listOf(item.displayName) + item.getLore()
+                val loreAndName = listOf(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) + item.getLore()
                 if (!current.conditionPattern.anyMatches(loreAndName)) continue
                 missing.add(slot)
             }
@@ -151,7 +154,7 @@ class SkyblockGuideHighlightFeature private constructor(
             }
         }
 
-        private val openWikiTooltip: (ToolTipEvent) -> Unit = { event ->
+        private val openWikiTooltip: (ToolTipTextEvent) -> Unit = { event ->
             event.toolTip.add("")
             event.toolTip.add("§7§eClick to view on the SkyBlock Wiki!")
         }

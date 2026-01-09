@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 
@@ -41,9 +42,9 @@ object ExperimentationXPOverlay {
         if (!isEnabled()) return
         event.stack ?: return
         if (!event.stack.isDye()) return
-        enchantingXPPattern.matchMatcher(event.stack.displayName) {
+        enchantingXPPattern.matchMatcher(event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             val text = "${group("xp")}k"
-            val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)
+            val stringWidth = Minecraft.getInstance().font.width(text)
             event.drawSlotText(event.x + 2 + stringWidth, event.y + 10, text, .6f)
         }
     }

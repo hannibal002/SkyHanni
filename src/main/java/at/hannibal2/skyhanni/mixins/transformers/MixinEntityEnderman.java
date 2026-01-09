@@ -1,20 +1,17 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.SkyHanniMod;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.world.World;
+import at.hannibal2.skyhanni.events.entity.EndermanTeleportEvent;
+import net.minecraft.world.entity.monster.EnderMan;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(EntityEnderman.class)
+@Mixin(EnderMan.class)
 public class MixinEntityEnderman {
 
-    @Redirect(method = "onLivingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;spawnParticle(Lnet/minecraft/util/EnumParticleTypes;DDDDDD[I)V"))
-    private void onLivingUpdate(World world, EnumParticleTypes particleType, double x, double y, double z, double xOffset, double yOffset, double zOffset, int[] parameters) {
-        if (!SkyHanniMod.feature.misc.particleHiders.hideEndermanParticles) {
-            world.spawnParticle(particleType, x, y, z, xOffset, yOffset, zOffset, parameters);
-        }
+    @Inject(method = "teleport(DDD)Z", at = @At(value = "HEAD"), cancellable = true)
+    private void onLivingUpdate(double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
+        if (new EndermanTeleportEvent().post()) cir.setReturnValue(false);
     }
 }
