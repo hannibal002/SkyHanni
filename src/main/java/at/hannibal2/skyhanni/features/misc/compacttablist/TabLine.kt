@@ -2,14 +2,14 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
-import net.minecraft.client.network.NetworkPlayerInfo
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.client.multiplayer.PlayerInfo
+import net.minecraft.world.entity.player.Player
 
 class TabLine(val text: String, val type: TabStringType, val customName: String = text) {
 
     fun getWidth(): Int {
-        val mc = Minecraft.getMinecraft()
-        var width = mc.fontRendererObj.getStringWidth(customName)
+        val mc = Minecraft.getInstance()
+        var width = mc.font.width(customName)
         if (type === TabStringType.PLAYER) {
             width += 8 + 2 // Player head
         }
@@ -19,19 +19,19 @@ class TabLine(val text: String, val type: TabStringType, val customName: String 
         return width
     }
 
-    fun getInfo(): NetworkPlayerInfo? {
-        val minecraft = Minecraft.getMinecraft()
+    fun getInfo(): PlayerInfo? {
+        val minecraft = Minecraft.getInstance()
         val usernameFromLine = TabStringType.usernameFromLine(text)
-        return minecraft.netHandler?.getPlayerInfo(usernameFromLine)
+        return minecraft.connection?.getPlayerInfo(usernameFromLine)
     }
 
-    private var entity: EntityPlayer? = null
+    private var entity: Player? = null
 
-    fun getEntity(pLayerInfo: NetworkPlayerInfo): EntityPlayer? {
+    fun getEntity(pLayerInfo: PlayerInfo): Player? {
         entity?.let {
             return it
         }
-        val entity = MinecraftCompat.localWorld.getPlayerEntityByUUID(pLayerInfo.gameProfile.id)
+        val entity = MinecraftCompat.localWorld.getPlayerByUUID(pLayerInfo.profile.id)
         this.entity = entity
         return entity
     }

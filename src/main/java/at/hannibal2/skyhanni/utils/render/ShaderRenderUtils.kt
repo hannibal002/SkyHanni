@@ -8,18 +8,15 @@ import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.util.ResourceLocation
+import net.minecraft.resources.ResourceLocation
+import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
-//#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer
+//#if MC > 1.21.5
 //$$ import org.joml.Matrix3x2f
-//$$ import org.joml.Matrix4f
 //#endif
 
 object ShaderRenderUtils {
@@ -31,7 +28,7 @@ object ShaderRenderUtils {
         this.toColor().red.toFloat() / 255f,
         this.toColor().green.toFloat() / 255f,
         this.toColor().blue.toFloat() / 255f,
-        this.alpha.toFloat() / 255f
+        this.alpha.toFloat() / 255f,
     )
 
     /**
@@ -55,13 +52,11 @@ object ShaderRenderUtils {
         this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
-        //#if MC > 1.21
         //#if MC < 1.21.6
-        //$$ this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
-        //#endif
+        this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.pose().last().pose())
         //#endif
         //#if MC > 1.21.6
-        //$$ val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.matrices)
+        //$$ val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.pose())
         //$$ this.modelViewMatrix = Matrix4f()
         //$$     .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
         //$$     .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)
@@ -97,15 +92,7 @@ object ShaderRenderUtils {
 
         RoundedTextureShader.applyBaseSettings(radius, width, height, x, y, smoothness)
 
-        //#if MC < 1.21
-        DrawContextUtils.pushPop {
-            ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
-            GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
-            ShaderManager.disableShader()
-        }
-        //#else
-        //$$ RoundedShapeDrawer.drawRoundedTexturedRect(x, y, width, height, texture)
-        //#endif
+        RoundedShapeDrawer.drawRoundedTexturedRect(x, y, width, height, texture)
     }
 
     /**
@@ -124,15 +111,7 @@ object ShaderRenderUtils {
     fun drawRoundRect(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Float = 1f) {
         RoundedRectangleShader.applyBaseSettings(radius, width, height, x, y, smoothness)
 
-        //#if MC < 1.21
-        DrawContextUtils.pushPop {
-            ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
-            GuiRenderUtils.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
-            ShaderManager.disableShader()
-        }
-        //#else
-        //$$ RoundedShapeDrawer.drawRoundedRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
-        //#endif
+        RoundedShapeDrawer.drawRoundedRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
     }
 
     /**
@@ -175,15 +154,7 @@ object ShaderRenderUtils {
         val right = x + width + borderAdjustment
         val bottom = y + height + borderAdjustment
 
-        //#if MC < 1.21
-        DrawContextUtils.pushPop {
-            ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECT_OUTLINE)
-            GuiRenderUtils.drawGradientRect(left, top, right, bottom, topColor, bottomColor)
-            ShaderManager.disableShader()
-        }
-        //#else
-        //$$ RoundedShapeDrawer.drawRoundedRectOutline(left, top, right, bottom, topColor, bottomColor)
-        //#endif
+        RoundedShapeDrawer.drawRoundedRectOutline(left, top, right, bottom, topColor, bottomColor)
     }
 
     /**
@@ -217,15 +188,7 @@ object ShaderRenderUtils {
         val right = x + width + 5
         val bottom = y + height + 5
 
-        //#if MC < 1.21
-        DrawContextUtils.pushPop {
-            ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
-            GuiRenderUtils.drawGradientRect(left, top, right, bottom, topColor, bottomColor)
-            ShaderManager.disableShader()
-        }
-        //#else
-        //$$ RoundedShapeDrawer.drawRoundedRect(left, top, right, bottom, topColor, bottomColor)
-        //#endif
+        RoundedShapeDrawer.drawRoundedRect(left, top, right, bottom, topColor, bottomColor)
     }
 
     /**
@@ -250,7 +213,7 @@ object ShaderRenderUtils {
         radius: Int = 10,
         smoothness: Float = 1f,
         angle1: Float = 7.0f,
-        angle2: Float = 7.0f
+        angle2: Float = 7.0f,
     ) {
         // todo all of these diameters might need to be calced from radiusIn instead of radius?
         val radiusIn = radius * GuiScreenUtils.scaleFactor
@@ -266,15 +229,7 @@ object ShaderRenderUtils {
         val right = x + (radius * 2) + 5
         val bottom = y + (radius * 2) + 5
 
-        //#if MC < 1.21
-        DrawContextUtils.pushPop {
-            ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
-            GuiRenderUtils.drawRect(left, top, right, bottom, color.rgb)
-            ShaderManager.disableShader()
-        }
-        //#else
-        //$$ RoundedShapeDrawer.drawCircle(left, top, right, bottom, color.rgb)
-        //#endif
+        RoundedShapeDrawer.drawCircle(left, top, right, bottom, color.rgb)
     }
 
     /**
@@ -324,14 +279,7 @@ object ShaderRenderUtils {
         val right = x + (radius * 2) + 5
         val bottom = y + (radius * 2) + 5
 
-        //#if MC < 1.21
-        DrawContextUtils.pushPop {
-            ShaderManager.enableShader(ShaderManager.Shaders.RADIAL_GRADIENT_CIRCLE)
-            GuiRenderUtils.drawRect(left, top, right, bottom, LorenzColor.WHITE.toColor().rgb)
-            ShaderManager.disableShader()
-        }
-        //#else
-        //$$ RoundedShapeDrawer.drawGradientCircle(left, top, right, bottom, startColor, endColor)
-        //#endif
+        RoundedShapeDrawer.drawGradientCircle(left, top, right, bottom, startColor, endColor)
+
     }
 }

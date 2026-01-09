@@ -23,12 +23,13 @@ import at.hannibal2.skyhanni.utils.SoundUtils.playBeepSound
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -77,7 +78,7 @@ object TotemOfCorruption {
         if (!config.hideParticles) return
 
         for (totem in totems) {
-            if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0f) {
+            if (event.type == ParticleTypes.WITCH && event.speed == 0f) {
                 if (totem.location.distance(event.location) < 4.0) {
                     event.cancel()
                 }
@@ -121,20 +122,20 @@ object TotemOfCorruption {
         totems = emptyList()
     }
 
-    private fun getTimeRemaining(totem: EntityArmorStand): Duration? =
-        EntityUtils.getEntitiesNearby<EntityArmorStand>(totem.getLorenzVec(), 2.0)
+    private fun getTimeRemaining(totem: ArmorStand): Duration? =
+        EntityUtils.getEntitiesNearby<ArmorStand>(totem.getLorenzVec(), 2.0)
             .firstNotNullOfOrNull { entity ->
-                timeRemainingPattern.matchMatcher(entity.name) {
+                timeRemainingPattern.matchMatcher(entity.name.formattedTextCompatLessResets()) {
                     val minutes = group("min")?.toIntOrNull() ?: 0
                     val seconds = group("sec")?.toInt() ?: 0
                     (minutes * 60 + seconds).seconds
                 }
             }
 
-    private fun getOwner(totem: EntityArmorStand): String? =
-        EntityUtils.getEntitiesNearby<EntityArmorStand>(totem.getLorenzVec(), 2.0)
+    private fun getOwner(totem: ArmorStand): String? =
+        EntityUtils.getEntitiesNearby<ArmorStand>(totem.getLorenzVec(), 2.0)
             .firstNotNullOfOrNull { entity ->
-                ownerPattern.matchMatcher(entity.name) {
+                ownerPattern.matchMatcher(entity.name.formattedTextCompatLessResets()) {
                     group("owner")
                 }
             }
@@ -150,17 +151,17 @@ object TotemOfCorruption {
         .filter { it.distance < config.distanceThreshold }
         .maxByOrNull { it.timeRemaining }
 
-    private fun getTotems(): List<Totem> = EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(100.0)
-        .filter { totemNamePattern.matches(it.name) }.toList()
+    private fun getTotems(): List<Totem> = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(100.0)
+        .filter { totemNamePattern.matches(it.name.formattedTextCompatLessResets()) }.toList()
         .mapNotNull { totem ->
             val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null
             val owner = getOwner(totem) ?: return@mapNotNull null
 
             val timeToWarn = config.warnWhenAboutToExpire.seconds
-            if (timeToWarn > 0.seconds && timeRemaining <= timeToWarn && totem.uniqueID !in warnedTotems) {
+            if (timeToWarn > 0.seconds && timeRemaining <= timeToWarn && totem.uuid !in warnedTotems) {
                 playBeepSound(0.5f)
                 TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
-                warnedTotems.add(totem.uniqueID)
+                warnedTotems.add(totem.uuid)
             }
             Totem(totem.getLorenzVec(), timeRemaining, owner)
         }

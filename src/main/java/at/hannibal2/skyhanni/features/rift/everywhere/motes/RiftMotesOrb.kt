@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 
 @SkyHanniModule
 object RiftMotesOrb {
@@ -50,7 +50,7 @@ object RiftMotesOrb {
         if (!enabled) return
         val location = event.location.add(-0.5, 0.0, -0.5)
 
-        if (event.type == EnumParticleTypes.SPELL_MOB) {
+        if (event.type == ParticleTypes.ENTITY_EFFECT) {
             val orb =
                 motesOrbs.find { it.location.distance(location) < 3 } ?: MotesOrb(location).also {
                     motesOrbs = motesOrbs.editCopy { add(it) }

@@ -1,14 +1,13 @@
-// Chroma Fragment Shader
-// (Same as textured_chroma.fsh but isn't restricted to textured elements)
+#version 150
 
-#version 120
+in vec4 vertexColor;
 
 uniform float chromaSize;
 uniform float timeOffset;
 uniform float saturation;
 uniform bool forwardDirection;
 
-varying vec4 originalColor;
+out vec4 fragColor;
 
 float rgb2b(vec3 rgb) {
     return max(max(rgb.r, rgb.g), rgb.b);
@@ -33,5 +32,5 @@ void main() {
     float hue = mod(((fragCoord) / chromaSize) - timeOffset, 1.0);
 
     // Set the color to use the new hue & original saturation/value/alpha values
-    gl_FragColor = vec4(hsb2rgb_smooth(vec3(hue, saturation, rgb2b(originalColor.rgb))), originalColor.a);
+    fragColor = vec4(hsb2rgb_smooth(vec3(hue, saturation, rgb2b(vertexColor.rgb))), vertexColor.a);
 }

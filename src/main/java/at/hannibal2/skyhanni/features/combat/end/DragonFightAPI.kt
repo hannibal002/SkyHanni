@@ -59,10 +59,10 @@ object DragonFightAPI {
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent) {
-        chatSpawnPattern.matchMatcher(event.message.removeColor()) {
+        chatSpawnPattern.matchMatcher(event.cleanMessage) {
             currentType = group("type")
         }
-        chatDeath.matchMatcher(event.message.removeColor()) {
+        chatDeath.matchMatcher(event.cleanMessage) {
             reset()
         }
     }
