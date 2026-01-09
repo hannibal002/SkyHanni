@@ -90,11 +90,15 @@ object SensitivityReducer {
     }
 
     private fun autoToggleIfNeeded() {
-        val holdingTool = config.mode.contains(SensitivityReducerConfig.Mode.TOOL) && isHoldingTool()
-        val holdingFishingRod = config.mode.contains(SensitivityReducerConfig.Mode.FISHING_ROD) && isHoldingFishingRod()
-        val holdenKeybind = config.mode.contains(SensitivityReducerConfig.Mode.KEYBIND) && isHoldingKey()
+        val shouldReduce = config.mode.any {
+            when (it) {
+                SensitivityReducerConfig.Mode.TOOL -> isHoldingTool()
+                SensitivityReducerConfig.Mode.FISHING_ROD -> isHoldingFishingRod()
+                SensitivityReducerConfig.Mode.KEYBIND -> isHoldingKey()
+            }
+        }
 
-        toggleIfCondition { holdingTool || holdingFishingRod || holdenKeybind }
+        toggleIfCondition { shouldReduce }
     }
 
     private fun toggleIfCondition(check: () -> Boolean) {
