@@ -284,9 +284,9 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
 
         RngDropEnum.entries.forEach {
             val drops = rngMap[it] ?: 0
-            val blocksBroken = if (data.selectedBucket == null) data.getTotalOutsideCount()
-            else data.blocksBrokenOutside[data.selectedBucket] ?: 0
-            val breaksPerDrop = if (blocksBroken == 0L) 0 else drops / blocksBroken
+            val blocksBroken = if (data.selectedBucket == null) data.getTotalDuringCount()
+            else data.blocksBrokenDuring[data.selectedBucket] ?: 0
+            val breaksPerDrop = if (drops == 0L) 0 else blocksBroken / drops
             add(
                 Renderable.hoverTips(
                     Renderable.text("§7- §e${drops}x $it"),
