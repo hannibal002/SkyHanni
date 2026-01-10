@@ -276,9 +276,11 @@ object BitsApi {
         }
     }
 
-    fun bitsPerCookie(): Int {
+    fun bitsPerCookie(): Int = (DEFAULT_COOKIE_BITS * bitsMultiplier()).toInt()
+
+    fun bitsMultiplier(): Double {
         val museumBonus = profileStorage?.museumMilestone?.let { 1 + it * 0.01 } ?: 1.0 // Adds 1% per level
-        return (DEFAULT_COOKIE_BITS * museumBonus * (fameRank?.bitsMultiplier ?: 1.0)).toInt()
+        return museumBonus * (fameRank?.bitsMultiplier ?: 1.0)
     }
 
     @HandleEvent

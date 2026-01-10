@@ -289,7 +289,7 @@ object PestApi {
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
             GardenPlotApi.getCurrentPlot()?.let { gardenPestTypes.removeFromPlot(it, pest) }
-            PestKillEvent.post()
+            PestKillEvent(pest).post()
         }
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
