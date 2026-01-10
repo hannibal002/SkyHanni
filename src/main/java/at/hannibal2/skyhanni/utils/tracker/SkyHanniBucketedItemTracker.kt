@@ -16,7 +16,15 @@ abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedI
     getStorage: (ProfileSpecificStorage) -> BucketedData,
     drawDisplay: (BucketedData) -> List<Searchable>,
     extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> BucketedData> = emptyMap(),
-) : SkyHanniItemTracker<BucketedData>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
+    customUptimeControl: Boolean = false
+) : SkyHanniItemTracker<BucketedData>(
+    name,
+    createNewSession,
+    getStorage,
+    extraDisplayModes,
+    drawDisplay = drawDisplay,
+    customUptimeControl = customUptimeControl
+) {
 
     final override fun addCoins(amount: Int, command: Boolean) =
         throw UnsupportedOperationException("Use addCoins(bucket, coins, command) instead")

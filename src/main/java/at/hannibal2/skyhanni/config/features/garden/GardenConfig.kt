@@ -152,6 +152,11 @@ class GardenConfig {
     val dnaAnalyzerSolver: DnaAnalyzerSolverConfig = DnaAnalyzerSolverConfig()
 
     @Expose
+    @ConfigOption(name = "Crop Fever Tracker", desc = "")
+    @Accordion
+    val cropFeverTracker: CropFeverTrackerConfig = CropFeverTrackerConfig()
+
+    @Expose
     @ConfigOption(
         name = "Plot Price",
         desc = "Show the price of the plot in coins when inside the Configure Plots inventory.",

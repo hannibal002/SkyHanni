@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
+import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.hunting.HuntingProfitTracker
@@ -615,6 +616,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var overflowHoeLevels: MutableMap<String, Int> = mutableMapOf()
+
+        @Expose
+        var cropFeverTracker: CropFeverTracker.BucketData = CropFeverTracker.BucketData()
     }
 
     // - gui
