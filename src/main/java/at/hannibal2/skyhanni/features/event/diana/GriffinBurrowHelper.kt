@@ -164,6 +164,7 @@ object GriffinBurrowHelper {
         private fun shouldKeepGuess(): Boolean {
 
             // burrows that are known from the previous dug even if particles don't update
+            // or inaccurate precise guesses
             if (ignoreParticleCheckUntil.passedSince() < 0.milliseconds) return true
 
             // don't attempt to move mob burrows if a mob is alive
@@ -338,10 +339,10 @@ object GriffinBurrowHelper {
             } else if (genericMythologicalSpawnPattern.matches(event.message)) {
                 mobAlive = true
                 removeGuess(it)
-                addGuess(GuessEntry(listOf(it), BurrowType.MOB, ignoreParticleCheckUntil = SimpleTimeMark.now() + 2.seconds))
+                addGuess(GuessEntry(listOf(it), BurrowType.MOB))
             } else if (treasureDugPattern.matches(event.message)) {
                 removeGuess(it)
-                addGuess(GuessEntry(listOf(it), BurrowType.START, ignoreParticleCheckUntil = SimpleTimeMark.now() + 2.seconds))
+                addGuess(GuessEntry(listOf(it), BurrowType.START, ignoreParticleCheckUntil = SimpleTimeMark.now() + 3.seconds))
             }
         }
 
