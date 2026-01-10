@@ -211,7 +211,8 @@ object GardenApi {
     }
 
     fun getCurrentlyFarmedCrop(): CropType? {
-        val brokenCrop = if (toolInHand != null) GardenCropSpeed.lastBrokenCrop else null
+        if (toolInHand == null) return null
+        val brokenCrop =  GardenCropSpeed.lastBrokenCrop
         return lastBrokenCropType ?: cropInHand ?: brokenCrop
     }
 
