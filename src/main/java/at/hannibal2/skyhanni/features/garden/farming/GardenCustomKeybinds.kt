@@ -27,7 +27,7 @@ object GardenCustomKeybinds {
 
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
-    private val versionAllowsDuplicateKeybinds by lazy { PlatformUtils.isMcAbove("1.21.9") }
+    private val versionAllowsDuplicateKeybinds by lazy { PlatformUtils.isMcBelow("1.21.9") }
 
     private var map: Map<KeyMapping, Int> = emptyMap()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
