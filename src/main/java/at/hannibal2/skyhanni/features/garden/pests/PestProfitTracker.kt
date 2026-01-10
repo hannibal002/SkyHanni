@@ -85,6 +85,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
+    val OVERCLOCKER = "OVERCLOCKER_3000".toInternalName()
     private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
     private val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
     private var adjustmentMap: Map<PestType, Map<NeuInternalName, Int>> = mapOf()
@@ -155,7 +156,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
             // Field Mice drop 6 separate items, but we only want to count the kill once
             if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
-            else if (pest != PestType.FIELD_MOUSE) addKill(pest)
+            // overclocker drops have the same format as crop drops and causes double counting kills
+            else if (pest != PestType.FIELD_MOUSE && internalName != OVERCLOCKER) addKill(pest)
         }
         pestRareDropPattern.matchMatcher(message) {
             val itemGroup = group("item")
