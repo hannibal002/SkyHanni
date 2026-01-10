@@ -37,7 +37,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.math.abs
 import kotlin.reflect.KClass
-import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,17 +53,10 @@ object EliteFarmersLeaderboard {
     private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardPosMap
     private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double>? get() = storage?.leaderboardAmountMap
     private val minAmount: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minAmountMap
-    private val lastLeaderboardUpdate: MutableMap<EliteLeaderboardType, SimpleTimeMark> = mutableMapOf()
-    private val shouldRefreshLeaderboard: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
-    // increases the amount of players requested if they're getting constantly overtaken
-    private val lastPlayer: MutableMap<EliteLeaderboardType, EliteLeaderboardPlayer?> = mutableMapOf()
-    private val nextPlayers: MutableMap<EliteLeaderboardType, MutableList<EliteLeaderboardPlayer>> = mutableMapOf()
-    private val lastApiData: MutableMap<EliteLeaderboardType, EliteLeaderboard> = mutableMapOf()
-    private val isUnranked: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
-    private val rankGoal: MutableMap<EliteLeaderboardType, Int?> = mutableMapOf()
-    private val loadedLeaderboardCategories = mutableSetOf<KClass<out EliteLeaderboardType>>()
-    private val passedPlayerCache: MutableMap<EliteLeaderboardType, MutableList<String>> = mutableMapOf()
     private var lastPassedMessage: SimpleTimeMark = SimpleTimeMark.farPast()
+    private val loadedLeaderboardCategories = mutableSetOf<KClass<out EliteLeaderboardType>>()
+
+    private val eliteLeaderboardData: MutableMap<EliteLeaderboardType, EliteLeaderboardData> = mutableMapOf()
 
     var apiError = false
     private var hasWarned = false
@@ -72,21 +64,14 @@ object EliteFarmersLeaderboard {
     private var lastFetchAttempt = SimpleTimeMark.farPast()
 
     fun clearEntries(leaderboardType: EliteLeaderboardType) {
-        lastApiData.remove(leaderboardType)
-        rankGoal.remove(leaderboardType)
         leaderboardPosMap?.remove(leaderboardType)
-        shouldRefreshLeaderboard.remove(leaderboardType)
-        nextPlayers.remove(leaderboardType)
-        lastPlayer.remove(leaderboardType)
+        eliteLeaderboardData.remove(leaderboardType)
     }
 
+    // removes all subclasses
     fun clearCategories(category: KClass<out EliteLeaderboardType>) {
-        lastApiData.clearCategory(category)
-        rankGoal.clearCategory(category)
         leaderboardPosMap?.clearCategory(category)
-        shouldRefreshLeaderboard.clearCategory(category)
-        nextPlayers.clearCategory(category)
-        lastPlayer.clearCategory(category)
+        eliteLeaderboardData.clearCategory(category)
     }
 
     private fun <T> MutableMap<EliteLeaderboardType, T>.clearCategory(category: KClass<out EliteLeaderboardType>) {
@@ -104,8 +89,8 @@ object EliteFarmersLeaderboard {
 
     @HandleEvent
     fun onPestKill(event: PestKillEvent) {
-        addPestKill(EliteLeaderboardType.Pest(event.pest, EliteLeaderboardMode.ALL_TIME))
-        addPestKill(EliteLeaderboardType.Pest(event.pest, EliteLeaderboardMode.MONTHLY))
+        addPestKill(EliteLeaderboardType.Pest(event.pestType, EliteLeaderboardMode.ALL_TIME))
+        addPestKill(EliteLeaderboardType.Pest(event.pestType, EliteLeaderboardMode.MONTHLY))
         addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.MONTHLY))
         addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.ALL_TIME))
     }
@@ -113,13 +98,13 @@ object EliteFarmersLeaderboard {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (lastPassedMessage.passedSince() < 30.seconds) return
-        passedPlayerCache.forEach { lbtype ->
+        eliteLeaderboardData.forEach { lbtype ->
             if (!getLeaderboardConfig(lbtype.key).showLbChange) return@forEach
-            val list = lbtype.value
+            val list = lbtype.value.passedPlayers
             if (list.isEmpty()) return@forEach
             if (list.size < 3) {
-                list.forEach {name ->
-                    farmingChatMessage("You passed §b${name} §ein the §6${lbtype.key} §eLeaderboard!")
+                list.forEach { name ->
+                    farmingChatMessage("You passed §b$name §ein the §6${lbtype.key} §eLeaderboard!")
                 }
             } else {
                 farmingChatMessage("You recently passed §b${list.size.addSeparators()} players §ein the §6${lbtype.key} §eLeaderboard!")
@@ -134,7 +119,7 @@ object EliteFarmersLeaderboard {
     }
 
     fun isUnranked(leaderboardType: EliteLeaderboardType): Boolean {
-        return isUnranked[leaderboardType] ?: false
+        return eliteLeaderboardData[leaderboardType]?.isUnranked ?: false
     }
 
     fun leaderboardMinAmount(leaderboardType: EliteLeaderboardType): Double? {
@@ -142,9 +127,10 @@ object EliteFarmersLeaderboard {
     }
 
     fun getLeaderboardPosition(leaderboardType: EliteLeaderboardType, override: Boolean = false): Int? {
+        val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
         if (profileId == "") return null // api call requires profile id
-        val lastUpdate = lastLeaderboardUpdate[leaderboardType]?.passedSince() ?: INFINITE
-        val refresh = override || (shouldRefreshLeaderboard[leaderboardType] ?: true)
+        val lastUpdate = lbData.lastUpdate.passedSince()
+        val refresh = override || (lbData.shouldRefresh)
 
         if (!refresh && lastUpdate < 10.minutes) {
             val pos = leaderboardPosMap?.get(leaderboardType)
@@ -162,8 +148,8 @@ object EliteFarmersLeaderboard {
 
         val pos = loadLeaderboardIfAble(leaderboardType)
         if (pos != null || fetchAttempts > 3) {
-            lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
-            shouldRefreshLeaderboard[leaderboardType] = false
+            lbData.lastUpdate = SimpleTimeMark.now()
+            lbData.shouldRefresh = false
             fetchAttempts = 0
         }
 
@@ -171,23 +157,25 @@ object EliteFarmersLeaderboard {
     }
 
     fun getNextPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
+        val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
         val amount = getAmount(leaderboardType) ?: return null
-        var nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
+        var nextPlayer = lbData.nextPlayers.firstOrNull() ?: return null
         var amountBehind = nextPlayer.amount - amount
         while (amountBehind < 0) {
             nextPlayer = updateNextPlayer(leaderboardType) ?: break
             amountBehind = nextPlayer.amount - amount
         }
         if (amountBehind < 0) {
-            shouldRefreshLeaderboard[leaderboardType] = true
+            lbData.shouldRefresh = true
             return null
         }
         return Pair(nextPlayer.name, amountBehind)
     }
 
     fun getLastPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
+        val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
         val amount = getAmount(leaderboardType) ?: return null
-        val lastPlayer = lastPlayer[leaderboardType] ?: return null
+        val lastPlayer = lbData.lastPlayer ?: return null
         val amountAhead = amount - lastPlayer.amount
         return if (amountAhead < 0) null else Pair(lastPlayer.name, amountAhead)
     }
@@ -222,23 +210,24 @@ object EliteFarmersLeaderboard {
     }
 
     private fun updateNextPlayer(leaderboardType: EliteLeaderboardType): EliteLeaderboardPlayer? {
-        val nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
-        lastPlayer[leaderboardType] = nextPlayer
+        val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
+        val nextPlayer = lbData.nextPlayers.firstOrNull() ?: return null
+        lbData.lastPlayer = nextPlayer
         // send messages every ~30s instead of every pass to avoid chat spam
-        val list = passedPlayerCache.getOrPut(leaderboardType) { mutableListOf() }
+        val list = lbData.passedPlayers.toMutableList()
         list.add(nextPlayer.name)
-        nextPlayers[leaderboardType]?.removeFirstOrNull() ?: return null
+        lbData.nextPlayers.removeFirstOrNull() ?: return null
 
         val currentRank = leaderboardPosMap?.get(leaderboardType) ?: return null
         // shouldn't be able to pass players if we're rank 1, something went wrong
         if (currentRank == 1) {
             leaderboardPosMap?.remove(leaderboardType)
-            nextPlayers.remove(leaderboardType)
+            lbData.nextPlayers.clear()
             return null
         }
         val rankGoal = getRankGoal(leaderboardType) // getRankGoal returns null if we're at or in front of it
         leaderboardPosMap?.set(leaderboardType, rankGoal ?: (currentRank - 1)) // player we passed should be at rank goal if not null
-        return nextPlayers[leaderboardType]?.firstOrNull()
+        return lbData.nextPlayers.firstOrNull()
     }
 
     private fun loadLeaderboardIfAble(leaderboardType: EliteLeaderboardType): Int? {
@@ -258,7 +247,7 @@ object EliteFarmersLeaderboard {
                         checkOffScreenLeaderboardChanges(oldPos, leaderboardType)
                         loadedLeaderboardCategories.add(category)
                     }
-                    lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
+                    eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }.lastUpdate = SimpleTimeMark.now()
                 }
             }
         }
@@ -283,6 +272,7 @@ object EliteFarmersLeaderboard {
 
 
     private suspend fun loadLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int? {
+        val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
         if (profileId == "") return null
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
         val currentPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
@@ -302,23 +292,23 @@ object EliteFarmersLeaderboard {
         // elite only updates player profiles once an hour, so assume it's wrong if it's the same as last fetch
         val shouldUpdateData = shouldUpdateData(leaderboardType, apiData)
         minAmount?.set(leaderboardType, apiData.minAmount)
-        lastApiData[leaderboardType] = apiData
-        lastLeaderboardUpdate[leaderboardType] = SimpleTimeMark.now()
-        shouldRefreshLeaderboard[leaderboardType] = false
+        lbData.apiData = apiData
+        lbData.lastUpdate = SimpleTimeMark.now()
+        lbData.shouldRefresh = false
         apiError = false
         if (apiData.rank <= 0) { // api returns -1 for unranked players
-            isUnranked[leaderboardType] = true
+            lbData.isUnranked = true
             // correct wrong data
             leaderboardAmountMap?.remove(leaderboardType)
             leaderboardPosMap?.remove(leaderboardType)
             if (!useRankGoal) {
-                nextPlayers.remove(leaderboardType)
-                lastPlayer.remove(leaderboardType)
+                lbData.nextPlayers.clear()
+                lbData.lastPlayer = null
             }
 
             return null
         }
-        isUnranked[leaderboardType] = false
+        lbData.isUnranked = true
         if (shouldUpdateData) handleDiff(leaderboardType, apiData)
         handleUpcomingPlayers(leaderboardType, apiData)
         // prefer our lb pos
@@ -355,7 +345,8 @@ object EliteFarmersLeaderboard {
 
     // only update data if api data has changed since last request
     private fun shouldUpdateData(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard): Boolean {
-        val oldApiData = lastApiData[leaderboardType] ?: return true
+        val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
+        val oldApiData = lbData.apiData ?: return true
         val amountDiff = oldApiData.amount != apiData.amount
         return amountDiff
     }
@@ -413,14 +404,16 @@ object EliteFarmersLeaderboard {
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
     ) {
-        lastPlayer[leaderboardType] = apiData.previous?.firstOrNull()
-        nextPlayers[leaderboardType] = mutableListOf()
+        val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
+        lbData.lastPlayer = apiData.previous?.firstOrNull()
+        lbData.nextPlayers.clear()
         apiData.upcomingPlayers.forEach {
-            if (apiData.rank != 1) nextPlayers[leaderboardType]?.add(it)
+            if (apiData.rank != 1) lbData.nextPlayers.add(it)
         }
     }
 
     fun getRankGoal(leaderboardType: EliteLeaderboardType): Int? {
+        val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
         val goal = getRankGoalIfValid(leaderboardType)?.get()?.toIntOrNull() ?: return null
 
         val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
@@ -436,27 +429,22 @@ object EliteFarmersLeaderboard {
                 }
                 hasWarned = true
             }
-            rankGoal[leaderboardType] = null
+            lbData.rankGoal = null
             return null
         }
 
-        if (rankGoal[leaderboardType] != goal) {
-            shouldRefreshLeaderboard[leaderboardType] = true
-            rankGoal[leaderboardType] = goal
+        if (lbData.rankGoal != goal) {
+            lbData.shouldRefresh = true
+            lbData.rankGoal = goal
         }
 
-        return rankGoal[leaderboardType]
+        return lbData.rankGoal
     }
 
     fun reset() {
         leaderboardPosMap?.clear()
         leaderboardAmountMap?.clear()
-        lastLeaderboardUpdate.clear()
-        lastPlayer.clear()
-        nextPlayers.clear()
-        shouldRefreshLeaderboard.clear()
-        rankGoal.clear()
-        isUnranked.clear()
+        eliteLeaderboardData.clear()
         apiError = false
         hasWarned = false
         fetchAttempts = 0
@@ -478,8 +466,8 @@ object EliteFarmersLeaderboard {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("elite leaderboard")
         event.addIrrelevant {
-            lastApiData.forEach {
-                add(it.value.toString())
+            eliteLeaderboardData.forEach {
+                add(it.value.apiData.toString())
             }
         }
     }
