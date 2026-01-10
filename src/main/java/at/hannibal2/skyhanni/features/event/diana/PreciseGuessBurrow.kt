@@ -57,7 +57,7 @@ object PreciseGuessBurrow {
             listOf(guessPosition.down(0.5).roundToBlock()),
         )
 
-        if (lastGuess != guessEntry) {
+        if (lastGuess?.getCurrent() != guessEntry.getCurrent()) {
             lastGuess?.let { GriffinBurrowHelper.removeGuess(it) }
             BurrowGuessEvent(guessEntry).post()
             lastGuess = guessEntry

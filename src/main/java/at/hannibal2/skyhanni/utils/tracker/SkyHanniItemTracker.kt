@@ -44,8 +44,16 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
     extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
-    drawDisplay: (Data) -> List<Searchable>,
-) : SkyHanniTracker<Data>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
+    customUptimeControl: Boolean = false,
+    drawDisplay: (Data) -> List<Searchable>
+) : SkyHanniTracker<Data>(
+    name,
+    createNewSession,
+    getStorage,
+    extraDisplayModes,
+    drawDisplay = drawDisplay,
+    customUptimeControl = customUptimeControl
+) {
 
     companion object {
         private val config get() = SkyHanniMod.feature.misc.tracker

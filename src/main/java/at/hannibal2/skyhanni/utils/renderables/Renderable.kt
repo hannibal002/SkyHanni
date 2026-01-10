@@ -46,14 +46,7 @@ import net.minecraft.world.item.ItemStack
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
-//#if TODO
-//$$ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
-//$$ import at.hannibal2.skyhanni.features.chroma.ChromaType
-//$$ import at.hannibal2.skyhanni.features.misc.DarkenShader
-//$$ import at.hannibal2.skyhanni.utils.shader.ShaderManager
-//#endif
 
-// todo 1.21 impl needed
 @Suppress("TooManyFunctions")
 interface Renderable {
 
@@ -418,24 +411,6 @@ interface Renderable {
                     mouseOffsetX to mouseOffsetY
                 }
                 bottomLayer.render(nMouseOffsetX, nMouseOffsetY)
-            }
-        }
-
-        fun Renderable.darken(amount: Float = 1f) = object : Renderable {
-            override val width = this@darken.width
-            override val height = this@darken.height
-            override val horizontalAlign = this@darken.horizontalAlign
-            override val verticalAlign = this@darken.verticalAlign
-
-            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                //#if TODO
-                //$$ DarkenShader.darknessLevel = amount
-                //$$ ShaderManager.enableShader(ShaderManager.Shaders.DARKEN)
-                //#endif
-                this@darken.render(mouseOffsetX, mouseOffsetY)
-                //#if TODO
-                //$$ ShaderManager.disableShader()
-                //#endif
             }
         }
 

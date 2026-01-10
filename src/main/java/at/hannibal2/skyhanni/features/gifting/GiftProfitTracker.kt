@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -197,15 +198,11 @@ object GiftProfitTracker {
         "POTION_${skill.name.uppercase()}_XP_BOOST;$tier".toInternalName()
     }
 
-    private const val ADD_GIFT_USAGE = "§eUsage:\n§6/shaddusedgifts §e<§6giftType§7: white,red,green§e> <§6amount§e>\n" +
+    private const val ADD_GIFT_USAGE = "§eUsage:\n§6/shaddusedgifts §e<§6giftType§7: white,red,green,party§e> <§6amount§e>\n" +
         "§eExample: §6/shaddusedgifts white 10\n§eIf no amount is specified, 1 is assumed."
 
-    private fun tryAddUsedGift(args: Array<String>): String {
-        if (args.isEmpty()) return ADD_GIFT_USAGE
-        val giftName = args[0]
-        val gift = GiftType.byUserInput(giftName) ?: return ADD_GIFT_USAGE
-        val amountArg = args.getOrNull(1) ?: "1"
-        val amount = amountArg.toLongOrNull() ?: return "§cInvalid amount (§4${args[1]}§c) specified.\n$ADD_GIFT_USAGE"
+    private fun tryAddUsedGift(giftInput: String, amount: Long): String {
+        val gift = GiftType.byUserInput(giftInput) ?: return ADD_GIFT_USAGE
         tracker.modify {
             it.giftsUsed.addOrPut(gift, amount)
         }
@@ -215,17 +212,19 @@ object GiftProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shaddusedgifts") {
+        event.registerBrigadier("shaddusedgifts") {
             description = "Add used gifts to the gift profit tracker."
             category = CommandCategory.USERS_ACTIVE
-            callback {
-                ChatUtils.chat(tryAddUsedGift(it))
+            arg("gift", BrigadierArguments.string(), listOf("white", "red", "green", "party")) { gift ->
+                argCallback("amount", BrigadierArguments.long()) { amount ->
+                    ChatUtils.chat(tryAddUsedGift(getArg(gift), amount))
+                }
             }
         }
-        event.register("shresetgifttracker") {
+        event.registerBrigadier("shresetgifttracker") {
             description = "Reset the gift profit tracker."
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

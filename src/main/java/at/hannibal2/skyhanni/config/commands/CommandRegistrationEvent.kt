@@ -23,14 +23,6 @@ class CommandRegistrationEvent(
         command.addToRegister(dispatcher, builders)
     }
 
-    // TODO: Use Brigadier as backend and eventually deprecate it
-    fun register(name: String, block: CommandBuilder.() -> Unit) {
-        val command = CommandBuilder(name).apply(block)
-        command.hasUniqueName(builders)
-        command.checkDescriptionAndCategory()
-        command.addToRegister(dispatcher, builders)
-    }
-
     private fun CommandData.checkDescriptionAndCategory() {
         require(descriptor.isNotEmpty() || category in CommandCategory.developmentCategories) {
             "The command '$name' has no required description"

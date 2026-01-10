@@ -133,10 +133,10 @@ object DraconicSacrificeTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetdraconicsacrificetracker") {
+        event.registerBrigadier("shresetdraconicsacrificetracker") {
             description = "Resets the Draconic Sacrifice Tracker."
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

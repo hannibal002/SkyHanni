@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -731,13 +732,9 @@ object ComposterOverlay {
         event.registerBrigadier("shtestcomposter") {
             description = "Test the composter overlay"
             category = CommandCategory.DEVELOPER_DEBUG
-            legacyCallbackArgs {
-                if (it.size != 1) {
-                    ChatUtils.userError("Usage: /shtestcomposter <offset>")
-                } else {
-                    testOffset = it[0].toInt()
-                    ChatUtils.chat("Composter test offset set to $testOffset.")
-                }
+            argCallback("offset", BrigadierArguments.integer()) {
+                testOffset = it
+                ChatUtils.chat("Composter test offset set to $testOffset.")
             }
         }
     }
