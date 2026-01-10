@@ -63,9 +63,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -327,15 +327,6 @@ object GardenVisitorFeatures {
         }
     }
 
-    private val missingRepoItemsList: MutableMap<String, SimpleTimeMark> = mutableMapOf()
-    private fun logMissingRepoItems(name: String) {
-        if ((missingRepoItemsList[name] ?: SimpleTimeMark.farPast()).passedSince() < 10.minutes) return
-        missingRepoItemsList[name] = SimpleTimeMark.now()
-        val text = "Visitor '$name§7' has no items in repo!"
-        logger.log(text)
-        ChatUtils.debug(text)
-    }
-
     private fun MutableList<Renderable>.drawVisitor(visitorName: String) {
         val displayName = GardenVisitorColorNames.getColoredName(visitorName)
 
@@ -364,6 +355,16 @@ object GardenVisitorFeatures {
         }
 
         add(Renderable.horizontal(list))
+    }
+
+    private val visitorMissingItemsWarnTime: MutableMap<String, SimpleTimeMark> = mutableMapOf()
+    private fun logMissingRepoItems(name: String) {
+        if ((visitorMissingItemsWarnTime[name] ?: SimpleTimeMark.farPast()).passedSince() < 10.minutes) return
+        visitorMissingItemsWarnTime[name] = SimpleTimeMark.now()
+        val text = "Visitor '$name§7' has no items in repo!"
+        logger.log(text)
+        ChatUtils.debug(text)
+        visitorMissingItemsWarnTime.removeIf { it.value.passedSince() > 10.minutes }
     }
 
     @HandleEvent
