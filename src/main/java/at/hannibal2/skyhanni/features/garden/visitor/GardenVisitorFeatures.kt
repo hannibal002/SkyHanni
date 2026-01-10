@@ -87,6 +87,7 @@ import kotlin.math.round
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("LargeClass")
 @SkyHanniModule
 object GardenVisitorFeatures {
 
