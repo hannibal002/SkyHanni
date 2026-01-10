@@ -22,6 +22,11 @@ class PestProfitTrackerConfig {
     var hideChat: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Hide while farming", desc = "Hide profit tracker while farming.")
+    @ConfigEditorBoolean
+    var hideWhileFarming: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Time Displayed", desc = "Time displayed after killing a pest.")
     @ConfigEditorSlider(minValue = 5f, maxValue = 60f, minStep = 1f)
     var timeDisplayed: Int = 30

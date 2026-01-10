@@ -329,7 +329,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled || !GardenApi.inGarden()) return false
-        if (GardenApi.isCurrentlyFarming()) return false
+        if (GardenApi.isCurrentlyFarming() && config.hideWhileFarming) return false
         val allInactive = lastPestKillTimes.all {
             it.value.passedSince() > config.timeDisplayed.seconds
         }
