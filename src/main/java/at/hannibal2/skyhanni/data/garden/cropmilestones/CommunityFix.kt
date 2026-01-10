@@ -1,10 +1,14 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data.garden.cropmilestones
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.cropMilestoneRepoData
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCropTypeByLore
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneTotalCropsForTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.totalPattern
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -23,12 +27,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
-object GardenCropMilestonesCommunityFix {
+object CommunityFix {
 
     /**
      * REGEX-TEST: §2§l§m       §f§l§m             §r §e676,985§6/§e2M
@@ -64,7 +67,7 @@ object GardenCropMilestonesCommunityFix {
     private fun fixForWrongData(inventoryItems: Map<Int, ItemStack>) {
         val data = mutableListOf<String>()
         for ((_, stack) in inventoryItems) {
-            val crop = GardenCropMilestones.getCropTypeByLore(stack) ?: continue
+            val crop = getCropTypeByLore(stack) ?: continue
             checkForWrongData(stack, crop, data)
         }
 
@@ -91,7 +94,7 @@ object GardenCropMilestonesCommunityFix {
         val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()
-        val next = lore.nextAfter({ GardenCropMilestones.totalPattern.matches(it) }, 3) ?: return
+        val next = lore.nextAfter({ totalPattern.matches(it) }, 3) ?: return
 
         val guessNextMax = nextMax(realTier, crop)
         val nextMax = amountPattern.matchMatcher(next) {
@@ -140,22 +143,23 @@ object GardenCropMilestonesCommunityFix {
         }
         totalFixedValues += fixed
         ChatUtils.chat("Fixed: $fixed/$alreadyCorrect, total fixes: $totalFixedValues")
-        val s = ConfigManager.gson.toJsonTree(GardenCropMilestones.cropMilestoneData).toString()
+        val s = ConfigManager.gson.toJsonTree(cropMilestoneRepoData).toString()
         OSUtils.copyToClipboard("\"crop_milestones\":$s,")
     }
 
     private fun tryFix(crop: CropType, tier: Int, amount: Int): Boolean {
         val guessNextMax = nextMax(tier, crop)
         if (guessNextMax.toInt() == amount) return false
-        GardenCropMilestones.cropMilestoneData = GardenCropMilestones.cropMilestoneData.editCopy {
+        cropMilestoneRepoData = cropMilestoneRepoData.editCopy {
             fix(crop, this, tier, amount)
         }
         return true
     }
 
     private fun nextMax(tier: Int, crop: CropType): Long =
-        GardenCropMilestones.getCropsForTier(tier + 1, crop) - GardenCropMilestones.getCropsForTier(tier, crop)
+        crop.milestoneTotalCropsForTier(tier).let { crop.milestoneTotalCropsForTier(tier + 1).minus(it) }
 
+    @Suppress("UnsafeCallOnNullableType")
     private fun fix(crop: CropType, map: MutableMap<CropType, List<Int>>, tier: Int, amount: Int) {
         map[crop] = map[crop]!!.editCopy {
             this[tier] = amount
