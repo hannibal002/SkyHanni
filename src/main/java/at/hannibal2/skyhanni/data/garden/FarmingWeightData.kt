@@ -147,13 +147,13 @@ object FarmingWeightData {
                     val storedAmount = crop.getCollection()
                     val diff = value - storedAmount
                     val weightDiff = abs(diff / crop.getFactor())
-                    if (diff > 0 || weightDiff >= 30) { // 10 weight diff is an half an hour of farming
+                    if (diff > 0 || weightDiff >= 100 || storedAmount < 0) { // elite only updates data every 2 hours or so
                         crop.setCollectionCounter(value)
                     }
                 }
 
             }
-            // we don't track these
+            // we don't track these so always prefer api data
             apiData.uncountedCrops.forEach { (name, value) ->
                 CropType.getByNameOrNull(name)?.let { ignoredCollection[it] = value.toLong() }
             }

@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.config.features.garden.leaderboards.generics
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -19,11 +22,20 @@ open class EliteLeaderboardGenericConfig<RankGoal : RankGoalGenericConfig, Displ
     @Accordion
     val rankGoals: RankGoal = rankGoalConfig()
 
+    // TODO configfix for these
     @Expose
     @ConfigOption(
-        name = "Show LB Change",
+        name = "Player Overtake Messages",
+        desc = "Send a message in chat when you overtake a player on the leaderboard."
+    )
+    @ConfigEditorBoolean
+    var showLbChange: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Show Offline LB Change",
         desc = "Show the change of your position on your current leaderboard while you were offline."
     )
     @ConfigEditorBoolean
-    var showLbChange: Boolean = false
+    var offlineLbChange: Boolean = false
 }

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboar
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankGoalIfValid
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getFactor
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
@@ -19,6 +20,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.crop
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
@@ -47,17 +50,21 @@ object EliteFarmersLeaderboard {
         EliteLeaderboardType.Pest::class to Mutex()
     )
     private val storage get() = GardenApi.storage?.farmingWeight
+    // TODO make class
     private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardPosMap
     private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double>? get() = storage?.leaderboardAmountMap
     private val minAmount: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minAmountMap
     private val lastLeaderboardUpdate: MutableMap<EliteLeaderboardType, SimpleTimeMark> = mutableMapOf()
     private val shouldRefreshLeaderboard: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
+    // increases the amount of players requested if they're getting constantly overtaken
     private val lastPlayer: MutableMap<EliteLeaderboardType, EliteLeaderboardPlayer?> = mutableMapOf()
     private val nextPlayers: MutableMap<EliteLeaderboardType, MutableList<EliteLeaderboardPlayer>> = mutableMapOf()
     private val lastApiData: MutableMap<EliteLeaderboardType, EliteLeaderboard> = mutableMapOf()
     private val isUnranked: MutableMap<EliteLeaderboardType, Boolean> = mutableMapOf()
     private val rankGoal: MutableMap<EliteLeaderboardType, Int?> = mutableMapOf()
     private val loadedLeaderboardCategories = mutableSetOf<KClass<out EliteLeaderboardType>>()
+    private val passedPlayerCache: MutableMap<EliteLeaderboardType, MutableList<String>> = mutableMapOf()
+    private var lastPassedMessage: SimpleTimeMark = SimpleTimeMark.farPast()
 
     var apiError = false
     private var hasWarned = false
@@ -101,6 +108,25 @@ object EliteFarmersLeaderboard {
         addPestKill(EliteLeaderboardType.Pest(event.pest, EliteLeaderboardMode.MONTHLY))
         addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.MONTHLY))
         addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.ALL_TIME))
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (lastPassedMessage.passedSince() < 30.seconds) return
+        passedPlayerCache.forEach { lbtype ->
+            if (!getLeaderboardConfig(lbtype.key).showLbChange) return@forEach
+            val list = lbtype.value
+            if (list.isEmpty()) return@forEach
+            if (list.size < 3) {
+                list.forEach {name ->
+                    farmingChatMessage("You passed §b${name} §ein the §6${lbtype.key} §eLeaderboard!")
+                }
+            } else {
+                farmingChatMessage("You recently passed §b${list.size.addSeparators()} players §ein the §6${lbtype.key} §eLeaderboard!")
+            }
+            list.clear()
+        }
+        lastPassedMessage = SimpleTimeMark.now()
     }
 
     private fun addPestKill(leaderboardType: EliteLeaderboardType, amount: Double = 1.0) {
@@ -198,10 +224,18 @@ object EliteFarmersLeaderboard {
     private fun updateNextPlayer(leaderboardType: EliteLeaderboardType): EliteLeaderboardPlayer? {
         val nextPlayer = nextPlayers[leaderboardType]?.firstOrNull() ?: return null
         lastPlayer[leaderboardType] = nextPlayer
-        farmingChatMessage("You passed §b${nextPlayer.name} §ein the §6$leaderboardType §eLeaderboard!")
+        // send messages every ~30s instead of every pass to avoid chat spam
+        val list = passedPlayerCache.getOrPut(leaderboardType) { mutableListOf() }
+        list.add(nextPlayer.name)
         nextPlayers[leaderboardType]?.removeFirstOrNull() ?: return null
 
         val currentRank = leaderboardPosMap?.get(leaderboardType) ?: return null
+        // shouldn't be able to pass players if we're rank 1, something went wrong
+        if (currentRank == 1) {
+            leaderboardPosMap?.remove(leaderboardType)
+            nextPlayers.remove(leaderboardType)
+            return null
+        }
         val rankGoal = getRankGoal(leaderboardType) // getRankGoal returns null if we're at or in front of it
         leaderboardPosMap?.set(leaderboardType, rankGoal ?: (currentRank - 1)) // player we passed should be at rank goal if not null
         return nextPlayers[leaderboardType]?.firstOrNull()
@@ -232,7 +266,7 @@ object EliteFarmersLeaderboard {
     }
 
     private fun checkOffScreenLeaderboardChanges(oldPosition: Int?, leaderboardType: EliteLeaderboardType) {
-        if (!getLeaderboardConfig(leaderboardType).showLbChange) return
+        if (!getLeaderboardConfig(leaderboardType).offlineLbChange) return
         if (oldPosition == null) return
         val currentPosition = leaderboardPosMap?.get(leaderboardType) ?: return
 
@@ -252,7 +286,8 @@ object EliteFarmersLeaderboard {
         if (profileId == "") return null
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
         val currentPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
-        val upcomingPlayers = getUpcomingPlayerCount(currentPos, leaderboardType)
+        val upcomingPlayers =
+            getUpcomingPlayerCount(currentPos, leaderboardType)
         // Fetch upcoming players from current lb pos if api hasn't updated, or from rank goal
         val rankGoal = getRankGoal(leaderboardType)
         val useRankGoal = getRankConfig(leaderboardType).useRankGoal.get() && rankGoal != null
@@ -294,6 +329,7 @@ object EliteFarmersLeaderboard {
         if (LeaderboardTextEntry.OVERTAKE !in getLeaderboardConfig(leaderboardType).display.text.get()) return 0
         if (leaderboardType.mode == EliteLeaderboardMode.ALL_TIME) {
             return when {
+                currentPos > 20_000 -> 100
                 currentPos > 10_000 -> 50
                 currentPos > 5_000 -> 30
                 currentPos > 1_000 -> 20
@@ -301,6 +337,7 @@ object EliteFarmersLeaderboard {
             }
         } else if (leaderboardType.mode == EliteLeaderboardMode.MONTHLY) {
             return when {
+                currentPos > 5_000 -> 100
                 currentPos > 1000 -> 50
                 currentPos > 500 -> 30
                 currentPos > 100 -> 20
@@ -338,7 +375,7 @@ object EliteFarmersLeaderboard {
         apiData: EliteLeaderboard,
         diff: Double
     ) {
-        if (diff >= 0.5 || abs(diff) >= 30) {
+        if (diff >= 0.5 || abs(diff) >= 100) {
             when (leaderboardType.mode) {
                 EliteLeaderboardMode.ALL_TIME -> updateCollections() // we handle all-time weight in the farmingweight class
                 EliteLeaderboardMode.MONTHLY -> setWeight(leaderboardType.mode, apiData.amount)
@@ -353,7 +390,7 @@ object EliteFarmersLeaderboard {
     ) {
         val crop = leaderboardType.crop ?: return
         val diffWeight = diff / crop.getFactor()
-        if (diffWeight >= 0.5 || abs(diffWeight) >= 30) {
+        if (diffWeight >= 0.5 || abs(diffWeight) >= 100) {
             when (leaderboardType.mode) {
                 EliteLeaderboardMode.ALL_TIME -> updateCollections() // we handle all-time collections in the farming weight class
                 EliteLeaderboardMode.MONTHLY ->
@@ -435,5 +472,15 @@ object EliteFarmersLeaderboard {
             ),
             "/shfarmingprofile ${PlayerUtils.getName()}",
         )
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("elite leaderboard")
+        event.addIrrelevant {
+            lastApiData.forEach {
+                add(it.value.toString())
+            }
+        }
     }
 }

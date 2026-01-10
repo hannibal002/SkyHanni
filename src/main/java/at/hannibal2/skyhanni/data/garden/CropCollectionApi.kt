@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -68,6 +69,7 @@ object CropCollectionApi {
         cropCollectionCounter?.get(this)?.setTotal(counter)
         // Some displays update off add events
         CropCollectionAddEvent(this, CropCollectionType.UNKNOWN, 0).post()
+        ChatUtils.debug("Set $this collection to $counter")
     }
 
     private fun addCollectionCommand(crop: CropType, amount: Long, type: CropCollectionType) {
@@ -107,7 +109,7 @@ object CropCollectionApi {
 
         fun setTotal(amount: Long) {
             val diff = amount - getTotal()
-            setCollection(CropCollectionType.UNKNOWN, diff)
+            addCollection(CropCollectionType.UNKNOWN, diff)
         }
 
         fun getCollection(collectionType: CropCollectionType): Long {
@@ -119,11 +121,21 @@ object CropCollectionApi {
             setCollection(collectionType, collection + amount)
         }
 
-        fun setCollection(collectionType: CropCollectionType, amount: Long) {
+        private fun setCollection(collectionType: CropCollectionType, amount: Long) {
             cropCollectionType[collectionType] = amount
         }
 
         @Expose
         var cropCollectionType: MutableMap<CropCollectionType, Long> = EnumMap(CropCollectionType::class.java)
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("crop collection")
+        event.addIrrelevant {
+            cropCollectionCounter?.forEach {
+                add("Crop: ${it.key}, Collection: ${it.value.getTotal()}")
+            }
+        }
     }
 }
