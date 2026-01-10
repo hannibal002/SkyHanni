@@ -29,12 +29,12 @@ class PestProfitTrackerConfig {
     @Expose
     @ConfigOption(name = "Include Bits", desc = "Add bits gained from killing pests to the tracker.")
     @ConfigEditorBoolean
-    var includeBits: Property<Boolean> = Property.of(false)
+    val includeBits: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Coins Per Bit", desc = "Set how much bits gained from killing pests are worth.")
     @ConfigEditorSlider(minValue = 0f, maxValue = 2000f, minStep = 100f)
-    var coinsPerBit: Property<Int> = Property.of(700)
+    val coinsPerBit: Property<Int> = Property.of(700)
 
     @Expose
     @ConfigLink(owner = PestProfitTrackerConfig::class, field = "enabled")

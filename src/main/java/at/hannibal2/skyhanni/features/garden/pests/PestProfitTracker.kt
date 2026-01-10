@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -92,7 +93,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     val DUNG_ITEM = "DUNG".toInternalName()
     val OVERCLOCKER = "OVERCLOCKER_3000".toInternalName()
     val BITS = "SKYBLOCK_BIT".toInternalName()
-    val KILL_BITS = 5
+    const val KILL_BITS = 5
     private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
     private val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
     private var adjustmentMap: Map<PestType, Map<NeuInternalName, Int>> = mapOf()
@@ -120,11 +121,14 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         }
 
         private fun getBitsPrice(): Double {
-            return if (SkyBlockUtils.noTradeMode) 0.0 else config.coinsPerBit.get().toDouble()
+            return if (SkyHanniMod.feature.misc.tracker.priceSource == ItemPriceSource.NPC_SELL) 0.0 else config.coinsPerBit.get()
+                .toDouble()
         }
 
-        override val selectedBucketItems get() =
-            if (config.includeBits.get()) super.selectedBucketItems else super.selectedBucketItems.filter { it.key != BITS }.toMutableMap()
+        override val selectedBucketItems
+            get() =
+                if (config.includeBits.get()) super.selectedBucketItems else super.selectedBucketItems.filter { it.key != BITS }
+                    .toMutableMap()
 
         override fun getCoinName(bucket: PestType?, item: TrackedItem) = "§6Pest Kill Coins"
 
