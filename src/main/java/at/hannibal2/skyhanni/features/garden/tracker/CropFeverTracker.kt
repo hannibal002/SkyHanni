@@ -196,7 +196,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     private fun shouldShowDisplay(): Boolean =
         config.enabled &&
             GardenApi.inGarden() &&
-            (!config.onlyWithTool || GardenApi.hasFarmingToolInHand()) &&
+            (!config.onlyWithTool || GardenApi.isHoldingCropFever()) &&
             (!config.onlyDuringFever || isCropFever)
 
     private fun startCropFever(partialFever: Boolean = false) {

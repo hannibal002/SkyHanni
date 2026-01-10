@@ -17,7 +17,7 @@ class CropFeverTrackerConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Only Show With Tool", desc = "Only show when holding a farming tool.")
+    @ConfigOption(name = "Only Show With Enchant", desc = "Only show when holding a farming with the crop fever enchant.")
     @ConfigEditorBoolean
     @FeatureToggle
     var onlyWithTool: Boolean = true
