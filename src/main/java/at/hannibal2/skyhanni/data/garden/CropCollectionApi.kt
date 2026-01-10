@@ -26,7 +26,7 @@ object CropCollectionApi {
         MutableMap<CropType, CropCollection>? get() = storage?.cropCollectionCounter
 
     var lastGainedCrop: CropType?
-        get() = storage?.lastGainedCrop
+        get() = GardenApi.storage?.lastGainedCrop
         set(value) {
             value?.let {
                 GardenApi.storage?.lastGainedCrop = it
@@ -84,7 +84,7 @@ object CropCollectionApi {
             category = CommandCategory.DEVELOPER_TEST
             arg("crop", EnumArgumentType.custom<CropType>({ it.simpleName })) { crop ->
                 arg("amount", BrigadierArguments.long()) { amount ->
-                    arg("type", EnumArgumentType.custom<CropCollectionType>({ it.toString() })) { type ->
+                    arg("type", EnumArgumentType.custom<CropCollectionType>({ it.toString() }, isGreedy = true)) { type ->
                         callback { addCollectionCommand(getArg(crop), getArg(amount), getArg(type)) }
                     }
                 }

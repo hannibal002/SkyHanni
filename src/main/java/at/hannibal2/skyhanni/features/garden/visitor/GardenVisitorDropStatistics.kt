@@ -340,10 +340,10 @@ object GardenVisitorDropStatistics {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetvisitordrops") {
+        event.registerBrigadier("shresetvisitordrops") {
             description = "Resets the Visitors Drop Statistics"
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

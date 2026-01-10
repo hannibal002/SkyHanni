@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.PartyApi.partyLeader
 import at.hannibal2.skyhanni.data.PartyApi.transferVoluntaryPattern
@@ -39,19 +40,16 @@ object PartyCommands {
         HypixelCommands.partyWarp()
     }
 
-    private fun kick(args: Array<String>) {
+    private fun kick(kickedPlayer: String, kickedReason: String? = null) {
         if (!config.shortCommands) return
-        if (args.isEmpty()) return
-        val kickedPlayer = args[0]
-        val kickedReason = args.drop(1).joinToString(" ").trim()
-        if (kickedReason.isNotEmpty() && config.partyKickReason) {
+        if (kickedReason != null && config.partyKickReason) {
             HypixelCommands.partyChat("Kicking $kickedPlayer: $kickedReason")
         }
         HypixelCommands.partyKick(kickedPlayer)
     }
 
-    private fun transfer(args: Array<String>) {
-        if (args.isEmpty()) {
+    private fun transfer(name: String? = null) {
+        if (name == null) {
             if (LimboTimeTracker.inLimbo) {
                 LimboTimeTracker.printStats(true)
                 return
@@ -60,13 +58,12 @@ object PartyCommands {
             return
         }
         if (!config.shortCommands) return
-        HypixelCommands.partyTransfer(args[0])
+        HypixelCommands.partyTransfer(name)
     }
 
-    private fun promote(args: Array<String>) {
+    private fun promote(name: String) {
         if (!config.shortCommands) return
-        if (args.isEmpty()) return
-        HypixelCommands.partyPromote(args[0])
+        HypixelCommands.partyPromote(name)
     }
 
     private fun reverseTransfer() {
@@ -133,40 +130,54 @@ object PartyCommands {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("pko") {
+        event.registerBrigadier("pko") {
             description = "Kicks offline party members"
             category = CommandCategory.SHORTENED_COMMANDS
-            callback { kickOffline() }
+            simpleCallback { kickOffline() }
         }
-        event.register("pw") {
+        event.registerBrigadier("pw") {
             description = "Warps your party"
             category = CommandCategory.SHORTENED_COMMANDS
-            callback { warp() }
+            simpleCallback { warp() }
         }
-        event.register("pk") {
+        event.registerBrigadier("pk") {
             description = "Kick a specific party member"
             category = CommandCategory.SHORTENED_COMMANDS
-            callback { kick(it) }
+            arg("name", BrigadierArguments.string()) { name ->
+                argCallback("reason", BrigadierArguments.greedyString()) { reason ->
+                    kick(getArg(name), reason)
+                }
+                callback {
+                    kick(getArg(name))
+                }
+            }
         }
-        event.register("pt") {
+        event.registerBrigadier("pt") {
             description = "Transfer the party to another party member"
             category = CommandCategory.SHORTENED_COMMANDS
-            callback { transfer(it) }
+            argCallback("name", BrigadierArguments.string()) { name ->
+                transfer(name)
+            }
+            simpleCallback {
+                transfer()
+            }
         }
-        event.register("pp") {
+        event.registerBrigadier("pp") {
             description = "Promote a specific party member"
             category = CommandCategory.SHORTENED_COMMANDS
-            callback { promote(it) }
+            argCallback("name", BrigadierArguments.string()) { name ->
+                promote(name)
+            }
         }
-        event.register("pd") {
+        event.registerBrigadier("pd") {
             description = "Disbands the party"
             category = CommandCategory.SHORTENED_COMMANDS
-            callback { disband() }
+            simpleCallback { disband() }
         }
-        event.register("rpt") {
+        event.registerBrigadier("rpt") {
             description = "Reverse transfer party to the previous leader"
             category = CommandCategory.SHORTENED_COMMANDS
-            callback { reverseTransfer() }
+            simpleCallback { reverseTransfer() }
         }
     }
 }

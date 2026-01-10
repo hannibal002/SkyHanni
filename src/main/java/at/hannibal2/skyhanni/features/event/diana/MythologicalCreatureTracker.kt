@@ -161,10 +161,10 @@ object MythologicalCreatureTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetmythologicalcreaturetracker") {
+        event.registerBrigadier("shresetmythologicalcreaturetracker") {
             description = "Resets the Mythological Creature Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

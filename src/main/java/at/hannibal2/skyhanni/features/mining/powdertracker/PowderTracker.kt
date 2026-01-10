@@ -445,10 +445,10 @@ object PowderTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetpowdertracker") {
+        event.registerBrigadier("shresetpowdertracker") {
             description = "Resets the Powder Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 }
