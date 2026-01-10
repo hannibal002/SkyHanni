@@ -203,10 +203,11 @@ object BitsApi {
 
     /**
      * REGEX-TEST: §7§7Milestone: §e11§6/§e30
+     * REGEX-TEST: §7§7Milestone: §e20§6/§e40
      */
     private val museumMilestonePattern by bitsGuiGroup.pattern(
         "museummilestone",
-        "(?:§.)*Milestone: §e(?<milestone>\\d+)§6/§e30",
+        "(?:§.)*Milestone: §e(?<milestone>\\d+)§6/§e\\d+",
     )
 
     @HandleEvent
