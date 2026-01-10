@@ -141,9 +141,7 @@ object GriffinBurrowHelper {
             var shouldMove = false
             if (!isBlockValid(this.getCurrent())) shouldMove = true
 
-            val now = SimpleTimeMark.now()
-            val shouldBeLoaded = InventoryUtils.getItemInHandDuringTimeframe(now - 0.3.seconds, now - 0.8.seconds)?.isDianaSpade
-            if (shouldBeLoaded == true &&
+            if (shouldBurrowParticlesBeVisible() &&
                 !GriffinBurrowParticleFinder.containsBurrow(this.getCurrent()) && // burrow is not found
                 this.getCurrent().distanceSq(MinecraftCompat.localPlayer.position().toLorenzVec()) < 900 // within 30 blocks
             ) {
@@ -383,6 +381,12 @@ object GriffinBurrowHelper {
         val isGround = recentClickedBlocks.contains(pos) || pos.getBlockAt() == Blocks.GRASS_BLOCK
         val isValidBlockAbove = pos.up().getBlockAt() in allowedBlocksAboveGround
         return isGround && isValidBlockAbove
+    }
+
+    fun shouldBurrowParticlesBeVisible(): Boolean {
+        val spade = InventoryUtils.getItemInHand()?.isDianaSpade == true
+        val time = InventoryUtils.lastItemChangeTime.passedSince()
+        return spade && time > 2.seconds
     }
 
     fun removeSpadeWarnTitle() {

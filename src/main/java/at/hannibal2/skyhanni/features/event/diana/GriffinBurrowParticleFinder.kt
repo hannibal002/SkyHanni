@@ -8,9 +8,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -90,9 +88,7 @@ object GriffinBurrowParticleFinder {
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onTick() {
-        val now = SimpleTimeMark.now()
-        val burrowsVisible = InventoryUtils.getItemInHandDuringTimeframe(now - 0.3.seconds, now - 0.8.seconds)?.isDianaSpade
-        if (burrowsVisible == true) {
+        if (GriffinBurrowHelper.shouldBurrowParticlesBeVisible()) {
             for ((location, burrow) in burrows.toMutableMap()) {
                 if (burrow.lastSeen.passedSince() > 0.5.seconds) {
                     burrows.remove(location)
