@@ -133,9 +133,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         }
 
         override val selectedBucketItems
-            get() =
-                if (config.includeBits.get()) super.selectedBucketItems else super.selectedBucketItems.filter { it.key != BITS }
-                    .toMutableMap()
+            get() = if (config.includeBits.get()) super.selectedBucketItems else super.selectedBucketItems.filter { it.key != BITS }
+                .toMutableMap()
 
         override fun getCoinName(bucket: PestType?, item: TrackedItem) = "§6Pest Kill Coins"
 
@@ -153,9 +152,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             return "Pest"
         }
 
-        fun getTotalPestCount(): Long =
-            if (selectedBucket != null) pestKills[selectedBucket] ?: 0L
-            else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
+        fun getTotalPestCount(): Long = if (selectedBucket != null) pestKills[selectedBucket] ?: 0L
+        else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
     }
 
     private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }
@@ -198,9 +196,9 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
-            val cropType = CropType.getByNameOrNull(rawName) ?: return
+            CropType.getByNameOrNull(rawName)
+                ?.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
 
-            cropType.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
             if (config.hideChat && config.enabled) blockedReason = "pest_drop"
 
             addItem(pest, internalName, amount, command = false)
@@ -227,9 +225,9 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
-            val cropType = CropType.getByNameOrNull(rawName) ?: return
 
-            cropType.addCollectionCounter(CropCollectionType.PEST_RNG, primitiveStack.amount.toLong() * amount.toLong())
+            CropType.getByNameOrNull(rawName)
+                ?.addCollectionCounter(CropCollectionType.PEST_RNG, primitiveStack.amount.toLong() * amount.toLong())
             // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
     }
