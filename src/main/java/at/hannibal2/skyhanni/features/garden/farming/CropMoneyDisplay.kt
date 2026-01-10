@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry
 import at.hannibal2.skyhanni.data.IslandType
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
+import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -167,7 +169,8 @@ object CropMoneyDisplay {
                 }
 
                 val mushroomPrice = (redPrice + brownPrice) / 2
-                val perSecond = GardenCropSpeed.getRecentBPS() * it.multiplier * mushroomPrice
+                val perSecond =
+                    GardenCropSpeed.getRecentBPS() * it.multiplier * mushroomPrice * (CurrentPetApi.currentPet?.level ?: 0) / 100.0
                 extraMoneyPerHour.mushroomCowCoins = perSecond * 60 * 60
             }
 

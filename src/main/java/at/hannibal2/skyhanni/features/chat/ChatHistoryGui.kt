@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
@@ -15,7 +14,9 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.components.ComponentRenderUtils
 import net.minecraft.network.chat.Component
+import net.minecraft.util.FormattedCharSequence
 
 class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyHanniBaseScreen() {
 
@@ -94,8 +95,10 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         }
     }
 
-    private fun splitLine(comp: Component): List<String> {
-        return comp.formattedTextCompat().splitLines(w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10)).split("\n")
+    private fun splitLine(comp: Component): List<FormattedCharSequence> {
+        return ComponentRenderUtils.wrapComponents(
+            comp, w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10), Minecraft.getInstance().font
+        )
     }
 
     override fun onInitGui() {
@@ -108,7 +111,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         this.scroll = newScroll.coerceAtMost(historySize - h + 10.0).coerceAtLeast(0.0)
     }
 
-    private fun drawMultipleTextLines(lines: List<String>, xPos: Int) {
+    private fun drawMultipleTextLines(lines: List<FormattedCharSequence>, xPos: Int) {
         for (line in lines) {
             GuiRenderUtils.drawString(line, xPos, 0, -1)
             DrawContextUtils.translate(0f, 10f, 0f)

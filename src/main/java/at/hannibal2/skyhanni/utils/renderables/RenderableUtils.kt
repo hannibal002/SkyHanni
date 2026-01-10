@@ -317,12 +317,28 @@ internal object RenderableUtils {
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addRenderableNullableButton(
         label: String,
         current: T?,
-        crossinline getName: (T?) -> String = { it?.toString().orEmpty() },
         crossinline onChange: (T?) -> Unit,
         universe: List<T?> = enumValues<T>().toList(),
+        nullLabel: String? = null,
         enableUniverseScroll: Boolean = true,
     ) {
-        add(createButtonNew(label, current, getName, onChange, universe, enableUniverseScroll).renderable)
+        val map = universe.associateWithTo(LinkedHashMap()) { it.toString() }
+        if (nullLabel != null) map.putAt(0, null, nullLabel)
+
+        val currentName = map[current] ?: error("unknown entry $current in map")
+        add(
+            createButtonNew(
+                label = label,
+                current = currentName,
+                getName = { it ?: nullLabel.orEmpty() },
+                onChange = { newString ->
+                    val newKey = map.entries.first { it.value == newString }.key
+                    onChange(newKey)
+                },
+                universe = map.values.toList(),
+                enableUniverseScroll = enableUniverseScroll,
+            ).toRenderable(),
+        )
     }
 
     fun <T> List<T?>.circle(current: T?): T? {

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates.ChatProgressCategory
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GitHubUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -100,6 +101,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private var loadingError: Boolean = false
     private var latestError = SimpleTimeMark.farPast()
 
+    abstract val progressCategory: ChatProgressCategory
+
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
 
@@ -119,8 +122,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             description = "Shows the status of the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
             coroutineSimpleCallback {
-                val progress = ChatProgressUpdates()
-                progress.start("Showing status of $commonName repo via /$statusCommand")
+                val progress = progressCategory.start("showing status via /$statusCommand")
                 displayRepoStatus(progress, joinEvent = true, command = true)
                 progress.end("done showing status")
             }
@@ -129,8 +131,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             description = "Reloads the local $commonName repo"
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                val progress = ChatProgressUpdates()
-                progress.start("Reloading the local $commonName repo via /$reloadCommand")
+                val progress = progressCategory.start("reloading local repo via /$reloadCommand")
                 reloadLocalRepo(progress)
             }
         }
@@ -172,8 +173,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     // <editor-fold desc="Repo Management">
     fun updateRepo(reason: String, forceReset: Boolean = false) {
-        val progress = ChatProgressUpdates()
-        progress.start("updateRepo $commonName Repo")
+        val progress = progressCategory.start("updateRepo")
         progress.update("reason: $reason")
         progress.update("Remove and re-download, forceReset=$forceReset")
         shouldManuallyReload = true
@@ -217,8 +217,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     fun initRepo() {
-        val progress = ChatProgressUpdates()
-        progress.start("auto loading $commonName repo on init")
+        val progress = progressCategory.start("auto loading on init")
         shouldManuallyReload = true
         val loaded = AtomicBoolean(false)
         val job = SkyHanniMod.launchIOCoroutine("$commonName repo init", timeout = 2.minutes) {

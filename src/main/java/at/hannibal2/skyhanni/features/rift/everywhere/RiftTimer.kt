@@ -140,7 +140,7 @@ object RiftTimer {
         val time = nametagPattern.matchMatcher(nametag) {
             group("time")?.toIntOrNull()
         } ?: return
-        event.text = Component.nullToEmpty("${time.seconds.format()} §aф")
+        event.text = Component.literal("${time.seconds.format()} §aф")
     }
 
     fun isEnabled() = RiftApi.inRift() && config.enabled

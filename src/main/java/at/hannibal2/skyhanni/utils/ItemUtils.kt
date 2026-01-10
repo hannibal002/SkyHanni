@@ -78,7 +78,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.21.8
 //$$ import com.google.common.collect.ImmutableMultimap
 //$$ import com.mojang.authlib.properties.PropertyMap
@@ -204,7 +203,7 @@ object ItemUtils {
     }
 
     fun ItemStack.setLoreString(lore: List<String>): ItemStack {
-        this.set(DataComponents.LORE, ItemLore(lore.map { Component.nullToEmpty(it) }))
+        this.set(DataComponents.LORE, ItemLore(lore.map { Component.literal(it) }))
         return this
     }
 
@@ -902,11 +901,4 @@ object ItemUtils {
         val itemModel = BuiltInRegistries.ITEM.getValue(identifier)
         return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
     }
-
-    /**
-     * Returns the display name of the item stack as string.
-     * This name is currently without color codes, we might wanna bring them back.
-     */
-    // TODO rename to name or displayName or whatever better version, once its possible to do so.
-    val ItemStack.realDisplayName get() = hoverName.string
 }
