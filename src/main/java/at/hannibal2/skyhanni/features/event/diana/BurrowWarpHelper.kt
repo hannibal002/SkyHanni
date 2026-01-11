@@ -137,10 +137,10 @@ object BurrowWarpHelper {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetburrowwarps") {
+        event.registerBrigadier("shresetburrowwarps") {
             description = "Manually resetting disabled diana burrow warp points"
             category = CommandCategory.USERS_RESET
-            callback {
+            simpleCallback {
                 WarpPoint.entries.forEach { point -> point.unlocked = true }
                 ChatUtils.chat("Reset disabled burrow warps.")
             }

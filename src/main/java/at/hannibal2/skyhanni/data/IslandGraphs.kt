@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandGraphSettingsJson
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
@@ -662,15 +663,30 @@ object IslandGraphs {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shreportlocation") {
+        event.registerBrigadier("shreportlocation") {
             description = "Allows the user to report an error with pathfinding at the current location."
             category = CommandCategory.USERS_BUG_FIX
-            callback { reportCommand(it) }
+            argCallback("reason", BrigadierArguments.greedyString()) { reason ->
+                sendReportLocation(
+                    playerPosition,
+                    reasonForReport = reason,
+                    technicalInfo = "Manual reported graph location error via /shreportlocation",
+                    "reason provided by user" to reason,
+                )
+            }
+            simpleCallback {
+                ChatUtils.userError("Usage: /shreportlocation <reason>")
+                ChatUtils.chat(
+                    "Give a reason that explains what's wrong at this location, e.g.: " +
+                        "pathfinding goes through wall, ignores obvious shortcut, " +
+                        "missing npc/fishing hotspot/skyblock area name in /shnavigate..",
+                )
+            }
         }
-        event.register("shstopnavigation") {
+        event.registerBrigadier("shstopnavigation") {
             description = "Stops the current pathfinding."
             category = CommandCategory.USERS_ACTIVE
-            callback {
+            simpleCallback {
                 if (currentTarget != null) {
                     stop()
                 } else {
@@ -678,26 +694,6 @@ object IslandGraphs {
                 }
             }
         }
-    }
-
-    private fun reportCommand(args: Array<String>) {
-        if (args.isEmpty()) {
-            ChatUtils.userError("Usage: /shreportlocation <reason>")
-            ChatUtils.chat(
-                "Give a reason that explains what's wrong at this location, e.g.: " +
-                    "pathfinding goes through wall, ignores obvious shortcut, " +
-                    "missing npc/fishing hotspot/skyblock area name in /shnavigate..",
-            )
-            return
-        }
-
-        val userReportedReason = args.joinToString(" ")
-        sendReportLocation(
-            playerPosition,
-            reasonForReport = userReportedReason,
-            technicalInfo = "Manual reported graph location error via /shreportlocation",
-            "reason provided by user" to userReportedReason,
-        )
     }
 
     fun reportLocation(
