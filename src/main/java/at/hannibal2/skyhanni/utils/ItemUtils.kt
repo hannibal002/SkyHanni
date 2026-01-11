@@ -154,6 +154,7 @@ object ItemUtils {
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
+    @Deprecated("Use getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
     fun ItemStack.getLore(): List<String> {
         val data = cachedData
         if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
