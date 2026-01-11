@@ -3,17 +3,12 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerDropsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerType
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import kotlin.concurrent.fixedRateTimer
@@ -33,11 +28,6 @@ object GardenCropSpeed {
     private var blocksSpeedList = listOf<Int>()
     private var blocksBroken = 0
     private var secondsStopped = 0
-
-    private val melonDicer = mutableListOf<Double>()
-    private val pumpkinDicer = mutableListOf<Double>()
-    var latestMelonDicer = 0.0
-    var latestPumpkinDicer = 0.0
 
     init {
         // TODO use SecondPassedEvent + passedSince
@@ -102,50 +92,8 @@ object GardenCropSpeed {
                 blocksSpeedList.drop(1).average().coerceAtMost(20.0)
             } else 0.0
             GardenApi.getCurrentlyFarmedCrop()?.let {
-                val heldTool = InventoryUtils.getItemInHand()
-                val toolName = heldTool?.getInternalName()?.asString()
-                if (toolName?.contains("DICER") == true) {
-                    val lastCrop = lastBrokenCrop?.cropName?.lowercase() ?: "NONE"
-                    if (toolName.lowercase().contains(lastCrop)) {
-                        val tier = when {
-                            toolName.endsWith("DICER") -> 0
-                            toolName.endsWith("DICER_2") -> 1
-                            toolName.endsWith("DICER_3") -> 2
-                            else -> -1
-                        }
-                        if (tier != -1 && melonDicer.isNotEmpty() && pumpkinDicer.isNotEmpty()) {
-                            if (it == CropType.MELON) {
-                                latestMelonDicer = melonDicer[tier]
-                            } else if (it == CropType.PUMPKIN) {
-                                latestPumpkinDicer = pumpkinDicer[tier]
-                            }
-                        }
-                    }
-                }
                 if (averageBlocksPerSecond > 1) {
                     latestBlocksPerSecond?.put(it, averageBlocksPerSecond)
-                }
-            }
-        }
-    }
-
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<DicerDropsJson>("DicerDrops")
-        calculateAverageDicer(melonDicer, data.MELON)
-        calculateAverageDicer(pumpkinDicer, data.PUMPKIN)
-    }
-
-    private fun calculateAverageDicer(dicerList: MutableList<Double>, data: DicerType) {
-        dicerList.clear()
-        for (dropType in data.drops) {
-            val chance = dropType.chance / data.totalChance.toDouble()
-            for ((index, amount) in dropType.amount.withIndex()) {
-                val dropAmount = amount * chance
-                if (index < dicerList.size) {
-                    dicerList[index] += dropAmount
-                } else {
-                    dicerList.add(dropAmount)
                 }
             }
         }

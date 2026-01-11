@@ -433,10 +433,10 @@ object PetStorageApi {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetpetstorage") {
+        event.registerBrigadier("shresetpetstorage") {
             description = "Removes all pets from SkyHanni's storage"
             category = CommandCategory.USERS_RESET
-            callback {
+            simpleCallback {
                 ProfileStorageData.petProfiles = PetDataStorage.ProfileSpecific()
                 ChatUtils.clickableChat(
                     "Cleared all pets from storage. Re-open the §b/pet §emenu to re-populate it.",

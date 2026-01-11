@@ -103,7 +103,7 @@ open class Enchant : Comparable<Enchant> {
             if (itemName == "Stonk" ||
                 (itemCategory != null && !ItemCategory.miningTools.contains(itemCategory) && level == 5 && itemName != "Promising Shovel")
             ) {
-                return if (advanced.useAdvancedPerfectColor.get()) {
+                var style = if (advanced.useAdvancedPerfectColor.get()) {
                     Style.EMPTY.withColor(advanced.advancedPerfectColor.get().getEffectiveColourRGB())
                 } else {
                     if (config.perfectEnchantColor.get() == LorenzColor.CHROMA)
@@ -111,6 +111,10 @@ open class Enchant : Comparable<Enchant> {
                     else
                         Style.EMPTY.withColor(config.perfectEnchantColor.get().toChromaColor().getEffectiveColourRGB())
                 }
+
+                if (config.boldPerfectEnchant.get()) style = style.withBold(true)
+
+                return style
             }
         }
 

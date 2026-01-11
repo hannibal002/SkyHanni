@@ -88,15 +88,15 @@ object AllBurrowsList {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shaddfoundburrowlocationsfromclipboard") {
+        event.registerBrigadier("shaddfoundburrowlocationsfromclipboard") {
             description = "Add all ever found burrow locations from clipboard"
             category = CommandCategory.DEVELOPER_TEST
-            callback { addFromClipboard() }
+            simpleCallback { addFromClipboard() }
         }
-        event.register("shcopyfoundburrowlocations") {
+        event.registerBrigadier("shcopyfoundburrowlocations") {
             description = "Copy all ever found burrow locations to clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            callback { copyToClipboard() }
+            simpleCallback { copyToClipboard() }
         }
     }
 
