@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.LorenzVecArgumentType
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -109,22 +110,18 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    private fun waypoint(args: Array<String>) {
+    private fun waypoint(location: LorenzVec? = null, pathfind: Boolean = false) {
         SoundUtils.playBeepSound()
 
-        if (args.isEmpty()) {
+        if (location == null) {
             testLocation = null
             ChatUtils.chat("reset test waypoint")
             IslandGraphs.stop()
             return
         }
 
-        val x = args[0].toDouble()
-        val y = args[1].toDouble()
-        val z = args[2].toDouble()
-        val location = LorenzVec(x, y, z)
         testLocation = location
-        if (args.getOrNull(3) == "pathfind") {
+        if (pathfind) {
             IslandGraphs.pathFind(location, "/shtestwaypoint", condition = { true })
         }
         ChatUtils.chat("set test waypoint")
@@ -302,12 +299,12 @@ object SkyHanniDebugsAndTests {
         GardenNextJacobContest.resetContestData(true)
     }
 
-    private fun copyLocation(args: Array<String>) {
+    private fun copyLocation(parameter: String? = null) {
         val location = LocationUtils.playerLocation()
         val x = (location.x + 0.001).roundTo(1)
         val y = (location.y + 0.001).roundTo(1)
         val z = (location.z + 0.001).roundTo(1)
-        val (clipboard, format) = formatLocation(x, y, z, args.getOrNull(0))
+        val (clipboard, format) = formatLocation(x, y, z, parameter)
         OSUtils.copyToClipboard(clipboard)
         ChatUtils.chat("Copied the current location to clipboard ($format format)!", replaceSameMessage = true)
     }
@@ -509,12 +506,12 @@ object SkyHanniDebugsAndTests {
     @Suppress("LongMethod")
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetconfig") {
+        event.registerBrigadier("shresetconfig") {
             description = "Reloads the config manager and rendering processors of MoulConfig. " +
                 "This §cWILL RESET §7your config, but also update the config files " +
                 "(names, description, orderings and stuff)."
             category = CommandCategory.DEVELOPER_TEST
-            callback {
+            simpleCallback {
                 ChatUtils.clickableChat(
                     "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
                     onClick = { resetConfig() },
@@ -555,7 +552,15 @@ object SkyHanniDebugsAndTests {
         event.registerBrigadier("shcopylocation") {
             description = "Copies the player location as LorenzVec format to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            legacyCallbackArgs { copyLocation(it) }
+            literalCallback("json") {
+                copyLocation("json")
+            }
+            literalCallback("pathfind") {
+                copyLocation("pathfind")
+            }
+            simpleCallback {
+                copyLocation()
+            }
         }
         event.registerBrigadier("shtest") {
             description = "Unused test command."
@@ -565,7 +570,7 @@ object SkyHanniDebugsAndTests {
         event.registerBrigadier("shfindnullconfig") {
             description = "Find config elements that are null and prints them into the console"
             category = CommandCategory.DEVELOPER_TEST
-            legacyCallbackArgs {
+            simpleCallback {
                 println("start null finder")
                 findNull(SkyHanniMod.feature, "config")
                 println("stop null finder")
@@ -574,7 +579,14 @@ object SkyHanniDebugsAndTests {
         event.registerBrigadier("shtestwaypoint") {
             description = "Set a waypoint on that location"
             category = CommandCategory.DEVELOPER_TEST
-            legacyCallbackArgs { waypoint(it) }
+            arg("waypoint", LorenzVecArgumentType.double()) { vec ->
+                literalCallback("pathfind") {
+                    waypoint(getArg(vec), true)
+                }
+                callback { waypoint(getArg(vec)) }
+
+            }
+            simpleCallback { waypoint() }
         }
         event.registerBrigadier("shstoplisteners") {
             description = "Unregistering all loaded event listeners"

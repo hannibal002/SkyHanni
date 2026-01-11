@@ -144,10 +144,10 @@ object HoppityEggLocations {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtoggleegglocationdebug") {
+        event.registerBrigadier("shtoggleegglocationdebug") {
             description = "Shows Hoppity egg locations with their internal API names and status."
             category = CommandCategory.DEVELOPER_TEST
-            callback { toggleDebug() }
+            simpleCallback { toggleDebug() }
         }
     }
 }

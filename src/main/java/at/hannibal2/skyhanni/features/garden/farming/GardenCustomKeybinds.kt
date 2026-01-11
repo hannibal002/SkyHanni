@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
@@ -26,11 +27,12 @@ object GardenCustomKeybinds {
 
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
+    private val versionAllowsDuplicateKeybinds by lazy { PlatformUtils.isMcBelow("1.21.9") }
 
     private var map: Map<KeyMapping, Int> = emptyMap()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
     private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
-    private var isDuplicate = false
+    private var hasDisallowedDuplicateKeybinds = false
 
     @JvmStatic
     fun isKeyDown(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
@@ -65,10 +67,10 @@ object GardenCustomKeybinds {
         lastWindowOpenTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!isEnabled()) return
-        if (!isDuplicate || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
+        if (!hasDisallowedDuplicateKeybinds || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
         ChatUtils.chatAndOpenConfig(
             "Duplicate Custom Keybinds aren't allowed!",
             GardenApi.config::keyBind,
@@ -76,8 +78,8 @@ object GardenCustomKeybinds {
         lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(attack, useItem, left, right, forward, back, jump, sneak) {
                 update()
@@ -104,21 +106,29 @@ object GardenCustomKeybinds {
                 }
             }
         }
-        calculateDuplicates()
+        checkDuplicateKeybinds()
         lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
         KeyMapping.releaseAll()
     }
 
-    private fun calculateDuplicates() {
-        isDuplicate = map.values
-            .filter { it != GLFW.GLFW_KEY_UNKNOWN }
-            .let { values -> values.size != values.toSet().size }
+    private fun checkDuplicateKeybinds() {
+        hasDisallowedDuplicateKeybinds = !versionAllowsDuplicateKeybinds &&
+            map.values
+                .filter { it != GLFW.GLFW_KEY_UNKNOWN }
+                .let { values -> values.size != values.toSet().size }
     }
 
-    private fun isEnabled() = GardenApi.inGarden() && config.enabled && !(GardenApi.onUnfarmablePlot && config.excludeBarn)
+    private fun isEnabled(): Boolean =
+        GardenApi.inGarden() &&
+            config.enabled &&
+            !(GardenApi.onUnfarmablePlot && config.excludeBarn)
 
     private fun isActive(): Boolean =
-        isEnabled() && GardenApi.toolInHand != null && !isDuplicate && !hasGuiOpen() && lastWindowOpenTime.passedSince() > 300.milliseconds
+        isEnabled() &&
+            GardenApi.toolInHand != null &&
+            !hasDisallowedDuplicateKeybinds &&
+            !hasGuiOpen() &&
+            lastWindowOpenTime.passedSince() > 300.milliseconds
 
     private fun hasGuiOpen() = Minecraft.getInstance().screen != null
 
