@@ -142,7 +142,7 @@ object GriffinBurrowHelper {
             var shouldMove = false
             if (!isBlockValid(this.getCurrent())) shouldMove = true
 
-            if (shouldBurrowParticlesBeVisible() &&
+            if (shouldBurrowParticlesBeVisible(timeInPast = 1.seconds) &&
                 !GriffinBurrowParticleFinder.containsBurrow(this.getCurrent()) && // burrow is not found
                 this.getCurrent().distanceSq(MinecraftCompat.localPlayer.position().toLorenzVec()) < 900 // within 30 blocks
             ) {
@@ -153,6 +153,7 @@ object GriffinBurrowHelper {
                 val nextIndex = currentIndex + 1
                 if (nextIndex in guesses.indices) {
                     currentIndex = nextIndex
+                    update()
                     BurrowGuessEvent(this).post()
                     return false
                 } else return true // remove if it should have moved but cant
@@ -282,13 +283,8 @@ object GriffinBurrowHelper {
         val burrowLocation = event.burrowLocation
         val currentEntry = allGuesses.firstOrNull { it.contains(burrowLocation) }
 
-        if (currentEntry == null) addGuess(GuessEntry(listOf(burrowLocation), event.type))
-        else {
-            val correctIndex = currentEntry.guesses.indices // safe because of the .contains and null checks above
-                .first { index -> currentEntry.guesses[index] == burrowLocation }
-            currentEntry.burrowType = event.type
-            currentEntry.currentIndex = correctIndex
-        }
+        if (currentEntry != null) removeGuess(currentEntry)
+        addGuess(GuessEntry(listOf(burrowLocation), event.type))
 
         update()
     }
@@ -582,6 +578,33 @@ object GriffinBurrowHelper {
             category = CommandCategory.DEVELOPER_TEST
             arg("type", BrigadierArguments.string()) { type ->
                 callback { setTestBurrow(getArg(type)) }
+            }
+        }
+        event.registerBrigadier("shtestburrowchain") {
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback {
+                addGuess(
+                    GuessEntry(
+                        listOf(
+                            LorenzVec(-143, 69, 62),
+                            LorenzVec(-137, 69, 68),
+                            LorenzVec(-132, 69, 73),
+                            LorenzVec(-125, 69, 80),
+                            LorenzVec(-117, 69, 88),
+                            LorenzVec(-107, 69, 98),
+                            LorenzVec(-92, 69, 113),
+                            LorenzVec(-88, 69, 123),
+                            LorenzVec(-78, 69, 136),
+                        ),
+                    ),
+                )
+            }
+
+        }
+        event.registerBrigadier("shtestburrowchainenddetect") {
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback {
+                BurrowDetectEvent(LorenzVec(-88, 69, 123), BurrowType.TREASURE).post()
             }
         }
     }
