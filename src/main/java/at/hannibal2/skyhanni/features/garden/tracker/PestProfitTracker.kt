@@ -125,11 +125,11 @@ object PestProfitTracker : SkyHanniTimedBucketedItemTracker<PestType, PestProfit
             )
         }
 
-        override fun getCustomPricePer(internalName: NeuInternalName): Double {
+        override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>): Double {
             return if (internalName == BITS) {
                 getBitsPrice()
             } else {
-                super.getCustomPricePer(internalName)
+                super.getCustomPricePer(internalName, tracker)
             }
         }
 
