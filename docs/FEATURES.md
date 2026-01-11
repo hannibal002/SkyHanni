@@ -48,6 +48,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Current Chat Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/3491)
     + Displays a GUI element that indicates what chat you are in (e.g. Party, Guild, Coop, All).
 + Notify you in chat when a marked player joins/leaves your lobby. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2653)
++ Added /shtodos. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4968)
+  + Works exactly the same as NEU's version, you can even import your NEU todos into skyhanni.
++ Added `/shcalc` command. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
 
 #### Chat Filter
 
@@ -465,6 +468,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to display total Trophy Fish count in Odger's inventory. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3526)
 + Added Rare Sea Creature Party Announcer. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/3672)
     + Sends a message to party chat when a rare sea creature is caught.
++ Mute Banshee screams. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/5007)
 
 </details>
 <details open><summary>
@@ -811,6 +815,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Compact the Jacob Claim message, only showing full information when hovering.
 + Added Monthly Farming Weight Leaderboard option. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3886)
 + Optimal Angles Overlay for Squeaky Mousemat. - nikijul (https://github.com/hannibal002/SkyHanni/pull/2999)
++ Added DNA Analyser Solver. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
++ Added Hoe Level Display. - nopo (https://github.com/hannibal002/SkyHanni/pull/4926)
++ Mute Hoe Level Up Sound. - nopo (https://github.com/hannibal002/SkyHanni/pull/4966)
++ Added Zorro's Cape Contest Protection. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5029)
+  + Requires equipping Zorro's Cape to claim Jacob's Farming Contest rewards.
++ Added crop fever tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5059)
 
 ### Garden Pests
 
@@ -995,6 +1005,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Ubik's Cube reminder. - jepn (https://github.com/hannibal002/SkyHanni/pull/3125)
 + Added Bacte Kill Zone Warning. - Luna (https://github.com/hannibal002/SkyHanni/pull/4541)
     + Sound and title alert if you are outside the arena during the Bacte fight and about to die.
++ Added Ubik Cube Timer GUI. - nopo (https://github.com/hannibal002/SkyHanni/pull/4909)
 
 </details>
 <details open><summary>
@@ -1785,6 +1796,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Middle Click Fix for 1.21.x. - Luna (https://github.com/hannibal002/SkyHanni/pull/4863)
     + This fixes not being able to middle click items in inventories (e.g. to disable a full set bonus or a rune).
 + \* Few extra features not worth mentioning. - nopo (https://github.com/hannibal002/SkyHanni/pull/4902)
++ Added Particle Colour Fixer. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4993)
+  + This makes particles have the same colours as they do on 1.8.
++ Added Anti Super Crafting Overpay. - Hype_the_Time (https://github.com/hannibal002/SkyHanni/pull/5022)
+    + Blocks Super Crafts (bypassable) if you can save more than X coins by instantly selling the mats and instant buying the item directly.
++ Added downloading community shtodos. - nopo & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5048)
+    + Access via /shtodos or download directly from /shdownloadtodo.
+    + If you want your own todos featured, post them in Discord.
 
 </details>
 <details open><summary>

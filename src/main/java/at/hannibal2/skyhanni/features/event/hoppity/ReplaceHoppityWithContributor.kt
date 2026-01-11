@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CircularList
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 @SkyHanniModule
 object ReplaceHoppityWithContributor {
@@ -57,7 +58,7 @@ object ReplaceHoppityWithContributor {
         val last = lore.lastOrNull() ?: return
         if (!last.endsWith(" RABBIT")) return
 
-        val realName = itemStack.displayName
+        val realName = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val cleanName = realName.removeColor()
         val fakeName = replaceMap[cleanName] ?: return
 

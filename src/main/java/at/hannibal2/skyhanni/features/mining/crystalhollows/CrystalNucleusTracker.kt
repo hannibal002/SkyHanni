@@ -57,7 +57,7 @@ object CrystalNucleusTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Crystal Nucleus Tracker",
-        { Data() },
+        ::Data,
         { it.mining.crystalNucleusTracker },
     ) { drawDisplay(it) }
 
@@ -105,10 +105,10 @@ object CrystalNucleusTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetcrystalnucleustracker") {
+        event.registerBrigadier("shresetcrystalnucleustracker") {
             description = "Resets the Crystal Nucleus Tracker."
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 
@@ -199,7 +199,7 @@ object CrystalNucleusTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() },
+            condition = ::isEnabled,
             onRender = {
                 tracker.renderDisplay(config.position)
             },

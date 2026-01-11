@@ -78,7 +78,7 @@ object GhostTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Ghost Tracker",
-        { Data() },
+        ::Data,
         { it.ghostStorage.ghostTracker },
     ) { drawDisplay(it) }
 
@@ -375,10 +375,10 @@ object GhostTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetghosttracker") {
+        event.registerBrigadier("shresetghosttracker") {
             description = "Resets the Ghost Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

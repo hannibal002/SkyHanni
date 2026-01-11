@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig
 import at.hannibal2.skyhanni.data.HypixelData
@@ -41,6 +42,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.minecraft.client.Minecraft
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.time.Duration.Companion.minutes
@@ -192,21 +194,23 @@ object FarmingWeightDisplay {
         if (rankGoal == -1) rankGoal = getRankGoal()
         val leaderboard = getLeaderboardFormat()
 
-        val list = mutableListOf<Renderable>()
-        list.add(
-            Renderable.clickable(
-                "§6$lbName§7: $weight$leaderboard",
-                tips = listOf("§eClick to open your Farming Profile."),
-                onLeftClick = { openWebsite(PlayerUtils.getName()) },
-            ),
-        )
+        Minecraft.getInstance().execute {
+            val list = mutableListOf<Renderable>()
+            list.add(
+                Renderable.clickable(
+                    "§6$lbName§7: $weight$leaderboard",
+                    tips = listOf("§eClick to open your Farming Profile."),
+                    onLeftClick = { openWebsite(PlayerUtils.getName()) },
+                ),
+            )
 
-        if (isEtaEnabled() && (weightPerSecond != -1.0 || config.overtakeETAAlways)) {
-            getETA()?.let {
-                list.add(it)
+            if (isEtaEnabled() && (weightPerSecond != -1.0 || config.overtakeETAAlways)) {
+                getETA()?.let {
+                    list.add(it)
+                }
             }
+            display = list
         }
-        display = list
     }
 
     private fun getLeaderboardFormat(): String {
@@ -528,11 +532,6 @@ object FarmingWeightDisplay {
         return cropWeight[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
     }
 
-    private fun lookUpCommand(it: Array<String>) {
-        val name = if (it.size == 1) it[0] else PlayerUtils.getName()
-        openWebsite(name, ignoreCooldown = true)
-    }
-
     private var lastName = ""
 
     private fun openWebsite(name: String, ignoreCooldown: Boolean = false) {
@@ -578,14 +577,22 @@ object FarmingWeightDisplay {
         CropType.MUSHROOM to 90_944.27,
         CropType.COCOA_BEANS to 276_733.75,
         CropType.CACTUS to 178_730.65,
+        CropType.MOONFLOWER to 200_000.0,
+        CropType.SUNFLOWER to 200_000.0,
+        CropType.WILD_ROSE to 200_000.0,
     )
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shfarmingprofile") {
+        event.registerBrigadier("shfarmingprofile") {
             description = "Look up the farming profile from yourself or another player on elitebot.dev"
             category = CommandCategory.USERS_ACTIVE
-            callback { lookUpCommand(it) }
+            argCallback("name", BrigadierArguments.string()) { name ->
+                openWebsite(name, ignoreCooldown = true)
+            }
+            simpleCallback {
+                openWebsite(PlayerUtils.getName(), ignoreCooldown = true)
+            }
         }
     }
 

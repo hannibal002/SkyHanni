@@ -32,10 +32,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 
@@ -219,7 +219,7 @@ object CaptureFarmingGear {
             if (stack.getInternalNameOrNull() == null) {
                 storage.farmingItems.remove(itemType)
                 storage.outdatedItems[itemType] = true
-                ChatUtils.debug("removed invalid farming item: $itemType (${stack.displayName})")
+                ChatUtils.debug("removed invalid farming item: $itemType (${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()})")
             }
         }
     }
@@ -288,7 +288,7 @@ object CaptureFarmingGear {
         storage: ProfileSpecificStorage.GardenStorage.Fortune,
     ) {
         for ((_, item) in items) {
-            if (item.displayName.contains("Garden")) {
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets().contains("Garden")) {
                 var fortune = -1.0
                 for (line in item.getLore()) {
                     bestiaryPattern.matchMatcher(line) {
@@ -307,7 +307,7 @@ object CaptureFarmingGear {
         storage: ProfileSpecificStorage.GardenStorage.Fortune,
     ) {
         for ((_, item) in items) {
-            if (item.displayName.contains("Dark Chocolate")) {
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets().contains("Dark Chocolate")) {
                 var fortune = -1
                 for (line in item.getLore()) {
                     fortuneFlatPattern.matchMatcher(line) {
@@ -318,7 +318,7 @@ object CaptureFarmingGear {
                     storage.cacao = fortune
                 }
             }
-            if (item.displayName.contains("Relic of Power")) {
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets().contains("Relic of Power")) {
                 var fortune = -1.0
                 for (line in item.getLore()) {
                     fortuneFlatPattern.matchMatcher(line) {
@@ -338,7 +338,7 @@ object CaptureFarmingGear {
     ) {
         for ((_, item) in items) {
             // Stats ➜ <Crop> Fortune
-            if (item.displayName.contains("Flat Bonuses")) {
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets().contains("Flat Bonuses")) {
                 var fortune = -1.0
                 for (line in item.getLore()) {
                     personalBestPattern.matchMatcher(line) {
@@ -351,7 +351,7 @@ object CaptureFarmingGear {
             }
 
             // <Crop> Fortune ➜ Flat Bonuses
-            if (item.displayName.contains("Anita's Personal Bests")) {
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets().contains("Anita's Personal Bests")) {
                 var fortune = -1.0
                 for (line in item.getLore()) {
                     fortuneFlatPattern.matchMatcher(line) {
@@ -370,7 +370,7 @@ object CaptureFarmingGear {
         storage: ProfileSpecificStorage.GardenStorage.Fortune,
     ) {
         for ((_, item) in items) {
-            if (item.displayName.contains("Relic of Power")) {
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets().contains("Relic of Power")) {
                 var fortune = -1.0
                 for (line in item.getLore()) {
                     relicOfPowerFarmingFortune.matchMatcher(line) {
@@ -386,7 +386,7 @@ object CaptureFarmingGear {
 
     private fun visitorMilestones(items: Map<Int, ItemStack>) {
         for ((_, item) in items) {
-            if (item.displayName != "§aUnique Visitors Served") continue
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aUnique Visitors Served") continue
 
             var tier = -1
             var tierProgress = -1
@@ -410,7 +410,7 @@ object CaptureFarmingGear {
     ) {
         var level = -1
         for ((_, item) in items) {
-            if (item.displayName.contains("Extra Farming Fortune")) {
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets().contains("Extra Farming Fortune")) {
                 level = 0
 
                 anitaMenuPattern.firstMatcher(item.getLore()) {
@@ -440,13 +440,13 @@ object CaptureFarmingGear {
 
     private fun communityShop(items: Map<Int, ItemStack>) {
         for ((_, item) in items) {
-            if (item.displayName.contains("Garden Farming Fortune")) {
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets().contains("Garden Farming Fortune")) {
                 if (item.getLore().contains("§aMaxed out!")) {
                     ProfileStorageData.playerSpecific?.gardenCommunityUpgrade =
-                        item.displayName.split(" ").last().romanToDecimal()
+                        item.hoverName.formattedTextCompatLeadingWhiteLessResets().split(" ").last().romanToDecimal()
                 } else {
                     ProfileStorageData.playerSpecific?.gardenCommunityUpgrade =
-                        item.displayName.split(" ").last().romanToDecimal() - 1
+                        item.hoverName.formattedTextCompatLeadingWhiteLessResets().split(" ").last().romanToDecimal() - 1
                 }
             }
         }
@@ -457,8 +457,8 @@ object CaptureFarmingGear {
         storage: ProfileSpecificStorage.GardenStorage.Fortune,
     ) {
         for ((_, item) in items) {
-            if (item.displayName.contains("Farming ")) {
-                storage.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNecessary()
+            if (item.hoverName.formattedTextCompatLeadingWhiteLessResets().contains("Farming ")) {
+                storage.farmingLevel = item.hoverName.formattedTextCompatLeadingWhiteLessResets().split(" ").last().romanToDecimalIfNecessary()
             }
         }
     }
@@ -539,7 +539,7 @@ object CaptureFarmingGear {
     fun onChat(event: SkyHanniChatEvent) {
         val storage = GardenApi.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
-        val msg = event.message.removeColor().trim()
+        val msg = event.cleanMessage.trim()
         fortuneUpgradePattern.matchMatcher(msg) {
             ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = group("level").romanToDecimal()
             return

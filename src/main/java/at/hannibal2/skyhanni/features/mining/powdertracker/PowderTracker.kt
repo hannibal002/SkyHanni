@@ -135,7 +135,7 @@ object PowderTracker {
     }
 
     private val tracker =
-        SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker }) { formatDisplay(drawDisplay(it)) }
+        SkyHanniTracker("Powder Tracker", ::Data, { it.powderTracker }) { formatDisplay(drawDisplay(it)) }
 
     data class Data(
         @Expose var totalChestPicked: Long = 0,
@@ -445,10 +445,10 @@ object PowderTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetpowdertracker") {
+        event.registerBrigadier("shresetpowdertracker") {
             description = "Resets the Powder Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 }

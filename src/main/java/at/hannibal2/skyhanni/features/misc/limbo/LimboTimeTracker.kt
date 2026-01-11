@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.phys.AABB
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -40,14 +40,14 @@ object LimboTimeTracker {
     private const val FIRE_MULTIPLIER = 1.01F
     private var onFire = false
 
-    private val bedWarsLobbyLimbo = AxisAlignedBB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
+    private val bedWarsLobbyLimbo = AABB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
-            onFire = MinecraftCompat.localPlayer.isBurning
+            onFire = MinecraftCompat.localPlayer.isOnFire
         }
     }
 

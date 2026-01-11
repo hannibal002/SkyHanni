@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -39,6 +40,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
@@ -49,9 +51,9 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.ItemStack
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -89,7 +91,7 @@ object HideNotClickableItems {
      */
     private val seedsPattern by patternGroup.pattern(
         "inventory.hidenotclickable.seeds",
-        "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3",
+        "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3|DOUBLE_PLANT|MOONFLOWER|WILD_ROSE",
     )
 
     private val netherWart = "NETHER_STALK".toInternalName()
@@ -120,8 +122,8 @@ object HideNotClickableItems {
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (bypassActive()) return
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is ContainerScreen) return
+        val chest = event.container as ChestMenu
         val chestName = InventoryUtils.openInventoryName()
 
         for ((slot, stack) in chest.getLowerItems()) {
@@ -138,12 +140,12 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (bypassActive()) return
 
-        val guiChest = Minecraft.getMinecraft().currentScreen
-        if (guiChest !is GuiChest) return
+        val guiChest = Minecraft.getInstance().screen
+        if (guiChest !is ContainerScreen) return
         val chestName = InventoryUtils.openInventoryName()
 
         val stack = event.itemStack
-        if (InventoryUtils.getItemsInOpenChest().map { it.stack }.contains(stack)) return
+        if (InventoryUtils.getItemsInOpenChest().map { it.item }.contains(stack)) return
         if (!ItemUtils.getItemsInInventory().contains(stack)) return
 
         if (hide(chestName, stack)) {
@@ -168,13 +170,13 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (!config.itemsBlockClicks) return
         if (bypassActive()) return
-        if (event.gui !is GuiChest) return
+        if (event.gui !is ContainerScreen) return
         val chestName = InventoryUtils.openInventoryName()
 
         val slot = event.slot ?: return
 
-        if (slot.slotNumber == slot.slotIndex) return
-        val stack = slot.stack.orNull() ?: return
+        if (slot.index == slot.containerSlot) return
+        val stack = slot.item.orNull() ?: return
 
         if (hide(chestName, stack)) {
             event.cancel()
@@ -486,13 +488,15 @@ object HideNotClickableItems {
         showGreenLine = true
 
         var name = stack.cleanName()
-        val size = stack.stackSize
+        val size = stack.count
         val amountText = " x$size"
         if (name.endsWith(amountText)) {
             name = name.substring(0, name.length - amountText.length)
         }
 
-        if (!clickToSellPattern.anyMatches(stack.getLore())) {
+        val sellable = clickToSellPattern.anyMatches(stack.getLore()) ||
+            (stack.getItemId() != "PET" && (stack.getInternalNameOrNull()?.getNpcPriceOrNull() ?: 0.0) > 0)
+        if (!sellable) {
             hideReason = "This item cannot be sold at the NPC!"
             return true
         }
@@ -508,7 +512,7 @@ object HideNotClickableItems {
         }
 
         if (!config.protectRarelySoldItems) return false
-        if (stack.isVanilla() && !stack.isEnchanted()) return false
+        if (stack.isVanilla() && !stack.isEnchanted) return false
         if (SkyBlockUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) return false
         if (hideNpcSellFilter.match(name)) return false
 

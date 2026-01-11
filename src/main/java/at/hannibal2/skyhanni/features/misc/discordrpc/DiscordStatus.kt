@@ -4,18 +4,20 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.ActionBarStatsData
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
-import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
-import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMaxTier
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMilestoneCounter
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.isMaxMilestone
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.percentToNextMilestone
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
@@ -29,6 +31,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
+import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -58,16 +63,16 @@ var beenAfkFor = SimpleTimeMark.now()
 
 private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()
-    val cropCounter = crop?.getCounter()
+    val cropCounter = crop?.getMilestoneCounter()
     val allowOverflow = GardenApi.config.cropMilestones.overflow.discordRPC
-    val tier = cropCounter?.let { getTierForCropCount(it, crop, allowOverflow) }
+    val tier = crop?.getCurrentMilestoneTier()
     val progress = tier?.let {
-        crop.progressToNextLevel(allowOverflow).formatPercentage()
+        crop.percentToNextMilestone()?.formatPercentage()
     } ?: 100 // percentage to next milestone
 
-    if (tier == null) return AutoStatus.CROP_MILESTONES.placeholderText
+    if (tier == null || cropCounter == null) return AutoStatus.CROP_MILESTONES.placeholderText
 
-    val text = if (crop.isMaxed(allowOverflow)) {
+    val text = if (crop.isMaxMilestone() || (!allowOverflow && tier >= (getMaxTier()))) {
         "MAXED (${cropCounter.addSeparators()} crops)"
     } else {
         "Milestone $tier ($progress)"
@@ -104,7 +109,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                     else "Visiting a Garden"
                 }
 
-                else -> location.takeIf { it != "None" && it != "invalid" && it != "no_area" }
+                else -> location.takeIf { it != "None" && it != "invalid" && it != AreaNode.NO_AREA }
                     ?: lastKnownDisplayStrings[LOCATION].orEmpty()
             }
             // Only display None if we don't have a last known area
@@ -166,7 +171,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     ITEM(
         {
             InventoryUtils.getItemInHand()?.let {
-                String.format(java.util.Locale.US, "Holding ${it.displayName.removeColor()}")
+                String.format(java.util.Locale.US, "Holding ${it.hoverName.string.removeColor()}")
             } ?: "No item in hand"
         },
     ),
@@ -272,7 +277,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         {
             // Logic for getting the currently held stacking enchant is from Skytils
             val itemInHand = InventoryUtils.getItemInHand()
-            val itemName = itemInHand?.displayName?.removeColor().orEmpty()
+            val itemName = itemInHand?.hoverName?.string?.removeColor().orEmpty()
 
             fun getProgressPercent(amount: Int, levels: List<Int>): String {
                 var percent = "MAXED"
@@ -293,17 +298,17 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             val extraAttributes = itemInHand?.extraAttributes
             var stackingReturn = AutoStatus.STACKING.placeholderText
             if (extraAttributes != null) {
-                val enchantments = extraAttributes.getCompoundTag("enchantments")
+                val enchantments = extraAttributes.getCompoundOrDefault("enchantments")
                 var stackingEnchant = ""
                 for (enchant in EstimatedItemValue.stackingEnchants) {
-                    if (extraAttributes.hasKey(enchant.value.statName)) {
+                    if (extraAttributes.contains(enchant.value.statName)) {
                         stackingEnchant = enchant.key
                         break
                     }
                 }
                 val levels = EstimatedItemValue.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
-                val level = enchantments.getInteger(stackingEnchant)
-                val amount = extraAttributes.getInteger(EstimatedItemValue.stackingEnchants[stackingEnchant]?.statName)
+                val level = enchantments.getIntOrDefault(stackingEnchant)
+                val amount = extraAttributes.getIntOrDefault(EstimatedItemValue.stackingEnchants[stackingEnchant]?.statName)
                 val stackingPercent = getProgressPercent(amount, levels)
 
                 stackingReturn =

@@ -60,7 +60,7 @@ class DefaultConfigOptionGui(
         GuiRenderUtils.drawStringCenteredScaledMaxWidth(
             guiTitle,
             0F,
-            mc.fontRendererObj.FONT_HEIGHT.toFloat(),
+            mc.font.lineHeight.toFloat(),
             false,
             xSize / 2 - padding,
             -1,
@@ -70,12 +70,12 @@ class DefaultConfigOptionGui(
         DrawContextUtils.pushMatrix()
         DrawContextUtils.translate(
             (width - xSize) / 2F + padding,
-            (height + ySize) / 2F - mc.fontRendererObj.FONT_HEIGHT * 2,
+            (height + ySize) / 2F - mc.font.lineHeight * 2,
             0F,
         )
         var i = 0
         fun button(title: String, tooltip: List<String>, func: () -> Unit) {
-            val width = mc.fontRendererObj.getStringWidth(title)
+            val width = mc.font.width(title)
             var overMouse = false
             if (originalMouseX - ((this.width - xSize) / 2 + padding) in i..(i + width) &&
                 originalMouseY - (height + ySize) / 2 in -barSize..0
@@ -98,7 +98,7 @@ class DefaultConfigOptionGui(
         }
         button("Apply choices", listOf()) {
             DefaultConfigFeatures.applyCategorySelections(resetSuggestionState, orderedOptions)
-            mc.displayGuiScreen(null)
+            mc.setScreen(null)
         }
         button("Turn all on", listOf()) {
             for (entry in resetSuggestionState.entries) {
@@ -125,7 +125,7 @@ class DefaultConfigOptionGui(
             }
         }
         button("Cancel", listOf()) {
-            mc.displayGuiScreen(null)
+            mc.setScreen(null)
         }
         DrawContextUtils.popMatrix()
 

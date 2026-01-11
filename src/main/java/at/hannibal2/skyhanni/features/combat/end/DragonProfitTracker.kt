@@ -31,7 +31,7 @@ import java.util.EnumMap
 @SkyHanniModule
 object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfitTracker.BucketData>(
     "Dragon Profit Tracker",
-    { BucketData() },
+    ::BucketData,
     { it.dragonProfitTracker },
     { drawDisplay(it) },
 ) {
@@ -163,10 +163,10 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetdragonprofittracker") {
+        event.registerBrigadier("shresetdragonprofittracker") {
             description = "Resets the Dragon Profit Tracker."
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

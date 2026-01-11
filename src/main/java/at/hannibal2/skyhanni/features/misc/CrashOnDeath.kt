@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.CrashReport
 import net.minecraft.client.Minecraft
-import net.minecraft.crash.CrashReport
 
 @SkyHanniModule
 object CrashOnDeath {
@@ -27,7 +27,7 @@ object CrashOnDeath {
         if (!isEnabled()) return
 
         if (pattern.matches(event.message)) {
-            Minecraft.getMinecraft().crashed(CrashReport("Not Reading", Throwable("Don't toggle all the Options")))
+            Minecraft.getInstance().delayCrash(CrashReport("Not Reading", Throwable("Don't toggle all the Options")))
         }
     }
 

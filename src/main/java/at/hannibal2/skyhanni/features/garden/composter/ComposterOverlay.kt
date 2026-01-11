@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -57,6 +59,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
@@ -141,7 +144,7 @@ object ComposterOverlay {
     fun onToolTip(event: ToolTipEvent) {
         if (!composterUpgradesInventory.isInside()) return
         for (upgrade in ComposterUpgrade.entries) {
-            val name = event.itemStack.displayName
+            val name = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
             if (name.contains(upgrade.displayName)) {
                 maxLevel = ComposterUpgrade.regex.matchMatcher(name) {
                     group("level")?.romanToDecimalIfNecessary() ?: 0
@@ -596,6 +599,13 @@ object ComposterOverlay {
         updateOrganicMatterFactors()
     }
 
+    // hopefully fix the display not working properly
+    @HandleEvent
+    fun onIslandSwap(event: IslandChangeEvent) {
+        if (event.newIsland != IslandType.GARDEN) return
+        updateOrganicMatterFactors()
+    }
+
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
@@ -722,13 +732,9 @@ object ComposterOverlay {
         event.registerBrigadier("shtestcomposter") {
             description = "Test the composter overlay"
             category = CommandCategory.DEVELOPER_DEBUG
-            legacyCallbackArgs {
-                if (it.size != 1) {
-                    ChatUtils.userError("Usage: /shtestcomposter <offset>")
-                } else {
-                    testOffset = it[0].toInt()
-                    ChatUtils.chat("Composter test offset set to $testOffset.")
-                }
+            argCallback("offset", BrigadierArguments.integer()) {
+                testOffset = it
+                ChatUtils.chat("Composter test offset set to $testOffset.")
             }
         }
     }

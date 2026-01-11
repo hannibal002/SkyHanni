@@ -88,10 +88,19 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresethoppityeventstats") {
+        event.registerBrigadier("shresethoppityeventstats") {
             description = "Reset Hoppity Event stats for all years."
             category = CommandCategory.USERS_RESET
-            callback { handleResetRequest(it) }
+            literalCallback("confirm") {
+                resetStats()
+            }
+            simpleCallback {
+                ChatUtils.clickableChat(
+                    "§c§lWARNING! §r§7This will reset §call §7Hoppity Event stats for §call §7years. " +
+                        "Click here or type §c/shresethoppityeventstats confirm §7to confirm.",
+                    onClick = HoppityEventSummary::resetStats,
+                )
+            }
         }
     }
 
@@ -163,18 +172,6 @@ object HoppityEventSummary {
     fun onProfileJoin() {
         lastSnapshotServer = null
         checkEnded()
-    }
-
-    private fun handleResetRequest(args: Array<String>) {
-        if (args.any { it.equals("confirm", ignoreCase = true) }) {
-            resetStats()
-            return
-        }
-        ChatUtils.clickableChat(
-            "§c§lWARNING! §r§7This will reset §call §7Hoppity Event stats for §call §7years. " +
-                "Click here or type §c/shresethoppityeventstats confirm §7to confirm.",
-            onClick = HoppityEventSummary::resetStats,
-        )
     }
 
     private fun resetStats() {

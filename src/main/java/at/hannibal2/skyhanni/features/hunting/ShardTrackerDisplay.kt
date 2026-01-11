@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 import java.util.zip.GZIPInputStream
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -142,7 +142,7 @@ object ShardTrackerDisplay {
     fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (!isInsideShardsMenu()) return
-        if (config.selectShardKeybind == Keyboard.KEY_NONE) return
+        if (config.selectShardKeybind == GLFW.GLFW_KEY_UNKNOWN) return
         if (!AttributeShardsData.isAttributeShard(event.itemStack.getInternalName())) return
         event.toolTip.add("§ePress ${KeyboardManager.getKeyName(config.selectShardKeybind)} to track this shard.")
     }

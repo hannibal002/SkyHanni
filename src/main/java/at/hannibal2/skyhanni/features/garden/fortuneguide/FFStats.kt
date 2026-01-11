@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.data.CropAccessoryData
-import at.hannibal2.skyhanni.data.GardenCropUpgrades.getUpgradeLevel
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.garden.CropUpgrades.getUpgradeLevel
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummie
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHeldPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.math.floor
 
 object FFStats {
@@ -71,9 +71,10 @@ object FFStats {
         FarmingFortuneDisplay.loadFortuneLineData(tool, 0.0)
 
         when (crop) {
-            CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART -> {
+            CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART,
+            CropType.SUNFLOWER, CropType.MOONFLOWER, CropType.WILD_ROSE,
+            -> {
                 FortuneStats.BASE_TOOL.set(FarmingFortuneDisplay.getToolFortune(tool), 50.0)
-                FortuneStats.COUNTER.set(FarmingFortuneDisplay.getCounterFortune(tool), 96.0)
                 FortuneStats.HARVESTING.set(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
                 FortuneStats.COLLECTION.set(FarmingFortuneDisplay.getCollectionFortune(tool), 48.0)
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 20.0)
