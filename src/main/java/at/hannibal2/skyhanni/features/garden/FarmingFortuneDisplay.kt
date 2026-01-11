@@ -2,9 +2,8 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -409,9 +408,7 @@ object FarmingFortuneDisplay {
         if (cropType == null) return 0.0
         val dedicationLevel = tool?.getHypixelEnchantments()?.get("dedication") ?: 0
         val dedicationMultiplier = listOf(0.0, 0.5, 0.75, 1.0, 2.0)[dedicationLevel]
-        val cropMilestone = GardenCropMilestones.getTierForCropCount(
-            cropType.getCounter(), cropType,
-        )
+        val cropMilestone = cropType.getCurrentMilestoneTier()?.toDouble() ?: 0.0
         return dedicationMultiplier * cropMilestone
     }
 
