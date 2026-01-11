@@ -147,7 +147,8 @@ object FarmingWeightData {
                     val storedAmount = crop.getCollection()
                     val diff = value - storedAmount
                     val weightDiff = abs(diff / crop.getFactor())
-                    if (diff > 0 || weightDiff >= 100) { // elite only updates data every 2 hours or so
+                    // elite only updates data every 2 hours or so
+                    if (diff > 0 || weightDiff >= 100) { // || apiData.lastUpdated > CropCollectionApi.lastGainedCollectionTime
                         crop.setCollectionCounter(value)
                     }
                 }
