@@ -128,7 +128,7 @@ fun Renderable.Companion.fakePlayer(
 //$$     entity.yHeadRotO = u
 //$$     entity.yHeadRot = v
 //#else
-//$$ InventoryScreen.drawEntity(context, x1, y1, x2, y2, size, scale, mouseX, mouseY, entity)
+//$$ InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x1, y1, x2, y2, size, scale, mouseX, mouseY, entity)
 //#endif
 //$$ }
 //#endif
