@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
@@ -81,7 +82,9 @@ object ChestValue {
     fun onInventoryOpen() {
         if (!isEnabled()) return
         if (inInventory) {
-            update()
+            DelayedRun.runOrNextTick {
+                update()
+            }
         }
     }
 

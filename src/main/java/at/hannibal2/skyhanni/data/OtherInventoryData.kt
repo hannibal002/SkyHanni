@@ -137,12 +137,10 @@ object OtherInventoryData {
     }
 
     private fun done(inventory: Inventory) {
-        DelayedRun.runOrNextTick {
-            InventoryFullyOpenedEvent(inventory).post()
-            inventory.fullyOpenedOnce = true
-            InventoryUpdatedEvent(inventory).post()
-            acceptItems = false
-        }
+        InventoryFullyOpenedEvent(inventory).post()
+        inventory.fullyOpenedOnce = true
+        InventoryUpdatedEvent(inventory).post()
+        acceptItems = false
     }
 
     class Inventory(

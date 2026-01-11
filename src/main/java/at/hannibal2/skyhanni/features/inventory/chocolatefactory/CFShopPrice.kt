@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
@@ -95,7 +96,9 @@ object CFShopPrice {
         if (!callUpdate) {
             products.forEach { it.slot = null }
         }
-        update()
+        DelayedRun.runOrNextTick {
+            update()
+        }
     }
 
     private fun updateProducts() {
