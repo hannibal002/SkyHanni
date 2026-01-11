@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -527,11 +526,12 @@ object SkillApi {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shskills") {
+        event.registerBrigadier("shskills") {
             description = "Skills XP/Level related command"
             category = CommandCategory.USERS_ACTIVE
-            callback { onCommand(it) }
-            autoComplete { args ->
+            legacyCallbackArgs { onCommand(it) }
+            // todo auto complete
+            /* autoComplete { args ->
                 when (args.size) {
                     1 -> listOf("levelwithxp", "xpforlevel", "goal")
                     2 -> if (args[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
@@ -541,7 +541,7 @@ object SkillApi {
 
                     else -> listOf()
                 }
-            }
+            }*/
         }
     }
 }

@@ -185,10 +185,10 @@ object KingTalismanHelper {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetkinghelper") {
+        event.registerBrigadier("shresetkinghelper") {
             description = "Resets the King Talisman Helper"
             category = CommandCategory.USERS_RESET
-            callback { resetKings() }
+            simpleCallback { resetKings() }
         }
     }
 }

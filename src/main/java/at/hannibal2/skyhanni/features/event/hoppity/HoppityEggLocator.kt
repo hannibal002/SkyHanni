@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -243,24 +243,21 @@ object HoppityEggLocator {
         }
     }
 
-    private fun testPathFind(args: Array<String>) {
-        val target = args[0].formatInt()
-        HoppityEggLocations.apiEggLocations[SkyBlockUtils.currentIsland]?.let {
-            for ((i, location) in it.values.withIndex()) {
-                if (i == target) {
-                    IslandGraphs.pathFind(location, "Hoppity Test", condition = { true })
-                    return
-                }
-            }
-        }
-    }
-
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestrabbitpaths") {
+        event.registerBrigadier("shtestrabbitpaths") {
             description = "Tests pathfinding to rabbit eggs. Use a number 0-14."
             category = CommandCategory.DEVELOPER_TEST
-            callback { testPathFind(it) }
+            argCallback("target", BrigadierArguments.integer()) { target ->
+                HoppityEggLocations.apiEggLocations[SkyBlockUtils.currentIsland]?.let {
+                    for ((i, location) in it.values.withIndex()) {
+                        if (i == target) {
+                            IslandGraphs.pathFind(location, "Hoppity Test", condition = { true })
+                            return@argCallback
+                        }
+                    }
+                }
+            }
         }
     }
 }

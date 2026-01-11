@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.CollectionApi.getCorrectedName
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
@@ -102,41 +103,8 @@ object HideExCoopMembers {
             }
     }
 
-    private fun editHiddenCoopMembers(args: Array<String>) {
-        if (args.isEmpty()) return sendUsage()
-
-        val validActions = setOf("add", "remove")
-        val action = args.firstOrNull()?.takeIf { it in validActions } ?: return sendUsage()
-
-        val name = args.getOrNull(1)?.takeIf { it.isPlayerName() } ?: run {
-            return ChatUtils.userError("Invalid username! Did you enter it correctly?")
-        }
-
-        val new = when (action) {
-            "add" -> addHiddenMember(name)
-            "remove" -> removeHiddenMember(name)
-            else -> return sendUsage()
-        }
-
-        if (new == null) return ChatUtils.userError(
-            when (action) {
-                "add" -> "That username is already in the list!"
-                "remove" -> "That username wasn't in the list!"
-                else -> ""
-            },
-        )
-
-        ChatUtils.hoverableChat("${action.successString()} $name (Hover to see current list).", hover = new)
-    }
-
     private const val usage = "§c/shedithiddencoopmembers <add|remove> <name>"
     private fun sendUsage() = ChatUtils.userError(usage)
-
-    private fun String.successString(): String = when (this) {
-        "add" -> "Added"
-        "remove" -> "Removed"
-        else -> ""
-    }
 
     private fun addHiddenMember(name: String): List<String>? {
         val exMembers = storage?.hiddenCoopMembers ?: return null
@@ -152,10 +120,38 @@ object HideExCoopMembers {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shedithiddencoopmembers") {
+        event.registerBrigadier("shedithiddencoopmembers") {
             description = "Manually edit the list of ex co-op members you want to hide."
             category = CommandCategory.USERS_ACTIVE
-            callback { editHiddenCoopMembers(it) }
+            literal("add") {
+                argCallback("name", BrigadierArguments.string()) { name ->
+                    if (!name.isPlayerName()) {
+                        ChatUtils.userError("Invalid username! Did you enter it correctly?")
+                        return@argCallback
+                    }
+                    val new = addHiddenMember(name)
+                    if (new == null) {
+                        ChatUtils.userError("That username is already in the list!")
+                        return@argCallback
+                    }
+                    ChatUtils.hoverableChat("Added $name (Hover to see current list).", hover = new)
+                }
+            }
+            literal("remove") {
+                argCallback("name", BrigadierArguments.string()) { name ->
+                    if (!name.isPlayerName()) {
+                        ChatUtils.userError("Invalid username! Did you enter it correctly?")
+                        return@argCallback
+                    }
+                    val new = removeHiddenMember(name)
+                    if (new == null) {
+                        ChatUtils.userError("That username wasn't in the list!")
+                        return@argCallback
+                    }
+                    ChatUtils.hoverableChat("Removed $name (Hover to see current list).", hover = new)
+                }
+            }
+            simpleCallback { sendUsage() }
         }
     }
 }

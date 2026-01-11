@@ -271,10 +271,10 @@ object EnderNodeTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetendernodetracker") {
+        event.registerBrigadier("shresetendernodetracker") {
             description = "Resets the Ender Node Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 }
