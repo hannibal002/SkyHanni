@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -76,6 +77,10 @@ object BurrowWarpHelper {
             it.unlocked = false
             ChatUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
             ChatUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
+            ChatUtils.chatAndOpenConfig(
+                "Click Here to permanently ignore this warp.",
+                SkyHanniMod.feature.event.diana::ignoredWarpsList,
+            )
             lastWarp = null
             currentWarp = null
         }
@@ -147,22 +152,42 @@ object BurrowWarpHelper {
         }
     }
 
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(117, "event.diana") { element ->
+            val oldWarps = element.asJsonObject.getAsJsonObject("ignoredWarps")
+            val newWarps = element.asJsonObject.getAsJsonArray("ignoredWarpsList")
+
+            if (oldWarps.getAsJsonPrimitive("crypt")?.asBoolean == true) {
+                newWarps.add("CRYPT")
+            }
+            if (oldWarps.getAsJsonPrimitive("wizard")?.asBoolean == true) {
+                newWarps.add("WIZARD")
+            }
+            if (oldWarps.getAsJsonPrimitive("stonks")?.asBoolean == true) {
+                newWarps.add("STONKS")
+            }
+            element
+        }
+    }
+
     enum class WarpPoint(
         val displayName: String,
         val location: LorenzVec,
         private val extraBlocks: Int,
-        val ignored: () -> Boolean = { false },
         var unlocked: Boolean = true,
     ) {
         HUB("Hub", LorenzVec(-3, 70, -70), 2),
         CASTLE("Castle", LorenzVec(-250, 130, 45), 10),
-        CRYPT("Crypt", LorenzVec(-190, 74, -88), 15, { config.ignoredWarps.crypt }),
+        CRYPT("Crypt", LorenzVec(-190, 74, -88), 15),
         DA("Dark Auction", LorenzVec(91, 74, 173), 2),
         MUSEUM("Museum", LorenzVec(-75, 76, 81), 2),
-        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5, { config.ignoredWarps.wizard }),
-        STONKS("Stonks", LorenzVec(-52.5, 70.0, -49.5), 5, { config.ignoredWarps.stonks }),
+        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5),
+        STONKS("Stonks", LorenzVec(-52.5, 70.0, -49.5), 5),
         ;
 
         fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks
+
+        fun ignored(): Boolean = config.ignoredWarpsList.contains(this)
     }
 }

@@ -52,6 +52,7 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.level.block.Blocks
 import java.awt.Color
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -383,10 +384,10 @@ object GriffinBurrowHelper {
         return isGround && isValidBlockAbove
     }
 
-    fun shouldBurrowParticlesBeVisible(): Boolean {
+    fun shouldBurrowParticlesBeVisible(timeInPast: Duration = 2.seconds): Boolean {
         val spade = InventoryUtils.getItemInHand()?.isDianaSpade == true
         val time = InventoryUtils.lastItemChangeTime.passedSince()
-        return spade && time > 2.seconds
+        return spade && time > timeInPast
     }
 
     fun removeSpadeWarnTitle() {
@@ -443,8 +444,8 @@ object GriffinBurrowHelper {
                 else -> target.burrowType.text
             }
 
-            event.drawColor(location, target.burrowType.color, distance > 10)
-            event.drawDynamicText(location.up(), text, 1.5)
+            event.drawColor(location, target.burrowType.color, config.beaconDistance != -1.0F && distance > config.beaconDistance)
+            event.drawDynamicText(location.up(), text, 1.5 * config.textScale)
         }
 
     }
@@ -458,19 +459,19 @@ object GriffinBurrowHelper {
             if (distance > 10) {
                 // TODO use round(1)
                 val formattedDistance = distance.toInt().addSeparators()
-                event.drawDynamicText(location.up(), "§d§l${rareMob.mobName} §e${formattedDistance}m", 1.7)
+                event.drawDynamicText(location.up(), "§d§l${rareMob.mobName} §e${formattedDistance}m", 1.7 * config.textScale)
             } else {
-                event.drawDynamicText(location.up(), "§d§l${rareMob.mobName}", 1.7)
+                event.drawDynamicText(location.up(), "§d§l${rareMob.mobName}", 1.7 * config.textScale)
             }
             if (distance < 5) {
                 RareMobWaypointShare.maybeRemove(rareMob)
             }
-            event.drawDynamicText(location.up(), "§eFrom §b${rareMob.playerDisplayName}", 1.6, yOff = 9f)
+            event.drawDynamicText(location.up(), "§eFrom §b${rareMob.playerDisplayName}", 1.6 * config.textScale, yOff = 9f)
 
             if (config.inquisitorSharing.showDespawnTime) {
                 val spawnTime = rareMob.spawnTime
                 val format = (75.seconds - spawnTime.passedSince()).format()
-                event.drawDynamicText(location.up(), "§eDespawns in §b$format", 1.6, yOff = 18f)
+                event.drawDynamicText(location.up(), "§eDespawns in §b$format", 1.6 * config.textScale, yOff = 18f)
             }
         }
     }
@@ -493,7 +494,7 @@ object GriffinBurrowHelper {
                     text = "${textColor}Guess"
                     if (distance > 5) {
                         val formattedDistance = distance.toInt().addSeparators()
-                        event.drawDynamicText(location.up(), "§e${formattedDistance}m", 1.7, yOff = 10f)
+                        event.drawDynamicText(location.up(), "§e${formattedDistance}m", 1.7 * config.textScale, yOff = 10f)
                     }
                 }
             }
@@ -508,8 +509,8 @@ object GriffinBurrowHelper {
             }
 
             // TODO add chroma color support via config
-            event.drawColor(location, burrowType.color, distance > 10)
-            event.drawDynamicText(location.up(), text, 1.5)
+            event.drawColor(location, burrowType.color, config.beaconDistance != -1.0F && distance > config.beaconDistance)
+            event.drawDynamicText(location.up(), text, 1.5 * config.textScale)
         }
     }
 
