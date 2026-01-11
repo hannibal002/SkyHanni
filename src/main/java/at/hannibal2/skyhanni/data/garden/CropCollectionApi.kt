@@ -50,7 +50,7 @@ object CropCollectionApi {
             lastGainedCollectionTime = SimpleTimeMark.now()
         }
 
-        cropCollectionCounter?.get(this)?.addCollection(type, amount)
+        cropCollectionCounter?.getOrPut(this){CropCollection()}?.addCollection(type, amount)
 
         CropCollectionAddEvent(this, type, amount).post()
     }
@@ -66,7 +66,7 @@ object CropCollectionApi {
         )
 
     fun CropType.setCollectionCounter(counter: Long) {
-        cropCollectionCounter?.get(this)?.setTotal(counter)
+        cropCollectionCounter?.getOrPut(this){ CropCollection() }?.setTotal(counter)
         // Some displays update off add events
         CropCollectionAddEvent(this, CropCollectionType.UNKNOWN, 0).post()
         ChatUtils.debug("Set $this collection to $counter")
