@@ -342,7 +342,6 @@ object GardenCropMilestoneDisplay {
                 update()
             },
             universe = CropType.entries,
-            enableUniverseScroll = false // would infinitely scroll while hovered
         )
     }
 

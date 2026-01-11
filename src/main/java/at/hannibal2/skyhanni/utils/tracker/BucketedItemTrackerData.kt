@@ -86,10 +86,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
     @Expose
     val bucketedItems: MutableMap<E, MutableMap<NeuInternalName, TrackedItem>> = mutableMapOf()
 
-    fun getBucketedItems(bucket: E) = bucketedItems[bucket] ?: flattenBucketsItems()
+    open fun getBucketedItems(bucket: E) = bucketedItems[bucket] ?: flattenBucketsItems()
 
     protected val E.items get() = bucketedItems[this] ?: mutableMapOf()
-    val selectedBucketItems get() = selectedBucket?.items ?: flattenBucketsItems()
+    open val selectedBucketItems get() = selectedBucket?.items ?: flattenBucketsItems()
 
     open fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> =
         buckets.distinct().fold(mutableMapOf()) { acc, bucket ->

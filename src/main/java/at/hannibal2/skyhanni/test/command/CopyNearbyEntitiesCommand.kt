@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test.command
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
@@ -51,23 +52,6 @@ import net.minecraft.world.item.ItemStack
 object CopyNearbyEntitiesCommand {
 
     private var entityCounter = 0
-
-    private fun command(args: Array<String>) {
-        var searchRadius = 10
-        if (args.size == 1) {
-            searchRadius = args[0].toInt()
-        }
-
-        val resultList = buildCommandResult(searchRadius)
-
-        if (entityCounter != 0) {
-            val string = resultList.joinToString("\n")
-            OSUtils.copyToClipboard(string)
-            ChatUtils.chat("$entityCounter entities copied into the clipboard!")
-        } else {
-            ChatUtils.chat("No entities found in a search radius of $searchRadius!")
-        }
-    }
 
     // Only runs on the command, so performance impact is minimal
     @OptIn(AllEntitiesGetter::class)
@@ -358,7 +342,24 @@ object CopyNearbyEntitiesCommand {
         event.registerBrigadier("shcopyentities") {
             description = "Copies the entities in the specified radius around the player into the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            legacyCallbackArgs { command(it) }
+            argCallback("radius", BrigadierArguments.integer()) { radius ->
+                command(radius)
+            }
+            simpleCallback {
+                command()
+            }
+        }
+    }
+
+    private fun command(searchRadius: Int = 10) {
+        val resultList = buildCommandResult(searchRadius)
+
+        if (entityCounter != 0) {
+            val string = resultList.joinToString("\n")
+            OSUtils.copyToClipboard(string)
+            ChatUtils.chat("$entityCounter entities copied into the clipboard!")
+        } else {
+            ChatUtils.chat("No entities found in a search radius of $searchRadius!")
         }
     }
 

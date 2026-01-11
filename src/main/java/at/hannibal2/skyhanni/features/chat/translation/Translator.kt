@@ -172,21 +172,21 @@ object Translator {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtranslateadvanced") {
+        event.registerBrigadier("shtranslateadvanced") {
             description = "Translates a message in an inputted language to another inputted language."
             category = CommandCategory.DEVELOPER_TEST
-            callback { translateAdvancedCommand(it) }
+            legacyCallbackArgs { translateAdvancedCommand(it) }
         }
-        event.register("shcopytranslation") {
+        event.registerBrigadier("shcopytranslation") {
             description = "Copy the translation of a message in another language to your clipboard.\n" +
                 "Uses a 2 letter language code that can be found at the end of a translation message."
             category = CommandCategory.USERS_ACTIVE
-            callback { fromNativeLanguage(it) }
+            legacyCallbackArgs { fromNativeLanguage(it) }
         }
-        event.register("shtranslate") {
+        event.registerBrigadier("shtranslate") {
             description = "Translate a message in another language your language."
             category = CommandCategory.USERS_ACTIVE
-            callback { toNativeLanguage(it) }
+            legacyCallbackArgs { toNativeLanguage(it) }
         }
     }
 

@@ -318,10 +318,10 @@ object DiscordRPCManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shrpcstart") {
+        event.registerBrigadier("shrpcstart") {
             description = "Manually starts the Discord Rich Presence feature"
             category = CommandCategory.USERS_ACTIVE
-            callback { startCommand() }
+            simpleCallback { startCommand() }
         }
     }
 }
