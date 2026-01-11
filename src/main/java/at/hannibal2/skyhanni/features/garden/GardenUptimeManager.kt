@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
+import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -21,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenUptimeManager {
     private val config get() = GardenApi.config.trackerUptimeSettings
-    private val trackerSet: Set<SkyHanniTracker<*, *>> = setOf(ArmorDropTracker.tracker, PestProfitTracker)
+    private val trackerSet: Set<SkyHanniTracker<*, *>> = setOf(ArmorDropTracker.tracker, PestProfitTracker, CropFeverTracker)
     private val afkTracker = Stopwatch()
 
     @HandleEvent
