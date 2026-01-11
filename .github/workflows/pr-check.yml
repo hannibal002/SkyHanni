@@ -23,6 +23,11 @@ jobs:
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
 
+            - name: Disable preprocessor
+              run: |
+                  mkdir -p .gradle
+                  echo skyhanni.multi-version=off > .gradle/private.properties
+
             -   name: Run ChangeLog verification w/retry
                 env:
                     PR_TITLE: ${{ github.event.pull_request.title }}
