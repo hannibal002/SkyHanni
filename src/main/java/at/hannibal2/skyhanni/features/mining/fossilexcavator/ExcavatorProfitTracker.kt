@@ -218,10 +218,10 @@ object ExcavatorProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetexcavatortracker") {
+        event.registerBrigadier("shresetexcavatortracker") {
             description = "Resets the Fossil Excavator Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 }

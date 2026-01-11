@@ -118,9 +118,9 @@ object CarryTracker {
 
     @HandleEvent
     fun onCommandRegister(event: CommandRegistrationEvent) {
-        event.register("shcarry") {
+        event.registerBrigadier("shcarry") {
             description = "Keep track of carries you do."
-            callback { onCommand(it) }
+            legacyCallbackArgs { onCommand(it) }
         }
     }
 

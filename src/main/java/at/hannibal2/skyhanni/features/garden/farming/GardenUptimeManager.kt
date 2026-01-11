@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
-import at.hannibal2.skyhanni.features.garden.tracker.CropCollectionTracker
-import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.VisitorDropTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule

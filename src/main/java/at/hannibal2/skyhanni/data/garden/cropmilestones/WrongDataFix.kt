@@ -146,6 +146,6 @@ object WrongDataFix {
     private fun forceUpdateMilestone(crop: CropType, amount: Long) {
         if (amount == 0L) return
         ChatUtils.debug("Force Updating Milestone: Crop: $crop, Amount: ${amount.addSeparators()}")
-        crop.addMilestoneCounter(amount)
+        crop.addMilestoneCounter(amount, false)
     }
 }

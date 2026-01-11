@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.reminders
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -46,7 +47,7 @@ object ReminderManager {
         null
     }
 
-    private fun listReminders(page: Int) {
+    private fun listReminders(page: Int = 1) {
         TextHelper.displayPaginatedList(
             "SkyHanni Reminders",
             getSortedReminders(),
@@ -77,11 +78,7 @@ object ReminderManager {
         }
     }
 
-    private fun createReminder(args: Array<String>) {
-        if (args.size < 2) return help()
-
-        val time = parseDuration(args.first()) ?: return ChatUtils.userError("Invalid time format")
-        val reminder = args.drop(1).joinToString(" ")
+    private fun createReminder(time: Duration, reminder: String) {
         val remindAt = SimpleTimeMark.now().plus(time)
 
         storage[StringUtils.generateRandomId()] = Reminder(reminder, remindAt)
@@ -197,20 +194,52 @@ object ReminderManager {
         }
     }
 
-    private fun command(args: Array<String>) = when (args.firstOrNull()) {
-        "list" -> listReminders(args.drop(1).firstOrNull()?.toIntOrNull() ?: 1)
-        "remove", "delete" -> removeReminder(args.drop(1))
-        "edit", "update" -> editReminder(args.drop(1))
-        "move" -> moveReminder(args.drop(1))
-        "help" -> help()
-        else -> createReminder(args)
-    }
-
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shremind") {
+        event.registerBrigadier("shremind") {
             description = "Set a reminder for yourself"
-            callback { command(it) }
+            literal("list") {
+                argCallback("page", BrigadierArguments.integer()) { page ->
+                    listReminders(page)
+                }
+                simpleCallback {
+                    listReminders()
+                }
+            }
+            literal("remove", "delete") {
+                argCallback("reminder", BrigadierArguments.greedyString()) {
+                    removeReminder(it.split(" "))
+                }
+            }
+            literal("edit", "update") {
+                argCallback("reminder", BrigadierArguments.greedyString()) {
+                    editReminder(it.split(" "))
+                }
+            }
+            literal("move") {
+                argCallback("reminder", BrigadierArguments.greedyString()) {
+                    moveReminder(it.split(" "))
+                }
+            }
+            literalCallback("help") {
+                help()
+            }
+            arg("time", BrigadierArguments.string()) { time ->
+                argCallback("name", BrigadierArguments.greedyString()) { name ->
+                    val parsedTime = parseDuration(getArg(time))
+                    if (parsedTime == null) {
+                        ChatUtils.userError("Invalid time format")
+                        return@argCallback
+                    }
+                    createReminder(parsedTime, name)
+                }
+                simpleCallback {
+                    help()
+                }
+            }
+            simpleCallback {
+                help()
+            }
         }
     }
 }

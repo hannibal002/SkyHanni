@@ -207,12 +207,12 @@ object CropMilestonesApi {
         return totalCrops
     }
 
-    internal fun CropType.addMilestoneCounter(counter: Long) {
+    internal fun CropType.addMilestoneCounter(counter: Long, sendLevelUp: Boolean = true) {
         if (counter == 0L) return
         amountToNextTierCache[this] = amountToNextTierCache[this]?.plus(counter) ?: counter
         val milestoneCounter = this.getMilestoneCounter() ?: 0
         this.setMilestoneCounter(milestoneCounter + counter)
-        this.milestoneCheckProgress()
+        this.milestoneCheckProgress(sendLevelUp)
         CropMilestoneUpdateEvent.post()
     }
 
@@ -225,7 +225,7 @@ object CropMilestonesApi {
         cropMilestoneCounter?.set(this, counter)
     }
 
-    private fun CropType.milestoneCheckProgress() {
+    private fun CropType.milestoneCheckProgress(sendLevelUp: Boolean = true) {
         val tierProgress = this.milestoneProgressToNextTier() ?: return
         val tierCutoff = this.milestoneNextTierAmount() ?: return
         val maxTier = getMaxTier()
@@ -234,7 +234,7 @@ object CropMilestonesApi {
             val oldLevel = this.getCurrentMilestoneTier() ?: return
             val newLevel = this.milestoneCalculateCurrentTier() ?: return
 
-            if (config.overflow.chat) {
+            if (config.overflow.chat && sendLevelUp) {
                 if (newLevel > (maxTier)) {
                     onOverflowLevelUp(this, maxOf(oldLevel, maxTier), newLevel)
                 }

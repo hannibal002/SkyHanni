@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType.Pest
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType.Weight
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.TypeAdapter
@@ -34,6 +35,7 @@ data class WeightProfile(
     @Expose val bonusWeight: Map<String, Int>,
     @Expose val uncountedCrops: Map<String, Int>,
     @Expose val pests: Map<String, Int>,
+    @Expose val lastUpdated: SimpleTimeMark,
 )
 
 data class EliteLeaderboard(

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -25,7 +26,7 @@ object CropCollectionApi {
         MutableMap<CropType, CropCollection>? get() = storage?.cropCollectionCounter
 
     var lastGainedCrop: CropType?
-        get() = storage?.lastGainedCrop
+        get() = GardenApi.storage?.lastGainedCrop
         set(value) {
             value?.let {
                 GardenApi.storage?.lastGainedCrop = it
@@ -49,8 +50,7 @@ object CropCollectionApi {
             lastGainedCollectionTime = SimpleTimeMark.now()
         }
 
-        val collectionCounter = cropCollectionCounter?.getOrPut(this) { CropCollection() }
-        collectionCounter?.addCollection(type, amount)
+        cropCollectionCounter?.getOrPut(this){CropCollection()}?.addCollection(type, amount)
 
         CropCollectionAddEvent(this, type, amount).post()
     }
@@ -66,10 +66,10 @@ object CropCollectionApi {
         )
 
     fun CropType.setCollectionCounter(counter: Long) {
-        val collectionCounter = cropCollectionCounter?.getOrPut(this) { CropCollection() }
-        collectionCounter?.setTotal(counter)
+        cropCollectionCounter?.getOrPut(this){ CropCollection() }?.setTotal(counter)
         // Some displays update off add events
         CropCollectionAddEvent(this, CropCollectionType.UNKNOWN, 0).post()
+        ChatUtils.debug("Set $this collection to $counter")
     }
 
     private fun addCollectionCommand(crop: CropType, amount: Long, type: CropCollectionType) {
@@ -84,7 +84,7 @@ object CropCollectionApi {
             category = CommandCategory.DEVELOPER_TEST
             arg("crop", EnumArgumentType.custom<CropType>({ it.simpleName })) { crop ->
                 arg("amount", BrigadierArguments.long()) { amount ->
-                    arg("type", EnumArgumentType.custom<CropCollectionType>({ it.displayName })) { type ->
+                    arg("type", EnumArgumentType.custom<CropCollectionType>({ it.toString() }, isGreedy = true)) { type ->
                         callback { addCollectionCommand(getArg(crop), getArg(amount), getArg(type)) }
                     }
                 }
@@ -110,7 +110,7 @@ object CropCollectionApi {
         fun setTotal(amount: Long) {
             val total = cropCollectionType.filter { it.key != CropCollectionType.UNKNOWN }.sumAllValues().toLong()
             val diff = amount - total
-            setCollection(CropCollectionType.UNKNOWN, diff)
+            addCollection(CropCollectionType.UNKNOWN, diff)
         }
 
         fun getCollection(collectionType: CropCollectionType): Long {
@@ -122,11 +122,21 @@ object CropCollectionApi {
             setCollection(collectionType, collection + amount)
         }
 
-        fun setCollection(collectionType: CropCollectionType, amount: Long) {
+        private fun setCollection(collectionType: CropCollectionType, amount: Long) {
             cropCollectionType[collectionType] = amount
         }
 
         @Expose
         var cropCollectionType: MutableMap<CropCollectionType, Long> = EnumMap(CropCollectionType::class.java)
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("crop collection")
+        event.addIrrelevant {
+            cropCollectionCounter?.forEach {
+                add("Crop: ${it.key}, Collection: ${it.value.getTotal()}")
+            }
+        }
     }
 }

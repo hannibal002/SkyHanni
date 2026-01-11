@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -49,32 +50,6 @@ object MarkedPlayerManager {
     private val notifyList = mutableSetOf<String>()
     private val currentLobbyPlayers = mutableSetOf<String>()
     private var personOfInterest = listOf<String>()
-
-    private fun command(args: Array<String>) {
-        if (args.size != 1) {
-            ChatUtils.userError("Usage: /shmarkplayer <name>")
-            return
-        }
-
-        val displayName = args[0]
-        val name = displayName.lowercase()
-
-        if (name == PlayerUtils.getName().lowercase()) {
-            ChatUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
-            return
-        }
-
-        if (name !in playerNamesToMark) {
-            playerNamesToMark.add(name)
-            findPlayers()
-            ChatUtils.chat("§aMarked §eplayer §b$displayName§e!")
-        } else {
-            playerNamesToMark.remove(name)
-            markedPlayers[name]?.let { RenderLivingEntityHelper.removeCustomRender(it) }
-            markedPlayers.remove(name)
-            ChatUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
-        }
-    }
 
     @HandleEvent
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
@@ -206,9 +181,30 @@ object MarkedPlayerManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shmarkplayer") {
+        event.registerBrigadier("shmarkplayer") {
             description = "Add a highlight effect to a player for better visibility"
-            callback { command(it) }
+            argCallback("name", BrigadierArguments.string()) { displayName ->
+                val name = displayName.lowercase()
+
+                if (name == PlayerUtils.getName().lowercase()) {
+                    ChatUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
+                    return@argCallback
+                }
+
+                if (name !in playerNamesToMark) {
+                    playerNamesToMark.add(name)
+                    findPlayers()
+                    ChatUtils.chat("§aMarked §eplayer §b$displayName§e!")
+                } else {
+                    playerNamesToMark.remove(name)
+                    markedPlayers[name]?.let { RenderLivingEntityHelper.removeCustomRender(it) }
+                    markedPlayers.remove(name)
+                    ChatUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
+                }
+            }
+            simpleCallback {
+                ChatUtils.userError("Usage: /shmarkplayer <name>")
+            }
         }
     }
 }
