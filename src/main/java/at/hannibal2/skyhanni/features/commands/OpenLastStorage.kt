@@ -62,12 +62,12 @@ object OpenLastStorage {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shlastopened") {
+        event.registerBrigadier("shlastopened") {
             description = "Opens the storage page last accessed by either /ec or /bp"
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlo")
-            callback {
-                val storage = storage ?: return@callback
+            simpleCallback {
+                val storage = storage ?: return@simpleCallback
                 if (isEnabled() && SkyBlockUtils.inSkyBlock) {
                     openLastStoragePage(storage.type)
                 } else {
