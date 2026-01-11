@@ -16,8 +16,8 @@ import kotlin.time.Duration.Companion.seconds
 object GardenUptimeCommand {
     private val storage get() = GardenApi.storage?.gardenBpsTracker
 
-    fun onCommand(args: Array<String>) {
-        val dayAmount = args.getOrNull(0)?.toIntOrNull()?.coerceAtMost(31) ?: 7
+    fun onCommand() {
+        val dayAmount = 7 // args.getOrNull(0)?.toIntOrNull()?.coerceAtMost(31) ?: 7
 
         val date = LocalDate.now()
         var totalUptime = 0.seconds
@@ -52,10 +52,10 @@ object GardenUptimeCommand {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shgardenuptime") {
+        event.registerBrigadier("shgardenuptime") {
             description = "Shows garden uptime history for past x days, defaults to 7"
             category = CommandCategory.USERS_ACTIVE
-            callback { onCommand(it) }
+            simpleCallback { onCommand() }
         }
     }
 }

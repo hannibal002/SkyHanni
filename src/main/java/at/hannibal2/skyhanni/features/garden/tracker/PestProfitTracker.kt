@@ -57,6 +57,7 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTimedBucketedItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
