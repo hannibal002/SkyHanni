@@ -18,6 +18,7 @@
 
 + Added Zorro's Cape Contest Protection. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5029)
   + Requires equipping Zorro's Cape to claim Jacob's Farming Contest rewards.
++ Added crop fever tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5059)
 
 #### Inventory
 
@@ -47,6 +48,18 @@
 + Added an option to use a different custom pest spawn cooldown time when Finnegan's Pest Eradicator perk is active. - Luna (https://github.com/hannibal002/SkyHanni/pull/5004)
 + Added Farming Exp Boost (Epic) to rare visitor rewards. - Luna (https://github.com/hannibal002/SkyHanni/pull/4999)
 + Added Overclockers to Estimated Item Value. - nopo (https://github.com/hannibal002/SkyHanni/pull/5008)
++ Added option to include bits from pest kills to pest profit tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5064)
++ Added option to set Custom Crop Milestone Goals in config. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
+  + This was previously a command.
++ Added option to show Crop Milestones Display while not holding a farming tool. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
+  + Will show last gained crop by default.
+  + Can set what crop to display by clicking on the tracker while in an inventory.
++ Garden Custom Keybinds now allows setting duplicate keybinds on Minecraft 1.21.10 and above. - Luna (https://github.com/hannibal002/SkyHanni/pull/4732)
+  + Minecraft itself allows doing this now, so there is no longer any reason to restrict this.
++ Improved overflow milestone calculation performance. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
++ Improved Sensitivity Reducer to allow Fishing Rods. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5061)
++ Mooshroom Cow Display now displays overflow and custom milestones. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
+  + These values are the same as the main Crop Milestone display.
 
 #### Inventory
 
@@ -76,6 +89,8 @@
 + Added `/shnav` as alias to `/shnavigate`. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4995)
 + Island area rendering is now more performant. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5026)
 + Sunflower/Moonflower and animated pet skin variants are now correctly detected when using a time changer mod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5044)
++ Added auto complete to /shnavigate. - nopo (https://github.com/hannibal002/SkyHanni/pull/5050)
++ Improved argument suggestions in misc commands. - nopo (https://github.com/hannibal002/SkyHanni/pull/5050)
 
 ### Fixes
 
@@ -93,12 +108,24 @@
 + Fixed current chest profit number misalignment. - frostyy1905 (https://github.com/hannibal002/SkyHanni/pull/5054)
 + Fixed small performance issue with enchant parsing. - nopo (https://github.com/hannibal002/SkyHanni/pull/5049)
 + Fixed some items being incorrectly shown as NPC sellable with Not Clickable Items enabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/5038)
++ Fixed Super Crafting Price Warning when advanced supercraft wasn't enabled. - Hype_the_Time (https://github.com/hannibal002/SkyHanni/pull/5056)
++ Fixed the wrong milestone incrementing when farming with the wrong tool. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
++ Fixed bold perfect enchants not applying to enchant exceptions. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5060)
++ Fixed enchant regex for new Hypixel formatting. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5055)
 
 #### Farming
 
 + Fixed Stereo Harmony Disc Replacer not working on 1 vinyl. - nopo (https://github.com/hannibal002/SkyHanni/pull/4983)
 + Fixed Farming milestone display not working on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/5023)
 + Fixed DNA Solver working in the Ultimate DNA Shard menu. - nopo (https://github.com/hannibal002/SkyHanni/pull/5053)
++ Fixed Best Crop Time display incorrectly telling users with all maxed milestones to farm crops. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
++ Fixed crop milestones not properly tracking pest drops. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
++ Fixed milestones incrementing too quickly when farming wheat. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
++ Fixed milestones not incrementing when farming without a cultivating tool. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
+  Fixed mushrooms gained from Mooshroom Cow calculations assuming the pet was level 100. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
++ Fixed overflow Crop Milestone level ups occasionally not triggering. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
++ Fixed overflow Crop Milestone level ups occasionally triggering when they shouldn't. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
++ Fixed pest profit tracker occasionally double counting pest kills. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5063)
 
 #### Mining
 
@@ -148,6 +175,8 @@
 + Fixed area titles showing too frequently when crossing borders. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5026)
 + Fixed crash with Lunar when entering the Garden. - Soopyboo32 (https://github.com/hannibal002/SkyHanni/pull/5043)
 + Fixed Cron /shtodos not being able to be disabled. - nopo (https://github.com/hannibal002/SkyHanni/pull/5042)
++ Fixed Museum milestone not getting tracked correctly. - nopo (https://github.com/hannibal002/SkyHanni/pull/5067)
++ Fixed Scrolling in trackers. - nopo (https://github.com/hannibal002/SkyHanni/pull/5066)
 
 ### Technical Details
 
@@ -180,10 +209,37 @@
 + Converted more places to use Components instead of string nonsense. - nopo (https://github.com/hannibal002/SkyHanni/pull/5018)
 + Refactored ChatProgressUpdates to use per-category toggles instead of global debug mode. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4769)
 + Refactored island area system into backend/features modules. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5026)
++ Added /shaddcropcollection, and /shresetcropmilestones debug commands. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
++ Added crop collection tracking. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
+  + Tracks collection gained from breaking crops, pests, dicer drops, and mooshroom cow.
+  + Types that affect Crop Milestones are added to that tracker.
+  + Backend for future crop collection/profit tracker.
++ Added parity between addRenderableNullableButton and addNullableButton. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
++ Moved and renamed Garden-related files in the data package to sub-packages. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
+  + GardenComposterUpgradesData, GardenCropUpgrades: data -> data.garden.
+  + GardenCropMilestones, GardenCropMilestonesCommunityFix -> data.garden.cropmilestones.
+  + Removed "Garden" from above names.
+  + Renamed GardenCropMilestonesCommunityFix to CommunityFix.
+  + Renamed GardenCropMilestones to CropMilestonesAPI.
++ Moved some garden feature objects to a tracker subpackage. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
+  + Done to group files that track collection/profit in one place.
+  + Moved PestProfitTracker, DicerRngDropTracker, and ArmorDropTracker.
++ Redid backend for Crop Milestones. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
+  + Added caching for frequently calculated values.
+  + Fixed some other performance issues and outdated code.
++ Reduced visitor debug spam when a visitor doesn't have an associated item in repo. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5065)
++ Renamed cropCounter to cropMilestoneCounter in ProfileSpecificStorage. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
+  + Planning to add different types of crop counters in the future.
 
 ### Removed Features
 
 + Removed 1.8.9 support. - nopo (https://github.com/hannibal002/SkyHanni/pull/4978)
++ Removed /shcropgoal command. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
+  + This has been replaced with config options, open with /sh custom goal.
++ Removed comma formatting from Enchant Parser. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5055)
++ Removed dicer drops from crop profit estimation displays. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5062)
++ Removed overflow option in the Best Crop Time Display. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
+  + Best Crop Time shows best crop for garden/SkyBlock experience; overflow levels give neither.
 
 ## Version 6.0.0
 

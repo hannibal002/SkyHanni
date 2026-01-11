@@ -45,8 +45,10 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
@@ -175,6 +177,9 @@ object GardenApi {
         getToolInHand(it, crop) != null
     } ?: false
 
+    fun isHoldingCropFever(): Boolean =
+        InventoryUtils.getItemInHand()?.getHypixelEnchantments()?.containsKeys("ultimate_crop_fever") == true
+
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
         if (internalName.startsWith("THEORETICAL_HOE_SUNFLOWER")) {
@@ -206,7 +211,8 @@ object GardenApi {
     }
 
     fun getCurrentlyFarmedCrop(): CropType? {
-        val brokenCrop = if (toolInHand != null) GardenCropSpeed.lastBrokenCrop else null
+        if (toolInHand == null) return null
+        val brokenCrop = GardenCropSpeed.lastBrokenCrop
         return lastBrokenCropType ?: cropInHand ?: brokenCrop
     }
 
