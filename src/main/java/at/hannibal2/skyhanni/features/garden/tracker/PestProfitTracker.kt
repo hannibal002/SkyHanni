@@ -256,6 +256,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         modify {
             it.pestKills.addOrPut(type, 1)
         }
+        PestKillEvent(type).post()
         lastPestKillTimes[type] = SimpleTimeMark.now()
     }
 
