@@ -969,4 +969,11 @@ class ProfileSpecificStorage(
 
     @Expose
     var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
+
+    @Expose
+    var greenhouse: GreenHouseStorage = GreenHouseStorage()
+
+    class GreenHouseStorage(
+        @Expose var nextCycle: SimpleTimeMark = farPast(),
+    )
 }
