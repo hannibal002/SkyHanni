@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -141,8 +142,10 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
                 modify { it.rngDrops.getOrPut(currentFarmedCrop) { mutableMapOf() }.addOrPut(rarity, 1) }
 
                 val primitiveStack = NeuItems.getPrimitiveMultiplier(crop)
+                val rawName = primitiveStack.internalName.itemNameWithoutColor
+                val cropType = CropType.getByNameOrNull(rawName)
 
-                currentFarmedCrop.addCollectionCounter(CropCollectionType.CROP_FEVER, primitiveStack.amount * amount.toLong())
+                cropType?.addCollectionCounter(CropCollectionType.CROP_FEVER, primitiveStack.amount * amount.toLong())
             }
         }
     }
