@@ -187,7 +187,7 @@ open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTracker
 
     open fun getCurrentStopwatch(): Stopwatch? = displayMode?.let { getSharedTracker()?.get(it)?.getActiveStopwatch() }
 
-    private fun startSessionUptime() {
+    fun startSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.start(true) }
@@ -195,7 +195,7 @@ open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTracker
         update()
     }
 
-    private fun pauseSessionUptime() {
+    fun pauseSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.pause(true) }
@@ -203,7 +203,7 @@ open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTracker
         update()
     }
 
-    private fun swapActiveSession(session: SessionUptime) {
+    fun swapActiveSession(session: SessionUptime) {
         if (!this.customUptimeControl) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.setActiveStopwatch(session) }

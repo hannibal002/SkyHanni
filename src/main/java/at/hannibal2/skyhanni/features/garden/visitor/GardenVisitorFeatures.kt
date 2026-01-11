@@ -58,13 +58,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isBazaarSign
 import at.hannibal2.skyhanni.utils.SignUtils.isSupercraftAmountSetSign
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -83,8 +84,10 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.item.ItemStack
 import kotlin.math.round
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("LargeClass")
 @SkyHanniModule
 object GardenVisitorFeatures {
 
@@ -335,9 +338,7 @@ object GardenVisitorFeatures {
             val visitor = GardenVisitorColorNames.visitorMap[visitorName.removeColor()]
             val items = visitor?.needItems
             if (items == null) {
-                val text = "Visitor '$visitorName§7' has no items in repo!"
-                logger.log(text)
-                ChatUtils.debug(text)
+                logMissingRepoItems(visitorName)
                 list.addString(" §7(§c?§7)")
                 return
             }
@@ -355,6 +356,16 @@ object GardenVisitorFeatures {
         }
 
         add(Renderable.horizontal(list))
+    }
+
+    private val visitorMissingItemsWarnTime: MutableMap<String, SimpleTimeMark> = mutableMapOf()
+    private fun logMissingRepoItems(name: String) {
+        if ((visitorMissingItemsWarnTime[name] ?: SimpleTimeMark.farPast()).passedSince() < 10.minutes) return
+        visitorMissingItemsWarnTime[name] = SimpleTimeMark.now()
+        val text = "Visitor '$name§7' has no items in repo!"
+        logger.log(text)
+        ChatUtils.debug(text)
+        visitorMissingItemsWarnTime.removeIf { it.value.passedSince() > 10.minutes }
     }
 
     @HandleEvent

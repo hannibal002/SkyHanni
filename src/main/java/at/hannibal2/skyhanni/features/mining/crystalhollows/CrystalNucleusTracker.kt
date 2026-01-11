@@ -105,10 +105,10 @@ object CrystalNucleusTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetcrystalnucleustracker") {
+        event.registerBrigadier("shresetcrystalnucleustracker") {
             description = "Resets the Crystal Nucleus Tracker."
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

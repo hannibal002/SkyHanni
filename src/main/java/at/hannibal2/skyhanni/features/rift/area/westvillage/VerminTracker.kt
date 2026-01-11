@@ -191,10 +191,10 @@ object VerminTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetvermintracker") {
+        event.registerBrigadier("shresetvermintracker") {
             description = "Resets the Vermin Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

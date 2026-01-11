@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig
 import at.hannibal2.skyhanni.data.HypixelData
@@ -531,11 +532,6 @@ object FarmingWeightDisplay {
         return cropWeight[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
     }
 
-    private fun lookUpCommand(it: Array<String>) {
-        val name = if (it.size == 1) it[0] else PlayerUtils.getName()
-        openWebsite(name, ignoreCooldown = true)
-    }
-
     private var lastName = ""
 
     private fun openWebsite(name: String, ignoreCooldown: Boolean = false) {
@@ -588,10 +584,15 @@ object FarmingWeightDisplay {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shfarmingprofile") {
+        event.registerBrigadier("shfarmingprofile") {
             description = "Look up the farming profile from yourself or another player on elitebot.dev"
             category = CommandCategory.USERS_ACTIVE
-            callback { lookUpCommand(it) }
+            argCallback("name", BrigadierArguments.string()) { name ->
+                openWebsite(name, ignoreCooldown = true)
+            }
+            simpleCallback {
+                openWebsite(PlayerUtils.getName(), ignoreCooldown = true)
+            }
         }
     }
 

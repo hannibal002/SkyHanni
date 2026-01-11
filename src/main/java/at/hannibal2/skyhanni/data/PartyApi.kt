@@ -287,10 +287,10 @@ object PartyApi {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shpartydebug") {
+        event.registerBrigadier("shpartydebug") {
             description = "List persons into the chat SkyHanni thinks are in your party."
             category = CommandCategory.DEVELOPER_TEST
-            callback { listMembers() }
+            simpleCallback { listMembers() }
         }
     }
 

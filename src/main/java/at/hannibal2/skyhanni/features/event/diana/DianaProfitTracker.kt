@@ -179,10 +179,10 @@ object DianaProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetdianaprofittracker") {
+        event.registerBrigadier("shresetdianaprofittracker") {
             description = "Resets the Diana Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 
