@@ -5,17 +5,20 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.CropFeverTrackerConfig.CropFeverTrackerTextEntry
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
@@ -136,6 +139,10 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
                 addItem(currentFarmedCrop, crop, amount, false)
 
                 modify { it.rngDrops.getOrPut(currentFarmedCrop) { mutableMapOf() }.addOrPut(rarity, 1) }
+
+                val primitiveStack = NeuItems.getPrimitiveMultiplier(crop)
+
+                currentFarmedCrop.addCollectionCounter(CropCollectionType.CROP_FEVER, primitiveStack.amount * amount.toLong())
             }
         }
     }

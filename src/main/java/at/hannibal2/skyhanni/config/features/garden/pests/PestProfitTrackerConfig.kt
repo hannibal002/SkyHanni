@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -20,6 +21,35 @@ class PestProfitTrackerConfig {
     @ConfigOption(name = "Hide messages", desc = "Hide regular pest drop messages.")
     @ConfigEditorBoolean
     var hideChat: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Only When Holding",
+        desc = "Only show the time display when holding the specified items.\n" +
+            "Leave empty to always show.",
+    )
+    @ConfigEditorDraggableList
+    val onlyWhenHolding: MutableList<HeldItem> = mutableListOf(
+        HeldItem.SPRAYONATOR,
+        HeldItem.VACUUM,
+        HeldItem.TIMEOUT,
+    )
+
+    enum class HeldItem(val displayName: String) {
+        FARMING_TOOL("Farming Tool"),
+        SPRAYONATOR("Sprayonator"),
+        VACUUM("Vacuum"),
+        LASSO("Lasso"),
+        TIMEOUT("Timeout"),
+        ;
+
+        override fun toString() = displayName
+    }
+
+    @Expose
+    @ConfigOption(name = "Hide while farming", desc = "Hide profit tracker while farming.")
+    @ConfigEditorBoolean
+    var hideWhileFarming: Boolean = true
 
     @Expose
     @ConfigOption(name = "Time Displayed", desc = "Time displayed after killing a pest.")
