@@ -34,7 +34,7 @@ class WeightDisplay : EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboar
         set(value) { weightStorage?.enum = value }
 
     override fun getDefaultEnum(): FarmingWeight {
-        return FarmingWeight.FARMING_WEIGHT // TODO set actual default
+        return FarmingWeight.FARMING_WEIGHT
     }
 
     override fun overtakeEta(amountUntil: Double): String {

@@ -49,7 +49,6 @@ object EliteFarmersLeaderboard {
         EliteLeaderboardType.Pest::class to Mutex()
     )
     private val storage get() = GardenApi.storage?.farmingWeight
-    // TODO make class
     private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardPosMap
     private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double>? get() = storage?.leaderboardAmountMap
     private val minAmount: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minAmountMap

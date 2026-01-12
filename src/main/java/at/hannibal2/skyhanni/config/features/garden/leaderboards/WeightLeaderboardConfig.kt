@@ -21,7 +21,7 @@ class WeightDisplayConfig : EliteDisplayGenericConfig() {
     @ConfigOption(
         name = "Overtake ETA",
         desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
-            "Does not factor in pests or dicer drops. Garden Milestones Display must be enabled."
+            "Does not factor in pest drops. Garden Milestones Display must be enabled."
     )
     @ConfigEditorBoolean
     val overtakeETA: Property<Boolean> = Property.of(false)

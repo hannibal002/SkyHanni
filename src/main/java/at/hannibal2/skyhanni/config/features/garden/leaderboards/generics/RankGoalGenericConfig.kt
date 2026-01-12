@@ -10,7 +10,7 @@ open class RankGoalGenericConfig {
     @ConfigOption(
         name = "Use Rank Goal",
         desc = "Use the Rank Goal number instead of the next upcoming rank. Useful when your rank is in the " +
-            "ten thousands and you don't want to see small ETAs."
+            "ten thousands and you don't want to see small ETAs.",
     )
     @ConfigEditorBoolean
     val useRankGoal: Property<Boolean> = Property.of(true)

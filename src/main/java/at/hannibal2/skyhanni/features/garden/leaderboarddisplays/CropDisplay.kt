@@ -56,7 +56,6 @@ class CropDisplay : EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.C
                 update()
             },
             universe = CropType.entries,
-            enableUniverseScroll = false // would infinitely scroll while hovered
         )
     }
 

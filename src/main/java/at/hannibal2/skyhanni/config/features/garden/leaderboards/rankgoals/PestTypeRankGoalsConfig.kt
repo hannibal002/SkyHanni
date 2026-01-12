@@ -69,6 +69,21 @@ class PestTypeRankGoalsConfig : TypeRankGoalGenericConfig<PestTypeWithAll>() {
     @ConfigEditorText
     val slug: Property<String> = Property.of("10000")
 
+    @Expose
+    @ConfigOption(name = "Dragonfly", desc = "")
+    @ConfigEditorText
+    val dragonfly: Property<String> = Property.of("10000")
+
+    @Expose
+    @ConfigOption(name = "Firefly", desc = "")
+    @ConfigEditorText
+    val firefly: Property<String> = Property.of("10000")
+
+    @Expose
+    @ConfigOption(name = "Praying Mantis", desc = "")
+    @ConfigEditorText
+    val mantis: Property<String> = Property.of("10000")
+
     override fun getConfig(type: PestTypeWithAll): KProperty0<Property<String>> = when (type) {
         PestTypeWithAll.FLY -> this::fly
         PestTypeWithAll.CRICKET -> this::cricket
@@ -81,6 +96,9 @@ class PestTypeRankGoalsConfig : TypeRankGoalGenericConfig<PestTypeWithAll>() {
         PestTypeWithAll.MITE -> this::mite
         PestTypeWithAll.SLUG -> this::slug
         PestTypeWithAll.FIELD_MOUSE -> this::fieldMouse
+        PestTypeWithAll.DRAGONFLY -> this::dragonfly
+        PestTypeWithAll.FIREFLY -> this::firefly
+        PestTypeWithAll.PRAYING_MANTIS -> this::mantis
         else -> this::allPests
     }
 }

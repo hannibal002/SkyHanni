@@ -108,8 +108,9 @@ object CropCollectionApi {
         }
 
         fun setTotal(amount: Long) {
-            val diff = amount - getTotal()
-            addCollection(CropCollectionType.UNKNOWN, diff)
+            val total = cropCollectionType.filter { it.key != CropCollectionType.UNKNOWN }.sumAllValues().toLong()
+            val diff = amount - total
+            setCollection(CropCollectionType.UNKNOWN, diff)
         }
 
         fun getCollection(collectionType: CropCollectionType): Long {
@@ -134,7 +135,11 @@ object CropCollectionApi {
         event.title("crop collection")
         event.addIrrelevant {
             cropCollectionCounter?.forEach {
-                add("Crop: ${it.key}, Collection: ${it.value.getTotal()}")
+                add("Crop: ${it.key}")
+                add("Total: ${it.value.getTotal()}")
+                it.value.cropCollectionType.forEach { collectionType ->
+                    add("$collectionType: ${collectionType.value}")
+                }
             }
         }
     }

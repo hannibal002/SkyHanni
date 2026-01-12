@@ -12,7 +12,7 @@ import kotlin.reflect.KProperty0
 abstract class MultiModeTypeRankGoalConfig<
     E : Enum<E>,
     Config : TypeRankGoalGenericConfig<E>,
-    ConfigMonthly : TypeRankGoalGenericConfig<E>
+    ConfigMonthly : TypeRankGoalGenericConfig<E>,
     >(
     createConfig: () -> Config,
     createMonthlyConfig: () -> ConfigMonthly,
@@ -24,7 +24,7 @@ abstract class MultiModeTypeRankGoalConfig<
     @Expose
     @ConfigOption(
         name = "All-Time Rank Goals",
-        desc = ""
+        desc = "",
     )
     @Accordion
     val rankGoalsConfig: Config = createConfig()
@@ -32,7 +32,7 @@ abstract class MultiModeTypeRankGoalConfig<
     @Expose
     @ConfigOption(
         name = "Monthly Rank Goals",
-        desc = ""
+        desc = "",
     )
     @Accordion
     val monthlyRankGoalsConfig: ConfigMonthly = createMonthlyConfig()

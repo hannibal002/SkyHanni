@@ -49,7 +49,6 @@ class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.P
                 update()
             },
             universe = PestType.filterableEntries,
-            enableUniverseScroll = false // would infinitely scroll while hovered
         )
     }
 

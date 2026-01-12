@@ -9,7 +9,7 @@ class SingleTypeRankGoalConfig : RankGoalGenericConfig() {
     @Expose
     @ConfigOption(
         name = "All-Time Rank Goal",
-        desc = "Set a rank goal for the All-Time Leaderboard."
+        desc = "Set a rank goal for the All-Time Leaderboard.",
     )
     @ConfigEditorText
     val rankGoal: Property<String> = Property.of("10000")
@@ -17,7 +17,7 @@ class SingleTypeRankGoalConfig : RankGoalGenericConfig() {
     @Expose
     @ConfigOption(
         name = "Monthly Rank Goal",
-        desc = "Set a rank goal for the Monthly Leaderboard."
+        desc = "Set a rank goal for the Monthly Leaderboard.",
     )
     @ConfigEditorText
     val monthlyRankGoal: Property<String> = Property.of("10000")
