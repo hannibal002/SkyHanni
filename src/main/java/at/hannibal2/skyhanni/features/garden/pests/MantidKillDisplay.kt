@@ -117,6 +117,7 @@ object MantidKillDisplay {
     private fun resetKills() {
         pestExpireQueue.clear()
         updateNextExpireGroup()
+        update()
     }
 
     private fun isEnabled() = config.enabled && GardenApi.inGarden()
