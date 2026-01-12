@@ -87,7 +87,6 @@ object FarmingWeightData {
     fun setWeight(leaderboardMode: EliteLeaderboardMode, value: Double) {
         weightMap[leaderboardMode] = value
         weightGain = 0.0
-        // TODO: Update event post
     }
 
     fun getWeight(leaderboardMode: EliteLeaderboardMode, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
