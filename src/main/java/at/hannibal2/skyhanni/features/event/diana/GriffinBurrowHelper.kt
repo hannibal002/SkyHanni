@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -182,13 +183,17 @@ object GriffinBurrowHelper {
     }
 
     fun removeGuess(guess: GuessEntry) {
-        allGuesses.remove(guess)
-        allGuessesTimers.remove(guess)
+        DelayedRun.runOrNextTick {
+            allGuesses.remove(guess)
+            allGuessesTimers.remove(guess)
+        }
     }
 
     fun addGuess(guess: GuessEntry) {
-        allGuesses.add(guess)
-        allGuessesTimers[guess] = SimpleTimeMark.now()
+        DelayedRun.runOrNextTick {
+            allGuesses.add(guess)
+            allGuessesTimers[guess] = SimpleTimeMark.now()
+        }
     }
 
     @HandleEvent
@@ -330,7 +335,7 @@ object GriffinBurrowHelper {
             if (burrowDugMatcher.find()) {
                 val current = burrowDugMatcher.group("current").toInt()
                 val max = burrowDugMatcher.group("max").toInt()
-                BurrowDugEvent(it, current, max).post()
+                DelayedRun.runOrNextTick { BurrowDugEvent(it, current, max).post() }
             } else if (genericMythologicalSpawnPattern.matches(event.message)) {
                 mobAlive = true
                 removeGuess(it)
@@ -604,7 +609,9 @@ object GriffinBurrowHelper {
         event.registerBrigadier("shtestburrowchainenddetect") {
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                BurrowDetectEvent(LorenzVec(-88, 69, 123), BurrowType.TREASURE).post()
+                DelayedRun.runOrNextTick {
+                    BurrowDetectEvent(LorenzVec(-88, 69, 123), BurrowType.TREASURE).post()
+                }
             }
         }
     }

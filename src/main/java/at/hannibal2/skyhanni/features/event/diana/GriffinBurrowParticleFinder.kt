@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -80,7 +81,7 @@ object GriffinBurrowParticleFinder {
         burrow.lastSeen = SimpleTimeMark.now()
         if (burrow.hasEnchant && burrow.hasFootstep && burrow.type != -1) {
             if (!burrow.found || burrow.type != oldBurrowType) {
-                BurrowDetectEvent(burrow.location, burrow.getType()).post()
+                DelayedRun.runOrNextTick { BurrowDetectEvent(burrow.location, burrow.getType()).post() }
                 burrow.found = true
             }
         }
