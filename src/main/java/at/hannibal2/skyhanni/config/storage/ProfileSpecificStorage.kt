@@ -619,6 +619,13 @@ class ProfileSpecificStorage(
 
         @Expose
         var cropFeverTracker: CropFeverTracker.BucketData = CropFeverTracker.BucketData()
+
+        @Expose
+        var greenhouse: GreenHouseStorage = GreenHouseStorage()
+
+        class GreenHouseStorage(
+            @Expose var nextCycle: SimpleTimeMark = farPast(),
+        )
     }
 
     // - gui
@@ -969,11 +976,4 @@ class ProfileSpecificStorage(
 
     @Expose
     var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
-
-    @Expose
-    var greenhouse: GreenHouseStorage = GreenHouseStorage()
-
-    class GreenHouseStorage(
-        @Expose var nextCycle: SimpleTimeMark = farPast(),
-    )
 }

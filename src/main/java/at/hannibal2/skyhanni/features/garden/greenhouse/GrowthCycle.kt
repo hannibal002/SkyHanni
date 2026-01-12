@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -28,7 +28,7 @@ import kotlin.time.Duration.Companion.minutes
 object GrowthCycle {
 
     private val config get() = SkyHanniMod.feature.garden.greenhouse
-    private val storage get() = ProfileStorageData.profileSpecific?.greenhouse
+    private val storage get() = ProfileStorageData.profileSpecific?.garden?.greenhouse
 
     val patternGroup = RepoPattern.group("garden.greenhouse.growthcycle")
 
@@ -41,21 +41,21 @@ object GrowthCycle {
     )
 
     /**
-     * REGEX-TEST: §7Next Stage: §a1h 40m 20s
-     * REGEX-TEST: §7Next Stage: §a40m 20s
-     * REGEX-TEST: §7Next Stage: §a20s
+     * REGEX-TEST: Next Stage: 1h 40m 20s
+     * REGEX-TEST: Next Stage: 40m 20s
+     * REGEX-TEST: Next Stage: 20s
      */
     val nextStagePattern by patternGroup.pattern(
         "nextstage",
-        "§7Next Stage: §a(?<time>.*)",
+        "Next Stage: (?<time>.*)",
     )
 
     /**
-     * REGEX-TEST: §a§lFULLY GROWN
+     * REGEX-TEST: FULLY GROWN
      */
     val fullyGrownPattern by patternGroup.pattern(
         "fullygrown",
-        "§a§lFULLY GROWN",
+        "FULLY GROWN",
     )
 
     val cropDiagnosticInventory = InventoryDetector(inventoryPattern)
@@ -66,9 +66,9 @@ object GrowthCycle {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!cropDiagnosticInventory.isInside()) return
         val item = event.inventoryItemsWithNull[20] ?: return
-        val lore = item.getLore()
+        val lore = item.getLoreComponent()
 
-        nextStagePattern.firstMatcher(lore) {
+        nextStagePattern.firstMatcher(lore.map { it.string }) {
             val timeString = group("time")
             if (fullyGrownPattern.matches(timeString)) return@firstMatcher
             val duration = TimeUtils.getDurationOrNull(timeString) ?: return
@@ -97,7 +97,7 @@ object GrowthCycle {
         val timeUntil = nextCycle.timeUntil()
         val color = timeUntil.timerColor("§a")
         val formatted = if (nextCycle.passedSince() > 10.minutes) "§cOVERDUE" else "$color${timeUntil.format(maxUnits = 2)}"
-        addString("§6Next Growth Stage: $formatted")
+        addString("§6Next Greenhouse Growth Stage: $formatted")
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)

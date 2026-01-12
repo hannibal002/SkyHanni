@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.greenhouse
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -14,9 +15,10 @@ class GreenhouseConfig {
         desc = "Show a timer for the next growth stage. Open the Crop Diagnostics menu in the Greenhouse to detect the time.",
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var showDisplay: Boolean = true
 
     @Expose
     @ConfigLink(owner = GreenhouseConfig::class, field = "showDisplay")
-    val position: Position = Position(-350, 220, 1.3f)
+    val position: Position = Position(-350, 220)
 }
