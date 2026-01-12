@@ -54,7 +54,7 @@ object MantidKillDisplay {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
         checkForExpires()
-        update()
+        updateDisplay()
     }
 
     @HandleEvent(GuiRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
@@ -99,7 +99,7 @@ object MantidKillDisplay {
         nextExpireGroup = count
     }
 
-    private fun update() {
+    private fun updateDisplay() {
         displayCache = drawDisplay()
     }
 
@@ -117,7 +117,7 @@ object MantidKillDisplay {
     private fun resetKills() {
         pestExpireQueue.clear()
         updateNextExpireGroup()
-        update()
+        updateDisplay()
     }
 
     private fun isEnabled() = config.enabled && GardenApi.inGarden()
