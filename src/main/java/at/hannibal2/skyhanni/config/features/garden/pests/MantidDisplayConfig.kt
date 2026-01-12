@@ -28,11 +28,12 @@ class MantidDisplayConfig {
         TOOL("Holding farming tool"),
         VACUUM("Holding vacuum"),
         ;
+
         override fun toString(): String = displayName
     }
 
     @Expose
-    @ConfigOption(name = "Group Similar Expires", desc = "Group pests that expire within this many seconds together.")
+    @ConfigOption(name = "Group Similar Expiry", desc = "Group pests that expire within this many seconds together.")
     @ConfigEditorSlider(minValue = 0.0F, maxValue = 120F, minStep = 5f)
     var groupSimilarExpire: Int = 30
 

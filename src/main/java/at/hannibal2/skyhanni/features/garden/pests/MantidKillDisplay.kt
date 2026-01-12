@@ -53,7 +53,7 @@ object MantidKillDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        checkForExpires()
+        checkForExpired()
         updateDisplay()
     }
 
@@ -78,7 +78,7 @@ object MantidKillDisplay {
         return false
     }
 
-    private fun checkForExpires() {
+    private fun checkForExpired() {
         while (pestExpireQueue.peek()?.isInPast() == true) {
             pestExpireQueue.poll()
         }
