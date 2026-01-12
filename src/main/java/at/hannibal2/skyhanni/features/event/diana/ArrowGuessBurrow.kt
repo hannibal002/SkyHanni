@@ -32,14 +32,13 @@ object ArrowGuessBurrow {
 
     private val points: MutableSet<LorenzVec> = mutableSetOf()
     private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
+    private val recentFoundArrows = TimeLimitedSet<RaycastUtils.Ray>(18.seconds)
 
-    private var newArrow = true
     private var failures = 0
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (!newArrow) return
 
         if (event.distanceToPlayer > 6) return
         if (event.type != ParticleTypes.DUST) return
@@ -54,7 +53,6 @@ object ArrowGuessBurrow {
 
         val arrow = detectArrow(points) ?: return
         GriffinBurrowHelper.removeGuess(arrow.origin)
-        newArrow = false
         points.clear()
         findClosestValidBlockToRayNew(arrow, range) ?: run {
             failures++
@@ -69,7 +67,6 @@ object ArrowGuessBurrow {
     fun onBurrowDug(event: BurrowDugEvent) {
         if (event.current != event.max) {
             points.clear()
-            newArrow = true
         }
     }
 
@@ -171,9 +168,12 @@ object ArrowGuessBurrow {
         val adjustedBase = base.down(1.5) // this is always an exact multiple of 0.5
         val adjustedTip = tip.down(1.5)
 
+        val ray = RaycastUtils.Ray(adjustedBase, adjustedTip.minus(adjustedBase).normalize())
+        if (recentFoundArrows.add(ray)) return null
+
         BurrowApi.lastBurrowInteracted?.let { if (adjustedBase.distanceSq(it) > 5) return null } // not your arrow
 
-        return RaycastUtils.Ray(adjustedBase, adjustedTip.minus(adjustedBase).normalize())
+        return ray
     }
 
     private fun getPointsWithinDistance(
