@@ -109,7 +109,7 @@ object MantidKillDisplay {
         add(Renderable.text("§2Mantid Bonus: $bonusColor$bonus§7/§a$MAX_BONUS"))
 
         if (bonus > 0) {
-            val pestString = if (bonus == 1) "Next Pest Expires" else "$nextExpireGroup Pests Expire"
+            val pestString = if (nextExpireGroup == 1) "1 Pest Expires" else "$nextExpireGroup Pests Expire"
             add(Renderable.text("§e$pestString: §b${nextExpire.timeUntil().format()}"))
         }
     }
