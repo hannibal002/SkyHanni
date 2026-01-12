@@ -48,8 +48,7 @@ object MantidKillDisplay {
     // mantid bonus resets on world change
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
-        pestExpireQueue.clear()
-        updateNextExpireGroup()
+        resetKills()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -113,6 +112,11 @@ object MantidKillDisplay {
             val pestString = if (bonus == 1) "Next Pest Expires" else "$nextExpireGroup Pests Expire"
             add(Renderable.text("§e$pestString: §b${nextExpire.timeUntil().format()}"))
         }
+    }
+
+    private fun resetKills() {
+        pestExpireQueue.clear()
+        updateNextExpireGroup()
     }
 
     private fun isEnabled() = config.enabled && GardenApi.inGarden()
