@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -43,19 +42,12 @@ object GrowthCycle {
     /**
      * REGEX-TEST: Next Stage: 1h 40m 20s
      * REGEX-TEST: Next Stage: 40m 20s
+     * REGEX-TEST: Next Stage: 20m 1s
      * REGEX-TEST: Next Stage: 20s
      */
     val nextStagePattern by patternGroup.pattern(
         "nextstage",
-        "Next Stage: (?<time>.*)",
-    )
-
-    /**
-     * REGEX-TEST: FULLY GROWN
-     */
-    val fullyGrownPattern by patternGroup.pattern(
-        "fullygrown",
-        "FULLY GROWN",
+        "Next Stage: (?<time>(?:\\d\\d?[hms] ?)+)",
     )
 
     val cropDiagnosticInventory = InventoryDetector(inventoryPattern)
@@ -70,7 +62,6 @@ object GrowthCycle {
 
         nextStagePattern.firstMatcher(lore.map { it.string }) {
             val timeString = group("time")
-            if (fullyGrownPattern.matches(timeString)) return@firstMatcher
             val duration = TimeUtils.getDurationOrNull(timeString) ?: return
             storage?.nextCycle = duration.fromNow()
             updateDisplay()
