@@ -136,7 +136,7 @@ object ArmorDropTracker {
         val armorPieces = InventoryUtils.getArmor()
             .mapNotNull { it?.getInternalName()?.asString() }
             .count { armorPattern.matcher(it).matches() }
-        return armorPieces > 0
+        return armorPieces > 1
     }
 
     fun getDropsPerHour(crop: CropType?): Double {
