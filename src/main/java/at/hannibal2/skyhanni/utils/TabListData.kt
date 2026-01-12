@@ -25,30 +25,31 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.PlayerInfo
+import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.minecraft.world.level.GameType
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TabListData {
-    private var tablistCache = emptyList<String>()
-    private var debugCache: List<String>? = null
+    private var tablistCache = emptyList<Component>()
+    //private var debugCache: List<String>? = null
 
-    private var header = ""
-    private var footer = ""
+    private var header: Component? = null
+    private var footer: Component? = null
 
     var fullyLoaded = false
 
     // TODO replace with TabListUpdateEvent
     @Deprecated("replace with TabListUpdateEvent")
-    fun getTabList() = debugCache ?: tablistCache
+    fun getTabList() = /*debugCache ?: */ tablistCache
     fun getHeader() = header
     fun getFooter() = footer
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Tab List Debug Cache")
-        debugCache?.let {
+        /*debugCache?.let {
             event.addData {
                 add("debug active!")
                 add("lines: (${it.size})")
@@ -56,11 +57,11 @@ object TabListData {
                     add(" '$line'")
                 }
             }
-        } ?: event.addIrrelevant("not active.")
+        } ?: */event.addIrrelevant("not active.")
     }
 
     private fun toggleDebug() {
-        if (debugCache != null) {
+        /*if (debugCache != null) {
             ChatUtils.chat("Disabled tab list debug.")
             debugCache = null
             return
@@ -69,27 +70,27 @@ object TabListData {
             val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
             debugCache = clipboard.lines()
             ChatUtils.chat("Enabled tab list debug with your clipboard.")
-        }
+        }*/
     }
 
     private fun copyCommand(noColor: Boolean) {
-        if (debugCache != null) {
+        /*if (debugCache != null) {
             ChatUtils.clickableChat(
                 "Tab list debug is enabled!",
                 onClick = ::toggleDebug,
                 "§eClick to disable!",
             )
             return
-        }
+        }*/
 
         val resultList = mutableListOf<String>()
         for (line in getTabList()) {
-            val tabListLine = line.transformIf({ noColor }) { removeColor() }
-            if (tabListLine != "") resultList.add("'$tabListLine'")
+            val tabListLine = line/*.transformIf({ noColor }) { removeColor() }*/
+            if (tabListLine.string != "") resultList.add("'$tabListLine'")
         }
 
-        val tabHeader = header.conditionalTransform(noColor, { this.removeColor() }, { this })
-        val tabFooter = footer.conditionalTransform(noColor, { this.removeColor() }, { this })
+        val tabHeader = header?.string ?: ""
+        val tabFooter = footer?.string ?: ""
 
         val widgets = TabWidget.entries.filter { it.isActive }
             .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
@@ -117,14 +118,14 @@ object TabListData {
         }
     }
 
-    private fun readTabList(): List<String>? {
+    private fun readTabList(): List<Component>? {
         val player = MinecraftCompat.localPlayerOrNull ?: return null
         val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
-        val result = mutableListOf<String>()
+        val result = mutableListOf<Component>()
         tabListGuard = true
         for (info in players) {
             val name = Minecraft.getInstance().gui.tabList.getNameForDisplay(info)
-            result.add(name.formattedTextCompat().stripHypixelMessage())
+            result.add(name)
         }
         tabListGuard = false
         return if (result.size < 80) result.dropLast(1)
@@ -148,17 +149,17 @@ object TabListData {
         val tabList = readTabList() ?: return
         if (tablistCache != tabList) {
             tablistCache = tabList
-            TabListUpdateEvent(getTabList()).post()
+            TabListUpdateEvent(tablistCache).post()
             if (!SkyBlockUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
         }
 
         val tabListOverlay = Minecraft.getInstance().gui.tabList as AccessorGuiPlayerTabOverlay
-        header = tabListOverlay.header_skyhanni?.formattedTextCompat().orEmpty()
+        header = tabListOverlay.header_skyhanni
 
-        val tabFooter = tabListOverlay.footer_skyhanni?.formattedTextCompat().orEmpty()
-        if (tabFooter != footer && tabFooter != "") {
+        val tabFooter = tabListOverlay.footer_skyhanni
+        if (tabFooter != footer && tabFooter.string != "") {
             TablistFooterUpdateEvent(tabFooter).post()
         }
         footer = tabFooter
@@ -168,7 +169,7 @@ object TabListData {
         DelayedRun.runDelayed(2.seconds) {
             if (SkyBlockUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
-                TabListUpdateEvent(getTabList()).post()
+                TabListUpdateEvent(tablistCache).post()
             }
         }
     }

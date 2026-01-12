@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.network.chat.Component
 
 enum class TabStringType {
     TITLE,
@@ -10,8 +11,8 @@ enum class TabStringType {
 
     companion object {
 
-        fun fromLine(line: String): TabStringType {
-            val unformattedLine: String = line.removeColor()
+        fun fromLine(line: Component): TabStringType {
+            val unformattedLine: String = line.string
             if (unformattedLine.startsWith(" ")) {
                 return TEXT
             }

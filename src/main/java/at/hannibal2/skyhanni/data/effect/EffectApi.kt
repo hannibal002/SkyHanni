@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -211,7 +212,7 @@ object EffectApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
-        val footerLines = event.footer.split("\n")
+        val footerLines = event.footer
         footerLines.readNonGodPotEffects()
     }
 
@@ -224,7 +225,7 @@ object EffectApi {
         event.lines.readNonGodPotEffects()
     }
 
-    private fun List<String>.readNonGodPotEffects() = tabEffectPattern.matchAll(this) {
+    private fun List<Component>.readNonGodPotEffects() = tabEffectPattern.matchAll(this) {
         val nonGodPotEffect = NonGodPotEffect.entries.firstOrNull {
             it.tabListName == group("effect")
         } ?: return@matchAll

@@ -14,11 +14,11 @@ object ScoreboardEventSpooky : ScoreboardEvent() {
             add(time)
             add("§7Your Candy: ")
             add(
-                TabListData.getFooter()
-                    .removeResets()
-                    .split("\n")
-                    .firstOrNull { it.startsWith("§7Your Candy:") }
-                    ?.removePrefix("§7Your Candy: ") ?: "§cCandy not found",
+                TabListData.getFooter()?.string
+                    ?.removeResets()
+                    ?.split("\n")
+                    ?.firstOrNull { it.startsWith("Your Candy:") }
+                    ?.removePrefix("Your Candy: ") ?: "§cCandy not found",
             )
         }
     }

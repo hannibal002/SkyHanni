@@ -84,18 +84,18 @@ object TabListRenderer {
 
         var totalHeight = maxLines * LINE_HEIGHT
 
-        var header = listOf<String>()
+        var header = mutableListOf<String>()
 
         if (!config.hideAdverts) {
-            header = TabListData.getHeader().split("\n").toMutableList()
-            header.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
+            header = TabListData.getHeader()?.string?.split("\n")?.toMutableList() ?: mutableListOf()
+            header.removeIf { true }
             totalHeight += header.size * LINE_HEIGHT + TAB_PADDING
         }
 
-        var footer = listOf<String>()
+        var footer = mutableListOf<String>()
 
         if (!config.hideAdverts) {
-            footer = TabListData.getFooter().split("\n").toMutableList()
+            footer = TabListData.getFooter()?.string?.split("\n")?.toMutableList() ?: mutableListOf()
             footer.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
             totalHeight += footer.size * LINE_HEIGHT + TAB_PADDING
         }

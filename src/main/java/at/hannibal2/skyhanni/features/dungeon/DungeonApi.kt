@@ -32,8 +32,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
@@ -103,15 +105,15 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST: §r§r§fBlessing of Power V§r
+     * REGEX-TEST: Blessing of Power V§r
      */
     private val blessingPattern by patternGroup.pattern(
-        "blessings",
-        "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r",
+        "blessings.no-color",
+        "Blessing of (?<type>\\w+) (?<amount>\\w+)",
     )
     private val noBlessingPattern by patternGroup.pattern(
-        "noblessings",
-        "§r§r§7No Buffs active\\. Find them by exploring the Dungeon!§r",
+        "noblessings.no-color",
+        "No Buffs active\\. Find them by exploring the Dungeon!",
     )
 
     /**
@@ -221,7 +223,7 @@ object DungeonApi {
         if (!inDungeon()) return
         if (dungeonFloor == null || playerClass != null) return
 
-        val playerTeam = event.tabList.find { it.contains(PlayerUtils.getName()) }?.removeColor() ?: return
+        val playerTeam = event.tabList.find { it.string.contains(PlayerUtils.getName()) }?.string?.removeColor() ?: return
         for (dungeonClass in DungeonClass.entries) {
             if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
                 val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
@@ -235,7 +237,7 @@ object DungeonApi {
     @HandleEvent
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
-        for (line in event.footer.split("\n")) {
+        for (line in event.footer.string.split("\n")) {
             if (noBlessingPattern.matches(line)) {
                 DungeonBlessings.reset()
                 return
@@ -449,7 +451,7 @@ object DungeonApi {
     fun onTabUpdate(event: TabListUpdateEvent) {
         if (!inDungeon() || !started || completed) return
 
-        playerDungeonTeamPattern.matchAll(event.tabList) {
+        playerDungeonTeamPattern.matchAll(event.tabList.map { it.formattedTextCompat().stripHypixelMessage() }) {
             val username = group("playerName").removeColor()
             val playerDead = group("playerDead") == "DEAD"
 

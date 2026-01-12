@@ -41,11 +41,11 @@ object NonGodPotEffectDisplay {
     private var display = emptyList<String>()
 
     /**
-     * REGEX-TEST: §7You have §e10 §7non-god effects.
+     * REGEX-TEST: You have 10 non-god effects.
      */
     private val effectsCountPattern by RepoPattern.pattern(
-        "misc.nongodpot.effects",
-        "§7You have §e(?<name>\\d+) §7non-god effects\\.",
+        "misc.nongodpot.effects.no-color",
+        "You have (?<name>\\d+) non-god effects\\.",
     )
     private var totalEffectsCount = 0
 
@@ -147,8 +147,8 @@ object NonGodPotEffectDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!checkFooter) return
-        val lines = event.footer.split("\n")
-        if (!lines.any { it.contains("§a§lActive Effects") }) return
+        val lines = event.footer.string.split("\n")
+        if (!lines.any { it.contains("Active Effects") }) return
 
         checkFooter = false
         var effectsCount = 0

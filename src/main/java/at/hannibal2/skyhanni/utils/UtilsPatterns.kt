@@ -153,12 +153,13 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: §l§r§e§lProfile: §r§aApple §r§7♲
-     * REGEX-TEST: §l§r§e§lProfile: §r§aNot Allowed To Quit Skyblock Ever Again
+     * REGEX-TEST: Profile: Grapes
+     * REGEX-TEST: Profile: Apple ♲
+     * REGEX-TEST: Profile: Not Allowed To Quit Skyblock Ever Again
      */
     val tabListProfilePattern by patternGroup.pattern(
-        "tablist.profile",
-        "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*",
+        "tablist.profile.no-color",
+        "Profile: (?<profile>[\\w\\s]+) ?.*",
     )
 
     /**

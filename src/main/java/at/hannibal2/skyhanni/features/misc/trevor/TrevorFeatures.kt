@@ -6,11 +6,13 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -221,13 +223,17 @@ object TrevorFeatures {
             currentStatus = TrapperStatus.READY
             currentLabel = "§2Ready"
         }
+    }
 
+    @HandleEvent
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.TRAPPER)) return
         var found = false
         var active = false
         val previousLocation = TrevorSolver.mobLocation
         // TODO work with trapper widget, widget api, repo patterns, when not found, warn in chat and dont update
-        for (line in TabListData.getTabList()) {
-            val formattedLine = line.removeColor().drop(1)
+        for (line in event.widget.lines) {
+            val formattedLine = line.string.drop(1)
             if (formattedLine.startsWith("Time Left: ")) {
                 trapperReady = false
                 currentStatus = TrapperStatus.ACTIVE

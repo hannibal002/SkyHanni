@@ -207,9 +207,9 @@ object CaptureFarmingGear {
             currentCrop.farmingItem.setItem(itemStack)
         }
 
-        strengthPattern.firstMatcher(TabListData.getTabList()) {
+        /*strengthPattern.firstMatcher(TabListData.getTabList()) {
             GardenApi.storage?.fortune?.farmingStrength = group("strength").toInt()
-        }
+        }*/
     }
 
     fun removeInvalidItems() {

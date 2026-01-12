@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -94,6 +95,7 @@ object BingoApi {
     fun getIconFromScoreboard(text: String) = getRankFromScoreboard(text)?.let { getIcon(it) }
 
     fun getRank(text: String) = ranks.entries.find { text.contains(it.key) }?.value
+    fun getRank(text: Component) = -3 // todo
 
     fun getIcon(searchRank: Int) = ranks.entries.find { it.value == searchRank }?.key
 

@@ -11,9 +11,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 
 // heavily inspired by SBA code
 @SkyHanniModule
@@ -84,7 +87,7 @@ object TabListReader {
 
     val renderColumns = mutableListOf<RenderColumn>()
 
-    private fun updateTablistData(tablist: List<String>? = null) {
+    private fun updateTablistData(tablist: List<Component>? = null) {
         if (!SkyBlockUtils.inSkyBlock) return
 
         var tabLines = tablist ?: TabListData.getTabList()
@@ -114,12 +117,12 @@ object TabListReader {
         updateTablistData(event.tabList)
     }
 
-    private fun parseColumns(original: List<String>): MutableList<TabColumn> {
+    private fun parseColumns(original: List<Component>): MutableList<TabColumn> {
         val columns = mutableListOf<TabColumn>()
         val fullTabList = AdvancedPlayerList.newSorting(original)
 
         for (entry in fullTabList.indices step 20) {
-            val title = fullTabList[entry].trimWhiteSpaceAndResets()
+            val title = fullTabList[entry]
             var column = getColumnFromName(columns, title)
 
             if (column == null) {
@@ -135,7 +138,7 @@ object TabListReader {
     }
 
     private fun parseFooterAsColumn(): TabColumn? {
-        var footer = TabListData.getFooter().removeSFormattingCode()
+        var footer = TabListData.getFooter().formattedTextCompat().stripHypixelMessage().removeSFormattingCode()
         if (footer.isEmpty()) return null
 
         footer = godPotPattern.findMatcher(footer) {
@@ -192,9 +195,9 @@ object TabListReader {
         return column
     }
 
-    private fun getColumnFromName(columns: List<TabColumn>, name: String): TabColumn? {
+    private fun getColumnFromName(columns: List<TabColumn>, name: Component): TabColumn? {
         for (tabColumn in columns) {
-            if (name == tabColumn.columnTitle) {
+            if (name.string == tabColumn.columnTitle.string) {
                 return tabColumn
             }
         }
@@ -205,7 +208,7 @@ object TabListReader {
         for (column in columns) {
             var currentTabSection: TabSection? = null
             for (line in column.lines) {
-                if (line.trimWhiteSpaceAndResets().isEmpty()) {
+                if (line.string.trimWhiteSpaceAndResets().isEmpty()) {
                     currentTabSection = null
                     continue
                 }
@@ -221,7 +224,7 @@ object TabListReader {
 
     private fun combineColumnsToRender(columns: MutableList<TabColumn>, firstColumn: RenderColumn) {
         var firstColumnCopy = firstColumn
-        var lastTitle: String? = null
+        var lastTitle: Component? = null
 
         for (section in columns.flatMap { it.sections }) {
             var sectionSize = section.size()
@@ -240,7 +243,7 @@ object TabListReader {
                     currentCount = 1
                 } else {
                     if (firstColumnCopy.size() > 0) {
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
+                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(Component.empty(), TabStringType.TEXT))
                     }
                 }
 
@@ -264,7 +267,7 @@ object TabListReader {
                     renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                 } else {
                     if (firstColumnCopy.size() > 0) {
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
+                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(Component.empty(), TabStringType.TEXT))
                     }
                 }
 

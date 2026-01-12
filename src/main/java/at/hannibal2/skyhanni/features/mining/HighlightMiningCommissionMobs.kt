@@ -76,8 +76,8 @@ object HighlightMiningCommissionMobs {
 
         // TODO Commissin API
         MobType.entries.filter { type ->
-            event.tabList.findLast { line -> line.removeColor().trim().startsWith(type.commissionName) }
-                ?.let { !it.endsWith("§aDONE") }
+            event.tabList.findLast { line -> line.string.trim().startsWith(type.commissionName) }
+                ?.let { !it.string.endsWith("DONE") }
                 ?: false
         }.let {
             if (it != active) {

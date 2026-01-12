@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -414,8 +415,6 @@ object HypixelData {
                     break@loop
                 }
             }
-
-            checkProfileName()
         }
 
         val wasOnHypixel = SkyBlockUtils.onHypixel
@@ -487,11 +486,12 @@ object HypixelData {
         }
     }
 
-    private fun checkProfileName() {
+    @HandleEvent
+    fun checkProfileName(event: TabListUpdateEvent) {
         if (profileName.isNotEmpty()) return
 
-        UtilsPatterns.tabListProfilePattern.firstMatcher(TabListData.getTabList()) {
-            profileName = group("profile").lowercase()
+        UtilsPatterns.tabListProfilePattern.firstMatcher(event.tabList.map { it.string }) {
+            profileName = group("profile").lowercase().trim()
             ProfileJoinEvent(profileName).post()
         }
     }

@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
@@ -384,7 +385,7 @@ enum class TabWidget(
      *
      * When the widget isn't visible, it will be empty
      * */
-    var lines: List<String> = emptyList()
+    var lines: List<Component> = emptyList()
         private set
 
     /** Both are inclusive */
@@ -406,7 +407,7 @@ enum class TabWidget(
             pattern.matchMatcher(lines.first(), consumer)
         else null
 
-    private fun postNewEvent(lines: List<String>) {
+    private fun postNewEvent(lines: List<Component>) {
         // Prevent Post if lines are equal
         if (lines == this.lines) return
         this.lines = lines
@@ -484,7 +485,7 @@ enum class TabWidget(
             }
         }
 
-        private fun update(newTablist: List<String>) {
+        private fun update(newTablist: List<Component>) {
             val tabList = filterTabList(newTablist)
 
             separatorIndexes.clear()
@@ -499,7 +500,7 @@ enum class TabWidget(
             separatorIndexes.zipWithNext { (firstIndex, widget), (secondIndex, _) ->
                 widget?.boundary = firstIndex to secondIndex - 1
                 widget?.gotChecked = true
-                widget?.postNewEvent(tabList.subList(firstIndex, secondIndex).filter { it.isNotEmpty() })
+                widget?.postNewEvent(tabList.subList(firstIndex, secondIndex).filter { it.string.isNotEmpty() })
             }
 
             entries.forEach { it.updateIsActive() }
@@ -519,7 +520,7 @@ enum class TabWidget(
             extraPatterns = repoGroup.getUnusedPatterns()
         }
 
-        private fun filterTabList(tabList: List<String>): List<String> {
+        private fun filterTabList(tabList: List<Component>): List<Component> {
             var playerListFound = false
             var infoFound = false
 

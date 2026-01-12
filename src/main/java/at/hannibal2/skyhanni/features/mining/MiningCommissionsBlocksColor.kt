@@ -63,8 +63,8 @@ object MiningCommissionsBlocksColor {
     @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         for (block in CommissionBlock.entries) {
-            val tabList = " §r§f${block.commissionName}: "
-            val newValue = event.tabList.any { it.startsWith(tabList) && !it.contains("DONE") }
+            val tabList = " ${block.commissionName}: "
+            val newValue = event.tabList.any { it.string.startsWith(tabList) && !it.string.contains("DONE") }
             if (block.highlight != newValue) {
                 if (newValue && block in ignoredTabListCommissions) continue
                 block.highlight = newValue

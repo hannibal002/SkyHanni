@@ -13,7 +13,11 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
@@ -28,6 +32,17 @@ object CustomTodosGui {
     private fun matchString(todo: CustomTodo, text: String): Boolean {
         if (!todo.isValid()) return false
         val cleanedText = if (todo.ignoreColorCodes) text.removeColor() else text
+        return when (todo.triggerMatcher) {
+            CustomTodo.TriggerMatcher.REGEX -> cleanedText.matches(todo.getRegex() ?: return false)
+            CustomTodo.TriggerMatcher.STARTS_WITH -> cleanedText.startsWith(todo.trigger)
+            CustomTodo.TriggerMatcher.CONTAINS -> cleanedText.contains(todo.trigger)
+            CustomTodo.TriggerMatcher.EQUALS -> cleanedText == todo.trigger
+        }
+    }
+
+    private fun matchString(todo: CustomTodo, text: Component): Boolean {
+        if (!todo.isValid()) return false
+        val cleanedText = if (todo.ignoreColorCodes) text.string else text.formattedTextCompat().stripHypixelMessage()
         return when (todo.triggerMatcher) {
             CustomTodo.TriggerMatcher.REGEX -> cleanedText.matches(todo.getRegex() ?: return false)
             CustomTodo.TriggerMatcher.STARTS_WITH -> cleanedText.startsWith(todo.trigger)
