@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import net.minecraft.core.particles.ParticleTypes
 import kotlin.math.abs
 import kotlin.math.sign
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -31,7 +30,6 @@ object ArrowGuessBurrow {
     private const val EPSILON = 1e-6
 
     private val points: MutableSet<LorenzVec> = mutableSetOf()
-    private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
     private val recentFoundArrows = TimeLimitedSet<RaycastUtils.Ray>(18.seconds)
 
     private var failures = 0
@@ -48,7 +46,6 @@ object ArrowGuessBurrow {
         // offset is color for some reason
         val range = getArrowRange(event.offset) ?: return
 
-        if (!recentArrowParticles.add(event.location)) return
         points.add(event.location)
 
         val arrow = detectArrow(points) ?: return

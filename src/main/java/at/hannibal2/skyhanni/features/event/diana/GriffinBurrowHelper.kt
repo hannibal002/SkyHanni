@@ -123,6 +123,7 @@ object GriffinBurrowHelper {
         val guesses: List<LorenzVec>,
         var burrowType: BurrowType = BurrowType.UNKNOWN,
         var currentIndex: Int = 0,
+        val inaccurate: Boolean = false,
         var ignoreParticleCheckUntil: SimpleTimeMark = SimpleTimeMark.now(),
     ) {
         fun getCurrent(): LorenzVec = guesses[currentIndex]
@@ -141,7 +142,11 @@ object GriffinBurrowHelper {
             if (shouldKeepGuess()) return false
 
             var shouldMove = false
-            if (!isBlockValid(this.getCurrent())) shouldMove = true
+            if (!isBlockValid(this.getCurrent())) {
+                if (!inaccurate || getCurrent().distanceToPlayer() < 50) {
+                    shouldMove = true
+                }
+            }
 
             if (shouldBurrowParticlesBeVisible(timeInPast = 1.seconds) &&
                 !GriffinBurrowParticleFinder.containsBurrow(this.getCurrent()) && // burrow is not found
@@ -194,6 +199,11 @@ object GriffinBurrowHelper {
             allGuesses.add(guess)
             allGuessesTimers[guess] = SimpleTimeMark.now()
         }
+    }
+
+    fun getGuess(location: LorenzVec?): GuessEntry? {
+        if (location == null) return null
+        return allGuesses.firstOrNull { it.contains(location) }
     }
 
     @HandleEvent
@@ -286,7 +296,7 @@ object GriffinBurrowHelper {
     fun onBurrowDetect(event: BurrowDetectEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val burrowLocation = event.burrowLocation
-        val currentEntry = allGuesses.firstOrNull { it.contains(burrowLocation) }
+        val currentEntry = getGuess(burrowLocation)
 
         if (currentEntry != null) removeGuess(currentEntry)
         addGuess(GuessEntry(listOf(burrowLocation), event.type))
@@ -419,7 +429,7 @@ object GriffinBurrowHelper {
                 targetLocation?.blockCenter() ?: return
             }
 
-            val targetType = allGuesses.firstOrNull { it.getCurrent() == targetLocation }?.burrowType
+            val targetType = getGuess(targetLocation)?.burrowType
             val lineWidth = if (targetType != null && targetType != BurrowType.UNKNOWN) {
                 color = targetType.color
                 3
@@ -436,8 +446,7 @@ object GriffinBurrowHelper {
         if (config.multiGuesses) {
             renderAllGuesses(event, playerLocation)
         } else {
-            val target = allGuesses.firstOrNull { it.getCurrent() == targetLocation }
-            if (target == null) return
+            val target = getGuess(targetLocation) ?: return
             val location = target.getCurrent()
             val distance = location.distance(playerLocation)
             val text = when (target.burrowType) {

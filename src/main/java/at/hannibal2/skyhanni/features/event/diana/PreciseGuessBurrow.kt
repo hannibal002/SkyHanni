@@ -55,7 +55,7 @@ object PreciseGuessBurrow {
 
         val guessEntry = GriffinBurrowHelper.GuessEntry(
             listOf(guessPosition.down(0.5).roundToBlock()),
-            ignoreParticleCheckUntil = SimpleTimeMark.now() + 3.seconds,
+            inaccurate = bezierFitter.count() < 5,
         )
 
         if (lastGuess?.getCurrent() != guessEntry.getCurrent()) {

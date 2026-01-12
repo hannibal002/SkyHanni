@@ -56,14 +56,17 @@ object BurrowWarpHelper {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
+        if (event.keyCode != config.keyBindWarp) return
+        warp()
+    }
+
+    private fun warp() {
         if (!DianaApi.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
-
-        if (event.keyCode != config.keyBindWarp) return
         if (Minecraft.getInstance().screen != null) return
-
         val warp = currentWarp ?: return
         if (lastWarpTime.passedSince() < 1.seconds) return
+
         lastWarpTime = SimpleTimeMark.now()
         HypixelCommands.warp(warp.name)
         lastWarp = currentWarp
