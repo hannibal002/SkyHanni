@@ -19,7 +19,7 @@ class MantidDisplayConfig {
     @Expose
     @ConfigOption(name = "When to show", desc = "When to show this display")
     @ConfigEditorDraggableList
-    val whenToShow: List<WhenShowDisplay> = listOf(WhenShowDisplay.MANTID)
+    val whenToShow: MutableList<WhenShowDisplay> = mutableListOf(WhenShowDisplay.MANTID)
 
     enum class WhenShowDisplay(val displayName: String) {
         ALWAYS("Always on Garden"),

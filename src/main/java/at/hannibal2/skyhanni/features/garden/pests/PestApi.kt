@@ -472,7 +472,7 @@ object PestApi {
         event.registerBrigadier("shtestpestkill") {
             description = "Simulates a pest kill"
             category = CommandCategory.DEVELOPER_TEST
-            argCallback("pestType", EnumArgumentType.custom<PestType>({it.name}, isGreedy = true)) { pestType ->
+            argCallback("pestType", EnumArgumentType.custom<PestType>({ it.name }, isGreedy = true)) { pestType ->
                 PestKillEvent(pestType).post()
             }
             simpleCallback { PestKillEvent(PestType.UNKNOWN).post() }
