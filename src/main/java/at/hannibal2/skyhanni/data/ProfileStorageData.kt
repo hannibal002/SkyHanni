@@ -88,7 +88,7 @@ object ProfileStorageData {
                 "onHypixel" to SkyBlockUtils.onHypixel,
                 "HypixelData.hypixelLive" to HypixelData.hypixelLive,
                 "HypixelData.hypixelAlpha" to HypixelData.hypixelAlpha,
-                "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
+                "sidebarLinesFormatted" to ScoreboardData.getSidebarLinesTextCompat(),
             )
         }
         if (sackPlayers == null) {

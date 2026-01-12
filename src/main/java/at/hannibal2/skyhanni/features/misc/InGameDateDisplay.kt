@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object InGameDateDisplay {
@@ -54,13 +55,14 @@ object InGameDateDisplay {
         val date = SkyBlockTime.now()
         var theBaseString: String
         if (config.useScoreboard) {
-            val list = ScoreboardData.sidebarLinesFormatted // we need this to grab the moon/sun symbol
+            val list = ScoreboardData.sidebarLines // we need this to grab the moon/sun symbol
             val year = "Year ${date.year}"
-            var monthAndDate = (list.find { monthAndDatePattern.matches(it) } ?: "??").trim()
+            var monthAndDate = (list.find { monthAndDatePattern.matches(it) })?.string?.trim() ?: "??"
             if (monthAndDate.last().isDigit()) {
                 monthAndDate = "${monthAndDate}${SkyBlockTime.daySuffix(monthAndDate.takeLast(2).trim().toInt())}"
             }
-            val time = list.find { it.lowercase().contains("am ") || it.lowercase().contains("pm ") } ?: "??"
+            val time =
+                list.find { it.string.lowercase().contains("am ") || it.string.lowercase().contains("pm ") }?.string ?: "??"
             theBaseString = "$monthAndDate, $year ${time.trim()}".removeColor()
             if (!config.includeSunMoon) {
                 theBaseString = timeSymbolsPattern.matcher(theBaseString).replaceAll("")

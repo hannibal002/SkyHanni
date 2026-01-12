@@ -34,7 +34,7 @@ object UnknownLinesHandler {
      * Remove known lines with patterns
      **/
     fun handleUnknownLines() {
-        val sidebarLines = ScoreboardData.sidebarLinesFormatted
+        val sidebarLines = ScoreboardData.getSidebarLinesTextCompat()
 
         var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 
@@ -160,7 +160,7 @@ object UnknownLinesHandler {
             "Island" to SkyBlockUtils.currentIsland,
             "Area" to HypixelData.skyBlockArea,
             "Loaded Patterns" to CustomScoreboard.activePatterns.size,
-            "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
+            "Full Scoreboard" to ScoreboardData.getSidebarLinesTextCompat(),
             noStackTrace = true,
             betaOnly = true,
         )

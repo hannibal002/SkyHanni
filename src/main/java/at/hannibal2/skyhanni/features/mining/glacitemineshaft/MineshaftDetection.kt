@@ -55,9 +55,8 @@ object MineshaftDetection {
         if (!config.mineshaftDetection) return
         if (found) return
 
-        val matchingLine = ScoreboardData.sidebarLinesFormatted
-            .firstOrNull { line -> MineshaftType.entries.any { line.contains(it.name) } }
-            ?.removeColor() ?: return
+        val matchingLine = ScoreboardData.sidebarLines
+            .firstOrNull { line -> MineshaftType.entries.any { line.string.contains(it.name) } }?.string ?: return
 
         val areaName = matchingLine.split(" ").last()
 

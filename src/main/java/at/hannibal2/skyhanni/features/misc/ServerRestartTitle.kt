@@ -20,11 +20,11 @@ object ServerRestartTitle {
     private var timerTitleContext: TitleContext? = null
 
     /**
-     * REGEX-TEST: §cServer closing: 03:11 §8m77A
+     * REGEX-TEST: Server closing: 03:11 m77A
      */
     private val restartingPattern by patternGroup.pattern(
-        "time",
-        "§cServer closing: (?<minutes>\\d+):(?<seconds>\\d+) ?§8.*",
+        "time-nocolor",
+        "Server closing: (?<minutes>\\d+):(?<seconds>\\d+) ?.*",
     )
 
     /**
@@ -43,7 +43,7 @@ object ServerRestartTitle {
             return
         }
 
-        restartingPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
+        restartingPattern.firstMatcher(ScoreboardData.sidebarLines.map { it.string }) {
             if (timerTitleContext?.alive == true) return
             else if (timerTitleContext?.alive == false) {
                 timerTitleContext = null

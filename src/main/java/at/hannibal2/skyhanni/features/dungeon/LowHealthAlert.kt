@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -23,7 +24,7 @@ object LowHealthAlert {
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
-        ScoreboardPattern.teammatesPattern.matchAll(event.added) {
+        ScoreboardPattern.teammatesPattern.matchAll(event.added.map { it.formattedTextCompatLessResets() }) {
             val username = group("username")
             val color = group("color")
             val health = group("health")

@@ -96,18 +96,18 @@ object FarmingContestApi {
     }
 
     private fun readCurrentCrop(): CropType? {
-        val line = ScoreboardData.sidebarLinesFormatted.nextAfter("§eJacob's Contest") ?: return null
+        val line = ScoreboardData.getSidebarLinesTextCompat().nextAfter("§eJacob's Contest") ?: return null
         return sidebarCropPattern.matchMatcher(line) {
             val cropName = group("crop")
             try {
                 CropType.getByName(cropName)
             } catch (e: IllegalStateException) {
-                ScoreboardData.sidebarLinesFormatted
+                ScoreboardData.getSidebarLinesTextCompat()
                 ErrorManager.logErrorWithData(
                     e, "Farming contest read current crop failed",
                     "cropName" to cropName,
                     "line" to line,
-                    "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
+                    "sidebarLinesFormatted" to ScoreboardData.getSidebarLinesTextCompat(),
                 )
                 null
             }

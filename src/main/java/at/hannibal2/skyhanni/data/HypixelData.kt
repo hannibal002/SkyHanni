@@ -66,12 +66,12 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST: §711/15/24 §8m19CJ
-     * REGEX-TEST: §711/15/24 §8m1F
+     * REGEX-TEST: 11/15/24 m19CJ
+     * REGEX-TEST: 11/15/24 m1F
      */
     private val serverIdScoreboardPattern by patternGroup.pattern(
         "serverid.scoreboard",
-        "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
+        "\\d+/\\d+/\\d+ (?<servertype>[mM])(?<serverid>\\S+).*",
     )
     private val lobbyTypePattern by patternGroup.pattern(
         "lobbytype",
@@ -111,12 +111,12 @@ object HypixelData {
     )
 
     /**
-     * WRAPPED-REGEX-TEST: " §a✌ §7(§a11§7/20)"
-     * WRAPPED-REGEX-TEST: " §a✌ §7(§e1/1§7)"
+     * WRAPPED-REGEX-TEST: " ✌ (11/20)"
+     * WRAPPED-REGEX-TEST: " ✌ (1/1)"
      */
     private val scoreboardVisitingAmountPattern by patternGroup.pattern(
-        "scoreboard.visiting.amount",
-        "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)(?:§.)?/(?<maxamount>\\d+)(?:§.)?\\)",
+        "scoreboard.visiting.amount.no-color",
+        "\\s+✌ \\((?<currentamount>\\d+)/(?<maxamount>\\d+)\\)",
     )
     private val guestPattern by patternGroup.pattern(
         "guesting.scoreboard",
@@ -142,8 +142,8 @@ object HypixelData {
      * REGEX-TEST:  §5ф §dWizard Tower
      */
     private val skyblockAreaPattern by patternGroup.pattern(
-        "skyblock.area",
-        "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
+        "skyblock.area.no-color",
+        "\\s*(?<symbol>⏣|ф) (?<area>.*)",
     )
 
     var lastLocRaw = SimpleTimeMark.farPast()
@@ -211,7 +211,7 @@ object HypixelData {
             return
         }
 
-        serverIdScoreboardPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
+        serverIdScoreboardPattern.firstMatcher(ScoreboardData.sidebarLines.map { it.string }) {
             val serverType = if (group("servertype") == "M") "mega" else "mini"
             serverId = "$serverType${group("serverid")}"
             HypixelLocationApi.checkEquals()
@@ -231,7 +231,7 @@ object HypixelData {
             "lastSuccessfulServerIdFetchType" to lastSuccessfulServerIdFetchType,
             "islandType" to SkyBlockUtils.currentIsland,
             "tablist" to TabListData.getTabList(),
-            "scoreboard" to ScoreboardData.sidebarLinesFormatted,
+            "scoreboard" to ScoreboardData.getSidebarLinesTextCompat(),
         )
     }
 
@@ -289,7 +289,7 @@ object HypixelData {
     }
 
     fun getMaxPlayersForCurrentServer(): Int {
-        scoreboardVisitingAmountPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
+        scoreboardVisitingAmountPattern.firstMatcher(ScoreboardData.sidebarLines.map { it.string }) {
             return group("maxamount").toInt() + playerAmountOnIsland
         }
         if (serverId?.startsWith("mega") == true) {
@@ -401,11 +401,11 @@ object HypixelData {
         }
 
         if (SkyBlockUtils.onHypixel && SkyBlockUtils.inSkyBlock) {
-            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
-                skyblockAreaPattern.matchMatcher(line) {
+            loop@ for (line in ScoreboardData.sidebarLines) {
+                skyblockAreaPattern.matchMatcher(line.string) {
                     val originalLocation = group("area").removeColor()
                     val area = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
-                    skyBlockAreaWithSymbol = line.trim()
+                    skyBlockAreaWithSymbol = line.string.trim()
                     if (area != skyBlockArea) {
                         val previousArea = skyBlockArea
                         skyBlockArea = area
@@ -517,7 +517,7 @@ object HypixelData {
             }
         }
 
-        for (line in ScoreboardData.sidebarLinesFormatted) {
+        for (line in ScoreboardData.sidebarLines) {
             serverNameScoreboardPattern.matchMatcher(line) {
                 hypixel = true
                 if (group("prefix") == "alpha.") {
@@ -541,23 +541,6 @@ object HypixelData {
 
         if (scoreboardTitle.contains("♲")) ironman = true
         else if (scoreboardTitle.contains("☀")) stranded = true
-
-        // remove once update is on main
-        // make sure to keep the bingo part when you remove it
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            if (BingoApi.getRankFromScoreboard(line) != null) {
-                bingo = true
-            }
-            when (line) {
-                " §7♲ §7Ironman" -> {
-                    ironman = true
-                }
-
-                " §a☀ §aStranded" -> {
-                    stranded = true
-                }
-            }
-        }
 
         noTrade = ironman || stranded || bingo
     }

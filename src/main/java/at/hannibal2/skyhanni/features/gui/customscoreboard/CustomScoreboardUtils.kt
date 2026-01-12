@@ -55,7 +55,7 @@ object CustomScoreboardUtils {
     fun getProfileTypeSymbol() = when {
         HypixelData.ironman -> "§7♲ "
         HypixelData.stranded -> "§a☀ "
-        HypixelData.bingo -> ScoreboardData.sidebarLinesFormatted.firstNotNullOfOrNull {
+        HypixelData.bingo -> ScoreboardData.getSidebarLinesTextCompat().firstNotNullOfOrNull {
             BingoApi.getIconFromScoreboard(it)?.plus(" ") // TODO: add bingo rank to bingo api
         } ?: "§e❤ "
 
@@ -114,5 +114,5 @@ object CustomScoreboardUtils {
         else -> null
     }
 
-    internal fun getSBLines() = ScoreboardData.sidebarLinesFormatted
+    internal fun getSBLines() = ScoreboardData.getSidebarLinesTextCompat()
 }

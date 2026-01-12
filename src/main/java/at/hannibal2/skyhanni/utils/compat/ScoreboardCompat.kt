@@ -10,7 +10,7 @@ fun Scoreboard.getSidebarObjective(): Objective? {
     return this.getDisplayObjective(DisplaySlot.SIDEBAR)
 }
 
-fun Collection<PlayerScoreEntry>.getPlayerNames(scoreboard: Scoreboard): List<Component> {
+fun Collection<PlayerScoreEntry>.getPlayerNames(scoreboard: Scoreboard, old: Boolean = false): List<Component> {
     return this.sortedBy { it.value }
         .map {
             val team = scoreboard.getPlayersTeam(it.owner)
@@ -19,9 +19,7 @@ fun Collection<PlayerScoreEntry>.getPlayerNames(scoreboard: Scoreboard): List<Co
                     if (siblings.isNotEmpty()) siblings.forEach { sibling -> main.append(sibling) }
                     else main.append(this)
                 }
-                // the soccer ball is because it is like that on 1.8
-                // this could be changed later but for now i think this is fine
-                main.append("⚽")
+                if (old) main.append("⚽")
                 team?.playerSuffix?.apply {
                     if (siblings.isNotEmpty()) siblings.forEach { sibling -> main.append(sibling) }
                     else main.append(this)

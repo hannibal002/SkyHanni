@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -31,7 +32,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import java.util.regex.Pattern
@@ -119,13 +119,13 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     PURSE(
         {
-            val scoreboard = ScoreboardData.sidebarLinesFormatted
+            val scoreboard = ScoreboardData.sidebarLines
             // Matches coins amount in purse or piggy, with optional decimal points
-            val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
-                purseRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
+            val coins = scoreboard.firstOrNull { purseRegex.matches(it) }?.let {
+                purseRegex.find(it.string)?.groupValues?.get(1).orEmpty()
             }
-            val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
-                motesRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
+            val motes = scoreboard.firstOrNull { motesRegex.matches(it) }?.let {
+                motesRegex.find(it.string)?.groupValues?.get(1).orEmpty()
             }
             lastKnownDisplayStrings[PURSE] = when {
                 coins == "1" -> "1 Coin"
@@ -141,9 +141,9 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     BITS(
         {
-            val scoreboard = ScoreboardData.sidebarLinesFormatted
-            val bits = scoreboard.firstOrNull { bitsRegex.matches(it.removeColor()) }?.let {
-                bitsRegex.find(it.removeColor())?.groupValues?.get(1)
+            val scoreboard = ScoreboardData.sidebarLines
+            val bits = scoreboard.firstOrNull { bitsRegex.matches(it) }?.let {
+                bitsRegex.find(it.string)?.groupValues?.get(1)
             }
 
             when (bits) {
@@ -213,8 +213,8 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             val slayerRegex =
                 Pattern.compile("(?<name>(?:\\w| )*) (?<level>[IV]+)") // Samples: Revenant Horror I; Tarantula Broodfather IV
 
-            for (line in ScoreboardData.sidebarLinesFormatted) {
-                val noColorLine = line.removeColor()
+            for (line in ScoreboardData.sidebarLines) {
+                val noColorLine = line.string
                 val match = slayerRegex.matcher(noColorLine)
                 when {
                     match.matches() -> {

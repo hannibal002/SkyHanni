@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -99,7 +100,7 @@ object KuudraApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (kuudraTier != null) return
-        tierPattern.firstMatcher(event.added) {
+        tierPattern.firstMatcher(event.added.map { it.formattedTextCompatLessResets() }) {
             val tier = group("tier").toInt()
             kuudraTier = tier
             KuudraEnterEvent(tier).post()

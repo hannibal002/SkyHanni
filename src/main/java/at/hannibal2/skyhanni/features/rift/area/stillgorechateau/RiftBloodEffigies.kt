@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftEffigiesJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -115,12 +115,12 @@ object RiftBloodEffigies {
     }
 
     @HandleEvent
-    fun onRawScoreboardChange(event: RawScoreboardUpdateEvent) {
+    fun onRawScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
 
-        val line = event.rawScoreboard.firstOrNull { it.startsWith("Effigies:") } ?: return
+        val line = event.new.firstOrNull { it.string.startsWith("Effigies:") } ?: return
         ChatUtils.debug("Effigies line: $line")
-        val hearts = heartsPattern.matchMatcher(line) {
+        val hearts = heartsPattern.matchMatcher(line.formattedTextCompatLessResets()) {
             group("hearts")
         } ?: return
 

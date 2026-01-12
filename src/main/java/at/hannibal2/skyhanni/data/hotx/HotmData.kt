@@ -605,7 +605,7 @@ enum class HotmData(
 
         @HandleEvent(onlyOnSkyblock = true)
         fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
-            ScoreboardPattern.powderPattern.firstMatcher(event.added) {
+            ScoreboardPattern.powderPattern.firstMatcher(event.added.map { it.string }) {
                 val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 type.setAmount(amount, postEvent = true)

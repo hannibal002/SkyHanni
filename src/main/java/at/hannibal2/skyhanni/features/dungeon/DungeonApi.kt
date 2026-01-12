@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
@@ -43,7 +44,7 @@ import net.minecraft.world.level.block.Blocks
 object DungeonApi {
 
     // TODO repo patterns
-    private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
+    private val floorPattern = " ⏣ The Catacombs \\((?<floor>.*)\\)".toPattern()
     private val uniqueClassBonus = "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
 
     private val bossPattern = "View all your (?<name>\\w+) Collection".toPattern()
@@ -77,12 +78,12 @@ object DungeonApi {
     private val WITHER_ESSENCE_TEXTURE by lazy { SkullTextureHolder.getTexture("WITHER_ESSENCE") }
 
     /**
-     * REGEX-TEST: Time Elapsed: §a01m 17s
-     * REGEX-TEST: Time Elapsed: §a14s
+     * REGEX-TEST: Time Elapsed: 01m 17s
+     * REGEX-TEST: Time Elapsed: 14s
      */
     private val timePattern by patternGroup.pattern(
         "time",
-        "Time Elapsed: §.(?:(?<minutes>\\d+)m )?(?<seconds>\\d+)s",
+        "Time Elapsed: (?:(?<minutes>\\d+)m )?(?<seconds>\\d+)s",
     )
 
     /**
@@ -95,11 +96,11 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST: §711/15/24 §8m4F 830,-420
+     * REGEX-TEST: 11/15/24 m4F 830,-420
      */
     val dungeonRoomPattern by patternGroup.pattern(
         "room",
-        "§7\\d+/\\d+/\\d+ §\\w+ (?<roomId>[\\w,-]+)",
+        "\\d+/\\d+/\\d+ \\w+ (?<roomId>[\\w,-]+)",
     )
 
     /**
@@ -198,7 +199,7 @@ object DungeonApi {
     @HandleEvent
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         // TODO: move this under inDungeon check when we use Hypixel's ModAPI for island detection
-        floorPattern.firstMatcher(event.added) {
+        floorPattern.firstMatcher(event.added.map { it.string }) {
             val floor = group("floor")
             if (dungeonFloor == floor) return
             dungeonFloor = floor
@@ -206,11 +207,11 @@ object DungeonApi {
             return
         }
         if (!inDungeon()) return
-        dungeonRoomPattern.firstMatcher(event.added) {
+        dungeonRoomPattern.firstMatcher(event.added.map { it.string }) {
             roomId = group("roomId")
             return
         }
-        timePattern.firstMatcher(event.added) {
+        timePattern.firstMatcher(event.added.map { it.string }) {
             time = "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
             return
         }

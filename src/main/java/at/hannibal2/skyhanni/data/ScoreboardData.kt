@@ -32,7 +32,9 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria
 @SkyHanniModule
 object ScoreboardData {
 
-    var sidebarLinesFormatted: List<String> = emptyList()
+    var sidebarLines: List<Component> = emptyList()
+    @Deprecated("Use sidebarLines", ReplaceWith("this.sidebarLines"))
+    fun getSidebarLinesTextCompat(): List<String> = sidebarLines.map { it.formattedTextCompatLessResets() }
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
@@ -155,6 +157,14 @@ object ScoreboardData {
         val objective = scoreboard.getSidebarObjective() ?: return emptyList()
         var scores = scoreboard.listPlayerScores(objective)
         val list = scores.getPlayerNames(scoreboard)
+        return list.map { it.formattedTextCompatLessResets() }
+    }
+
+    private fun fetchScoreboardLinesOld(): List<String> {
+        val scoreboard = MinecraftCompat.localWorldOrNull?.scoreboard ?: return emptyList()
+        val objective = scoreboard.getSidebarObjective() ?: return emptyList()
+        var scores = scoreboard.listPlayerScores(objective)
+        val list = scores.getPlayerNames(scoreboard, true)
         return list.map { it.formattedTextCompatLessResets() }
     }
 

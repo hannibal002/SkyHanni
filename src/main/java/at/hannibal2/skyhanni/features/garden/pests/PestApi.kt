@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.decoration.ArmorStand
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
@@ -82,28 +83,28 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:  §7⏣ §aPlot §7- §b22a
-     * REGEX-TEST:  §7⏣ §aThe Garden
+     * REGEX-TEST:  ⏣ Plot - 22a
+     * REGEX-TEST:  ⏣ The Garden
      */
     private val noPestsInScoreboardPattern by patternGroup.pattern(
-        "scoreboard.no-pests",
-        " §7⏣ §a(?:The Garden|Plot §7- §b.+)$",
+        "scoreboard.no-pests.no-color",
+        " ⏣ (?:The Garden|Plot - .+)$",
     )
 
     /**
-     * REGEX-TEST:    §aPlot §7- §b4 §4§lൠ§7 x1
+     * REGEX-TEST:    Plot - 4 ൠ x1
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
-        "scoreboard.plot.pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*ൠ(?:§.)* x(?<pests>\\d+)",
+        "scoreboard.plot.pests.no-color",
+        "\\s*Plot - (?<plot>.+) ൠ x(?<pests>\\d+)",
     )
 
     /**
-     * REGEX-TEST:  §aPlot §7- §b3
+     * REGEX-TEST:  Plot - 3
      */
     private val noPestsInPlotScoreboardPattern by patternGroup.pattern(
-        "scoreboard.plot.no-pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
+        "scoreboard.plot.no-pests.no-color",
+        "\\s*Plot - (?<plot>.{1,3})$",
     )
     /**
      * REGEX-TEST: §4§lൠ §cThis plot has §25 §2ൠ Pests§c!
@@ -293,7 +294,7 @@ object PestApi {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick() {
         if (!firstScoreboardCheck && gardenJoinTime.passedSince() > 5.seconds) {
-            checkScoreboardLines(ScoreboardData.sidebarLinesFormatted)
+            checkScoreboardLines(ScoreboardData.sidebarLines)
             firstScoreboardCheck = true
             updatePests()
         }
@@ -391,7 +392,7 @@ object PestApi {
         )
     }
 
-    private fun checkScoreboardLines(list: List<String>) {
+    private fun checkScoreboardLines(list: List<Component>) {
         for (line in list) {
             // gets if there are no pests remaining in the garden
             noPestsInScoreboardPattern.matchMatcher(line) {

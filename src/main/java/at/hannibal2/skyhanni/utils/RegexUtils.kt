@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -54,6 +55,8 @@ object RegexUtils {
 
     fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
     fun Pattern.matches(component: Component?): Boolean = component?.let { matcher(it.string).matches() } ?: false
+    fun Regex.matches(component: Component?): Boolean = component?.let { this.matches(it.string) } ?: false
+
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
     fun Pattern.find(component: Component?) = component?.let { matcher(it.string).find() } ?: false
 

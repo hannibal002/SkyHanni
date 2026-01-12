@@ -291,3 +291,7 @@ fun Component.replace(oldValue: String, newValue: String): Component {
     }
     return this
 }
+
+fun Component.startsWith(input: String): Boolean {
+    return this.string.startsWith(input)
+}

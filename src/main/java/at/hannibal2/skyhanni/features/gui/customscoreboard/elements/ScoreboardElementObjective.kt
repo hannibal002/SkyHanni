@@ -6,19 +6,20 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 // scoreboard
 // scoreboard update event
 object ScoreboardElementObjective : ScoreboardElement() {
     override fun getDisplay() = buildList {
-        val objective = ScoreboardPattern.objectivePattern.firstMatches(ScoreboardData.sidebarLinesFormatted) ?: return@buildList
+        val objective = ScoreboardPattern.objectivePattern.firstMatches(ScoreboardData.getSidebarLinesTextCompat()) ?: return@buildList
 
         add(objective)
-        addNotNull(ScoreboardData.sidebarLinesFormatted.nextAfter(objective))
+        addNotNull(ScoreboardData.getSidebarLinesTextCompat().nextAfter(objective))
 
         var index = 2
-        while (ScoreboardPattern.thirdObjectiveLinePattern.matches(ScoreboardData.sidebarLinesFormatted.nextAfter(objective, index))) {
-            addNotNull(ScoreboardData.sidebarLinesFormatted.nextAfter(objective, index))
+        while (ScoreboardPattern.thirdObjectiveLinePattern.matches(ScoreboardData.getSidebarLinesTextCompat().nextAfter(objective, index))) {
+            addNotNull(listOf("", "").nextAfter(objective, index))
             index++
         }
     }

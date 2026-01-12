@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlass
+import at.hannibal2.skyhanni.utils.compat.startsWith
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.awt.Color
 import kotlin.time.Duration
@@ -254,9 +255,9 @@ object SunGeckoHelper {
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
         for (line in event.new) {
-            if (line.startsWith(" Big damage in: §d")) {
+            if (line.startsWith(" Big damage in: ")) {
                 modifiers.add(Modifiers.TIME_SLICED)
-                timeSliceDuration = TimeUtils.getDuration(line.replace(" Big damage in: §d", ""))
+                timeSliceDuration = TimeUtils.getDuration(line.string.replace(" Big damage in: ", ""))
             }
         }
     }

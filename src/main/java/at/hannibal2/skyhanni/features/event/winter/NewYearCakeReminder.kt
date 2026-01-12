@@ -22,8 +22,8 @@ object NewYearCakeReminder {
 
     private val config get() = SkyHanniMod.feature.event.winter
     private val sidebarDetectionPattern by RepoPattern.pattern(
-        "event.winter.newyearcake.reminder.sidebar",
-        "§dNew Year Event!§f (?<time>.*)",
+        "event.winter.newyearcake.reminder.sidebar.no-color",
+        "New Year Event! (?<time>.*)",
     )
     private var lastReminderSend = SimpleTimeMark.farPast()
 
@@ -69,5 +69,5 @@ object NewYearCakeReminder {
         )
     }
 
-    private fun isCakeTime() = ScoreboardData.sidebarLinesFormatted.any { sidebarDetectionPattern.matches(it) }
+    private fun isCakeTime() = ScoreboardData.sidebarLines.any { sidebarDetectionPattern.matches(it) }
 }

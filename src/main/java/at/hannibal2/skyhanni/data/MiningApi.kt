@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.level.block.Blocks
 import java.util.concurrent.ConcurrentHashMap
@@ -204,11 +205,11 @@ object MiningApi {
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (IslandTypeTags.IS_COLD.inAny()) {
-            dungeonRoomPattern.firstMatcher(event.new) {
+            dungeonRoomPattern.firstMatcher(event.new.map { it.string }) {
                 groupOrNull("roomId")?.let { mineshaftRoomId = it }
             }
 
-            coldPattern.firstMatcher(event.added) {
+            coldPattern.firstMatcher(event.added.map { it.formattedTextCompatLessResets() }) {
                 val newCold = group("cold").toInt().absoluteValue
 
                 if (newCold != cold) {
@@ -219,7 +220,7 @@ object MiningApi {
 
         if (IslandType.CRYSTAL_HOLLOWS.isCurrent()) {
             var found = false
-            heatPattern.firstMatcher(event.new) {
+            heatPattern.firstMatcher(event.new.map { it.formattedTextCompatLessResets() }) {
                 found = true
                 val newHeat = group("heat")
                 heatDisplay = group("scoreboard").takeIf { it.isNotEmpty() }

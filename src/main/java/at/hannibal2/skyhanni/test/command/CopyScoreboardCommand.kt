@@ -15,16 +15,15 @@ object CopyScoreboardCommand {
 
     private fun command(args: Array<String>) {
         val resultList = mutableListOf<String>()
-        val noColor = args.contains("-nocolor")
-        val raw = args.contains("-raw")
+        /*val noColor = args.contains("-nocolor")
+        val raw = args.contains("-raw")*/
         resultList.add("Title:")
-        resultList.add(ScoreboardData.objectiveTitle.transformIf({ noColor }) { removeColor() })
+        resultList.add(ScoreboardData.objectiveTitle)
         resultList.add("")
 
-        val lines = if (raw) ScoreboardData.sidebarLinesRaw else ScoreboardData.sidebarLinesFormatted
+        val lines = ScoreboardData.sidebarLines
         for (line in lines) {
-            val scoreboardLine = line.transformIf({ noColor }) { removeColor() }
-            resultList.add("'$scoreboardLine'")
+            resultList.add("'${line.string}'")
         }
 
         val string = resultList.joinToString("\n")

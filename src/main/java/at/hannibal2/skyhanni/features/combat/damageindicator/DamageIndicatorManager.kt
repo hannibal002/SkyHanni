@@ -677,7 +677,7 @@ object DamageIndicatorManager {
 //        entityData.healthLineHidden = position.x == -368.0 && position.z == -804.0
 
         var calcHealth = -1
-        for (line in ScoreboardData.sidebarLinesRaw) {
+        for (line in ScoreboardData.getSidebarLinesTextCompat()) {
             if (line.contains("▎")) {
                 val color: String
                 if (line.startsWith("§7")) {
@@ -692,7 +692,7 @@ object DamageIndicatorManager {
                         "Unknown magma boss health sidebar format",
                         "Damage Indicator could not find magma boss bar data",
                         "line" to line,
-                        "ScoreboardData.sidebarLinesRaw" to ScoreboardData.sidebarLinesRaw,
+                        "ScoreboardData.sidebarLinesRaw" to ScoreboardData.getSidebarLinesTextCompat(),
                         "calcHealth" to calcHealth,
                         "slimeSize" to slimeSize,
                         "entity" to entity,

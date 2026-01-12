@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 object ScoreboardElementLocation : ScoreboardElement() {
     override fun getDisplay() = listOf(
         HypixelData.skyBlockAreaWithSymbol,
-        ScoreboardPattern.plotPattern.firstMatches(ScoreboardData.sidebarLinesFormatted),
+        ScoreboardPattern.plotPattern.firstMatches(ScoreboardData.getSidebarLinesTextCompat()),
     )
 
     override val configLine = "§7⏣ §bVillage"

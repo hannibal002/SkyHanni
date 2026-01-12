@@ -21,5 +21,5 @@ object SpidersDenApi {
 
     fun inSpidersDen() = IslandType.SPIDER_DEN.isCurrent()
 
-    fun isAtTopOfNest() = inSpidersDen() && broodmotherPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
+    fun isAtTopOfNest() = inSpidersDen() && broodmotherPattern.anyMatches(ScoreboardData.getSidebarLinesTextCompat())
 }
