@@ -133,9 +133,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         }
 
         override val selectedBucketItems
-            get() =
-                if (config.includeBits.get()) super.selectedBucketItems else super.selectedBucketItems.filter { it.key != BITS }
-                    .toMutableMap()
+            get() = if (config.includeBits.get()) super.selectedBucketItems else super.selectedBucketItems.filter { it.key != BITS }
+                .toMutableMap()
 
         override fun getCoinName(bucket: PestType?, item: TrackedItem) = "§6Pest Kill Coins"
 
@@ -153,9 +152,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             return "Pest"
         }
 
-        fun getTotalPestCount(): Long =
-            if (selectedBucket != null) pestKills[selectedBucket] ?: 0L
-            else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
+        fun getTotalPestCount(): Long = if (selectedBucket != null) pestKills[selectedBucket] ?: 0L
+        else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
     }
 
     private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }
@@ -198,9 +196,9 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
-            val cropType = CropType.getByNameOrNull(rawName) ?: return
+            CropType.getByNameOrNull(rawName)
+                ?.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
 
-            cropType.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
             if (config.hideChat && config.enabled) blockedReason = "pest_drop"
 
             addItem(pest, internalName, amount, command = false)
@@ -227,9 +225,9 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
-            val cropType = CropType.getByNameOrNull(rawName) ?: return
 
-            cropType.addCollectionCounter(CropCollectionType.PEST_RNG, primitiveStack.amount.toLong() * amount.toLong())
+            CropType.getByNameOrNull(rawName)
+                ?.addCollectionCounter(CropCollectionType.PEST_RNG, primitiveStack.amount.toLong() * amount.toLong())
             // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
     }
@@ -258,6 +256,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         modify {
             it.pestKills.addOrPut(type, 1)
         }
+        PestKillEvent(type).post()
         lastPestKillTimes[type] = SimpleTimeMark.now()
     }
 
@@ -329,12 +328,20 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled || !GardenApi.inGarden()) return false
-        if (GardenApi.isCurrentlyFarming()) return false
+        if (GardenApi.isCurrentlyFarming() && config.hideWhileFarming) return false
+        if (config.onlyWhenHolding.isEmpty()) return true
         val allInactive = lastPestKillTimes.all {
             it.value.passedSince() > config.timeDisplayed.seconds
         }
-        val notHoldingTool = !PestApi.hasVacuumInHand() && !PestApi.hasSprayonatorInHand()
-        return !(allInactive && notHoldingTool)
+        return config.onlyWhenHolding.any {
+            when (it) {
+                PestProfitTrackerConfig.HeldItem.FARMING_TOOL -> GardenApi.hasFarmingToolInHand()
+                PestProfitTrackerConfig.HeldItem.VACUUM -> PestApi.hasVacuumInHand()
+                PestProfitTrackerConfig.HeldItem.SPRAYONATOR -> PestApi.hasSprayonatorInHand()
+                PestProfitTrackerConfig.HeldItem.LASSO -> PestApi.hasLassoInHand()
+                PestProfitTrackerConfig.HeldItem.TIMEOUT -> !allInactive
+            }
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
