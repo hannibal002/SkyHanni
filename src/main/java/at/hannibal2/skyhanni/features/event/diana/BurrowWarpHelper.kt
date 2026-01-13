@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -25,6 +26,8 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -37,11 +40,22 @@ object BurrowWarpHelper {
     private var lastWarpTime = SimpleTimeMark.farPast()
     private var lastWarp: WarpPoint? = null
 
+    private var cannotWarpUntil: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var warpQueued = false
+
+    fun blockWarp(duration: Duration) {
+        val until = SimpleTimeMark.now().plus(duration)
+        if (until.minus(cannotWarpUntil) > 0.milliseconds) {
+            cannotWarpUntil = until
+        }
+    }
+
     @HandleEvent(GuiRenderEvent::class, onlyOnIsland = IslandType.HUB)
     fun onRenderOverlay() {
         if (!config.burrowNearestWarp) return
         if (!DianaApi.isDoingDiana()) return
         val warp = currentWarp ?: return
+        if (GriffinBurrowHelper.mobAlive) return
 
         val text = "§bWarp to " + warp.displayName
         val keybindSuffix = if (config.keyBindWarp != GLFW.GLFW_KEY_UNKNOWN) {
@@ -57,10 +71,16 @@ object BurrowWarpHelper {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (event.keyCode != config.keyBindWarp) return
-        warp()
+        if (warpQueued) return
+
+        if (cannotWarpUntil.isInFuture()) {
+            warpQueued = true
+            DelayedRun.runDelayed(cannotWarpUntil.timeUntil(), { warp() })
+        } else warp()
     }
 
     private fun warp() {
+        warpQueued = false
         if (!DianaApi.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
         if (Minecraft.getInstance().screen != null) return

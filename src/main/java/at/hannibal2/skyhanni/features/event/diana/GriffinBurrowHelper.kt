@@ -53,6 +53,7 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.level.block.Blocks
 import java.awt.Color
+import kotlin.math.acos
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -117,7 +118,7 @@ object GriffinBurrowHelper {
     private val recentClickedBlocks = TimeLimitedSet<LorenzVec>(1.seconds)
 
     private var shouldFocusOnRareMob = false
-    private var mobAlive = false
+    var mobAlive = false
 
     data class GuessEntry(
         val guesses: List<LorenzVec>,
@@ -143,7 +144,7 @@ object GriffinBurrowHelper {
 
             var shouldMove = false
             if (!isBlockValid(this.getCurrent())) {
-                if (!inaccurate || getCurrent().distanceToPlayer() < 50) {
+                if (!inaccurate || getCurrent().distanceToPlayer() < 15) {
                     shouldMove = true
                 }
             }
@@ -188,22 +189,42 @@ object GriffinBurrowHelper {
     }
 
     fun removeGuess(guess: GuessEntry) {
-        DelayedRun.runOrNextTick {
-            allGuesses.remove(guess)
-            allGuessesTimers.remove(guess)
-        }
+        allGuesses.remove(guess)
+        allGuessesTimers.remove(guess)
     }
 
     fun addGuess(guess: GuessEntry) {
-        DelayedRun.runOrNextTick {
-            allGuesses.add(guess)
-            allGuessesTimers[guess] = SimpleTimeMark.now()
+        getGuess(guess.getCurrent())?.let {
+            val existingType = it.burrowType
+            if (existingType != BurrowType.UNKNOWN) {
+                return
+            } else removeGuess(it)
         }
+
+        allGuesses.add(guess)
+        allGuessesTimers[guess] = SimpleTimeMark.now()
     }
 
     fun getGuess(location: LorenzVec?): GuessEntry? {
         if (location == null) return null
-        return allGuesses.firstOrNull { it.contains(location) }
+        return allGuesses.toList().firstOrNull { it.contains(location) }
+    }
+
+    fun removeInaccurateIfLooking() {
+        // remove any inaccurate guesses that the player is looking at
+        val inaccurate = allGuesses.filter { it.inaccurate }.toSet()
+        val toDelete = mutableSetOf<GuessEntry>()
+        for (item in inaccurate) {
+            val player = MinecraftCompat.localPlayer
+            val eyePos = player.eyePosition.toLorenzVec()
+            val lookAngle = player.lookAngle.toLorenzVec()
+            val toTarget = item.getCurrent().minus(eyePos)
+
+            val angle = Math.toDegrees(acos(lookAngle.dotProduct(toTarget.normalize())))
+            if (angle < 2.0 && toTarget.length() < 80) toDelete.add(item)
+        }
+        allGuesses.removeAll(toDelete)
+        allGuessesTimers.keys.removeAll(toDelete)
     }
 
     @HandleEvent
@@ -277,10 +298,6 @@ object GriffinBurrowHelper {
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
 
-        if (allGuesses.flatMap { it.guesses }.any { event.guess.contains(it) }) {
-            return
-        }
-
         val newLocation = event.guess.getCurrent()
         val playerLocation = LocationUtils.playerLocation()
 
@@ -337,7 +354,9 @@ object GriffinBurrowHelper {
 
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             mobAlive = false
-            BurrowApi.lastBurrowInteracted?.let { removeGuess(it) }
+            BurrowApi.lastBurrowInteracted?.let {
+                DelayedRun.runOrNextTick { removeGuess(it) }
+            }
         }
 
         BurrowApi.lastBurrowInteracted?.let {
@@ -348,17 +367,27 @@ object GriffinBurrowHelper {
                 DelayedRun.runOrNextTick { BurrowDugEvent(it, current, max).post() }
             } else if (genericMythologicalSpawnPattern.matches(event.message)) {
                 mobAlive = true
-                removeGuess(it)
-                addGuess(GuessEntry(listOf(it), BurrowType.MOB))
+                DelayedRun.runOrNextTick {
+                    removeGuess(it)
+                    addGuess(GuessEntry(listOf(it), BurrowType.MOB))
+                }
             } else if (treasureDugPattern.matches(event.message)) {
-                removeGuess(it)
-                addGuess(GuessEntry(listOf(it), BurrowType.START, ignoreParticleCheckUntil = SimpleTimeMark.now() + 3.seconds))
+                DelayedRun.runOrNextTick {
+                    removeGuess(it)
+                    addGuess(
+                        GuessEntry(
+                            listOf(it),
+                            BurrowType.START,
+                            ignoreParticleCheckUntil = SimpleTimeMark.now() + 3.seconds,
+                        ),
+                    )
+                }
             }
         }
 
         // talking to Diana NPC
         if (event.message == "§6Poof! §r§eYou have cleared your griffin burrows!") {
-            resetAllData()
+            DelayedRun.runOrNextTick { resetAllData() }
         }
     }
 
@@ -377,13 +406,18 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onWorldChange() {
-        mobAlive = false
-        if (config.clearOnWorldChange) resetAllData()
+        DelayedRun.runOrNextTick {
+            if (mobAlive) {
+                BurrowApi.lastBurrowInteracted?.let { removeGuess(it) }
+                mobAlive = false
+            }
+            if (config.clearOnWorldChange) resetAllData()
+        }
     }
 
     @HandleEvent
     fun onProfileChange(event: ProfileJoinEvent) {
-        resetAllData()
+        DelayedRun.runOrNextTick { resetAllData() }
     }
 
     fun isBlockValid(pos: LorenzVec): Boolean {
@@ -536,10 +570,8 @@ object GriffinBurrowHelper {
         val location = event.position
         if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.GRASS_BLOCK) return
 
-        val burrows = allGuesses.flatMap { it.guesses }
-        if (burrows.contains(location)) {
-            BurrowApi.lastBurrowInteracted = location
-        }
+        val burrows = allGuesses.toList().flatMap { it.guesses }
+        if (burrows.contains(location)) BurrowApi.setBurrowInteracted(location)
     }
 
     private fun isEnabled() = DianaApi.isDoingDiana()
@@ -565,7 +597,7 @@ object GriffinBurrowHelper {
 
         val type: BurrowType = when (arg) {
             "reset" -> {
-                resetAllData()
+                DelayedRun.runOrNextTick { resetAllData() }
                 ChatUtils.chat("Manually reset all burrow data.")
                 return
             }
@@ -591,27 +623,29 @@ object GriffinBurrowHelper {
             description = "Sets a test burrow waypoint at your location"
             category = CommandCategory.DEVELOPER_TEST
             arg("type", BrigadierArguments.string()) { type ->
-                callback { setTestBurrow(getArg(type)) }
+                callback { DelayedRun.runOrNextTick { setTestBurrow(getArg(type)) } }
             }
         }
         event.registerBrigadier("shtestburrowchain") {
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                addGuess(
-                    GuessEntry(
-                        listOf(
-                            LorenzVec(-143, 69, 62),
-                            LorenzVec(-137, 69, 68),
-                            LorenzVec(-132, 69, 73),
-                            LorenzVec(-125, 69, 80),
-                            LorenzVec(-117, 69, 88),
-                            LorenzVec(-107, 69, 98),
-                            LorenzVec(-92, 69, 113),
-                            LorenzVec(-88, 69, 123),
-                            LorenzVec(-78, 69, 136),
+                DelayedRun.runOrNextTick {
+                    addGuess(
+                        GuessEntry(
+                            listOf(
+                                LorenzVec(-143, 69, 62),
+                                LorenzVec(-137, 69, 68),
+                                LorenzVec(-132, 69, 73),
+                                LorenzVec(-125, 69, 80),
+                                LorenzVec(-117, 69, 88),
+                                LorenzVec(-107, 69, 98),
+                                LorenzVec(-92, 69, 113),
+                                LorenzVec(-88, 69, 123),
+                                LorenzVec(-78, 69, 136),
+                            ),
                         ),
-                    ),
-                )
+                    )
+                }
             }
 
         }

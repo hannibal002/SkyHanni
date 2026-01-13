@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -46,17 +47,18 @@ object ArrowGuessBurrow {
         // offset is color for some reason
         val range = getArrowRange(event.offset) ?: return
 
-        points.add(event.location)
-
-        val arrow = detectArrow(points) ?: return
-        GriffinBurrowHelper.removeGuess(arrow.origin)
-        points.clear()
-        findClosestValidBlockToRayNew(arrow, range) ?: run {
-            failures++
-            if (config.warnOnFail) {
-                TitleManager.sendTitle("§eUse Spade", duration = 3.seconds)
+        DelayedRun.runOrNextTick {
+            points.add(event.location)
+            detectArrow(points)?.let {
+                GriffinBurrowHelper.removeGuess(it.origin)
+                points.clear()
+                addGuessFromRay(it, range) ?: run {
+                    failures++
+                    if (config.warnOnFail) {
+                        TitleManager.sendTitle("§eUse Spade", duration = 3.seconds)
+                    }
+                }
             }
-            return
         }
     }
 
@@ -90,7 +92,7 @@ object ArrowGuessBurrow {
         }
     }
 
-    private fun findClosestValidBlockToRayNew(ray: RaycastUtils.Ray, range: IntRange): LorenzVec? {
+    private fun addGuessFromRay(ray: RaycastUtils.Ray, range: IntRange): LorenzVec? {
         val bounds = IslandType.HUB.islandData?.boundingBox ?: return null
         if (!bounds.isInside(ray.origin)) return null // guarantees exit point is first intersect
         // you technically don't need to find the endpoint for this, but it makes it simpler so why not
