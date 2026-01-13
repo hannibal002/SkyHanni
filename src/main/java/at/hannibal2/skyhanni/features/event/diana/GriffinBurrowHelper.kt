@@ -143,11 +143,7 @@ object GriffinBurrowHelper {
             if (shouldKeepGuess()) return false
 
             var shouldMove = false
-            if (!isBlockValid(this.getCurrent())) {
-                if (!inaccurate || getCurrent().distanceToPlayer() < 15) {
-                    shouldMove = true
-                }
-            }
+            if (!isBlockValid(this.getCurrent()) && !inaccurate) shouldMove = true
 
             if (shouldBurrowParticlesBeVisible(timeInPast = 1.seconds) &&
                 !GriffinBurrowParticleFinder.containsBurrow(this.getCurrent()) && // burrow is not found
@@ -193,6 +189,11 @@ object GriffinBurrowHelper {
         allGuessesTimers.remove(guess)
     }
 
+    fun removeGuess(set: Set<GuessEntry>) {
+        allGuesses.removeAll(set)
+        allGuessesTimers.keys.removeAll(set)
+    }
+
     fun addGuess(guess: GuessEntry) {
         getGuess(guess.getCurrent())?.let {
             val existingType = it.burrowType
@@ -223,8 +224,7 @@ object GriffinBurrowHelper {
             val angle = Math.toDegrees(acos(lookAngle.dotProduct(toTarget.normalize())))
             if (angle < 2.0 && toTarget.length() < 80) toDelete.add(item)
         }
-        allGuesses.removeAll(toDelete)
-        allGuessesTimers.keys.removeAll(toDelete)
+        removeGuess(toDelete)
     }
 
     @HandleEvent
@@ -269,8 +269,7 @@ object GriffinBurrowHelper {
 
         // attempt to move all guesses
         val toDelete = allGuesses.filter { it.checkRemove() }.toSet()
-        allGuesses.removeAll(toDelete)
-        allGuessesTimers.keys.removeAll(toDelete)
+        removeGuess(toDelete)
 
         if (!toDelete.isEmpty()) update()
     }
@@ -317,6 +316,14 @@ object GriffinBurrowHelper {
 
         if (currentEntry != null) removeGuess(currentEntry)
         addGuess(GuessEntry(listOf(burrowLocation), event.type))
+
+        val toDelete = mutableSetOf<GuessEntry>()
+        allGuesses.filter { it.inaccurate }.forEach {
+            if (it.getCurrent().distanceSq(burrowLocation) < 2000) {
+                toDelete.add(it)
+            }
+        }
+        removeGuess(toDelete)
 
         update()
     }
