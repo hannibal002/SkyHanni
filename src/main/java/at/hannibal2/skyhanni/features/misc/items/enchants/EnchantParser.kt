@@ -414,7 +414,8 @@ object EnchantParser {
             val notLastEnchantOnLine = (i % maxEnchantsPerLine != maxEnchantsPerLine - 1 && orderedEnchant != lastElement)
 
             component = component.append(
-                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent))
+                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent)
+            )
 
             if (notLastEnchantOnLine) {
                 // Add comma
@@ -441,7 +442,8 @@ object EnchantParser {
             val notLastEnchantOnLine = (i % 3 != 2 && orderedEnchant != lastElement)
 
             component = component.append(
-                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent))
+                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent)
+            )
 
             if (itemIsBook() && maxEnchantsPerLine == 1) {
                 insertEnchants.add(component)

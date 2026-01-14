@@ -19,12 +19,12 @@ import at.hannibal2.skyhanni.utils.compat.withColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
-import java.util.TreeSet
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import net.minecraft.world.item.ItemStack
+import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {
 
