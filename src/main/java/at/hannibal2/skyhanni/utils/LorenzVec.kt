@@ -63,7 +63,7 @@ data class LorenzVec(
         return (dx * dx + dz * dz)
     }
 
-    fun distanceSqOnlyY(other: LorenzVec): Double{
+    fun distanceSqOnlyY(other: LorenzVec): Double {
         val dy = other.y - y
         return (dy * dy)
     }

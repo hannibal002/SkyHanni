@@ -10,15 +10,17 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("MaxLineLength")
 @SkyHanniModule
 object CocoonAPI {
-    private const val cocoonTexture = "eyJ0aW1lc3RhbXAiOjE1ODMxMjMyODkwNTMsInByb2ZpbGVJZCI6IjkxZjA0ZmU5MGYzNjQzYjU4ZjIwZTMzNzVmODZkMzllIiwicHJvZmlsZU5hbWUiOiJTdG9ybVN0b3JteSIsInNpZ25hdHVyZVJlcXVpcmVkIjp0cnVlLCJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNlYjBlZDhmYzIyNzJiM2QzZDgyMDY3NmQ1MmEzOGU3YjJlOGRhOGM2ODdhMjMzZTBkYWJhYTE2YzBlOTZkZiJ9fX0="
+    private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
     private val mobRecentDeaths = mutableMapOf<Mob, SimpleTimeMark>()
     private val recentCocoonMobs = mutableListOf<CocoonMob>()
 
@@ -33,7 +35,7 @@ object CocoonAPI {
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         val entity = event.entity as? ArmorStand ?: return
         if (recentCocoonMobs.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == event.entity.id) }) return
-        if (entity.wearingSkullTexture(cocoonTexture)) {
+        if (entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) {
             val position = entity.getLorenzVec()
             val mob = getCocoonMobName(position) ?: return
             val id = entity.id
@@ -50,13 +52,13 @@ object CocoonAPI {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
+    fun onSecondPassed() {
         mobRecentDeaths.removeIf { it.value.passedSince() > 3.seconds }
         recentCocoonMobs.removeIf { it.spawnTime.passedSince() > 10.seconds }
     }
 
     private fun getCocoonMobName(cocoonVector: LorenzVec): Mob? {
-        val mob = mobRecentDeaths.minByOrNull { it.key.baseEntity.getLorenzVec().distanceSqIgnoreY(cocoonVector)} ?: return null
+        val mob = mobRecentDeaths.minByOrNull { it.key.baseEntity.getLorenzVec().distanceSqIgnoreY(cocoonVector) } ?: return null
         if (mob.key.baseEntity.getLorenzVec().distanceSqOnlyY(cocoonVector) > 4.0) return null
         return mob.key
     }
