@@ -380,7 +380,7 @@ object GriffinBurrowHelper {
                     DelayedRun.runDelayed(
                         1.seconds,
                         {
-                            if (ArrowGuessBurrow.lastArrowTime.passedSince() > 1.seconds) {
+                            if (ArrowGuessBurrow.lastArrowTime.passedSince() > 2.seconds) {
                                 TitleManager.sendTitle("§eUse Spade")
                             }
                         }
