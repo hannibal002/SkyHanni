@@ -177,6 +177,14 @@ object BurrowWarpHelper {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(117, "event.diana.inquisitorSharing", "event.diana.rareMobsSharing") {
+            val sharing = it.asJsonObject
+            val focus = sharing.remove("focusInquisitor")
+            sharing.add("focus", focus)
+            it
+        }
+        event.move(117, "event.diana.highlightInquisitors", "event.diana.highlightRareMobs")
+
         event.transform(117, "event.diana") { element ->
             val oldWarps = element.asJsonObject.getAsJsonObject("ignoredWarps")
             val newWarps = element.asJsonObject.getAsJsonArray("ignoredWarpsList")

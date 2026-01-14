@@ -283,12 +283,12 @@ object GriffinBurrowHelper {
     private fun calculateNewTarget(): LorenzVec? {
         val locations = mutableListOf<LorenzVec>()
 
-        if (config.inquisitorSharing.enabled) {
+        if (config.rareMobsSharing.enabled) {
             for (waypoint in RareMobWaypointShare.waypoints) {
                 locations.add(waypoint.value.location)
             }
         }
-        shouldFocusOnRareMob = config.inquisitorSharing.focusInquisitor && locations.isNotEmpty()
+        shouldFocusOnRareMob = config.rareMobsSharing.focus && locations.isNotEmpty()
         if (!shouldFocusOnRareMob) {
             allGuesses.forEach { locations.add(it.getCurrent()) }
             locations.addAll(RareMobWaypointShare.waypoints.values.map { it.location })
@@ -471,7 +471,7 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
 
         val playerLocation = LocationUtils.playerLocation()
-        if (config.inquisitorSharing.enabled) {
+        if (config.rareMobsSharing.enabled) {
             renderRareMobs(event, playerLocation)
         }
 
@@ -496,7 +496,7 @@ object GriffinBurrowHelper {
             }
         }
 
-        if (RareMobWaypointShare.waypoints.isNotEmpty() && config.inquisitorSharing.focusInquisitor) {
+        if (RareMobWaypointShare.waypoints.isNotEmpty() && config.rareMobsSharing.focus) {
             return
         }
 
@@ -535,7 +535,7 @@ object GriffinBurrowHelper {
             }
             event.drawDynamicText(location.up(), "§eFrom §b${rareMob.playerDisplayName}", 1.6 * config.textScale, yOff = 9f)
 
-            if (config.inquisitorSharing.showDespawnTime) {
+            if (config.rareMobsSharing.showDespawnTime) {
                 val spawnTime = rareMob.spawnTime
                 val format = (75.seconds - spawnTime.passedSince()).format()
                 event.drawDynamicText(location.up(), "§eDespawns in §b$format", 1.6 * config.textScale, yOff = 18f)

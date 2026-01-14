@@ -39,7 +39,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object RareMobWaypointShare {
 
-    private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
+    private val config get() = SkyHanniMod.feature.event.diana.rareMobsSharing
 
     private val patternGroup = RepoPattern.group("diana.waypoints.inquisitor")
 

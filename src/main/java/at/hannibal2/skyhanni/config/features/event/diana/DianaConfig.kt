@@ -17,7 +17,6 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.glfw.GLFW
 
 class DianaConfig {
-    // TODO rename to highlightRareMobs
     @Expose
     @ConfigOption(
         name = "Highlight Rare Diana Mobs",
@@ -26,7 +25,7 @@ class DianaConfig {
     @SearchTag("inquisitor")
     @ConfigEditorBoolean
     @FeatureToggle
-    var highlightInquisitors: Boolean = true
+    var highlightRareMobs: Boolean = true
 
     @Expose
     @ConfigOption(name = "Rare Diana Mob Highlight", desc = "Color in which Rare Diana Mobs will be highlighted.")
@@ -165,12 +164,11 @@ class DianaConfig {
     @FeatureToggle
     var petWarning: Boolean = true
 
-    // TODO rename to rareMobsSharing
     @Expose
     @ConfigOption(name = "Rare Diana Mob Waypoint Sharing", desc = "")
     @SearchTag("inquisitor")
     @Accordion
-    val inquisitorSharing: InquisitorSharingConfig = InquisitorSharingConfig()
+    val rareMobsSharing: RareMobSharingConfig = RareMobSharingConfig()
 
     @Expose
     @ConfigOption(name = "Diana Profit Tracker", desc = "")
