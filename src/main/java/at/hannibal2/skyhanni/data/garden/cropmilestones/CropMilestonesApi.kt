@@ -356,7 +356,6 @@ object CropMilestonesApi {
         cropMilestoneTierCache.clear()
         amountToNextTierCache.clear()
         maxTier = null
-        GardenCropMilestoneDisplay.update()
     }
 
     private fun resetMilestones() {
