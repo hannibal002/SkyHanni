@@ -9,7 +9,8 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMil
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirst
 
 @SkyHanniModule
 object GardenCropMilestoneInventory {
@@ -48,7 +48,7 @@ object GardenCropMilestoneInventory {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun addMaxMilestoneProgress(event: ToolTipEvent) {
+    fun addMaxMilestoneProgress(event: ToolTipTextEvent) {
         if (!config.tooltipTweak.cropMilestoneTotalProgress || InventoryUtils.openInventoryName() != "Crop Milestones") return
 
         val crop = CropMilestonesApi.getCropTypeByLore(event.itemStack) ?: return
@@ -58,9 +58,8 @@ object GardenCropMilestoneInventory {
         val maxTier = CropMilestonesApi.getMaxTier()
         val maxCounter = crop.milestoneTotalCropsForTier(maxTier)
 
-        val index = event.toolTipRemovedPrefix().indexOfFirst(
-            "§7Rewards:",
-        ) ?: return
+        val index = event.toolTip.indexOfFirst { it.string == "Rewards:" }
+        if (index == -1) return
 
         val counter = crop.getMilestoneCounter()?.toDouble() ?: return
         val percentage = counter / maxCounter
