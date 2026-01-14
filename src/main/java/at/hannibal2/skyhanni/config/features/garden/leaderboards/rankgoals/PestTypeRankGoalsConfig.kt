@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.reflect.KProperty0
 
 class PestTypeRankGoalsConfig : TypeRankGoalGenericConfig<PestTypeWithAll>() {
+
     @Expose
     @ConfigOption(name = "All pests", desc = "")
     @ConfigEditorText

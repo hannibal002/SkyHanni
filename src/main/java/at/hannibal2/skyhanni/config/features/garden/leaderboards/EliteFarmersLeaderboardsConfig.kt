@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class EliteFarmersLeaderboardsConfig {
+
     @Expose
     @ConfigOption(
         name = "Leaderboards",

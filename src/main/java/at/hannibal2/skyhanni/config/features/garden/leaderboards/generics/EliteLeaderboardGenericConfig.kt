@@ -9,6 +9,7 @@ open class EliteLeaderboardGenericConfig<RankGoal : RankGoalGenericConfig, Displ
     rankGoalConfig: () -> RankGoal,
     displayConfig: () -> Display,
 ) {
+
     @Expose
     @ConfigOption(name = "Display", desc = "")
     @Accordion

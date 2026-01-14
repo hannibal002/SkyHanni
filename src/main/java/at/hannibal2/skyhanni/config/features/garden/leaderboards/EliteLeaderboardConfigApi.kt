@@ -13,6 +13,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty0
 
 object EliteLeaderboardConfigApi {
+
     private val weightConfig get() = GardenApi.config.eliteFarmersLeaderboards.farmingWeightLeaderboard
     private val cropConfig get() = GardenApi.config.eliteFarmersLeaderboards.cropCollectionLeaderboard
     private val pestConfig get() = GardenApi.config.eliteFarmersLeaderboards.pestKillsLeaderboard

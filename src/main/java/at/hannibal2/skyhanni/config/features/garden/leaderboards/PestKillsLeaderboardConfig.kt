@@ -27,6 +27,7 @@ class PestRankGoalConfig : MultiModeTypeRankGoalConfig<PestTypeWithAll, PestType
     { PestTypeRankGoalsConfig() },
     { PestTypeMonthlyRankGoalsConfig() }
 ) {
+
     @Expose
     @ConfigOption(
         name = "Rank Goal",

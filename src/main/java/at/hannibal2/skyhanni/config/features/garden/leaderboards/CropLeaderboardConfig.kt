@@ -20,6 +20,7 @@ class CropCollectionLeaderboardConfig : EliteLeaderboardGenericConfig<
 )
 
 class CropCollectionDisplayConfig : EliteDisplayGenericConfig() {
+
     @Expose
     @ConfigOption(
         name = "Overtake ETA",

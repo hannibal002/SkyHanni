@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 open class EliteDisplayGenericConfig {
+
     @Expose
     @ConfigOption(
         name = "Text",

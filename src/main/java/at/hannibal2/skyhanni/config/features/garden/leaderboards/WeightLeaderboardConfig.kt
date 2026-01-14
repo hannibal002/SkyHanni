@@ -17,6 +17,7 @@ class WeightLeaderboardConfig : EliteLeaderboardGenericConfig<
 )
 
 class WeightDisplayConfig : EliteDisplayGenericConfig() {
+
     @Expose
     @ConfigOption(
         name = "Overtake ETA",

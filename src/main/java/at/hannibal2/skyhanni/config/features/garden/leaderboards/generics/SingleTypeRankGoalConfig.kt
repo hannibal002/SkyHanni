@@ -6,6 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class SingleTypeRankGoalConfig : RankGoalGenericConfig() {
+
     @Expose
     @ConfigOption(
         name = "All-Time Rank Goal",

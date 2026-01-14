@@ -6,6 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 open class RankGoalGenericConfig {
+
     @Expose
     @ConfigOption(
         name = "Use Rank Goal",

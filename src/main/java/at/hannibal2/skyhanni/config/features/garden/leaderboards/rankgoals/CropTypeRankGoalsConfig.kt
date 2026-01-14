@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.reflect.KProperty0
 
 class CropTypeRankGoalsConfig : TypeRankGoalGenericConfig<CropType>() {
+
     @Expose
     @ConfigOption(name = "Wheat", desc = "")
     @ConfigEditorText
