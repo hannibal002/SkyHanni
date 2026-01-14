@@ -8,18 +8,19 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -50,9 +51,10 @@ object GrowthCycle {
         "Next Stage: (?<time>(?:\\d\\d?[hms] ?)+)",
     )
 
-    val cropDiagnosticInventory = InventoryDetector(inventoryPattern)
+    private val cropDiagnosticInventory = InventoryDetector(inventoryPattern)
 
     private var display: Renderable? = null
+    private var beep = true
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
@@ -64,6 +66,7 @@ object GrowthCycle {
             val timeString = group("time")
             val duration = TimeUtils.getDurationOrNull(timeString) ?: return
             storage?.nextCycle = duration.fromNow()
+            beep = false
             updateDisplay()
         }
     }
@@ -79,16 +82,27 @@ object GrowthCycle {
         val nextCycle = storage?.nextCycle ?: return
         if (nextCycle.isFarPast() || nextCycle.passedSince() > 60.minutes) {
             display = null
+            beep = false
             return
         }
         display = drawDisplay(nextCycle)
     }
 
-    private fun drawDisplay(nextCycle: SimpleTimeMark) = Renderable.vertical {
+    private fun drawDisplay(nextCycle: SimpleTimeMark): Renderable? {
         val timeUntil = nextCycle.timeUntil()
         val color = timeUntil.timerColor("§a")
-        val formatted = if (nextCycle.passedSince() > 10.minutes) "§cOVERDUE" else "$color${timeUntil.format(maxUnits = 2)}"
-        addString("§6Next Greenhouse Growth Stage: $formatted")
+        val formatted = if (nextCycle.isInFuture()) {
+            if (!beep) {
+                SoundUtils.playPlingSound()
+                ChatUtils.chat("§aGreenhouse Growth Stage is ready in the Garden")
+                beep = true
+            }
+            "§cOVERDUE"
+        } else {
+            if (config.onlyShowWhenOverdue) return null
+            "$color${timeUntil.format(maxUnits = 2)}"
+        }
+        return Renderable.text("§6Next Greenhouse Growth Stage: $formatted")
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)

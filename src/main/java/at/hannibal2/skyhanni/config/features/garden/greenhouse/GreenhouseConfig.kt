@@ -19,6 +19,14 @@ class GreenhouseConfig {
     var showDisplay: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Only Show When Ready",
+        desc = "Only show the timer when it is ready.",
+    )
+    @ConfigEditorBoolean
+    var onlyShowWhenOverdue: Boolean = false
+
+    @Expose
     @ConfigLink(owner = GreenhouseConfig::class, field = "showDisplay")
     val position: Position = Position(-350, 220)
 }
