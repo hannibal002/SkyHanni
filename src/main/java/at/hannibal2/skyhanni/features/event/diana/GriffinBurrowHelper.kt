@@ -339,12 +339,22 @@ object GriffinBurrowHelper {
 
         // finished chain
         if (event.current == event.max && config.warnOnChainComp) {
-            // finished chain
             if (config.warnOnChainComp) {
                 val playerLoc = MinecraftCompat.localPlayer.position().toLorenzVec()
                 val anyClose = allGuesses.filter { it.getCurrent().distanceSq(playerLoc) < 8100 }
                 if (anyClose.isEmpty()) TitleManager.sendTitle("§eUse Spade")
             }
+        }
+
+        if (config.guessFromArrow && config.warnOnFail && event.current != event.max) {
+            DelayedRun.runDelayed(
+                1.seconds,
+                {
+                    if (ArrowGuessBurrow.lastArrowTime.passedSince() > 2.seconds) {
+                        TitleManager.sendTitle("§eUse Spade")
+                    }
+                }
+            )
         }
 
         update()
@@ -376,16 +386,6 @@ object GriffinBurrowHelper {
                 val current = burrowDugMatcher.group("current").toInt()
                 val max = burrowDugMatcher.group("max").toInt()
                 DelayedRun.runOrNextTick { BurrowDugEvent(it, current, max).post() }
-                if (config.guessFromArrow && config.warnOnFail) {
-                    DelayedRun.runDelayed(
-                        1.seconds,
-                        {
-                            if (ArrowGuessBurrow.lastArrowTime.passedSince() > 2.seconds) {
-                                TitleManager.sendTitle("§eUse Spade")
-                            }
-                        }
-                    )
-                }
             } else if (genericMythologicalSpawnPattern.matches(event.message)) {
                 DelayedRun.runOrNextTick {
                     mobAlive = true
