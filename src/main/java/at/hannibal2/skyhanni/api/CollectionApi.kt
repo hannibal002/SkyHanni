@@ -38,12 +38,12 @@ object CollectionApi {
     )
 
     /**
-     * REGEX-TEST: §2§l§m                      §f§l§m   §r §e43,649§6/§e50k
-     * REGEX-TEST: §7Total collected: §e277,252
+     * REGEX-TEST:                           43,649/50k
+     * REGEX-TEST: Total collected: 277,252
      */
     private val counterPattern by patternGroup.pattern(
-        "counter",
-        ".* §e(?<amount>[\\d,]*)(?:§6/.*)?",
+        "counter.new",
+        ".* (?<amount>[\\d,]*)(?:/.*)?",
     )
 
     /**
@@ -57,7 +57,7 @@ object CollectionApi {
 
     /**
      * REGEX-TEST: [MVP+] oxsss: 1.9M
-     * REGEX-TEST: [VIP] oxsss§7: 0
+     * REGEX-TEST: [VIP] oxsss: 0
      * REGEX-TEST: oxsss: 0
      */
     val playerCounterPattern by patternGroup.pattern(
@@ -132,7 +132,7 @@ object CollectionApi {
                         collectionValue[internalName] = counter
                     }
                 } else {
-                    val coopIndex = lore.indexOfFirst { it.string == "Co-op Contributions:"}
+                    val coopIndex = lore.indexOfFirst { it.string == "Co-op Contributions:" }
                     if (coopIndex == -1) continue
 
                     var totalCollected = 0L

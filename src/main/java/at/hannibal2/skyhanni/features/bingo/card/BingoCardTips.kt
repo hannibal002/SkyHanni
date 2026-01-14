@@ -40,6 +40,9 @@ object BingoCardTips {
         "reward",
         "Reward",
     )
+    /**
+     * REGEX-TEST: Contribution Rewards
+     */
     private val contributionRewardsPattern by patternGroup.pattern(
         "reward.contribution",
         "Contribution Rewards.*",

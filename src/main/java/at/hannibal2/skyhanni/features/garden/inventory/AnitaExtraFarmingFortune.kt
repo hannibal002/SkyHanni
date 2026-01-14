@@ -63,7 +63,7 @@ object AnitaExtraFarmingFortune {
         }
         jacobTickets = (contributionFactor * jacobTickets).toInt()
 
-        val index = event.toolTip.indexOfFirst{ it.string == "Click to trade!" }.let { it - 1 }
+        val index = event.toolTip.indexOfFirst { it.string == "Click to trade!" }.let { it - 1 }
         if (index < 0) return
 
         val price = jacobTickets * "JACOBS_TICKET".toInternalName().getPrice()

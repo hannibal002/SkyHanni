@@ -58,7 +58,8 @@ object HideExCoopMembers {
         changedSlotNumber = index
     }
 
-    private fun List<Component>.handleTooltip(storage: MutableSet<String>, item: ItemStack): MutableList<Component> = this.toMutableList().apply {
+    private fun List<Component>.handleTooltip(storage: MutableSet<String>, item: ItemStack): MutableList<Component> =
+        this.toMutableList().apply {
         val coopIndex = indexOfFirst { it.string == "Co-op Contributions:" }
         if (coopIndex == -1) return@apply
 
