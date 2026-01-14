@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
@@ -55,6 +56,12 @@ object CocoonAPI {
     fun onSecondPassed() {
         mobRecentDeaths.removeIf { it.value.passedSince() > 3.seconds }
         recentCocoonMobs.removeIf { it.spawnTime.passedSince() > 10.seconds }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onWorldChange(event: WorldChangeEvent) {
+        mobRecentDeaths.clear()
+        recentCocoonMobs.clear()
     }
 
     private fun getCocoonMobName(cocoonVector: LorenzVec): Mob? {
