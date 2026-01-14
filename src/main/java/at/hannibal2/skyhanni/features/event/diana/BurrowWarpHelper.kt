@@ -207,6 +207,7 @@ object BurrowWarpHelper {
         MUSEUM("Museum", LorenzVec(-75, 76, 81), 2),
         WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5),
         STONKS("Stonks", LorenzVec(-52.5, 70.0, -49.5), 5),
+        TAYLOR("taylor", LorenzVec(22.0, 71.0, -42.5), 2),
         ;
 
         fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks

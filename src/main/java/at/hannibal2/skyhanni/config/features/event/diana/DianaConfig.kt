@@ -154,7 +154,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(name = "Ignored Warps", desc = "Warps listed here will not be suggested.")
     @ConfigEditorDraggableList
-    val ignoredWarpsList: MutableList<BurrowWarpHelper.WarpPoint> = mutableListOf()
+    val ignoredWarpsList: MutableList<BurrowWarpHelper.WarpPoint> = mutableListOf(BurrowWarpHelper.WarpPoint.TAYLOR)
 
     @Expose
     @ConfigOption(
