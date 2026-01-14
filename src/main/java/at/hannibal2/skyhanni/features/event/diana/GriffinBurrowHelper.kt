@@ -113,6 +113,7 @@ object GriffinBurrowHelper {
 
     private val allGuessesTimers = mutableMapOf<GuessEntry, SimpleTimeMark>() // hypixel itself removes burrows after 30m
     private val allGuesses = mutableListOf<GuessEntry>()
+    private val recentGuessesRemoved = TimeLimitedSet<LorenzVec>(5.seconds)
 
     // used because insta-breaking a block makes it invalid would be better to store valid blocks in repo
     private val recentClickedBlocks = TimeLimitedSet<LorenzVec>(1.seconds)
@@ -187,11 +188,13 @@ object GriffinBurrowHelper {
     fun removeGuess(guess: GuessEntry) {
         allGuesses.remove(guess)
         allGuessesTimers.remove(guess)
+        recentGuessesRemoved.addAll(guess.guesses)
     }
 
     fun removeGuess(set: Set<GuessEntry>) {
         allGuesses.removeAll(set)
         allGuessesTimers.keys.removeAll(set)
+        recentGuessesRemoved.addAll(set.flatMap { it.guesses })
     }
 
     fun addGuess(guess: GuessEntry) {
@@ -359,22 +362,23 @@ object GriffinBurrowHelper {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
-        if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
-            mobAlive = false
-            BurrowApi.lastBurrowInteracted?.let {
-                DelayedRun.runOrNextTick { removeGuess(it) }
-            }
-        }
-
         BurrowApi.lastBurrowInteracted?.let {
+            if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
+                DelayedRun.runOrNextTick {
+                    mobAlive = false
+                    removeGuess(it)
+                }
+            }
+            if (it.distanceToPlayer() > 20) return
+
             val burrowDugMatcher = burrowDugPattern.matcher(event.message)
             if (burrowDugMatcher.find()) {
                 val current = burrowDugMatcher.group("current").toInt()
                 val max = burrowDugMatcher.group("max").toInt()
                 DelayedRun.runOrNextTick { BurrowDugEvent(it, current, max).post() }
             } else if (genericMythologicalSpawnPattern.matches(event.message)) {
-                mobAlive = true
                 DelayedRun.runOrNextTick {
+                    mobAlive = true
                     removeGuess(it)
                     addGuess(GuessEntry(listOf(it), BurrowType.MOB))
                 }
@@ -577,7 +581,7 @@ object GriffinBurrowHelper {
         val location = event.position
         if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.GRASS_BLOCK) return
 
-        val burrows = allGuesses.toList().flatMap { it.guesses }
+        val burrows = allGuesses.toList().flatMap { it.guesses }.union(recentGuessesRemoved)
         if (burrows.contains(location)) BurrowApi.setBurrowInteracted(location)
     }
 
