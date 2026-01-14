@@ -66,11 +66,9 @@ object AnitaExtraFarmingFortune {
 
         val index = event.toolTipRemovedPrefix().indexOfFirst("§eClick to trade!")?.let { it - 1 } ?: return
 
-        // TODO: maybe only show the price when playing classic
-//        if (!LorenzUtils.noTradeMode) {
         val price = jacobTickets * "JACOBS_TICKET".toInternalName().getPrice()
         event.toolTip.add(index, "  §7Price: §6${price.shortFormat()} coins")
-//        }
+
         event.toolTip.add(index, "§aJacob Tickets §8x${jacobTickets.addSeparators()}")
         event.toolTip.add(index, "§6Gold medals: §8x$goldMedals")
         event.toolTip.add(index, "§7Cost to max out")
