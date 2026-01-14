@@ -67,16 +67,15 @@ object ReplaceRomanNumerals {
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onChatHover(event: ChatHoverEvent) {
-        if (event.getHoverEvent().action() != HoverEvent.Action.SHOW_TEXT) return
+        if (event.get().action() != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled()) return
 
-        val lore = event.getHoverEvent().value().formattedTextCompat().split("\n").toMutableList()
+        val lore = event.get().value().formattedTextCompat().split("\n").toMutableList()
         lore.replaceAll { it.tryReplace() }
 
         val chatComponentText = lore.joinToString("\n").asComponent()
-        val hoverEvent = HoverEvent.ShowText(chatComponentText)
 
-        GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
+        GuiChatHook.replaceHoverEventComponent(chatComponentText)
     }
 
     @HandleEvent

@@ -42,3 +42,4 @@ accessible method net/minecraft/client/gui/components/ChatComponent screenToChat
 accessible field net/minecraft/client/ToggleKeyMapping needsToggle Ljava/util/function/BooleanSupplier;
 accessible field net/minecraft/core/particles/ColorParticleOption color I
 mutable field net/minecraft/core/particles/ColorParticleOption color I
+accessible method net/minecraft/network/chat/MutableComponent <init> (Lnet/minecraft/network/chat/ComponentContents;Ljava/util/List;Lnet/minecraft/network/chat/Style;)V
