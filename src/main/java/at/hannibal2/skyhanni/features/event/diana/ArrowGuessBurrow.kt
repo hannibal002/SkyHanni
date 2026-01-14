@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RaycastUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import net.minecraft.core.particles.ParticleTypes
 import kotlin.math.abs
@@ -32,6 +33,7 @@ object ArrowGuessBurrow {
 
     private val points: MutableSet<LorenzVec> = mutableSetOf()
     private val recentFoundArrows = TimeLimitedSet<RaycastUtils.Ray>(18.seconds)
+    var lastArrowTime = SimpleTimeMark.farPast()
 
     private var failures = 0
 
@@ -52,6 +54,7 @@ object ArrowGuessBurrow {
             detectArrow(points)?.let {
                 GriffinBurrowHelper.removeGuess(it.origin)
                 points.clear()
+                lastArrowTime = SimpleTimeMark.now()
                 addGuessFromRay(it, range) ?: run {
                     failures++
                     if (config.warnOnFail) {

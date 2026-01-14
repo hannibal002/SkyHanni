@@ -376,6 +376,16 @@ object GriffinBurrowHelper {
                 val current = burrowDugMatcher.group("current").toInt()
                 val max = burrowDugMatcher.group("max").toInt()
                 DelayedRun.runOrNextTick { BurrowDugEvent(it, current, max).post() }
+                if (config.guessFromArrow && config.warnOnFail) {
+                    DelayedRun.runDelayed(
+                        1.seconds,
+                        {
+                            if (ArrowGuessBurrow.lastArrowTime.passedSince() > 1.seconds) {
+                                TitleManager.sendTitle("§eUse Spade")
+                            }
+                        }
+                    )
+                }
             } else if (genericMythologicalSpawnPattern.matches(event.message)) {
                 DelayedRun.runOrNextTick {
                     mobAlive = true
