@@ -233,8 +233,9 @@ object GriffinBurrowHelper {
         }
 
         // attempt to move all guesses
-        val toDelete = allGuesses.filter { it.checkRemove() }.toSet()
-        removeGuess(toDelete, "attempted to move guess but nowhere to move to")
+        val sb = StringBuilder()
+        val toDelete = allGuesses.filter { it.checkRemove(sb) }.toSet()
+        removeGuess(toDelete, sb.toString())
 
         if (!toDelete.isEmpty()) update()
     }
@@ -280,7 +281,7 @@ object GriffinBurrowHelper {
         val currentEntry = getGuess(burrowLocation)
 
         if (currentEntry != null) removeGuess(currentEntry, "type detected")
-        addGuess(GuessEntry(listOf(burrowLocation), event.type), "type detected")
+        addGuess(GuessEntry(listOf(burrowLocation), event.type, ignoreInvalidBlock = true), "type detected")
 
         val toDelete = mutableSetOf<GuessEntry>()
         allGuesses.filter { it.inaccurate }.forEach {

@@ -14,7 +14,7 @@ data class GuessEntry(
     var burrowType: BurrowType = BurrowType.UNKNOWN,
     var currentIndex: Int = 0,
     val inaccurate: Boolean = false,
-    var ignoreParticleCheckUntil: SimpleTimeMark = SimpleTimeMark.Companion.now(),
+    var ignoreParticleCheckUntil: SimpleTimeMark = SimpleTimeMark.now(),
     var ignoreInvalidBlock: Boolean = false,
 ) {
     fun getCurrent(): LorenzVec = guesses[currentIndex]
@@ -22,10 +22,11 @@ data class GuessEntry(
         return guesses.contains(vec)
     }
 
-    fun checkRemove(): Boolean {
+    fun checkRemove(reason: StringBuilder): Boolean {
         // remove guesses older than 30 minutes
         GriffinBurrowHelper.getTimer(this)?.passedSince()?.let {
             if (it > 30.minutes) {
+                reason.append("expired (30M active) ")
                 return true
             }
         }
@@ -33,12 +34,16 @@ data class GuessEntry(
         if (shouldKeepGuess()) return false
 
         var shouldMove = false
-        if (!GriffinBurrowHelper.isBlockValid(this.getCurrent()) && !inaccurate && !ignoreInvalidBlock) shouldMove = true
+        if (!GriffinBurrowHelper.isBlockValid(this.getCurrent()) && !inaccurate && !ignoreInvalidBlock) {
+            reason.append("invalid block ")
+            shouldMove = true
+        }
 
         if (GriffinBurrowHelper.shouldBurrowParticlesBeVisible(timeInPast = 1.seconds) &&
             !GriffinBurrowParticleFinder.containsBurrow(this.getCurrent()) && // burrow is not found
             this.getCurrent().distanceSq(MinecraftCompat.localPlayer.position().toLorenzVec()) < 900 // within 30 blocks
         ) {
+            reason.append("particles not found when they should have been ")
             shouldMove = true
         }
 
@@ -95,7 +100,7 @@ data class GuessEntry(
             nonDefaults.add("inaccurate=true")
         }
 
-        if (ignoreParticleCheckUntil != SimpleTimeMark.Companion.now()) {
+        if (ignoreParticleCheckUntil != SimpleTimeMark.now()) {
             nonDefaults.add("ignoreUntil=${ignoreParticleCheckUntil.timeUntil()}")
         }
 
