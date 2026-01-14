@@ -480,11 +480,11 @@ enum class HotmData(
         // but the value might be useful in the future or for debugging
 
         /**
-         * REGEX-TEST: §7Cost
+         * REGEX-TEST: Cost
          */
         val perkCostPattern by patternGroup.pattern(
-            "perk.cost",
-            "(?:§.)*§7Cost",
+            "perk.cost.new",
+            "Cost",
         )
 
         override val resetChatPattern by patternGroup.pattern(
