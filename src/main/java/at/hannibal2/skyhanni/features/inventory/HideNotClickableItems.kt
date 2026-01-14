@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
@@ -27,9 +28,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.isCoopSoulBound
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.ItemUtils.isSoulBound
+import at.hannibal2.skyhanni.utils.ItemUtils.isAnySoulbound
+import at.hannibal2.skyhanni.utils.ItemUtils.isSoulbound
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -349,7 +349,7 @@ object HideNotClickableItems {
     private fun hidePrivateIslandChest(stack: ItemStack): Boolean {
         if (!InventoryUtils.isInNormalChest()) return false
         if (!IslandType.PRIVATE_ISLAND.isCurrent()) return false
-        if (!stack.isSoulBound()) return false
+        if (!stack.isSoulbound()) return false
 
         hideReason = "This item cannot be stored into a chest!"
         return true
@@ -456,7 +456,7 @@ object HideNotClickableItems {
     private fun hidePlayerTrade(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("You    ")) return false
 
-        if (stack.isCoopSoulBound()) {
+        if ((HypixelData.noTrade && stack.isSoulbound()) || (!HypixelData.noTrade && stack.isAnySoulbound())) {
             hideReason = "Soulbound items cannot be traded!"
             return true
         }
@@ -602,7 +602,7 @@ object HideNotClickableItems {
     }
 
     private fun isNotAuctionable(stack: ItemStack): Boolean {
-        if (stack.isCoopSoulBound()) {
+        if (stack.isAnySoulbound()) {
             hideReason = "Soulbound items cannot be auctioned!"
             return true
         }
