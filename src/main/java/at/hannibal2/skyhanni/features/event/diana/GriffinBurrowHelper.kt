@@ -127,6 +127,7 @@ object GriffinBurrowHelper {
         var currentIndex: Int = 0,
         val inaccurate: Boolean = false,
         var ignoreParticleCheckUntil: SimpleTimeMark = SimpleTimeMark.now(),
+        var ignoreInvalidBlock: Boolean = false
     ) {
         fun getCurrent(): LorenzVec = guesses[currentIndex]
         fun contains(vec: LorenzVec): Boolean {
@@ -144,7 +145,7 @@ object GriffinBurrowHelper {
             if (shouldKeepGuess()) return false
 
             var shouldMove = false
-            if (!isBlockValid(this.getCurrent()) && !inaccurate) shouldMove = true
+            if (!isBlockValid(this.getCurrent()) && !inaccurate && !ignoreInvalidBlock) shouldMove = true
 
             if (shouldBurrowParticlesBeVisible(timeInPast = 1.seconds) &&
                 !GriffinBurrowParticleFinder.containsBurrow(this.getCurrent()) && // burrow is not found
@@ -390,7 +391,7 @@ object GriffinBurrowHelper {
                 DelayedRun.runOrNextTick {
                     mobAlive = true
                     removeGuess(it)
-                    addGuess(GuessEntry(listOf(it), BurrowType.MOB))
+                    addGuess(GuessEntry(listOf(it), BurrowType.MOB, ignoreInvalidBlock = true))
                 }
             } else if (treasureDugPattern.matches(event.message)) {
                 DelayedRun.runOrNextTick {
@@ -400,6 +401,7 @@ object GriffinBurrowHelper {
                             listOf(it),
                             BurrowType.START,
                             ignoreParticleCheckUntil = SimpleTimeMark.now() + 3.seconds,
+                            ignoreInvalidBlock = true,
                         ),
                     )
                 }
