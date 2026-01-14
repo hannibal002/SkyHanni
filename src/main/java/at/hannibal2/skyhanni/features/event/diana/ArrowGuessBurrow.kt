@@ -52,10 +52,12 @@ object ArrowGuessBurrow {
         DelayedRun.runOrNextTick {
             points.add(event.location)
             detectArrow(points)?.let {
-                GriffinBurrowHelper.removeGuess(it.origin)
+                GriffinBurrowHelper.addDebug("detected arrow")
+                GriffinBurrowHelper.removeGuess(it.origin, "origin of detected arrow")
                 points.clear()
                 lastArrowTime = SimpleTimeMark.now()
                 addGuessFromRay(it, range) ?: run {
+                    GriffinBurrowHelper.addDebug("arrow guess returned null")
                     failures++
                     if (config.warnOnFail) {
                         TitleManager.sendTitle("§eUse Spade", duration = 3.seconds)
@@ -136,7 +138,7 @@ object ArrowGuessBurrow {
         val withinRange = possibilities.filterValues { it.second.toInt() in range }.map { it.key }
         if (withinRange.isEmpty()) return null
 
-        BurrowGuessEvent(GriffinBurrowHelper.GuessEntry(withinRange)).post()
+        BurrowGuessEvent(GuessEntry(withinRange)).post()
 
         return withinRange[0]
     }

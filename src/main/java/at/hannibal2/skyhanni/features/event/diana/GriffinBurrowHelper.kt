@@ -53,11 +53,10 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.level.block.Blocks
 import java.awt.Color
+import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.acos
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -115,6 +114,17 @@ object GriffinBurrowHelper {
     private val allGuessesTimers = mutableMapOf<GuessEntry, SimpleTimeMark>() // hypixel itself removes burrows after 30m
     private val allGuesses = ConcurrentLinkedQueue<GuessEntry>()
     private val recentGuessesRemoved = TimeLimitedSet<LorenzVec>(5.seconds)
+    fun getTimer(guessEntry: GuessEntry): SimpleTimeMark? {
+        return allGuessesTimers[guessEntry]
+    }
+
+    private val recentActionsDebug = ConcurrentLinkedDeque<String>()
+    fun addDebug(action: String) {
+        recentActionsDebug.addFirst(action)
+        if (recentActionsDebug.size > 50) {
+            recentActionsDebug.pollLast()
+        }
+    }
 
     // used because insta-breaking a block makes it invalid would be better to store valid blocks in repo
     private val recentClickedBlocks = TimeLimitedSet<LorenzVec>(1.seconds)
@@ -122,93 +132,39 @@ object GriffinBurrowHelper {
     private var shouldFocusOnRareMob = false
     var mobAlive = false
 
-    data class GuessEntry(
-        val guesses: List<LorenzVec>,
-        var burrowType: BurrowType = BurrowType.UNKNOWN,
-        var currentIndex: Int = 0,
-        val inaccurate: Boolean = false,
-        var ignoreParticleCheckUntil: SimpleTimeMark = SimpleTimeMark.now(),
-        var ignoreInvalidBlock: Boolean = false
-    ) {
-        fun getCurrent(): LorenzVec = guesses[currentIndex]
-        fun contains(vec: LorenzVec): Boolean {
-            return guesses.contains(vec)
-        }
-
-        fun checkRemove(): Boolean {
-            // remove guesses older than 30 minutes
-            allGuessesTimers[this]?.passedSince()?.let {
-                if (it > 30.minutes) {
-                    return true
-                }
-            }
-
-            if (shouldKeepGuess()) return false
-
-            var shouldMove = false
-            if (!isBlockValid(this.getCurrent()) && !inaccurate && !ignoreInvalidBlock) shouldMove = true
-
-            if (shouldBurrowParticlesBeVisible(timeInPast = 1.seconds) &&
-                !GriffinBurrowParticleFinder.containsBurrow(this.getCurrent()) && // burrow is not found
-                this.getCurrent().distanceSq(MinecraftCompat.localPlayer.position().toLorenzVec()) < 900 // within 30 blocks
-            ) {
-                shouldMove = true
-            }
-
-            if (shouldMove) {
-                val nextIndex = currentIndex + 1
-                if (nextIndex in guesses.indices) {
-                    currentIndex = nextIndex
-                    update()
-                    BurrowGuessEvent(this).post()
-                    return false
-                } else return true // remove if it should have moved but cant
-            }
-            return false
-        }
-
-        private fun shouldKeepGuess(): Boolean {
-
-            // burrows that are known from the previous dug even if particles don't update
-            // or inaccurate precise guesses
-            if (ignoreParticleCheckUntil.passedSince() < 0.milliseconds) return true
-
-            // don't attempt to move mob burrows if a mob is alive
-            if (mobAlive && this.burrowType == BurrowType.MOB) return true
-
-            return false
-        }
-    }
-
-    fun removeGuess(location: LorenzVec) {
+    fun removeGuess(location: LorenzVec, reason: String) {
         val toRemove = allGuesses.filter { it.contains(location) }
         for (item in toRemove) {
-            removeGuess(item)
+            removeGuess(item, reason)
         }
     }
 
-    fun removeGuess(guess: GuessEntry) {
+    fun removeGuess(guess: GuessEntry, reason: String) {
+        if (allGuesses.contains(guess)) addDebug("removed guess: $guess because $reason")
         allGuesses.remove(guess)
         allGuessesTimers.remove(guess)
         recentGuessesRemoved.addAll(guess.guesses)
     }
 
-    fun removeGuess(set: Set<GuessEntry>) {
+    fun removeGuess(set: Set<GuessEntry>, reason: String) {
+        if (allGuesses.any { set.contains(it) }) addDebug("removed guesses: $set because $reason")
         allGuesses.removeAll(set)
         allGuessesTimers.keys.removeAll(set)
         recentGuessesRemoved.addAll(set.flatMap { it.guesses })
     }
 
-    fun addGuess(guess: GuessEntry) {
+    fun addGuess(guess: GuessEntry, reason: String) {
         getGuess(guess.getCurrent())?.let {
             val existingType = it.burrowType
             if (existingType != BurrowType.UNKNOWN) {
+                addDebug("didnt add guess because already exists with type: $guess")
                 return
-            } else removeGuess(it)
+            } else removeGuess(it, "added guess replacing unknown type")
         }
 
         allGuesses.add(guess)
         allGuessesTimers[guess] = SimpleTimeMark.now()
+        addDebug("added guess: $guess because $reason")
     }
 
     fun getGuess(location: LorenzVec?): GuessEntry? {
@@ -229,7 +185,7 @@ object GriffinBurrowHelper {
             val angle = Math.toDegrees(acos(lookAngle.dotProduct(toTarget.normalize())))
             if (angle < 2.0 && toTarget.length() < 80) toDelete.add(item)
         }
-        removeGuess(toDelete)
+        removeGuess(toDelete, "clicked inaccurate guess")
     }
 
     @HandleEvent
@@ -246,6 +202,10 @@ object GriffinBurrowHelper {
             add("allGuesses: ${allGuesses.size}")
             for (guess in allGuesses) {
                 add("  ${guess.getCurrent().printWithAccuracy(1)} (size=${guess.guesses.size}) (type=${guess.burrowType})")
+            }
+            add("recent actions:")
+            for (string in recentActionsDebug) {
+                add("  $string")
             }
         }
     }
@@ -274,7 +234,7 @@ object GriffinBurrowHelper {
 
         // attempt to move all guesses
         val toDelete = allGuesses.filter { it.checkRemove() }.toSet()
-        removeGuess(toDelete)
+        removeGuess(toDelete, "attempted to move guess but nowhere to move to")
 
         if (!toDelete.isEmpty()) update()
     }
@@ -308,7 +268,7 @@ object GriffinBurrowHelper {
         if (newLocation.distance(playerLocation) < 6) return
         if (!IslandType.HUB.isInBounds(newLocation)) return
 
-        addGuess(event.guess)
+        addGuess(event.guess, "burrow guess event")
 
         update()
     }
@@ -319,8 +279,8 @@ object GriffinBurrowHelper {
         val burrowLocation = event.burrowLocation
         val currentEntry = getGuess(burrowLocation)
 
-        if (currentEntry != null) removeGuess(currentEntry)
-        addGuess(GuessEntry(listOf(burrowLocation), event.type))
+        if (currentEntry != null) removeGuess(currentEntry, "type detected")
+        addGuess(GuessEntry(listOf(burrowLocation), event.type), "type detected")
 
         val toDelete = mutableSetOf<GuessEntry>()
         allGuesses.filter { it.inaccurate }.forEach {
@@ -328,7 +288,7 @@ object GriffinBurrowHelper {
                 toDelete.add(it)
             }
         }
-        removeGuess(toDelete)
+        removeGuess(toDelete, "inaccurate burrow near detected burrow")
 
         update()
     }
@@ -337,7 +297,7 @@ object GriffinBurrowHelper {
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
         mobAlive = false
-        removeGuess(location)
+        removeGuess(location, "burrow dug event")
 
         // finished chain
         if (event.current == event.max && config.warnOnChainComp) {
@@ -351,12 +311,11 @@ object GriffinBurrowHelper {
         if (config.guessFromArrow && config.warnOnFail && event.current != event.max) {
             DelayedRun.runDelayed(
                 1.seconds,
-                {
-                    if (ArrowGuessBurrow.lastArrowTime.passedSince() > 2.seconds) {
-                        TitleManager.sendTitle("§eUse Spade")
-                    }
+            ) {
+                if (ArrowGuessBurrow.lastArrowTime.passedSince() > 2.seconds) {
+                    TitleManager.sendTitle("§eUse Spade")
                 }
-            )
+            }
         }
 
         update()
@@ -378,7 +337,7 @@ object GriffinBurrowHelper {
             if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
                 DelayedRun.runOrNextTick {
                     mobAlive = false
-                    removeGuess(it)
+                    removeGuess(it, "you died L bozo")
                 }
             }
             if (it.distanceToPlayer() > 20) return
@@ -391,12 +350,12 @@ object GriffinBurrowHelper {
             } else if (genericMythologicalSpawnPattern.matches(event.message)) {
                 DelayedRun.runOrNextTick {
                     mobAlive = true
-                    removeGuess(it)
-                    addGuess(GuessEntry(listOf(it), BurrowType.MOB, ignoreInvalidBlock = true))
+                    removeGuess(it, "chat mob spawn replacing old")
+                    addGuess(GuessEntry(listOf(it), BurrowType.MOB, ignoreInvalidBlock = true), "chat mob spawn")
                 }
             } else if (treasureDugPattern.matches(event.message)) {
                 DelayedRun.runOrNextTick {
-                    removeGuess(it)
+                    removeGuess(it, "chat treasure dug replacing old")
                     addGuess(
                         GuessEntry(
                             listOf(it),
@@ -404,6 +363,7 @@ object GriffinBurrowHelper {
                             ignoreParticleCheckUntil = SimpleTimeMark.now() + 3.seconds,
                             ignoreInvalidBlock = true,
                         ),
+                        "chat treasure dug",
                     )
                 }
             }
@@ -416,6 +376,7 @@ object GriffinBurrowHelper {
     }
 
     private fun resetAllData() {
+        addDebug("reset all data")
         allGuesses.clear()
         allGuessesTimers.clear()
         targetLocation = null
@@ -432,7 +393,7 @@ object GriffinBurrowHelper {
     fun onWorldChange() {
         DelayedRun.runOrNextTick {
             if (mobAlive) {
-                BurrowApi.lastBurrowInteracted?.let { removeGuess(it) }
+                BurrowApi.lastBurrowInteracted?.let { removeGuess(it, "changed worlds while mob was alive") }
                 mobAlive = false
             }
             if (config.clearOnWorldChange) resetAllData()
@@ -637,7 +598,7 @@ object GriffinBurrowHelper {
 
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val location = LocationUtils.playerLocation().roundLocation()
-        allGuesses.add(GuessEntry(listOf(location), burrowType = type))
+        addGuess(GuessEntry(listOf(location), burrowType = type), "added test burrow from command")
         update()
     }
 
@@ -668,6 +629,7 @@ object GriffinBurrowHelper {
                                 LorenzVec(-78, 69, 136),
                             ),
                         ),
+                        "added test burrow chain from command",
                     )
                 }
             }

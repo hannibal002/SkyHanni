@@ -25,7 +25,7 @@ object PreciseGuessBurrow {
 
     private val bezierFitter = ParticlePathBezierFitter(3)
 
-    private var lastGuess: GriffinBurrowHelper.GuessEntry? = null
+    private var lastGuess: GuessEntry? = null
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onIslandChange() {
@@ -60,14 +60,14 @@ object PreciseGuessBurrow {
 
         val guessPosition = guessBurrowLocation() ?: return
 
-        val guessEntry = GriffinBurrowHelper.GuessEntry(
+        val guessEntry = GuessEntry(
             listOf(guessPosition.down(0.5).roundToBlock()),
             inaccurate = true,
         )
 
         if (lastGuess?.getCurrent() != guessEntry.getCurrent()) {
             DelayedRun.runOrNextTick {
-                lastGuess?.let { GriffinBurrowHelper.removeGuess(it) }
+                lastGuess?.let { GriffinBurrowHelper.removeGuess(it, "moving spade guess") }
                 BurrowGuessEvent(guessEntry).post()
                 lastGuess = guessEntry
             }

@@ -10,6 +10,9 @@ object BurrowApi {
     var lastBurrowInteracted: LorenzVec? = null
 
     fun setBurrowInteracted(interacted: LorenzVec?) {
+        if (interacted != null) {
+            GriffinBurrowHelper.addDebug("set last interacted burrow to [${interacted.x}, ${interacted.y}, ${interacted.z}]")
+        } else GriffinBurrowHelper.addDebug("set last interacted burrow to null")
         lastBurrowInteracted = interacted
         BurrowWarpHelper.blockWarp(400.milliseconds)
     }

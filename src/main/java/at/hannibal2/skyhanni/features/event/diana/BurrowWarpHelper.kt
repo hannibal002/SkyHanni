@@ -74,6 +74,7 @@ object BurrowWarpHelper {
         if (warpQueued) return
 
         if (cannotWarpUntil.isInFuture()) {
+            GriffinBurrowHelper.addDebug("delaying warp for ${cannotWarpUntil.timeUntil()}")
             warpQueued = true
             DelayedRun.runDelayed(cannotWarpUntil.timeUntil(), { warp() })
         } else warp()
@@ -87,6 +88,7 @@ object BurrowWarpHelper {
         val warp = currentWarp ?: return
         if (lastWarpTime.passedSince() < 1.seconds) return
 
+        GriffinBurrowHelper.addDebug("warping to $warp")
         lastWarpTime = SimpleTimeMark.now()
         HypixelCommands.warp(warp.name)
         lastWarp = currentWarp
