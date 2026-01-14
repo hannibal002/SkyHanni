@@ -60,42 +60,43 @@ object HideExCoopMembers {
 
     private fun List<Component>.handleTooltip(storage: MutableSet<String>, item: ItemStack): MutableList<Component> =
         this.toMutableList().apply {
-        val coopIndex = indexOfFirst { it.string == "Co-op Contributions:" }
-        if (coopIndex == -1) return@apply
+            val coopIndex = indexOfFirst { it.string == "Co-op Contributions:" }
+            if (coopIndex == -1) return@apply
 
-        val internalName = item.getInternalName().getCorrectedName()
-        val totalCollected = CollectionApi.getCollectionCounter(internalName) ?: 0L
+            val internalName = item.getInternalName().getCorrectedName()
+            val totalCollected = CollectionApi.getCollectionCounter(internalName) ?: 0L
 
-        var remainingPlayers = 0
-        val linesToRemove = mutableListOf<Int>()
+            var remainingPlayers = 0
+            val linesToRemove = mutableListOf<Int>()
 
-        drop(coopIndex).forEachIndexed { index, line ->
-            if (line.string.isBlank()) return@forEachIndexed
+            drop(coopIndex).forEachIndexed { index, line ->
+                if (line.string.isBlank()) return@forEachIndexed
 
-            CollectionApi.playerCounterPattern.matchMatcher(line) {
-                if (group("name") in storage) {
-                    linesToRemove.add(coopIndex + index)
-                } else {
-                    remainingPlayers++
+                CollectionApi.playerCounterPattern.matchMatcher(line) {
+                    if (group("name") in storage) {
+                        linesToRemove.add(coopIndex + index)
+                    } else {
+                        remainingPlayers++
+                    }
+                }
+            }
+
+            linesToRemove.sortedDescending().forEach { removeAt(it) }
+
+            if (remainingPlayers >= 2) return this
+
+            val notMaxed = CollectionApi.collectionNotMaxedPattern.anyMatches(this.map { it.string })
+
+            if (!notMaxed) {
+                if (coopIndex + 1 < size) this[coopIndex + 1] =
+                    "§7Total collected: §e${totalCollected.addSeparators()}".asComponent()
+                if (coopIndex < size) this[coopIndex] = "§a§lCOLLECTION MAXED OUT!".asComponent()
+            } else {
+                for (i in (coopIndex + 1) downTo (coopIndex - 1)) {
+                    if (i < size) removeAt(i)
                 }
             }
         }
-
-        linesToRemove.sortedDescending().forEach { removeAt(it) }
-
-        if (remainingPlayers >= 2) return this
-
-        val notMaxed = CollectionApi.collectionNotMaxedPattern.anyMatches(this.map { it.string })
-
-        if (!notMaxed) {
-            if (coopIndex + 1 < size) this[coopIndex + 1] = "§7Total collected: §e${totalCollected.addSeparators()}".asComponent()
-            if (coopIndex < size) this[coopIndex] = "§a§lCOLLECTION MAXED OUT!".asComponent()
-        } else {
-            for (i in (coopIndex + 1) downTo (coopIndex - 1)) {
-                if (i < size) removeAt(i)
-            }
-        }
-    }
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
