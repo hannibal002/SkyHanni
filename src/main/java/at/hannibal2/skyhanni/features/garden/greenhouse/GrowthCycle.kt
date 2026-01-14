@@ -91,7 +91,7 @@ object GrowthCycle {
     private fun drawDisplay(nextCycle: SimpleTimeMark): Renderable? {
         val timeUntil = nextCycle.timeUntil()
         val color = timeUntil.timerColor("§a")
-        val formatted = if (nextCycle.isInFuture()) {
+        val formatted = if (nextCycle.isInPast()) {
             if (!beep) {
                 SoundUtils.playPlingSound()
                 ChatUtils.chat("§aGreenhouse Growth Stage is ready in the Garden")
