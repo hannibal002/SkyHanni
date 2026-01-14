@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.isAnySoulbound
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -114,6 +115,7 @@ object ChestValue {
         val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
         addString("§7$featureName: §o(Showing $amountShowing of ${sortedList.size} items)")
         for ((index, amount, stack, total, tips) in sortedList) {
+            if (config.ignoreSoulbound && stack.isAnySoulbound()) continue
             totalPrice += total
             if (rendered >= config.itemToShow) continue
             if (total < config.hideBelow) continue
