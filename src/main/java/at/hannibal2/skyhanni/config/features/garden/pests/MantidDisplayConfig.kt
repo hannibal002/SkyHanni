@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MantidDisplayConfig {
+
     @Expose
     @FeatureToggle
     @ConfigOption(name = "Enabled", desc = "Enables the display")

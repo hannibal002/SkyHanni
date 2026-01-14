@@ -26,6 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MantidKillDisplay {
+
     private const val MAX_BONUS = 20
     private val EXPIRE_TIME = 10.minutes
     private val config get() = PestApi.config.mantidDisplay
@@ -57,7 +58,7 @@ object MantidKillDisplay {
         updateDisplay()
     }
 
-    @HandleEvent(GuiRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay() {
         if (!shouldShow()) return
         config.pos.renderRenderables(displayCache, posLabel = "Pest Spawn Timer")
