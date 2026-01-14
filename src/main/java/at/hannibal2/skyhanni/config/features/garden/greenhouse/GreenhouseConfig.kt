@@ -28,5 +28,5 @@ class GreenhouseConfig {
 
     @Expose
     @ConfigLink(owner = GreenhouseConfig::class, field = "showDisplay")
-    val position: Position = Position(-350, 220)
+    val position: Position = Position(180, 40)
 }
