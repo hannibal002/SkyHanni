@@ -53,6 +53,7 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.level.block.Blocks
 import java.awt.Color
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.acos
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -112,7 +113,7 @@ object GriffinBurrowHelper {
     var targetLocation: LorenzVec? = null
 
     private val allGuessesTimers = mutableMapOf<GuessEntry, SimpleTimeMark>() // hypixel itself removes burrows after 30m
-    private val allGuesses = mutableListOf<GuessEntry>()
+    private val allGuesses = ConcurrentLinkedQueue<GuessEntry>()
     private val recentGuessesRemoved = TimeLimitedSet<LorenzVec>(5.seconds)
 
     // used because insta-breaking a block makes it invalid would be better to store valid blocks in repo
