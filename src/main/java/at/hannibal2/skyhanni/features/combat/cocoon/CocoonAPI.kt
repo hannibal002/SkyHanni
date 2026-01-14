@@ -23,7 +23,7 @@ object CocoonAPI {
     private val recentCocoonMobs = mutableListOf<CocoonMob>()
 
     data class CocoonMob(
-        val mobName: String,
+        val mob: Mob,
         val coordinates: LorenzVec,
         val spawnTime: SimpleTimeMark,
         val cocoonID: Int,
@@ -35,10 +35,10 @@ object CocoonAPI {
         if (recentCocoonMobs.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == event.entity.id) }) return
         if (entity.wearingSkullTexture(cocoonTexture)) {
             val position = entity.getLorenzVec()
-            val name = getCocoonMobName(position) ?: return
+            val mob = getCocoonMobName(position) ?: return
             val id = entity.id
-            ChatUtils.debug("Cocoon mob detected $name, ${position.toCleanString()}")
-            val cocoon = CocoonMob(name, position, SimpleTimeMark.now(), id)
+            ChatUtils.debug("Cocoon mob detected ${mob.name}, ${position.toCleanString()}")
+            val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id)
             recentCocoonMobs.add(cocoon)
             CocoonSpawnEvent(cocoon).post()
         }
@@ -55,10 +55,10 @@ object CocoonAPI {
         recentCocoonMobs.removeIf { it.spawnTime.passedSince() > 10.seconds }
     }
 
-    private fun getCocoonMobName(cocoonVector: LorenzVec): String? {
+    private fun getCocoonMobName(cocoonVector: LorenzVec): Mob? {
         val mob = mobRecentDeaths.minByOrNull { it.key.baseEntity.getLorenzVec().distanceSqIgnoreY(cocoonVector)} ?: return null
         if (mob.key.baseEntity.getLorenzVec().distanceSqOnlyY(cocoonVector) > 4.0) return null
-        return mob.key.name
+        return mob.key
     }
 
 }
