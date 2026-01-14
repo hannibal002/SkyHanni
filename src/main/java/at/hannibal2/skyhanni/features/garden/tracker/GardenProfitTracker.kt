@@ -464,10 +464,10 @@ object GardenProfitTracker : SkyHanniTimedBucketedItemTracker<GardenTrackerTypes
 
     @HandleEvent
     fun onCommand(event: CommandRegistrationEvent) {
-        event.register("shimportgardenprofits") {
+        event.registerBrigadier("shimportgardenprofits") {
             description = "Imports profits from other trackers to the garden profit tracker. May cause issues."
             category = CommandCategory.DEVELOPER_TEST
-            callback { importData() }
+            simpleCallback { importData() }
         }
     }
 }
