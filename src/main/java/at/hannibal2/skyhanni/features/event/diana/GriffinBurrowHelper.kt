@@ -591,7 +591,7 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
 
         val location = event.position
-        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.GRASS_BLOCK) return
+        if (event.itemInHand?.isDianaSpade != true) return
 
         val burrows = allGuesses.toList().flatMap { it.guesses }.union(recentGuessesRemoved)
         if (burrows.contains(location)) BurrowApi.setBurrowInteracted(location)
