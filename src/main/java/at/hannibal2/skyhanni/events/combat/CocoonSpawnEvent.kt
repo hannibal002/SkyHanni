@@ -1,0 +1,6 @@
+package at.hannibal2.skyhanni.events.combat
+
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.features.combat.cocoon.CocoonAPI.CocoonMob
+
+class CocoonSpawnEvent(cocoonMob: CocoonMob): SkyHanniEvent()
