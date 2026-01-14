@@ -59,7 +59,7 @@ object SkillTooltip {
                             (
                                 "$progressBar §e${skillInfo.overflowCurrentXp.addSeparators()}§6/" +
                                     "§e${skillInfo.overflowCurrentXpMax.addSeparators()}"
-                                    ).asComponent()
+                                ).asComponent()
                         )
                         iterator.add(Component.empty())
                     }
