@@ -525,7 +525,7 @@ object ComposterOverlay {
                 onClick(internalName)
                 if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
                     lastAttemptTime = SimpleTimeMark.now()
-                    retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
+                    retrieveMaterials(internalName, internalName.repoItemName.removeColor(), itemsNeeded)
                 }
             },
             tips = tips,
