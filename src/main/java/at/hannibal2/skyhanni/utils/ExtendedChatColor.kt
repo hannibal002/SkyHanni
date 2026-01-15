@@ -39,7 +39,7 @@ class ExtendedChatColor(
                     val comp = componentBuilder {
                         for (i in (0 until 100)) {
                             val color = Color.HSBtoRGB(i / 100F, 1f, 1f)
-                            // its funny this doesn't even use extended chat color yet...
+                            // its funny this doesn't even use extended chat color anymore...
                             append(" ") {
                                 withColor(color)
                                 strikethrough = true
