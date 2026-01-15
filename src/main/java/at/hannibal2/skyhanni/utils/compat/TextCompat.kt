@@ -123,6 +123,10 @@ fun MutableComponent.withColor(formatting: ChatFormatting): Component {
     return this.withStyle { it.withColor(formatting) }
 }
 
+fun MutableComponent.withColor(formatting: TextColor): Component {
+    return this.withStyle { it.withColor(formatting) }
+}
+
 fun createResourceLocation(domain: String, path: String): ResourceLocation {
     val textureLocation = ResourceLocation.fromNamespaceAndPath(domain, path)
     return textureLocation
@@ -163,6 +167,36 @@ var Component.url: String?
     }?.let { (it as ClickEvent.OpenUrl).uri.toString() }
     set(value) {
         (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
+    }
+
+var Component.underlined: Boolean
+    get() = this.style.isUnderlined
+    set(value) {
+        (this as MutableComponent).withStyle { it.withUnderlined(value) }
+    }
+
+var Component.bold: Boolean
+    get() = this.style.isBold
+    set(value) {
+        (this as MutableComponent).withStyle { it.withBold(value) }
+    }
+
+var Component.strikethrough: Boolean
+    get() = this.style.isStrikethrough
+    set(value) {
+        (this as MutableComponent).withStyle { it.withStrikethrough(value) }
+    }
+
+var Component.italic: Boolean
+    get() = this.style.isItalic
+    set(value) {
+        (this as MutableComponent).withStyle { it.withItalic(value) }
+    }
+
+var Component.obfuscated: Boolean
+    get() = this.style.isObfuscated
+    set(value) {
+        (this as MutableComponent).withStyle { it.withObfuscated(value) }
     }
 
 fun Style.setClickRunCommand(text: String): Style {
@@ -263,7 +297,7 @@ fun Component.append(newText: Component): Component {
 
 val formattingPattern = Regex("§.(?:§.)?")
 
-fun Component.append(newText: String): Component {
+fun Component.append(newText: String): MutableComponent {
     val mutableText = this as MutableComponent
     if (mutableText.string.matches(formattingPattern)) {
         return Component.literal(mutableText.string + newText)
@@ -294,4 +328,16 @@ fun Component.replace(oldValue: String, newValue: String): Component {
 
 operator fun Component.plus(string: String): Component {
     return this.append(string)
+}
+
+fun componentBuilder(init: MutableComponent.() -> Unit): Component {
+    return Component.empty().also(init)
+}
+
+fun Component.append(string: String = "", init: MutableComponent.() -> Unit): Component {
+    return this.append(Component.literal(string).also(init))
+}
+
+fun Component.append(comp: Component, init: MutableComponent.() -> Unit): Component {
+    return this.append((comp as MutableComponent).also(init))
 }
