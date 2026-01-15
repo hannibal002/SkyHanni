@@ -211,12 +211,6 @@ fun Style.setHoverShowText(text: Component): Style {
     return this.withHoverEvent(HoverEvent.ShowText(text))
 }
 
-fun Component.appendString(text: String): Component =
-    (this as MutableComponent).append(text)
-
-fun Component.appendComponent(component: Component): Component =
-    (this as MutableComponent).append(component)
-
 fun addChatMessageToChat(message: Component) {
     Minecraft.getInstance().player?.displayClientMessage(message, false)
 }
@@ -305,6 +299,14 @@ fun Component.append(newText: String): MutableComponent {
     return mutableText.append(newText)
 }
 
+fun Component.append(string: String = "", init: MutableComponent.() -> Unit): Component {
+    return this.append(Component.literal(string).also(init))
+}
+
+fun Component.append(comp: Component, init: MutableComponent.() -> Unit): Component {
+    return this.append((comp as MutableComponent).also(init))
+}
+
 fun List<Any>.mapToComponents(): List<Component> {
     val newList = mutableListOf<Component>()
     for (entry in this) {
@@ -332,12 +334,4 @@ operator fun Component.plus(string: String): Component {
 
 fun componentBuilder(init: MutableComponent.() -> Unit): Component {
     return Component.empty().also(init)
-}
-
-fun Component.append(string: String = "", init: MutableComponent.() -> Unit): Component {
-    return this.append(Component.literal(string).also(init))
-}
-
-fun Component.append(comp: Component, init: MutableComponent.() -> Unit): Component {
-    return this.append((comp as MutableComponent).also(init))
 }

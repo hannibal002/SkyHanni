@@ -33,7 +33,7 @@ object TextHelper {
         components.forEachIndexed { index, component ->
             when (component) {
                 is Component -> result.append(component)
-                is String -> result.appendString(component)
+                is String -> result.append(component)
                 is List<*> -> result.append(join(*component.toTypedArray(), separator = separator))
                 null -> return@forEachIndexed
                 else -> error("Unsupported type: ${component::class.simpleName}")
