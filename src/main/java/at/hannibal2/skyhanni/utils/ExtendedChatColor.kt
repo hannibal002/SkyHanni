@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
@@ -80,8 +81,7 @@ class ExtendedChatColor(
                                     underlined = true
                                 }
                             }
-                            append {
-                                withColor(16737792)
+                            appendWithColor("", 16737792) {
                                 append(" And overall it makes working with ")
                                 append("Components") {
                                     bold = true
