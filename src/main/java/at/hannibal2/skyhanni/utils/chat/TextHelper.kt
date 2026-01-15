@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
 import at.hannibal2.skyhanni.utils.compat.append
@@ -177,11 +178,15 @@ object TextHelper {
         multiline(text).send(chatLineId)
     }
 
+    fun createGradientText(start: LorenzColor, end: LorenzColor, string: String): Component {
+        return createGradientText(start.toColor(), end.toColor(), string)
+    }
+
     fun createGradientText(start: Color, end: Color, string: String): Component {
-        val length = string.length.toDouble()
+        val length = string.length
         val text = componentBuilder {
             for ((index, char) in string.withIndex()) {
-                val color = ColorUtils.blendRGB(start, end, index / length).rgb
+                val color = ColorUtils.blendRGB(start, end, index, length).rgb
                 append(char.toString()) {
                     withColor(color)
                 }
