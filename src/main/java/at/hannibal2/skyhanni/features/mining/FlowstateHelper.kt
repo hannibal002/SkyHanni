@@ -17,9 +17,10 @@ import at.hannibal2.skyhanni.features.mining.FlowstateHelper.personalBest
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.streakEndTimer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ExtendedChatColor
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -27,13 +28,14 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
+import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -159,15 +161,25 @@ object FlowstateHelper {
         attemptClearDisplay()
     }
 
-    fun getTimerColor(timeRemaining: Duration): Component {
-        if (!config.colorfulTimer) return Component.literal("§b")
+    fun getTimerColor(timeRemaining: Duration): Int {
+        if (!config.colorfulTimer) return LorenzColor.AQUA.toColor().rgb
         return when (timeRemaining) {
-            in 0.seconds..2.seconds -> Component.literal("§c")
-            in 2.seconds..4.seconds -> ExtendedChatColor("#ec7b36").asText()
-            in 4.seconds..6.seconds -> Component.literal("§e")
-            in 6.seconds..8.seconds -> Component.literal("§a")
-            in 8.seconds..10.seconds -> Component.literal("§2")
-            else -> Component.literal("§6")
+            in 0.seconds..2.seconds -> {
+                ColorUtils.blendRGB(LorenzColor.RED.toColor(), Color(Integer.decode("#ec7b36")), timeRemaining.inPartialSeconds / 2.0).rgb
+            }
+            in 2.seconds..4.seconds -> {
+                ColorUtils.blendRGB(Color(Integer.decode("#ec7b36")), LorenzColor.YELLOW.toColor(), (timeRemaining.inPartialSeconds - 2) / 2.0).rgb
+            }
+            in 4.seconds..6.seconds -> {
+                ColorUtils.blendRGB(LorenzColor.YELLOW, LorenzColor.GREEN, (timeRemaining.inPartialSeconds - 4) / 2.0).rgb
+            }
+            in 6.seconds..8.seconds -> {
+                ColorUtils.blendRGB(LorenzColor.GREEN, LorenzColor.DARK_GREEN, (timeRemaining.inPartialSeconds - 6) / 2.0).rgb
+            }
+            in 8.seconds..10.seconds -> {
+                LorenzColor.DARK_GREEN.toColor().rgb
+            }
+            else -> LorenzColor.GOLD.toColor().rgb
         }
     }
 
@@ -297,7 +309,10 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
         private val config get() = SkyHanniMod.feature.mining.flowstateHelper
 
         private fun Duration.formatTime(): Component {
-            return getTimerColor(this).append(format(TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true))
+            return componentBuilder {
+                append(format(TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true))
+                withColor(getTimerColor(this@formatTime))
+            }
         }
 
         @JvmField
