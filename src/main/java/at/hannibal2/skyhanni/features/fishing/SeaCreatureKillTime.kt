@@ -19,12 +19,12 @@ object SeaCreatureKillTime {
         if (!seaCreature.isRare) return
         val time = seaCreature.spawnTime.passedSince()
         if (event.seenDeath) {
-            ChatUtils.chat("${seaCreature.displayName}§3 took §b${time.format(showMilliSeconds = true)}§3 to die.")
+            ChatUtils.chat("${seaCreature.displayName}§3 took §b${time.format(showMilliSeconds = true)}§e to die.")
         } else {
             val minTime = seaCreature.lastUpdate.passedSince()
-            val message = "${seaCreature.displayName}§3 took between " +
-                "§b${minTime.format(showMilliSeconds = true)} §3and " +
-                "§b${time.format(showMilliSeconds = true)}§3 to die."
+            val message = "${seaCreature.displayName}§e took between " +
+                "§b${minTime.format(showMilliSeconds = true)} §eand " +
+                "§b${time.format(showMilliSeconds = true)}§e to die."
             ChatUtils.chat(message)
         }
     }
