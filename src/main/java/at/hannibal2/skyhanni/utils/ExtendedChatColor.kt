@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.command
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.compat.underlined
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TextColor
 import java.awt.Color
 
 class ExtendedChatColor(
@@ -56,7 +56,7 @@ class ExtendedChatColor(
                             append("example") {
                                 underlined = true
                                 hover = Component.literal("ඞ")
-                                withColor(TextColor(0xFFFFFE, "chroma"))
+                                withColor(TextHelper.getChromaColorStyle())
                             }
                             append(". ")
                             append {
