@@ -150,7 +150,7 @@ var Component.hover: Component?
         it.action() == HoverEvent.Action.SHOW_TEXT
     }?.let { (it as HoverEvent.ShowText).value }
     set(value) {
-        value?.let { new -> (this as MutableComponent).withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
+        value?.let { new -> this.copy().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
     }
 
 var Component.command: String?
@@ -158,7 +158,7 @@ var Component.command: String?
         it.action() == ClickEvent.Action.RUN_COMMAND
     }?.let { (it as ClickEvent.RunCommand).command }
     set(value) {
-        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
+        this.copy().withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
     }
 
 var Component.suggest: String?
@@ -166,7 +166,7 @@ var Component.suggest: String?
         it.action() == ClickEvent.Action.SUGGEST_COMMAND
     }?.let { (it as ClickEvent.SuggestCommand).command }
     set(value) {
-        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
+        this.copy().withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
     }
 
 var Component.url: String?
@@ -174,7 +174,7 @@ var Component.url: String?
         it.action() == ClickEvent.Action.OPEN_URL
     }?.let { (it as ClickEvent.OpenUrl).uri.toString() }
     set(value) {
-        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
+        this.copy().withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
     }
 
 var MutableComponent.underlined: Boolean
@@ -294,13 +294,13 @@ fun Component.convertToJsonString(): String {
 }
 
 fun Component.append(newText: Component): MutableComponent {
-    return (this as MutableComponent).append(newText)
+    return this.copy().append(newText)
 }
 
 val formattingPattern = Regex("§.(?:§.)?")
 
 fun Component.append(newText: String): MutableComponent {
-    val mutableText = this as MutableComponent
+    val mutableText = this.copy()
     if (mutableText.string.matches(formattingPattern)) {
         return Component.literal(mutableText.string + newText)
     }
@@ -312,7 +312,7 @@ fun MutableComponent.append(string: String = "", init: MutableComponent.() -> Un
 }
 
 fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit): MutableComponent {
-    return this.append((comp as MutableComponent).also(init))
+    return this.append(comp.copy().also(init))
 }
 
 fun List<Any>.mapToComponents(): List<Component> {
