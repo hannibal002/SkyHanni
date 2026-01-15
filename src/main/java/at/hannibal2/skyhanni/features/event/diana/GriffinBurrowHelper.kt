@@ -141,11 +141,11 @@ object GriffinBurrowHelper {
         }
     }
 
-    fun removeGuess(guess: GuessEntry, reason: String) {
+    fun removeGuess(guess: GuessEntry, reason: String, logAsPossibleBurrow: Boolean = true) {
         if (allGuesses.contains(guess)) addDebug("removed guess: $guess because $reason")
         allGuesses.remove(guess)
         allGuessesTimers.remove(guess)
-        recentGuessesRemoved.addAll(guess.guesses)
+        if (logAsPossibleBurrow) recentGuessesRemoved.addAll(guess.guesses)
     }
 
     fun removeGuess(set: Set<GuessEntry>, reason: String) {
