@@ -303,6 +303,8 @@ object GriffinBurrowHelper {
 
         // finished chain
         if (event.current == event.max && config.warnOnChainComp) {
+            val nearby = allGuesses.filter { it.getCurrent().distanceSq(location) < 10 }.toSet()
+            removeGuess(nearby, "chain finished with leftover burrow within 3 blocks")
             if (config.warnOnChainComp) {
                 val playerLoc = MinecraftCompat.localPlayer.position().toLorenzVec()
                 val anyClose = allGuesses.filter { it.getCurrent().distanceSq(playerLoc) < 8100 }
