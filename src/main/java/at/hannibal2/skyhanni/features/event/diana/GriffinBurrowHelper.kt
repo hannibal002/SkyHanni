@@ -294,6 +294,7 @@ object GriffinBurrowHelper {
         update()
     }
 
+    @Suppress("MaxLineLength")
     @HandleEvent
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
