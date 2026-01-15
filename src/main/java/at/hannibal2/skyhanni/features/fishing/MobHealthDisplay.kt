@@ -7,10 +7,17 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.blendRGB
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ConfigUtils.toSet
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object MobHealthDisplay {
@@ -36,16 +43,17 @@ object MobHealthDisplay {
         }
     }
 
-    private fun formatHealth(mob: Mob): String {
+    private fun formatHealth(mob: Mob): Component {
         val health = mob.health
         val maxHealth = mob.maxHealth
-        val percentage = (health / maxHealth * 100)
-        val color = when (percentage) {
-            in 0f..config.redPercentage -> "§c"
-            in config.redPercentage..50f -> "§e"
-            else -> "§a"
+        val percentage = (1 - (health / maxHealth)).toDouble()
+        val componentColor = blendRGB(LorenzColor.GREEN, LorenzColor.RED, percentage)
+        return componentBuilder {
+            appendWithColor(health.shortFormat(), componentColor.rgb)
+            appendWithColor("/", LorenzColor.WHITE.toColor().rgb)
+            appendWithColor(maxHealth.shortFormat(), LorenzColor.GREEN.toColor().rgb)
+            appendWithColor(" ❤", LorenzColor.RED.toColor().rgb)
         }
-        return "$color${health.shortFormat()}§f/§a${maxHealth.shortFormat()}§c❤"
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -56,12 +64,18 @@ object MobHealthDisplay {
             for ((seaCreature, health) in healthMap) {
                 if (health == -1) continue
                 val mob = seaCreature.mob ?: continue
-                val color = if (seaCreature.isOwn) "§a" else "§c"
-                add("$color${seaCreature.name} ${formatHealth(mob)}")
+                val color = if (seaCreature.isOwn) LorenzColor.GREEN else LorenzColor.RED
+                val guiComponent = componentBuilder {
+                    appendWithColor(seaCreature.name, color.toColor().rgb)
+                    append(" ")
+                    append(formatHealth(mob))
+                }
+                add(Renderable.text(guiComponent))
                 if (size >= config.limit) break
             }
         }
-        config.pos.renderStrings(strings, posLabel = "Mob Health Display")
+
+        config.pos.renderRenderables(strings, posLabel = "Mob Health Display")
     }
 
     @HandleEvent

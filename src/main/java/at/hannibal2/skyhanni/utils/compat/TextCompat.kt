@@ -315,6 +315,14 @@ fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit):
     return this.append((comp as MutableComponent).also(init))
 }
 
+fun MutableComponent.appendWithColor(string: String = "", color: Int): MutableComponent {
+    return this.append(Component.literal(string).withColor(color))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: Int): MutableComponent {
+    return this.append((comp as MutableComponent).withColor(color))
+}
+
 fun List<Any>.mapToComponents(): List<Component> {
     val newList = mutableListOf<Component>()
     for (entry in this) {
