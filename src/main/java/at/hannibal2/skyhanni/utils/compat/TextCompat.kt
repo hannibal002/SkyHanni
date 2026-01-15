@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
@@ -119,8 +120,19 @@ fun Component.iterator(): Sequence<Component> {
     return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() } // TODO: in theory we want to properly inherit styles here
 }
 
-fun MutableComponent.withColor(formatting: ChatFormatting): Component {
+fun MutableComponent.withColor(formatting: ChatFormatting): MutableComponent {
     return this.withStyle { it.withColor(formatting) }
+}
+
+fun MutableComponent.withColor(color: TextColor): MutableComponent {
+    return this.withStyle { it.withColor(color) }
+}
+
+/**
+ * This might have performance issues if you render it every frame idk
+ */
+fun MutableComponent.withColor(hex: String): MutableComponent {
+    return this.withStyle { it.withColor(ColorUtils.getColorFromHex(hex)) }
 }
 
 fun createResourceLocation(domain: String, path: String): ResourceLocation {
@@ -165,6 +177,36 @@ var Component.url: String?
         (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
     }
 
+var MutableComponent.underlined: Boolean
+    get() = this.style.isUnderlined
+    set(value) {
+        this.withStyle { it.withUnderlined(value) }
+    }
+
+var MutableComponent.bold: Boolean
+    get() = this.style.isBold
+    set(value) {
+        this.withStyle { it.withBold(value) }
+    }
+
+var MutableComponent.strikethrough: Boolean
+    get() = this.style.isStrikethrough
+    set(value) {
+        this.withStyle { it.withStrikethrough(value) }
+    }
+
+var MutableComponent.italic: Boolean
+    get() = this.style.isItalic
+    set(value) {
+        this.withStyle { it.withItalic(value) }
+    }
+
+var MutableComponent.obfuscated: Boolean
+    get() = this.style.isObfuscated
+    set(value) {
+        this.withStyle { it.withObfuscated(value) }
+    }
+
 fun Style.setClickRunCommand(text: String): Style {
     return this.withClickEvent(ClickEvent.RunCommand(text))
 }
@@ -176,12 +218,6 @@ fun Style.setHoverShowText(text: String): Style {
 fun Style.setHoverShowText(text: Component): Style {
     return this.withHoverEvent(HoverEvent.ShowText(text))
 }
-
-fun Component.appendString(text: String): Component =
-    (this as MutableComponent).append(text)
-
-fun Component.appendComponent(component: Component): Component =
-    (this as MutableComponent).append(component)
 
 fun addChatMessageToChat(message: Component) {
     Minecraft.getInstance().player?.displayClientMessage(message, false)
@@ -257,18 +293,26 @@ fun Component.convertToJsonString(): String {
     //#endif
 }
 
-fun Component.append(newText: Component): Component {
+fun Component.append(newText: Component): MutableComponent {
     return (this as MutableComponent).append(newText)
 }
 
 val formattingPattern = Regex("§.(?:§.)?")
 
-fun Component.append(newText: String): Component {
+fun Component.append(newText: String): MutableComponent {
     val mutableText = this as MutableComponent
     if (mutableText.string.matches(formattingPattern)) {
         return Component.literal(mutableText.string + newText)
     }
     return mutableText.append(newText)
+}
+
+fun MutableComponent.append(string: String = "", init: MutableComponent.() -> Unit): MutableComponent {
+    return this.append(Component.literal(string).also(init))
+}
+
+fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit): MutableComponent {
+    return this.append((comp as MutableComponent).also(init))
 }
 
 fun List<Any>.mapToComponents(): List<Component> {
@@ -294,4 +338,8 @@ fun Component.replace(oldValue: String, newValue: String): Component {
 
 operator fun Component.plus(string: String): Component {
     return this.append(string)
+}
+
+fun componentBuilder(init: MutableComponent.() -> Unit): Component {
+    return Component.empty().also(init)
 }

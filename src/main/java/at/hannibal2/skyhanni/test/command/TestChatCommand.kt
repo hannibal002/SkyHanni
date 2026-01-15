@@ -89,7 +89,7 @@ object TestChatCommand {
         if (!isHidden && finalMessage.formattedTextCompat().stripHypixelMessage() != message) {
             ChatUtils.chat("§eChat modified!")
         }
-        ChatUtils.chat(finalMessage)
+        ChatUtils.chat(finalMessage, prefix = false)
     }
 
     @HandleEvent
