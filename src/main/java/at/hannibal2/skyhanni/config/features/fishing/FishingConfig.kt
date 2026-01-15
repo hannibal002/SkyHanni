@@ -3,10 +3,12 @@ package at.hannibal2.skyhanni.config.features.fishing
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingConfig
+import at.hannibal2.skyhanni.utils.ConfigUtils.asProperty
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -137,4 +139,18 @@ class FishingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var seaCreatureKillTimer: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Lootshare Range",
+        desc = "Shows the range at which you can lootshare. The range is §aGreen §7when the mob is your own or" +
+            "when inside the lootshare range."
+    )
+    @ConfigEditorBoolean
+    var lootshareRange = false
+
+    @Expose
+    @ConfigOption(name = "Lootshare Mobs", desc = "The name of the sea creatures to show the lootshare range for, separated by commas.")
+    @ConfigEditorText
+    val lootshareMobs = "Lord Jawbus, Thunder".asProperty()
 }
