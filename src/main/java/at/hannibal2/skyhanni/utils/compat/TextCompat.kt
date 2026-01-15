@@ -120,18 +120,18 @@ fun Component.iterator(): Sequence<Component> {
     return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() } // TODO: in theory we want to properly inherit styles here
 }
 
-fun MutableComponent.withColor(formatting: ChatFormatting): Component {
+fun MutableComponent.withColor(formatting: ChatFormatting): MutableComponent {
     return this.withStyle { it.withColor(formatting) }
 }
 
-fun MutableComponent.withColor(color: TextColor): Component {
+fun MutableComponent.withColor(color: TextColor): MutableComponent {
     return this.withStyle { it.withColor(color) }
 }
 
 /**
  * This might have performance issues if you render it every frame idk
  */
-fun MutableComponent.withColor(hex: String): Component {
+fun MutableComponent.withColor(hex: String): MutableComponent {
     return this.withStyle { it.withColor(ColorUtils.getColorFromHex(hex)) }
 }
 
