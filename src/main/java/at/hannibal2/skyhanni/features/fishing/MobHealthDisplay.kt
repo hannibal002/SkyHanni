@@ -9,7 +9,8 @@ import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ConfigUtils.toSet
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 
 @SkyHanniModule
 object MobHealthDisplay {

@@ -208,6 +208,7 @@ object SeaCreatureDetectionApi {
 
     // This should hopefully make it so that if a sea creature dies while the player isn't in the area and the despawn timer
     // isn't up yet, it will be assumed that it died
+    @Suppress("LoopWithTooManyJumpStatements")
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed() {
         val playerPos = LocationUtils.playerLocation()
