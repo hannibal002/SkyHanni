@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -40,6 +40,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     private var innerProgressMax = 0
     private val innerProgressCount = AtomicInteger(0)
     var currentText: ProgressText? = null
+    val logger = LorenzLogger("chat_progress_updates")
 
     data class ProgressText(val text: String, val hoverText: String)
 
@@ -83,12 +84,9 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     private fun statusUpdate(nextStep: String, phase: Phase) {
         if (phase == Phase.START) {
             if (currentlyRunning) {
-                ErrorManager.logErrorStateWithData(
-                    "error properly logging something in SkyHanni",
-                    "trying to start an already running chat",
-                    "next step" to nextStep,
-                    "last step" to currentStep?.lastOrNull(),
-                )
+                logger.log("Error: trying to start a progress updater that has already been started\n" +
+                    "next step = $nextStep\n" +
+                    "last step = ${currentStep?.lastOrNull()}")
             }
             currentlyRunning = true
             startOfFirst = SimpleTimeMark.now()
@@ -96,16 +94,13 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
         }
         if (phase == Phase.UPDATE) {
             if (!currentlyRunning) {
-                ErrorManager.logErrorStateWithData(
-                    "error properly logging something in SkyHanni",
-                    "trying to update an not running chat",
-                    "next step" to nextStep,
-                )
+                logger.log("Error: trying to update a progress updater that hasn't been started\n" +
+                    "next step = $nextStep")
             }
         }
 
         currentStep?.let {
-            val format = startOfCurrent?.format() ?: error("start of current is null")
+            val format = startOfCurrent?.format() ?: return@let
             previousSteps.add("§8- §f$it $innerProgress$format")
         }
         innerProgress = ""
@@ -117,12 +112,9 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
 
         if (phase == Phase.END) {
             if (!currentlyRunning) {
-                ErrorManager.logErrorStateWithData(
-                    "error properly logging something in SkyHanni",
-                    "trying to end an not running chat",
-                    "next step" to nextStep,
-                    "last step" to currentStep?.lastOrNull(),
-                )
+                logger.log("Error: trying to stop a progress updater that hasn't been started\n" +
+                    "next step = $nextStep\n" +
+                    "last step = ${currentStep?.lastOrNull()}")
             }
             currentlyRunning = false
             update()
@@ -148,15 +140,15 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     }
 
     private fun update() {
-        val title = title ?: error("title is null")
-        val currentStep = currentStep ?: error("currentStep is null")
-        val totalTime = startOfFirst?.format() ?: error("startOfFirst is null: $currentStep")
+        val title = title ?: return
+        val currentStep = currentStep ?: return
+        val totalTime = startOfFirst?.format() ?: return
 
         val hover = buildList {
             add("§e$title")
             add("")
             addAll(previousSteps)
-            val currentTime = startOfCurrent?.format() ?: error("startOfCurrent is null")
+            val currentTime = startOfCurrent?.format() ?: "Unknown time"
             val currentLine = "§8- §f$currentStep $innerProgress$currentTime"
             add(currentLine)
             add("")
