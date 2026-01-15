@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.contest.JacobContestConfig
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig
+import at.hannibal2.skyhanni.config.features.garden.greenhouse.GreenhouseConfig
 import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig
 import at.hannibal2.skyhanni.config.features.garden.optimalAngles.OptimalAnglesConfig
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig
@@ -95,6 +96,10 @@ class GardenConfig {
     @Expose
     @Category(name = "Pests", desc = "Pests Settings")
     val pests: PestsConfig = PestsConfig()
+
+    @Expose
+    @Category(name = "Greenhouse", desc = "Greenhouse Settings")
+    val greenhouse: GreenhouseConfig = GreenhouseConfig()
 
     @Expose
     @ConfigOption(name = "Farming Fortune Display", desc = "")
