@@ -283,6 +283,12 @@ object GriffinBurrowHelper {
         if (currentEntry != null) removeGuess(currentEntry, "type detected")
         addGuess(GuessEntry(listOf(burrowLocation), event.type, ignoreInvalidBlock = true), "type detected")
 
+        val nearbyUnknown = allGuesses.filter {
+            it.getCurrent().distanceSq(burrowLocation) < 5 && it.burrowType == BurrowType.UNKNOWN
+        }.toSet()
+        removeGuess(nearbyUnknown, "burrow detected within 2 blocks")
+        recentGuessesRemoved.removeAll(nearbyUnknown.map { it.getCurrent() }) // removes incorrect guesses from being future options
+
         val toDelete = mutableSetOf<GuessEntry>()
         allGuesses.filter { it.inaccurate }.forEach {
             if (it.getCurrent().distanceSq(burrowLocation) < 2000) {
