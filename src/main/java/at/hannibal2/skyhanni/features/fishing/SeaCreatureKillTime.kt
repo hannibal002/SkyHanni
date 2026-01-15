@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object SeaCreatureKillTime {
@@ -14,12 +16,12 @@ object SeaCreatureKillTime {
     @HandleEvent
     fun onSeaCreatureDeath(event: SeaCreatureEvent.Death) {
         if (!config) return
+        if (!event.seaCreature.isRare) return
         val seaCreature = event.seaCreature
-        ChatUtils.debug("Sea Creature Dead ${seaCreature.name}, ${seaCreature.lastUpdate.passedSince()}")
-        if (!seaCreature.isRare) return
         val time = seaCreature.spawnTime.passedSince()
         if (event.seenDeath) {
-            ChatUtils.chat("${seaCreature.displayName}§3 took §b${time.format(showMilliSeconds = true)}§e to die.")
+            ChatUtils.chat(Component.literal("${seaCreature.displayName}§e took ").append(ExtendedChatColor("#FFC600").asText(time.format(showMilliSeconds = true))).append("§e to die."))
+
         } else {
             val minTime = seaCreature.lastUpdate.passedSince()
             val message = "${seaCreature.displayName}§e took between " +
