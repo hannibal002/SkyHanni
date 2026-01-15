@@ -269,7 +269,7 @@ object GriffinBurrowHelper {
         if (newLocation.distance(playerLocation) < 6) return
         if (!IslandType.HUB.isInBounds(newLocation)) return
 
-        addGuess(event.guess, "burrow guess event")
+        addGuess(event.guess, "burrow guess from ${event.source}")
 
         update()
     }
@@ -298,6 +298,7 @@ object GriffinBurrowHelper {
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
         mobAlive = false
+        addDebug("Burrow dug event [${location.x}, ${location.y}, ${location.z}] recently removed burrows size: ${recentGuessesRemoved.size}")
         removeGuess(location, "burrow dug event")
 
         // finished chain

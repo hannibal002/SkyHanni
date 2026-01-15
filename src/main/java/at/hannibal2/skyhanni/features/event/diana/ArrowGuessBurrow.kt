@@ -52,8 +52,9 @@ object ArrowGuessBurrow {
         DelayedRun.runOrNextTick {
             points.add(event.location)
             detectArrow(points)?.let {
-                GriffinBurrowHelper.addDebug("detected arrow")
-                GriffinBurrowHelper.removeGuess(it.origin, "origin of detected arrow")
+                val dugBlock = it.origin.roundToBlock()
+                GriffinBurrowHelper.addDebug("detected arrow origin above block [${dugBlock.x}, ${dugBlock.y}, ${dugBlock.z}]")
+                GriffinBurrowHelper.removeGuess(dugBlock, "origin of detected arrow")
                 points.clear()
                 lastArrowTime = SimpleTimeMark.now()
                 addGuessFromRay(it, range) ?: run {
@@ -138,7 +139,7 @@ object ArrowGuessBurrow {
         val withinRange = possibilities.filterValues { it.second.toInt() in range }.map { it.key }
         if (withinRange.isEmpty()) return null
 
-        BurrowGuessEvent(GuessEntry(withinRange)).post()
+        BurrowGuessEvent(GuessEntry(withinRange), "arrow guess").post()
 
         return withinRange[0]
     }

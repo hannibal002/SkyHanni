@@ -52,7 +52,7 @@ data class GuessEntry(
             if (nextIndex in guesses.indices) {
                 currentIndex = nextIndex
                 GriffinBurrowHelper.update()
-                BurrowGuessEvent(this).post()
+                BurrowGuessEvent(this, "moving").post()
                 return false
             } else return true // remove if it should have moved but cant
         }

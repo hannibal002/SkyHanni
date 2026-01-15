@@ -69,7 +69,7 @@ object PreciseGuessBurrow {
         if (lastGuess?.getCurrent() != guessEntry.getCurrent()) {
             DelayedRun.runOrNextTick {
                 lastGuess?.let { GriffinBurrowHelper.removeGuess(it, "moving spade guess") }
-                BurrowGuessEvent(guessEntry).post()
+                BurrowGuessEvent(guessEntry, "spade guess").post()
                 lastGuess = guessEntry
             }
         }
