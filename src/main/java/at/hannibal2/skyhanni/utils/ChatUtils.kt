@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
+import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
@@ -99,7 +100,24 @@ object ChatUtils {
         }
     }
 
+    fun chat(
+        message: Component,
+        prefix: Boolean = true,
+        prefixColor: Int = 16777045,
+        replaceSameMessage: Boolean = false,
+        onlySendOnce: Boolean = false,
+        messageId: Int? = null,
+    ) {
+        if (prefix) {
+            val comp = Component.literal(CHAT_PREFIX).withColor(prefixColor).append(message)
+            internalChatComponent(comp, replaceSameMessage, onlySendOnce, messageId = messageId)
+        } else {
+            internalChatComponent(message, replaceSameMessage, onlySendOnce, messageId = messageId)
+        }
+    }
+
     private val messagesThatAreOnlySentOnce = mutableSetOf<String>()
+    private val messagesThatAreOnlySentOnceComponent = mutableSetOf<Component>()
 
     private fun internalChat(
         message: String,
@@ -111,11 +129,24 @@ object ChatUtils {
         if (onlySendOnce && !messagesThatAreOnlySentOnce.add(message)) return false
         return if (replaceSameMessage || messageId != null) {
             text.send(messageId ?: message.getUniqueMessageIdForString())
-            chat(text, false)
-        } else chat(text)
+            logAndSendMessage(text, false)
+        } else logAndSendMessage(text)
     }
 
-    fun chat(message: Component, send: Boolean = true): Boolean {
+    private fun internalChatComponent(
+        message: Component,
+        replaceSameMessage: Boolean,
+        onlySendOnce: Boolean = false,
+        messageId: Int? = null,
+    ): Boolean {
+        if (onlySendOnce && !messagesThatAreOnlySentOnceComponent.add(message)) return false
+        return if (replaceSameMessage || messageId != null) {
+            message.send(messageId ?: message.getUniqueMessageIdForString())
+            logAndSendMessage(message, false)
+        } else logAndSendMessage(message)
+    }
+
+    private fun logAndSendMessage(message: Component, send: Boolean = true): Boolean {
         val formattedMessage = message.formattedTextCompat()
         log.log(formattedMessage)
 
@@ -159,7 +190,7 @@ object ChatUtils {
         }
 
         if (replaceSameMessage) text.send(rawText.getUniqueMessageIdForString())
-        else chat(text)
+        else logAndSendMessage(text)
     }
 
     /**
@@ -181,6 +212,10 @@ object ChatUtils {
 
     private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
     private fun String.getUniqueMessageIdForString() = uniqueMessageIdStorage.getOrPut(this) {
+        getUniqueMessageId()
+    }
+
+    private fun Component.getUniqueMessageIdForString() = uniqueMessageIdStorage.getOrPut(this.string) {
         getUniqueMessageId()
     }
 
@@ -207,7 +242,7 @@ object ChatUtils {
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
-        chat(
+        logAndSendMessage(
             TextHelper.text(msgPrefix + message) {
                 this.hover = TextHelper.multiline(hover)
                 if (command != null) {
@@ -244,7 +279,7 @@ object ChatUtils {
         }
 
         if (replaceSameMessage) text.send(message.getUniqueMessageIdForString())
-        else chat(text)
+        else logAndSendMessage(text)
 
         if (autoOpen) OSUtils.openBrowser(url)
     }
@@ -263,7 +298,7 @@ object ChatUtils {
         prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(TextHelper.join(components).prefix(msgPrefix))
+        logAndSendMessage(TextHelper.join(components).prefix(msgPrefix))
     }
 
     private val chatGui get() = Minecraft.getInstance().gui.chat
