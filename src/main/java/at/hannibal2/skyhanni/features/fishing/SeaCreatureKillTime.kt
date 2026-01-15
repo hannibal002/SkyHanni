@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component
 object SeaCreatureKillTime {
     private val config get() = SkyHanniMod.feature.fishing.seaCreatureKillTimer
 
+    @Suppress("MaxLineLength")
     @HandleEvent
     fun onSeaCreatureDeath(event: SeaCreatureEvent.Death) {
         if (!config) return
