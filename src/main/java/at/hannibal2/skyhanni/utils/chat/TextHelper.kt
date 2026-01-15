@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import java.awt.Color
 
+@Suppress("TooManyFunctions")
 object TextHelper {
 
     val NEWLINE = "\n".asComponent()
