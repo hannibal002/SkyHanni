@@ -30,7 +30,9 @@ object PlayerPosData {
     }
 
     @HandleEvent
-    fun onWorldChange() = playerPositions.clear()
+    fun onWorldChange() {
+        playerPositions.clear()
+    }
 
     /** Returns the time the player has been at the specified position, within a distance of [distance]. */
     fun timeAtPos(pos: LorenzVec, distance: Double): Duration? {

@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SeaCreatureHealthDisplayConfig {
+
     @Expose
     @ConfigOption(name = "Enabled", desc = "Shows a GUI with the health of the sea creatures shown.")
     @ConfigEditorBoolean

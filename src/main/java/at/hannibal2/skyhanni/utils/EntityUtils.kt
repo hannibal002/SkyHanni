@@ -235,8 +235,6 @@ object EntityUtils {
     val LivingEntity.baseMaxHealth: Int
         get() = this.getAttributeBaseValue(Attributes.MAX_HEALTH).toInt()
 
-    inline val LivingEntity.hasDied get() = isDeadOrDying
-
     inline val Entity.spawnTime: SimpleTimeMark get() = SimpleTimeMark.now() - tickCount.ticks
 
 }
