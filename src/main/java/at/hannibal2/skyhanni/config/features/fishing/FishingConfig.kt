@@ -130,7 +130,10 @@ class FishingConfig {
     var muteBanshee: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Sea Creature Kill Time", desc = "Sends a chat message that shows how much time it took to kill a specific sea creature.")
+    @ConfigOption(
+        name = "Sea Creature Kill Time",
+        desc = "Sends a chat message that shows how much time it took to kill a specific sea creature."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var seaCreatureKillTimer: Boolean = false
