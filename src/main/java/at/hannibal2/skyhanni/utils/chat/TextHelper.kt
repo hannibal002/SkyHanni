@@ -195,7 +195,9 @@ object TextHelper {
         return text
     }
 
+    private val chromaStyle by lazy { TextColor(0xFFFFFE, "chroma") }
+
     fun getChromaColorStyle(): TextColor {
-        return TextColor(0xFFFFFE, "chroma")
+        return chromaStyle
     }
 }
