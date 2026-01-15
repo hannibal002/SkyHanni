@@ -120,18 +120,18 @@ fun Component.iterator(): Sequence<Component> {
     return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() } // TODO: in theory we want to properly inherit styles here
 }
 
-fun MutableComponent.withColor(formatting: ChatFormatting): Component {
+fun MutableComponent.withColor(formatting: ChatFormatting): MutableComponent {
     return this.withStyle { it.withColor(formatting) }
 }
 
-fun MutableComponent.withColor(color: TextColor): Component {
+fun MutableComponent.withColor(color: TextColor): MutableComponent {
     return this.withStyle { it.withColor(color) }
 }
 
 /**
  * This might have performance issues if you render it every frame idk
  */
-fun MutableComponent.withColor(hex: String): Component {
+fun MutableComponent.withColor(hex: String): MutableComponent {
     return this.withStyle { it.withColor(ColorUtils.getColorFromHex(hex)) }
 }
 
@@ -177,34 +177,34 @@ var Component.url: String?
         (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
     }
 
-var Component.underlined: Boolean
+var MutableComponent.underlined: Boolean
     get() = this.style.isUnderlined
     set(value) {
-        (this as MutableComponent).withStyle { it.withUnderlined(value) }
+        this.withStyle { it.withUnderlined(value) }
     }
 
-var Component.bold: Boolean
+var MutableComponent.bold: Boolean
     get() = this.style.isBold
     set(value) {
-        (this as MutableComponent).withStyle { it.withBold(value) }
+        this.withStyle { it.withBold(value) }
     }
 
-var Component.strikethrough: Boolean
+var MutableComponent.strikethrough: Boolean
     get() = this.style.isStrikethrough
     set(value) {
-        (this as MutableComponent).withStyle { it.withStrikethrough(value) }
+        this.withStyle { it.withStrikethrough(value) }
     }
 
-var Component.italic: Boolean
+var MutableComponent.italic: Boolean
     get() = this.style.isItalic
     set(value) {
-        (this as MutableComponent).withStyle { it.withItalic(value) }
+        this.withStyle { it.withItalic(value) }
     }
 
-var Component.obfuscated: Boolean
+var MutableComponent.obfuscated: Boolean
     get() = this.style.isObfuscated
     set(value) {
-        (this as MutableComponent).withStyle { it.withObfuscated(value) }
+        this.withStyle { it.withObfuscated(value) }
     }
 
 fun Style.setClickRunCommand(text: String): Style {
@@ -293,7 +293,7 @@ fun Component.convertToJsonString(): String {
     //#endif
 }
 
-fun Component.append(newText: Component): Component {
+fun Component.append(newText: Component): MutableComponent {
     return (this as MutableComponent).append(newText)
 }
 
@@ -307,11 +307,11 @@ fun Component.append(newText: String): MutableComponent {
     return mutableText.append(newText)
 }
 
-fun Component.append(string: String = "", init: MutableComponent.() -> Unit): Component {
+fun MutableComponent.append(string: String = "", init: MutableComponent.() -> Unit): MutableComponent {
     return this.append(Component.literal(string).also(init))
 }
 
-fun Component.append(comp: Component, init: MutableComponent.() -> Unit): Component {
+fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit): MutableComponent {
     return this.append((comp as MutableComponent).also(init))
 }
 

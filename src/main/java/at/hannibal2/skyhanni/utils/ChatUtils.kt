@@ -20,9 +20,12 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
 import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
+import at.hannibal2.skyhanni.utils.compat.withColor
+import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
@@ -102,14 +105,23 @@ object ChatUtils {
     fun chat(
         message: Component,
         prefix: Boolean = true,
-        prefixColor: Int = 16777045,
+        prefixColor: Int? = null,
         replaceSameMessage: Boolean = false,
         onlySendOnce: Boolean = false,
         messageId: Int? = null,
     ) {
         if (prefix) {
-            val comp = Component.literal(CHAT_PREFIX).withColor(prefixColor).append(message)
-            internalChatComponent(comp, replaceSameMessage, onlySendOnce, messageId = messageId)
+            val text = componentBuilder {
+                if (prefixColor != null) {
+                    append(CHAT_PREFIX)
+                    withColor(prefixColor)
+                } else {
+                    append(TextHelper.createGradientText(LorenzColor.YELLOW, LorenzColor.GOLD, CHAT_PREFIX))
+                    withColor(ChatFormatting.YELLOW)
+                }
+                append(message)
+            }
+            internalChatComponent(text, replaceSameMessage, onlySendOnce, messageId = messageId)
         } else {
             internalChatComponent(message, replaceSameMessage, onlySendOnce, messageId = messageId)
         }
