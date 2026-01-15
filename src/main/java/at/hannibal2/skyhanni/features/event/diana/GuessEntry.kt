@@ -13,7 +13,7 @@ data class GuessEntry(
     val guesses: List<LorenzVec>,
     var burrowType: BurrowType = BurrowType.UNKNOWN,
     var currentIndex: Int = 0,
-    val inaccurate: Boolean = false,
+    val spadeGuess: Boolean = false,
     var ignoreParticleCheckUntil: SimpleTimeMark = SimpleTimeMark.now(),
     var ignoreInvalidBlock: Boolean = false,
 ) {
@@ -26,7 +26,7 @@ data class GuessEntry(
         // remove guesses older than 30 minutes
         GriffinBurrowHelper.getTimer(this)?.passedSince()?.let {
             if (it > 30.minutes) {
-                reason.append("expired (30M active) ")
+                reason.append("expired (30min active) ")
                 return true
             }
         }
@@ -34,7 +34,7 @@ data class GuessEntry(
         if (shouldKeepGuess()) return false
 
         var shouldMove = false
-        if (!GriffinBurrowHelper.isBlockValid(this.getCurrent()) && !inaccurate && !ignoreInvalidBlock) {
+        if (!GriffinBurrowHelper.isBlockValid(this.getCurrent()) && !spadeGuess && !ignoreInvalidBlock) {
             reason.append("invalid block ")
             shouldMove = true
         }
@@ -47,16 +47,19 @@ data class GuessEntry(
             shouldMove = true
         }
 
-        if (shouldMove) {
-            val nextIndex = currentIndex + 1
-            if (nextIndex in guesses.indices) {
-                currentIndex = nextIndex
-                GriffinBurrowHelper.update()
-                BurrowGuessEvent(this, "moving").post()
-                return false
-            } else return true // remove if it should have moved but cant
-        }
+        if (shouldMove && !attemptMove()) return true
+
         return false
+    }
+
+    fun attemptMove(): Boolean {
+        val nextIndex = currentIndex + 1
+        if (nextIndex in guesses.indices) {
+            currentIndex = nextIndex
+            GriffinBurrowHelper.update()
+            BurrowGuessEvent(this, "moving").post()
+            return true
+        } else return false
     }
 
     private fun shouldKeepGuess(): Boolean {
@@ -96,7 +99,7 @@ data class GuessEntry(
             nonDefaults.add("index=$currentIndex")
         }
 
-        if (inaccurate) {
+        if (spadeGuess) {
             nonDefaults.add("inaccurate=true")
         }
 

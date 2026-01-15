@@ -63,7 +63,7 @@ object PreciseGuessBurrow {
 
         val guessEntry = GuessEntry(
             listOf(guessPosition.down(0.5).roundToBlock()),
-            inaccurate = true,
+            spadeGuess = true,
         )
 
         if (lastGuess?.getCurrent() != guessEntry.getCurrent()) {

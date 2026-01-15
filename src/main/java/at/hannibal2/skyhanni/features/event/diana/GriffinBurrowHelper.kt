@@ -123,7 +123,7 @@ object GriffinBurrowHelper {
     private val recentActionsDebug = ConcurrentLinkedDeque<String>()
     fun addDebug(action: String) {
         recentActionsDebug.addFirst(action)
-        if (recentActionsDebug.size > 50) {
+        if (recentActionsDebug.size > 80) {
             recentActionsDebug.pollLast()
         }
     }
@@ -176,7 +176,7 @@ object GriffinBurrowHelper {
 
     fun removeInaccurateIfLooking() {
         // remove any inaccurate guesses that the player is looking at
-        val inaccurate = allGuesses.filter { it.inaccurate }.toSet()
+        val inaccurate = allGuesses.filter { it.spadeGuess }.toSet()
         val toDelete = mutableSetOf<GuessEntry>()
         for (item in inaccurate) {
             val player = MinecraftCompat.localPlayer
@@ -286,7 +286,7 @@ object GriffinBurrowHelper {
         addGuess(GuessEntry(listOf(burrowLocation), event.type, ignoreInvalidBlock = true), "type detected")
 
         val toDelete = mutableSetOf<GuessEntry>()
-        allGuesses.filter { it.inaccurate }.forEach {
+        allGuesses.filter { it.spadeGuess }.forEach {
             if (it.getCurrent().distanceSq(burrowLocation) < 2000) {
                 toDelete.add(it)
             }
@@ -563,6 +563,12 @@ object GriffinBurrowHelper {
         if (event.itemInHand?.isDianaSpade != true &&
             InventoryUtils.lastItemChangeTime.passedSince() > CurrentPing.averagePing + 50.milliseconds
         ) return
+
+        getGuess(location)?.let { if (it.burrowType == BurrowType.UNKNOWN && it.getCurrent() == location) {
+            DelayedRun.runDelayed(200.milliseconds, {
+                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 400.milliseconds) it.attemptMove()
+            })
+        } }
 
         val burrows = allGuesses.toList().flatMap { it.guesses }.union(recentGuessesRemoved)
         if (burrows.contains(location)) BurrowApi.setBurrowInteracted(location)
