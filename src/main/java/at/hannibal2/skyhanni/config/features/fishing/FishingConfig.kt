@@ -142,6 +142,15 @@ class FishingConfig {
 
     @Expose
     @ConfigOption(
+        name = "Only on Own Mobs",
+        desc = "Only send the Kill Time for mobs detected as your own."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var seaCreatureKillTimerOwnMobsOnly: Boolean = true
+
+    @Expose
+    @ConfigOption(
         name = "Lootshare Range",
         desc = "Shows the range at which you can lootshare. The range is §aGreen §7when the mob is your own or" +
             "when inside the lootshare range."
