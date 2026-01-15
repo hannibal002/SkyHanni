@@ -61,7 +61,7 @@ object MantidKillDisplay {
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay() {
         if (!shouldShow()) return
-        config.pos.renderRenderables(displayCache, posLabel = "Pest Spawn Timer")
+        config.pos.renderRenderables(displayCache, posLabel = "Mantid Kill Display")
     }
 
     private fun removeExtraEntries() {
