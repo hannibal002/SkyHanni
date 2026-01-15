@@ -16,9 +16,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.core.particles.ParticleTypes
 import kotlin.math.abs
 import kotlin.math.sign
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -176,7 +178,17 @@ object ArrowGuessBurrow {
         val ray = RaycastUtils.Ray(adjustedBase, adjustedTip.minus(adjustedBase).normalize())
         if (recentFoundArrows.add(ray)) return null
 
-        BurrowApi.lastBurrowInteracted?.let { if (adjustedBase.distanceSq(it) > 5) return null } // not your arrow
+        // not your arrow
+        BurrowApi.lastBurrowInteracted?.let {
+            if (adjustedBase.distanceSq(it) > 5 && BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 500.milliseconds) {
+                val playerLocation = MinecraftCompat.localPlayer.position()
+                val bStr = "[${adjustedBase.roundToBlock().x}, ${adjustedBase.roundToBlock().y}, ${adjustedBase.roundToBlock().z}]"
+                val lIStr = "[${it.x}, ${it.y}, ${it.z}]"
+                val pStr = "[${playerLocation.x}, ${playerLocation.y}, ${playerLocation.z}]"
+                GriffinBurrowHelper.addDebug("not your arrow detected at $bStr, last interaction $lIStr, player pos $pStr")
+                return null
+            }
+        }
 
         return ray
     }
