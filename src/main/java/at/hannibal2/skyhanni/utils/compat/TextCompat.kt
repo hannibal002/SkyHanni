@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
@@ -123,8 +124,15 @@ fun MutableComponent.withColor(formatting: ChatFormatting): Component {
     return this.withStyle { it.withColor(formatting) }
 }
 
-fun MutableComponent.withColor(formatting: TextColor): Component {
-    return this.withStyle { it.withColor(formatting) }
+fun MutableComponent.withColor(color: TextColor): Component {
+    return this.withStyle { it.withColor(color) }
+}
+
+/**
+ * This might have performance issues if you render it every frame idk
+ */
+fun MutableComponent.withColor(hex: String): Component {
+    return this.withStyle { it.withColor(ColorUtils.getColorFromHex(hex)) }
 }
 
 fun createResourceLocation(domain: String, path: String): ResourceLocation {

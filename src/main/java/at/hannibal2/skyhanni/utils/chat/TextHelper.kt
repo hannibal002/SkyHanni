@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
+import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
@@ -178,10 +179,13 @@ object TextHelper {
 
     fun createGradientText(start: Color, end: Color, string: String): Component {
         val length = string.length.toDouble()
-        var text = Component.literal("")
-        for ((index, char) in string.withIndex()) {
-            val color = ColorUtils.blendRGB(start, end, index / length).rgb
-            text = text.append(ExtendedChatColor(color).asText(char.toString()))
+        val text = componentBuilder {
+            for ((index, char) in string.withIndex()) {
+                val color = ColorUtils.blendRGB(start, end, index / length).rgb
+                append(char.toString()) {
+                    withColor(color)
+                }
+            }
         }
         return text
     }

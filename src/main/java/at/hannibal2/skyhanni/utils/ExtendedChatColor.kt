@@ -36,11 +36,15 @@ class ExtendedChatColor(
                 description = "Sends a rainbow in chat"
                 category = CommandCategory.DEVELOPER_TEST
                 callback {
-                    val comp = Component.literal("")
-                    for (i in (0 until 100)) {
-                        val color = Color.HSBtoRGB(i / 100F, 1f, 1f)
-                        val extendedChatColor = ExtendedChatColor(color)
-                        comp.append(extendedChatColor.asText("§m "))
+                    val comp = componentBuilder {
+                        for (i in (0 until 100)) {
+                            val color = Color.HSBtoRGB(i / 100F, 1f, 1f)
+                            // its funny this doesn't even use extended chat color yet...
+                            append(" ") {
+                                withColor(color)
+                                strikethrough = true
+                            }
+                        }
                     }
                     ChatUtils.chat(comp)
                 }
