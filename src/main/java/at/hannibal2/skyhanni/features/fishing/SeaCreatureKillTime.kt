@@ -18,6 +18,7 @@ object SeaCreatureKillTime {
     @HandleEvent
     fun onSeaCreatureDeath(event: SeaCreatureEvent.Death) {
         if (!config.seaCreatureKillTimer) return
+        if (!event.seaCreature.isRare) return
         if (!event.seaCreature.isOwn && config.seaCreatureKillTimerOwnMobsOnly) return
         val seaCreature = event.seaCreature
         val time = seaCreature.spawnTime.passedSince()
