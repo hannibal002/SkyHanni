@@ -28,11 +28,15 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
 import java.awt.Color
@@ -88,10 +92,22 @@ object FlowstateHelper {
             if (personalBest > 200 && config.personalBestMessage) {
                 val newLuck = calculateFlowstateLuck(blockBreakStreak)
                 val oldLuck = calculateFlowstateLuck(personalBest)
-                val userLuckSegment = if (personalBest > 500) " §aYou Gained +${newLuck - oldLuck}✴ SkyHanni User Luck" else ""
                 ChatUtils.chat(
-                    "§d§lNEW FLOWSTATE PERSONAL BEST!§f Streak: $blockBreakStreak." +
-                        " You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!" + userLuckSegment,
+                    componentBuilder {
+                        append("NEW FLOWSTATE PERSONAL BEST!") {
+                            bold = true
+                            withColor(ChatFormatting.LIGHT_PURPLE)
+                        }
+                        withColor(ChatFormatting.WHITE)
+                        append(" Streak: $blockBreakStreak.")
+                        append(" You beat your old personal best by ${blockBreakStreak - personalBest} Blocks!")
+                        if (personalBest > 500) {
+                            append(" You Gained +${newLuck - oldLuck}✴ SkyHanni User Luck") {
+                                withColor(ChatFormatting.GREEN)
+
+                            }
+                        }
+                    }
                 )
             }
             personalBest = blockBreakStreak

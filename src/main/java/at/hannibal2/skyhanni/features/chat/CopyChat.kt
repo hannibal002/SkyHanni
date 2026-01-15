@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -52,7 +53,7 @@ object CopyChat {
         }
 
         ClipboardUtils.copyToClipboard(clipboard)
-        ChatUtils.chat("Copied $infoMessage to clipboard!")
+        ChatUtils.chat("Copied $infoMessage to clipboard!".asComponent())
     }
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {

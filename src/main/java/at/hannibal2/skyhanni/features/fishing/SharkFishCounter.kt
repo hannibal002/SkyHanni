@@ -10,6 +10,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
+import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object SharkFishCounter {
@@ -58,7 +62,30 @@ object SharkFishCounter {
         val g = counter[3] // Great White
         val total = count.addSeparators()
         val funnyComment = funnyComment(count)
-        ChatUtils.chat("You caught $total §f(§a$n §9$b §5$t §6$g§f) §esharks during this fishing festival. $funnyComment")
+        ChatUtils.chat(
+            componentBuilder {
+                append("You caught $total ")
+                append("(") {
+                    withColor(ChatFormatting.WHITE)
+                }
+                append("$n ") {
+                    withColor(ChatFormatting.GREEN)
+                }
+                append("$b ") {
+                    withColor(ChatFormatting.GOLD)
+                }
+                append("$t ") {
+                    withColor(ChatFormatting.DARK_PURPLE)
+                }
+                append("$g") {
+                    withColor(ChatFormatting.GOLD)
+                }
+                append(") ") {
+                    withColor(ChatFormatting.WHITE)
+                }
+                append("sharks during this fishing festival. $funnyComment")
+            }
+        )
         counter = mutableListOf(0, 0, 0, 0)
         display = ""
     }

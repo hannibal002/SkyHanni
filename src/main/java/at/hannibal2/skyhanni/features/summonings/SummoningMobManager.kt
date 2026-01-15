@@ -21,11 +21,15 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
 
@@ -105,7 +109,14 @@ object SummoningMobManager {
         if (!mob.isInRender()) return
         DelayedRun.runNextTick {
             if (lastChatTime.passedSince() > timeOut) {
-                ChatUtils.chat("Your Summoning Mob just §cdied!")
+                ChatUtils.chat(
+                    componentBuilder {
+                        append("Your Summoning Mob just ")
+                        append("died!") {
+                            withColor(ChatFormatting.RED)
+                        }
+                    }
+                )
             }
         }
     }

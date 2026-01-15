@@ -11,6 +11,10 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
+import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object NoBitsWarning {
@@ -33,7 +37,15 @@ object NoBitsWarning {
 
         if (config.bitsGainChatMessage) {
             if (event.bits < config.messageThreshold) return
-            ChatUtils.chat("You have gained §b${event.difference.addSeparators()} §eBits.")
+            ChatUtils.chat(
+                componentBuilder {
+                    append("You have gained ")
+                    append(event.difference.addSeparators()) {
+                        withColor(ChatFormatting.AQUA)
+                    }
+                    append(" Bits.")
+                }
+            )
         }
     }
 
