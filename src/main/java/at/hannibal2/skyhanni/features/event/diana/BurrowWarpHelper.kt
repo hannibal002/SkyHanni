@@ -88,7 +88,7 @@ object BurrowWarpHelper {
         val warp = currentWarp ?: return
         if (lastWarpTime.passedSince() < 1.seconds) return
 
-        GriffinBurrowHelper.addDebug("warping to $warp")
+        GriffinBurrowHelper.addDebug("warping to $warp count of bezierFitter ${PreciseGuessBurrow.getBezierFitterCount()}")
         lastWarpTime = SimpleTimeMark.now()
         HypixelCommands.warp(warp.name)
         lastWarp = currentWarp
