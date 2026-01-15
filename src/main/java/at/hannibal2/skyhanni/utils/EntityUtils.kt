@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -233,4 +234,9 @@ object EntityUtils {
     // TODO use derpy() on every use case
     val LivingEntity.baseMaxHealth: Int
         get() = this.getAttributeBaseValue(Attributes.MAX_HEALTH).toInt()
+
+    inline val LivingEntity.hasDied get() = isDeadOrDying
+
+    inline val Entity.spawnTime: SimpleTimeMark get() = SimpleTimeMark.now() - tickCount.ticks
+
 }

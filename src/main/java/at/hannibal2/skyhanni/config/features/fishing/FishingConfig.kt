@@ -71,6 +71,11 @@ class FishingConfig {
     val lavaReplacement: LavaReplacementConfig = LavaReplacementConfig()
 
     @Expose
+    @ConfigOption(name = "Health Display", desc = "")
+    @Accordion
+    val healthDisplay: SeaCreatureHealthDisplayConfig = SeaCreatureHealthDisplayConfig()
+
+    @Expose
     @ConfigOption(name = "Shark Fish Counter", desc = "Counts how many Sharks have been caught.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -123,4 +128,10 @@ class FishingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var muteBanshee: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Sea Creature Kill Time", desc = "Sends a chat message that shows how much time it took to kill a specific sea creature.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var seaCreatureKillTimer: Boolean = false
 }

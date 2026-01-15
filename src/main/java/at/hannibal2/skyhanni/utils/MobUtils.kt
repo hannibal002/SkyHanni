@@ -86,6 +86,10 @@ object MobUtils {
         return possibleEntities.distinct().sortedBy { it.baseEntity.distanceTo(pos) }
     }
 
+    fun Mob.getLorenzVec() = baseEntity.getLorenzVec()
+
+    inline val Mob.entityId get() = baseEntity.id
+
     val LivingEntity.mob: Mob? get() = MobData.entityToMob[this]
 
     val Entity.mob: Mob? get() = (this as? LivingEntity)?.mob

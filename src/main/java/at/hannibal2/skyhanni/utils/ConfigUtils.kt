@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
+import io.github.notenoughupdates.moulconfig.observer.Property
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import net.minecraft.client.Minecraft
@@ -54,6 +55,16 @@ object ConfigUtils {
         if (!editor.goToOption(option)) return false
         openEditor(editor)
         return true
+    }
+
+    fun <T : Any> T.asProperty(): Property<T> = Property.of(this)
+
+    fun String.toSplitSet(delimiter: String = ","): Set<String> = split(delimiter).map(String::trim).toSet()
+
+    fun Property<String>.toSet(lowercase: Boolean = true, delimiter: String = ","): Set<String> {
+        var value = get()
+        if (lowercase) value = value.lowercase()
+        return value.toSplitSet(delimiter)
     }
 
     fun openEditor(editor: MoulConfigEditor<*>) {
