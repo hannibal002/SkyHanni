@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
-import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
