@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
@@ -50,9 +51,9 @@ object MobHealthDisplay {
         val componentColor = blendRGB(LorenzColor.GREEN, LorenzColor.RED, percentage)
         return componentBuilder {
             appendWithColor(health.shortFormat(), componentColor.rgb)
-            appendWithColor("/", LorenzColor.WHITE.toColor().rgb)
-            appendWithColor(maxHealth.shortFormat(), LorenzColor.GREEN.toColor().rgb)
-            appendWithColor(" ❤", LorenzColor.RED.toColor().rgb)
+            appendWithColor("/", ChatFormatting.WHITE)
+            appendWithColor(maxHealth.shortFormat(), ChatFormatting.GREEN)
+            appendWithColor(" ❤", ChatFormatting.RED)
         }
     }
 
@@ -64,9 +65,9 @@ object MobHealthDisplay {
             for ((seaCreature, health) in healthMap) {
                 if (health == -1) continue
                 val mob = seaCreature.mob ?: continue
-                val color = if (seaCreature.isOwn) LorenzColor.GREEN else LorenzColor.RED
+                val color = if (seaCreature.isOwn) ChatFormatting.GREEN else ChatFormatting.RED
                 val guiComponent = componentBuilder {
-                    appendWithColor(seaCreature.name, color.toColor().rgb)
+                    appendWithColor(seaCreature.name, color)
                     append(" ")
                     append(formatHealth(mob))
                 }
