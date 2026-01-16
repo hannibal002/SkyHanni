@@ -25,11 +25,38 @@ class SpecificSeaCreatures(
             event.registerBrigadier("shSpecificSeaCreatureSettings") {
                 description = "Opens a Special Config Menu for Specific Sea Creature Settings."
                 category = CommandCategory.USERS_ACTIVE
+                aliases = listOf("SeaCreatureSpecificSettings")
                 simpleCallback {
                     val existingSettings = updateList()
                     val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/seacreaturetoggles.xml")
                     XmlUtils.openXmlScreen(SpecificSeaCreatures(existingSettings), location)
                 }
+            }
+            event.registerBrigadier("resetSeaCreatureSpecificSettings") {
+                description = "Resets entirety of Specific Sea Creature Settings to Default."
+                category = CommandCategory.USERS_RESET
+                simpleCallback {
+                    resetConfig()
+                }
+            }
+        }
+
+        private fun resetConfig() {
+            val existingSettings = ObservableList<SpecificSeaCreatureStorageXMLHelper>(mutableListOf())
+            SeaCreatureManager.allFishingMobs.forEach { (name, seaCreature) ->
+                if (SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage[name] == null) existingSettings.add(
+                    SpecificSeaCreatureStorageXMLHelper(
+                        SpecificSeaCreatureSettings(
+                            name,
+                            shouldRenderLootshare = seaCreature.rare,
+                            shouldShowHealthOverlay =  seaCreature.rare,
+                            shouldShareInChat =  seaCreature.rare,
+                            shouldShowKillTime = seaCreature.rare,),
+                        existingSettings),
+                )
+            }
+            SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage.forEach {
+                existingSettings.add(SpecificSeaCreatureStorageXMLHelper(it.value, existingSettings))
             }
         }
 

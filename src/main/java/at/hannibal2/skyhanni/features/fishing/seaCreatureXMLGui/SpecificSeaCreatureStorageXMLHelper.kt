@@ -14,16 +14,16 @@ class SpecificSeaCreatureStorageXMLHelper(
     var name: String = from.name
 
     @field:Bind
-    var shouldRenderLootshare: Boolean = from.shouldRenderLootshare
+    var shouldRenderLootshare: Boolean? = from.shouldRenderLootshare
 
     @field:Bind
-    var shouldShowHealthOverlay: Boolean = from.shouldShowHealthOverlay
+    var shouldShowHealthOverlay: Boolean? = from.shouldShowHealthOverlay
 
     @field:Bind
-    var shouldShareInChat: Boolean = from.shouldShareInChat
+    var shouldShareInChat: Boolean? = from.shouldShareInChat
 
     @field:Bind
-    var shouldShowKillTime: Boolean = from.shouldShowKillTime
+    var shouldShowKillTime: Boolean? = from.shouldShowKillTime
 
 
     @Bind
