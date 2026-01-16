@@ -493,7 +493,10 @@ object FarmingWeightDisplay {
         return if (newData) apiData.rank else leaderboardPosition
     }
 
-    private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine("farming weight display load weight", timeout = 30.seconds) {
+    private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine(
+        "farming weight display load weight",
+        timeout = 30.seconds,
+    ) {
         val apiData = EliteDevApi.fetchWeightProfile(localProfile) ?: run {
             apiError = true
             return@launchIOCoroutine
