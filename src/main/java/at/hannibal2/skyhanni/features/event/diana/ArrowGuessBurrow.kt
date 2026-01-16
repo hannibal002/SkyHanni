@@ -63,7 +63,7 @@ object ArrowGuessBurrow {
                     GriffinBurrowHelper.addDebug("arrow guess returned null")
                     failures++
                     if (config.warnOnFail) {
-                        TitleManager.sendTitle("§eUse Spade", duration = 3.seconds)
+                        GriffinBurrowHelper.showUseSpadeTitle()
                     }
                 }
             }
@@ -101,17 +101,29 @@ object ArrowGuessBurrow {
     }
 
     private fun addGuessFromRay(ray: RaycastUtils.Ray, range: IntRange): LorenzVec? {
-        val bounds = IslandType.HUB.islandData?.boundingBox ?: return null
-        if (!bounds.isInside(ray.origin)) return null // guarantees exit point is first intersect
+        val bounds = IslandType.HUB.islandData?.boundingBox ?: run {
+            GriffinBurrowHelper.addDebug("couldnt get hub bounds")
+            return null
+        }
+        if (!bounds.isInside(ray.origin)) { // guarantees exit point is first intersect
+            GriffinBurrowHelper.addDebug("origin not in bounds")
+            return null
+        }
         // you technically don't need to find the endpoint for this, but it makes it simpler so why not
-        val endPoint = RaycastUtils.intersectAABBWithRay(bounds, ray)?.second ?: return null
+        val endPoint = RaycastUtils.intersectAABBWithRay(bounds, ray)?.second ?: run {
+            GriffinBurrowHelper.addDebug("couldnt find endpoint")
+            return null
+        }
 
         val diff = endPoint.minus(ray.origin).toDoubleArray()
         val axisIndex = diff.withIndex()
             .filter { (_, value) -> abs(value) > 0.9 } // only if the axis isn't the same block
             .minByOrNull { (_, value) -> abs(value) } // find the axis with the least change
             ?.index
-            ?: return null
+            ?: run {
+                GriffinBurrowHelper.addDebug("couldnt find axis index")
+                return null
+            }
 
         val candidates = mutableMapOf<LorenzVec, Pair<Double, Double>>() // position mapped to scaledDistToRay and distFromOrigin
         val endPointArray = endPoint.toDoubleArray()
@@ -135,11 +147,17 @@ object ArrowGuessBurrow {
             candidates[candidateBlock] = Pair(scaledDistance.roundTo(2), distanceFromOrigin)
         }
 
-        if (candidates.isEmpty()) return null
+        if (candidates.isEmpty()) {
+            GriffinBurrowHelper.addDebug("candidates is empty")
+            return null
+        }
         val minValue = candidates.values.minOf { it.first }
         val possibilities = candidates.filterValues { it.first == minValue }
         val withinRange = possibilities.filterValues { it.second.toInt() in range }.map { it.key }
-        if (withinRange.isEmpty()) return null
+        if (withinRange.isEmpty()) {
+            GriffinBurrowHelper.addDebug("no candidates within range")
+            return null
+        }
 
         BurrowGuessEvent(GuessEntry(withinRange), "arrow guess").post()
 

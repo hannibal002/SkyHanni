@@ -261,6 +261,11 @@ object GriffinBurrowHelper {
         return newLocation
     }
 
+    fun showUseSpadeTitle() {
+        addDebug("showing use spade title")
+        TitleManager.sendTitle("§eUse Spade")
+    }
+
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
@@ -311,7 +316,7 @@ object GriffinBurrowHelper {
             if (config.warnOnChainComp) {
                 val playerLoc = MinecraftCompat.localPlayer.position().toLorenzVec()
                 val anyClose = allGuesses.filter { it.getCurrent().distanceSq(playerLoc) < 8100 }
-                if (anyClose.isEmpty()) TitleManager.sendTitle("§eUse Spade")
+                if (anyClose.isEmpty()) showUseSpadeTitle()
             }
         }
 
@@ -320,7 +325,7 @@ object GriffinBurrowHelper {
                 1.seconds,
             ) {
                 if (ArrowGuessBurrow.lastArrowTime.passedSince() > 2.seconds) {
-                    TitleManager.sendTitle("§eUse Spade")
+                    showUseSpadeTitle()
                 }
             }
         }
