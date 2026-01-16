@@ -1,9 +1,6 @@
 package at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
-import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.xml.Bind

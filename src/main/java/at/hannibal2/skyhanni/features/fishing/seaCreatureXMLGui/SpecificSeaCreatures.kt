@@ -36,7 +36,6 @@ class SpecificSeaCreatures(
         fun updateList():ObservableList<SpecificSeaCreatureStorageXMLHelper> {
             val existingSettings = ObservableList<SpecificSeaCreatureStorageXMLHelper>(mutableListOf())
             SeaCreatureManager.allFishingMobs.forEach { (name, seaCreature) ->
-
                 if (SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage[name] == null) existingSettings.add(
                     SpecificSeaCreatureStorageXMLHelper(
                         SpecificSeaCreatureSettings(
@@ -62,7 +61,6 @@ class SpecificSeaCreatures(
                     seaCreature.shouldShowHealthOverlay,
                     seaCreature.shouldShareInChat,
                     seaCreature.shouldShowKillTime,
-                    seaCreature.warnWhenSeeing
                 )
             }
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SEA_CREATURES, "save file")

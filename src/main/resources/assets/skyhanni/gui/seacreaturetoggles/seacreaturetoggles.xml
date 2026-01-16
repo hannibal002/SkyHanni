@@ -23,6 +23,11 @@
                     <Text text="go to Party Chat Share Settings"/>
                 </Button>
             </Row>
+            <Row>
+                <Button onClick = "@showKillTime">
+                    <Text text = "go to Kill Time Settings"/>
+                </Button>
+            </Row>
         </Column>
     </Gui>
 </Root>
