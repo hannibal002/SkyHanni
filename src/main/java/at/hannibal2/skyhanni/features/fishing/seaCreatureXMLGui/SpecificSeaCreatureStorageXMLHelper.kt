@@ -31,9 +31,5 @@ class SpecificSeaCreatureStorageXMLHelper(
         return name.asStructuredText()
     }
 
-    @Bind
-    fun afterClose() {
-        SpecificSeaCreatures.save(seaCreatureList)
-    }
 }
 

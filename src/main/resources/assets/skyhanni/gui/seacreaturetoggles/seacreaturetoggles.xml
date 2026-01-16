@@ -8,26 +8,34 @@
                 </Scale>
             </Center>
             <Spacer height="5"/>
-            <Row>
-                <Button onClick="@showLootshare">
-                    <Text text="go to Lootshare Toggles"/>
-                </Button>
-            </Row>
-            <Row>
-                <Button onClick="@showHealthDisp">
-                    <Text text="go to Health Display Settings"/>
-                </Button>
-            </Row>
-            <Row>
-                <Button onClick="@showShareParty">
-                    <Text text="go to Party Chat Share Settings"/>
-                </Button>
-            </Row>
-            <Row>
-                <Button onClick = "@showKillTime">
-                    <Text text = "go to Kill Time Settings"/>
-                </Button>
-            </Row>
+            <Center>
+                <Row>
+                    <Button onClick="@showLootshare">
+                        <Text text="Lootshare Sphere Settings"/>
+                    </Button>
+                </Row>
+            </Center>
+            <Center>
+                <Row>
+                    <Button onClick="@showHealthDisp">
+                        <Text text="Health Display Settings"/>
+                    </Button>
+                </Row>
+            </Center>
+            <Center>
+                <Row>
+                    <Button onClick="@showShareParty">
+                        <Text text="Party Chat Share Settings"/>
+                    </Button>
+                </Row>
+            </Center>
+            <Center>
+                <Row>
+                    <Button onClick="@showKillTime">
+                        <Text text="Kill Time Settings"/>
+                    </Button>
+                </Row>
+            </Center>
         </Column>
     </Gui>
 </Root>

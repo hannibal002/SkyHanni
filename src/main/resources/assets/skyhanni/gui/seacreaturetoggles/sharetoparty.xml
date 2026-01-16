@@ -7,11 +7,18 @@
                     <Text text="Send To Party Chat Toggle per sea creature"/>
                 </Scale>
             </Center>
+            <Center>
+                <Row>
+                    <Text text="Search: "/>
+                    <TextField value="@search"/>
+                    <Text text="@poll"/>
+                </Row>
+            </Center>
             <Spacer height="5"/>
             <ScrollPanel width="350" height="200">
-                <Array data="@seaCreatures">
+                <Array data="@searchResults">
                     <Row>
-                        <Text text="@getName" width="200"/>
+                        <Text text="@getName" width="300"/>
                         <Switch value="@shouldShareInChat"/>
                     </Row>
                 </Array>

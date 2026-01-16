@@ -4,13 +4,21 @@
             <Meta afterClose="@afterClose"/>
             <Center>
                 <Scale scale="2">
-                    <Text text="Per Sea Creature Kill Time Message Toggle"/>
+                    <Text text="Send Kill Time Message"/>
                 </Scale>
+            </Center>
+            <Center>
+                <Row>
+                    <Text text="Search: "/>
+                    <TextField value="@search"/>
+                    <Text text="@poll"/>
+                </Row>
             </Center>
             <Spacer height="5"/>
             <ScrollPanel width="350" height="200">
-                <Array data="@seaCreatures">
+                <Array data="@searchResults">
                     <Row>
+                        <Text text="@getName" width="300"/>
                         <Switch value="@shouldShowKillTime"/>
                     </Row>
                 </Array>

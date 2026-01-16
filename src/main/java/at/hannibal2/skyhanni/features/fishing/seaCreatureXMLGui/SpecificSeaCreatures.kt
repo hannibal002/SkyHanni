@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.XmlUtils
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
+import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.xml.Bind
 
@@ -16,6 +18,18 @@ class SpecificSeaCreatures(
     @field:Bind
     val seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>,
 ) {
+
+    @field:Bind
+    var search: String = ""
+
+    private var lastSearch: String? = null
+
+    private val searchCache = ObservableList(mutableListOf<SpecificSeaCreatureStorageXMLHelper>())
+
+    @Bind
+    fun searchResults(): ObservableList<SpecificSeaCreatureStorageXMLHelper> {
+        return searchCache
+    }
 
     @SkyHanniModule
     companion object {
@@ -29,10 +43,9 @@ class SpecificSeaCreatures(
                 simpleCallback {
                     val existingSettings = updateList()
                     val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/seacreaturetoggles.xml")
-                    XmlUtils.openXmlScreen(SpecificSeaCreatures(existingSettings), location)
-                }
+                    XmlUtils.openXmlScreen(SpecificSeaCreatures(existingSettings), location)                }
             }
-            event.registerBrigadier("resetSeaCreatureSpecificSettings") {
+            event.registerBrigadier("shresetSeaCreatureSpecificSettings") {
                 description = "Resets entirety of Specific Sea Creature Settings to Default."
                 category = CommandCategory.USERS_RESET
                 simpleCallback {
@@ -97,6 +110,16 @@ class SpecificSeaCreatures(
     @Bind
     fun afterClose() {
         save(seaCreatures)
+    }
+
+    @Bind
+    fun poll(): StructuredText {
+        if (search != lastSearch) {
+            lastSearch = search
+            searchCache.clear()
+            searchCache.addAll(seaCreatures.filter { it.name.contains(search, true)})
+        }
+        return "".asStructuredText()
     }
 
     @Bind
