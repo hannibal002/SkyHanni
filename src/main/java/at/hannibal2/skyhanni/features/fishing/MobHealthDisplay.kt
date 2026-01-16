@@ -24,6 +24,7 @@ import net.minecraft.network.chat.Component
 object MobHealthDisplay {
 
     private val config get() = SkyHanniMod.feature.fishing.healthDisplay
+    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage
 
     private var names = setOf<String>()
     private val healthMap = mutableMapOf<SeaCreatureData, Int>()
@@ -79,29 +80,11 @@ object MobHealthDisplay {
         config.pos.renderRenderables(strings, posLabel = "Mob Health Display")
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        updateNames()
-        config.names.onToggle {
-            updateNames()
-            reloadMobs()
-        }
-    }
-
     private fun addMob(seaCreature: SeaCreatureData) {
-        if (seaCreature.name in names) {
+        if (scSpecificConfig[seaCreature.name]?.shouldShowHealthOverlay == true) {
             val value = if (seaCreature.canBeSeen()) seaCreature.health else null
             healthMap[seaCreature] = value ?: -1
         }
-    }
-
-    private fun reloadMobs() {
-        healthMap.clear()
-        SeaCreatureDetectionApi.getSeaCreatures().forEach(MobHealthDisplay::addMob)
-    }
-
-    private fun updateNames() {
-        names = config.names.toSet(false)
     }
 
 }

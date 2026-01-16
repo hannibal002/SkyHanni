@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeIn
 @SkyHanniModule
 object SeaCreatureLootshareSphere {
     private val config get() = SkyHanniMod.feature.fishing
+    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage
 
     private const val RANGE = 30.0f
 
@@ -40,25 +41,8 @@ object SeaCreatureLootshareSphere {
         }
     }
 
-    @HandleEvent
-    fun onConfigLoad() {
-        updateNames()
-        config.lootshareMobs.onToggle {
-            updateNames()
-            reloadMobs()
-        }
-    }
-
     private fun addMob(seaCreature: SeaCreatureData) {
-        if (seaCreature.name in names) seaCreatures.add(seaCreature)
+        if (scSpecificConfig[seaCreature.name]?.shouldRenderLootshare == true) seaCreatures.add(seaCreature)
     }
 
-    private fun reloadMobs() {
-        seaCreatures.clear()
-        SeaCreatureDetectionApi.getSeaCreatures().forEach(::addMob)
-    }
-
-    private fun updateNames() {
-        names = config.lootshareMobs.toSet(false)
-    }
 }

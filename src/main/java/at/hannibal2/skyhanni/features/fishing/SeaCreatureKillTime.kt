@@ -14,11 +14,12 @@ import net.minecraft.ChatFormatting
 @SkyHanniModule
 object SeaCreatureKillTime {
     private val config get() = SkyHanniMod.feature.fishing
+    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage
 
     @HandleEvent
     fun onSeaCreatureDeath(event: SeaCreatureEvent.Death) {
         if (!config.seaCreatureKillTimer) return
-        if (!event.seaCreature.isRare) return
+        if (scSpecificConfig[event.name]?.shouldShowKillTime == false) return
         if (!event.seaCreature.isOwn && config.seaCreatureKillTimerOwnMobsOnly) return
         val seaCreature = event.seaCreature
         val time = seaCreature.spawnTime.passedSince()

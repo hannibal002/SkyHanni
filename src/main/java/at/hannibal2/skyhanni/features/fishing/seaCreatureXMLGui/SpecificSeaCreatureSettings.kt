@@ -8,5 +8,7 @@ data class SpecificSeaCreatureSettings(
     @Expose var name: String,
     @Expose var shouldRenderLootshare: Boolean,
     @Expose var shouldShowHealthOverlay: Boolean,
-    @Expose var shouldShareInChat: Boolean
+    @Expose var shouldShareInChat: Boolean,
+    @Expose var shouldShowKillTime: Boolean,
+
 )

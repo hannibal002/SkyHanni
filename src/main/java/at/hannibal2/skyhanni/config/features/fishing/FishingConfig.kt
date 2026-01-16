@@ -3,12 +3,11 @@ package at.hannibal2.skyhanni.config.features.fishing
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingConfig
-import at.hannibal2.skyhanni.utils.ConfigUtils.asProperty
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -149,6 +148,10 @@ class FishingConfig {
     @FeatureToggle
     var seaCreatureKillTimerOwnMobsOnly: Boolean = true
 
+    @ConfigOption(name = "Custom Kill Time Mobs", desc = "This Feature can be customized under shSpecificSeaCreatureSettings!")
+    @ConfigEditorInfoText
+    var notice1: String = ""
+
     @Expose
     @ConfigOption(
         name = "Lootshare Range",
@@ -158,8 +161,7 @@ class FishingConfig {
     @ConfigEditorBoolean
     var lootshareRange = false
 
-    @Expose
-    @ConfigOption(name = "Lootshare Mobs", desc = "The name of the sea creatures to show the lootshare range for, separated by commas.")
-    @ConfigEditorText
-    val lootshareMobs = "Lord Jawbus, Thunder".asProperty()
+    @ConfigOption(name = "Custom LS Mobs", desc = "This Feature can be customized under shSpecificSeaCreatureSettings!")
+    @ConfigEditorInfoText
+    var notice: String = ""
 }

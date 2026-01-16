@@ -4,15 +4,14 @@
             <Meta afterClose="@afterClose"/>
             <Center>
                 <Scale scale="2">
-                    <Text text="Lootshare Sphere Toggle per Sea Creature"/>
+                    <Text text="Per Sea Creature Kill Time Message Toggle"/>
                 </Scale>
             </Center>
             <Spacer height="5"/>
             <ScrollPanel width="350" height="200">
                 <Array data="@seaCreatures">
                     <Row>
-                        <Text text="@getName" width="200"/>
-                        <Switch value="@shouldRenderLootshare"/>
+                        <Switch value="@shouldShowKillTime"/>
                     </Row>
                 </Array>
             </ScrollPanel>

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.ConfigUtils.asProperty
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -17,19 +18,13 @@ class SeaCreatureHealthDisplayConfig {
     var enabled = false
 
     @Expose
-    @ConfigOption(name = "Health Display Mobs", desc = "The name of the sea creatures to show the health display for, separated by commas.")
-    @ConfigEditorText
-    val names = "Lord Jawbus, Thunder".asProperty()
-
-    @Expose
     @ConfigOption(name = "Limit", desc = "The maximum amount of mobs to show.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
     var limit = 5
 
-    @Expose
-    @ConfigOption(name = "Red Percentage", desc = "Percentage of health at which a mob's health should be shown in red.")
-    @ConfigEditorSlider(minValue = 1f, maxValue = 25f, minStep = 1f)
-    var redPercentage: Float = 5f
+    @ConfigOption(name = "Custom Health Display Mobs", desc = "This Feature's Mobs can be customized under shSpecificSeaCreatureSettings!")
+    @ConfigEditorInfoText
+    var notice: String = ""
 
     @Expose
     @ConfigLink(owner = SeaCreatureHealthDisplayConfig::class, field = "enabled")
