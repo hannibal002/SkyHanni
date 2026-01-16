@@ -57,7 +57,6 @@ object ArrowGuessBurrow {
                 val dugBlock = it.origin.roundToBlock()
                 GriffinBurrowHelper.addDebug("detected arrow origin above block [${dugBlock.x}, ${dugBlock.y}, ${dugBlock.z}]")
                 GriffinBurrowHelper.removeGuess(dugBlock, "origin of detected arrow")
-                points.clear()
                 lastArrowTime = SimpleTimeMark.now()
                 addGuessFromRay(it, range) ?: run {
                     GriffinBurrowHelper.addDebug("arrow guess returned null")
@@ -195,6 +194,7 @@ object ArrowGuessBurrow {
 
         val ray = RaycastUtils.Ray(adjustedBase, adjustedTip.minus(adjustedBase).normalize())
         if (recentFoundArrows.add(ray)) return null
+        points.clear()
 
         // not your arrow
         BurrowApi.lastBurrowInteracted?.let {
