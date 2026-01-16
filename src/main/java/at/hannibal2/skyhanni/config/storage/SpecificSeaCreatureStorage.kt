@@ -5,5 +5,5 @@ import com.google.gson.annotations.Expose
 
 class SpecificSeaCreatureStorage {
     @Expose
-    var specificSeaCreatureStorage: MutableMap<String, SpecificSeaCreatureSettings> = mutableMapOf()
+    var specificSeaCreatureConfigStorage: MutableMap<String, SpecificSeaCreatureSettings> = mutableMapOf()
 }

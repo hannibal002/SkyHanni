@@ -10,5 +10,4 @@ data class SpecificSeaCreatureSettings(
     @Expose var shouldShowHealthOverlay: Boolean?,
     @Expose var shouldShareInChat: Boolean?,
     @Expose var shouldShowKillTime: Boolean?,
-
 )

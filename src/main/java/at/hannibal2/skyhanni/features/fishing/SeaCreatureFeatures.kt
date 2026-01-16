@@ -34,7 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 object SeaCreatureFeatures {
 
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
-    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage
+    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage
     private var lastRareCatch = SimpleTimeMark.farPast()
     private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
     private val entityIds = TimeLimitedSet<Int>(6.minutes)

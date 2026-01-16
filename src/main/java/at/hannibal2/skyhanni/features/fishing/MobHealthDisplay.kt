@@ -3,13 +3,10 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.blendRGB
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.ConfigUtils.toSet
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -24,9 +21,8 @@ import net.minecraft.network.chat.Component
 object MobHealthDisplay {
 
     private val config get() = SkyHanniMod.feature.fishing.healthDisplay
-    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage
+    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage
 
-    private var names = setOf<String>()
     private val healthMap = mutableMapOf<SeaCreatureData, Int>()
 
     @HandleEvent

@@ -43,7 +43,8 @@ class SpecificSeaCreatures(
                 simpleCallback {
                     val existingSettings = updateList()
                     val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/seacreaturetoggles.xml")
-                    XmlUtils.openXmlScreen(SpecificSeaCreatures(existingSettings), location)                }
+                    XmlUtils.openXmlScreen(SpecificSeaCreatures(existingSettings), location)
+                }
             }
             event.registerBrigadier("shresetSeaCreatureSpecificSettings") {
                 description = "Resets entirety of Specific Sea Creature Settings to Default."
@@ -57,45 +58,47 @@ class SpecificSeaCreatures(
         private fun resetConfig() {
             val existingSettings = ObservableList<SpecificSeaCreatureStorageXMLHelper>(mutableListOf())
             SeaCreatureManager.allFishingMobs.forEach { (name, seaCreature) ->
-                if (SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage[name] == null) existingSettings.add(
+                if (SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage[name] == null) existingSettings.add(
                     SpecificSeaCreatureStorageXMLHelper(
                         SpecificSeaCreatureSettings(
                             name,
                             shouldRenderLootshare = seaCreature.rare,
-                            shouldShowHealthOverlay =  seaCreature.rare,
-                            shouldShareInChat =  seaCreature.rare,
-                            shouldShowKillTime = seaCreature.rare,),
-                        existingSettings),
+                            shouldShowHealthOverlay = seaCreature.rare,
+                            shouldShareInChat = seaCreature.rare,
+                            shouldShowKillTime = seaCreature.rare,
+                        ),
+                    ),
                 )
             }
-            SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage.forEach {
-                existingSettings.add(SpecificSeaCreatureStorageXMLHelper(it.value, existingSettings))
+            SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage.forEach {
+                existingSettings.add(SpecificSeaCreatureStorageXMLHelper(it.value))
             }
         }
 
-        fun updateList():ObservableList<SpecificSeaCreatureStorageXMLHelper> {
+        fun updateList(): ObservableList<SpecificSeaCreatureStorageXMLHelper> {
             val existingSettings = ObservableList<SpecificSeaCreatureStorageXMLHelper>(mutableListOf())
             SeaCreatureManager.allFishingMobs.forEach { (name, seaCreature) ->
-                if (SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage[name] == null) existingSettings.add(
+                if (SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage[name] == null) existingSettings.add(
                     SpecificSeaCreatureStorageXMLHelper(
                         SpecificSeaCreatureSettings(
                             name,
                             shouldRenderLootshare = seaCreature.rare,
-                            shouldShowHealthOverlay =  seaCreature.rare,
-                            shouldShareInChat =  seaCreature.rare,
-                            shouldShowKillTime = seaCreature.rare,),
-                        existingSettings),
+                            shouldShowHealthOverlay = seaCreature.rare,
+                            shouldShareInChat = seaCreature.rare,
+                            shouldShowKillTime = seaCreature.rare,
+                        ),
+                    ),
                 )
             }
-            SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage.forEach {
-                existingSettings.add(SpecificSeaCreatureStorageXMLHelper(it.value, existingSettings))
+            SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage.forEach {
+                existingSettings.add(SpecificSeaCreatureStorageXMLHelper(it.value))
             }
             return existingSettings
         }
 
         fun save(seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>) {
             for (seaCreature in seaCreatures) {
-                SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage[seaCreature.name] = SpecificSeaCreatureSettings(
+                SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage[seaCreature.name] = SpecificSeaCreatureSettings(
                     seaCreature.name,
                     seaCreature.shouldRenderLootshare,
                     seaCreature.shouldShowHealthOverlay,
@@ -107,6 +110,7 @@ class SpecificSeaCreatures(
         }
 
     }
+
     @Bind
     fun afterClose() {
         save(seaCreatures)
@@ -117,7 +121,7 @@ class SpecificSeaCreatures(
         if (search != lastSearch) {
             lastSearch = search
             searchCache.clear()
-            searchCache.addAll(seaCreatures.filter { it.name.contains(search, true)})
+            searchCache.addAll(seaCreatures.filter { it.name.contains(search, true) })
         }
         return "".asStructuredText()
     }

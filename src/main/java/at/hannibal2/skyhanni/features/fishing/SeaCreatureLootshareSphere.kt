@@ -5,8 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.ConfigUtils.toSet
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -15,11 +13,10 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeIn
 @SkyHanniModule
 object SeaCreatureLootshareSphere {
     private val config get() = SkyHanniMod.feature.fishing
-    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage
+    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage
 
     private const val RANGE = 30.0f
 
-    private var names = setOf<String>()
     private val seaCreatures = mutableSetOf<SeaCreatureData>()
 
     fun isInRange(pos: LorenzVec): Boolean = pos.distanceToPlayer() < RANGE

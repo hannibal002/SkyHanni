@@ -14,7 +14,7 @@ import net.minecraft.ChatFormatting
 @SkyHanniModule
 object SeaCreatureKillTime {
     private val config get() = SkyHanniMod.feature.fishing
-    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage
+    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage
 
     @HandleEvent
     fun onSeaCreatureDeath(event: SeaCreatureEvent.Death) {
