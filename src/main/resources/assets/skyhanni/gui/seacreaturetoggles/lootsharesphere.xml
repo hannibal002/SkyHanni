@@ -1,0 +1,21 @@
+<Root xmlns="http://notenoughupdates.org/moulconfig">
+    <Gui>
+        <Column>
+            <Meta afterClose="@afterClose"/>
+            <Center>
+                <Scale scale="2">
+                    <Text text="Lootshare Sphere Toggles per Sea Creature"/>
+                </Scale>
+            </Center>
+            <Spacer height="5"/>
+            <ScrollPanel width="350" height="200">
+                <Array data="@seaCreatures">
+                    <Row>
+                        <Text text="@getName" width="200"/>
+                        <Switch value="@shouldRenderLootshare"/>
+                    </Row>
+                </Array>
+            </ScrollPanel>
+        </Column>
+    </Gui>
+</Root>

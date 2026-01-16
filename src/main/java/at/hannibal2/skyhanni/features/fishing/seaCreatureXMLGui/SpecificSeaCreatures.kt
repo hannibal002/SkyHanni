@@ -1,0 +1,81 @@
+package at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui
+
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.XmlUtils
+import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
+import io.github.notenoughupdates.moulconfig.common.text.StructuredText
+import io.github.notenoughupdates.moulconfig.observer.ObservableList
+import io.github.notenoughupdates.moulconfig.xml.Bind
+
+class SpecificSeaCreatures(
+    @field:Bind
+    val seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>,
+) {
+
+    @SkyHanniModule
+    companion object {
+
+        @HandleEvent
+        fun onCommandRegistration(event: CommandRegistrationEvent) {
+            event.registerBrigadier("shSpecificSeaCreatureSettings") {
+                description = "Opens a Special Config Menu for Specific Sea Creature Settings."
+                category = CommandCategory.USERS_ACTIVE
+                simpleCallback {
+                    val existingSettings = ObservableList<SpecificSeaCreatureStorageXMLHelper>(mutableListOf())
+                    SeaCreatureManager.allFishingMobs.forEach { (name, seaCreature) ->
+                        if (SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage[name] == null) existingSettings.add(
+                            SpecificSeaCreatureStorageXMLHelper(SpecificSeaCreatureSettings(name, false, false, false), existingSettings),
+                        )
+                    }
+                    SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage.forEach {
+                        existingSettings.add(SpecificSeaCreatureStorageXMLHelper(it.value, existingSettings))
+                    }
+                    val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/seacreaturetoggles.xml")
+                    XmlUtils.openXmlScreen(SpecificSeaCreatures(existingSettings), location)
+                }
+            }
+        }
+
+        fun save(seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>) {
+            for (seaCreature in seaCreatures) {
+                SkyHanniMod.seaCreatureStorage.specificSeaCreatureStorage[seaCreature.name] = SpecificSeaCreatureSettings(
+                    seaCreature.name,
+                    seaCreature.shouldRenderLootshare,
+                    seaCreature.shouldShowHealthOverlay,
+                    seaCreature.shouldShareInChat,
+                )
+            }
+            SkyHanniMod.configManager.saveConfig(ConfigFileType.SEA_CREATURES, "save file")
+        }
+
+    }
+    @Bind
+    fun afterClose() {
+        save(seaCreatures)
+    }
+
+    @Bind
+    fun showLootshare() {
+        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/lootsharesphere.xml")
+        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+    }
+
+    @Bind
+    fun showHealthDisp() {
+        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/healthdisplay.xml")
+        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+    }
+
+    @Bind
+    fun showShareParty() {
+        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/sharetoparty.xml")
+        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+    }
+
+}

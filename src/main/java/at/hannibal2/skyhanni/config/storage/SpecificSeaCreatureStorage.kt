@@ -1,0 +1,9 @@
+package at.hannibal2.skyhanni.config.storage
+
+import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SpecificSeaCreatureSettings
+import com.google.gson.annotations.Expose
+
+class SpecificSeaCreatureStorage {
+    @Expose
+    var specificSeaCreatureStorage: MutableMap<String, SpecificSeaCreatureSettings> = mutableMapOf()
+}
