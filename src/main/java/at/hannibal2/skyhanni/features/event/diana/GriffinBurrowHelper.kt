@@ -569,11 +569,16 @@ object GriffinBurrowHelper {
             InventoryUtils.lastItemChangeTime.passedSince() > CurrentPing.averagePing + 50.milliseconds
         ) return
 
-        getGuess(location)?.let { if (it.burrowType == BurrowType.UNKNOWN && it.getCurrent() == location) {
-            DelayedRun.runDelayed(200.milliseconds, {
-                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 400.milliseconds) it.attemptMove()
-            })
-        } }
+        getGuess(location)?.let {
+            if (it.burrowType == BurrowType.UNKNOWN && it.getCurrent() == location) {
+                DelayedRun.runDelayed(
+                    200.milliseconds,
+                    {
+                        if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 400.milliseconds) it.attemptMove()
+                    },
+                )
+            }
+        }
 
         val burrows = allGuesses.toList().flatMap { it.guesses }.union(recentGuessesRemoved)
         if (burrows.contains(location)) BurrowApi.setBurrowInteracted(location)

@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
@@ -99,6 +98,7 @@ object ArrowGuessBurrow {
         }
     }
 
+    @Suppress("ReturnCount")
     private fun addGuessFromRay(ray: RaycastUtils.Ray, range: IntRange): LorenzVec? {
         val bounds = IslandType.HUB.islandData?.boundingBox ?: run {
             GriffinBurrowHelper.addDebug("couldnt get hub bounds")
