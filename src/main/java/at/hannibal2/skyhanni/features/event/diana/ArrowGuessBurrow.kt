@@ -197,15 +197,12 @@ object ArrowGuessBurrow {
         points.clear()
 
         // not your arrow
-        BurrowApi.lastBurrowInteracted?.let {
-            if (adjustedBase.distanceSq(it) > 5 && BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 500.milliseconds) {
-                val playerLocation = MinecraftCompat.localPlayer.position()
-                val bStr = "[${adjustedBase.roundToBlock().x}, ${adjustedBase.roundToBlock().y}, ${adjustedBase.roundToBlock().z}]"
-                val lIStr = "[${it.x}, ${it.y}, ${it.z}]"
-                val pStr = "[${playerLocation.x}, ${playerLocation.y}, ${playerLocation.z}]"
-                GriffinBurrowHelper.addDebug("not your arrow detected at $bStr, last interaction $lIStr, player pos $pStr")
-                return null
-            }
+        if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 500.milliseconds) {
+            val playerLocation = MinecraftCompat.localPlayer.position()
+            val bStr = "[${adjustedBase.roundToBlock().x}, ${adjustedBase.roundToBlock().y}, ${adjustedBase.roundToBlock().z}]"
+            val pStr = "[${playerLocation.x}, ${playerLocation.y}, ${playerLocation.z}]"
+            GriffinBurrowHelper.addDebug("not your arrow detected at $bStr, player pos $pStr")
+            return null
         }
 
         return ray
