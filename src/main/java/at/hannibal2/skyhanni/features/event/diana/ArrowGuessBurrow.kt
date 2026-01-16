@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
+import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
@@ -56,6 +57,9 @@ object ArrowGuessBurrow {
                 val dugBlock = it.origin.roundToBlock()
                 GriffinBurrowHelper.addDebug("detected arrow origin above block [${dugBlock.x}, ${dugBlock.y}, ${dugBlock.z}]")
                 GriffinBurrowHelper.removeGuess(dugBlock, "origin of detected arrow")
+                DelayedRun.runDelayed(CurrentPing.averagePing + 200.milliseconds) {
+                    GriffinBurrowHelper.removeGuess(dugBlock, "origin of detected arrow (delayed)")
+                }
                 lastArrowTime = SimpleTimeMark.now()
                 addGuessFromRay(it, range) ?: run {
                     GriffinBurrowHelper.addDebug("arrow guess returned null")
