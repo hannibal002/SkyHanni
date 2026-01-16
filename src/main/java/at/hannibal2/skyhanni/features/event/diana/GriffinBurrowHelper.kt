@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
-import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
@@ -352,7 +351,10 @@ object GriffinBurrowHelper {
                     removeGuess(it, "you died L bozo")
                 }
             }
-            if (it.distanceToPlayer() > 20) return
+            if (it.distanceToPlayer() > 9) {
+                addDebug("burrow dug event received at to far away location [${it.x}, ${it.y}, ${it.z}]")
+                return
+            }
 
             val burrowDugMatcher = burrowDugPattern.matcher(event.message)
             if (burrowDugMatcher.find()) {
@@ -565,12 +567,9 @@ object GriffinBurrowHelper {
         if (!isEnabled()) return
 
         val location = event.position
-        if (event.itemInHand?.isDianaSpade != true &&
-            InventoryUtils.lastItemChangeTime.passedSince() > CurrentPing.averagePing + 50.milliseconds
-        ) return
 
         getGuess(location)?.let {
-            if (it.burrowType == BurrowType.UNKNOWN && it.getCurrent() == location) {
+            if (event.itemInHand?.isDianaSpade == true && it.burrowType == BurrowType.UNKNOWN && it.getCurrent() == location) {
                 DelayedRun.runDelayed(
                     200.milliseconds,
                     {
