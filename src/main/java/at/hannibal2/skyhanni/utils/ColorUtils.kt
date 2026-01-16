@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 
+@Suppress("TooManyFunctions")
 object ColorUtils {
 
     @JvmStatic
@@ -36,11 +37,26 @@ object ColorUtils {
     operator fun Color.component3(): Float = if (!tooltipFixBool) this.green / 255f else this.blue / 255f
     operator fun Color.component4(): Float = if (!tooltipFixBool) this.blue / 255f else this.alpha / 255f
 
+    fun blendRGB(start: Color, end: Color, progress: Int, max: Int): Color {
+        val percent = (progress.toDouble() / max.toDouble()).coerceAtMost(1.0)
+        return blendRGB(start, end, percent)
+    }
 
     fun blendRGB(start: Color, end: Color, percent: Double) = Color(
         (start.red * (1 - percent) + end.red * percent).toInt(),
         (start.green * (1 - percent) + end.green * percent).toInt(),
         (start.blue * (1 - percent) + end.blue * percent).toInt(),
+    )
+
+    fun blendRGB(start: LorenzColor, end: LorenzColor, progress: Int, max: Int): Color {
+        val percent = (progress.toDouble() / max.toDouble()).coerceAtMost(1.0)
+        return blendRGB(start, end, percent)
+    }
+
+    fun blendRGB(start: LorenzColor, end: LorenzColor, percent: Double) = Color(
+        (start.toColor().red * (1 - percent) + end.toColor().red * percent).toInt(),
+        (start.toColor().green * (1 - percent) + end.toColor().green * percent).toInt(),
+        (start.toColor().blue * (1 - percent) + end.toColor().blue * percent).toInt(),
     )
 
     val ChromaColour.rgb get() = this.toColor().rgb

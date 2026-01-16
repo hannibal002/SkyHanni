@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -249,7 +250,12 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
             TIMER -> {
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                Renderable.text(Component.literal("§7Time Remaining: ").append(timeRemaining.formatTime()))
+                Renderable.text(
+                    componentBuilder {
+                        append("§7Time Remaining: ")
+                        append(timeRemaining.formatTime())
+                    }
+                )
             }
 
             STREAK -> {
@@ -266,11 +272,10 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
                 Renderable.text(
-                    Component.literal(
-                        "§7x${getStreakColor()}$blockBreakStreak " + "§6+${getSpeedBonus()}⸕ ",
-                    ).append(
-                        timeRemaining.formatTime(),
-                    ),
+                    componentBuilder {
+                        append("§7x${getStreakColor()}$blockBreakStreak " + "§6+${getSpeedBonus()}⸕ ")
+                        append(timeRemaining.formatTime())
+                    }
                 )
             }
 
