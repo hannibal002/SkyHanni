@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.italic
+import at.hannibal2.skyhanni.utils.compat.stackHover
 import at.hannibal2.skyhanni.utils.compat.strikethrough
 import at.hannibal2.skyhanni.utils.compat.underlined
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -87,6 +88,13 @@ class ExtendedChatColor(
                                     bold = true
                                 }
                                 append(" much nicer.")
+                            }
+                            val heldItem = InventoryUtils.getItemInHand()
+                            if (heldItem != null) {
+                                append(" Look its the item you are holding!") {
+                                    stackHover = heldItem
+                                    withColor("#349EFB")
+                                }
                             }
                         }
                     )

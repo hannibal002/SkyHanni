@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.XmlUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 
@@ -46,7 +45,7 @@ object CustomTodoDownload {
                             }
                         )
                         CustomTodos.save()
-                        ChatUtils.chat("Todo downloaded successfully. Use /shtodos to edit it".asComponent())
+                        ChatUtils.chat("Todo downloaded successfully. Use /shtodos to edit it")
                         return@argCallback
                     }
                 }

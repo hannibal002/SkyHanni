@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -53,17 +54,11 @@ object ExperimentsDryStreakDisplay {
                 }
                 append("You have $finallyFormat")
                 append("found an ")
-                append("ULTRA-RARE ") {
-                    withColor(ChatFormatting.DARK_PURPLE)
-                }
+                appendWithColor("ULTRA-RARE ", ChatFormatting.DARK_PURPLE)
                 append("after ")
-                append("${storage.xpSince.shortFormat()} Enchanting Exp ") {
-                    withColor(ChatFormatting.DARK_AQUA)
-                }
+                appendWithColor("${storage.xpSince.shortFormat()} Enchanting Exp ", ChatFormatting.DARK_AQUA)
                 append("and ")
-                append("${storage.attemptsSince} $attemptsFormat") {
-                    withColor(ChatFormatting.DARK_GREEN)
-                }
+                appendWithColor("${storage.attemptsSince} $attemptsFormat", ChatFormatting.DARK_GREEN)
                 append("!")
             }
         )

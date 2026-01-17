@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import com.google.gson.JsonArray
@@ -89,13 +90,9 @@ object MineshaftDetection {
                 componentBuilder {
                     withColor(ChatFormatting.GREEN)
                     append("It took ")
-                    append(formattedTime) {
-                        withColor(ChatFormatting.YELLOW)
-                    }
+                    appendWithColor(formattedTime, ChatFormatting.YELLOW)
                     append(" and ")
-                    append("$sinceThis ") {
-                        withColor(ChatFormatting.YELLOW)
-                    }
+                    appendWithColor("$sinceThis ", ChatFormatting.YELLOW)
                     append("mineshaft".pluralize(sinceThis))
                     append(" entered to get a ")
                     append(type.displayName)

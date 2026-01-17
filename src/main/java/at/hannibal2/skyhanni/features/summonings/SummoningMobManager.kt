@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -112,9 +113,7 @@ object SummoningMobManager {
                 ChatUtils.chat(
                     componentBuilder {
                         append("Your Summoning Mob just ")
-                        append("died!") {
-                            withColor(ChatFormatting.RED)
-                        }
+                        appendWithColor("died!", ChatFormatting.RED)
                     }
                 )
             }

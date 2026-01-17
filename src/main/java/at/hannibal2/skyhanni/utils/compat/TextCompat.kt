@@ -16,6 +16,7 @@ import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
 import java.net.URI
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
@@ -153,6 +154,14 @@ var Component.hover: Component?
         value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
     }
 
+var Component.stackHover: ItemStack?
+    get() = this.style.hoverEvent?.takeIf {
+        it.action() == HoverEvent.Action.SHOW_ITEM
+    }?.let { (it as HoverEvent.ShowItem).item }
+    set(value) {
+        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowItem(new)) } }
+    }
+
 var Component.command: String?
     get() = this.style.clickEvent?.takeIf {
         it.action() == ClickEvent.Action.RUN_COMMAND
@@ -175,36 +184,6 @@ var Component.url: String?
     }?.let { (it as ClickEvent.OpenUrl).uri.toString() }
     set(value) {
         this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
-    }
-
-var MutableComponent.underlined: Boolean
-    get() = this.style.isUnderlined
-    set(value) {
-        this.withStyle { it.withUnderlined(value) }
-    }
-
-var MutableComponent.bold: Boolean
-    get() = this.style.isBold
-    set(value) {
-        this.withStyle { it.withBold(value) }
-    }
-
-var MutableComponent.strikethrough: Boolean
-    get() = this.style.isStrikethrough
-    set(value) {
-        this.withStyle { it.withStrikethrough(value) }
-    }
-
-var MutableComponent.italic: Boolean
-    get() = this.style.isItalic
-    set(value) {
-        this.withStyle { it.withItalic(value) }
-    }
-
-var MutableComponent.obfuscated: Boolean
-    get() = this.style.isObfuscated
-    set(value) {
-        this.withStyle { it.withObfuscated(value) }
     }
 
 var MutableComponent.underlined: Boolean

@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
@@ -137,13 +138,9 @@ object BroodmotherFeatures {
         ChatUtils.chat(
             componentBuilder {
                 append("The Broodmother is ")
-                append("Imminent") {
-                    withColor(ChatFormatting.DARK_RED)
-                }
+                appendWithColor("Imminent", ChatFormatting.DARK_RED)
                 append("! It will spawn in ")
-                append("60 seconds") {
-                    withColor(ChatFormatting.AQUA)
-                }
+                appendWithColor("60 seconds", ChatFormatting.AQUA)
                 append("!")
             }
         )

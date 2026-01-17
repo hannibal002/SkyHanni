@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -79,8 +80,7 @@ object UbikReminder {
         if (config.ubikReminder) {
             ChatUtils.chat(
                 componentBuilder {
-                    append("Ubik's Cube is ready in the Rift!")
-                    withColor(ChatFormatting.GREEN)
+                    appendWithColor("Ubik's Cube is ready in the Rift!", ChatFormatting.GREEN)
                 }
             )
         }

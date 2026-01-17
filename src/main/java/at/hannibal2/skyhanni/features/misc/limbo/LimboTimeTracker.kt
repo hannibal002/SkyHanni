@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -78,9 +79,7 @@ object LimboTimeTracker {
                     }
                     withColor(ChatFormatting.WHITE)
                     append("! You've surpassed your previous record of ")
-                    append("$oldPB") {
-                        withColor(ChatFormatting.YELLOW)
-                    }
+                    appendWithColor("$oldPB", ChatFormatting.YELLOW)
                     append("!")
                 }
             )

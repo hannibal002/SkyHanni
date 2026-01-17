@@ -17,6 +17,6 @@ object SkyblockXPInChat {
     fun onActionBarValueUpdate(event: ActionBarValueUpdateEvent) {
         if (event.updated != ActionBarStatsData.SKYBLOCK_XP) return
         if (!config) return
-        ChatUtils.chat(event.updated.value.asComponent())
+        ChatUtils.chat(event.updated.value)
     }
 }

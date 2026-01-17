@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -41,7 +40,7 @@ object CurrentPing {
                         config::pingApi,
                     )
                 } else {
-                    ChatUtils.chat(getFormattedPing().asComponent())
+                    ChatUtils.chat(getFormattedPing())
                 }
             }
         }

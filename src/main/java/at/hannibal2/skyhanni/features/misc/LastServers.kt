@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
@@ -41,9 +42,7 @@ object LastServers {
                 componentBuilder {
                     withColor(ChatFormatting.GRAY)
                     append("You were already on this server ")
-                    append(it.format()) {
-                        withColor(ChatFormatting.AQUA)
-                    }
+                    appendWithColor(it.format(), ChatFormatting.AQUA)
                     append(" ago.")
                 }
             )

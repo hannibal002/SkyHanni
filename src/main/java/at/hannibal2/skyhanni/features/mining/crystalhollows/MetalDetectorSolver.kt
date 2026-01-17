@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
@@ -174,9 +175,7 @@ object MetalDetectorSolver {
                     componentBuilder {
                         withColor(ChatFormatting.GREEN)
                         append("You found the treasure in ")
-                        append("${timeTaken.inWholeSeconds}") {
-                            withColor(ChatFormatting.YELLOW)
-                        }
+                        appendWithColor("${timeTaken.inWholeSeconds}", ChatFormatting.YELLOW)
                         append(" seconds.")
                     }
                 )

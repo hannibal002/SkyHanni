@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -337,12 +338,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (config.warnings.chat && price >= config.warnings.minimumChat && message) {
             ChatUtils.chat(
                 componentBuilder {
-                    append("+Tracker Drop") {
-                        withColor(ChatFormatting.GREEN)
-                    }
-                    append(": ") {
-                        withColor(ChatFormatting.GRAY)
-                    }
+                    appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
+                    appendWithColor(": ", ChatFormatting.GRAY)
                     append("§r$itemName")
                 }
             )

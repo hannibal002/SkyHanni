@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -94,9 +95,8 @@ object FlowstateHelper {
                 val oldLuck = calculateFlowstateLuck(personalBest)
                 ChatUtils.chat(
                     componentBuilder {
-                        append("NEW FLOWSTATE PERSONAL BEST!") {
+                        appendWithColor("NEW FLOWSTATE PERSONAL BEST!", ChatFormatting.LIGHT_PURPLE) {
                             bold = true
-                            withColor(ChatFormatting.LIGHT_PURPLE)
                         }
                         withColor(ChatFormatting.WHITE)
                         append(" Streak: $blockBreakStreak.")
@@ -104,7 +104,6 @@ object FlowstateHelper {
                         if (personalBest > 500) {
                             append(" You Gained +${newLuck - oldLuck}✴ SkyHanni User Luck") {
                                 withColor(ChatFormatting.GREEN)
-
                             }
                         }
                     }

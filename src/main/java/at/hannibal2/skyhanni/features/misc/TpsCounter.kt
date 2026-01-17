@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
@@ -92,13 +91,13 @@ object TpsCounter {
     private fun tpsCommand() {
         val timeUntil = minimumSecondsDisplayDelay - timeSinceWorldSwitch
         if (timeUntil.isPositive()) {
-            ChatUtils.chat("TPS: §fCalculating... §7(${timeUntil.inWholeSeconds}s)".asComponent())
+            ChatUtils.chat("TPS: §fCalculating... §7(${timeUntil.inWholeSeconds}s)")
             DelayedRun.runDelayed(timeUntil) {
                 pendingTpsCommand = true
             }
         } else {
             val tpsMessage = tps?.let { "${format(fixTps(it))}$it" } ?: "§70 (Limbo?)"
-            ChatUtils.chat("TPS: $tpsMessage".asComponent())
+            ChatUtils.chat("TPS: $tpsMessage")
         }
     }
 

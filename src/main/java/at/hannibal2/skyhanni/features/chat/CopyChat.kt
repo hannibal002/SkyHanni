@@ -53,7 +53,7 @@ object CopyChat {
         }
 
         ClipboardUtils.copyToClipboard(clipboard)
-        ChatUtils.chat("Copied $infoMessage to clipboard!".asComponent())
+        ChatUtils.chat("Copied $infoMessage to clipboard!")
     }
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {

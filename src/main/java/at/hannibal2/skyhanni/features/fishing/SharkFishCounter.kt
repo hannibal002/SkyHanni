@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
@@ -65,24 +66,12 @@ object SharkFishCounter {
         ChatUtils.chat(
             componentBuilder {
                 append("You caught $total ")
-                append("(") {
-                    withColor(ChatFormatting.WHITE)
-                }
-                append("$n ") {
-                    withColor(ChatFormatting.GREEN)
-                }
-                append("$b ") {
-                    withColor(ChatFormatting.GOLD)
-                }
-                append("$t ") {
-                    withColor(ChatFormatting.DARK_PURPLE)
-                }
-                append("$g") {
-                    withColor(ChatFormatting.GOLD)
-                }
-                append(") ") {
-                    withColor(ChatFormatting.WHITE)
-                }
+                appendWithColor("(", ChatFormatting.WHITE)
+                appendWithColor("$n ", ChatFormatting.GREEN)
+                appendWithColor("$b ", ChatFormatting.GOLD)
+                appendWithColor("$t ", ChatFormatting.DARK_PURPLE)
+                appendWithColor("$g", ChatFormatting.GOLD)
+                appendWithColor(") ", ChatFormatting.WHITE)
                 append("sharks during this fishing festival. $funnyComment")
             }
         )

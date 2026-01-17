@@ -95,11 +95,15 @@ object ChatUtils {
         onlySendOnce: Boolean = false,
         messageId: Int? = null,
     ) {
-        if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce, messageId = messageId)
-        } else {
-            internalChat(message, replaceSameMessage, onlySendOnce, messageId = messageId)
+        var color: Int? = null
+        if (prefixColor != "§e") {
+            for (entry in LorenzColor.entries) {
+                if (entry.getChatColor() == prefixColor) {
+                    color = entry.toColor().rgb
+                }
+            }
         }
+        chat(message.asComponent(), prefix, color, replaceSameMessage, onlySendOnce, messageId)
     }
 
     fun chat(

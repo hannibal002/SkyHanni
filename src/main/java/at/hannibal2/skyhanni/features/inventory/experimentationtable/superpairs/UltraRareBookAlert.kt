@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.obfuscated
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -37,21 +38,15 @@ object UltraRareBookAlert {
         ChatUtils.chat(
             componentBuilder {
                 append("You have uncovered a ")
-                append("XX") {
+                appendWithColor("XX", ChatFormatting.LIGHT_PURPLE) {
                     obfuscated = true
-                    withColor(ChatFormatting.LIGHT_PURPLE)
                 }
-                append(" ULTRA-RARE BOOK! ") {
-                    withColor(ChatFormatting.DARK_PURPLE)
-                }
-                append("XX") {
+                appendWithColor(" ULTRA-RARE BOOK! ", ChatFormatting.DARK_PURPLE)
+                appendWithColor("XX", ChatFormatting.LIGHT_PURPLE) {
                     obfuscated = true
-                    withColor(ChatFormatting.LIGHT_PURPLE)
                 }
                 append("! You found: ")
-                append(enchantsName) {
-                    withColor(ChatFormatting.BLUE)
-                }
+                appendWithColor(enchantsName, ChatFormatting.BLUE)
             }
         )
     }
