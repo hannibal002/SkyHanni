@@ -42,7 +42,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhite
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
@@ -183,9 +182,13 @@ object InstanceChestProfit {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderItemTipEvent) {
         val slots = slotsWithFavorites
-        if (!isInCroesusMenu()) return
-        slots.forEach {
-            if (it == event.stack.hoverName.formattedTextCompat()) event.stackTip = "§6✯"
+        if (isInCroesusMenu()) {
+            slots.forEach {
+                if (it == event.stack.hoverName.formattedTextCompatLeadingWhite()) event.stackTip = "§6✯"
+            }
+        }
+        if (isInstanceChestGUI()) {
+            if (profileStorage?.instanceChestFavoriteItems?.contains(event.stack.getInternalName()) == true) event.stackTip = "§6✯"
         }
     }
 
@@ -333,6 +336,7 @@ object InstanceChestProfit {
                 // TODO remove if check, getEssence should return null if no price is found
                 if (price != 0.0) itemsWithCost.addOrPut(name, price)
             }
+
         }
 
         // Slot 31 has the cost information for the chest
@@ -364,21 +368,26 @@ object InstanceChestProfit {
         val revenue = itemsWithCost.values.filter { it > 0 }.sum()
         add(Renderable.text("§a§lTotal Revenue §a${revenue.formatCoin()}"))
 
-        itemsWithCost.forEach {
-            val coinsColor = if (it.value < 0) "§c"
+        itemsWithCost.forEach { itemWithCost ->
+            var favourited = ""
+            val coinsColor = if (itemWithCost.value < 0) "§c"
             else "§a"
 
-            if (!displayedCost && it.value < 0) {
+            if (profileStorage?.instanceChestFavoriteItems?.any { it.repoItemName == itemWithCost.key } == true) {
+                favourited = " §6✯ Favourited Item"
+            }
+
+            if (!displayedCost && itemWithCost.value < 0) {
                 val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
                 add(Renderable.text(" "))
                 add(Renderable.text("§c§lTotal Cost §c${cost.formatCoin()}"))
                 displayedCost = true
             }
 
-            val coins = "$coinsColor${it.value.formatCoin()}"
+            val coins = "$coinsColor${itemWithCost.value.formatCoin()}"
 
-            total += it.value
-            add(Renderable.text("${it.key} $coins"))
+            total += itemWithCost.value
+            add(Renderable.text("${itemWithCost.key} $coins$favourited"))
         }
 
         chestProfits[fixedInventoryName] = total

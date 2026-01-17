@@ -46,10 +46,12 @@ class InstanceChestProfitConfig {
     @FeatureToggle
     var croesusHighlight: Boolean = false
 
+    @Suppress("Line Too Long")
     @Expose
     @ConfigOption(
         name = "Favorite Item Keybind",
-        desc = "Press while Hovering an item to add/remove it from favorites which will Star chests containing this item in Croesus."
+        desc = "Press while Hovering an item to add/remove it from favorites which will Star chests containing this item in Croesus" +
+            " and highlight the Item in Instance Chests."
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
