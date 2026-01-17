@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 // gets fired when we want to calculate what the current player user luck values are
 class UserLuckCalculateEvent : SkyHanniEvent() {

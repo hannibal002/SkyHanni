@@ -29,12 +29,17 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
+import net.minecraft.ChatFormatting
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -167,7 +172,12 @@ object MetalDetectorSolver {
         if (config.showTimeTaken && !lastTreasureFound.isFarPast()) {
             DelayedRun.runNextTick {
                 ChatUtils.chat(
-                    "§aYou found the treasure in §e${timeTaken.inWholeSeconds}§a seconds.",
+                    componentBuilder {
+                        withColor(ChatFormatting.GREEN)
+                        append("You found the treasure in ")
+                        appendWithColor("${timeTaken.inWholeSeconds}", ChatFormatting.YELLOW)
+                        append(" seconds.")
+                    }
                 )
             }
         }
@@ -220,7 +230,7 @@ object MetalDetectorSolver {
                 for (k in -50 until 50) {
                     val blockPosition = player.add(i, j, k).roundToBlock()
                     val nextBlockPosition = blockPosition.add(0, 13, 0)
-                    if (blockPosition.getBlockAt() == Blocks.quartz_stairs && nextBlockPosition.getBlockAt() == Blocks.barrier) {
+                    if (blockPosition.getBlockAt() == Blocks.QUARTZ_STAIRS && nextBlockPosition.getBlockAt() == Blocks.BARRIER) {
                         baseCoordinates = getBaseCoordinates(nextBlockPosition)
                         return
                     }
@@ -235,15 +245,15 @@ object MetalDetectorSolver {
         var currentPosition = blockPosition
         while (changed) {
             changed = false
-            if (currentPosition.add(1, 0, 0).getBlockAt() == Blocks.barrier) {
+            if (currentPosition.add(1, 0, 0).getBlockAt() == Blocks.BARRIER) {
                 changed = true
                 currentPosition = currentPosition.add(1, 0, 0)
             }
-            if (currentPosition.add(0, 1, 0).getBlockAt() == Blocks.barrier) {
+            if (currentPosition.add(0, 1, 0).getBlockAt() == Blocks.BARRIER) {
                 changed = true
                 currentPosition = currentPosition.add(0, 1, 0)
             }
-            if (currentPosition.add(0, 0, 1).getBlockAt() == Blocks.barrier) {
+            if (currentPosition.add(0, 0, 1).getBlockAt() == Blocks.BARRIER) {
                 changed = true
                 currentPosition = currentPosition.add(0, 0, 1)
             }

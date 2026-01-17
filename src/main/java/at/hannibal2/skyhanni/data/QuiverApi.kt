@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemBow
+import net.minecraft.world.item.BowItem
 import java.util.regex.Matcher
 
 @SkyHanniModule
@@ -226,7 +226,7 @@ object QuiverApi {
             if (stack.getItemCategoryOrNull() != ItemCategory.ARROW) continue
             val arrow = stack.getInternalNameOrNull() ?: continue
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
-            arrowType.amount += stack.stackSize
+            arrowType.amount += stack.count
         }
     }
 
@@ -234,7 +234,7 @@ object QuiverApi {
     fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!isEnabled() && event.slot != 44) return
         val stack = event.itemStack
-        if (stack.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
+        if (stack.getExtraAttributes()?.contains("quiver_arrow") == true) {
             for (line in stack.getLore()) {
                 quiverInventoryPattern.matchMatcher(line) {
                     val type = group("type")
@@ -267,7 +267,7 @@ object QuiverApi {
 
     fun isHoldingBow(): Boolean {
         InventoryUtils.getItemInHand()?.let {
-            return it.item is ItemBow && !fakeBowsPattern.matches(it.getInternalName().asString())
+            return it.item is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
         } ?: return false
     }
 
@@ -285,7 +285,7 @@ object QuiverApi {
 
     private fun checkBowInventory() {
         hasBow = InventoryUtils.getItemsInOwnInventory().any {
-            it.item is ItemBow && !fakeBowsPattern.matches(it.getInternalName().asString())
+            it.item is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
         }
     }
 

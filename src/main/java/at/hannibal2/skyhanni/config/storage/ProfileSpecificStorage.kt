@@ -29,12 +29,12 @@ import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
-import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
-import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
-import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
+import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
+import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
+import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.hunting.HuntingProfitTracker
@@ -62,11 +62,13 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
+import java.util.EnumMap
 import java.util.UUID
 import kotlin.time.Duration
 
@@ -425,7 +427,16 @@ class ProfileSpecificStorage(
         var experience: Long? = null
 
         @Expose
-        var cropCounter: MutableMap<CropType, Long> = enumMapOf()
+        var lastMilestoneFix: SimpleTimeMark = farPast()
+
+        @Expose
+        var lastGainedCrop: CropType? = null
+
+        @Expose
+        var cropMilestoneCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
+
+        @Expose
+        var toolCounterData: MutableMap<String, Long> = HashMap()
 
         @Expose
         var cropUpgrades: MutableMap<CropType, Int> = enumMapOf()
@@ -444,9 +455,6 @@ class ProfileSpecificStorage(
 
         @Expose
         var savedCropAccessory: CropAccessory? = CropAccessory.NONE
-
-        @Expose
-        var dicerDropTracker: DicerRngDropTracker.Data = DicerRngDropTracker.Data()
 
         @Expose
         var informedAboutLowMatter: SimpleTimeMark = farPast()
@@ -605,6 +613,19 @@ class ProfileSpecificStorage(
 
         @Expose
         var activeVinyl: VinylType? = null
+
+        @Expose
+        var overflowHoeLevels: MutableMap<String, Int> = mutableMapOf()
+
+        @Expose
+        var cropFeverTracker: CropFeverTracker.BucketData = CropFeverTracker.BucketData()
+
+        @Expose
+        var greenhouse: GreenHouseStorage = GreenHouseStorage()
+
+        class GreenHouseStorage(
+            @Expose var nextCycle: SimpleTimeMark = farPast(),
+        )
     }
 
     // - gui
@@ -839,6 +860,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
+
+        @Expose
+        var ubikRemindTime: SimpleTimeMark = farFuture()
     }
 
     // - slayer

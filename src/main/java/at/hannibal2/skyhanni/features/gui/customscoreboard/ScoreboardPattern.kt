@@ -37,6 +37,27 @@ object ScoreboardPattern {
     )
 
     /**
+     * REGEX-TEST: Sowdust: §230,210,307
+     * WRAPPED-REGEX-TEST: " Sowdust: §r§230,120,093"
+     */
+    val sowdustPattern by mainSB.pattern(
+        "sowdust",
+        "\\s?(?:§.)*Sowdust: (?:§.)*(?<sowdust>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: Sowdust: §26.5k §7(+912)
+     * REGEX-TEST: Sowdust: §230.1M §7(+798)
+     * REGEX-TEST: Sowdust: §22.7B §7(+12)
+     * REGEX-TEST: Sowdust: §210.7k §7(+3.3k)
+     * REGEX-TEST: Sowdust: §210.7k §7(+1.2M)
+     */
+    val sowdustGainedPattern by mainSB.pattern(
+        "sowdust-gained",
+        "^(?:§.)*Sowdust: (?:§.)*[\\d,.kKmMbB]+ §7\\(\\+[\\d.kKmMbB]+\\)",
+    )
+
+    /**
      * REGEX-TEST: Gems: §a350
      */
     val gemsPattern by mainSB.pattern(
@@ -920,7 +941,7 @@ object ScoreboardPattern {
      */
     val whispersPattern by galateaSB.pattern(
         "whispers",
-        "(?:§f)?Whispers: §3[\\w,.]+.*"
+        "(?:§f)?Whispers: §3[\\w,.]+.*",
     )
 
     /**

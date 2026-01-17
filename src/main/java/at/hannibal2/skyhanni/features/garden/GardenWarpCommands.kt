@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.garden.sensitivity.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -59,8 +58,7 @@ object GardenWarpCommands {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onKeyDown(event: KeyDownEvent) {
-        if (Minecraft.getMinecraft().currentScreen != null) return
-        if (NeuItems.neuHasFocus()) return
+        if (Minecraft.getInstance().screen != null) return
 
         when (event.keyCode) {
             config.homeHotkey -> {

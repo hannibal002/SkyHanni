@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsIgnoreOrder
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toPair
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.util.regex.Pattern
 
 @SkyHanniModule

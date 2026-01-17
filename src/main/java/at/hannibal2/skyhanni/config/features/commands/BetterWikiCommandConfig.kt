@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class BetterWikiCommandConfig {
     @Expose
@@ -56,6 +56,6 @@ class BetterWikiCommandConfig {
         name = "Wiki Key",
         desc = "Search for an item's wiki page with this keybind. §cFor an optimal experience, do §lNOT §cbind this to a mouse button."
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var wikiKeybind: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var wikiKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 }

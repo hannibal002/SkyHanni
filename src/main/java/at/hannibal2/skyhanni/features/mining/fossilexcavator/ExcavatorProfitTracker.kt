@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
 
 @SkyHanniModule
 object ExcavatorProfitTracker {
@@ -36,7 +36,7 @@ object ExcavatorProfitTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Fossil Excavation Profit Tracker",
-        { Data() },
+        ::Data,
         { it.mining.fossilExcavatorProfitTracker },
     ) { drawDisplay(it) }
 
@@ -202,7 +202,7 @@ object ExcavatorProfitTracker {
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled) return false
         if (!isEnabled()) return false
-        if (Minecraft.getMinecraft().currentScreen !is GuiChest) return true
+        if (Minecraft.getInstance().screen !is ContainerScreen) return true
         // Only show in excavation menu
         return FossilExcavatorApi.inExcavatorMenu
     }
@@ -218,10 +218,10 @@ object ExcavatorProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetexcavatortracker") {
+        event.registerBrigadier("shresetexcavatortracker") {
             description = "Resets the Fossil Excavator Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 }

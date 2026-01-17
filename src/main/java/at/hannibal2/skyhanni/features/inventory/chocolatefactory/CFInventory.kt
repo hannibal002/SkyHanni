@@ -34,11 +34,11 @@ object CFInventory {
         if (!config.highlightUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.stack == null) continue
-            val slotIndex = slot.slotNumber
+            if (slot.item == null) continue
+            val slotIndex = slot.index
 
             if (slotIndex == CFApi.bestPossibleSlot) {
-                event.drawSlotText(slot.xDisplayPosition + 18, slot.yDisplayPosition, "§6✦", 1f)
+                event.drawSlotText(slot.x + 18, slot.y, "§6✦", 1f)
             }
         }
     }
@@ -50,8 +50,8 @@ object CFInventory {
         if (!config.highlightUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.stack == null) continue
-            val slotIndex = slot.slotNumber
+            if (slot.item == null) continue
+            val slotIndex = slot.index
 
             val currentUpdates = CFApi.factoryUpgrades
             currentUpdates.find { it.slotIndex == slotIndex }?.let { upgrade ->
@@ -67,7 +67,7 @@ object CFInventory {
                 slot.highlight(LorenzColor.RED)
             }
             if (slotIndex == CFApi.milestoneIndex) {
-                unclaimedRewardsPattern.firstMatcher(slot.stack?.getLore().orEmpty()) {
+                unclaimedRewardsPattern.firstMatcher(slot.item?.getLore().orEmpty()) {
                     slot.highlight(LorenzColor.RED)
                 }
             }
@@ -88,7 +88,7 @@ object CFInventory {
         if (!CFApi.isEnabled()) return
         if (!config.showStackSizes) return
 
-        val upgradeInfo = CFApi.factoryUpgrades.find { it.slotIndex == event.slot.slotNumber } ?: return
+        val upgradeInfo = CFApi.factoryUpgrades.find { it.slotIndex == event.slot.index } ?: return
         event.stackTip = upgradeInfo.stackTip()
     }
 
@@ -97,7 +97,7 @@ object CFInventory {
         if (!CFApi.inChocolateFactory) return
         if (!CFApi.isEnabled()) return
         val slot = event.slot ?: return
-        val slotNumber = slot.slotNumber
+        val slotNumber = slot.index
         if (!config.useMiddleClick) return
         if (slotNumber in CFApi.noPickblockSlots &&
             (slotNumber != CFApi.timeTowerIndex || event.clickedButton == 1)

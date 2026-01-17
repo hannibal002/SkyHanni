@@ -24,6 +24,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
@@ -34,9 +36,10 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
+import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -117,7 +120,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     fun renderDisplay(position: Position) {
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
-        var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
+        var currentlyOpen = Minecraft.getInstance().screen?.let { it is InventoryScreen || it is ContainerScreen } ?: false
         if (!currentlyOpen && config.hideOutsideInventory && this is SkyHanniItemTracker) {
             return
         }
@@ -181,7 +184,7 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     open fun getCurrentStopwatch(): Stopwatch? = displayMode?.let { getSharedTracker()?.get(it)?.getActiveStopwatch() }
 
-    private fun startSessionUptime() {
+    fun startSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.start(true) }
@@ -189,7 +192,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         update()
     }
 
-    private fun pauseSessionUptime() {
+    fun pauseSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.pause(true) }
@@ -197,7 +200,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         update()
     }
 
-    private fun swapActiveSession(session: SessionUptime) {
+    fun swapActiveSession(session: SessionUptime) {
         if (!this.customUptimeControl) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.setActiveStopwatch(session) }
@@ -215,7 +218,7 @@ open class SkyHanniTracker<Data : TrackerData>(
                 tips = listOf(
                     "§eⓘ §7Uptime tracked only from",
                     "§7SkyHanni version 6.0.0 onwards",
-                )
+                ),
             )
         } else {
             Renderable.text("§eSession Uptime: §b${sessionUptime.format()}$pausedText")
@@ -331,7 +334,13 @@ open class SkyHanniTracker<Data : TrackerData>(
     fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int, message: Boolean = true) {
         val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
         if (config.warnings.chat && price >= config.warnings.minimumChat && message) {
-            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
+            ChatUtils.chat(
+                componentBuilder {
+                    appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
+                    appendWithColor(": ", ChatFormatting.GRAY)
+                    append("§r$itemName")
+                }
+            )
         }
         if (config.warnings.title && price >= config.warnings.minimumTitle) {
             TitleManager.sendTitle("§a+ $itemName", weight = price)

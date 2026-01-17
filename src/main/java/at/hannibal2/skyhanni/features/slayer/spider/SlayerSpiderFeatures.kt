@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
-import net.minecraft.entity.monster.EntitySpider
-import net.minecraft.network.play.client.C02PacketUseEntity
+import net.minecraft.network.protocol.game.ServerboundInteractPacket
+import net.minecraft.world.entity.monster.Spider
 
 @SkyHanniModule
 object SlayerSpiderFeatures {
@@ -33,7 +33,7 @@ object SlayerSpiderFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {
-        if (event.action != C02PacketUseEntity.Action.ATTACK) return
+        if (event.action != ServerboundInteractPacket.ActionType.ATTACK) return
         val mob = event.clickedEntity.mob ?: return
         if (mob in allTier5) {
             lastClickedTier5 = mob
@@ -51,7 +51,7 @@ object SlayerSpiderFeatures {
     }
 
     @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent<EntitySpider>) {
+    fun onPlayerMove(event: EntityMoveEvent<Spider>) {
         val mob = event.entity.mob ?: return
         if (mob in stuckTier5) {
             stuckTier5.remove(mob)

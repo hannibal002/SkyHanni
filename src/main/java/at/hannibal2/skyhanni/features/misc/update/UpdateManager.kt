@@ -16,9 +16,10 @@ import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement
@@ -28,6 +29,8 @@ import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
 import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
+import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
 import kotlin.time.Duration
@@ -73,6 +76,9 @@ object UpdateManager {
         processor.registerConfigEditor(ConfigVersionDisplay::class.java) { option, _ ->
             GuiOptionEditorUpdateCheck(option)
         }
+        processor.registerConfigEditor(ConfigVersionDeprecatedDisplay::class.java) { option, _ ->
+            GuiOptionEditorDeprecatedVersion(option)
+        }
     }
 
     private val config get() = SkyHanniMod.feature.about
@@ -112,7 +118,12 @@ object UpdateManager {
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
                     if (config.fullAutoUpdates || forceDownload) {
-                        ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}, starting to download now.")
+                        ChatUtils.chat(
+                            componentBuilder {
+                                append("SkyHanni found a new update: ${it.update.versionName}, starting to download now.")
+                                withColor(ChatFormatting.GREEN)
+                            }
+                        )
                         queueUpdate()
                     } else if (config.autoUpdates) {
                         ChatUtils.chatAndOpenConfig(
@@ -128,10 +139,15 @@ object UpdateManager {
                         )
                     }
                 } else if (forceDownload) {
-                    ChatUtils.chat("§aSkyHanni didn't find a new update.")
+                    ChatUtils.chat(
+                        componentBuilder {
+                            append("SkyHanni didn't find a new update.")
+                            withColor(ChatFormatting.GREEN)
+                        }
+                    )
                 }
             },
-            DelayedRun.onThread,
+            Minecraft.getInstance(),
         )
     }
 
@@ -151,7 +167,7 @@ object UpdateManager {
                 ChatUtils.chat("Download of update complete. ")
                 ChatUtils.chat("§aThe update will be installed after your next restart.")
             },
-            DelayedRun.onThread,
+            Minecraft.getInstance(),
         )
     }
 
@@ -231,7 +247,8 @@ object UpdateManager {
         }
     }
 
-    private var discontinuedVersions: Map<String, DiscontinuedMinecraftVersion> = mapOf()
+    var discontinuedVersions: Map<String, DiscontinuedMinecraftVersion> = mapOf()
+        private set
     private var hasWarned = false
 
     @HandleEvent
@@ -247,7 +264,7 @@ object UpdateManager {
         if (hasWarned) return
 
         if (PlatformUtils.MC_VERSION in discontinuedVersions) {
-            val extraInfo = discontinuedVersions[PlatformUtils.MC_VERSION]?.extraInfo.orEmpty()
+            val extraInfo = discontinuedVersions[PlatformUtils.MC_VERSION]?.extraInfo ?: return
 
             val notification = SkyHanniNotification(
                 listOf(

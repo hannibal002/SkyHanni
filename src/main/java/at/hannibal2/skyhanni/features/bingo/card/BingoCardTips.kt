@@ -3,7 +3,8 @@ package at.hannibal2.skyhanni.features.bingo.card
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.bingo.BingoApi.getData
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
@@ -16,15 +17,16 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.plus
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.inventory.ContainerChest
+import net.minecraft.world.inventory.ChestMenu
 
 @SkyHanniModule
 object BingoCardTips {
 
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
 
-    private val patternGroup = RepoPattern.group("bingo.card.tips")
+    private val patternGroup = RepoPattern.group("bingo.card.tips.new")
 
     private val inventoryPattern by patternGroup.pattern(
         "card",
@@ -32,35 +34,37 @@ object BingoCardTips {
     )
 
     /**
-     * REGEX-TEST: §7Reward
-     * REGEX-TEST: §7Reward§r
+     * REGEX-TEST: Reward
      */
     private val rewardPattern by patternGroup.pattern(
         "reward",
-        "(?:§.)+Reward(?:§.)?",
+        "Reward",
     )
+    /**
+     * REGEX-TEST: Contribution Rewards
+     */
     private val contributionRewardsPattern by patternGroup.pattern(
         "reward.contribution",
-        "(?:§.)+Contribution Rewards.*",
+        "Contribution Rewards.*",
     )
 
     /**
-     * REGEX-TEST: §eRow #4
+     * REGEX-TEST: Row #4
      */
     private val rowNamePattern by patternGroup.pattern(
         "row.name",
-        "(?:§.)+Row #.*",
+        "Row #.*",
     )
 
     private val bingoCardInventory = InventoryDetector(inventoryPattern)
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!bingoCardInventory.isInside()) return
 
-        val slot = event.slot
-        val goal = BingoApi.bingoGoals[slot.slotNumber] ?: return
+        val slot = event.slot ?: return
+        val goal = BingoApi.bingoGoals[slot.index] ?: return
 
         val toolTip = event.toolTip
         // When hovering over a row
@@ -70,7 +74,7 @@ object BingoCardTips {
         val communityGoal = goal.type == GoalType.COMMUNITY
 
         val difficulty = Difficulty.valueOf(bingoTip.difficulty.uppercase())
-        toolTip[0] = toolTip[0] + " §7(" + difficulty.displayName + "§7)"
+        toolTip[0] = toolTip[0] + " §7(${difficulty.displayName}§7)"
 
         var index = if (!communityGoal) {
             toolTip.indexOfFirst { rewardPattern.matches(it) }
@@ -83,7 +87,7 @@ object BingoCardTips {
                 IndexOutOfBoundsException(),
                 "BingoCardTips reward line not found",
                 "goal displayName" to goal.displayName,
-                "slot slotNumber" to slot.slotNumber,
+                "slot slotNumber" to slot.index,
                 "toolTip" to toolTip,
             )
             return
@@ -104,9 +108,9 @@ object BingoCardTips {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
-        val chest = event.container as ContainerChest
+        val chest = event.container as ChestMenu
         for ((slot, _) in chest.getAllItems()) {
-            val goal = BingoApi.bingoGoals[slot.slotNumber] ?: continue
+            val goal = BingoApi.bingoGoals[slot.index] ?: continue
             if (config.hideDoneDifficulty && goal.done) continue
 
             val color = goal.getData()?.let {

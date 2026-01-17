@@ -2,10 +2,13 @@ package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
+import at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
@@ -25,12 +28,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object InstanceChestProfit {
@@ -96,6 +100,7 @@ object InstanceChestProfit {
     private var inDungeonChest = false
     private var inKuudraChest = false
     private var display: Renderable? = null
+    private val chestProfits: MutableMap<String, Double> = mutableMapOf()
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -114,7 +119,7 @@ object InstanceChestProfit {
             else -> return
         }
 
-        createDisplay(event.inventoryItems)
+        createDisplay(event.inventoryName, event.inventoryItems)
     }
 
     @HandleEvent(InventoryCloseEvent::class)
@@ -123,27 +128,32 @@ object InstanceChestProfit {
         inKuudraChest = false
     }
 
-    private fun createDisplay(items: Map<Int, ItemStack>) {
+    private fun createDisplay(inventoryName: String, items: Map<Int, ItemStack>) {
+        /**
+         * Kuudra chests say "Free Chest Chest" and "Paid Chest Chest" due to Hypixel issue
+         */
+        val fixedInventoryName = inventoryName.replace("Chest Chest", "Chest")
+
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
-            if (fakeItemNamePattern.matches(it.value.displayName)) return@forEach
+            if (fakeItemNamePattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())) return@forEach
             if (it.value.getInternalNameOrNull() != null) {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, cost)
             }
-            attributeShardPattern.matchMatcher(it.value.displayName) {
+            attributeShardPattern.matchMatcher(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val name = group("name")
                 val count = group("count").toInt()
                 val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.displayName, price)
+                itemsWithCost.addOrPut(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets(), price)
             }
-            essencePattern.matchMatcher(it.value.displayName) {
+            essencePattern.matchMatcher(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val name = group("name")
                 val rawCount = group("count").toInt()
                 val count = if (name == "Crimson") rawCount * (1 + getKuudraEssenceBonus())
                 else rawCount.toDouble()
                 val price = count * (NeuInternalName.fromItemName(name).getPriceOrNull(config.priceSource) ?: 0.0)
-                itemsWithCost.addOrPut(it.value.displayName, price)
+                itemsWithCost.addOrPut(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets(), price)
             }
         }
 
@@ -163,44 +173,55 @@ object InstanceChestProfit {
             }
         }
 
-        val newDisplay = buildList {
-            val chestName = if (inDungeonChest) "Dungeon"
-            else if (inKuudraChest) "Kuudra"
-            else ""
-            add(listOf(Renderable.text("§d§l$chestName Chest Profit")))
-            add(listOf(Renderable.emptyText()))
+        display = Renderable.table(buildDisplay(fixedInventoryName, itemsWithCost), ySpacing = 1)
+    }
 
-            var total = 0.0
-            var displayedCost = false
+    private fun buildDisplay(fixedInventoryName: String, itemsWithCost: Map<String, Double>) = buildList {
+        add(listOf(Renderable.text("§d§l$fixedInventoryName Profit")))
+        add(listOf(Renderable.emptyText()))
 
-            val revenue = itemsWithCost.values.filter { it > 0 }.sum()
-            add(listOf(Renderable.text("§a§lTotal Revenue"), Renderable.text("§a${revenue.formatCoin()}")))
+        var total = 0.0
+        var displayedCost = false
 
-            itemsWithCost.forEach {
-                val coinsColor = if (it.value < 0) "§c"
-                else "§a"
+        val revenue = itemsWithCost.values.filter { it > 0 }.sum()
+        add(listOf(Renderable.text("§a§lTotal Revenue"), Renderable.text("§a${revenue.formatCoin()}")))
 
-                if (!displayedCost && it.value < 0) {
-                    val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
-                    add(listOf(Renderable.emptyText()))
-                    add(listOf(Renderable.text("§c§lTotal Cost"), Renderable.text("§c${cost.formatCoin()}")))
-                    displayedCost = true
-                }
-
-                val coins = "$coinsColor${it.value.formatCoin()}"
-
-                total += it.value
-                add(listOf(Renderable.text(it.key), Renderable.text(coins)))
-            }
-
-            val color = if (total < 0) "§c"
+        itemsWithCost.forEach {
+            val coinsColor = if (it.value < 0) "§c"
             else "§a"
 
-            add(listOf(Renderable.emptyText()))
-            add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color ${total.formatCoin()}")))
+            if (!displayedCost && it.value < 0) {
+                val cost = itemsWithCost.values.filter { cost -> cost < 0 }.sum()
+                add(listOf(Renderable.emptyText()))
+                add(listOf(Renderable.text("§c§lTotal Cost"), Renderable.text("§c${cost.formatCoin()}")))
+                displayedCost = true
+            }
+
+            val coins = "$coinsColor${it.value.formatCoin()}"
+
+            total += it.value
+            add(listOf(Renderable.text(it.key), Renderable.text(coins)))
         }
 
-        display = Renderable.table(newDisplay, ySpacing = 1)
+        chestProfits[fixedInventoryName] = total
+
+        var color = if (total < 0) "§c"
+        else "§a"
+
+        add(listOf(Renderable.emptyText()))
+        add(listOf(Renderable.text("$color§lProfit"), Renderable.text("$color${total.formatCoin()}")))
+
+        if (!IslandType.CATACOMBS.isCurrent() && !IslandType.KUUDRA_ARENA.isCurrent()) return@buildList
+
+        add(listOf(Renderable.emptyText()))
+        add(listOf(Renderable.text("§d§lAll Chest Profits")))
+
+        for (it in chestProfits.entries.sortedByDescending { it.value }) {
+            color = if (it.value < 0) "§c"
+            else "§a"
+
+            add(listOf(Renderable.text(it.key), Renderable.text("$color${it.value.formatCoin()}")))
+        }
     }
 
     private fun getKuudraEssenceBonus(): Double {
@@ -220,5 +241,15 @@ object InstanceChestProfit {
         if (!config.enabled || (!inDungeonChest && !inKuudraChest)) return
 
         config.position.renderRenderable(display, posLabel = "Instance Chest Profit")
+    }
+
+    @HandleEvent(DungeonEnterEvent::class)
+    fun onDungeonEnter() {
+        chestProfits.clear()
+    }
+
+    @HandleEvent(KuudraEnterEvent::class)
+    fun onKuudraEnter() {
+        chestProfits.clear()
     }
 }

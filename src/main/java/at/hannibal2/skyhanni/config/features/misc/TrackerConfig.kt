@@ -109,15 +109,16 @@ class TrackerConfig {
         desc = "Only show uptime and profit per hour when the tracker is on session mode."
     )
     @ConfigEditorBoolean
-    val onlyShowSession: Property<Boolean> = Property.of(true)
+    val onlyShowSession: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
         name = "AFK timeout",
         desc = "Pause the tracker if it is not modified for this amount of seconds."
     )
+    @SearchTag("uptime")
     @ConfigEditorSlider(minValue = 15f, maxValue = 900f, minStep = 15f)
-    var afkTimeout: Int = 30
+    var afkTimeout: Int = 60
 
     @Expose
     @ConfigOption(name = "Tracker Search", desc = "Add a search bar to tracker GUIs.")

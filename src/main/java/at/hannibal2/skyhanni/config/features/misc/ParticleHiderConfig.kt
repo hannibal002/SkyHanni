@@ -5,10 +5,12 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class ParticleHiderConfig {
     @Expose
     @ConfigOption(name = "Block Break Particle", desc = "")
+    @SearchTag("breaking")
     @Accordion
     val blockBreakParticle: BlockBreakParticleConfig = BlockBreakParticleConfig()
 

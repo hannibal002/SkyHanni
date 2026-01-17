@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.client.player.LocalPlayer
 
 @SkyHanniModule
 object MobDebug {
@@ -64,7 +64,7 @@ object MobDebug {
         }
         if (config.realPlayerHighlight) {
             MobData.players.highlight(event) {
-                (if (it.baseEntity is EntityPlayerSP) LorenzColor.CHROMA else LorenzColor.BLUE).toChromaColor()
+                (if (it.baseEntity is LocalPlayer) LorenzColor.CHROMA else LorenzColor.BLUE).toChromaColor()
             }
         }
         if (config.summon.isHighlight()) {
