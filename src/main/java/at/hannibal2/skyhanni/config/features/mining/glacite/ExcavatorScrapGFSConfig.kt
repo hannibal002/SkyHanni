@@ -44,6 +44,6 @@ class ExcavatorScrapGFSConfig {
         desc = "If you do not have any Suspicious Scrap in your sacks, show a link to open the bazaar page for Suspicious Scrap."
     )
     @ConfigEditorBoolean
-    var bzIfSacksEmpty: Boolean = false
+    var bzIfSacksEmpty: Boolean = true
 
 }
