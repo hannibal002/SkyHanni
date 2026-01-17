@@ -67,6 +67,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -462,7 +464,13 @@ object GardenVisitorFeatures {
             visitor.allRewards = foundRewards
             if (wasEmpty && config.rewardWarning.notifyInChat) {
                 visitor.getRewardWarningAwards().forEach { reward ->
-                    ChatUtils.chat("Found Visitor Reward ${reward.displayName}§e!")
+                    ChatUtils.chat(
+                        componentBuilder {
+                            append("Found Visitor Reward ")
+                            append(reward.displayName)
+                            append("!")
+                        }
+                    )
                 }
             }
         }
@@ -561,7 +569,12 @@ object GardenVisitorFeatures {
         }
         if (config.notificationChat) {
             val displayName = GardenVisitorColorNames.getColoredName(name)
-            ChatUtils.chat("$displayName §eis visiting your garden!")
+            ChatUtils.chat(
+                componentBuilder {
+                    append(displayName)
+                    append(" is visiting your garden!")
+                }
+            )
         }
 
         if (name.removeColor() == "Jerry") {

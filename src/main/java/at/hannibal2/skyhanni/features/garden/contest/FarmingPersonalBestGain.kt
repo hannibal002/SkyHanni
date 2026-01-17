@@ -13,7 +13,11 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object FarmingPersonalBestGain {
@@ -109,10 +113,34 @@ object FarmingPersonalBestGain {
         val overflowFFDiff = newOverflowFF - oldFF
 
         if (oldFF < 100 && !config.overflow) {
-            ChatUtils.chat("This is §6${ffDiff.roundTo(2)}☘ $crop Fortune §emore than previously!")
+            ChatUtils.chat(
+                componentBuilder {
+                    append("This is ")
+                    append("${ffDiff.roundTo(2)}☘ $crop Fortune ") {
+                        withColor(ChatFormatting.GOLD)
+                    }
+                    append("more than previously!")
+                }
+            )
         } else if (newOverflowFF > 100 && config.overflow) {
-            ChatUtils.chat("You have §6${newOverflowFF.roundTo(2)}☘ $crop Fortune §eincluding overflow!")
-            ChatUtils.chat("This is §6${overflowFFDiff.roundTo(2)}☘ $crop Fortune §emore than previously!")
+            ChatUtils.chat(
+                componentBuilder {
+                    append("You have ")
+                    append("${overflowFFDiff.roundTo(2)}☘ $crop Fortune ") {
+                        withColor(ChatFormatting.GOLD)
+                    }
+                    append("including overflow!")
+                }
+            )
+            ChatUtils.chat(
+                componentBuilder {
+                    append("This is ")
+                    append("${overflowFFDiff.roundTo(2)}☘ $crop Fortune ") {
+                        withColor(ChatFormatting.GOLD)
+                    }
+                    append("more than previously!")
+                }
+            )
         }
     }
 

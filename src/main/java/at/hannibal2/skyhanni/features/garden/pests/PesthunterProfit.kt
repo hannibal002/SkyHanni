@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
-import at.hannibal2.skyhanni.utils.compat.replace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -80,7 +79,8 @@ object PesthunterProfit {
         if (slot == 49) return null
 
         val totalCost = getFullCost(getRequiredItems(item)).takeIf { it >= 0 } ?: return null
-        val (name, amount) = ItemUtils.readItemAmount(itemName.formattedTextCompatLeadingWhiteLessResets()) ?: return null
+        val nameString = itemName.formattedTextCompatLeadingWhiteLessResets()
+        val (name, amount) = ItemUtils.readItemAmount(nameString) ?: return null
         val fixedDisplayName = name.replace("[Lvl 100]", "[Lvl {LVL}]")
         val internalName = NeuInternalName.fromItemNameOrNull(fixedDisplayName)
             ?: item.getInternalName()
@@ -93,7 +93,7 @@ object PesthunterProfit {
         val color = if (profitPerPest > 0) "§6" else "§c"
 
         val hover = listOf(
-            itemName.replace("[Lvl 100]", "[Lvl 1]"),
+            nameString.replace("[Lvl 100]", "[Lvl 1]"),
             "",
             "§7Item price: §6${itemPrice.shortFormat()} ",
             "§7Material cost: §6${totalCost.shortFormat()} ",
@@ -102,7 +102,7 @@ object PesthunterProfit {
         )
 
         return DisplayTableEntry(
-            itemName.replace("[Lvl 100]", "[Lvl 1]"), // show level 1 hedgehog instead of level 100
+            nameString.replace("[Lvl 100]", "[Lvl 1]").asComponent(), // show level 1 hedgehog instead of level 100
             "$color${profitPerPest.shortFormat()}".asComponent(),
             profitPerPest,
             internalName,
