@@ -11,24 +11,31 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.SkyShardsExportData
 import at.hannibal2.skyhanni.data.jsonobjects.other.SkyShardsExportJson
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.ChatFormatting
 import org.lwjgl.glfw.GLFW
 import java.util.zip.GZIPInputStream
 import kotlin.io.encoding.Base64
@@ -73,22 +80,32 @@ object ShardTrackerDisplay {
 
             val shardName = AttributeShardsData.shardInternalNameToShardName(shardId)
             val amountInHuntingBox = AttributeShardsData.getAmountInHuntingBox(shardName)
-            val amountUntilMax = if (shard.value == -1) AttributeShardsData.getAmountUntilMax(shardName) else shard.value
+            val amountUntilMax =
+                if (shard.value == -1) AttributeShardsData.getAmountUntilMax(shardName) else shard.value
 
-            if (amountUntilMax == 0) {
-                renderable += Renderable.clickable(
-                    " $shardDisplayName§7: §a$amountInHuntingBox",
-                    onLeftClick = { toggleShard(shardId) },
-                    tips = listOf("§cClick to remove from tracker")
-                )
-            } else {
-                val color = if (amountInHuntingBox >= amountUntilMax) "§a" else if (amountInHuntingBox == 0) "§c" else "§e"
-                renderable += Renderable.clickable(
-                    " $shardDisplayName§7: $color$amountInHuntingBox§7/§a$amountUntilMax",
-                    onLeftClick = { toggleShard(shardId) },
-                    tips = listOf("§cClick to remove from tracker")
-                )
+            val color =
+                ColorUtils.blendRGB(LorenzColor.YELLOW, LorenzColor.GREEN, amountInHuntingBox, amountUntilMax).rgb
+            val text = componentBuilder {
+                withColor(ChatFormatting.GRAY)
+                append(" $shardDisplayName")
+                append(": ")
+                append("$amountInHuntingBox") {
+                    if (amountUntilMax == 0) withColor(ChatFormatting.GREEN)
+                    else if (amountInHuntingBox > 0) withColor(color)
+                    else withColor(ChatFormatting.RED)
+                }
+                if (amountUntilMax > 0) {
+                    append("/")
+                    append("$amountUntilMax") {
+                        withColor(ChatFormatting.GREEN)
+                    }
+                }
             }
+            renderable += Renderable.clickable(
+                Renderable.text(text),
+                onLeftClick = { toggleShard(shardId) },
+                tips = listOf("§cClick to remove from tracker")
+            )
         }
 
         val list = mutableListOf<Renderable>(Renderable.text("§e§lAttribute Shard Tracker"))
@@ -139,7 +156,7 @@ object ShardTrackerDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltip(event: ToolTipEvent) {
+    fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!isInsideShardsMenu()) return
         if (config.selectShardKeybind == GLFW.GLFW_KEY_UNKNOWN) return

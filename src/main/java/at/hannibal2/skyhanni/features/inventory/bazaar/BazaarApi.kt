@@ -115,7 +115,7 @@ object BazaarApi {
 
     private var taxRate: Double
         get() = storage?.taxRate ?: 1.25
-        private set(value) {
+        set(value) {
             storage?.taxRate = value
         }
 
@@ -286,4 +286,33 @@ object BazaarApi {
     }
 
     fun isBazaarOrderInventory(inventoryName: String): Boolean = inventoryBazaarOrdersPattern.matches(inventoryName)
+
+    /**
+     * Gets the sum of Coins you can get when using the specified sell type to sell the item.
+     * For example if you want to instant sell 71680 enchanted coal from sack you can't use top offer only.
+     * The best offers may be inflated, and you are selling all the items so you must use the prices in each order as such.
+     */
+    fun calculatePriceOfAvailableOrders(
+        item: NeuInternalName,
+        count: Long,
+        priceSource: SimpleTransactionType,
+    ): Double? {
+        val bazaarData = item.getBazaarData()?.product ?: return null
+        val offers = if (priceSource == SimpleTransactionType.SELL_OFFER) bazaarData.buySummary else bazaarData.sellSummary
+        var remaining = count
+        var totalPrice = 0.0
+        for (offer in offers) {
+            val takeAmount = offer.amount.coerceAtMost(remaining)
+            totalPrice += takeAmount * offer.pricePerUnit
+            remaining -= takeAmount
+            if (remaining <= 0) break
+        }
+        if (remaining > 0) return null
+        return totalPrice
+    }
+
+    enum class SimpleTransactionType {
+        BUY_ORDER,
+        SELL_OFFER,
+    }
 }

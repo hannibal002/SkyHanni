@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterApi.getLevel
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -140,7 +141,7 @@ object ComposterOverlay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!composterUpgradesInventory.isInside()) return
         for (upgrade in ComposterUpgrade.entries) {
             val name = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
@@ -524,7 +525,7 @@ object ComposterOverlay {
                 onClick(internalName)
                 if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
                     lastAttemptTime = SimpleTimeMark.now()
-                    retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
+                    retrieveMaterials(internalName, internalName.repoItemName.removeColor(), itemsNeeded)
                 }
             },
             tips = tips,
@@ -731,13 +732,9 @@ object ComposterOverlay {
         event.registerBrigadier("shtestcomposter") {
             description = "Test the composter overlay"
             category = CommandCategory.DEVELOPER_DEBUG
-            legacyCallbackArgs {
-                if (it.size != 1) {
-                    ChatUtils.userError("Usage: /shtestcomposter <offset>")
-                } else {
-                    testOffset = it[0].toInt()
-                    ChatUtils.chat("Composter test offset set to $testOffset.")
-                }
+            argCallback("offset", BrigadierArguments.integer()) {
+                testOffset = it
+                ChatUtils.chat("Composter test offset set to $testOffset.")
             }
         }
     }

@@ -340,20 +340,20 @@ object FastFairySoulsPathfinder {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shsoulsreset") {
+        event.registerBrigadier("shsoulsreset") {
             description = "Reset known Fairy Souls for the current island."
             category = CommandCategory.USERS_RESET
-            callback { onResetCommand() }
+            simpleCallback { onResetCommand() }
         }
-        event.register("shsoulsfoundall") {
+        event.registerBrigadier("shsoulsfoundall") {
             description = "Mark all Fairy Souls for the current island as found."
             category = CommandCategory.USERS_RESET
-            callback { onFoundAllCommand() }
+            simpleCallback { onFoundAllCommand() }
         }
-        event.register("shsoulsreloadpath") {
+        event.registerBrigadier("shsoulsreloadpath") {
             description = "Reload the Fairy Souls pathfinder."
             category = CommandCategory.DEVELOPER_TEST
-            callback { onReloadPathCommand() }
+            simpleCallback { onReloadPathCommand() }
         }
     }
 

@@ -211,10 +211,10 @@ object SeaCreatureTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetseacreaturetracker") {
+        event.registerBrigadier("shresetseacreaturetracker") {
             description = "Resets the Sea Creature Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

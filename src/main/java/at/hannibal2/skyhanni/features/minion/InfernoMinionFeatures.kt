@@ -7,7 +7,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -62,9 +63,10 @@ object InfernoMinionFeatures {
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
+        event.slot?.index ?: return
 
         val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
         if (!containsFuel) return

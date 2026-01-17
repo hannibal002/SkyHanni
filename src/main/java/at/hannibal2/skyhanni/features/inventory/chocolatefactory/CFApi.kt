@@ -32,9 +32,12 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
 import kotlin.time.Duration
@@ -139,19 +142,21 @@ object CFApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
-            if (config.enabled) {
-                chocolateFactoryPaused = true
-                CFStats.updateDisplay()
+        DelayedRun.runNextTick {
+            if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
+                if (config.enabled) {
+                    chocolateFactoryPaused = true
+                    CFStats.updateDisplay()
+                }
+                return@runNextTick
             }
-            return
-        }
-        if (!mainInventory.isInside()) return
+            if (!mainInventory.isInside()) return@runNextTick
 
-        if (config.enabled) {
-            factoryUpgrades = emptyList()
-            DelayedRun.runNextTick {
-                CFDataLoader.updateInventoryItems(event.inventoryItems)
+            if (config.enabled) {
+                factoryUpgrades = emptyList()
+                DelayedRun.runNextTick {
+                    CFDataLoader.updateInventoryItems(event.inventoryItems)
+                }
             }
         }
     }
@@ -282,6 +287,12 @@ object CFApi {
     fun partyModeReplace(text: String): String {
         return if (config.partyMode.get() && inChocolateFactory && chromaEnabled) {
             text.replace(partyModeRegex, "§z")
+        } else text
+    }
+
+    fun partyModeReplace(text: Component): Component {
+        return if (config.partyMode.get() && inChocolateFactory && chromaEnabled) {
+            text.formattedTextCompat().replace(partyModeRegex, "§z").asComponent()
         } else text
     }
 

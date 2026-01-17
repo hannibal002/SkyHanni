@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -21,7 +25,6 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotApi.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.uncleared
-import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.DUNG_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -33,7 +36,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -60,6 +63,9 @@ object PestApi {
         set(value) {
             storage?.scoreboardPests = value
         }
+
+    private val gardenPestTypes = mutableMapOf<GardenPlotApi.Plot, List<PestType>>()
+    private var lastCheckedPlot = 0
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
     var lastPestSpawnTime = SimpleTimeMark.farPast()
@@ -275,19 +281,16 @@ object PestApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        pestDeathChatPattern.matchMatcher(event.message) {
-            val pest = PestType.getByNameOrNull(group("pest")) ?: return
-            val item = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
-
-            // Field Mice drop 6 separate items, but we only want to count the kill once
-            if (pest == PestType.FIELD_MOUSE && item != DUNG_ITEM) return
-            lastPestKillTime = SimpleTimeMark.now()
-            removeNearestPest()
-            PestKillEvent.post()
-        }
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
         }
+    }
+
+    @HandleEvent
+    fun onPestKill(event: PestKillEvent) {
+        lastPestKillTime = SimpleTimeMark.now()
+        removeNearestPest()
+        GardenPlotApi.getCurrentPlot()?.let { gardenPestTypes.removeFromPlot(it, event.pestType) }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -318,6 +321,29 @@ object PestApi {
         }
     }
 
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
+        val type = PestType.getByNameOrNull(event.mob.name) ?: return
+        val plot = GardenPlotApi.plots.find { it.box.isInside(event.mob.centerCords) } ?: return
+        if (lastCheckedPlot != plot.id) gardenPestTypes[plot] = listOf()
+        if (plot.pests >= 1 && !plot.isPestCountInaccurate && (gardenPestTypes[plot]?.size ?: 0) == plot.pests) return
+
+        gardenPestTypes.addToPlot(plot, type)
+        lastCheckedPlot = plot.id
+    }
+
+    private fun MutableMap<GardenPlotApi.Plot, List<PestType>>.addToPlot(plot: GardenPlotApi.Plot, pestType: PestType) {
+        this[plot] = this.getOrDefault(plot, emptyList()) + pestType
+    }
+
+    private fun MutableMap<GardenPlotApi.Plot, List<PestType>>.removeFromPlot(plot: GardenPlotApi.Plot, pestType: PestType) {
+        val currentList = this[plot].orEmpty()
+        val indexToRemove = currentList.indexOfFirst { it == pestType }
+        if (indexToRemove != -1) {
+            this[plot] = currentList.filterIndexed { index, _ -> index != indexToRemove }
+        }
+    }
+
     private fun getPlotsWithAccuratePests() = GardenPlotApi.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }
 
     private fun getPlotsWithInaccuratePests() = GardenPlotApi.plots.filter { it.isPestCountInaccurate }
@@ -331,6 +357,8 @@ object PestApi {
     fun isNearPestTrap() = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(10.0).any {
         pestTrapPattern.matches(it.displayName.formattedTextCompat())
     }
+
+    fun GardenPlotApi.Plot.getPestTypesInPlot() = gardenPestTypes.getOrDefault(this, listOf())
 
     private fun removePests(removedPests: Int) {
         if (removedPests < 1) return
@@ -436,6 +464,18 @@ object PestApi {
                 add(" pests: ${it.pests}")
                 add(" ")
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommand(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestpestkill") {
+            description = "Simulates a pest kill"
+            category = CommandCategory.DEVELOPER_TEST
+            argCallback("pestType", EnumArgumentType.custom<PestType>({ it.name }, isGreedy = true)) { pestType ->
+                PestKillEvent(pestType).post()
+            }
+            simpleCallback { PestKillEvent(PestType.UNKNOWN).post() }
         }
     }
 }

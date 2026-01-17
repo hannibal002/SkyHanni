@@ -167,10 +167,10 @@ object FrozenTreasureTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetfrozentreasuretracker") {
+        event.registerBrigadier("shresetfrozentreasuretracker") {
             description = "Resets the Frozen Treasure Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 }

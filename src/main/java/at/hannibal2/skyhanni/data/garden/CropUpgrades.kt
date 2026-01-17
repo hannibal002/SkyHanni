@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -11,11 +12,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object GardenCropUpgrades {
+object CropUpgrades {
 
     private val patternGroup = RepoPattern.group("garden.cropupgrades")
 
@@ -35,7 +35,7 @@ object GardenCropUpgrades {
         "\\s+§r§6§lCROP UPGRADE §e(?<crop>[\\w ]+)§7 #(?<tier>\\d)",
     )
 
-    private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenApi.storage?.cropUpgrades
+    private val cropUpgradesStorage: MutableMap<CropType, Int>? get() = GardenApi.storage?.cropUpgrades
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
@@ -60,9 +60,9 @@ object GardenCropUpgrades {
         }
     }
 
-    fun CropType.getUpgradeLevel() = cropUpgrades?.get(this)
+    fun CropType.getUpgradeLevel() = cropUpgradesStorage?.get(this)
 
     private fun CropType.setUpgradeLevel(level: Int) {
-        cropUpgrades?.put(this, level)
+        cropUpgradesStorage?.put(this, level)
     }
 }
