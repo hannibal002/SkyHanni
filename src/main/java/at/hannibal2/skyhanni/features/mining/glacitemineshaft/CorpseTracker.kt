@@ -146,10 +146,10 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetcorpsetracker") {
+        event.registerBrigadier("shresetcorpsetracker") {
             description = "Resets the Glacite Mineshaft Corpse Tracker"
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 

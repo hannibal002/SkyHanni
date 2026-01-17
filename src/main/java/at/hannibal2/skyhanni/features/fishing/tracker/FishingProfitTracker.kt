@@ -272,10 +272,10 @@ object FishingProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetfishingtracker") {
+        event.registerBrigadier("shresetfishingtracker") {
             description = "Resets the Fishing Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 }

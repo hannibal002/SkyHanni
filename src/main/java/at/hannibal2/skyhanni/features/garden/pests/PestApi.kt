@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -22,7 +25,6 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotApi.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.uncleared
-import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.DUNG_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -35,7 +37,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
-import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -280,20 +281,16 @@ object PestApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        pestDeathChatPattern.matchMatcher(event.message) {
-            val pest = PestType.getByNameOrNull(group("pest")) ?: return
-            val item = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
-
-            // Field Mice drop 6 separate items, but we only want to count the kill once
-            if (pest == PestType.FIELD_MOUSE && item != DUNG_ITEM) return
-            lastPestKillTime = SimpleTimeMark.now()
-            removeNearestPest()
-            GardenPlotApi.getCurrentPlot()?.let { gardenPestTypes.removeFromPlot(it, pest) }
-            PestKillEvent.post()
-        }
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
         }
+    }
+
+    @HandleEvent
+    fun onPestKill(event: PestKillEvent) {
+        lastPestKillTime = SimpleTimeMark.now()
+        removeNearestPest()
+        GardenPlotApi.getCurrentPlot()?.let { gardenPestTypes.removeFromPlot(it, event.pestType) }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -467,6 +464,18 @@ object PestApi {
                 add(" pests: ${it.pests}")
                 add(" ")
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommand(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestpestkill") {
+            description = "Simulates a pest kill"
+            category = CommandCategory.DEVELOPER_TEST
+            argCallback("pestType", EnumArgumentType.custom<PestType>({ it.name }, isGreedy = true)) { pestType ->
+                PestKillEvent(pestType).post()
+            }
+            simpleCallback { PestKillEvent(PestType.UNKNOWN).post() }
         }
     }
 }

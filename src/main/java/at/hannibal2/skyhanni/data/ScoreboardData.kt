@@ -235,11 +235,11 @@ object ScoreboardData {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shdebugscoreboard") {
+        event.registerBrigadier("shdebugscoreboard") {
             description = "Monitors the scoreboard changes: " +
                 "Prints the raw scoreboard lines in the console after each update, with time since last update."
             category = CommandCategory.DEVELOPER_DEBUG
-            callback {
+            simpleCallback {
                 monitor = !monitor
                 val action = if (monitor) "Enabled" else "Disabled"
                 ChatUtils.chat("$action scoreboard monitoring in the console.")

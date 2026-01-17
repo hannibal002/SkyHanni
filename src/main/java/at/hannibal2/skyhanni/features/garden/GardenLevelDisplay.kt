@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -29,9 +29,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -75,12 +76,11 @@ object GardenLevelDisplay {
     )
 
     /**
-     * REGEX-TEST: §7§8Max level reached!
-     * REGEX-TEST: §5§o§7§8Max level reached!
+     * REGEX-TEST: Max level reached!
      */
     private val gardenMaxLevelPattern by patternGroup.pattern(
-        "inventory.max",
-        "(?:§5§o)?§7§8Max level reached!",
+        "inventory.max.new",
+        "Max level reached!",
     )
 
     /**
@@ -162,9 +162,9 @@ object GardenLevelDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!config.overflow.get()) return
-        val slotIndex = event.slot.containerSlot
+        val slotIndex = event.slot?.containerSlot
         val name = InventoryUtils.openInventoryName()
         if (!((name == "Desk" && slotIndex == 4) || (name == "SkyBlock Menu" && slotIndex == 10))) return
 
@@ -185,17 +185,17 @@ object GardenLevelDisplay {
         var next = false
         for (line in iterator) {
             if (gardenMaxLevelPattern.matches(line)) {
-                iterator.set("§7Progress to Level ${(currentLevel + 1).toRomanIfNecessary()}")
+                iterator.set("§7Progress to Level ${(currentLevel + 1).toRomanIfNecessary()}".asComponent())
                 next = true
                 continue
             }
-            if (next && line.contains("                    ")) {
+            if (next && line.string.contains("                    ")) {
                 val progress = overflow / needForOnlyNextLvl
                 val progressBar = StringUtils.progressBar(progress, 20)
-                iterator.set("$progressBar §e${overflow.addSeparators()}§6/§e${needForOnlyNextLvl.shortFormat()}")
-                iterator.add("")
-                iterator.add("§b§lOVERFLOW XP:")
-                iterator.add("§7▸ ${overflowTotal.addSeparators()}")
+                iterator.set("$progressBar §e${overflow.addSeparators()}§6/§e${needForOnlyNextLvl.shortFormat()}".asComponent())
+                iterator.add(Component.empty())
+                iterator.add("§b§lOVERFLOW XP:".asComponent())
+                iterator.add("§7▸ ${overflowTotal.addSeparators()}".asComponent())
                 return
             }
         }

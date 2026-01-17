@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlinx.coroutines.delay
@@ -77,19 +78,6 @@ object SoundUtils {
         plingSound.playSound()
     }
 
-    private fun onCommand(args: Array<String>) {
-        if (args.isEmpty()) {
-            ChatUtils.userError("Specify a sound effect to test")
-            return
-        }
-
-        val soundName = args[0]
-        val pitch = args.getOrNull(1)?.toFloat() ?: 1f
-        val volume = args.getOrNull(2)?.toFloat() ?: 50f
-
-        createSound(soundName, pitch, volume).playSound()
-    }
-
     fun playErrorSound() {
         errorSound.playSound()
     }
@@ -109,7 +97,24 @@ object SoundUtils {
         event.registerBrigadier("shplaysound") {
             description = "Play the specified sound effect at the given pitch and volume."
             category = CommandCategory.DEVELOPER_TEST
-            legacyCallbackArgs { onCommand(it) }
+            arg("name", BrigadierArguments.string()) { soundName ->
+                arg("pitch", BrigadierArguments.float()) { pitch ->
+                    arg("volume", BrigadierArguments.float()) { volume ->
+                        callback {
+                            createSound(getArg(soundName), getArg(pitch), getArg(volume)).playSound()
+                        }
+                    }
+                    callback {
+                        createSound(getArg(soundName), getArg(pitch), 50f).playSound()
+                    }
+                }
+                callback {
+                    createSound(getArg(soundName), 1f, 50f).playSound()
+                }
+            }
+            simpleCallback {
+                ChatUtils.userError("Specify a sound effect to test")
+            }
         }
     }
 }

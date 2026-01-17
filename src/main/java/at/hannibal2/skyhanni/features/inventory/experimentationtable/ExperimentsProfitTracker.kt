@@ -245,10 +245,10 @@ object ExperimentsProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetexperimentsprofittracker") {
+        event.registerBrigadier("shresetexperimentsprofittracker") {
             description = "Resets the Experiments Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

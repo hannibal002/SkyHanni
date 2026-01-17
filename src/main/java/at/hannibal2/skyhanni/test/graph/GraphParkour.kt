@@ -20,19 +20,19 @@ object GraphParkour {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shgraphloadparkour") {
+        event.registerBrigadier("shgraphloadparkour") {
             description = "Loads the current clipboard as parkour into the graph editor."
             category = CommandCategory.DEVELOPER_TEST
-            callback {
+            simpleCallback {
                 SkyHanniMod.launchCoroutine("shgraphloadparkour command") {
                     loadParkour()
                 }
             }
         }
-        event.register("shgraphexportasparkour") {
+        event.registerBrigadier("shgraphexportasparkour") {
             description = "Saves the graph editor as parkour into the clipboard."
             category = CommandCategory.DEVELOPER_TEST
-            callback { saveParkour() }
+            simpleCallback { saveParkour() }
         }
     }
 

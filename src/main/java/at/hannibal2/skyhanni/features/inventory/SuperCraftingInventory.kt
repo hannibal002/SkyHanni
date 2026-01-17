@@ -49,10 +49,12 @@ object SuperCraftingInventory {
 
     /**
      * REGEX-TEST: ✔ 177,889/32 (5,559x) Enchanted Glowstone Dust
+     * REGEX-TEST: ✔ 2,067/320 Enchanted Cocoa Beans
+     * REGEX-TEST: ✔ 1,747/1,600 Enchanted Cocoa Beans
      */
     private val craftingResourcePattern by craftingPatternGroup.pattern(
         "crafting.resource",
-        " *✔ [0-9,]+/[0-9,]+ \\((?<amount>[0-9,]+)x\\) (?<resource>.+)",
+        " *✔ (?<owned>[0-9,]+)/(?<used>[0-9,]+) (?:\\([0-9,]+x\\) )?(?<resource>.+)",
     )
 
     /**
@@ -88,7 +90,7 @@ object SuperCraftingInventory {
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
         val craftingAmount = getSuperCraftingCount(slots) ?: return
         val profit = getProfit(slots, craftingAmount) ?: return
-        val maxCraftingAmount = getSuperCraftingMaxCount(slots)
+        val maxCraftingAmount = getSuperCraftingMaxCount(slots, craftingAmount)
         if (!blockWasteClick(profit, craftingAmount, maxCraftingAmount)) return
         SoundUtils.playErrorSound()
         val diff = (-profit).formatChatCoins()
@@ -106,14 +108,21 @@ object SuperCraftingInventory {
         event.cancel()
     }
 
-    private fun getSuperCraftingMaxCount(slots: List<Slot>) = slots[PICKAXE_SLOT].item.getLore().mapNotNull {
-        craftingResourcePattern.matchMatcher(it.removeColor()) {
-            groupOrNull("amount")?.formatLongOrNull()
-        }
-    }.minOrNull() ?: ErrorManager.skyHanniError(
+    private fun getSuperCraftingMaxCount(slots: List<Slot>, craftingAmount: Long) = slots[PICKAXE_SLOT].item.getLore()
+        .mapNotNull { calculateMaxPossible(it, craftingAmount) }
+        .minOrNull() ?: ErrorManager.skyHanniError(
         "Super Crafting resource line not found",
         "lore" to slots.map { slot -> slot.item.getLore().map { line -> line.removeColor() } },
     )
+
+    private fun calculateMaxPossible(string: String, craftingAmount: Long) = craftingResourcePattern.matchMatcher(string.removeColor()) {
+        val owned = groupOrNull("owned")?.formatLongOrNull() ?: return null
+        val used = groupOrNull("used")?.formatLongOrNull() ?: return null
+        if (used == 0L || owned == 0L) return null
+        val matsPerCraft = used / craftingAmount
+        if (matsPerCraft == 0L) return null
+        owned / matsPerCraft
+    }
 
     private fun getProfit(slots: List<Slot>, craftingAmount: Long): Double? {
         val materials = getRecipeMaterials(slots)
