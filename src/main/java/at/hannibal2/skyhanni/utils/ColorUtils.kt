@@ -112,8 +112,7 @@ object ColorUtils {
     }
 
     fun getRandomColor(): Color {
-        val random = Random
-        val hue = random.nextFloat()
+        val hue = Random.nextFloat()
         val saturation = 0.9f
         val luminance = 1.0f
         return Color.getHSBColor(hue, saturation, luminance)
